@@ -22,7 +22,7 @@ import com.webond.venue.service.VenueService;
 import jakarta.transaction.Transactional;
 
 @SpringBootApplication // 注意: 當使用 maven install 匯出 jar 檔時，整個系統只能保留一個 @SpringBootApplication 的設定
-public class Test_Application_CommandLineRunner implements CommandLineRunner {
+public class TestVenue_Application_CommandLineRunner implements CommandLineRunner {
 
 	@Autowired
 	VenueRepository repository;
@@ -49,7 +49,7 @@ public class Test_Application_CommandLineRunner implements CommandLineRunner {
 	private SessionFactory sessionFactory;
 
 	public static void main(String[] args) {
-		SpringApplication.run(Test_Application_CommandLineRunner.class);
+		SpringApplication.run(TestVenue_Application_CommandLineRunner.class);
 	}
 
 	@Override
