@@ -255,7 +255,7 @@ public class Test_Application_CommandLineRunner implements CommandLineRunner {
 //		    for (VenueVO venue : venueList) {
 //		        System.out.println("場地ID: " + venue.getVenueId() + " | 場地名稱: " + venue.getVenueName());
 //		    }
-
+ 
 	}
 
 }
