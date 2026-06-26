@@ -1,4 +1,4 @@
-package com.webond.serviceorder.model;
+package com.webond.service.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

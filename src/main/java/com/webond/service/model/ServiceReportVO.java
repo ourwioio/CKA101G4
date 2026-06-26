@@ -1,12 +1,10 @@
-package com.webond.servicereport.model;
+package com.webond.service.model;
 
 import java.sql.Timestamp;
 
 import com.webond.employee.model.EmployeeVO;
 import com.webond.member.model.MemberVO;
-import com.webond.serviceorder.model.ServiceOrderVO;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
