@@ -124,3 +124,4 @@ public class MemberReportVO implements Serializable {
     public Integer getViolationPoints() { return violationPoints; }
     public void setViolationPoints(Integer violationPoints) { this.violationPoints = violationPoints; }
 }
+
