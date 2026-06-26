@@ -8,10 +8,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.webond.member.model.MemberRepository;
-import com.webond.member.model.MemberVO;
 import com.webond.venue.model.VenueOrderVO;
-import com.webond.venue.model.VenueVO;
 import com.webond.venue.repository.VenueImagesRepository;
 import com.webond.venue.repository.VenueOrderRepository;
 import com.webond.venue.repository.VenueRepository;
@@ -39,8 +36,8 @@ public class TestVenue_Application_CommandLineRunner implements CommandLineRunne
 	@Autowired
 	VenueOrderRepository repository5;
 	
-	@Autowired
-	MemberRepository repository6;
+//	@Autowired
+//	MemberRepository repository6;
 
 	@Autowired
 	private VenueService vs;
@@ -127,25 +124,25 @@ public class TestVenue_Application_CommandLineRunner implements CommandLineRunne
 //		}
 
 		// 場地訂單 查全部
-		List<VenueOrderVO> list5 = repository5.findAll();
-		for (VenueOrderVO voVO : list5) {
-			System.out.print(voVO.getVenueOrderId() + ",");
-			System.out.print(voVO.getMember().getMemberId() + ",");
-			// 改用三元運算子：如果員工不是 null 就印出 ID，否則印出 "無負責員工"
-			System.out.print((voVO.getEmpVO() != null ? voVO.getEmpVO().getEmpId() : "無負責員工") + ",");
-			System.out.print(voVO.getVenueRating() + ",");
-			System.out.print(voVO.getVenueComment() + ",");
-			System.out.print(voVO.getPayoutAmount() + ",");
-			System.out.print(voVO.getRefundReason() + ",");
-			System.out.print(voVO.getRefundStatus() + ",");
-			System.out.print(voVO.getHandledAt() + ",");
-			System.out.print(voVO.getCreatedAt() + ",");
-			System.out.print(voVO.getStartAt() + ",");
-			System.out.print(voVO.getEndAt() + ",");
-			System.out.print(voVO.getTotalAmount() + ",");
-			System.out.print(voVO.getPaymentMethod() + ",");
-			System.out.println();
-		}
+//		List<VenueOrderVO> list5 = repository5.findAll();
+//		for (VenueOrderVO voVO : list5) {
+//			System.out.print(voVO.getVenueOrderId() + ",");
+//			System.out.print(voVO.getMember().getMemberId() + ",");
+//			// 改用三元運算子：如果員工不是 null 就印出 ID，否則印出 "無負責員工"
+//			System.out.print((voVO.getEmpVO() != null ? voVO.getEmpVO().getEmpId() : "無負責員工") + ",");
+//			System.out.print(voVO.getVenueRating() + ",");
+//			System.out.print(voVO.getVenueComment() + ",");
+//			System.out.print(voVO.getPayoutAmount() + ",");
+//			System.out.print(voVO.getRefundReason() + ",");
+//			System.out.print(voVO.getRefundStatus() + ",");
+//			System.out.print(voVO.getHandledAt() + ",");
+//			System.out.print(voVO.getCreatedAt() + ",");
+//			System.out.print(voVO.getStartAt() + ",");
+//			System.out.print(voVO.getEndAt() + ",");
+//			System.out.print(voVO.getTotalAmount() + ",");
+//			System.out.print(voVO.getPaymentMethod() + ",");
+//			System.out.println();
+//		}
 
 //		vs.deleteVenue(2009);
 //		vs.getImagesByVenue(2001);
@@ -237,17 +234,17 @@ public class TestVenue_Application_CommandLineRunner implements CommandLineRunne
 //			System.err.println("❌ 找不到 ID 為 " + idToTest + " 的場地。");
 //		}
 		
-		 MemberVO member = repository6.findById(8).orElse(null);
-		    
-		    if (member != null) {
-		        System.out.println("會員ID: " + member.getMemberId());
-		        System.out.println("場地總數: " + member.getVenues().size());
-		        
-		        for (VenueVO venue : member.getVenues()) {
-		            System.out.println("場地ID: " + venue.getVenueId() 
-		                + " | 場地名稱: " + venue.getVenueName());
-		        }
-		    }
+//		 MemberVO member = repository6.findById(8).orElse(null);
+//		    
+//		    if (member != null) {
+//		        System.out.println("會員ID: " + member.getMemberId());
+//		        System.out.println("場地總數: " + member.getVenues().size());
+//		        
+//		        for (VenueVO venue : member.getVenues()) {
+//		            System.out.println("場地ID: " + venue.getVenueId() 
+//		                + " | 場地名稱: " + venue.getVenueName());
+//		        }
+//		    }
 	    
 //		    List<VenueVO> venueList = repository.findByMember_MemberId(8);
 //		    System.out.println("會員8 新增的場地數量: " + venueList.size());
