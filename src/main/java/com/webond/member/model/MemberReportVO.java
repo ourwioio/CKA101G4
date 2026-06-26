@@ -1,12 +1,9 @@
-package com.webond.memberreport.model;
+package com.webond.member.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
 
 import jakarta.persistence.Id;
-
-import com.webond.member.model.MemberVO;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
