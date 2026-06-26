@@ -11,9 +11,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.webond.member.model.MemberVO;
+import com.webond.member.model.NotificationVO;
 import com.webond.member.repository.MemberRepository;
-import com.webond.notification.model.NotificationVO;
-import com.webond.notification.repository.NotificationRepository;
+import com.webond.member.repository.NotificationRepository;
 
 /**
  * 與單元測試 (Spring21) 的根本差別:

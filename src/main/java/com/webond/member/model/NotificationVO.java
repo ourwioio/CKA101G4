@@ -1,10 +1,8 @@
-package com.webond.notification.model;
+package com.webond.member.model;
 
 import java.time.LocalDate;
 
 import com.webond.employee.model.EmployeeVO;
-import com.webond.member.model.MemberVO;
-import com.webond.memberreport.model.MemberReportVO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
