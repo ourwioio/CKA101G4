@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 import com.webond.employee.model.EmployeeVO;
 import com.webond.member.model.MemberVO;
-import com.webond.memberReport.model.MemberReportVO;
+import com.webond.memberreport.model.MemberReportVO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
