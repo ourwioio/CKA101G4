@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 import com.webond.employee.model.EmployeeVO;
-import com.webond.servicereport.model.ServiceReportVO;
+import com.webond.service.model.ServiceReportVO;
 import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueVO;
 

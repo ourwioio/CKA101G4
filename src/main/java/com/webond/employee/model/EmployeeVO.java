@@ -2,7 +2,7 @@ package com.webond.employee.model;
 
 import java.util.Set;
 
-import com.webond.servicereport.model.ServiceReportVO;
+import com.webond.service.model.ServiceReportVO;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
