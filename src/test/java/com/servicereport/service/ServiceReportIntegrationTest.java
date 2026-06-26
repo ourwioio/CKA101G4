@@ -1,4 +1,4 @@
-package com.serviceReport.service;
+package com.servicereport.service;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.webond.servicereport.model.ServiceReportVO;
-import com.webond.servicereport.repository.ServiceReportRepository;
+import com.webond.service.model.ServiceReportVO;
+import com.webond.service.repository.ServiceReportRepository;
 
 /**
  * 與單元測試 (Spring21) 的根本差別:
