@@ -1,10 +1,12 @@
-package com.activity.controller;
+package com.webond.activity.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.activity.model.ActivityOrderVO;
-import com.activity.model.ActivityOrderService;
+
+import com.webond.activity.model.ActivityOrderService;
+import com.webond.activity.model.ActivityOrderVO;
+
 import java.util.List;
 
 @RestController

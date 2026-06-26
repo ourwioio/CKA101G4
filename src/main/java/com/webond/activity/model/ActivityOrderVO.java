@@ -1,4 +1,4 @@
-package com.activity.model;
+package com.webond.activity.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

@@ -1,9 +1,11 @@
-package com.activity.controller;
+package com.webond.activity.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import com.activity.model.ActivityVO;
-import com.activity.model.ActivityService;
+
+import com.webond.activity.model.ActivityService;
+import com.webond.activity.model.ActivityVO;
+
 import java.util.List;
 
 @RestController // 告訴 Spring 這個類別專門回傳 JSON

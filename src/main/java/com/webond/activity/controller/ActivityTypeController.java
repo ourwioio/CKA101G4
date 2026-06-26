@@ -1,10 +1,12 @@
-package com.activity.controller;
+package com.webond.activity.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.activity.model.ActivityTypeVO;
-import com.activity.model.ActivityTypeService;
+
+import com.webond.activity.model.ActivityTypeService;
+import com.webond.activity.model.ActivityTypeVO;
+
 import java.util.List;
 
 @RestController
