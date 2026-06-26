@@ -1,9 +1,11 @@
-package com.activity.model;
+package com.webond.activity.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.activity.model.ActivityVO;
-import com.activity.model.ActivityRepository;
+
+import com.webond.activity.model.ActivityRepository;
+import com.webond.activity.model.ActivityVO;
+
 import java.util.List;
 
 @Service // 宣告這是一個 Service 元件

@@ -1,7 +1,8 @@
-package com.activity.model;
+package com.webond.activity.model;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.activity.model.ActivityVO;
+
+import com.webond.activity.model.ActivityVO;
 
 public interface ActivityRepository extends JpaRepository<ActivityVO, Integer> {
 }

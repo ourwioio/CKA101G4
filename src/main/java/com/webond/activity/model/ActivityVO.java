@@ -1,4 +1,4 @@
-package com.activity.model;
+package com.webond.activity.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;

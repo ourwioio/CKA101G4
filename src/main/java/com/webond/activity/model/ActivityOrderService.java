@@ -1,10 +1,12 @@
-package com.activity.model;
+package com.webond.activity.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.activity.model.ActivityOrderVO;
-import com.activity.model.ActivityOrderRepository;
+
+import com.webond.activity.model.ActivityOrderRepository;
+import com.webond.activity.model.ActivityOrderVO;
+
 import java.util.List;
 import java.util.Optional;
 
