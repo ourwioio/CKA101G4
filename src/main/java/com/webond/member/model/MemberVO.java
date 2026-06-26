@@ -8,6 +8,8 @@ import java.util.Set;
 import com.webond.employee.model.EmployeeVO;
 import com.webond.notification.model.NotificationVO;
 import com.webond.servicereport.model.ServiceReportVO;
+import com.webond.venue.model.VenueOrderVO;
+import com.webond.venue.model.VenueVO;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -37,13 +39,13 @@ public class MemberVO implements java.io.Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer memberId;
 
-//	@OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
-//	@OrderBy("venueId asc")
-//	private Set<VenueVO> venues;
-//
-//	@OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
-//	@OrderBy("venueOrderId asc")
-//	private Set<VenueOrderVO> venueOrders;
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
+	@OrderBy("venueId asc")
+	private Set<VenueVO> venues;
+
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
+	@OrderBy("venueOrderId asc")
+	private Set<VenueOrderVO> venueOrders;
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
 	@OrderBy("notificationId asc")
@@ -158,21 +160,21 @@ public class MemberVO implements java.io.Serializable {
 		super();
 	}
 
-//	public Set<VenueVO> getVenues() {
-//		return venues;
-//	}
-//
-//	public void setVenues(Set<VenueVO> venues) {
-//		this.venues = venues;
-//	}
-//
-//	public Set<VenueOrderVO> getVenueOrders() {
-//		return venueOrders;
-//	}
-//
-//	public void setVenueOrders(Set<VenueOrderVO> venueOrders) {
-//		this.venueOrders = venueOrders;
-//	}
+	public Set<VenueVO> getVenues() {
+		return venues;
+	}
+
+	public void setVenues(Set<VenueVO> venues) {
+		this.venues = venues;
+	}
+
+	public Set<VenueOrderVO> getVenueOrders() {
+		return venueOrders;
+	}
+
+	public void setVenueOrders(Set<VenueOrderVO> venueOrders) {
+		this.venueOrders = venueOrders;
+	}
 
 	public Integer getMemberId() {
 		return memberId;
