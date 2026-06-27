@@ -6,91 +6,140 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.webond.service.dao.ServiceDAO_interface;
+import com.webond.service.repository.ServiceRepository;
+import com.webond.service.repository.ServiceTypeRepository;
 
 @Service
 @Transactional
 public class ServiceService {
 
-	private ServiceDAO_interface dao;
+    // 取代原本的 ServiceDAO_interface
+    private final ServiceRepository serviceRepository;
 
-//	public ServiceService() {
-//		dao = new ServiceDAO();
-//		dao = new ServiceDAOHibernate();
-//	} 
-//	
+    // 因為 ServiceVO 有 ManyToOne 關聯 ServiceTypeVO
+    // 新增 / 修改時，要用 serviceTypeId 找到對應的 ServiceTypeVO
+    private final ServiceTypeRepository serviceTypeRepository;
 
-	public ServiceService(ServiceDAO_interface dao) {
-		this.dao = dao;
-	}
+    public ServiceService(ServiceRepository serviceRepository,
+                          ServiceTypeRepository serviceTypeRepository) {
+        this.serviceRepository = serviceRepository;
+        this.serviceTypeRepository = serviceTypeRepository;
+    }
 
-	public ServiceVO add(Integer serviceTypeId, Integer memberId, String serviceName, String description,
-			Integer hourlyRate, Byte status, LocalDateTime createdAt) {
+    // 新增服務
+    public ServiceVO add(Integer serviceTypeId,
+                         Integer memberId,
+                         String serviceName,
+                         String description,
+                         Integer hourlyRate,
+                         Byte status,
+                         LocalDateTime createdAt) {
 
-		if (serviceTypeId == null) {
-			throw new IllegalArgumentException("服務類型不可為空");
-		}
+        validateService(serviceTypeId, serviceName, hourlyRate, status);
 
-		if (serviceName == null || serviceName.trim().isEmpty()) {
-			throw new IllegalArgumentException("服務名稱不可為空");
-		}
+        ServiceVO svc = new ServiceVO();
 
-		if (hourlyRate == null || hourlyRate < 0) {
-			throw new IllegalArgumentException("每小時費率不可小於 0");
-		}
+        /*
+         * JPA 關聯寫法：
+         * 不要只 setServiceTypeId。
+         * 因為真正負責 SERVICE_TYPE_ID 外鍵的是 serviceType 這個 @ManyToOne 欄位。
+         */
+        ServiceTypeVO serviceType = serviceTypeRepository.getReferenceById(serviceTypeId);
+        svc.setServiceType(serviceType);
 
-		if (status == null || (status != 0 && status != 1)) {
-			throw new IllegalArgumentException("服務狀態不合法");
-		}
+        svc.setMemberId(memberId);
+        svc.setServiceName(serviceName.trim());
+        svc.setDescription(description);
+        svc.setHourlyRate(hourlyRate);
+        svc.setStatus(status);
 
-		ServiceVO svc = new ServiceVO();
+        /*
+         * 如果 ServiceVO.createdAt 有 @CreationTimestamp，
+         * 這行可以之後拿掉，讓 Hibernate 自動產生建立時間。
+         */
+        svc.setCreatedAt(createdAt);
 
-		svc.setServiceTypeId(serviceTypeId);
-		svc.setMemberId(memberId);
-		svc.setServiceName(serviceName);
-		svc.setDescription(description);
-		svc.setHourlyRate(hourlyRate);
-		svc.setStatus(status);
-		svc.setCreatedAt(createdAt);
+        // 原本 dao.insert(svc)
+        // 改成 repository.save(svc)
+        return serviceRepository.save(svc);
+    }
 
-		dao.insert(svc);
+    // 修改服務
+    public ServiceVO update(Integer serviceId,
+                            Integer serviceTypeId,
+                            Integer memberId,
+                            String serviceName,
+                            String description,
+                            Integer hourlyRate,
+                            Byte status) {
 
-		return svc;
-	}
+        validateService(serviceTypeId, serviceName, hourlyRate, status);
+        
+        
+        ServiceVO svc = serviceRepository.findById(serviceId).orElse(null);
 
-	public ServiceVO update(Integer serviceId, Integer serviceTypeId, Integer memberId, String serviceName,
-			String description, Integer hourlyRate, Byte status) {
+        if (svc == null) {
+            return null;
+        }
 
-		ServiceVO svc = new ServiceVO();
+        ServiceTypeVO serviceType = serviceTypeRepository.getReferenceById(serviceTypeId);
+        svc.setServiceType(serviceType);
 
-		svc.setServiceId(serviceId);
-		svc.setServiceTypeId(serviceTypeId);
-		svc.setMemberId(memberId);
-		svc.setServiceName(serviceName);
-		svc.setDescription(description);
-		svc.setHourlyRate(hourlyRate);
-		svc.setStatus(status);
+        svc.setMemberId(memberId);
+        svc.setServiceName(serviceName.trim());
+        svc.setDescription(description);
+        svc.setHourlyRate(hourlyRate);
+        svc.setStatus(status);
 
-		dao.update(svc);
+        // 有 PK 且資料存在時，save() 就是更新
+        return serviceRepository.save(svc);
+    }
 
-		return svc;
-	}
+    // 刪除服務
+    public void delete(Integer serviceId) {
+        if (serviceRepository.existsById(serviceId)) {
+            serviceRepository.deleteById(serviceId);
+        }
+    }
 
-	public void delete(Integer serviceId) {
-		dao.delete(serviceId);
-	}
+    // 查單一服務
+    @Transactional(readOnly = true)
+    public ServiceVO getOneService(Integer serviceId) {
+        return serviceRepository.findOneWithServiceType(serviceId);
+    }
 
-	public ServiceVO getOneService(Integer serviceId) {
-		return dao.getOne(serviceId);
-	}
+    // 查全部服務
+    @Transactional(readOnly = true)
+    public List<ServiceVO> getAll() {
+        return serviceRepository.findAllWithServiceType();
+    }
 
-	public List<ServiceVO> getAll() {
-		return dao.getAll();
-	}
+    // 依服務類型查服務
+    @Transactional(readOnly = true)
+    public List<ServiceVO> getServicesByServiceTypeId(Integer serviceTypeId) {
+        return serviceRepository.findByServiceTypeId(serviceTypeId);
+    }
 
-	// 關聯查詢
+    // 共用驗證
+    private void validateService(Integer serviceTypeId,
+                                 String serviceName,
+                                 Integer hourlyRate,
+                                 Byte status) {
 
-	public List<ServiceVO> getServicesByServiceTypeId(Integer serviceTypeId) {
-		return dao.getByServiceTypeId(serviceTypeId);
-	}
+        if (serviceTypeId == null) {
+            throw new IllegalArgumentException("服務類型不可為空");
+        }
+
+        if (serviceName == null || serviceName.trim().isEmpty()) {
+            throw new IllegalArgumentException("服務名稱不可為空");
+        }
+
+        if (hourlyRate == null || hourlyRate < 0) {
+            throw new IllegalArgumentException("每小時費率不可小於 0");
+        }
+
+        if (status == null || (status != 0 && status != 1)) {
+            throw new IllegalArgumentException("服務狀態不合法");
+        }
+    }
 }
