@@ -45,10 +45,10 @@ public class MemberVO implements java.io.Serializable {
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
 	@OrderBy("venueOrderId asc")
 	private Set<VenueOrderVO> venueOrders;
-	
+
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "member")
 	@OrderBy("notificationId asc")
-	private Set<NotificationVO> notifications;	
+	private Set<NotificationVO> notifications;
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "reporterMember")
 	@OrderBy("serviceReportId asc")
@@ -173,6 +173,14 @@ public class MemberVO implements java.io.Serializable {
 
 	public void setVenueOrders(Set<VenueOrderVO> venueOrders) {
 		this.venueOrders = venueOrders;
+	}
+
+	public Set<NotificationVO> getNotifications() {
+		return notifications;
+	}
+
+	public void setNotifications(Set<NotificationVO> notifications) {
+		this.notifications = notifications;
 	}
 
 	public Integer getMemberId() {
