@@ -8,13 +8,16 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.webond.venue.model.VenueOrderVO;
+import com.webond.member.model.MemberVO;
+import com.webond.venue.model.VenueTypeVO;
+import com.webond.venue.model.VenueVO;
 import com.webond.venue.repository.VenueImagesRepository;
 import com.webond.venue.repository.VenueOrderRepository;
 import com.webond.venue.repository.VenueRepository;
 import com.webond.venue.repository.VenueSlotRepository;
 import com.webond.venue.repository.VenueTypeRepository;
 import com.webond.venue.service.VenueService;
+import com.webond.venue.service.VenueTypeService;
 
 import jakarta.transaction.Transactional;
 
@@ -35,12 +38,15 @@ public class TestVenue_Application_CommandLineRunner implements CommandLineRunne
 
 	@Autowired
 	VenueOrderRepository repository5;
-	
+
 //	@Autowired
 //	MemberRepository repository6;
 
 	@Autowired
 	private VenueService vs;
+
+	@Autowired
+	private VenueTypeService venueTypeService;
 
 	@Autowired
 	private SessionFactory sessionFactory;
@@ -52,6 +58,7 @@ public class TestVenue_Application_CommandLineRunner implements CommandLineRunne
 	@Override
 	@Transactional
 	public void run(String... args) throws Exception {
+		
 
 		// 新增
 //		VenueVO venueVO = new VenueVO();
@@ -147,50 +154,6 @@ public class TestVenue_Application_CommandLineRunner implements CommandLineRunne
 //		vs.deleteVenue(2009);
 //		vs.getImagesByVenue(2001);
 
-//		System.out.println("====== 1. 開始準備場地主表資料 ======");
-//
-//		// 🟢 建立場地基礎物件並塞入測試資料
-//		VenueVO venueVO = new VenueVO();
-//		venueVO.setMemberId(8); // 測試用的會員 ID
-//		venueVO.setVenueName("大安活動中心 - 聯動新增測試");
-//
-//		// 🟢 處理外鍵 VENUE_TYPE_ID (場地類型)
-//		// 🎯 注意：請先確認你資料庫 VENUE_TYPE 表裡面「有沒有 ID 為 1 的資料」，沒有的話請改成資料庫現有的 ID！
-//		VenueTypeVO typeVO = new VenueTypeVO();
-//		typeVO.setVenueTypeId(1);
-//		venueVO.setVenueTypeVO(typeVO);
-//
-//		// 🟢 關鍵初始化：因為你的 VenueVO 類別裡沒有初始化 Set，不手動 new 會噴 NullPointerException
-//		if (venueVO.getViVO() == null) {
-//			venueVO.setViVO(new java.util.HashSet<>());
-//		}
-//
-//		System.out.println("====== 2. 準備測試用的假照片資料 ======");
-//
-//		// 🟢 建立一個 List 容器來裝多張照片的 byte[]
-//		java.util.List<byte[]> imageList = new java.util.ArrayList<>();
-//
-//		// 這裡用簡單的假 byte 陣列代替，避免因為檔案路徑不對而讓程式卡住
-//		byte[] fakeImage1 = new byte[] { 0x01, 0x02, 0x03, 0x04 };
-//		byte[] fakeImage2 = new byte[] { 0x05, 0x06, 0x07, 0x08 };
-//		imageList.add(fakeImage1);
-//		imageList.add(fakeImage2);
-//
-//		// 🟢 3. 呼叫 Service 執行聯動新增
-//		try {
-//			System.out.println("====== 3. 開始執行 Service 聯動新增 ======");
-//
-//			// 呼叫你在 Service 寫的方法
-//			vs.addVenueWithImages(venueVO, imageList);
-//
-//			System.out.println("====== 4. 聯動新增測試成功！ ======");
-//			System.out.println("資料庫自動生成的場地 ID 為: " + venueVO.getVenueId());
-//
-//		} catch (Exception e) {
-//			System.err.println("❌ 測試失敗，請檢查下方錯誤訊息：");
-//			e.printStackTrace();
-//		}
-
 //		Integer idToTest = 2001; // 🎯 確保這筆場地在你的資料庫真的存在
 //
 //		System.out.println("====== [EAGER 模式] 開始測試一條龍查詢 ======");
@@ -233,7 +196,7 @@ public class TestVenue_Application_CommandLineRunner implements CommandLineRunne
 //		} else {
 //			System.err.println("❌ 找不到 ID 為 " + idToTest + " 的場地。");
 //		}
-		
+
 //		 MemberVO member = repository6.findById(8).orElse(null);
 //		    
 //		    if (member != null) {
@@ -245,14 +208,75 @@ public class TestVenue_Application_CommandLineRunner implements CommandLineRunne
 //		                + " | 場地名稱: " + venue.getVenueName());
 //		        }
 //		    }
-	    
+
 //		    List<VenueVO> venueList = repository.findByMember_MemberId(8);
 //		    System.out.println("會員8 新增的場地數量: " + venueList.size());
 //
 //		    for (VenueVO venue : venueList) {
 //		        System.out.println("場地ID: " + venue.getVenueId() + " | 場地名稱: " + venue.getVenueName());
 //		    }
- 
+
+		// ==========================================
+		// 🎯 測試：直接呼叫 VenueTypeService 查詢場地
+		// ==========================================
+//		System.out.println("\n====== 🎯 開始測試：使用 VenueTypeService 查詢 ======");
+//
+//		Integer targetTypeId = 1; // 假設要查場地類型編號 1 底下的場地
+//
+//		try {
+//			// 直接呼叫你在 Service 寫好的方法
+//			Set<VenueVO> venues = venueTypeService.getVenueByVenueType(targetTypeId);
+//
+//			if (venues != null && !venues.isEmpty()) {
+//				System.out.println("👉 透過 Service 查到該類型底下有 " + venues.size() + " 間場地：");
+//				for (VenueVO v : venues) {
+//					System.out.println("   - 場地 ID: " + v.getVenueId() + " | 名稱: " + v.getVenueName());
+//				}
+//			} else {
+//				System.out.println("👉 該類型底下目前沒有綁定任何場地，或找不到該場地類型。");
+//			}
+//		} catch (Exception e) {
+//			System.err.println("❌ 測試發生錯誤，請檢查錯誤訊息：");
+//			e.printStackTrace();
+//		}
+//
+//		System.out.println("====== 🎯 測試結束 ======\n");
+		
+//		try {
+//	        System.out.println("====== 1. 開始準備場地主表資料 ======");
+//	        VenueVO venueVO = new VenueVO();
+//	        venueVO.setVenueName("大安活動中心 - 聯動新增測試");
+//	        // ... 其他場地必填欄位塞一塞 ...
+//
+//	        // 🎯 綁定你說的「已經存在的會員 8 號」
+//	        MemberVO memberVO = new MemberVO();
+//	        memberVO.setMemberId(8); 
+//	        venueVO.setMember(memberVO); 
+//	        
+//	        VenueTypeVO venueTypeVO = new VenueTypeVO();
+//	        venueTypeVO.setVenueTypeId(1);
+//	        venueVO.setVenueTypeVO(venueTypeVO);
+//
+//
+//	        System.out.println("====== 2. 準備測試用的假照片資料 ======");
+//	        List<byte[]> imageList = new java.util.ArrayList<>();
+//	        
+//	        // 模擬兩張假圖片的 byte array
+//	        imageList.add(new byte[]{1, 2, 3, 4, 5});
+//	        imageList.add(new byte[]{6, 7, 8, 9, 10});
+//
+//
+//	        System.out.println("====== 3. 開始執行 Service 聯動新增 ======");
+//	        // 呼叫你的 service 執行儲存
+//	        vs.addVenueWithImages(venueVO, imageList);
+//	        
+//	        System.out.println("✨ 聯動新增測試成功！請去資料庫看 VENUE 表與 VENUE_IMAGES 表是否有同步多出資料。");
+//
+//	    } catch (Exception e) {
+//	        System.out.println("❌ 測試失敗，請檢查下方錯誤訊息：");
+//	        e.printStackTrace();
+//	    }
+
 	}
 
 }

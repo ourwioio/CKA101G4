@@ -1,6 +1,7 @@
 package com.webond.venue.model;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.webond.member.model.MemberVO;
@@ -16,6 +17,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "VENUE")
@@ -28,7 +32,7 @@ public class VenueVO {
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "venueVO")
 	@OrderBy("imagesId asc")
-	private Set<VenueImagesVO> venueImages;
+	private Set<VenueImagesVO> venueImages = new HashSet<>();
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "venueVO")
 	@OrderBy("venueSlotId asc")
@@ -47,15 +51,21 @@ public class VenueVO {
 	private VenueTypeVO venueTypeVO;
 
 	@Column(name = "VENUE_NAME")
+	@NotEmpty(message = "場地名稱：請勿空白")
 	private String venueName;
 
 	@Column(name = "ADDRESS")
+	@NotEmpty(message = "場地地址：請勿空白")
 	private String address;
 
 	@Column(name = "CAPACITY")
+	@NotNull(message = "容納人數：請勿空白")
+	@Min(value = 1, message = "容納人數：必需大於 0")
 	private Integer capacity;
 
 	@Column(name = "HOURLY_RATE")
+	@NotNull(message = "每小時費用：請勿空白")
+	@Min(value = 1, message = "每小時費用：必需大於 0")
 	private Integer hourlyRate;
 
 	@Column(name = "VENUE_STATUS")
@@ -74,33 +84,10 @@ public class VenueVO {
 	private Integer ratingStars;
 
 	@Column(name = "RATING_COUNT")
-	private Integer ratingcount;
+	private Integer ratingCount;
 
 	public VenueVO() {
 		super();
-	}
-
-	public VenueVO(Integer venueId, Set<VenueImagesVO> venueImages, Set<VenueSlotVO> venueSlots,
-			Set<VenueOrderVO> venueOrders, MemberVO member, VenueTypeVO venueTypeVO, String venueName, String address,
-			Integer capacity, Integer hourlyRate, Byte venueStatus, LocalDate createdAt, String openDays,
-			String availableHours, Integer ratingStars, Integer ratingcount) {
-		super();
-		this.venueId = venueId;
-		this.venueImages = venueImages;
-		this.venueSlots = venueSlots;
-		this.venueOrders = venueOrders;
-		this.member = member;
-		this.venueTypeVO = venueTypeVO;
-		this.venueName = venueName;
-		this.address = address;
-		this.capacity = capacity;
-		this.hourlyRate = hourlyRate;
-		this.venueStatus = venueStatus;
-		this.createdAt = createdAt;
-		this.openDays = openDays;
-		this.availableHours = availableHours;
-		this.ratingStars = ratingStars;
-		this.ratingcount = ratingcount;
 	}
 
 	public Integer getVenueId() {
@@ -224,23 +211,11 @@ public class VenueVO {
 	}
 
 	public Integer getRatingcount() {
-		return ratingcount;
+		return ratingCount;
 	}
 
 	public void setRatingcount(Integer ratingcount) {
-		this.ratingcount = ratingcount;
+		this.ratingCount = ratingcount;
 	}
-
-	@Override
-	public String toString() {
-		return "VenueVO [venueId=" + venueId + ", venueImages=" + venueImages + ", venueSlots=" + venueSlots
-				+ ", venueOrders=" + venueOrders + ", member=" + member + ", venueTypeVO=" + venueTypeVO
-				+ ", venueName=" + venueName + ", address=" + address + ", capacity=" + capacity + ", hourlyRate="
-				+ hourlyRate + ", venueStatus=" + venueStatus + ", createdAt=" + createdAt + ", openDays=" + openDays
-				+ ", availableHours=" + availableHours + ", ratingStars=" + ratingStars + ", ratingcount=" + ratingcount
-				+ "]";
-	}
-
-	
 
 }
