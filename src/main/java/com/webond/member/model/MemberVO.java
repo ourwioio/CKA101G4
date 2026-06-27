@@ -54,6 +54,10 @@ public class MemberVO implements java.io.Serializable {
 	@OrderBy("serviceReportId asc")
 	private Set<ServiceReportVO> servicereports;
 
+	@ManyToOne
+	@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
+	private EmployeeVO employee;
+
 	@Column(name = "PASSWORD_HASH")
 	private String passwordHash;
 
@@ -119,10 +123,6 @@ public class MemberVO implements java.io.Serializable {
 	@Column(name = "REAL_NAME")
 	@NotEmpty(message = "請輸入姓名")
 	private String realName;
-
-	@ManyToOne
-	@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
-	private EmployeeVO employee;
 
 	@Lob
 	@Column(name = "ID_IMAGE")
