@@ -38,10 +38,6 @@ public class NotificationVO implements java.io.Serializable {
 	@JoinColumn(name = "REPORT_ID", referencedColumnName = "REPORT_ID")
 	private MemberReportVO report;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "memberReport")
-	@OrderBy("notificationId asc")
-	private Set<NotificationVO> notifications;
-
 	@ManyToOne
 	@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
 	private EmployeeVO employee;
