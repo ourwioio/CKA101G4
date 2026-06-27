@@ -1,9 +1,11 @@
 package com.webond.member.model;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 import com.webond.employee.model.EmployeeVO;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +13,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -34,9 +38,9 @@ public class NotificationVO implements java.io.Serializable {
 	@JoinColumn(name = "REPORT_ID", referencedColumnName = "REPORT_ID")
 	private MemberReportVO report;
 
-//	@OneToMany(cascade = CascadeType.ALL, mappedBy = "memberReport")
-//	@OrderBy("notificationId asc")
-//	private Set<NotificationVO> notifications;
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "memberReport")
+	@OrderBy("notificationId asc")
+	private Set<NotificationVO> notifications;
 
 	@ManyToOne
 	@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
