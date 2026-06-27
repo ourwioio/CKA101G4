@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>服務詳情</title>
+<style>
+body { font-family: Arial, "Microsoft JhengHei"; padding: 24px; }
+table { border-collapse: collapse; width: 60%; }
+th, td { border: 1px solid #ccc; padding: 8px; }
+th { background: #f2f2f2; width: 160px; }
+.success { color: green; }
+.error { color: red; }
+</style>
+</head>
+<body>
+
+<h1>服務詳情</h1>
+
+<p class="success" th:if="${successMsg}" th:text="${successMsg}"></p>
+<p class="error" th:if="${errorMsg}" th:text="${errorMsg}"></p>
+
+<table>
+    <tr>
+        <th>服務ID</th>
+        <td th:text="${serviceVO.serviceId}"></td>
+    </tr>
+    <tr>
+        <th>服務類型ID</th>
+        <td th:text="${serviceVO.serviceTypeId}"></td>
+    </tr>
+    <tr>
+        <th>會員ID</th>
+        <td th:text="${serviceVO.memberId}"></td>
+    </tr>
+    <tr>
+        <th>服務名稱</th>
+        <td th:text="${serviceVO.serviceName}"></td>
+    </tr>
+    <tr>
+        <th>描述</th>
+        <td th:text="${serviceVO.description}"></td>
+    </tr>
+    <tr>
+        <th>費率</th>
+        <td th:text="${serviceVO.hourlyRate}"></td>
+    </tr>
+    <tr>
+        <th>狀態</th>
+        <td th:text="${serviceVO.status == 1 ? '上架' : '下架'}"></td>
+    </tr>
+    <tr>
+        <th>建立時間</th>
+        <td th:text="${serviceVO.createdAt}"></td>
+    </tr>
+</table>
+
+<br>
+
+<a th:href="@{/services/{id}/edit(id=${serviceVO.serviceId})}">修改</a>
+<a th:href="@{/services}">回列表</a>
+
+</body>
+</html>
