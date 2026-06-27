@@ -27,18 +27,18 @@ public class ServiceTypeController {
     }
 
     // 查全部服務類型
-    // GET /service-types
+    // URL: GET /service-types
     @GetMapping
     public String getAll(Model model) {
         List<ServiceTypeVO> serviceTypeList = serviceTypeSvc.getAll();
 
         model.addAttribute("serviceTypeList", serviceTypeList);
 
-        return "service-type/list";
+        return "back-end/service/service-type-list";
     }
 
     // 查單一服務類型
-    // GET /service-types/{serviceTypeId}
+    // URL: GET /service-types/{serviceTypeId}
     @GetMapping("/{serviceTypeId}")
     public String getOne(@PathVariable Integer serviceTypeId, Model model) {
         ServiceTypeVO serviceTypeVO = serviceTypeSvc.findByPK(serviceTypeId);
@@ -46,26 +46,27 @@ public class ServiceTypeController {
         if (serviceTypeVO == null) {
             model.addAttribute("errorMsg", "查無此服務類型");
             model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
-            return "service-type/list";
+
+            return "back-end/service/service-type-list";
         }
 
         model.addAttribute("serviceTypeVO", serviceTypeVO);
 
-        return "service-type/detail";
+        return "back-end/service/service-type-detail";
     }
 
     // 前往新增頁面
-    // GET /service-types/new
+    // URL: GET /service-types/new
     @GetMapping("/new")
     public String showAddForm(Model model) {
         model.addAttribute("serviceTypeVO", new ServiceTypeVO());
         model.addAttribute("mode", "add");
 
-        return "service-type/form";
+        return "back-end/service/service-type-form";
     }
 
     // 新增服務類型
-    // POST /service-types
+    // URL: POST /service-types
     @PostMapping
     public String insert(
             @ModelAttribute ServiceTypeVO serviceTypeVO,
@@ -79,7 +80,7 @@ public class ServiceTypeController {
             model.addAttribute("serviceTypeVO", serviceTypeVO);
             model.addAttribute("mode", "add");
 
-            return "service-type/form";
+            return "back-end/service/service-type-form";
         }
 
         serviceTypeSvc.add(
@@ -95,7 +96,7 @@ public class ServiceTypeController {
     }
 
     // 前往修改頁面
-    // GET /service-types/{serviceTypeId}/edit
+    // URL: GET /service-types/{serviceTypeId}/edit
     @GetMapping("/{serviceTypeId}/edit")
     public String showUpdateForm(@PathVariable Integer serviceTypeId, Model model) {
         ServiceTypeVO serviceTypeVO = serviceTypeSvc.findByPK(serviceTypeId);
@@ -104,17 +105,17 @@ public class ServiceTypeController {
             model.addAttribute("errorMsg", "查無此服務類型，無法修改");
             model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
 
-            return "service-type/list";
+            return "back-end/service/service-type-list";
         }
 
         model.addAttribute("serviceTypeVO", serviceTypeVO);
         model.addAttribute("mode", "edit");
 
-        return "service-type/form";
+        return "back-end/service/service-type-form";
     }
 
     // 修改服務類型
-    // POST /service-types/{serviceTypeId}/edit
+    // URL: POST /service-types/{serviceTypeId}/edit
     @PostMapping("/{serviceTypeId}/edit")
     public String update(
             @PathVariable Integer serviceTypeId,
@@ -131,7 +132,7 @@ public class ServiceTypeController {
             model.addAttribute("serviceTypeVO", serviceTypeVO);
             model.addAttribute("mode", "edit");
 
-            return "service-type/form";
+            return "back-end/service/service-type-form";
         }
 
         ServiceTypeVO oldVO = serviceTypeSvc.findByPK(serviceTypeId);
@@ -140,7 +141,7 @@ public class ServiceTypeController {
             model.addAttribute("errorMsg", "查無此服務類型，無法修改");
             model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
 
-            return "service-type/list";
+            return "back-end/service/service-type-list";
         }
 
         serviceTypeSvc.update(
@@ -157,7 +158,7 @@ public class ServiceTypeController {
     }
 
     // 刪除服務類型
-    // POST /service-types/{serviceTypeId}/delete
+    // URL: POST /service-types/{serviceTypeId}/delete
     @PostMapping("/{serviceTypeId}/delete")
     public String delete(
             @PathVariable Integer serviceTypeId,

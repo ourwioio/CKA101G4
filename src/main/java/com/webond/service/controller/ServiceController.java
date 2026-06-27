@@ -41,7 +41,7 @@ public class ServiceController {
         model.addAttribute("serviceList", serviceList);
         model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
 
-        return "service/list";
+        return "back-end/service/service-list";
     }
 
     // 查單一服務
@@ -60,7 +60,7 @@ public class ServiceController {
 
         model.addAttribute("serviceVO", serviceVO);
 
-        return "service/detail";
+        return "back-end/service/service-detail";
     }
 
     // 依服務類型查服務
@@ -74,7 +74,7 @@ public class ServiceController {
         model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
         model.addAttribute("selectedServiceTypeId", serviceTypeId);
 
-        return "service/list";
+        return "back-end/service/service-list";
     }
 
     // 前往新增服務頁面
@@ -86,7 +86,7 @@ public class ServiceController {
         model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
         model.addAttribute("mode", "add");
 
-        return "service/form";
+        return "back-end/service/service-form";
     }
 
     // 新增服務
@@ -105,7 +105,7 @@ public class ServiceController {
             model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
             model.addAttribute("mode", "add");
 
-            return "service/form";
+            return "back-end/service/service-form";
         }
 
         serviceSvc.add(
@@ -135,7 +135,7 @@ public class ServiceController {
             model.addAttribute("serviceList", serviceSvc.getAll());
             model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
 
-            return "service/list";
+            return "back-end/service/service-list";
         }
 
         ServiceRequest request = toServiceRequest(serviceVO);
@@ -145,7 +145,7 @@ public class ServiceController {
         model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
         model.addAttribute("mode", "edit");
 
-        return "service/form";
+        return "back-end/service/service-form";
     }
 
     // 修改服務
@@ -166,7 +166,7 @@ public class ServiceController {
             model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
             model.addAttribute("mode", "edit");
 
-            return "service/form";
+            return "back-end/service/service-form";
         }
 
         ServiceVO oldService = serviceSvc.getOneService(serviceId);
@@ -176,7 +176,7 @@ public class ServiceController {
             model.addAttribute("serviceList", serviceSvc.getAll());
             model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
 
-            return "service/list";
+            return "back-end/service/service-list";
         }
 
         serviceSvc.update(
@@ -191,7 +191,7 @@ public class ServiceController {
 
         redirectAttributes.addFlashAttribute("successMsg", "修改服務成功");
 
-        return "redirect:/services/" + serviceId;
+        return "redirect:/services" + serviceId;
     }
 
     // 刪除服務

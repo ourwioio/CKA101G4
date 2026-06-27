@@ -32,7 +32,7 @@ public class ServiceSlotController {
     }
 
     // 查全部服務時段
-    // GET /service-slots
+    // URL: GET /service-slots
     @GetMapping
     public String getAll(Model model) {
         List<ServiceSlotVO> serviceSlotList = serviceSlotSvc.getAll();
@@ -40,11 +40,11 @@ public class ServiceSlotController {
         model.addAttribute("serviceSlotList", serviceSlotList);
         model.addAttribute("serviceList", serviceSvc.getAll());
 
-        return "service-slot/list";
+        return "back-end/service/service-slot-list";
     }
 
     // 查單一服務時段
-    // GET /service-slots/{serviceSlotId}
+    // URL: GET /service-slots/{serviceSlotId}
     @GetMapping("/{serviceSlotId}")
     public String getOne(@PathVariable Integer serviceSlotId, Model model) {
         ServiceSlotVO serviceSlotVO = serviceSlotSvc.getOneServiceSlot(serviceSlotId);
@@ -54,16 +54,16 @@ public class ServiceSlotController {
             model.addAttribute("serviceSlotList", serviceSlotSvc.getAll());
             model.addAttribute("serviceList", serviceSvc.getAll());
 
-            return "service-slot/list";
+            return "back-end/service/service-slot-list";
         }
 
         model.addAttribute("serviceSlotVO", serviceSlotVO);
 
-        return "service-slot/detail";
+        return "back-end/service/service-slot-detail";
     }
 
     // 依服務編號查服務時段
-    // GET /service-slots/service/{serviceId}
+    // URL: GET /service-slots/service/{serviceId}
     @GetMapping("/service/{serviceId}")
     public String getByServiceId(@PathVariable Integer serviceId, Model model) {
         List<ServiceSlotVO> serviceSlotList = serviceSlotSvc.getByServiceId(serviceId);
@@ -72,22 +72,22 @@ public class ServiceSlotController {
         model.addAttribute("serviceList", serviceSvc.getAll());
         model.addAttribute("selectedServiceId", serviceId);
 
-        return "service-slot/list";
+        return "back-end/service/service-slot-list";
     }
 
     // 前往新增頁面
-    // GET /service-slots/new
+    // URL: GET /service-slots/new
     @GetMapping("/new")
     public String showAddForm(Model model) {
         model.addAttribute("serviceSlotVO", new ServiceSlotVO());
         model.addAttribute("serviceList", serviceSvc.getAll());
         model.addAttribute("mode", "add");
 
-        return "service-slot/form";
+        return "back-end/service/service-slot-form";
     }
 
     // 新增服務時段
-    // POST /service-slots
+    // URL: POST /service-slots
     @PostMapping
     public String insert(
             @ModelAttribute ServiceSlotVO serviceSlotVO,
@@ -102,7 +102,7 @@ public class ServiceSlotController {
             model.addAttribute("serviceList", serviceSvc.getAll());
             model.addAttribute("mode", "add");
 
-            return "service-slot/form";
+            return "back-end/service/service-slot-form";
         }
 
         serviceSlotSvc.add(
@@ -119,7 +119,7 @@ public class ServiceSlotController {
     }
 
     // 前往修改頁面
-    // GET /service-slots/{serviceSlotId}/edit
+    // URL: GET /service-slots/{serviceSlotId}/edit
     @GetMapping("/{serviceSlotId}/edit")
     public String showUpdateForm(@PathVariable Integer serviceSlotId, Model model) {
         ServiceSlotVO serviceSlotVO = serviceSlotSvc.getOneServiceSlot(serviceSlotId);
@@ -129,17 +129,18 @@ public class ServiceSlotController {
             model.addAttribute("serviceSlotList", serviceSlotSvc.getAll());
             model.addAttribute("serviceList", serviceSvc.getAll());
 
-            return "service-slot/list";
+            return "back-end/service/service-slot-list";
         }
 
         model.addAttribute("serviceSlotVO", serviceSlotVO);
         model.addAttribute("serviceList", serviceSvc.getAll());
         model.addAttribute("mode", "edit");
 
-        return "service-slot/form";
+        return "back-end/service/service-slot-form";
     }
+
     // 修改服務時段
-    // POST /service-slots/{serviceSlotId}/edit
+    // URL: POST /service-slots/{serviceSlotId}/edit
     @PostMapping("/{serviceSlotId}/edit")
     public String update(
             @PathVariable Integer serviceSlotId,
@@ -157,7 +158,7 @@ public class ServiceSlotController {
             model.addAttribute("serviceList", serviceSvc.getAll());
             model.addAttribute("mode", "edit");
 
-            return "service-slot/form";
+            return "back-end/service/service-slot-form";
         }
 
         ServiceSlotVO oldVO = serviceSlotSvc.getOneServiceSlot(serviceSlotId);
@@ -167,7 +168,7 @@ public class ServiceSlotController {
             model.addAttribute("serviceSlotList", serviceSlotSvc.getAll());
             model.addAttribute("serviceList", serviceSvc.getAll());
 
-            return "service-slot/list";
+            return "back-end/service/service-slot-list";
         }
 
         serviceSlotSvc.update(
@@ -185,7 +186,7 @@ public class ServiceSlotController {
     }
 
     // 刪除服務時段
-    // POST /service-slots/{serviceSlotId}/delete
+    // URL: POST /service-slots/{serviceSlotId}/delete
     @PostMapping("/{serviceSlotId}/delete")
     public String delete(
             @PathVariable Integer serviceSlotId,
