@@ -3,7 +3,8 @@ package com.webond.service.model;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;import jakarta.persistence.FetchType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,13 +21,13 @@ public class ServiceSlotVO {
     @Column(name = "SERVICE_SLOT_ID")
     private Integer serviceSlotId;
 
-    // 實際存進資料庫的外鍵欄位
-    @Column(name = "SERVICE_ID")
+    // 只讀 FK 欄位，方便 DTO / 畫面顯示 serviceId
+    @Column(name = "SERVICE_ID", insertable = false, updatable = false)
     private Integer serviceId;
 
-    // 關聯查詢用：可以透過 service 拿到 serviceName、description 等資料
+    // 真正負責 SERVICE_ID 外鍵關聯
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "SERVICE_ID", insertable = false, updatable = false)
+    @JoinColumn(name = "SERVICE_ID")
     private ServiceVO service;
 
     @Column(name = "START_TIME")
@@ -42,7 +43,6 @@ public class ServiceSlotVO {
     private LocalDateTime lockExpiresAt;
 
     public ServiceSlotVO() {
-        super();
     }
 
     public Integer getServiceSlotId() {
@@ -54,9 +54,14 @@ public class ServiceSlotVO {
     }
 
     public Integer getServiceId() {
+        if (service != null) {
+            return service.getServiceId();
+        }
         return serviceId;
     }
 
+    // 保留給表單 / DTO 綁定用
+    // 但不要在這裡 new ServiceVO
     public void setServiceId(Integer serviceId) {
         this.serviceId = serviceId;
     }
@@ -67,12 +72,7 @@ public class ServiceSlotVO {
 
     public void setService(ServiceVO service) {
         this.service = service;
-
-        if (service != null) {
-            this.serviceId = service.getServiceId();
-        } else {
-            this.serviceId = null;
-        }
+        this.serviceId = service != null ? service.getServiceId() : null;
     }
 
     public LocalDateTime getStartTime() {
