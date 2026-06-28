@@ -9,8 +9,8 @@ public class ActivityOrderVO {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "ORDER_ID")
-	private Integer orderId;
+	@Column(name = "ACTIVITY_ORDER_ID")
+	private Integer activityOrderId;
 
 	@Column(name = "ACTIVITY_ID", nullable = false)
 	private Integer activityId;
@@ -33,12 +33,12 @@ public class ActivityOrderVO {
 	}
 
 	// Getters and Setters
-	public Integer getOrderId() {
-		return orderId;
+	public Integer getActivityOrderId() {
+		return activityOrderId;
 	}
 
-	public void setOrderId(Integer orderId) {
-		this.orderId = orderId;
+	public void setActivityOrderId(Integer activityOrderId) {
+		this.activityOrderId = activityOrderId;
 	}
 
 	public Integer getActivityId() {
