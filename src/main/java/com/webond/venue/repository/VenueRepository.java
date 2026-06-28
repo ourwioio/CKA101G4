@@ -9,4 +9,6 @@ import com.webond.venue.model.VenueVO;
 public interface VenueRepository extends JpaRepository<VenueVO, Integer> {
 	
 	List<VenueVO> findByMember_MemberId(Integer memberId);
+	
+	List<VenueVO> findByVenueStatus(Byte venueStatus);
 }

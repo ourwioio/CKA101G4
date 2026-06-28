@@ -109,6 +109,10 @@ public class VenueService {
 	    }
 	}
 	
+	public List<VenueVO> getAllActive() {
+	    return repository.findByVenueStatus((byte) 1);
+	}
+	
 	
 
 }
