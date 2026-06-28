@@ -158,7 +158,7 @@ td {
 						<td th:text="${venue.venueId}"></td>
 						<td class="img-cell"><img
 							th:if="${venue.venueImages != null and !venue.venueImages.isEmpty()}"
-							th:src="@{/venue/getImage(imagesId=${venue.venueImages.iterator().next().imagesId})}" />
+							th:src="@{/venue/getImage(imagesId=${venue.venueImages[0].imagesId})}" />
 							<div
 								th:unless="${venue.venueImages != null and !venue.venueImages.isEmpty()}"
 								class="no-img">無圖片</div></td>
