@@ -200,20 +200,6 @@ public class VenueController {
 		venueService.toggleVenueStatus(venueId);
 		return "redirect:/venue/listAllVenue";
 	}
-	
-	@GetMapping("listAllVenueFront")
-	public String listAllVenueFront(ModelMap model) {
-	    List<VenueVO> list = venueService.getAllActive();
-	    model.addAttribute("venueListData", list);
-	    return "front-end/venue/userListAllVenue";
-	}
-
-	@GetMapping("getOneVenue")
-	public String getOne(@RequestParam("venueId") Integer venueId, ModelMap model) {
-	    VenueVO venueVO = venueService.getOneVenue(venueId);
-	    model.addAttribute("venueVO", venueVO);
-	    return "front-end/venue/listOneVenue";
-	}
 
 	@ModelAttribute("venueTypeData")
 	protected List<VenueTypeVO> venueTypeListData() {
