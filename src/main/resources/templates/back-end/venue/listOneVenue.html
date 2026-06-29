@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>場地詳細資訊瀏覽</title>
+
+<style>
+	* { box-sizing: border-box; }
+	body {
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+		background-color: #f4f6f9;
+		color: #333;
+		margin: 0;
+		padding: 2rem 1rem;
+	}
+	.container {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+	.page-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1.5rem;
+	}
+	.page-title {
+		font-size: 24px;
+		font-weight: 600;
+		color: #2c3e50;
+	}
+	.alert-success {
+		background-color: #d1e7dd;
+		color: #0f5132;
+		border: 1px solid #badbcc;
+		padding: 12px 16px;
+		border-radius: 6px;
+		margin-bottom: 1.5rem;
+		font-size: 14px;
+		font-weight: 500;
+	}
+	.card {
+		background: #ffffff;
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+		padding: 2.5rem;
+	}
+	.section-title {
+		font-size: 16px;
+		font-weight: 600;
+		color: #0f6e56;
+		border-left: 4px solid #0f6e56;
+		padding-left: 8px;
+		margin: 1.5rem 0 1rem 0;
+	}
+	.info-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.5rem;
+		margin-bottom: 1rem;
+	}
+	.info-group {
+		border-bottom: 1px solid #f1f5f9;
+		padding-bottom: 10px;
+	}
+	.info-group.full-width {
+		grid-column: span 2;
+	}
+	.info-label {
+		font-size: 13px;
+		font-weight: 500;
+		color: #64748b;
+		margin-bottom: 4px;
+	}
+	.info-value {
+		font-size: 15px;
+		font-weight: 600;
+		color: #1e293b;
+	}
+	.status-badge {
+		display: inline-block;
+		padding: 4px 12px;
+		border-radius: 50px;
+		font-size: 12px;
+		font-weight: 600;
+	}
+	.status-online { background-color: #dcfce7; color: #15803d; }
+	.status-offline { background-color: #fee2e2; color: #b91c1c; }
+
+	.day-badge-group {
+		display: flex;
+		gap: 8px;
+		flex-wrap: wrap;
+		margin-top: 6px;
+	}
+	.day-badge {
+		padding: 6px 12px;
+		border-radius: 6px;
+		font-size: 13px;
+		font-weight: 500;
+		border: 1px solid #e2e8f0;
+	}
+	.day-open { background-color: #e6f4ea; color: #137333; border-color: #c4eed0; }
+/* 	.day-close { background-color: #f1f3f4; color: #5f6368; text-decoration: line-through; opacity: 0.6; } */
+	.day-close { background-color: #f1f3f4; color: #5f6368; opacity: 0.6; }
+
+	.gallery {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+		gap: 16px;
+		background: #f8fafc;
+		padding: 16px;
+		border-radius: 8px;
+		border: 1px solid #e2e8f0;
+	}
+	.gallery-item img {
+		width: 100%;
+		height: 120px;
+		object-fit: cover;
+		border-radius: 6px;
+		border: 1px solid #cbd5e1;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+	}
+	.no-image {
+		color: #94a3b8;
+		font-size: 14px;
+		font-style: italic;
+	}
+
+	.action-bar {
+		margin-top: 2.5rem;
+		display: flex;
+		justify-content: flex-end;
+		gap: 12px;
+		border-top: 1px solid #e2e8f0;
+		padding-top: 1.5rem;
+	}
+	.btn {
+		padding: 10px 24px;
+		font-size: 14px;
+		font-weight: 500;
+		border-radius: 6px;
+		cursor: pointer;
+		text-decoration: none;
+		transition: all 0.2s;
+		display: inline-flex;
+		align-items: center;
+	}
+	.btn-secondary {
+		background: #ffffff;
+		border: 1px solid #cbd5e1;
+		color: #475569;
+	}
+	.btn-secondary:hover { background: #f8fafc; }
+	.btn-primary {
+		background: #0f6e56;
+		color: #ffffff;
+		border: none;
+	}
+	.btn-primary:hover { background: #0b5240; }
+</style>
+</head>
+<body>
+
+<div class="container">
+	
+	<div class="alert-success" th:if="${success != null}">
+		✨ 提示訊息：<span th:text="${success}"></span>
+	</div>
+
+	<div class="page-header">
+		<h1 class="page-title">場地詳細資訊</h1>
+		<a th:href="@{/venue/listAllVenue}" class="btn btn-secondary">返回列表</a>
+	</div>
+
+	<div class="card" th:object="${venueVO}">
+		
+		<div class="section-title">系統狀態</div>
+		<div class="info-grid">
+			<div class="info-group">
+				<div class="info-label">場地流水號</div>
+				<div class="info-value" th:text="*{venueId}"></div>
+			</div>
+			<div class="info-group">
+				<div class="info-label">上架狀態</div>
+				<div class="info-top-margin">
+					<span class="status-badge status-online" th:if="*{venueStatus == 1}">上架中 (開放預約)</span>
+					<span class="status-badge status-offline" th:if="*{venueStatus != 1}">下架中 (暫停開放)</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="section-title">場地規格</div>
+		<div class="info-grid">
+			<div class="info-group">
+				<div class="info-label">場地名稱</div>
+				<div class="info-value" th:text="*{venueName}"></div>
+			</div>
+			<div class="info-group">
+				<div class="info-label">場地類型</div>
+				<div class="info-value" th:text="*{venueTypeVO.typeName}"></div>
+			</div>
+			<div class="info-group full-width">
+				<div class="info-label">場地地址</div>
+				<div class="info-value" th:text="*{address}"></div>
+			</div>
+			<div class="info-group">
+				<div class="info-label">最大容納人數</div>
+				<div class="info-value" th:text="*{capacity} + ' 人'"></div>
+			</div>
+			<div class="info-group">
+				<div class="info-label">租借費用 (每小時)</div>
+				<div class="info-value" style="color: #b91c1c;" th:text="'NT$ ' + ${#numbers.formatDecimal(venueVO.hourlyRate, 1, 'COMMA', 0, 'POINT')}"></div>
+			</div>
+		</div>
+
+		<div class="section-title">營運開放時間</div>
+		<div class="info-grid">
+			<div class="info-group full-width">
+				<div class="info-label">每週開放日</div>
+				<div class="day-badge-group">
+					<span class="day-badge" th:classappend="*{openDays != null && openDays.length() == 7 && openDays.substring(0,1) == '1'} ? 'day-open' : 'day-close'">週一</span>
+					<span class="day-badge" th:classappend="*{openDays != null && openDays.length() == 7 && openDays.substring(1,2) == '1'} ? 'day-open' : 'day-close'">週二</span>
+					<span class="day-badge" th:classappend="*{openDays != null && openDays.length() == 7 && openDays.substring(2,3) == '1'} ? 'day-open' : 'day-close'">週三</span>
+					<span class="day-badge" th:classappend="*{openDays != null && openDays.length() == 7 && openDays.substring(3,4) == '1'} ? 'day-open' : 'day-close'">週四</span>
+					<span class="day-badge" th:classappend="*{openDays != null && openDays.length() == 7 && openDays.substring(4,5) == '1'} ? 'day-open' : 'day-close'">週五</span>
+					<span class="day-badge" th:classappend="*{openDays != null && openDays.length() == 7 && openDays.substring(5,6) == '1'} ? 'day-open' : 'day-close'">週六</span>
+					<span class="day-badge" th:classappend="*{openDays != null && openDays.length() == 7 && openDays.substring(6,7) == '1'} ? 'day-open' : 'day-close'">週日</span>
+				</div>
+			</div>
+			
+			<div class="info-group full-width" th:with="
+				hoursStr=*{availableHours},
+				hasZero=${hoursStr != null && hoursStr.contains('0')},
+				startH=${hasZero ? hoursStr.indexOf('0') : 9},
+				endH=${hasZero ? hoursStr.lastIndexOf('0') + 1 : 18}">
+				<div class="info-label">每日營業時段</div>
+				<div class="info-value" th:text="${startH} + ':00 至 ' + ${endH} + ':00'"></div>
+			</div>
+		</div>
+
+		<div class="section-title">場地照片</div>
+		<div class="form-group">
+			<div th:if="*{venueImages == null || venueImages.isEmpty()}" class="no-image">
+				目前本場地尚未上傳任何照片。
+			</div>
+			<div class="gallery" th:if="*{venueImages != null && !venueImages.isEmpty()}">
+				<div class="gallery-item" th:each="img : *{venueImages}">
+					<img th:src="@{/venue/getImage(imagesId=${img.imagesId})}" alt="場地環境實景" />
+				</div>
+			</div>
+		</div>
+
+		<div class="action-bar">
+			<a th:href="@{/venue/listAllVenue}" class="btn btn-secondary">返回列表</a>
+			
+			<form th:action="@{/venue/getOne_For_Update}" method="post" style="display: inline;">
+				<input type="hidden" name="venueId" th:value="*{venueId}" />
+				<button type="submit" class="btn btn-primary">進入修改頁面</button>
+			</form>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>
