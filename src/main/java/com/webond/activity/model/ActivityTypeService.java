@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.webond.activity.repository.ActivityTypeRepository;
+
 import jakarta.persistence.EntityNotFoundException;
 
 @Service // 宣告為 Spring 管理的 Service 元件

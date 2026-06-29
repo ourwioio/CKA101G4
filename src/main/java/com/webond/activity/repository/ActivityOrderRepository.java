@@ -1,4 +1,4 @@
-package com.webond.activity.model;
+package com.webond.activity.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

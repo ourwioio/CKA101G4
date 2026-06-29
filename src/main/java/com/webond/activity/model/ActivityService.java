@@ -3,8 +3,8 @@ package com.webond.activity.model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.webond.activity.model.ActivityRepository;
 import com.webond.activity.model.ActivityVO;
+import com.webond.activity.repository.ActivityRepository;
 
 import java.util.List;
 
