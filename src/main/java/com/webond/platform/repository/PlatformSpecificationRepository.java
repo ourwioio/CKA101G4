@@ -11,11 +11,16 @@ import com.webond.platform.model.PlatformSpecificationVO;
 
 public interface PlatformSpecificationRepository extends JpaRepository<PlatformSpecificationVO, Integer> {
 
-    // 刪除平台規範
-    @Transactional
-    @Modifying
-    @Query(value = "DELETE FROM PLATFORM_SPECIFICATION WHERE SPEC_ID = ?1", nativeQuery = true)
-    void deleteBySpecId(int specId);
+    // ===== JpaRepository 原有方法 =====
+	
+    // save(entity)        → 新增或更新
+    // findAll()           → 查詢全部
+    // findById(id)        → 依主鍵查單筆
+    // deleteById(id)      → 依主鍵刪除
+    // count()             → 計算總筆數
+    // existsById(id)      → 判斷是否存在
+
+    // ===== 自訂查詢方法 =====
 
     // 依狀態查詢（0：草稿 / 1：已發布）
     @Query("FROM PlatformSpecificationVO WHERE status = ?1 ORDER BY specId DESC")
