@@ -11,11 +11,16 @@ import com.webond.platform.model.FaqVO;
 
 public interface FaqRepository extends JpaRepository<FaqVO, Integer> {
 
-    // 刪除 FAQ
-    @Transactional
-    @Modifying
-    @Query(value = "DELETE FROM FAQ WHERE FAQ_ID = ?1", nativeQuery = true)
-    void deleteByFaqId(int faqId);
+    // ===== JpaRepository 原有方法 =====
+	
+    // save(entity)        → 新增或更新
+    // findAll()           → 查詢全部
+    // findById(id)        → 依主鍵查單筆
+    // deleteById(id)      → 依主鍵刪除
+    // count()             → 計算總筆數
+    // existsById(id)      → 判斷是否存在
+
+    // ===== 自訂查詢方法 =====
 
     // 依狀態查詢（0：草稿 / 1：已發布）
     @Query("FROM FaqVO WHERE status = ?1 ORDER BY faqId DESC")

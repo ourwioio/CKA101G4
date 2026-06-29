@@ -12,11 +12,16 @@ import com.webond.platform.model.BulletinVO;
 
 public interface BulletinRepository extends JpaRepository<BulletinVO, Integer> {
 
-    // 刪除公告
-    @Transactional
-    @Modifying
-    @Query(value = "DELETE FROM BULLETIN WHERE BULLETIN_ID = ?1", nativeQuery = true)
-    void deleteByBulletinId(int bulletinId);
+    // ===== JpaRepository 原有方法 =====
+	
+    // save(entity)        → 新增或更新
+    // findAll()           → 查詢全部
+    // findById(id)        → 依主鍵查單筆
+    // deleteById(id)      → 依主鍵刪除
+    // count()             → 計算總筆數
+    // existsById(id)      → 判斷是否存在
+
+    // ===== 自訂查詢方法 =====
 
     // 依狀態查詢（0：草稿 / 1：已發布）
     @Query("FROM BulletinVO WHERE status = ?1 ORDER BY bulletinId DESC")
