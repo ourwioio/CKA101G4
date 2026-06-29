@@ -120,6 +120,17 @@ public class VenueFrontController {
 		return "redirect:/front/venue/listAllVenue";
 	}
 
+	@PostMapping("getOne_For_Update")
+	public String getOne_For_Update(@RequestParam("venueId") String venueId, ModelMap model) {
+		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
+		/*************************** 2.開始查詢資料 *****************************************/
+		VenueVO venueVO = venueService.getOneVenue(Integer.valueOf(venueId));
+
+		/*************************** 3.查詢完成,準備轉交(Send the Success view) **************/
+		model.addAttribute("venueVO", venueVO);
+		return "back-end/venue/update_venue_input";
+	}
+	
 	@GetMapping("listAllVenue")
 	public String listAllVenue(ModelMap model) {
 		List<VenueVO> list = venueService.getAllActive();

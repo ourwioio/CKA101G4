@@ -1,183 +1,200 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>場地資料管理</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>場地資料管理</title>
 
-<style>
-* {
-	box-sizing: border-box;
-}
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-.wrap {
-	padding: 1.5rem;
-}
+        .wrap {
+            padding: 1.5rem;
+        }
 
-.header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 1.25rem;
-}
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
 
-.title {
-	font-size: 18px;
-	font-weight: 500;
-}
+        .title {
+            font-size: 18px;
+            font-weight: 500;
+        }
 
-.table-wrap {
-	border: 1px solid #e0e0e0;
-	border-radius: 12px;
-	overflow: hidden;
-}
+        .table-wrap {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
 
-table {
-	width: 100%;
-	border-collapse: collapse;
-	table-layout: fixed;
-}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
 
-thead {
-	background: #f8f8f8;
-}
+        thead {
+            background: #f8f8f8;
+        }
 
-thead th {
-	padding: 10px 14px;
-	font-size: 13px;
-	color: #666;
-	text-align: left;
-	border-bottom: 1px solid #e0e0e0;
-}
+        thead th {
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #666;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
 
-tbody tr {
-	border-bottom: 1px solid #e0e0e0;
-	background: white;
-}
+        tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
+        }
 
-tbody tr:last-child {
-	border-bottom: none;
-}
+        tbody tr:last-child {
+            border-bottom: none;
+        }
 
-tbody tr:hover {
-	background: #fafafa;
-}
+        tbody tr:hover {
+            background: #fafafa;
+        }
 
-td {
-	padding: 12px 14px;
-	font-size: 14px;
-	vertical-align: middle;
-}
+        td {
+            padding: 12px 14px;
+            font-size: 14px;
+            vertical-align: middle;
+        }
 
-.img-cell img {
-	width: 64px;
-	height: 48px;
-	object-fit: cover;
-	border-radius: 6px;
-	display: block;
-}
+        .img-cell img {
+            width: 64px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 6px;
+            display: block;
+        }
 
-.no-img {
-	width: 64px;
-	height: 48px;
-	border-radius: 6px;
-	border: 1px dashed #ccc;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	color: #aaa;
-	font-size: 11px;
-}
+        .no-img {
+            width: 64px;
+            height: 48px;
+            border-radius: 6px;
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #aaa;
+            font-size: 11px;
+        }
 
-.badge {
-	display: inline-block;
-	padding: 3px 10px;
-	border-radius: 20px;
-	font-size: 12px;
-	font-weight: 500;
-}
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
 
-.badge-up {
-	background: #e1f5ee;
-	color: #0f6e56;
-}
+        .badge-up {
+            background: #e1f5ee;
+            color: #0f6e56;
+        }
 
-.badge-down {
-	background: #f5f5f5;
-	color: #888;
-	border: 1px solid #e0e0e0;
-}
+        .badge-down {
+            background: #f5f5f5;
+            color: #888;
+            border: 1px solid #e0e0e0;
+        }
 
-.actions {
-	display: flex;
-	gap: 6px;
-}
+        .actions {
+            display: flex;
+            gap: 6px;
+        }
 
-.btn-edit {
-	background: white;
-	border: 1px solid #ccc;
-	border-radius: 6px;
-	padding: 5px 12px;
-	font-size: 13px;
-	cursor: pointer;
-}
+        .btn-edit {
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-.btn-del {
-	background: white;
-	border: 1px solid #ffb3b3;
-	border-radius: 6px;
-	padding: 5px 12px;
-	font-size: 13px;
-	color: #c0392b;
-	cursor: pointer;
-}
-</style>
+        .btn-edit:hover {
+            background: #f5f5f5;
+            border-color: #999;
+        }
+
+        .btn-del {
+            background: white;
+            border: 1px solid #ffb3b3;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 13px;
+            color: #c0392b;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-	<div class="wrap">
-		<div class="header">
-			<span class="title">後台場地管理</span>
-		</div>
-		<div class="table-wrap">
-			<table>
-				<thead>
-					<tr>
-						<th>場地編號</th>
-						<th>照片</th>
-						<th>場地名稱</th>
-						<th>地址</th>
-						<th>人數</th>
-						<th>每小時金額</th>
-						<th>狀態</th>
-						<th>建立日期</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr th:each="venue : ${venueListData}">
-						<td th:text="${venue.venueId}"></td>
-						<td class="img-cell"><img
-							th:if="${venue.venueImages != null and !venue.venueImages.isEmpty()}"
-							th:src="@{/venue/getImage(imagesId=${venue.venueImages[0].imagesId})}" />
-							<div
-								th:unless="${venue.venueImages != null and !venue.venueImages.isEmpty()}"
-								class="no-img">無圖片</div></td>
-						<td th:text="${venue.venueName}"></td>
-						<td th:text="${venue.address}"></td>
-						<td th:text="${venue.capacity}"></td>
-						<td th:text="${venue.hourlyRate}"></td>
+    <div class="wrap">
+        <div class="header">
+            <span class="title">後台場地管理</span>
+        </div>
+        
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>場地編號</th>
+                        <th>照片</th>
+                        <th>場地名稱</th>
+                        <th>地址</th>
+                        <th>人數</th>
+                        <th>每小時金額</th>
+                        <th>建立日期</th>
+                        <th>更新上下架</th>
+                        <th>查看場地</th> <!-- 🎯 已修改表頭 -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="venue : ${venueListData}">
+                        <td th:text="${venue.venueId}"></td>
+                        <td class="img-cell">
+                            <img th:if="${venue.venueImages != null and !venue.venueImages.isEmpty()}"
+                                 th:src="@{/venue/getImage(imagesId=${venue.venueImages[0].imagesId})}" />
+                            <div th:unless="${venue.venueImages != null and !venue.venueImages.isEmpty()}"
+                                 class="no-img">無圖片</div>
+                        </td>
+                        <td th:text="${venue.venueName}"></td>
+                        <td th:text="${venue.address}"></td>
+                        <td th:text="${venue.capacity}"></td>
+                        <td th:text="${venue.hourlyRate}"></td>
+                        <td th:text="${venue.createdAt}"></td>
 						<td>
-							<form th:action="@{/venue/toggleStatus}" method="post"
-								style="display: inline">
-								<input type="hidden" name="venueId" th:value="${venue.venueId}" />
-								<button type="submit"
-									th:class="${venue.venueStatus == 0 ? 'badge badge-down' : 'badge badge-up'}"
-									th:text="${venue.venueStatus == 0 ? '下架' : '上架'}"></button>
-							</form>
+						    <form th:action="@{/venue/toggleStatus}" method="post" style="display: inline;">
+						        <input type="hidden" name="venueId" th:value="${venue.venueId}" />
+						        <button type="submit" 
+						                th:style="${venue.venueStatus == 1} ? 'background:#2ecc71; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;' : 'background:#95a5a6; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;'"
+						                th:text="${venue.venueStatus == 1} ? '上架中' : '已下架'"
+						                onclick="return confirm('確定要變更此場地的上下架狀態嗎？');">
+						        </button>
+						    </form>
 						</td>
-						<td th:text="${venue.createdAt}"></td>
-					</tr>
-				</tbody>
-			</table>
+                        <td>
+                            <!-- 🎯 已改為發送 GET 請求至 getOneVenue -->
+                            <form th:action="@{/venue/getOneVenue}" method="get" style="display: inline;">
+                                <input type="hidden" name="venueId" th:value="${venue.venueId}" />
+                                <button type="submit" class="btn-edit">查看場地</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div> 
 </body>
 </html>
