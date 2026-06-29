@@ -2,29 +2,36 @@ package com.webond.venue.model;
 
 import java.util.Set;
 
-import com.webond.venue.model.VenueVO;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 @Table(name = "VENUE_TYPE")
 public class VenueTypeVO {
 
 	@Id
-	@Column(name = "VENUE_TYPE_ID")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "VENUE_TYPE_ID", updatable = false)
 	private Integer venueTypeId;
 
 	@OneToMany(mappedBy = "venueTypeVO")
 	private Set<VenueVO> venues;
 
 	@Column(name = "TYPE_NAME")
+	@NotEmpty(message="場地名稱: 請勿空白")
+	@Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z)]{2,10}$", message = "場地名稱: 只能是中、英文字母, 且長度必需在2到10之間")
 	private String typeName;
 
 	@Column(name = "TYPE_DESC")
+	@NotEmpty(message="場地描述: 請勿空白")
+	@Pattern(regexp = "^[\u4e00-\u9fa5a-zA-Z0-9，。！？、\\s]{2,100}$", message = "場地描述: 長度必需在2到100之間")
 	private String typeDesc;
 
 	@Column(name = "TYPE_MODE")

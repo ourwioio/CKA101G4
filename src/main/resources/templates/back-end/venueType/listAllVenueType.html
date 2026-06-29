@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>場地類型列表</title>
+<style>
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: sans-serif;
+	background: #f5f5f5;
+	padding: 2rem;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1.25rem;
+}
+
+.title {
+	font-size: 18px;
+	font-weight: 500;
+}
+
+.btn-add {
+	background: #1d9e75;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	padding: 8px 16px;
+	font-size: 14px;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.table-wrap {
+	border: 1px solid #e0e0e0;
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+thead {
+	background: #f8f8f8;
+}
+
+thead th {
+	padding: 10px 14px;
+	font-size: 13px;
+	color: #666;
+	text-align: left;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+tbody tr {
+	border-bottom: 1px solid #e0e0e0;
+	background: white;
+}
+
+tbody tr:last-child {
+	border-bottom: none;
+}
+
+tbody tr:hover {
+	background: #fafafa;
+}
+
+td {
+	padding: 12px 14px;
+	font-size: 14px;
+	vertical-align: middle;
+}
+
+.actions {
+	display: flex;
+	gap: 6px;
+}
+
+.btn-edit {
+	background: white;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	padding: 5px 12px;
+	font-size: 13px;
+	cursor: pointer;
+}
+
+.btn-del {
+	background: white;
+	border: 1px solid #ffb3b3;
+	border-radius: 6px;
+	padding: 5px 12px;
+	font-size: 13px;
+	color: #c0392b;
+	cursor: pointer;
+}
+</style>
+</head>
+<body>
+	<div class="header">
+		<span class="title">場地類型管理</span> <a class="btn-add"
+			th:href="@{/venueType/addVenueType}">新增場地類型</a>
+	</div>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th>類型ID</th>
+					<th>類型名稱</th>
+					<th>類型描述</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="venueType : ${venueTypeListData}">
+					<td th:text="${venueType.venueTypeId}"></td>
+					<td th:text="${venueType.typeName}"></td>
+					<td th:text="${venueType.typeDesc}"></td>
+					<td>
+						<div class="actions">
+							<form th:action="@{/venueType/getOne_For_Update}" method="post"
+								style="display: inline">
+								<input type="hidden" name="venueTypeId"
+									th:value="${venueType.venueTypeId}" />
+								<button type="submit" class="btn-edit">修改</button>
+							</form>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>

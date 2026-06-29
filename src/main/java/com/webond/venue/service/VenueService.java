@@ -43,6 +43,7 @@ public class VenueService {
 	
 	@Transactional
 	public void updateVenueWithImages(VenueVO venueVO, List<byte[]> imageBytesList) {
+
 	    // 從資料庫取出現有場地（保留舊照片、createdAt、venueStatus等）
 	    VenueVO existingVenue = repository.findById(venueVO.getVenueId()).orElse(null);
 	    
