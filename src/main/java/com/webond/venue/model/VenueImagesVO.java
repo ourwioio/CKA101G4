@@ -28,16 +28,20 @@ public class VenueImagesVO {
 
 	@Column(name = "VENUE_IMAGES")
 	private byte[] images;
+	
+	@Column(name = "VENUE_COVER")
+	private Byte cover;  // 0 = 一般照片, 1 = 封面
 
 	public VenueImagesVO() {
 		super();
 	}
 
-	public VenueImagesVO(Integer imagesId, VenueVO venueVO, byte[] images) {
+	public VenueImagesVO(Integer imagesId, VenueVO venueVO, byte[] images, Byte cover) {
 		super();
 		this.imagesId = imagesId;
 		this.venueVO = venueVO;
 		this.images = images;
+		this.cover = cover;
 	}
 
 	public Integer getImagesId() {
@@ -64,10 +68,13 @@ public class VenueImagesVO {
 		this.images = images;
 	}
 
-	@Override
-	public String toString() {
-		return "VenueImagesVO [imagesId=" + imagesId + ", venueVO=" + venueVO + ", images=" + Arrays.toString(images)
-				+ "]";
+	public Byte getCover() {
+		return cover;
 	}
+
+	public void setCover(Byte cover) {
+		this.cover = cover;
+	}
+
 
 }
