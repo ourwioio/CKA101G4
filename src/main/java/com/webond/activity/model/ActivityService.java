@@ -3,10 +3,11 @@ package com.webond.activity.model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.webond.activity.model.ActivityRepository;
 import com.webond.activity.model.ActivityVO;
+import com.webond.activity.repository.ActivityRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service // 宣告這是一個 Service 元件
 public class ActivityService {
@@ -19,7 +20,12 @@ public class ActivityService {
 		return repository.findAll(); // findAll() 是 Spring 內建的方法
 	}
 
-	// 新增/修改 (Spring Boot 裡新增和修改都是 save)
+	public ActivityVO getOneActivity(Integer id) {
+		Optional<ActivityVO> optional = repository.findById(id);
+		return optional.orElse(null); // 如果找不到就回傳 null
+	}
+
+	// 新增/修改
 	public ActivityVO saveActivity(ActivityVO vo) {
 		return repository.save(vo);
 	}

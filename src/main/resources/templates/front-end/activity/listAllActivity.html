@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>活動項目管理</title>
+    <style>
+       
+        body {
+            background-color: #1a1a1a;
+            color: #f3f4f6;
+            font-family: 'Inter', 'PingFang TC', sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .header-container {
+            max-width: 1100px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+        }
+
+        .header-title { font-size: 1.8rem; font-weight: bold; color: #4b5563; display: flex; align-items: center; }
+        .header-title .highlight { color: #60a5fa; margin-left: 10px; }
+
+        .btn-group { display: flex; gap: 10px; }
+        .btn-primary { background-color: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; text-decoration: none; }
+        .btn-secondary { background-color: #f3f4f6; color: #1f2937; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; text-decoration: none; }
+
+        .table-card {
+            background-color: #ffffff;
+            max-width: 1100px;
+            margin: 0 auto;
+            border-radius: 12px;
+            padding: 20px;
+            color: #1f2937;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 16px; border-bottom: 2px solid #f3f4f6; text-align: center; color: #4b5563; font-weight: bold; }
+        td { padding: 16px; border-bottom: 1px solid #f3f4f6; text-align: center; vertical-align: middle; }
+        
+        .text-left { text-align: left; font-weight: bold; }
+
+        /* 標籤徽章 */
+        .badge-type { background-color: #e0e7ff; color: #3730a3; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block; }
+        .badge-status { padding: 6px 16px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; display: inline-block; }
+        .status-0 { background-color: #dcfce7; color: #166534; } /* 正常 */
+        .status-1 { background-color: #fef3c7; color: #92400e; } /* 延期 */
+        .status-2 { background-color: #fee2e2; color: #991b1b; } /* 取消 */
+
+        /* 操作按鈕 */
+        .action-btns { display: flex; gap: 8px; justify-content: center; }
+        .btn-edit { background-color: #10b981; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85rem; }
+        .btn-delete { background-color: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+    <div class="header-container">
+        <div class="header-title">
+            🎈 揪團活動管理後台 <span class="highlight">(Thymeleaf 版)</span>
+        </div>
+        <div class="btn-group">
+            <!-- Thymeleaf 動態路徑導向新增頁面 -->
+            <a th:href="@{/activity/addActivity}" class="btn-primary">➕ 新增活動</a>
+            <a th:href="@{/activity/listAllActivity}" class="btn-secondary">🔄 重新整理</a>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th width="8%">編號</th>
+                    <th width="30%" class="text-left">活動標題</th>
+                    <th width="12%">類型</th>
+                    <th width="10%">價格</th>
+                    <th width="15%">報名人數</th>
+                    <th width="10%">狀態</th>
+                    <th width="15%">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+               
+                <tr th:each="act : ${activityListData}">
+                    
+                    <td th:text="${act.activityId}">1</td>
+                    <td class="text-left" th:text="${act.activityTitle}">週末大佳河濱公園放風跑</td>
+                    
+                  
+                    <td>
+                        <span class="badge-type" 
+                              th:each="type : ${typeListData}" 
+                              th:if="${type.activityTypeId == act.activityTypeId}" 
+                              th:text="${type.activityTypeName}">球類運動</span>
+                    </td>
+                    
+                    <td th:text="${act.activityPrice == 0 ? '$0' : '$' + act.activityPrice}">$0</td>
+                    
+                    
+                    <td th:text="${(act.attendeesCount != null ? act.attendeesCount : 0) + ' / ' + act.maxParticipants}">4 / 10</td>
+                    
+                    
+                    <td th:switch="${act.activityStatus}">
+                        <span th:case="0" class="badge-status status-0">正常</span>
+                        <span th:case="1" class="badge-status status-1">延期</span>
+                        <span th:case="2" class="badge-status status-2">取消</span>
+                        <span th:case="*" class="badge-status">未知</span>
+                    </td>
+                    
+                    <td class="action-btns">
+                       
+                        <a class="btn-edit" th:href="@{/activity/updateActivity(id=${act.activityId})}">修改</a>
+                        
+                        
+                        <form th:action="@{/activity/deleteActivity}" method="post" onsubmit="return confirm('確定要刪除嗎？');" style="margin:0;">
+                            <input type="hidden" name="activityId" th:value="${act.activityId}" />
+                            <button type="submit" class="btn-delete">刪除</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>
