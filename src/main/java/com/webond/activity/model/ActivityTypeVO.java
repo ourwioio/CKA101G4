@@ -11,7 +11,7 @@ public class ActivityTypeVO {
 	@Column(name = "ACTIVITY_TYPE_ID")
 	private Integer activityTypeId;
 
-	@Column(name = "ACTIVITY_TYPE_NAME", nullable = false, length = 50)
+	@Column(name = "TYPE_NAME", nullable = false, length = 50)
 	private String activityTypeName;
 
 	// Getters and Setters

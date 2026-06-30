@@ -32,7 +32,7 @@ public class ActivityController {
 		// 取得活動類型，供前端 Thymeleaf 轉換名稱用
 		model.addAttribute("typeListData", activityTypeSvc.getAll());
 
-		return "activity/listAllActivity";
+		return "front-end/activity/listAllActivity";
 	}
 
 	// 新增活動 (Add)
@@ -44,7 +44,7 @@ public class ActivityController {
 		// 傳遞類型清單給下拉選單使用
 		model.addAttribute("typeListData", activityTypeSvc.getAll());
 
-		return "activity/addActivity";
+		return "front-end/activity/addActivity";
 	}
 
 	// 2. 處理表單送出
@@ -54,7 +54,7 @@ public class ActivityController {
 		activitySvc.saveActivity(activityVO);
 
 		// 新增完成後，重新導向回列表頁面
-		return "redirect:/activity/listAllActivity";
+		return "redirect:/front-end/activity/listAllActivity";
 	}
 
 	// 修改活動 (Update)
@@ -68,7 +68,7 @@ public class ActivityController {
 		model.addAttribute("activityVO", activityVO);
 		model.addAttribute("typeListData", activityTypeSvc.getAll());
 
-		return "activity/updateActivity";
+		return "front-end/activity/updateActivity";
 	}
 
 	// 2. 處理修改送出
@@ -77,7 +77,7 @@ public class ActivityController {
 
 		activitySvc.saveActivity(activityVO);
 
-		return "redirect:/activity/listAllActivity";
+		return "redirect:/front-end/activity/listAllActivity";
 	}
 
 	// 刪除活動 (Delete)
