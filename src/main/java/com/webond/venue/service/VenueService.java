@@ -30,15 +30,30 @@ public class VenueService {
 		repository.save(venueVO);
 	}
 
+//	@Transactional
+//	public void addVenueWithImages(VenueVO venueVO, List<byte[]> imageBytesList) {
+//		for (byte[] bytes : imageBytesList) {
+//			VenueImagesVO imageVO = new VenueImagesVO();
+//			imageVO.setImages(bytes);
+//			imageVO.setVenueVO(venueVO); // 場地編號新增到venueVO
+//			venueVO.getVenueImages().add(imageVO); // 找照片放進Set集合裡一起新增
+//		}
+//		repository.save(venueVO);
+//	}
+	
 	@Transactional
-	public void addVenueWithImages(VenueVO venueVO, List<byte[]> imageBytesList) {
-		for (byte[] bytes : imageBytesList) {
-			VenueImagesVO imageVO = new VenueImagesVO();
-			imageVO.setImages(bytes);
-			imageVO.setVenueVO(venueVO); // 場地編號新增到venueVO
-			venueVO.getVenueImages().add(imageVO); // 找照片放進Set集合裡一起新增
-		}
-		repository.save(venueVO);
+	public void addVenueWithImages(VenueVO venueVO, List<byte[]> imageBytesList, int coverIndex) {
+	    repository.save(venueVO);
+	    repository.flush();
+
+	    for (int i = 0; i < imageBytesList.size(); i++) {
+	        VenueImagesVO imageVO = new VenueImagesVO();
+	        imageVO.setImages(imageBytesList.get(i));
+	        imageVO.setVenueVO(venueVO);
+	        imageVO.setCover(i == coverIndex ? (byte) 1 : (byte) 0);
+	        venueVO.getVenueImages().add(imageVO);
+	    }
+	    repository.save(venueVO);
 	}
 	
 	@Transactional
@@ -99,6 +114,14 @@ public class VenueService {
 		return getOneVenue(venueId).getVenueOrders();
 	}
 	
+	public List<VenueVO> getAllActive() {
+		return repository.findByVenueStatus((byte) 1);
+	}
+	
+	public List<VenueVO> getVenuesByMember(Integer memberId) {
+		return repository.findByMember_MemberId(memberId);
+	}
+	
 	@Transactional
 	public void toggleVenueStatus(Integer venueId) {
 	    VenueVO venue = repository.findById(venueId).orElse(null);
@@ -110,9 +133,24 @@ public class VenueService {
 	    }
 	}
 	
-	public List<VenueVO> getAllActive() {
-	    return repository.findByVenueStatus((byte) 1);
+	@Transactional
+	public void updateVenueCover(VenueVO venueVO, Integer coverImageId) {
+	    VenueVO existingVenue = repository.findById(venueVO.getVenueId()).orElse(null);
+	    if (existingVenue == null) return;
+
+	    existingVenue.setVenueName(venueVO.getVenueName());
+	    existingVenue.setOpenDays(venueVO.getOpenDays());
+	    existingVenue.setAvailableHours(venueVO.getAvailableHours());
+
+	    if (coverImageId != null) {
+	        for (VenueImagesVO img : existingVenue.getVenueImages()) {
+	            img.setCover(img.getImagesId().equals(coverImageId) ? (byte) 1 : (byte) 0);
+	        }
+	    }
+	    repository.save(existingVenue);
 	}
+
+	
 	
 	
 
