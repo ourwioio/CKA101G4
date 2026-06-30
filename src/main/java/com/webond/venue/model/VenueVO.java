@@ -105,6 +105,15 @@ public class VenueVO {
 	public void setVenueImages(Set<VenueImagesVO> venueImages) {
 		this.venueImages = venueImages;
 	}
+	
+	public VenueImagesVO getCoverImage() {
+	    for (VenueImagesVO image : venueImages) {
+	        if (image.getCover() != null && image.getCover() == 1) {
+	            return image; // 回傳封面
+	        }
+	    }
+	    return null; // 防呆
+	}
 
 	public Set<VenueSlotVO> getVenueSlots() {
 		return venueSlots;
