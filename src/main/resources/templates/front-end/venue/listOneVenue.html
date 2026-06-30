@@ -142,8 +142,8 @@ hr {
 	<a class="back-link" th:href="@{/front/venue/listAllVenue}">← 回場地列表</a>
 	<div class="card">
 		<img class="main-img"
-			th:if="${venueVO.venueImages != null and !venueVO.venueImages.isEmpty()}"
-			th:src="@{/venue/getImage(imagesId=${venueVO.venueImages.iterator().next().imagesId})}" />
+			th:if="${venueVO.coverImage != null}"
+			th:src="@{/venue/getImage(imagesId=${venueVO.coverImage.imagesId})}" />
 		<div class="body">
 			<div class="venue-name" th:text="${venueVO.venueName}"></div>
 			<div class="venue-addr" th:text="${venueVO.address}"></div>
