@@ -1,57 +1,63 @@
 package com.webond.activity.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.webond.activity.model.ActivityTypeService;
-import com.webond.activity.model.ActivityTypeVO;
+import com.webond.activity.model.ActivityTypeVO; 
 
-import java.util.List;
-
-@RestController
-@RequestMapping("/api/activity-types")
-@CrossOrigin(origins = "*") // 允許前端 Vue 專案跨域調用 API
+@Controller 
+@RequestMapping("/activityType")
 public class ActivityTypeController {
 
-    // ✨ 修正：不再直接注入 Repository，而是注入更具安全保障的 Service 層！
     @Autowired
-    private ActivityTypeService typeService;
+    private ActivityTypeService activityTypeSvc;
 
-    /**
-     * API: 獲取所有活動類型字典
-     */
-    @GetMapping
-    public ResponseEntity<List<ActivityTypeVO>> getAll() {
-        List<ActivityTypeVO> list = typeService.getAll();
-        return ResponseEntity.ok(list);
+    //查詢全部活動類型
+    @GetMapping("/listAllActivityType")
+    public String listAllActivityType(Model model) {
+        model.addAttribute("typeListData", activityTypeSvc.getAll());
+        return "activityType/listAllActivityType"; 
+    }
+    
+    //新增類型 (Add)
+    @GetMapping("/addActivityType")
+    public String addActivityType(Model model) {
+        model.addAttribute("activityTypeVO", new ActivityTypeVO());
+        return "activityType/addActivityType";
     }
 
-    /**
-     * API: 新增/修改活動類型
-     */
-    @PostMapping
-    public ResponseEntity<?> insert(@RequestBody ActivityTypeVO typeVO) {
-        try {
-            ActivityTypeVO saved = typeService.saveType(typeVO);
-            return ResponseEntity.ok(saved);
-        } catch (IllegalArgumentException e) {
-            // 回傳 400 Bad Request 以及邏輯錯誤訊息
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PostMapping("/insert")
+    public String insert(@ModelAttribute("activityTypeVO") ActivityTypeVO activityTypeVO) {
+        activityTypeSvc.saveType(activityTypeVO); 
+        return "redirect:/activityType/listAllActivityType";
     }
 
-    /**
-     * API: 刪除活動類型
-     */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Integer id) {
-        try {
-            typeService.deleteType(id);
-            return ResponseEntity.ok("分類標籤下架成功！");
-        } catch (Exception e) {
-            // 回傳 400 Bad Request 並告知無法刪除的原因
-            return ResponseEntity.badRequest().body("無法刪除此分類。原因可能為：" + e.getMessage());
-        }
+    //Update
+    @GetMapping("/updateActivityType")
+    public String updateActivityType(@RequestParam("id") Integer activityTypeId, Model model) {
+        // 使用 service 查詢出該筆資料 (假設您的方法名稱為 getById，且回傳 Optional)
+        ActivityTypeVO activityTypeVO = activityTypeSvc.getById(activityTypeId).orElse(null); 
+        model.addAttribute("activityTypeVO", activityTypeVO);
+        return "activityType/updateActivityType";
+    }
+
+    @PostMapping("/update")
+    public String update(@ModelAttribute("activityTypeVO") ActivityTypeVO activityTypeVO) {
+        activityTypeSvc.saveType(activityTypeVO);
+        return "redirect:/activityType/listAllActivityType";
+    }
+   
+    //刪除類型 (Delete)
+    @PostMapping("/deleteActivityType")
+    public String deleteActivityType(@RequestParam("activityTypeId") Integer activityTypeId) {
+        activityTypeSvc.deleteType(activityTypeId);
+        return "redirect:/activityType/listAllActivityType";
     }
 }
