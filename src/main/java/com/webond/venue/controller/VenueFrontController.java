@@ -60,7 +60,8 @@ public class VenueFrontController {
 	public String insert(@Valid VenueVO venueVO, BindingResult result, ModelMap model,
 			@RequestParam("upFiles") MultipartFile[] parts,
 			@RequestParam(value = "openDays", required = false) List<Integer> openDays,
-			@RequestParam("startHour") int startHour, @RequestParam("endHour") int endHour,
+			@RequestParam("startHour") int startHour, 
+			@RequestParam("endHour") int endHour,
 			@RequestParam(value = "coverIndex", defaultValue = "0") int coverIndex, 
 			HttpSession session) throws IOException {
 
@@ -76,6 +77,7 @@ public class VenueFrontController {
 		model.addAttribute("savedStartHour", startHour);
 		model.addAttribute("savedEndHour", endHour);
 		model.addAttribute("savedOpenDays", openDays);
+		
 		if (venueVO.getAddress() != null && !venueVO.getAddress().isEmpty()) {
 			model.addAttribute("savedAddress", venueVO.getAddress());
 		}
@@ -166,7 +168,8 @@ public class VenueFrontController {
 	    StringBuilder daysSb = new StringBuilder("0000000");
 	    if (openDays != null) {
 	        for (Integer day : openDays) {
-	            if (day >= 0 && day <= 6) daysSb.setCharAt(day, '1');
+	            if (day >= 0 && day <= 6) 
+	            	daysSb.setCharAt(day, '1');
 	        }
 	    }
 	    venueVO.setOpenDays(daysSb.toString());
