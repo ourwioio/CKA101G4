@@ -202,9 +202,16 @@ public class VenueFrontController {
 		model.addAttribute("venueListData", list);
 		return "front-end/venue/listAllVenue";
 	}
-
+	
 	@GetMapping("getOneVenue")
 	public String getOne(@RequestParam("venueId") Integer venueId, HttpSession session, ModelMap model) {
+		VenueVO venueVO = venueService.getOneVenue(venueId);
+		model.addAttribute("venueVO", venueVO);
+		return "front-end/venue/listOneVenue";
+	}
+
+	@GetMapping("getOneMyVenue")
+	public String getOneMyvenue(@RequestParam("venueId") Integer venueId, HttpSession session, ModelMap model) {
 		VenueVO venueVO = venueService.getOneVenue(venueId);
 		model.addAttribute("venueVO", venueVO);
 
@@ -239,7 +246,7 @@ public class VenueFrontController {
 			venueService.toggleVenueStatus(venueId);
 		}
 
-		return "redirect:/front/venue/getOneVenue?venueId=" + venueId;
+		return "redirect:/front/venue/getOneMyVenue?venueId=" + venueId;
 	}
 
 	@ModelAttribute("venueTypeData")

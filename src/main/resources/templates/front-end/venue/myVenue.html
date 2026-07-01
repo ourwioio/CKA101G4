@@ -39,7 +39,7 @@ h1 { font-size: 22px; font-weight: 500; }
                 <span th:class="${venue.venueStatus == 0 ? 'badge badge-down' : 'badge badge-up'}"
                       th:text="${venue.venueStatus == 0 ? '下架' : '上架'}"></span>
                 <div class="actions">
-    				<a th:href="@{/front/venue/getOneVenue(venueId=${venue.venueId})}" class="btn-edit" style="text-decoration: none; display: inline-block;">查看</a>
+    				<a th:href="@{/front/venue/getOneMyVenue(venueId=${venue.venueId})}" class="btn-edit" style="text-decoration: none; display: inline-block;">查看</a>
 				</div>
             </div>
         </div>
