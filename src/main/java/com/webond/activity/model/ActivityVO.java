@@ -1,7 +1,8 @@
 package com.webond.activity.model;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -55,27 +56,28 @@ public class ActivityVO implements Serializable {
 	private Integer attendeesCount;
 
 	@NotNull(message = "請選擇報名開始時間")
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 	@Column(name = "REGISTRATION_STARTTIME")
-	private Timestamp registrationStartTime;
+	private LocalDateTime registrationStartTime;
 
 	@NotNull(message = "請選擇報名截止時間")
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 	@Column(name = "REGISTRATION_DEADLINE")
-	private Timestamp registrationDeadline;
+	private LocalDateTime registrationDeadline;
 
 	@NotNull(message = "請選擇活動狀態")
 	@Column(name = "ACTIVITY_STATUS")
 	private Byte activityStatus;
 
 	@Column(name = "CREATED_AT", insertable = false, updatable = false)
-	private Timestamp createdAt;
+	private LocalDateTime createdAt;
 
 	@NotNull(message = "請選擇活動結束時間")
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 	@Column(name = "END_TIME")
-	private Timestamp endTime;
+	private LocalDateTime endTime;
 
-	// ===========================
-	// Getter & Setter
-	// ===========================
+	// ================= Getter / Setter =================
 
 	public Integer getActivityId() {
 		return activityId;
@@ -149,19 +151,19 @@ public class ActivityVO implements Serializable {
 		this.attendeesCount = attendeesCount;
 	}
 
-	public Timestamp getRegistrationStartTime() {
+	public LocalDateTime getRegistrationStartTime() {
 		return registrationStartTime;
 	}
 
-	public void setRegistrationStartTime(Timestamp registrationStartTime) {
+	public void setRegistrationStartTime(LocalDateTime registrationStartTime) {
 		this.registrationStartTime = registrationStartTime;
 	}
 
-	public Timestamp getRegistrationDeadline() {
+	public LocalDateTime getRegistrationDeadline() {
 		return registrationDeadline;
 	}
 
-	public void setRegistrationDeadline(Timestamp registrationDeadline) {
+	public void setRegistrationDeadline(LocalDateTime registrationDeadline) {
 		this.registrationDeadline = registrationDeadline;
 	}
 
@@ -173,20 +175,19 @@ public class ActivityVO implements Serializable {
 		this.activityStatus = activityStatus;
 	}
 
-	public Timestamp getCreatedAt() {
+	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(Timestamp createdAt) {
+	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 
-	public Timestamp getEndTime() {
+	public LocalDateTime getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(Timestamp endTime) {
+	public void setEndTime(LocalDateTime endTime) {
 		this.endTime = endTime;
 	}
-
 }
