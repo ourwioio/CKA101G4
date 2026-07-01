@@ -73,11 +73,24 @@ public class ActivityController {
 
 	// 2. 處理修改送出
 	@PostMapping("/update")
-	public String update(@ModelAttribute("activityVO") ActivityVO activityVO) {
+	public String update(@ModelAttribute("activityVO") ActivityVO formVO) {
 
-		activitySvc.saveActivity(activityVO);
+	    // 先取得資料庫原本的資料
+	    ActivityVO actVO = activitySvc.getOneActivity(formVO.getActivityId());
+	    // 找不到資料就回列表
+	    if (actVO == null) {
+	        return "redirect:/activity/listAllActivity";
+	    }
+	    // 只更新畫面有提供的欄位
+	    actVO.setActivityTitle(formVO.getActivityTitle());
+	    actVO.setActivityTypeId(formVO.getActivityTypeId());
+	    actVO.setActivityPrice(formVO.getActivityPrice());
+	    actVO.setMaxParticipants(formVO.getMaxParticipants());
+	    actVO.setActivityStatus(formVO.getActivityStatus());
+	    // 儲存
+	    activitySvc.saveActivity(actVO);
 
-		return "redirect:/front-end/activity/listAllActivity";
+	    return "redirect:/activity/listAllActivity";
 	}
 
 	// 刪除活動 (Delete)

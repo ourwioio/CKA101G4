@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>修改活動類型</title>
+    <style>
+        body { background-color: #1a1a1a; color: #f3f4f6; font-family: 'Inter', 'PingFang TC', sans-serif; margin: 0; padding: 40px; }
+        .header-container { max-width: 600px; margin: 0 auto 20px auto; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 20px; }
+        .header-title { font-size: 1.8rem; font-weight: bold; color: #4b5563; }
+        .btn-secondary { background-color: #f3f4f6; color: #1f2937; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; text-decoration: none; }
+        .form-card { background-color: #ffffff; max-width: 600px; margin: 0 auto; border-radius: 12px; padding: 30px 40px; color: #1f2937; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #374151; font-size: 0.95rem; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; box-sizing: border-box; font-size: 1rem; background-color: #f9fafb; transition: all 0.2s; }
+        .form-control:focus { outline: none; border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15); background-color: #ffffff; }
+        .form-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; }
+        .btn-submit { background-color: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; }
+        .btn-submit:hover { background-color: #059669; }
+        .btn-cancel { background-color: #ffffff; color: #4b5563; border: 1px solid #d1d5db; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; text-decoration: none; }
+        .btn-cancel:hover { background-color: #f3f4f6; }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <div class="header-title">✏️ 修改活動分類</div>
+        <a th:href="@{/activityType/listAllActivityType}" class="btn-secondary">🔙 返回列表</a>
+    </div>
+    <div class="form-card">
+        <form th:action="@{/activityType/update}" th:object="${activityTypeVO}" method="post">
+            
+            <!-- 隱藏主鍵 ID，更新時必須有 -->
+            <input type="hidden" th:field="*{activityTypeId}" />
+
+            <div class="form-group">
+                <label>分類標籤名稱 <span style="color: #ef4444;">*</span></label>
+                <input type="text" class="form-control" th:field="*{activityTypeName}" required>
+            </div>
+            
+            <div class="form-actions">
+                <a th:href="@{/activityType/listAllActivityType}" class="btn-cancel">取消</a>
+                <button type="submit" class="btn-submit">💾 儲存修改</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
