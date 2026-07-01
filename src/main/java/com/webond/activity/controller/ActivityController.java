@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 import com.webond.activity.model.ActivityService;
 import com.webond.activity.model.ActivityTypeService;
 import com.webond.activity.model.ActivityVO;
@@ -49,12 +50,19 @@ public class ActivityController {
 
 	// 2. 處理表單送出
 	@PostMapping("/insert")
-	public String insert(@ModelAttribute("activityVO") ActivityVO activityVO) {
-		// 呼叫剛才更新的 saveActivity 進行新增
+	public String insert(@Valid @ModelAttribute("activityVO") ActivityVO activityVO, BindingResult result,
+			Model model) {
+
+		// 有驗證錯誤
+		if (result.hasErrors()) {
+			model.addAttribute("typeListData", activityTypeSvc.getAll());
+			return "front-end/activity/addActivity";
+		}
+
+		// 新增
 		activitySvc.saveActivity(activityVO);
 
-		// 新增完成後，重新導向回列表頁面
-		return "redirect:/front-end/activity/listAllActivity";
+		return "redirect:/activity/listAllActivity";
 	}
 
 	// 修改活動 (Update)
@@ -73,21 +81,30 @@ public class ActivityController {
 
 	// 2. 處理修改送出
 	@PostMapping("/update")
-	public String update(@ModelAttribute("activityVO") ActivityVO formVO) {
+	public String update(
+	        @Valid @ModelAttribute("activityVO") ActivityVO formVO,
+	        BindingResult result,
+	        Model model) {
 
-	    // 先取得資料庫原本的資料
-	    ActivityVO actVO = activitySvc.getOneActivity(formVO.getActivityId());
-	    // 找不到資料就回列表
-	    if (actVO == null) {
-	        return "redirect:/activity/listAllActivity";
+	    if (result.hasErrors()) {
+	        model.addAttribute("typeListData", activityTypeSvc.getAll());
+	        return "front-end/activity/updateActivity";
 	    }
-	    // 只更新畫面有提供的欄位
+
+	    ActivityVO actVO = activitySvc.getOneActivity(formVO.getActivityId());
+
 	    actVO.setActivityTitle(formVO.getActivityTitle());
 	    actVO.setActivityTypeId(formVO.getActivityTypeId());
+	    actVO.setMemberId(formVO.getMemberId());
+	    actVO.setActivityDescription(formVO.getActivityDescription());
 	    actVO.setActivityPrice(formVO.getActivityPrice());
+	    actVO.setMinParticipants(formVO.getMinParticipants());
 	    actVO.setMaxParticipants(formVO.getMaxParticipants());
+	    actVO.setRegistrationStartTime(formVO.getRegistrationStartTime());
+	    actVO.setRegistrationDeadline(formVO.getRegistrationDeadline());
+	    actVO.setEndTime(formVO.getEndTime());
 	    actVO.setActivityStatus(formVO.getActivityStatus());
-	    // 儲存
+
 	    activitySvc.saveActivity(actVO);
 
 	    return "redirect:/activity/listAllActivity";

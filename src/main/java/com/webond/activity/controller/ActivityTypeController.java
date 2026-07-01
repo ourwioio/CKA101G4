@@ -23,14 +23,14 @@ public class ActivityTypeController {
     @GetMapping("/listAllActivityType")
     public String listAllActivityType(Model model) {
         model.addAttribute("typeListData", activityTypeSvc.getAll());
-        return "activityType/listAllActivityType"; 
+        return "back-end/activity/listAllActivityType"; 
     }
     
     //新增類型 (Add)
     @GetMapping("/addActivityType")
     public String addActivityType(Model model) {
         model.addAttribute("activityTypeVO", new ActivityTypeVO());
-        return "activityType/addActivityType";
+        return "back-end/activity/addActivityType";
     }
 
     @PostMapping("/insert")
@@ -45,7 +45,7 @@ public class ActivityTypeController {
         // 使用 service 查詢出該筆資料 (假設您的方法名稱為 getById，且回傳 Optional)
         ActivityTypeVO activityTypeVO = activityTypeSvc.getById(activityTypeId).orElse(null); 
         model.addAttribute("activityTypeVO", activityTypeVO);
-        return "activityType/updateActivityType";
+        return "back-end/activity/updateActivityType";
     }
 
     @PostMapping("/update")
