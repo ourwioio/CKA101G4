@@ -1,5 +1,6 @@
 package com.webond.venue.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -12,7 +13,6 @@ import com.webond.venue.model.VenueImagesVO;
 import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueSlotVO;
 import com.webond.venue.model.VenueVO;
-import com.webond.venue.repository.VenueImagesRepository;
 import com.webond.venue.repository.VenueRepository;
 
 import jakarta.transaction.Transactional;
@@ -30,22 +30,13 @@ public class VenueService {
 		repository.save(venueVO);
 	}
 
-//	@Transactional
-//	public void addVenueWithImages(VenueVO venueVO, List<byte[]> imageBytesList) {
-//		for (byte[] bytes : imageBytesList) {
-//			VenueImagesVO imageVO = new VenueImagesVO();
-//			imageVO.setImages(bytes);
-//			imageVO.setVenueVO(venueVO); // 場地編號新增到venueVO
-//			venueVO.getVenueImages().add(imageVO); // 找照片放進Set集合裡一起新增
-//		}
-//		repository.save(venueVO);
-//	}
-	
 	@Transactional
 	public void addVenueWithImages(VenueVO venueVO, List<byte[]> imageBytesList, int coverIndex) {
+	    // 先存場地取得 venueId
 	    repository.save(venueVO);
 	    repository.flush();
 
+	    // 新增照片
 	    for (int i = 0; i < imageBytesList.size(); i++) {
 	        VenueImagesVO imageVO = new VenueImagesVO();
 	        imageVO.setImages(imageBytesList.get(i));
@@ -53,8 +44,33 @@ public class VenueService {
 	        imageVO.setCover(i == coverIndex ? (byte) 1 : (byte) 0);
 	        venueVO.getVenueImages().add(imageVO);
 	    }
+
+	 // 產生未來 15 天的預約時段
+	    LocalDate today = LocalDate.now();
+	    String openDays = venueVO.getOpenDays();        // 長度7的字串
+	    String availableHours = venueVO.getAvailableHours();  // 長度24的字串
+	    String closedHours = "2".repeat(24);            // 不可預約的全天字串
+
+	    for (int i = 0; i <= 15; i++) {
+	        LocalDate slotDate = today.plusDays(i);
+	        int dayOfWeek = slotDate.getDayOfWeek().getValue() - 1;  // 週一=0, 週日=6
+
+	        String slotStatus;
+	        if (openDays != null && openDays.length() == 7 && openDays.charAt(dayOfWeek) == '1') {
+	            slotStatus = availableHours;  // 開放日用場地設定的時段
+	        } else {
+	            slotStatus = closedHours;     // 非開放日全部不可預約
+	        }
+
+	        VenueSlotVO slotVO = new VenueSlotVO();
+	        slotVO.setVenueVO(venueVO);
+	        slotVO.setSlotDate(slotDate);
+	        slotVO.setSlotStatus(slotStatus);
+	        venueVO.getVenueSlots().add(slotVO);
+	    }
+	    // 照片和時段一起存
 	    repository.save(venueVO);
-	}
+	}	
 	
 	@Transactional
 	public void updateVenueWithImages(VenueVO venueVO, List<byte[]> imageBytesList) {
