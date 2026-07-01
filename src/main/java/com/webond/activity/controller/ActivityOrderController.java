@@ -1,44 +1,90 @@
 package com.webond.activity.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import com.webond.activity.model.ActivityOrderService;
 import com.webond.activity.model.ActivityOrderVO;
+import com.webond.activity.model.ActivityService;
 
-import java.util.List;
-
-@RestController
-@RequestMapping("/api/activity-orders")
-@CrossOrigin(origins = "*")
+@Controller
+@RequestMapping("/activityOrder")
 public class ActivityOrderController {
 
-    @Autowired
-    private ActivityOrderService orderService;
+	@Autowired
+	private ActivityOrderService orderService;
 
-    @GetMapping
-    public ResponseEntity<List<ActivityOrderVO>> getAll() {
-        return ResponseEntity.ok(orderService.getAll());
-    }
+	@Autowired
+	private ActivityService activitySvc;
 
-    @PostMapping
-    public ResponseEntity<ActivityOrderVO> createOrder(@RequestBody ActivityOrderVO orderVO) {
-        return ResponseEntity.ok(orderService.createOrder(orderVO));
-    }
+	// 查詢全部
+	@GetMapping("/listAllOrder")
+	public String listAllOrder(Model model) {
 
-    @PutMapping("/{id}/status")
-    public ResponseEntity<?> updateStatus(@PathVariable Integer id, @RequestParam Integer status) {
-        try {
-            return ResponseEntity.ok(orderService.updatePaymentStatus(id, status));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
+		model.addAttribute("orderListData", orderService.getAll());
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteOrder(@PathVariable Integer id) {
-        orderService.deleteOrder(id);
-        return ResponseEntity.ok("訂單已刪除");
-    }
+		// 活動清單(給畫面顯示活動名稱)
+		model.addAttribute("activityListData", activitySvc.getAll());
+
+		return "front-end/activityOrder/listAllActivityOrder";
+	}
+
+	// 新增
+	@GetMapping("/addOrder")
+	public String addOrder(Model model) {
+
+		model.addAttribute("activityOrderVO", new ActivityOrderVO());
+
+		model.addAttribute("activityListData", activitySvc.getAll());
+
+		return "front-end/activityOrder/addActivityOrder";
+	}
+
+	@PostMapping("/insert")
+	public String insert(@ModelAttribute ActivityOrderVO orderVO) {
+
+		orderService.createOrder(orderVO);
+
+		return "redirect:/activityOrder/listAllOrder";
+	}
+
+	// 修改
+	@GetMapping("/updateOrder")
+	public String updateOrder(@RequestParam("id") Integer orderId, Model model) {
+
+		ActivityOrderVO orderVO = orderService.getOneOrder(orderId);
+
+		model.addAttribute("activityOrderVO", orderVO);
+
+		model.addAttribute("activityListData", activitySvc.getAll());
+
+		return "front-end/activityOrder/updateActivityOrder";
+	}
+
+	@PostMapping("/update")
+	public String update(@ModelAttribute ActivityOrderVO formVO) {
+
+		ActivityOrderVO orderVO = orderService.getOneOrder(formVO.getActivityOrderId());
+
+		orderVO.setActivityId(formVO.getActivityId());
+		orderVO.setMemberId(formVO.getMemberId());
+		orderVO.setOrderTotal(formVO.getOrderTotal());
+		orderVO.setPaymentStatus(formVO.getPaymentStatus());
+
+		orderService.saveOrder(orderVO);
+
+		return "redirect:/activityOrder/listAllOrder";
+	}
+
+	// 刪除
+	@PostMapping("/delete")
+	public String delete(@RequestParam("activityOrderId") Integer id) {
+
+		orderService.deleteOrder(id);
+
+		return "redirect:/activityOrder/listAllOrder";
+	}
+
 }
