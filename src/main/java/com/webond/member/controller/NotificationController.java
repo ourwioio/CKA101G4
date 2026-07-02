@@ -69,6 +69,11 @@ public class NotificationController {
 	@PostMapping("insert")
 	public String insert(@Valid NotificationVO notificationVO, BindingResult result, ModelMap model) {
 		
+		if(notificationVO.getMember() == null) {
+			model.addAttribute("memberError", "請選擇會員");
+			return "back-end/member/addNotification";
+		}
+		
 		if (result.hasErrors()) {
 			return "back-end/member/addNotification";
 		}
