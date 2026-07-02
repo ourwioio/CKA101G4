@@ -1,11 +1,9 @@
 package com.webond.member.model;
 
 import java.time.LocalDate;
-import java.util.Set;
 
-import com.webond.employee.model.EmployeeVO;
+import com.webond.employee.model.EmpVO;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,10 +11,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "NOTIFICATION")
@@ -40,7 +37,7 @@ public class NotificationVO implements java.io.Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
-	private EmployeeVO employee;
+	private EmpVO employee;
 
 //	@OneToMany(cascade = CascadeType.ALL, mappedBy = "employee")
 //	@OrderBy("notificationId asc")
@@ -59,7 +56,7 @@ public class NotificationVO implements java.io.Serializable {
 	private String content;
 
 	@Column(name = "NOTIFICATION_TYPE")
-	@NotEmpty(message = "請選擇類型")
+	@NotNull(message = "請選擇類型")
 	private Byte notificationType;
 
 	@Column(name = "IS_READ", columnDefinition = "byte default 0")
@@ -132,11 +129,11 @@ public class NotificationVO implements java.io.Serializable {
 		this.report = report;
 	}
 
-	public EmployeeVO getEmployee() {
+	public EmpVO getEmployee() {
 		return employee;
 	}
 
-	public void setEmployee(EmployeeVO employee) {
+	public void setEmployee(EmpVO employee) {
 		this.employee = employee;
 	}
 

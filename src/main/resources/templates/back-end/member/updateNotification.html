@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>通知更新</title>
+</head>
+<body>
+
+	<table>
+		<tr>
+			<td th:text="${notificationVO.notificationId}"></td>
+			<td th:text="${notificationVO.member.memberId}"></td>
+			<td th:text="${notificationVO.title}"></td>
+			<td th:text="${notificationVO.content}"></td>
+			<td th:text="${notificationVO.notificationType}"></td>
+			<td th:text="${notificationVO.isRead}"></td>
+			<td th:text="${notificationVO.report.reportId}"></td>
+			<td th:text="${notificationVO.employee.empId}"></td>
+			<td th:text="${notificationVO.createdAt}"></td>
+		</tr>
+	</table>
+
+</body>
+</html>
