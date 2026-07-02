@@ -81,33 +81,30 @@ public class ActivityController {
 
 	// 2. 處理修改送出
 	@PostMapping("/update")
-	public String update(
-	        @Valid @ModelAttribute("activityVO") ActivityVO formVO,
-	        BindingResult result,
-	        Model model) {
+	public String update(@Valid @ModelAttribute("activityVO") ActivityVO formVO, BindingResult result, Model model) {
 
-	    if (result.hasErrors()) {
-	        model.addAttribute("typeListData", activityTypeSvc.getAll());
-	        return "front-end/activity/updateActivity";
-	    }
+		if (result.hasErrors()) {
+			model.addAttribute("typeListData", activityTypeSvc.getAll());
+			return "front-end/activity/updateActivity";
+		}
 
-	    ActivityVO actVO = activitySvc.getOneActivity(formVO.getActivityId());
+		ActivityVO actVO = activitySvc.getOneActivity(formVO.getActivityId());
 
-	    actVO.setActivityTitle(formVO.getActivityTitle());
-	    actVO.setActivityTypeId(formVO.getActivityTypeId());
-	    actVO.setMemberId(formVO.getMemberId());
-	    actVO.setActivityDescription(formVO.getActivityDescription());
-	    actVO.setActivityPrice(formVO.getActivityPrice());
-	    actVO.setMinParticipants(formVO.getMinParticipants());
-	    actVO.setMaxParticipants(formVO.getMaxParticipants());
-	    actVO.setRegistrationStartTime(formVO.getRegistrationStartTime());
-	    actVO.setRegistrationDeadline(formVO.getRegistrationDeadline());
-	    actVO.setEndTime(formVO.getEndTime());
-	    actVO.setActivityStatus(formVO.getActivityStatus());
+		actVO.setActivityTitle(formVO.getActivityTitle());
+		actVO.setActivityTypeId(formVO.getActivityTypeId());
+		actVO.setMemberId(formVO.getMemberId());
+		actVO.setActivityDescription(formVO.getActivityDescription());
+		actVO.setActivityPrice(formVO.getActivityPrice());
+		actVO.setMinParticipants(formVO.getMinParticipants());
+		actVO.setMaxParticipants(formVO.getMaxParticipants());
+		actVO.setRegistrationStartTime(formVO.getRegistrationStartTime());
+		actVO.setRegistrationDeadline(formVO.getRegistrationDeadline());
+		actVO.setEndTime(formVO.getEndTime());
+		actVO.setActivityStatus(formVO.getActivityStatus());
 
-	    activitySvc.saveActivity(actVO);
+		activitySvc.saveActivity(actVO);
 
-	    return "redirect:/activity/listAllActivity";
+		return "redirect:/activity/listAllActivity";
 	}
 
 	// 刪除活動 (Delete)
@@ -118,5 +115,11 @@ public class ActivityController {
 		activitySvc.deleteActivity(activityId);
 
 		return "redirect:/activity/listAllActivity";
+	}
+
+	// 活動管理首頁
+	@GetMapping("/activityHome")
+	public String activityHome() {
+		return "front-end/activity/activityHome";
 	}
 }

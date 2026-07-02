@@ -120,15 +120,13 @@ tr:hover {
 			<thead>
 
 				<tr>
-
 					<th>訂單ID</th>
-					<th>活動ID</th>
+					<th>活動名稱</th>
 					<th>會員ID</th>
 					<th>訂單金額</th>
 					<th>付款狀態</th>
 					<th>建立時間</th>
 					<th>操作</th>
-
 				</tr>
 
 			</thead>
@@ -139,7 +137,10 @@ tr:hover {
 
 					<td th:text="${order.activityOrderId}"></td>
 
-					<td th:text="${order.activityId}"></td>
+					<!-- 活動名稱 -->
+					<td><span th:each="activity : ${activityListData}"
+						th:if="${activity.activityId == order.activityId}"
+						th:text="${activity.activityTitle}"> </span></td>
 
 					<td th:text="${order.memberId}"></td>
 

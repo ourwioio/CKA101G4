@@ -32,15 +32,20 @@ public class ActivityOrderService {
 		return orderRepo.save(orderVO);
 	}
 
-	// 修改（新增這個方法）
+	// 修改
 	public ActivityOrderVO saveOrder(ActivityOrderVO orderVO) {
 		return orderRepo.save(orderVO);
 	}
 
-	// 修改付款狀態(API使用)
-	public ActivityOrderVO updatePaymentStatus(Integer actOrderId, Integer newStatus) {
+	// 新增、修改共用 (如果之後想統一呼叫可使用)
+	public ActivityOrderVO save(ActivityOrderVO orderVO) {
+		return orderRepo.save(orderVO);
+	}
 
-		return orderRepo.findById(actOrderId).map(order -> {
+	// 修改付款狀態(API使用)
+	public ActivityOrderVO updatePaymentStatus(Integer activityOrderId, Integer newStatus) {
+
+		return orderRepo.findById(activityOrderId).map(order -> {
 			order.setPaymentStatus(newStatus);
 			return orderRepo.save(order);
 		}).orElseThrow(() -> new IllegalArgumentException("訂單不存在"));
@@ -50,4 +55,5 @@ public class ActivityOrderService {
 	public void deleteOrder(Integer id) {
 		orderRepo.deleteById(id);
 	}
+
 }
