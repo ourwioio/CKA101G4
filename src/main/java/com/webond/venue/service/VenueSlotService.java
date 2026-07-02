@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import com.webond.venue.model.VenueSlotVO;
 import com.webond.venue.repository.VenueSlotRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class VenueSlotService {
 	
@@ -35,6 +37,19 @@ public class VenueSlotService {
 	
 	public List<VenueSlotVO> getAll(){
 		return repository.findAll();
+	}
+	
+	@Transactional
+	public void updateSlotStatus(Integer venueSlotId, int startHour, int endHour) {
+	    VenueSlotVO slotVO = repository.findById(venueSlotId).orElse(null);
+	    if (slotVO == null) return;
+
+	    StringBuilder sb = new StringBuilder(slotVO.getSlotStatus());
+	    for (int h = startHour; h < endHour; h++) {
+	        sb.setCharAt(h, '1');  // 1 = 已預約
+	    }
+	    slotVO.setSlotStatus(sb.toString());
+	    repository.save(slotVO);
 	}
 	
 	

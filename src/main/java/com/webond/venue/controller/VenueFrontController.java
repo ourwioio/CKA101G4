@@ -45,7 +45,7 @@ public class VenueFrontController {
 
 	@GetMapping("/fakeLogin")
 	public String fakeLogin(HttpSession session) {
-		session.setAttribute("loginMemberId", 8); // 會員假登入
+		session.setAttribute("loginMemberId", 5); // 會員假登入
 		return "redirect:/front/venue/myVenue";
 	}
 

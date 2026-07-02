@@ -25,6 +25,11 @@ h1 { font-size: 22px; font-weight: 500; }
 <body>
     <div class="header">
         <h1>我的場地</h1>
+        <div class="user-info">
+	    <span>
+	        當前登入會員編號：<strong th:text="${session.loginMemberId}"></strong>
+	    </span>
+	</div>	
         <a class="btn-add" th:href="@{/front/venue/listAllVenue}">瀏覽場地頁面</a>
         <a class="btn-add" th:href="@{/front/venue/addVenue}">新增場地</a>
     </div>
