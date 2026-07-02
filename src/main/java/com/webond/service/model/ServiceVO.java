@@ -66,8 +66,6 @@ public class ServiceVO {
         return serviceTypeId;
     }
 
-    // 這個 setter 可以保留給表單綁定或 DTO 使用
-    // 但不要在這裡 new ServiceTypeVO
     public void setServiceTypeId(Integer serviceTypeId) {
         this.serviceTypeId = serviceTypeId;
     }

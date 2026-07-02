@@ -1,10 +1,11 @@
-package com.webond.service.model;
+package com.webond.service.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.webond.service.model.ServiceTypeVO;
 import com.webond.service.repository.ServiceTypeRepository;
 
 @Service

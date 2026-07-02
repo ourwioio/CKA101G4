@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>服務模組假登入</title>
+</head>
+<body>
+
+<h1>服務模組假登入</h1>
+
+<p style="color:red;" th:if="${errorMsg != null}" th:text="${errorMsg}"></p>
+
+<form th:action="@{/member/services/fakelogin}" method="post">
+    <label>請輸入會員編號：</label>
+    <input type="number" name="memberId" required>
+
+    <button type="submit">登入</button>
+</form>
+
+<hr>
+
+<p>
+    <a th:href="@{/front/services}">回前台服務列表</a>
+</p>
+
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${mode == 'add' ? '新增服務' : '修改服務'}">服務表單</title>
+</head>
+<body>
+
+<h1 th:text="${mode == 'add' ? '新增服務' : '修改服務'}">服務表單</h1>
+
+<p>
+    <a th:href="@{/member/services}">回我的服務</a>
+</p>
+
+<hr>
+
+<!-- 錯誤訊息 -->
+<p th:if="${errorMsg != null}" th:text="${errorMsg}" style="color:red;"></p>
+
+<!-- 表單 -->
+<form th:action="${mode == 'add'} 
+                    ? @{/member/services/add} 
+                    : @{/member/services/{id}/edit(id=${serviceId})}"
+      th:object="${serviceRequest}"
+      method="post">
+
+    <!-- 服務類型 -->
+    <p>
+        <label>服務類型：</label>
+        <select th:field="*{serviceTypeId}">
+            <option value="">請選擇服務類型</option>
+            <option th:each="type : ${serviceTypeList}"
+                    th:value="${type.svcTypeID}"
+                    th:text="${type.typeName}">
+                類型名稱
+            </option>
+        </select>
+    </p>
+
+    <p th:if="${errors != null and errors['serviceTypeId'] != null}"
+       th:text="${errors['serviceTypeId']}"
+       style="color:red;"></p>
+
+    <!-- 服務名稱 -->
+    <p>
+        <label>服務名稱：</label>
+        <input type="text" th:field="*{serviceName}">
+    </p>
+
+    <p th:if="${errors != null and errors['serviceName'] != null}"
+       th:text="${errors['serviceName']}"
+       style="color:red;"></p>
+
+    <!-- 服務描述 -->
+    <p>
+        <label>服務描述：</label><br>
+        <textarea th:field="*{description}" rows="5" cols="50"></textarea>
+    </p>
+
+    <p th:if="${errors != null and errors['description'] != null}"
+       th:text="${errors['description']}"
+       style="color:red;"></p>
+
+    <!-- 每小時費率 -->
+    <p>
+        <label>每小時費率：</label>
+        <input type="number" th:field="*{hourlyRate}" min="100">
+    </p>
+
+    <p th:if="${errors != null and errors['hourlyRate'] != null}"
+       th:text="${errors['hourlyRate']}"
+       style="color:red;"></p>
+
+    <hr>
+
+    <button type="submit" th:text="${mode == 'add' ? '新增服務' : '儲存修改'}">
+        送出
+    </button>
+
+    <a th:href="@{/member/services}">取消</a>
+
+</form>
+
+</body>
+</html>

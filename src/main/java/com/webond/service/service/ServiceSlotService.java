@@ -1,4 +1,4 @@
-package com.webond.service.model;
+package com.webond.service.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.webond.service.model.ServiceSlotVO;
+import com.webond.service.model.ServiceVO;
 import com.webond.service.repository.ServiceRepository;
 import com.webond.service.repository.ServiceSlotRepository;
 
