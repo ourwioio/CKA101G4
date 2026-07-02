@@ -27,19 +27,18 @@ public class ActivityOrderPageController {
     public String listAllActivityOrder(Model model) {
 
         model.addAttribute("orderListData", orderSvc.getAll());
-
-        // 下拉式選單使用
         model.addAttribute("activityListData", activitySvc.getAll());
 
         return "front-end/activityorder/listAllActivityOrder";
     }
 
+    // =========================
     // 新增頁面
+    // =========================
     @GetMapping("/addActivityOrder")
     public String addActivityOrder(Model model) {
 
         model.addAttribute("activityOrderVO", new ActivityOrderVO());
-
         model.addAttribute("activityListData", activitySvc.getAll());
 
         return "front-end/activityorder/addActivityOrder";
@@ -57,7 +56,7 @@ public class ActivityOrderPageController {
             return "front-end/activityorder/addActivityOrder";
         }
 
-        orderSvc.createOrder(orderVO);
+        orderSvc.saveOrder(orderVO);
 
         return "redirect:/activityOrder/listAllActivityOrder";
     }
@@ -70,8 +69,11 @@ public class ActivityOrderPageController {
 
         ActivityOrderVO orderVO = orderSvc.getOneOrder(id);
 
-        model.addAttribute("activityOrderVO", orderVO);
+        if (orderVO == null) {
+            return "redirect:/activityOrder/listAllActivityOrder";
+        }
 
+        model.addAttribute("activityOrderVO", orderVO);
         model.addAttribute("activityListData", activitySvc.getAll());
 
         return "front-end/activityorder/updateActivityOrder";
@@ -85,20 +87,22 @@ public class ActivityOrderPageController {
             Model model) {
 
         if (result.hasErrors()) {
-
             model.addAttribute("activityListData", activitySvc.getAll());
-
             return "front-end/activityorder/updateActivityOrder";
         }
 
         ActivityOrderVO orderVO = orderSvc.getOneOrder(formVO.getActivityOrderId());
+
+        if (orderVO == null) {
+            return "redirect:/activityOrder/listAllActivityOrder";
+        }
 
         orderVO.setActivityId(formVO.getActivityId());
         orderVO.setMemberId(formVO.getMemberId());
         orderVO.setOrderTotal(formVO.getOrderTotal());
         orderVO.setPaymentStatus(formVO.getPaymentStatus());
 
-        orderSvc.createOrder(orderVO);
+        orderSvc.saveOrder(orderVO);
 
         return "redirect:/activityOrder/listAllActivityOrder";
     }

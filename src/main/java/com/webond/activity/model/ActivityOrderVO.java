@@ -1,93 +1,97 @@
 package com.webond.activity.model;
 
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ACTIVITY_ORDER")
-public class ActivityOrderVO {
+public class ActivityOrderVO implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ACTIVITY_ORDER_ID")
-    private Integer activityOrderId;
+	private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "請選擇活動")
-    @Min(value = 1, message = "請選擇活動")
-    @Column(name = "ACTIVITY_ID", nullable = false)
-    private Integer activityId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "ACTIVITY_ORDER_ID")
+	private Integer activityOrderId;
 
-    @NotNull(message = "請輸入會員ID")
-    @Min(value = 1, message = "會員ID不可小於1")
-    @Column(name = "MEMBER_ID", nullable = false)
-    private Integer memberId;
+	@NotNull(message = "請選擇活動")
+	@Min(value = 1, message = "請選擇活動")
+	@Column(name = "ACTIVITY_ID", nullable = false)
+	private Integer activityId;
 
-    @NotNull(message = "請輸入訂單金額")
-    @Min(value = 0, message = "金額不可小於0")
-    @Column(name = "ORDER_TOTAL", nullable = false)
-    private Integer orderTotal = 0;
+	@NotNull(message = "請輸入會員ID")
+	@Min(value = 1, message = "會員ID不可小於1")
+	@Column(name = "MEMBER_ID", nullable = false)
+	private Integer memberId;
 
-    @NotNull(message = "請選擇付款狀態")
-    @Column(name = "PAYMENT_STATUS", nullable = false)
-    private Integer paymentStatus = 0;
+	@NotNull(message = "請輸入訂單金額")
+	@Min(value = 0, message = "金額不可小於0")
+	@Column(name = "ORDER_TOTAL", nullable = false)
+	private Integer orderTotal = 0;
 
-    @Column(name = "CREATED_AT", updatable = false)
-    private LocalDateTime createdAt;
+	@NotNull(message = "請選擇付款狀態")
+	@Column(name = "PAYMENT_STATUS", nullable = false)
+	private Integer paymentStatus = 0;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
+	@Column(name = "CREATED_AT", updatable = false)
+	private LocalDateTime createdAt;
 
-    // Getter & Setter
+	@PrePersist
+	protected void onCreate() {
+		this.createdAt = LocalDateTime.now();
+	}
 
-    public Integer getActivityOrderId() {
-        return activityOrderId;
-    }
+	// Getter & Setter
 
-    public void setActivityOrderId(Integer activityOrderId) {
-        this.activityOrderId = activityOrderId;
-    }
+	public Integer getActivityOrderId() {
+		return activityOrderId;
+	}
 
-    public Integer getActivityId() {
-        return activityId;
-    }
+	public void setActivityOrderId(Integer activityOrderId) {
+		this.activityOrderId = activityOrderId;
+	}
 
-    public void setActivityId(Integer activityId) {
-        this.activityId = activityId;
-    }
+	public Integer getActivityId() {
+		return activityId;
+	}
 
-    public Integer getMemberId() {
-        return memberId;
-    }
+	public void setActivityId(Integer activityId) {
+		this.activityId = activityId;
+	}
 
-    public void setMemberId(Integer memberId) {
-        this.memberId = memberId;
-    }
+	public Integer getMemberId() {
+		return memberId;
+	}
 
-    public Integer getOrderTotal() {
-        return orderTotal;
-    }
+	public void setMemberId(Integer memberId) {
+		this.memberId = memberId;
+	}
 
-    public void setOrderTotal(Integer orderTotal) {
-        this.orderTotal = orderTotal;
-    }
+	public Integer getOrderTotal() {
+		return orderTotal;
+	}
 
-    public Integer getPaymentStatus() {
-        return paymentStatus;
-    }
+	public void setOrderTotal(Integer orderTotal) {
+		this.orderTotal = orderTotal;
+	}
 
-    public void setPaymentStatus(Integer paymentStatus) {
-        this.paymentStatus = paymentStatus;
-    }
+	public Integer getPaymentStatus() {
+		return paymentStatus;
+	}
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
+	public void setPaymentStatus(Integer paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 }

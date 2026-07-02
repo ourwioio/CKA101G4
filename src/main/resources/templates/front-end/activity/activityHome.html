@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>活動管理系統</title>
+
+<style>
+body {
+	margin: 0;
+	padding: 40px;
+	background: #f8fafc;
+	font-family: "Microsoft JhengHei", sans-serif;
+	color: #1e293b;
+}
+
+.header {
+	max-width: 1100px;
+	margin: auto;
+	text-align: center;
+	margin-bottom: 40px;
+}
+
+.header h1 {
+	font-size: 2.2rem;
+	margin-bottom: 10px;
+	color: #0f172a;
+}
+
+.header p {
+	color: #64748b;
+	font-size: 1.05rem;
+}
+
+.card-container {
+	max-width: 1100px;
+	margin: auto;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+	gap: 30px;
+}
+
+.card {
+	background: #fff;
+	border-radius: 15px;
+	padding: 35px;
+	text-align: center;
+	border: 1px solid #e2e8f0;
+	box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
+	transition: .25s;
+}
+
+.card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 10px 20px rgba(0, 0, 0, .15);
+}
+
+.icon {
+	font-size: 60px;
+	margin-bottom: 15px;
+}
+
+.card h2 {
+	margin: 10px 0;
+	color: #0f172a;
+}
+
+.card p {
+	color: #64748b;
+	line-height: 1.7;
+	min-height: 60px;
+}
+
+.btn {
+	display: inline-block;
+	margin-top: 20px;
+	padding: 12px 28px;
+	border-radius: 8px;
+	color: white;
+	text-decoration: none;
+	font-weight: bold;
+	transition: .2s;
+}
+
+.activity {
+	background: #3b82f6;
+}
+
+.activity:hover {
+	background: #2563eb;
+}
+
+.type {
+	background: #8b5cf6;
+}
+
+.type:hover {
+	background: #7c3aed;
+}
+
+.order {
+	background: #10b981;
+}
+
+.order:hover {
+	background: #059669;
+}
+
+.footer {
+	margin-top: 50px;
+	text-align: center;
+	color: #94a3b8;
+}
+</style>
+
+</head>
+
+<body>
+
+	<div class="header">
+
+		<h1>🎯 活動管理系統</h1>
+
+		<p>歡迎使用活動管理後台，請選擇要管理的功能。</p>
+
+	</div>
+
+	<div class="card-container">
+
+		<!-- 活動管理 -->
+		<div class="card">
+
+			<div class="icon">📋</div>
+
+			<h2>活動管理</h2>
+
+			<p>新增、修改、刪除活動資訊， 管理活動內容與報名資訊。</p>
+
+			<a class="btn activity" th:href="@{/activity/listAllActivity}">
+				進入管理 </a>
+
+		</div>
+
+		<!-- 活動類型 -->
+		<div class="card">
+
+			<div class="icon">🏷️</div>
+
+			<h2>活動類型管理</h2>
+
+			<p>建立與維護所有活動分類， 方便活動歸類管理。</p>
+
+			<a class="btn type" th:href="@{/activityType/listAllActivityType}">
+				進入管理 </a>
+
+		</div>
+
+		<!-- 活動訂單 -->
+		<div class="card">
+
+			<div class="icon">🧾</div>
+
+			<h2>活動訂單管理</h2>
+
+			<p>查看所有活動訂單， 修改付款狀態及管理訂單。</p>
+
+			<a class="btn order" th:href="@{/activityOrder/listAllActivityOrder}">
+				進入管理 </a>
+
+		</div>
+
+	</div>
+
+	<div class="footer">© 2026 Webond Activity Management System</div>
+
+</body>
+</html>
