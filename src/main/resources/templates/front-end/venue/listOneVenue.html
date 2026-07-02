@@ -172,7 +172,7 @@ hr {
 					每小時 <span th:text="${venueVO.hourlyRate}"></span> 元
 				</div>
 				<a class="btn-book"
-					th:href="@{/venueOrder/add(venueId=${venueVO.venueId})}">預約此場地</a>
+					th:href="@{/front/venueOrder/addVenueOrder(venueId=${venueVO.venueId})}">預約此場地</a>
 			</div>
 		</div>
 	</div>

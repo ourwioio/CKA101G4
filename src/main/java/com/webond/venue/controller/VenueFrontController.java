@@ -45,12 +45,16 @@ public class VenueFrontController {
 
 	@GetMapping("/fakeLogin")
 	public String fakeLogin(HttpSession session) {
-		session.setAttribute("loginMemberId", 8); // 假設用會員8登入
+		session.setAttribute("loginMemberId", 1); // 假設用會員8登入
 		return "redirect:/front/venue/myVenue";
 	}
 
 	@GetMapping("addVenue")
-	public String addVenue(ModelMap model) {
+	public String addVenue(ModelMap model, HttpSession session) {
+		Integer memberId = (Integer) session.getAttribute("loginMemberId");
+	    if (memberId == null) {
+	        return "redirect:/front/venue/fakeLogin";
+	    }
 		VenueVO venueVO = new VenueVO();
 		model.addAttribute("venueVO", venueVO);
 		return "front-end/venue/addVenue";
@@ -64,9 +68,14 @@ public class VenueFrontController {
 			@RequestParam("endHour") int endHour,
 			@RequestParam(value = "coverIndex", defaultValue = "0") int coverIndex, 
 			HttpSession session) throws IOException {
-
+		
+		/*************************** 從 Session 取得登入會員 ***************************/
+	    Integer memberId = (Integer) session.getAttribute("loginMemberId");
+	    if (memberId == null) {
+	        return "redirect:/front/venue/fakeLogin";  // 沒登入就導去假登入
+	    }
+		/*************************** 場地類型處理 ***************************/
 		Integer venueTypeId = venueVO.getVenueTypeVO() != null ? venueVO.getVenueTypeVO().getVenueTypeId() : null;
-
 		if (venueTypeId != null) {
 			VenueTypeVO venueTypeVO = venueTypeService.getOneVenueType(venueTypeId);
 			venueVO.setVenueTypeVO(venueTypeVO);
@@ -125,11 +134,6 @@ public class VenueFrontController {
 		venueVO.setRatingStars(0);
 		venueVO.setRatingcount(0);
 
-		/*************************** 從 Session 取得登入會員 ***************************/
-	    Integer memberId = (Integer) session.getAttribute("loginMemberId");
-	    if (memberId == null) {
-	        return "redirect:/front/venue/fakeLogin";  // 沒登入就導去假登入
-	    }
 	    MemberVO member = memberService.getOneMember(memberId);
 	    venueVO.setMember(member);
 
@@ -226,6 +230,8 @@ public class VenueFrontController {
 
 	@GetMapping("myVenue")
 	public String myVenue(HttpSession session, ModelMap model) {
+		
+    /*************************** 從 Session 取得登入會員 ***************************/
 		Integer memberId = (Integer) session.getAttribute("loginMemberId");
 		if (memberId == null) {
 			return "redirect:/front/venue/fakeLogin";
