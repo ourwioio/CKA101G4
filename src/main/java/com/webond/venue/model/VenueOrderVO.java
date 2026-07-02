@@ -1,11 +1,11 @@
 package com.webond.venue.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 import com.webond.employee.model.EmployeeVO;
 import com.webond.member.model.MemberVO;
-import com.webond.venue.model.VenueVO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -56,10 +56,10 @@ public class VenueOrderVO {
 	private Byte refundStatus;
 
 	@Column(name = "HANDLED_AT")
-	private LocalDate handledAt;
+	private LocalDateTime handledAt;
 
 	@Column(name = "CREATED_AT")
-	private LocalDate createdAt;
+	private LocalDateTime createdAt;
 
 	@Column(name = "START_AT")
 	private LocalTime startAt;
@@ -78,8 +78,8 @@ public class VenueOrderVO {
 	}
 
 	public VenueOrderVO(Integer venueOrderId, VenueVO venueVO, MemberVO member, EmployeeVO empVO, Integer venueRating,
-			String venueComment, Byte payoutAmount, String refundReason, Byte refundStatus, LocalDate handledAt,
-			LocalDate createdAt, LocalTime startAt, LocalTime endAt, Integer totalAmount, Byte paymentMethod) {
+			String venueComment, Byte payoutAmount, String refundReason, Byte refundStatus, LocalDateTime handledAt,
+			LocalDateTime createdAt, LocalTime startAt, LocalTime endAt, Integer totalAmount, Byte paymentMethod) {
 		super();
 		this.venueOrderId = venueOrderId;
 		this.venueVO = venueVO;
@@ -170,19 +170,19 @@ public class VenueOrderVO {
 		this.refundStatus = refundStatus;
 	}
 
-	public LocalDate getHandledAt() {
+	public LocalDateTime getHandledAt() {
 		return handledAt;
 	}
 
-	public void setHandledAt(LocalDate handledAt) {
+	public void setHandledAt(LocalDateTime handledAt) {
 		this.handledAt = handledAt;
 	}
 
-	public LocalDate getCreatedAt() {
+	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(LocalDate createdAt) {
+	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
 
@@ -218,14 +218,7 @@ public class VenueOrderVO {
 		this.paymentMethod = paymentMethod;
 	}
 
-	@Override
-	public String toString() {
-		return "VenueOrderVO [venueOrderId=" + venueOrderId + ", venueVO=" + venueVO + ", member=" + member + ", empVO="
-				+ empVO + ", venueRating=" + venueRating + ", venueComment=" + venueComment + ", payoutAmount="
-				+ payoutAmount + ", refundReason=" + refundReason + ", refundStatus=" + refundStatus + ", handledAt="
-				+ handledAt + ", createdAt=" + createdAt + ", startAt=" + startAt + ", endAt=" + endAt
-				+ ", totalAmount=" + totalAmount + ", paymentMethod=" + paymentMethod + "]";
-	}
+	
 
 	
 

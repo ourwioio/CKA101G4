@@ -1,7 +1,7 @@
 package com.webond.venue.controller;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,8 +45,8 @@ public class VenueFrontController {
 
 	@GetMapping("/fakeLogin")
 	public String fakeLogin(HttpSession session) {
-		session.setAttribute("loginMemberId", 5); // 會員假登入
-		return "redirect:/front/venue/myVenue";
+		session.setAttribute("loginMemberId", 8); // 會員假登入
+		return "front-end/venue/myPage";
 	}
 
 	@GetMapping("addVenue")
@@ -129,7 +129,7 @@ public class VenueFrontController {
 		}
 		venueVO.setAvailableHours(hoursSb.toString());
 
-		venueVO.setCreatedAt(LocalDate.now());
+		venueVO.setCreatedAt(LocalDateTime.now());
 		venueVO.setVenueStatus((byte) 0);
 		venueVO.setRatingStars(0);
 		venueVO.setRatingcount(0);

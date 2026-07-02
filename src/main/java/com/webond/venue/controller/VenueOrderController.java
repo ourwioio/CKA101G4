@@ -1,11 +1,13 @@
 package com.webond.venue.controller;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -87,7 +89,7 @@ public class VenueOrderController {
 	    venueOrderVO.setEndAt(LocalTime.of(endHour == 24 ? 23 : endHour, endHour == 24 ? 59 : 0));
 	    venueOrderVO.setTotalAmount(totalAmount);
 	    venueOrderVO.setPaymentMethod(paymentMethod);
-	    venueOrderVO.setCreatedAt(LocalDate.now());
+	    venueOrderVO.setCreatedAt(LocalDateTime.now());
 	    venueOrderVO.setRefundStatus((byte) 0);
 
 	    venueOrderService.addVenueOrder(venueOrderVO);
@@ -98,7 +100,19 @@ public class VenueOrderController {
 	    return "redirect:/front/venue/listAllVenue";
 	}
 	
-	
+	@GetMapping("myVenueOrder")
+	public String myVenue(HttpSession session, ModelMap model) {
+		
+    /*************************** 從 Session 取得登入會員 ***************************/
+		Integer memberId = (Integer) session.getAttribute("loginMemberId");
+		if (memberId == null) {
+			return "redirect:/front/venue/fakeLogin";
+		}
+
+		List<VenueOrderVO> list = venueOrderService.getVenuesByMember(memberId);
+		model.addAttribute("venueOrderListData", list);
+		return "front-end/venue/myVenueOrder";
+	}
 	
 	
 	

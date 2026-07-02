@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.webond.venue.model.VenueOrderVO;
+import com.webond.venue.model.VenueVO;
 import com.webond.venue.repository.VenueOrderRepository;
 
 @Service
@@ -35,6 +36,10 @@ public class VenueOrderService {
 	
 	public List<VenueOrderVO> getAll(){
 		return repository.findAll();
+	}
+	
+	public List<VenueOrderVO> getVenuesByMember(Integer memberId) {
+		return repository.findByMember_MemberId(memberId);
 	}
 	
 	
