@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>我的場地訂單</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: sans-serif; background: #f5f5f5; padding: 2rem; }
+.container { max-width: 800px; margin: 0 auto; }
+.back-link { display: inline-block; margin-bottom: 1rem; font-size: 13px; color: #888; text-decoration: none; }
+.back-link:hover { color: #1d9e75; }
+h1 { font-size: 24px; font-weight: 600; color: #333; margin-bottom: 1.5rem; }
+
+/* 查無訂單的樣式 */
+.no-orders { background: white; border-radius: 12px; border: 1px solid #e0e0e0; padding: 3rem; text-align: center; color: #888; }
+.btn-browse { display: inline-block; margin-top: 1rem; background: #1d9e75; color: white; border: none; border-radius: 6px; padding: 10px 20px; font-size: 14px; text-decoration: none; cursor: pointer; }
+
+/* 訂單卡片樣式 */
+.order-card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+.order-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 12px; }
+.order-id { font-size: 14px; font-weight: bold; color: #444; }
+.order-date { font-size: 13px; color: #999; }
+
+.order-body { display: flex; justify-content: space-between; align-items: flex-start; }
+.venue-details h2 { font-size: 18px; font-weight: 500; color: #222; margin-bottom: 6px; }
+.venue-details p { font-size: 14px; color: #666; margin-bottom: 4px; }
+
+/* 標籤（Badge）樣式 */
+.badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+.badge-payment { background: #e1f5ee; color: #0f6e56; margin-right: 5px; }
+.badge-status { background: #f1f3f5; color: #495057; }
+
+.order-right { text-align: right; }
+.total-amount { font-size: 20px; font-weight: 600; color: #1d9e75; margin-bottom: 10px; }
+.total-amount span { font-size: 14px; font-weight: normal; color: #666; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <a class="back-link" th:href="@{/front/venue/listAllVenue}">← 返回場地瀏覽</a>
+    <h1>我的場地訂單</h1>
+
+    <div class="no-orders" th:if="${#lists.isEmpty(venueOrderListData)}">
+        <p>目前沒有任何預約訂單紀錄。</p>
+        <a th:href="@{/front/venue/listAllVenue}" class="btn-browse">立即探索場地</a>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(venueOrderListData)}">
+        <div class="order-card" th:each="order : ${venueOrderListData}">
+            
+            <div class="order-header">
+                <span class="order-id" th:text="'訂單編號：#' + ${order.venueOrderId}"></span>
+                <span class="order-date" 
+			      th:text="'下單時間：' + ${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}">
+				</span>
+            </div>
+            
+            <div class="order-body">
+                <div class="venue-details">
+                    <h2 th:text="${order.venueVO.venueName}"></h2>
+                    
+                    <p>
+                        <strong>預約時段：</strong>
+                        <span th:text="${order.startAt} + ' ～ ' + ${order.endAt}"></span>
+                    </p>
+                    
+                    <div>
+                        <span class="badge badge-payment" 
+                              th:text="${order.paymentMethod == 0 ? '信用卡' : (order.paymentMethod == 1 ? '銀行轉帳' : '現場付款')}">
+                        </span>
+                        
+                        <span class="badge badge-status" 
+                              th:text="${order.refundStatus == 0 ? '訂單成立' : '有退款申請'}">
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="order-right">
+                    <div class="total-amount">
+                        <span class="currency">NT$ </span>
+                        <th:block th:text="${order.totalAmount}"></th:block>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

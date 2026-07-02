@@ -38,16 +38,21 @@ h1 { font-size: 22px; font-weight: 500; }
             <img th:if="${venue.coverImage != null}"
                  th:src="@{/venue/getImage(imagesId=${venue.coverImage.imagesId})}"
                  class="card-img"/>
-            <div class="card-body">
-                <h3 th:text="${venue.venueName}"></h3>
-                <p th:text="${venue.address}"></p>
-                <p>容納人數：<span th:text="${venue.capacity}"></span> 人</p>
-                <span th:class="${venue.venueStatus == 0 ? 'badge badge-down' : 'badge badge-up'}"
-                      th:text="${venue.venueStatus == 0 ? '下架' : '上架'}"></span>
-                <div class="actions">
-    				<a th:href="@{/front/venue/getOneMyVenue(venueId=${venue.venueId})}" class="btn-edit" style="text-decoration: none; display: inline-block;">查看</a>
-				</div>
-            </div>
+			<div class="card-body">
+			    <h3 th:text="${venue.venueName}"></h3>
+			    <p th:text="${venue.address}"></p>
+			    <p>容納人數：<span th:text="${venue.capacity}"></span> 人</p>
+			    
+			    <p style="font-size: 12px; color: #999;">
+			        建立時間：<span th:text="${#temporals.format(venue.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+			    </p>
+			    
+			    <span th:class="${venue.venueStatus == 0 ? 'badge badge-down' : 'badge badge-up'}"
+			          th:text="${venue.venueStatus == 0 ? '下架' : '上架'}"></span>
+			    <div class="actions">
+			        <a th:href="@{/front/venue/getOneMyVenue(venueId=${venue.venueId})}" class="btn-edit" style="text-decoration: none; display: inline-block;">查看</a>
+			    </div>
+			</div>
         </div>
     </div>
 </body>

@@ -157,7 +157,7 @@
                         <th>每小時金額</th>
                         <th>建立日期</th>
                         <th>更新上下架</th>
-                        <th>查看場地</th> <!-- 🎯 已修改表頭 -->
+                        <th>查看場地</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -173,7 +173,7 @@
                         <td th:text="${venue.address}"></td>
                         <td th:text="${venue.capacity}"></td>
                         <td th:text="${venue.hourlyRate}"></td>
-                        <td th:text="${venue.createdAt}"></td>
+                        <td th:text="${#temporals.format(venue.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
 						<td>
 						    <form th:action="@{/venue/toggleStatus}" method="post" style="display: inline;">
 						        <input type="hidden" name="venueId" th:value="${venue.venueId}" />
@@ -185,7 +185,6 @@
 						    </form>
 						</td>
                         <td>
-                            <!-- 🎯 已改為發送 GET 請求至 getOneVenue -->
                             <form th:action="@{/venue/getOneVenue}" method="get" style="display: inline;">
                                 <input type="hidden" name="venueId" th:value="${venue.venueId}" />
                                 <button type="submit" class="btn-edit">查看場地</button>

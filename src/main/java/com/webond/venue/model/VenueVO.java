@@ -1,6 +1,6 @@
 package com.webond.venue.model;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -72,7 +72,7 @@ public class VenueVO {
 	private Byte venueStatus;
 
 	@Column(name = "CREATED_AT")
-	private LocalDate createdAt;
+	private LocalDateTime createdAt;
 
 	@Column(name = "DEFAULT_OPEN_DAYS")
 	private String openDays;
@@ -187,12 +187,22 @@ public class VenueVO {
 		this.venueStatus = venueStatus;
 	}
 
-	public LocalDate getCreatedAt() {
+	
+
+	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(LocalDate createdAt) {
+	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
+	}
+
+	public Integer getRatingCount() {
+		return ratingCount;
+	}
+
+	public void setRatingCount(Integer ratingCount) {
+		this.ratingCount = ratingCount;
 	}
 
 	public String getOpenDays() {
