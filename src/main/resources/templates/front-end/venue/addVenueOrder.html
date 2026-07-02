@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>預約場地</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: sans-serif; background: #f5f5f5; padding: 2rem; }
+.back-link { display: inline-block; margin-bottom: 1rem; font-size: 13px; color: #888; text-decoration: none; }
+.card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; max-width: 600px; margin: 0 auto; padding: 1.5rem; }
+.venue-info { background: #f8f8f8; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+.venue-info h2 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+.venue-info p { font-size: 14px; color: #666; margin-top: 4px; }
+.form-group { margin-bottom: 1.25rem; }
+label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
+select { width: 100%; padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; outline: none; }
+select:focus { border-color: #1d9e75; }
+.time-row { display: flex; align-items: center; gap: 10px; }
+.time-row select { width: auto; }
+.time-row span { font-size: 14px; color: #666; }
+.total-amount { background: #e1f5ee; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 16px; font-weight: 500; color: #0f6e56; }
+.error { color: #c0392b; font-size: 12px; margin-top: 4px; }
+.btn-row { display: flex; gap: 10px; margin-top: 1.5rem; }
+.btn-submit { background: #1d9e75; color: white; border: none; border-radius: 6px; padding: 10px 24px; font-size: 14px; cursor: pointer; }
+.btn-back { background: white; color: #666; border: 1px solid #ccc; border-radius: 6px; padding: 10px 24px; font-size: 14px; text-decoration: none; display: inline-flex; align-items: center; }
+.slot-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.slot-btn { padding: 8px 16px; border-radius: 6px; border: 1px solid #e0e0e0; font-size: 13px; cursor: pointer; background: white; }
+.slot-available { border-color: #1d9e75; color: #1d9e75; }
+.slot-available:hover { background: #e1f5ee; }
+.slot-available.selected { background: #1d9e75; color: white; }
+.slot-unavailable { background: #f5f5f5; color: #ccc; cursor: not-allowed; border-color: #e0e0e0; }
+</style>
+</head>
+<body>
+<a class="back-link" th:href="@{/front/venue/getOneVenue(venueId=${venueVO.venueId})}">← 回場地詳情</a>
+<div class="card">
+    <div class="venue-info">
+        <h2 th:text="${venueVO.venueName}"></h2>
+        <p th:text="${venueVO.address}"></p>
+        <p>每小時 <span th:text="${venueVO.hourlyRate}"></span> 元</p>
+    </div>
+
+    <form th:action="@{/front/venueOrder/insert}" method="post">
+        <input type="hidden" name="venueId" th:value="${venueVO.venueId}"/>
+        <input type="hidden" id="hourlyRate" th:value="${venueVO.hourlyRate}"/>
+
+        <!-- 選擇日期 -->
+        <div class="form-group">
+            <label>選擇日期</label>
+            <div class="slot-grid">
+                <div th:each="slot : ${venueVO.venueSlots}">
+                    <button type="button"
+                            th:if="${slot.slotStatus != null and slot.slotStatus.contains('0')}"
+                            class="slot-btn slot-available"
+                            th:text="${slot.slotDate}"
+                            th:attr="data-slot-id=${slot.venueSlotId}, data-slot-date=${slot.slotDate}, data-slot-status=${slot.slotStatus}">
+                    </button>
+                    <button type="button"
+                            th:if="${slot.slotStatus == null or !slot.slotStatus.contains('0')}"
+                            class="slot-btn slot-unavailable"
+                            th:text="${slot.slotDate}"
+                            disabled>
+                    </button>
+                </div>
+            </div>
+            <input type="hidden" name="venueSlotId" id="selectedSlotId" value=""/>
+            <input type="hidden" name="slotDate" id="selectedSlotDate" value=""/>
+            <div class="error" id="slotError" style="display:none;">請選擇預約日期</div>
+        </div>
+
+        <!-- 選擇時段 -->
+        <div class="form-group" id="timeSection" style="display:none;">
+            <label>選擇時段</label>
+            <div class="time-row">
+                <select name="startHour" id="startHour">
+                    <option value="">開始時間</option>
+                </select>
+                <span>到</span>
+                <select name="endHour" id="endHour">
+                    <option value="">結束時間</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 付款方式 -->
+        <div class="form-group">
+            <label>付款方式</label>
+            <select name="paymentMethod">
+                <option value="0">信用卡</option>
+                <option value="1">銀行轉帳</option>
+                <option value="2">現場付款</option>
+            </select>
+        </div>
+
+        <!-- 費用計算 -->
+        <div class="total-amount" id="totalAmount" style="display:none;">
+            預估費用：<span id="totalAmountText"></span> 元
+        </div>
+
+        <div class="btn-row">
+            <button type="submit" class="btn-submit" onclick="return validateForm()">確認預約</button>
+            <a class="btn-back" th:href="@{/front/venue/getOneVenue(venueId=${venueVO.venueId})}">取消</a>
+        </div>
+    </form>
+</div>
+
+<script>
+let selectedSlotStatus = '';
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 綁定日期按鈕點擊事件
+    document.querySelectorAll('.slot-btn.slot-available').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            selectSlot(this);
+        });
+    });
+
+    // 綁定開始時間變更事件
+    document.getElementById('startHour').addEventListener('change', function() {
+        updateEndHourOptions();
+        calculateTotal();
+    });
+
+    // 綁定結束時間變更事件
+    document.getElementById('endHour').addEventListener('change', function() {
+        calculateTotal();
+    });
+});
+
+function selectSlot(btn) {
+    // 清除所有選取狀態
+    document.querySelectorAll('.slot-btn.slot-available').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+
+    // 帶入選取的值
+    document.getElementById('selectedSlotId').value = btn.dataset.slotId;
+    document.getElementById('selectedSlotDate').value = btn.dataset.slotDate;
+    document.getElementById('slotError').style.display = 'none';
+
+    // 根據這天的 slotStatus 顯示可用時段
+    selectedSlotStatus = btn.dataset.slotStatus;
+    updateStartHourOptions();
+    document.getElementById('timeSection').style.display = 'block';
+    document.getElementById('totalAmount').style.display = 'none';
+}
+
+function updateStartHourOptions() {
+    const startSelect = document.getElementById('startHour');
+    const endSelect = document.getElementById('endHour');
+    startSelect.innerHTML = '<option value="">開始時間</option>';
+    endSelect.innerHTML = '<option value="">結束時間</option>';
+
+    if (!selectedSlotStatus) return;
+
+    for (let h = 0; h < 24; h++) {
+        if (selectedSlotStatus[h] === '0') {
+            let opt = document.createElement('option');
+            opt.value = h;
+            opt.textContent = h + ':00';
+            startSelect.appendChild(opt);
+        }
+    }
+}
+
+function updateEndHourOptions() {
+    const startHour = parseInt(document.getElementById('startHour').value);
+    const endSelect = document.getElementById('endHour');
+    endSelect.innerHTML = '<option value="">結束時間</option>';
+
+    if (isNaN(startHour)) return;
+
+    for (let h = startHour + 1; h <= 24; h++) {
+        // 結束時間 h 可選的條件是：前一個小時 h-1 是可用的（值為 '0'）
+        if (selectedSlotStatus[h - 1] === '0') {
+            let opt = document.createElement('option');
+            opt.value = h;
+            opt.textContent = h + ':00';
+            endSelect.appendChild(opt);
+        } else {
+            break;
+        }
+    }
+}
+
+function calculateTotal() {
+    const start = parseInt(document.getElementById('startHour').value);
+    const end = parseInt(document.getElementById('endHour').value);
+    const hourlyRate = parseInt(document.getElementById('hourlyRate').value);
+
+    if (!isNaN(start) && !isNaN(end) && end > start) {
+        const hours = end - start;
+        const total = hours * hourlyRate;
+        document.getElementById('totalAmountText').textContent = total;
+        document.getElementById('totalAmount').style.display = 'block';
+    } else {
+        document.getElementById('totalAmount').style.display = 'none';
+    }
+}
+
+function validateForm() {
+    if (!document.getElementById('selectedSlotId').value) {
+        document.getElementById('slotError').style.display = 'block';
+        return false;
+    }
+    return true;
+}
+</script>
+</body>
+</html>
