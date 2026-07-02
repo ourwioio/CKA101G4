@@ -126,12 +126,12 @@ public class MemberVO implements java.io.Serializable {
 
 	@Lob
 	@Column(name = "ID_IMAGE")
-	@NotNull(message = "請上傳身分證件")
+//	@NotNull(message = "請上傳身分證件")
 	private byte[] idImage;
 
 	@Lob
 	@Column(name = "FACE_IMAGE")
-	@NotNull(message = "請上傳臉部圖片")
+//	@NotNull(message = "請上傳臉部圖片")
 	private byte[] faceImage;
 
 	@Column(name = "ID_NUMBER")

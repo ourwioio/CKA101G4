@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.Application;
 import com.webond.member.model.MemberVO;
 import com.webond.member.repository.MemberRepository;
 
@@ -29,7 +30,7 @@ import com.webond.member.repository.MemberRepository;
  *   Service 的 @Transactional 預設成功就 commit；
  *   測試的 @Transactional 預設「一律 rollback」，避免測試資料污染資料庫。
  */
-@SpringBootTest
+@SpringBootTest(classes = Application.class)
 @Transactional
 class MemberServiceIntegrationTest {
 
