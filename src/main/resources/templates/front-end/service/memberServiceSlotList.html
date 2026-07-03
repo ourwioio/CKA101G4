@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>管理服務時段</title>
+
+<style>
+body {
+	margin: 0;
+	padding: 32px;
+	font-family: Arial, "Microsoft JhengHei", sans-serif;
+	background-color: #f5f6f8;
+	color: #222;
+}
+
+.page {
+	max-width: 1050px;
+	margin: 0 auto;
+}
+
+.top-link {
+	margin-bottom: 16px;
+}
+
+.top-link a {
+	color: #2563eb;
+	text-decoration: none;
+}
+
+.top-link a:hover {
+	text-decoration: underline;
+}
+
+.card {
+	background-color: #fff;
+	border: 1px solid #ddd;
+	border-radius: 12px;
+	padding: 24px;
+	margin-bottom: 24px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+h1 {
+	margin-top: 0;
+	margin-bottom: 8px;
+	font-size: 32px;
+}
+
+h2 {
+	margin-top: 0;
+	margin-bottom: 20px;
+	font-size: 22px;
+}
+
+.service-info {
+	color: #555;
+	margin-bottom: 0;
+}
+
+.message-error {
+	color: #b91c1c;
+	background-color: #fee2e2;
+	border: 1px solid #fecaca;
+	padding: 10px 12px;
+	border-radius: 8px;
+	margin-bottom: 16px;
+}
+
+.message-success {
+	color: #166534;
+	background-color: #dcfce7;
+	border: 1px solid #bbf7d0;
+	padding: 10px 12px;
+	border-radius: 8px;
+	margin-bottom: 16px;
+}
+
+.form-grid {
+	display: grid;
+	grid-template-columns: 130px 1fr;
+	gap: 16px 18px;
+	align-items: center;
+	max-width: 650px;
+}
+
+.form-grid label {
+	font-weight: bold;
+	text-align: right;
+}
+
+.form-grid input, .form-grid select {
+	width: 300px;
+	padding: 8px 10px;
+	font-size: 16px;
+	border: 1px solid #bbb;
+	border-radius: 6px;
+	box-sizing: border-box;
+	background-color: #fff;
+}
+
+.hint {
+	grid-column: 2;
+	color: #666;
+	font-size: 13px;
+	margin-top: -8px;
+	line-height: 1.6;
+}
+
+.form-actions {
+	grid-column: 2;
+	margin-top: 8px;
+}
+
+button {
+	padding: 9px 16px;
+	font-size: 16px;
+	border: 1px solid #999;
+	border-radius: 6px;
+	background-color: #f8f8f8;
+	cursor: pointer;
+}
+
+button:hover {
+	background-color: #eeeeee;
+}
+
+.primary-btn {
+	background-color: #2563eb;
+	color: #fff;
+	border-color: #2563eb;
+}
+
+.primary-btn:hover {
+	background-color: #1d4ed8;
+}
+
+.danger-btn {
+	color: #b91c1c;
+	background-color: #fff;
+	border-color: #fca5a5;
+}
+
+.danger-btn:hover {
+	background-color: #fee2e2;
+}
+
+.empty-text {
+	color: #666;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	background-color: #fff;
+}
+
+th, td {
+	border: 1px solid #ddd;
+	padding: 10px;
+	text-align: center;
+}
+
+th {
+	background-color: #f1f5f9;
+	font-weight: bold;
+}
+
+.status-available {
+	color: #166534;
+	font-weight: bold;
+}
+
+.status-locked {
+	color: #b45309;
+	font-weight: bold;
+}
+
+.status-booked {
+	color: #991b1b;
+	font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+	<div class="page">
+
+		<div class="top-link">
+			<a th:href="@{/member/services}">← 回我的服務</a>
+		</div>
+
+		<div class="card">
+			<h1>管理服務時段</h1>
+
+			<p class="service-info">
+				目前管理的服務編號： <strong th:text="${serviceId}"></strong>
+			</p>
+		</div>
+
+		<div class="card">
+
+			<p th:if="${errorMsg != null}" th:text="${errorMsg}"
+				class="message-error"></p>
+
+			<p th:if="${successMsg != null}" th:text="${successMsg}"
+				class="message-success"></p>
+
+			<h2>新增可預約時段</h2>
+
+			<form id="slotForm"
+				th:action="@{/member/services/{id}/slots(id=${serviceId})}"
+				method="post">
+
+				<div class="form-grid">
+
+					<label for="slotDate">日期</label> <input type="date" id="slotDate"
+						name="slotDate" required> <label for="startTime">開始時間</label>
+					<input type="time" id="startTime" name="startTime" step="60"
+						required> <label for="splitMinutes">切分方式</label> <select
+						id="splitMinutes" name="splitMinutes" required>
+						<option value="0">不切，整段上架</option>
+						<option value="30">每 30 分鐘切一段</option>
+						<option value="60">每 60 分鐘切一段</option>
+						<option value="120">每 120 分鐘切一段</option>
+						<option value="240">每 240 分鐘切一段</option>
+					</select> <label for="endTime">結束時間</label> <select id="endTime"
+						name="endTime" required>
+						<option value="">請先選擇開始時間</option>
+					</select>
+
+					<div class="hint">
+						日期只能選今天起 14 天內。<br> 結束時間會自動列出同日與隔日選項，一次最多新增 12 小時。<br>
+						選到「隔日」時，系統會自動送出跨日參數。
+					</div>
+
+					<!-- 0 = 同日，1 = 隔日 -->
+					<input type="hidden" id="endDayOffset" name="endDayOffset"
+						value="0">
+
+					<div class="form-actions">
+						<button type="submit" class="primary-btn">新增時段</button>
+					</div>
+
+				</div>
+
+			</form>
+		</div>
+
+		<div class="card">
+			<h2>目前時段列表</h2>
+			<div style="margin-bottom: 16px;"
+				th:if="${!#lists.isEmpty(slotList)}">
+
+				<form
+					th:action="@{/member/services/{serviceId}/slots/delete-available(serviceId=${serviceId})}"
+					method="post" style="display: inline;">
+
+					<button type="submit" class="danger-btn"
+						onclick="return confirm('確定要清空這個服務底下所有「可預約」時段嗎？已預約或暫時鎖定的時段不會被刪除。')">
+						清空全部可預約時段</button>
+
+				</form>
+
+			</div>
+
+			<p th:if="${#lists.isEmpty(slotList)}" class="empty-text">
+				這個服務目前還沒有任何時段。</p>
+
+			<table th:if="${!#lists.isEmpty(slotList)}">
+				<thead>
+					<tr>
+						<th>時段編號</th>
+						<th>開始時間</th>
+						<th>結束時間</th>
+						<th>時段長度</th>
+						<th>狀態</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+
+				<tbody>
+					<tr th:each="slot : ${slotList}">
+
+						<td th:text="${slot.serviceSlotId}"></td>
+
+						<td
+							th:text="${#temporals.format(slot.startTime, 'yyyy-MM-dd HH:mm')}"></td>
+
+						<td
+							th:text="${#temporals.format(slot.endTime, 'yyyy-MM-dd HH:mm')}"></td>
+
+						<td><span
+							th:text="${T(java.time.Duration).between(slot.startTime, slot.endTime).toMinutes()}"></span>
+							分鐘</td>
+
+						<td><span th:if="${slot.slotStatus == 0}"
+							class="status-available">可預約</span> <span
+							th:if="${slot.slotStatus == 1}" class="status-locked">暫時鎖定</span>
+							<span th:if="${slot.slotStatus == 2}" class="status-booked">已預約</span>
+							<span
+							th:if="${slot.slotStatus != 0 and slot.slotStatus != 1 and slot.slotStatus != 2}">
+								未知狀態 </span></td>
+
+						<td>
+							<form th:if="${slot.slotStatus == 0}"
+								th:action="@{/member/services/{serviceId}/slots/{slotId}/delete(
+                                            serviceId=${serviceId},
+                                            slotId=${slot.serviceSlotId}
+                                          )}"
+								method="post" style="display: inline;">
+
+								<button type="submit" class="danger-btn"
+									onclick="return confirm('確定要刪除這個時段嗎？')">刪除</button>
+							</form> <span th:if="${slot.slotStatus != 0}"> 不可刪除 </span>
+						</td>
+
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+
+	<script>
+		const MAX_BOOKING_DAYS = 14;
+		const MAX_BLOCK_HOURS = 12;
+
+		const slotForm = document.getElementById("slotForm");
+		const slotDateInput = document.getElementById("slotDate");
+		const startTimeInput = document.getElementById("startTime");
+		const splitMinutesSelect = document.getElementById("splitMinutes");
+		const endTimeSelect = document.getElementById("endTime");
+		const endDayOffsetInput = document.getElementById("endDayOffset");
+
+		window.addEventListener("DOMContentLoaded", function() {
+			const today = new Date();
+
+			const maxDate = new Date();
+			maxDate.setDate(maxDate.getDate() + MAX_BOOKING_DAYS);
+
+			slotDateInput.min = formatDate(today);
+			slotDateInput.max = formatDate(maxDate);
+
+			generateEndTimeOptions();
+		});
+
+		slotDateInput.addEventListener("change", function() {
+			generateEndTimeOptions();
+		});
+
+		startTimeInput.addEventListener("change", function() {
+			generateEndTimeOptions();
+		});
+
+		splitMinutesSelect.addEventListener("change", function() {
+			generateEndTimeOptions();
+		});
+
+		endTimeSelect.addEventListener("change", function() {
+			updateEndDayOffset();
+		});
+
+		slotForm
+				.addEventListener(
+						"submit",
+						function(event) {
+							updateEndDayOffset();
+
+							if (!endTimeSelect.value) {
+								alert("請選擇結束時間");
+								event.preventDefault();
+								return;
+							}
+
+							const selectedOption = endTimeSelect.options[endTimeSelect.selectedIndex];
+
+							const confirmMessage = "確定要新增這批時段嗎？\n\n"
+									+ "日期："
+									+ slotDateInput.value
+									+ "\n"
+									+ "開始時間："
+									+ startTimeInput.value
+									+ "\n"
+									+ "結束時間："
+									+ selectedOption.textContent
+									+ "\n"
+									+ "切分方式："
+									+ splitMinutesSelect.options[splitMinutesSelect.selectedIndex].textContent;
+
+							if (!confirm(confirmMessage)) {
+								event.preventDefault();
+							}
+						});
+
+		function generateEndTimeOptions() {
+			const startTimeValue = startTimeInput.value;
+			const splitMinutes = Number(splitMinutesSelect.value);
+
+			endTimeSelect.innerHTML = "";
+			endDayOffsetInput.value = "0";
+
+			if (!startTimeValue) {
+				addOption("", "請先選擇開始時間", 0);
+				return;
+			}
+
+			const startMinutes = timeToMinutes(startTimeValue);
+			const maxDurationMinutes = MAX_BLOCK_HOURS * 60;
+
+			let stepMinutes = splitMinutes;
+
+			/*
+			 * splitMinutes = 0 代表後端不切資料。
+			 * 但前端結束時間選單仍用 30 分鐘產生選項。
+			 */
+			if (stepMinutes === 0) {
+				stepMinutes = 30;
+			}
+
+			let duration = stepMinutes;
+
+			while (duration <= maxDurationMinutes) {
+				const absoluteEndMinutes = startMinutes + duration;
+
+				const dayOffset = Math.floor(absoluteEndMinutes / (24 * 60));
+				const endMinutesInDay = absoluteEndMinutes % (24 * 60);
+
+				const endTimeText = minutesToTime(endMinutesInDay);
+
+				let label = endTimeText;
+
+				if (dayOffset === 1) {
+					label = "隔日 " + endTimeText;
+				} else if (dayOffset > 1) {
+					label = dayOffset + " 日後 " + endTimeText;
+				}
+
+				addOption(endTimeText, label, dayOffset);
+
+				duration += stepMinutes;
+			}
+
+			updateEndDayOffset();
+		}
+
+		function addOption(value, text, dayOffset) {
+			const option = document.createElement("option");
+			option.value = value;
+			option.textContent = text;
+			option.dataset.dayOffset = String(dayOffset);
+
+			endTimeSelect.appendChild(option);
+		}
+
+		function updateEndDayOffset() {
+			const selectedOption = endTimeSelect.options[endTimeSelect.selectedIndex];
+
+			if (selectedOption && selectedOption.dataset.dayOffset) {
+				endDayOffsetInput.value = selectedOption.dataset.dayOffset;
+			} else {
+				endDayOffsetInput.value = "0";
+			}
+		}
+
+		function timeToMinutes(timeText) {
+			const parts = timeText.split(":");
+			const hours = Number(parts[0]);
+			const minutes = Number(parts[1]);
+
+			return hours * 60 + minutes;
+		}
+
+		function minutesToTime(totalMinutes) {
+			const hours = Math.floor(totalMinutes / 60);
+			const minutes = totalMinutes % 60;
+
+			return String(hours).padStart(2, "0") + ":"
+					+ String(minutes).padStart(2, "0");
+		}
+
+		function formatDate(date) {
+			const year = date.getFullYear();
+			const month = String(date.getMonth() + 1).padStart(2, "0");
+			const day = String(date.getDate()).padStart(2, "0");
+
+			return year + "-" + month + "-" + day;
+		}
+	</script>
+
+</body>
+</html>

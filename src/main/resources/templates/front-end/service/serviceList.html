@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>一對一服務列表</title>
+</head>
+<body>
+
+	<h1>一對一服務列表</h1>
+
+	<p>
+		<a th:href="@{/member/services}">我的服務</a> <span
+			th:if="${session.memberVO != null}"> ｜目前假登入會員編號： <span
+			th:text="${session.memberVO.memberId}"></span> ｜<a
+			th:href="@{/member/services/fakelogout}">假登出</a>
+		</span> <span th:if="${session.memberVO == null}"> ｜尚未假登入 </span>
+	</p>
+
+	<!-- 錯誤訊息 -->
+	<p th:if="${errorMsg != null}" th:text="${errorMsg}"
+		style="color: red;"></p>
+
+	<!-- 搜尋區 -->
+	<h2>搜尋服務</h2>
+
+	<form th:action="@{/front/services/search}" method="get">
+		<input type="text" name="keyword" th:value="${keyword}"
+			placeholder="請輸入服務名稱或描述">
+		<button type="submit">搜尋</button>
+	</form>
+
+	<p>
+		<a th:href="@{/front/services}">清除搜尋 / 回全部服務</a>
+	</p>
+
+	<hr>
+
+	<!-- 服務類型分類 -->
+	<h2>服務類型</h2>
+
+	<ul>
+		<li><a th:href="@{/front/services}"> 全部服務 </a></li>
+
+		<li th:each="type : ${serviceTypeList}"><a
+			th:href="@{/front/services/type/{id}(id=${type.svcTypeID})}"
+			th:text="${type.typeName}"> 服務類型名稱 </a> <span
+			th:if="${selectedServiceTypeId != null and selectedServiceTypeId == type.svcTypeID}">
+				← 目前選取 </span></li>
+	</ul>
+
+	<hr>
+
+	<!-- 服務列表 -->
+	<h2>服務列表</h2>
+
+	<p th:if="${#lists.isEmpty(serviceList)}">目前沒有符合條件的服務。</p>
+
+	<table border="1" cellpadding="8" cellspacing="0"
+		th:if="${!#lists.isEmpty(serviceList)}">
+		<thead>
+			<tr>
+				<th>服務編號</th>
+				<th>服務類型</th>
+				<th>服務名稱</th>
+				<th>服務描述</th>
+				<th>提供者會員編號</th>
+				<th>每小時費率</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr th:each="service : ${serviceList}">
+				<td th:text="${service.serviceId}">1</td>
+
+				<td
+					th:text="${service.serviceType != null ? service.serviceType.typeName : '無類型'}">
+					服務類型</td>
+
+				<td th:text="${service.serviceName}">服務名稱</td>
+
+				<td th:text="${service.description}">服務描述</td>
+
+				<td th:text="${service.memberId}">1</td>
+
+				<td>NT$ <span th:text="${service.hourlyRate}">500</span> / 小時
+				</td>
+
+				<td><a
+					th:href="@{/front/services/{id}(id=${service.serviceId})}">
+						查看詳情 </a></td>
+			</tr>
+		</tbody>
+	</table>
+
+</body>
+</html>

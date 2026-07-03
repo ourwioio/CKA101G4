@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>一對一服務詳情</title>
+</head>
+<body>
+
+<h1>一對一服務詳情</h1>
+
+<p>
+    <a th:href="@{/front/services}">回服務列表</a>
+</p>
+
+<hr>
+
+<!-- 服務基本資料 -->
+<h2>服務基本資料</h2>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <tr>
+        <th>服務編號</th>
+        <td th:text="${serviceVO.serviceId}">1</td>
+    </tr>
+
+    <tr>
+        <th>服務類型</th>
+        <td th:text="${serviceVO.serviceType != null ? serviceVO.serviceType.typeName : '無類型'}">
+            服務類型
+        </td>
+    </tr>
+
+    <tr>
+        <th>服務名稱</th>
+        <td th:text="${serviceVO.serviceName}">
+            服務名稱
+        </td>
+    </tr>
+
+    <tr>
+        <th>服務描述</th>
+        <td th:text="${serviceVO.description}">
+            服務描述
+        </td>
+    </tr>
+
+    <tr>
+        <th>提供者會員編號</th>
+        <td th:text="${serviceVO.memberId}">
+            1
+        </td>
+    </tr>
+
+    <tr>
+        <th>每小時費率</th>
+        <td>
+            NT$
+            <span th:text="${serviceVO.hourlyRate}">500</span>
+            / 小時
+        </td>
+    </tr>
+
+    <tr>
+        <th>建立時間</th>
+        <td th:text="${serviceVO.createdAt}">
+            2026-01-01 10:00
+        </td>
+    </tr>
+</table>
+
+<hr>
+
+<!-- 服務時段 -->
+<h2>可預約時段</h2>
+
+<p th:if="${#lists.isEmpty(serviceSlotList)}">
+    目前沒有可顯示的服務時段。
+</p>
+
+<table border="1" cellpadding="8" cellspacing="0" th:if="${!#lists.isEmpty(serviceSlotList)}">
+    <thead>
+        <tr>
+            <th>時段編號</th>
+            <th>開始時間</th>
+            <th>結束時間</th>
+            <th>狀態</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr th:each="slot : ${serviceSlotList}">
+            <td th:text="${slot.serviceSlotId}">
+                1
+            </td>
+
+            <td th:text="${slot.startTime}">
+                2026-01-01 10:00
+            </td>
+
+            <td th:text="${slot.endTime}">
+                2026-01-01 11:00
+            </td>
+
+            <td>
+                <span th:if="${slot.slotStatus == 0}">可預約</span>
+                <span th:if="${slot.slotStatus == 1}">暫鎖</span>
+                <span th:if="${slot.slotStatus == 2}">已預約</span>
+                <span th:if="${slot.slotStatus != 0 and slot.slotStatus != 1 and slot.slotStatus != 2}">
+                    未知狀態
+                </span>
+            </td>
+
+            <td>
+                <span th:if="${slot.slotStatus == 0}">
+                    <!-- 目前先只顯示文字，等你做 MemberServiceOrderController 再改成 form -->
+                    可預約
+                </span>
+
+                <span th:unless="${slot.slotStatus == 0}">
+                    目前不可預約
+                </span>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<hr>
+
+<p>
+    <a th:href="@{/front/services}">回服務列表</a>
+</p>
+
+</body>
+</html>

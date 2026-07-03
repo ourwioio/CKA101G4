@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的服務</title>
+</head>
+<body>
+
+<h1>我的服務</h1>
+
+<!-- 目前登入資訊 -->
+<p>
+    目前假登入會員編號：
+    <span th:text="${loginMemberId}">1</span>
+</p>
+
+<!-- 上方操作區 -->
+<p>
+    <a th:href="@{/front/services}">回前台服務列表</a>
+    |
+    <a th:href="@{/member/services/add}">新增服務</a>
+    |
+    <a th:href="@{/member/services/fakelogout}">假登出</a>
+</p>
+
+<hr>
+
+<!-- 錯誤訊息 -->
+<p th:if="${errorMsg != null}" th:text="${errorMsg}" style="color:red;"></p>
+
+<!-- 成功訊息 -->
+<p th:if="${successMsg != null}" th:text="${successMsg}" style="color:green;"></p>
+
+<!-- 沒有資料 -->
+<p th:if="${#lists.isEmpty(serviceList)}">
+    你目前沒有可管理的服務。
+</p>
+
+<!-- 我的服務列表 -->
+<table border="1" cellpadding="8" cellspacing="0" th:if="${!#lists.isEmpty(serviceList)}">
+    <thead>
+        <tr>
+            <th>服務編號</th>
+            <th>服務類型</th>
+            <th>服務名稱</th>
+            <th>描述</th>
+            <th>每小時費率</th>
+            <th>狀態</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr th:each="service : ${serviceList}">
+            <!-- 服務編號 裡面帶入的值只是假資料 真正執行的時候會被渲染掉-->
+            <td th:text="${service.serviceId}">
+                1
+            </td>
+
+            <!-- 服務類型 -->
+            <td th:text="${service.serviceType != null ? service.serviceType.typeName : '無類型'}">
+                程式教學
+            </td>
+
+            <!-- 服務名稱 -->
+            <td th:text="${service.serviceName}">
+                Java 家教
+            </td>
+
+            <!-- 描述 -->
+            <td th:text="${service.description}">
+                協助 Java Spring Boot 專題開發
+            </td>
+
+            <!-- 價格 -->
+            <td>
+                NT$
+                <span th:text="${service.hourlyRate}">500</span>
+                / 小時
+            </td>
+
+            <!-- 狀態 -->
+            <td>
+                <span th:if="${service.status == 1}">上架中</span>
+                <span th:if="${service.status == 0}">已下架</span>
+                <span th:if="${service.status == 2}">已封存</span>
+                <span th:if="${service.status != 0 and service.status != 1 and service.status != 2}">
+                    未知狀態
+                </span>
+            </td>
+
+            <!-- 操作 -->
+            <td>
+                <!-- 修改 -->
+                <a th:href="@{/member/services/{id}/edit(id=${service.serviceId})}">
+                    修改
+                </a>
+                
+                <a th:href="@{/member/services/{id}/slots(id=${service.serviceId})}">
+ 			   管理時段
+ 			   </a>
+
+                <!-- 上架中才顯示下架 -->
+                <form th:if="${service.status == 1}"
+                      th:action="@{/member/services/{id}/deactivate(id=${service.serviceId})}"
+                      method="post"
+                      style="display:inline;">
+                    <button type="submit"
+                            onclick="return confirm('確定要下架這個服務嗎？下架後前台將看不到，但你可以重新上架。')">
+                        下架
+                    </button>
+                </form>
+
+                <!-- 已下架才顯示重新上架 -->
+                <form th:if="${service.status == 0}"
+                      th:action="@{/member/services/{id}/activate(id=${service.serviceId})}"
+                      method="post"
+                      style="display:inline;">
+                    <button type="submit"
+                            onclick="return confirm('確定要重新上架這個服務嗎？上架後前台使用者將可以看到。')">
+                        重新上架
+                    </button>
+                </form>
+
+                <!-- 刪除/封存 -->
+                <form th:action="@{/member/services/{id}/delete(id=${service.serviceId})}"
+                      method="post"
+                      style="display:inline;">
+                    <button type="submit"
+                            onclick="return confirm('確定要刪除此服務嗎？刪除後不可重新上架，只會保留歷史訂單紀錄。')">
+                        刪除
+                    </button>
+                </form>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<hr>
+
+<p>
+    <a th:href="@{/front/services}">回前台服務列表</a>
+</p>
+
+</body>
+</html>
