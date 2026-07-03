@@ -95,6 +95,10 @@
                 <a th:href="@{/member/services/{id}/edit(id=${service.serviceId})}">
                     修改
                 </a>
+                
+                <a th:href="@{/member/services/{id}/slots(id=${service.serviceId})}">
+ 			   管理時段
+ 			   </a>
 
                 <!-- 上架中才顯示下架 -->
                 <form th:if="${service.status == 1}"

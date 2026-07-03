@@ -2,7 +2,12 @@ package com.webond.service.model;
 
 import java.time.LocalDateTime;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "SERVICE_ORDER")
@@ -84,40 +89,41 @@ public class ServiceOrderVO {
 
     @Column(name = "CANCELLED_AT")
     private LocalDateTime cancelledAt;
-    
+
     @Column(name = "REFUND_AMOUNT")
     private Integer refundAmount;
 
     @Column(name = "SELLER_CONFIRM_EXPIRES_AT")
     private LocalDateTime sellerConfirmExpiresAt;
-    
-    public LocalDateTime getSellerConfirmExpiresAt() {
-		return sellerConfirmExpiresAt;
-	}
 
-	public void setSellerConfirmExpiresAt(LocalDateTime sellerConfirmExpiresAt) {
-		this.sellerConfirmExpiresAt = sellerConfirmExpiresAt;
-	}
-
-	public LocalDateTime getPaymentExpiresAt() {
-		return paymentExpiresAt;
-	}
-
-	public void setPaymentExpiresAt(LocalDateTime paymentExpiresAt) {
-		this.paymentExpiresAt = paymentExpiresAt;
-	}
-
-	@Column(name = "PAYMENT_EXPIRES_AT")
+    @Column(name = "PAYMENT_EXPIRES_AT")
     private LocalDateTime paymentExpiresAt;
-    public Integer getRefundAmount() {
-		return refundAmount;
-	}
 
-	public void setRefundAmount(Integer refundAmount) {
-		this.refundAmount = refundAmount;
-	}
+    // =====================
+    // 訂單快照欄位
+    // 建立訂單當下，把服務與時段資料寫死
+    // 避免服務後續修改影響歷史訂單
+    // =====================
 
-	public Integer getServiceOrderId() {
+    @Column(name = "SELLER_MEMBER_ID")
+    private Integer sellerMemberId;
+
+    @Column(name = "SERVICE_NAME_SNAPSHOT")
+    private String serviceNameSnapshot;
+
+    @Column(name = "SERVICE_TYPE_NAME_SNAPSHOT")
+    private String serviceTypeNameSnapshot;
+
+    @Column(name = "SERVICE_DESCRIPTION_SNAPSHOT")
+    private String serviceDescriptionSnapshot;
+
+    @Column(name = "SLOT_START_TIME_SNAPSHOT")
+    private LocalDateTime slotStartTimeSnapshot;
+
+    @Column(name = "SLOT_END_TIME_SNAPSHOT")
+    private LocalDateTime slotEndTimeSnapshot;
+
+    public Integer getServiceOrderId() {
         return serviceOrderId;
     }
 
@@ -315,5 +321,77 @@ public class ServiceOrderVO {
 
     public void setCancelledAt(LocalDateTime cancelledAt) {
         this.cancelledAt = cancelledAt;
+    }
+
+    public Integer getRefundAmount() {
+        return refundAmount;
+    }
+
+    public void setRefundAmount(Integer refundAmount) {
+        this.refundAmount = refundAmount;
+    }
+
+    public LocalDateTime getSellerConfirmExpiresAt() {
+        return sellerConfirmExpiresAt;
+    }
+
+    public void setSellerConfirmExpiresAt(LocalDateTime sellerConfirmExpiresAt) {
+        this.sellerConfirmExpiresAt = sellerConfirmExpiresAt;
+    }
+
+    public LocalDateTime getPaymentExpiresAt() {
+        return paymentExpiresAt;
+    }
+
+    public void setPaymentExpiresAt(LocalDateTime paymentExpiresAt) {
+        this.paymentExpiresAt = paymentExpiresAt;
+    }
+
+    public Integer getSellerMemberId() {
+        return sellerMemberId;
+    }
+
+    public void setSellerMemberId(Integer sellerMemberId) {
+        this.sellerMemberId = sellerMemberId;
+    }
+
+    public String getServiceNameSnapshot() {
+        return serviceNameSnapshot;
+    }
+
+    public void setServiceNameSnapshot(String serviceNameSnapshot) {
+        this.serviceNameSnapshot = serviceNameSnapshot;
+    }
+
+    public String getServiceTypeNameSnapshot() {
+        return serviceTypeNameSnapshot;
+    }
+
+    public void setServiceTypeNameSnapshot(String serviceTypeNameSnapshot) {
+        this.serviceTypeNameSnapshot = serviceTypeNameSnapshot;
+    }
+
+    public String getServiceDescriptionSnapshot() {
+        return serviceDescriptionSnapshot;
+    }
+
+    public void setServiceDescriptionSnapshot(String serviceDescriptionSnapshot) {
+        this.serviceDescriptionSnapshot = serviceDescriptionSnapshot;
+    }
+
+    public LocalDateTime getSlotStartTimeSnapshot() {
+        return slotStartTimeSnapshot;
+    }
+
+    public void setSlotStartTimeSnapshot(LocalDateTime slotStartTimeSnapshot) {
+        this.slotStartTimeSnapshot = slotStartTimeSnapshot;
+    }
+
+    public LocalDateTime getSlotEndTimeSnapshot() {
+        return slotEndTimeSnapshot;
+    }
+
+    public void setSlotEndTimeSnapshot(LocalDateTime slotEndTimeSnapshot) {
+        this.slotEndTimeSnapshot = slotEndTimeSnapshot;
     }
 }

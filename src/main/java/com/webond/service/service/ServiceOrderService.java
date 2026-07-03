@@ -21,14 +21,18 @@ public class ServiceOrderService {
     private final ServiceOrderRepository orderRepo;
     private final ServiceRepository serviceRepo;
     private final ServiceSlotRepository slotRepo;
+    private final SlotStatusWebSocketService slotStatusWebSocketService;
 
     public ServiceOrderService(
             ServiceOrderRepository orderRepo,
             ServiceRepository serviceRepo,
-            ServiceSlotRepository slotRepo) {
+            ServiceSlotRepository slotRepo,
+            SlotStatusWebSocketService slotStatusWebSocketService
+            ) {
         this.orderRepo = orderRepo;
         this.serviceRepo = serviceRepo;
         this.slotRepo = slotRepo;
+        this.slotStatusWebSocketService = slotStatusWebSocketService;
     }
 
     // 買家送出預約申請

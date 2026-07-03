@@ -190,7 +190,7 @@ public class ServiceService {
 
 		// 沒訂單才真刪除
 		// 先刪時段，再刪服務，避免外鍵擋住
-		serviceSlotRepository.deleteByServiceId(serviceId);
+		serviceSlotRepository.deleteByService_ServiceId(serviceId);
 		serviceRepository.delete(serviceVO);
 	}
 
