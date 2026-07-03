@@ -30,8 +30,14 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">負責員工編號</label>
-            <input type="number" class="form-control" th:field="*{employeeId}" />
+            <label class="form-label">負責員工</label>
+            <select class="form-select" th:field="*{employeeId}">
+                <option value="">請選擇員工</option>
+                <option th:each="emp : ${employeeListData}"
+                        th:value="${emp.employeeId}"
+                        th:text="${emp.employeeId} + ' - ' + ${emp.empName}">
+                </option>
+            </select>
         </div>
 
         <div class="mb-4">

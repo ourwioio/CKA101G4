@@ -16,20 +16,34 @@
     <!-- Flash 訊息：發布/收回/新增/修改/刪除成功時顯示 -->
     <div class="alert alert-success" th:if="${success != null}" th:text="${success}"></div>
 
-    <!-- 搜尋區塊 -->
-    <form th:action="@{/bulletin/search}" method="post" class="row g-2 mb-4">
+    <!-- 複合搜尋：狀態 / 關鍵字 / 發布日期區間，可任意組合或留空 -->
+    <form th:action="@{/bulletin/search}" method="post" class="row g-2 mb-4 align-items-center">
         <div class="col-auto">
             <select name="status" class="form-select">
-                <option value="">全部狀態</option>
-                <option value="0">草稿</option>
-                <option value="1">已發布</option>
+                <option value="" th:selected="${searchStatus == null}">全部狀態</option>
+                <option value="0" th:selected="${searchStatus != null and searchStatus == 0}">草稿</option>
+                <option value="1" th:selected="${searchStatus != null and searchStatus == 1}">已發布</option>
             </select>
         </div>
         <div class="col-auto">
-            <input type="text" name="keyword" class="form-control" placeholder="標題關鍵字" />
+            <input type="text" name="keyword" class="form-control" placeholder="標題或標籤關鍵字"
+                   th:value="${searchKeyword}" />
+        </div>
+        <div class="col-auto">
+            <label class="col-form-label">發布日期</label>
+        </div>
+        <div class="col-auto">
+            <input type="date" name="startDate" class="form-control" th:value="${searchStartDate}" />
+        </div>
+        <div class="col-auto">～</div>
+        <div class="col-auto">
+            <input type="date" name="endDate" class="form-control" th:value="${searchEndDate}" />
         </div>
         <div class="col-auto">
             <button type="submit" class="btn btn-outline-primary">搜尋</button>
+        </div>
+        <div class="col-auto">
+            <a th:href="@{/bulletin/listAllBulletin}" class="btn btn-outline-secondary">清除條件</a>
         </div>
     </form>
 
@@ -47,7 +61,12 @@
         <tbody>
             <tr th:each="bulletin : ${bulletinListData}">
                 <td th:text="${bulletin.bulletinId}"></td>
-                <td th:text="${bulletin.title}"></td>
+                <td>
+                    <form th:action="@{/bulletin/viewOne}" method="post" class="d-inline">
+                        <input type="hidden" name="bulletinId" th:value="${bulletin.bulletinId}" />
+                        <button type="submit" class="btn btn-link p-0 text-decoration-none" th:text="${bulletin.title}"></button>
+                    </form>
+                </td>
                 <td>
                     <span th:if="${bulletin.status == 1}" class="badge bg-success">已發布</span>
                     <span th:if="${bulletin.status == 0}" class="badge bg-secondary">草稿</span>
@@ -60,14 +79,10 @@
                         <button type="submit" class="btn btn-sm btn-outline-primary">修改</button>
                     </form>
 
-                    <form th:action="@{/bulletin/publish}" method="post" class="d-inline" th:if="${bulletin.status == 0}">
+                    <form th:action="@{/bulletin/publish}" method="post" class="d-inline" th:if="${bulletin.status == 0}"
+                          onsubmit="return confirm('發布後將無法改回草稿，確定要發布嗎？');">
                         <input type="hidden" name="bulletinId" th:value="${bulletin.bulletinId}" />
                         <button type="submit" class="btn btn-sm btn-outline-success">發布</button>
-                    </form>
-
-                    <form th:action="@{/bulletin/unpublish}" method="post" class="d-inline" th:if="${bulletin.status == 1}">
-                        <input type="hidden" name="bulletinId" th:value="${bulletin.bulletinId}" />
-                        <button type="submit" class="btn btn-sm btn-outline-warning">收回</button>
                     </form>
 
                     <form th:action="@{/bulletin/delete}" method="post" class="d-inline"
