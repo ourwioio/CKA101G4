@@ -34,4 +34,8 @@ public class ActivityService {
 	public void deleteActivity(Integer id) {
 		repository.deleteById(id);
 	}
+
+	public List<ActivityVO> getActivitiesByMemberId(Integer memberId) {
+		return repository.findByMemberId(memberId);
+	}
 }
