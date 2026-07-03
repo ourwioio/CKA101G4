@@ -1,6 +1,5 @@
 package com.webond.member.service;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -73,7 +72,7 @@ public class MemberServiceLoie {
 	}
 
 	// =========================================================================
-	// 💻 3. 後台管理：管理員審核 KYC 實名認證
+	// 💻 3. 後台管理：管理員審核 KYC 實名認證 (保留你原有的嚴謹審核邏輯)
 	// =========================================================================
 	@Transactional
 	public MemberVO reviewKycStatus(Integer memberId, Integer employeeId, Byte kycStatus) {
@@ -108,27 +107,48 @@ public class MemberServiceLoie {
 		return repository.findAll();
 	}
 	
-	// 🔍 後台輔助查詢：取得單一會員詳細資料 (審核細頁用)
+	// 🔍 後台輔助查詢：取得單一會員詳細資料 (審核細頁、圖片顯示用)
 	public MemberVO getOneMember(Integer memberId) {
 		return repository.findById(memberId).orElse(null);
 	}
+
+	// =========================================================================
+	// 🎯 接收 MemberVO 的註冊存檔實作 (完美對齊 Controller doRegister 呼叫)
+	// =========================================================================
 	@Transactional
 	public void registerMember(MemberVO memberVO) {
-		// 🎯 核心修復：讓這個接收 MemberVO 的方法真正做事，加上 @Transactional 並呼叫 save
+		// 初始化規格書要求的評價預設值
+		memberVO.setReportPoints(0);
+		memberVO.setServiceRateSum(BigDecimal.ZERO);
+		memberVO.setServiceRateCount(0);
+		memberVO.setServicerRateSum(BigDecimal.ZERO);
+		memberVO.setServicerRateCount(0);
+		memberVO.setActRateSum(BigDecimal.ZERO);
+		memberVO.setActRateCount(0);
+		memberVO.setHoldactRateSum(BigDecimal.ZERO);
+		memberVO.setHoldactRateCount(0);
 		
-			memberVO.setReportPoints(0);
-			memberVO.setServiceRateSum(BigDecimal.ZERO);
-			memberVO.setServiceRateCount(0);
-			memberVO.setServicerRateSum(BigDecimal.ZERO);
-			memberVO.setServicerRateCount(0);
-			memberVO.setActRateSum(BigDecimal.ZERO);
-			memberVO.setActRateCount(0);
-			memberVO.setHoldactRateSum(BigDecimal.ZERO);
-			memberVO.setHoldactRateCount(0);
-			
-			// 2. 真正呼叫 repository 送進資料庫！
+		// 真正呼叫 repository 送進資料庫
+		repository.save(memberVO);
+	}
+
+	// =========================================================================
+	// 🎯 補齊後台功能：依據狀態碼撈取會員清單 (用於前端 kycApproval.html 的待審核表格)
+	// =========================================================================
+	public List<MemberVO> getMembersByStatus(byte b) {
+		// 使用 Java Stream 語法，從所有會員中過濾出 AccountStatus 為 0 的待審核會員
+		return repository.findAll().stream()
+				.filter(m -> m.getAccountStatus() != null && m.getAccountStatus() == b)
+				.toList();
+	}
+
+	// =========================================================================
+	// 🎯 補齊後台功能：更新會員資料 (用於 Controller 提交審核結果存檔)
+	// =========================================================================
+	@Transactional
+	public void updateMember(MemberVO memberVO) {
+		if (memberVO != null && memberVO.getMemberId() != null) {
 			repository.save(memberVO);
-		
-		
+		}
 	}
 }

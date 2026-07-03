@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +17,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.member.model.MemberVO;
 import com.webond.member.service.MemberServiceLoie;
@@ -132,7 +138,7 @@ public class MemberControllerLoie {
 		memberVO.setCreatedAt(java.time.LocalDate.now());                  
 		memberVO.setSubmittedAt(java.time.LocalDateTime.now());            
 
-		// 📡 🎯 【攔截點】只要有任何錯誤（包括 VO 註解和手動 rejectValue），通通退回並攜帶 result 物件
+		// 📡 🎯 【攔截點】只要有任何錯誤（包括 VO 註解 and 手動 rejectValue），通通退回並攜帶 result 物件
 		if (result.hasErrors()) {
 			System.out.println("==== [Debug] 註冊驗證不通過，已被拒絕！錯誤數量: " + result.getErrorCount() + " ====");
 			model.addAttribute("memberVO", memberVO);
@@ -167,5 +173,92 @@ public class MemberControllerLoie {
 			model.addAttribute("memberVO", memberVO);
 			return "front-end/member/register";
 		}
+	}
+
+	/**
+	 * 📊 4. 顯示所有會員大總表（包含已核准、被駁回等所有人）
+	 */
+	@GetMapping("/back-end/memberList")
+	public String memberList(Model model) {
+		List<MemberVO> allMembers = memberService.getAllMembers(); 
+		model.addAttribute("allMembers", allMembers);
+		// 🎯 修正路徑：精準指定到 back-end/member/ 資料夾下
+		return "back-end/member/memberList"; 
+	}
+
+	// ==========================================
+	// 🎯 後台新增：KYC 綜合審核功能面板 (方案 A 模式)
+	// ==========================================
+
+	/**
+	 * 🖼️ 1. 圖片讀取 API（將資料庫的 byte[] 轉換為網頁圖檔資料流）
+	 */
+	@GetMapping("/back-end/displayImage")
+	@ResponseBody
+	public ResponseEntity<byte[]> displayImage(@RequestParam("memberId") Integer memberId, 
+	                                           @RequestParam("type") String type) {
+		MemberVO memberVO = memberService.getOneMember(memberId); 
+		
+		if (memberVO != null) {
+			byte[] imageBytes = null;
+			
+			if ("idImage".equals(type)) {
+				imageBytes = memberVO.getIdImage(); 
+			} else if ("faceImage".equals(type)) {
+				imageBytes = memberVO.getFaceImage(); 
+			} else if ("memberPic".equals(type)) {
+				imageBytes = memberVO.getMemberPic(); 
+			}
+			
+			if (imageBytes != null && imageBytes.length > 0) {
+				HttpHeaders headers = new HttpHeaders();
+				headers.setContentType(MediaType.IMAGE_JPEG); 
+				return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+			}
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+
+	/**
+	 * 🪪 2. 綜合審核面板：一次帶出 待審核、已通過、已駁回 三種清單
+	 */
+	@GetMapping("/back-end/kycApproval")
+	public String kycList(Model model) {
+		// 🎯 一次撈取三種狀態名單
+		List<MemberVO> pendingList = memberService.getMembersByStatus((byte) 0); // 0 = 待審核
+		List<MemberVO> passList = memberService.getMembersByStatus((byte) 1);    // 1 = 已核准
+		List<MemberVO> failList = memberService.getMembersByStatus((byte) 2);    // 2 = 已駁回
+		
+		// 打包裝箱送給前端
+		model.addAttribute("pendingList", pendingList);
+		model.addAttribute("passList", passList);
+		model.addAttribute("failList", failList);
+		
+		return "back-end/member/kycApproval"; 
+	}
+
+	/**
+	 * ⚖️ 3. 處理審核結果（通過為 1 / 駁回為 2）
+	 */
+	@PostMapping("/back-end/reviewKyc")
+	public String reviewKyc(@RequestParam("memberId") Integer memberId,
+	                        @RequestParam("status") Byte status,
+	                        RedirectAttributes redirectAttributes) {
+		
+		MemberVO memberVO = memberService.getOneMember(memberId);
+		if (memberVO != null) {
+			// 同步更新帳戶狀態與 KYC 審核狀態
+			memberVO.setAccountStatus(status); 
+			memberVO.setKycStatus(status); 
+			
+			memberService.updateMember(memberVO); // 儲存回資料庫
+			
+			redirectAttributes.addFlashAttribute("successMsg", "會員 [ID: " + memberId + "] 審核操作成功！");
+		} else {
+			redirectAttributes.addFlashAttribute("errorMsg", "找不到該會員資料！");
+		}
+		
+		// 🎯 修正導向：審核完後一律重新整理導回到綜合面板網址
+		return "redirect:/member/back-end/kycApproval"; 
 	}
 }
