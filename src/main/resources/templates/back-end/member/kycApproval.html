@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webond 後台管理 - KYC 綜合審核面板</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --sky-600: #0284c7;
+            --sky-700: #0369a1;
+            --emerald-600: #16a34a;
+            --emerald-700: #15803d;
+            --rose-600: #e11d48;
+            --rose-700: #be123c;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', "Microsoft JhengHei", sans-serif;
+            background-color: var(--slate-100);
+            color: var(--slate-800);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 32px;
+        }
+
+        /* 頂部標題區 */
+        .header-area {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        .header-area h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--slate-800);
+        }
+
+        /* 🎯 Tab 標籤切換區樣式 */
+        .tabs-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--slate-600);
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background-color: var(--slate-50);
+            color: var(--slate-800);
+        }
+
+        .tab-btn.active {
+            background-color: var(--slate-800);
+            color: #ffffff;
+        }
+
+        /* 各別 Tab 內部的計數小泡泡 */
+        .tab-badge {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+        .btn-pending .tab-badge { background-color: #bae6fd; color: #0369a1; }
+        .btn-pending.active .tab-badge { background-color: #0369a1; color: white; }
+        .btn-pass .tab-badge { background-color: #d1fae5; color: #065f46; }
+        .btn-pass.active .tab-badge { background-color: #065f46; color: white; }
+        .btn-fail .tab-badge { background-color: #ffe4e6; color: #9f1239; }
+        .btn-fail.active .tab-badge { background-color: #9f1239; color: white; }
+
+        /* 🎯 控制表格區塊隱藏/顯示 */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 提示訊息彈窗 */
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* 表格樣式優化 */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 15px;
+        }
+
+        th {
+            background-color: var(--slate-50);
+            color: var(--slate-700);
+            font-weight: 600;
+            padding: 16px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .member-info {
+            line-height: 1.5;
+        }
+
+        .member-info .email {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        /* 狀態標籤 */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .badge-success { background-color: #d1fae5; color: #065f46; }
+        .badge-danger { background-color: #ffe4e6; color: #9f1239; }
+
+        /* 圖片預覽縮圖 */
+        .img-wrapper {
+            position: relative;
+            width: 90px;
+            height: 60px;
+            overflow: hidden;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            background-color: #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .img-wrapper:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-color: var(--sky-600);
+        }
+
+        .img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 按鈕樣式 */
+        .action-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-pass { background-color: var(--emerald-600); color: white; }
+        .btn-pass:hover { background-color: var(--emerald-700); }
+
+        .btn-fail { background-color: var(--rose-600); color: white; }
+        .btn-fail:hover { background-color: var(--rose-700); }
+
+        /* 圖片燈箱效果 (Modal) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 23, 42, 0.85);
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+        .modal-content {
+            max-width: 85%;
+            max-height: 85%;
+            border-radius: 8px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: #ffffff;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-area">
+        <h2>🪪 KYC 會員實名認證審核面板</h2>
+    </div>
+    
+    <div class="alert-success" th:if="${successMsg != null}" th:text="${successMsg}"></div>
+
+    <div class="tabs-container">
+        <button class="tab-btn btn-pending active" onclick="switchTab('pending-tab', this)">
+            ⏳ 待審核清單 <span class="tab-badge" th:text="${pendingList != null ? pendingList.size() : 0}">0</span>
+        </button>
+        <button class="tab-btn btn-pass" onclick="switchTab('pass-tab', this)">
+            🟢 已核准通過 <span class="tab-badge" th:text="${passList != null ? passList.size() : 0}">0</span>
+        </button>
+        <button class="tab-btn btn-fail" onclick="switchTab('fail-tab', this)">
+            🔴 已駁回申請 <span class="tab-badge" th:text="${failList != null ? failList.size() : 0}">0</span>
+        </button>
+    </div>
+
+    <div id="pending-tab" class="tab-content active">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>會員 ID</th>
+                        <th>真實姓名</th>
+                        <th>身分證字號</th>
+                        <th>聯絡資訊</th>
+                        <th>身分證照片 (點擊放大)</th>
+                        <th>現場自拍照 (點擊放大)</th>
+                        <th>審核操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${pendingList == null or pendingList.isEmpty()}">
+                        <td colspan="7" style="text-align: center; color: #94a3b8; padding: 40px 0; font-weight: 500;">
+                            🎉 目前太棒了！沒有任何需要審核的 KYC 申請。
+                        </td>
+                    </tr>
+                    <tr th:each="member : ${pendingList}">
+                        <td th:text="${member.memberId}" style="font-weight: 600; color: #64748b;"></td>
+                        <td th:text="${member.realName}" style="font-weight: 700; color: var(--slate-800);"></td>
+                        <td th:text="${member.idNumber}" style="font-family: monospace; font-size: 16px;"></td>
+                        <td>
+                            <div class="member-info">
+                                <div th:text="${member.phone}"></div>
+                                <div class="email" th:text="${member.email}"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="img-wrapper" onclick="openPreview(this)">
+                                <img th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='idImage')}" alt="身分證證件">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="img-wrapper" onclick="openPreview(this)">
+                                <img th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='faceImage')}" alt="人臉自拍">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-group">
+                                <form th:action="@{/member/back-end/reviewKyc}" method="post" onsubmit="return confirm('確定要【核准】此會員的實名認證，並開通帳號嗎？')">
+                                    <input type="hidden" name="memberId" th:value="${member.memberId}">
+                                    <input type="hidden" name="status" value="1">
+                                    <button type="submit" class="btn btn-pass">通過</button>
+                                </form>
+                                <form th:action="@{/member/back-end/reviewKyc}" method="post" onsubmit="return confirm('確定要【駁回】此會員的 KYC 申請嗎？')">
+                                    <input type="hidden" name="memberId" th:value="${member.memberId}">
+                                    <input type="hidden" name="status" value="2">
+                                    <button type="submit" class="btn btn-fail">駁回</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="pass-tab" class="tab-content">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>會員 ID</th>
+                        <th>真實姓名</th>
+                        <th>身分證字號</th>
+                        <th>聯絡電話</th>
+                        <th>Email</th>
+                        <th>身分證</th>
+                        <th>自拍照</th>
+                        <th>目前狀態</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${passList == null or passList.isEmpty()}">
+                        <td colspan="8" style="text-align: center; color: #94a3b8; padding: 40px 0;">
+                            目前沒有任何已審核通過的會員。
+                        </td>
+                    </tr>
+                    <tr th:each="member : ${passList}">
+                        <td th:text="${member.memberId}" style="font-weight: 600; color: #64748b;"></td>
+                        <td th:text="${member.realName}" style="font-weight: 700;"></td>
+                        <td th:text="${member.idNumber}" style="font-family: monospace;"></td>
+                        <td th:text="${member.phone}"></td>
+                        <td th:text="${member.email}"></td>
+                        <td>
+                            <div class="img-wrapper" onclick="openPreview(this)">
+                                <img th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='idImage')}">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="img-wrapper" onclick="openPreview(this)">
+                                <img th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='faceImage')}">
+                            </div>
+                        </td>
+                        <td><span class="status-badge badge-success">認證通過</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="fail-tab" class="tab-content">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>會員 ID</th>
+                        <th>真實姓名</th>
+                        <th>身分證字號</th>
+                        <th>聯絡電話</th>
+                        <th>Email</th>
+                        <th>身分證</th>
+                        <th>自拍照</th>
+                        <th>目前狀態</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${failList == null or failList.isEmpty()}">
+                        <td colspan="8" style="text-align: center; color: #94a3b8; padding: 40px 0;">
+                            目前沒有任何遭審核駁回的會員。
+                        </td>
+                    </tr>
+                    <tr th:each="member : ${failList}">
+                        <td th:text="${member.memberId}" style="font-weight: 600; color: #64748b;"></td>
+                        <td th:text="${member.realName}" style="font-weight: 700;"></td>
+                        <td th:text="${member.idNumber}" style="font-family: monospace;"></td>
+                        <td th:text="${member.phone}"></td>
+                        <td th:text="${member.email}"></td>
+                        <td>
+                            <div class="img-wrapper" onclick="openPreview(this)">
+                                <img th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='idImage')}">
+                            </div>
+                        </td>
+                        <td>
+                            <div class="img-wrapper" onclick="openPreview(this)">
+                                <img th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='faceImage')}">
+                            </div>
+                        </td>
+                        <td><span class="status-badge badge-danger">審核失敗</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div id="imageModal" class="modal" onclick="closePreview()">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="modalImg">
+</div>
+
+<script>
+    // 🎯 切換 Tab 的前端 JavaScript 邏輯
+    function switchTab(tabId, buttonElement) {
+        // 1. 隱藏所有的表格區塊
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => content.classList.remove('active'));
+
+        // 2. 移除所有按鈕的 active 藍底白字狀態
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        // 3. 顯示目前被點擊的表格與按鈕樣式
+        document.getElementById(tabId).classList.add('active');
+        buttonElement.classList.add('active');
+    }
+
+    // 燈箱控制邏輯
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImg");
+
+    function openPreview(element) {
+        const imgSrc = element.querySelector("img").src;
+        modalImg.src = imgSrc;
+        modal.classList.add("show");
+    }
+
+    function closePreview() {
+        modal.classList.remove("show");
+    }
+    
+    document.addEventListener("keydown", function(e) {
+        if (e.key === "Escape") {
+            closePreview();
+        }
+    });
+</script>
+
+</body>
+</html>
