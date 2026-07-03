@@ -39,7 +39,6 @@ public class MemberControllerLoie {
 	
 	@GetMapping("/register")
 	public String registerPage(Model model) {
-		// 🎯 核心關鍵：這行絕對不能漏！Key 必須完全對齊小寫開頭的 "memberVO"
 		model.addAttribute("memberVO", new MemberVO());
 		return "front-end/member/register";
 	}
@@ -55,6 +54,12 @@ public class MemberControllerLoie {
 	@GetMapping("/login")
 	public String loginPage() {
 		return "front-end/member/login"; 
+	}
+	
+	@GetMapping("/logout")
+	public String logout(Model model, HttpSession session){
+		session.invalidate();
+		return "front-end/member/login";
 	}
 
 	@PostMapping("/logincontroller")
@@ -84,30 +89,26 @@ public class MemberControllerLoie {
 	}
 
 	/**
-	 * 📝 處理註冊與 KYC 實名認證請求 (完美對齊 BindingResult 欄位紅字機制)
+	 * 📝 處理註冊與 KYC 實名認證請求
 	 */
 	@PostMapping("/doRegister")
 	public String doRegister(
-			@Valid MemberVO memberVO, // 🎯 關鍵 1：啟動自動驗證
-			BindingResult result,     // 🎯 關鍵 2：接收欄位錯誤訊息
+			@Valid MemberVO memberVO, 
+			BindingResult result,     
 			@RequestParam(name = "password") String rawPassword, 
 			@RequestParam(name = "memberPicFile") MultipartFile memberPicFile,
 			@RequestParam(name = "idImageFile") MultipartFile idImageFile,
 			@RequestParam(name = "faceImageFile") MultipartFile faceImageFile,
 			Model model) {
 
-		// 📡 偵錯雷達 1
 		System.out.println("==== [Debug] 接收到註冊請求！Email: " + memberVO.getEmail() + " ====");
 
-		// 1. 手動檢查特殊欄位：密碼非空檢查
 		if (rawPassword == null || rawPassword.trim().isEmpty()) {
-			// 🎯 密碼有錯時，直接精準綁定到 "passwordHash" 欄位上！
 			result.rejectValue("passwordHash", "error.passwordHash", "密碼請勿空白");
 		} else {
 			memberVO.setPasswordHash(passwordEncoder.encode(rawPassword)); 
 		}
 
-		// 2. 手動檢查特殊欄位：圖片上傳檢查
 		try {
 			if (memberPicFile != null && !memberPicFile.isEmpty()) {
 				memberVO.setMemberPic(memberPicFile.getBytes());
@@ -118,57 +119,33 @@ public class MemberControllerLoie {
 			if (idImageFile != null && !idImageFile.isEmpty()) {
 				memberVO.setIdImage(idImageFile.getBytes());
 			} else {
-				// 🎯 身分證圖有錯，直接精準綁定到 "idImage" 欄位上！
 				result.rejectValue("idImage", "error.idImage", "請務必上傳身分證件照片");
 			}
 			
 			if (faceImageFile != null && !faceImageFile.isEmpty()) {
 				memberVO.setFaceImage(faceImageFile.getBytes());
 			} else {
-				// 🎯 自拍圖有錯，直接精準綁定到 "faceImage" 欄位上！
 				result.rejectValue("faceImage", "error.faceImage", "請務必上傳自拍人臉圖片");
 			}
 		} catch (IOException e) {
 			result.rejectValue("memberPic", "error.memberPic", "圖片處理發生錯誤: " + e.getMessage());
 		}
 
-		// 🎯 補填由後端自動生成的預設狀態與時間
 		memberVO.setAccountStatus((byte) 0);                               
 		memberVO.setKycStatus((byte) 0);                                   
 		memberVO.setCreatedAt(java.time.LocalDate.now());                  
 		memberVO.setSubmittedAt(java.time.LocalDateTime.now());            
 
-		// 📡 🎯 【攔截點】只要有任何錯誤（包括 VO 註解 and 手動 rejectValue），通通退回並攜帶 result 物件
 		if (result.hasErrors()) {
 			System.out.println("==== [Debug] 註冊驗證不通過，已被拒絕！錯誤數量: " + result.getErrorCount() + " ====");
 			model.addAttribute("memberVO", memberVO);
 			return "front-end/member/register";
 		}
 
-		// 📡 偵錯雷達 3：JPA 寫入前夕全面體檢
-		System.out.println("====== 🔍 [JPA 寫入前夕：MemberVO 物件內容總體檢] ======");
-		System.out.println("欄位 - Email: " + memberVO.getEmail());
-		System.out.println("欄位 - Nickname: " + memberVO.getNickname());
-		System.out.println("欄位 - RealName: " + memberVO.getRealName());
-		System.out.println("欄位 - Phone: " + memberVO.getPhone());
-		System.out.println("欄位 - Gender: " + memberVO.getGender());
-		System.out.println("欄位 - AccountStatus: " + memberVO.getAccountStatus());
-		System.out.println("欄位 - KycStatus: " + memberVO.getKycStatus());
-		System.out.println("欄位 - CreatedAt (註冊日期): " + memberVO.getCreatedAt());
-		System.out.println("欄位 - SubmittedAt (提交時間): " + memberVO.getSubmittedAt());
-		System.out.println("欄位 - 大頭貼(Byte長度): " + (memberVO.getMemberPic() != null ? memberVO.getMemberPic().length : "null"));
-		System.out.println("欄位 - 身分證圖(Byte長度): " + (memberVO.getIdImage() != null ? memberVO.getIdImage().length : "null"));
-		System.out.println("======================================================");
-
 		try {
-			System.out.println("==== [Debug] 格式與圖片檢驗完全通過！準備呼叫 Service 存入資料庫... ====");
 			memberService.registerMember(memberVO); 
-			System.out.println("==== [Debug] 🎉🎉🎉 資料庫成功寫入一筆新會員！ ====");
 			return "redirect:/member/login";
 		} catch (Exception e) {
-			System.out.println("==== [Debug] ❌ 資料庫拒絕寫入！錯誤細節: " + e.getMessage() + " ====");
-			e.printStackTrace(); 
-			// 🎯 資料庫噴錯（通常是 Email 重複），直接把錯誤送給 email 欄位顯示紅字
 			result.rejectValue("email", "error.database", "註冊失敗：Email 重複註冊或欄位長度超出限制！");
 			model.addAttribute("memberVO", memberVO);
 			return "front-end/member/register";
@@ -176,22 +153,67 @@ public class MemberControllerLoie {
 	}
 
 	/**
-	 * 📊 4. 顯示所有會員大總表（包含已核准、被駁回等所有人）
+	 * 📊 4. 顯示所有會員大總表（新增：關鍵字搜尋、檢舉點數高到低排序、自動停權提醒高亮）
 	 */
 	@GetMapping("/back-end/memberList")
-	public String memberList(Model model) {
-		List<MemberVO> allMembers = memberService.getAllMembers(); 
-		model.addAttribute("allMembers", allMembers);
-		// 🎯 修正路徑：精準指定到 back-end/member/ 資料夾下
+	public String memberList(@RequestParam(name = "keyword", required = false) String keyword, Model model) {
+		List<MemberVO> allMembers;
+		
+		// 判斷是否有輸入關鍵字搜尋
+		if (keyword != null && !keyword.trim().isEmpty()) {
+			allMembers = memberService.searchMembers(keyword.trim());
+			model.addAttribute("keyword", keyword.trim());
+		} else {
+			allMembers = memberService.getAllMembers(); 
+		}
+		
+		// 🎯 新增貼心排序：將全體會員轉為可變動 List，並依據檢舉點數 (reportPoints) 從大到小降冪排序
+		List<MemberVO> sortedMembers = new ArrayList<>(allMembers);
+		sortedMembers.sort((m1, m2) -> {
+			int p1 = m1.getReportPoints() != null ? m1.getReportPoints() : 0;
+			int p2 = m2.getReportPoints() != null ? m2.getReportPoints() : 0;
+			return Integer.compare(p2, p1); // 點數多的排前面
+		});
+		
+		model.addAttribute("allMembers", sortedMembers);
 		return "back-end/member/memberList"; 
 	}
 
+	/**
+	 * ⛔ 5. 新增管理功能：手動停權 / 恢復會員帳號權限
+	 */
+	@PostMapping("/back-end/toggleStatus")
+	public String toggleStatus(@RequestParam("memberId") Integer memberId,
+	                           @RequestParam("newStatus") Byte newStatus,
+	                           RedirectAttributes redirectAttributes) {
+		
+		MemberVO memberVO = memberService.getOneMember(memberId);
+		if (memberVO != null) {
+			memberVO.setAccountStatus(newStatus);
+			
+			// 🎯 貼心商業邏輯：如果管理員點擊「恢復權限」(newStatus=1)，主動幫會員把檢舉點數歸零，避免一放行又立刻觸發自動停權
+			if (newStatus == 1) {
+				memberVO.setReportPoints(0);
+			}
+			
+			// 呼叫帶有「滿 5 點自動停權防禦機制」的 Service 更新方法
+			memberService.updateMember(memberVO);
+			
+			String msg = (newStatus == 3) ? "該會員已被成功停權！" : "該會員帳號已恢復正常使用，檢舉點數已重置歸零！";
+			redirectAttributes.addFlashAttribute("successMsg", msg);
+		} else {
+			redirectAttributes.addFlashAttribute("errorMsg", "找不到該會員資料！");
+		}
+		
+		return "redirect:/member/back-end/memberList";
+	}
+
 	// ==========================================
-	// 🎯 後台新增：KYC 綜合審核功能面板 (方案 A 模式)
+	// 🎯 後台：KYC 綜合審核功能面板 (方案 A 模式)
 	// ==========================================
 
 	/**
-	 * 🖼️ 1. 圖片讀取 API（將資料庫的 byte[] 轉換為網頁圖檔資料流）
+	 * 🖼️ 1. 圖片讀取 API
 	 */
 	@GetMapping("/back-end/displayImage")
 	@ResponseBody
@@ -220,16 +242,14 @@ public class MemberControllerLoie {
 	}
 
 	/**
-	 * 🪪 2. 綜合審核面板：一次帶出 待審核、已通過、已駁回 三種清單
+	 * 🪪 2. 綜合審核面板
 	 */
 	@GetMapping("/back-end/kycApproval")
 	public String kycList(Model model) {
-		// 🎯 一次撈取三種狀態名單
-		List<MemberVO> pendingList = memberService.getMembersByStatus((byte) 0); // 0 = 待審核
-		List<MemberVO> passList = memberService.getMembersByStatus((byte) 1);    // 1 = 已核准
-		List<MemberVO> failList = memberService.getMembersByStatus((byte) 2);    // 2 = 已駁回
+		List<MemberVO> pendingList = memberService.getMembersByStatus((byte) 0); 
+		List<MemberVO> passList = memberService.getMembersByStatus((byte) 1);    
+		List<MemberVO> failList = memberService.getMembersByStatus((byte) 2);    
 		
-		// 打包裝箱送給前端
 		model.addAttribute("pendingList", pendingList);
 		model.addAttribute("passList", passList);
 		model.addAttribute("failList", failList);
@@ -238,7 +258,7 @@ public class MemberControllerLoie {
 	}
 
 	/**
-	 * ⚖️ 3. 處理審核結果（通過為 1 / 駁回為 2）
+	 * ⚖️ 3. 處理審核結果
 	 */
 	@PostMapping("/back-end/reviewKyc")
 	public String reviewKyc(@RequestParam("memberId") Integer memberId,
@@ -247,18 +267,15 @@ public class MemberControllerLoie {
 		
 		MemberVO memberVO = memberService.getOneMember(memberId);
 		if (memberVO != null) {
-			// 同步更新帳戶狀態與 KYC 審核狀態
 			memberVO.setAccountStatus(status); 
 			memberVO.setKycStatus(status); 
 			
-			memberService.updateMember(memberVO); // 儲存回資料庫
-			
+			memberService.updateMember(memberVO); 
 			redirectAttributes.addFlashAttribute("successMsg", "會員 [ID: " + memberId + "] 審核操作成功！");
 		} else {
 			redirectAttributes.addFlashAttribute("errorMsg", "找不到該會員資料！");
 		}
 		
-		// 🎯 修正導向：審核完後一律重新整理導回到綜合面板網址
 		return "redirect:/member/back-end/kycApproval"; 
 	}
 }
