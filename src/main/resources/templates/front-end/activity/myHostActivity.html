@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>我舉辦的活動</title>
+
+<style>
+body {
+	margin: 0;
+	padding: 40px;
+	background: #f8fafc;
+	font-family: "Microsoft JhengHei", sans-serif;
+}
+
+.container {
+	max-width: 1200px;
+	margin: auto;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 30px;
+}
+
+.header h1 {
+	margin: 0;
+	color: #0f172a;
+}
+
+.member {
+	color: #64748b;
+	font-weight: bold;
+	margin-top: 8px;
+}
+
+.btn {
+	padding: 12px 22px;
+	border-radius: 8px;
+	text-decoration: none;
+	color: white;
+	font-weight: bold;
+}
+
+.btn-back {
+	background: #64748b;
+}
+
+.btn-back:hover {
+	background: #475569;
+}
+
+.btn-add {
+	background: #8b5cf6;
+}
+
+.btn-add:hover {
+	background: #7c3aed;
+}
+
+.table-card {
+	background: white;
+	border-radius: 15px;
+	overflow: hidden;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+th {
+	background: #e2e8f0;
+	padding: 15px;
+}
+
+td {
+	padding: 15px;
+	text-align: center;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+tr:hover {
+	background: #f8fafc;
+}
+
+.status {
+	padding: 5px 12px;
+	border-radius: 20px;
+	font-size: 13px;
+	font-weight: bold;
+}
+
+.normal {
+	background: #dcfce7;
+	color: #166534;
+}
+
+.delay {
+	background: #fef3c7;
+	color: #92400e;
+}
+
+.cancel {
+	background: #fee2e2;
+	color: #991b1b;
+}
+
+.action {
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+}
+
+.btn-edit {
+	background: #3b82f6;
+	color: white;
+	text-decoration: none;
+	padding: 8px 16px;
+	border-radius: 6px;
+}
+
+.btn-member {
+	background: #10b981;
+	color: white;
+	text-decoration: none;
+	padding: 8px 16px;
+	border-radius: 6px;
+}
+
+.empty {
+	text-align: center;
+	padding: 50px;
+	color: #94a3b8;
+	font-size: 18px;
+}
+</style>
+
+</head>
+
+<body>
+
+	<div class="container">
+
+		<div class="header">
+
+			<div>
+
+				<h1>🎪 我舉辦的活動</h1>
+
+				<div class="member">
+
+					主辦人： <span th:text="${loginMemberName}"></span>
+
+				</div>
+
+			</div>
+
+			<div style="display: flex; gap: 12px;">
+
+				<a th:href="@{/activity/front/addHostActivity}" class="btn btn-add">
+
+					➕ 我要辦活動 </a> <a th:href="@{/activity/front/home}" class="btn btn-back">
+
+					🏠 返回前台 </a>
+
+			</div>
+
+		</div>
+
+		<div class="table-card">
+
+			<table>
+
+				<thead>
+
+					<tr>
+
+						<th>活動編號</th>
+
+						<th>活動名稱</th>
+
+						<th>價格</th>
+
+						<th>目前人數</th>
+
+						<th>活動狀態</th>
+
+						<th>操作</th>
+
+					</tr>
+
+				</thead>
+
+				<tbody>
+
+					<tr th:if="${#lists.isEmpty(activityListData)}">
+
+						<td colspan="6" class="empty">目前尚未建立任何活動</td>
+
+					</tr>
+
+					<tr th:each="activity : ${activityListData}">
+
+						<td th:text="${activity.activityId}"></td>
+
+						<td th:text="${activity.activityTitle}"></td>
+
+						<td>NT$ <span th:text="${activity.activityPrice}"></span>
+
+						</td>
+
+						<td><span th:text="${activity.attendeesCount}"></span> / <span
+							th:text="${activity.maxParticipants}"></span></td>
+
+						<td><span th:if="${activity.activityStatus==0}"
+							class="status normal"> 正常舉行 </span> <span
+							th:if="${activity.activityStatus==1}" class="status delay">
+
+								延期 </span> <span th:if="${activity.activityStatus==2}"
+							class="status cancel"> 已取消 </span></td>
+
+						<td>
+
+							<div class="action">
+
+								<a class="btn-edit"
+									th:href="@{/activity/front/updateHostActivity(id=${activity.activityId})}">
+
+									修改 </a> <a class="btn-member"
+									th:href="@{/activity/front/memberList(activityId=${activity.activityId})}">
+
+									報名名單 </a>
+
+							</div>
+
+						</td>
+
+					</tr>
+
+				</tbody>
+
+			</table>
+
+		</div>
+
+	</div>
+
+</body>
+</html>

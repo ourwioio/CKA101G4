@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>使用者前台</title>
+
+<style>
+body {
+	margin: 0;
+	padding: 40px;
+	background: #f8fafc;
+	font-family: "Microsoft JhengHei", sans-serif;
+	color: #1e293b;
+}
+
+.header {
+	max-width: 1100px;
+	margin: auto;
+	text-align: center;
+	margin-bottom: 40px;
+}
+
+.header h1 {
+	font-size: 2.2rem;
+	margin-bottom: 10px;
+	color: #0f172a;
+}
+
+.header p {
+	color: #64748b;
+	font-size: 1.05rem;
+}
+
+.card-container {
+	max-width: 1100px;
+	margin: auto;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 30px;
+}
+
+.card {
+	background: #fff;
+	border-radius: 15px;
+	padding: 35px;
+	text-align: center;
+	border: 1px solid #e2e8f0;
+	box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
+	transition: .25s;
+}
+
+.card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 10px 20px rgba(0, 0, 0, .15);
+}
+
+.icon {
+	font-size: 58px;
+	margin-bottom: 15px;
+}
+
+.card h2 {
+	margin: 10px 0;
+	color: #0f172a;
+}
+
+.card p {
+	color: #64748b;
+	line-height: 1.7;
+	min-height: 65px;
+}
+
+.btn {
+	display: inline-block;
+	margin-top: 20px;
+	padding: 12px 26px;
+	border-radius: 8px;
+	color: white;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.list {
+	background: #3b82f6;
+}
+
+.list:hover {
+	background: #2563eb;
+}
+
+.my {
+	background: #10b981;
+}
+
+.my:hover {
+	background: #059669;
+}
+
+.host {
+	background: #8b5cf6;
+}
+
+.host:hover {
+	background: #7c3aed;
+}
+
+.back {
+	background: #64748b;
+}
+
+.back:hover {
+	background: #475569;
+}
+</style>
+
+</head>
+
+<body>
+
+	<div class="header">
+		<h1>🎯 使用者前台</h1>
+		<p>
+			歡迎， <span th:text="${loginMemberName}">測試會員</span> ，請選擇要使用的功能。
+		</p>
+	</div>
+
+	<div class="card-container">
+
+		<div class="card">
+			<div class="icon">📅</div>
+			<h2>活動列表</h2>
+			<p>瀏覽所有活動，查看活動詳情並進行報名。</p>
+			<a th:href="@{/activity/front/list}" class="btn list"> 查看活動 </a>
+		</div>
+
+		<div class="card">
+			<div class="icon">📋</div>
+			<h2>我的活動</h2>
+			<p>查看自己已報名參加的活動與訂單紀錄。</p>
+			<a th:href="@{/activity/front/myOrder}" class="btn my"> 查看我的活動 </a>
+		</div>
+
+		<div class="card">
+			<div class="icon">🎪</div>
+			<h2>我要辦活動</h2>
+			<p>建立自己主辦的活動，讓其他會員報名參加。</p>
+			<a th:href="@{/activity/front/addHostActivity}" class="btn host">
+				建立活動 </a> <a th:href="@{/activity/front/myHostActivity}"
+				class="btn host"> 查看我舉辦的活動 </a>
+		</div>
+
+		<div class="card">
+			<div class="icon">🏠</div>
+			<h2>返回活動系統</h2>
+			<p>回到活動系統入口，重新選擇前台或後台。</p>
+			<a th:href="@{/activity/home}" class="btn back"> 返回入口 </a>
+		</div>
+
+	</div>
+
+</body>
+</html>
