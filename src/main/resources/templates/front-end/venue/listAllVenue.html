@@ -89,6 +89,10 @@ h1 {
 		<a th:if="${session.memberVO == null}" th:href="@{/member/login}"
 			style="display: inline-block; padding: 8px 16px; background: #1d9e75; color: white; border-radius: 6px; font-size: 14px; text-decoration: none;">
 			登入 </a>
+			
+		<a th:if="${session.memberVO != null}" th:href="@{/member/logout}"
+			style="display: inline-block; padding: 8px 16px; background: #1d9e75; color: white; border-radius: 6px; font-size: 14px; text-decoration: none;">
+			登出 </a>
 
 		<a th:href="@{/front/venue/myVenue}"
 			style="display: inline-block; padding: 8px 16px; background: #1d9e75; color: white; border-radius: 6px; font-size: 14px; text-decoration: none;">

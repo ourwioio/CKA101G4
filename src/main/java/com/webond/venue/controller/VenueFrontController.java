@@ -55,7 +55,8 @@ public class VenueFrontController {
 			@RequestParam("upFiles") MultipartFile[] parts,
 			@RequestParam(value = "openDays", required = false) List<Integer> openDays,
 			@RequestParam("startHour") int startHour, @RequestParam("endHour") int endHour,
-			@RequestParam(value = "coverIndex", defaultValue = "0") int coverIndex, HttpSession session)
+			@RequestParam(value = "coverIndex", defaultValue = "0") int coverIndex,
+			HttpSession session)
 			throws IOException {
 
 		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
@@ -123,7 +124,7 @@ public class VenueFrontController {
 		venueVO.setRatingStars(0);
 		venueVO.setRatingcount(0);
 
-		venueVO.setMember(loginMember); // 🌟 直接用 session 裡的會員物件，不用再查一次
+		venueVO.setMember(loginMember); // 直接用 session 裡的會員物件，不用再查一次
 
 		venueService.addVenueWithImages(venueVO, imageBytesList, coverIndex);
 
@@ -133,23 +134,30 @@ public class VenueFrontController {
 	@PostMapping("update")
 	public String update(@Valid VenueVO venueVO, BindingResult result, ModelMap model,
 			@RequestParam(value = "openDays", required = false) List<Integer> openDays,
-			@RequestParam("startHour") int startHour, @RequestParam("endHour") int endHour,
-			@RequestParam(value = "coverImageId", required = false) Integer coverImageId, HttpSession session) {
+			@RequestParam("startHour") int startHour, 
+			@RequestParam("endHour") int endHour,
+			@RequestParam(value = "coverImageId", required = false) Integer coverImageId, 
+			HttpSession session) {
 
 		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 		if (loginMember == null) {
 			return "redirect:/member/login";
 		}
-
-		VenueVO existing = venueService.getOneVenue(venueVO.getVenueId());
-		if (!existing.getMember().getMemberId().equals(loginMember.getMemberId())) {
-			return "redirect:/front/venue/myVenue";
-		}
-
+		
+		// 防止從前端使用者用瀏覽器開發者工具
+		// 把隱藏欄位 venueId 的值改成別人的場地 ID,再送出表單
+//		VenueVO existing = venueService.getOneVenue(venueVO.getVenueId());
+//		if (!existing.getMember().getMemberId().equals(loginMember.getMemberId())) {
+//			return "redirect:/front/venue/myVenue";
+//		}
+		
+		//  只要有欄位不通過驗證
 		if (result.hasErrors()) {
-			VenueVO fullVenue = venueService.getOneVenue(venueVO.getVenueId());
-			fullVenue.setVenueName(venueVO.getVenueName()); // 保留使用者打的
-			model.addAttribute("venueVO", fullVenue);
+			venueVO.setVenueImages(venueVO.getVenueImages());
+			venueVO.setCreatedAt(venueVO.getCreatedAt());
+			venueVO.setVenueStatus(venueVO.getVenueStatus());
+			venueVO.setAddress(venueVO.getAddress()); 
+
 			return "front-end/venue/update_venue_input";
 		}
 
