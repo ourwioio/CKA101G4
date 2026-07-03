@@ -9,11 +9,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.webond.employee.model.EmployeeVO;
+import com.webond.employee.repository.EmployeeRepository;
 import com.webond.platform.model.BulletinVO;
 import com.webond.platform.service.BulletinService;
 
@@ -25,6 +28,9 @@ public class BulletinController {
 
 	@Autowired
 	private BulletinService bulletinSvc;
+	
+    @Autowired
+    private EmployeeRepository employeeRepository;
 	
 	/*
 	 * This method will serve as addBulletin.html handler.
@@ -123,45 +129,63 @@ public class BulletinController {
 		return "redirect:/bulletin/listAllBulletin";
 	}
 
-	// ===== 收回為草稿 =====
-	@PostMapping("unpublish")
-	public String unpublish(@RequestParam("bulletinId") Integer bulletinId, RedirectAttributes redirectAttrs) {
-		bulletinSvc.unpublish(bulletinId);
-		redirectAttrs.addFlashAttribute("success", "- (已收回為草稿)");
-		return "redirect:/bulletin/listAllBulletin";
-	}
-
-	// ===== 複合條件查詢 =====
+	// ===== 複合查詢：狀態 + （標題或標籤關鍵字）+ 發布日期區間，任意組合 =====
 	@PostMapping("search")
 	public String search(
-			@RequestParam(value = "status", required = false) Byte status,
-			@RequestParam(value = "keyword", required = false) String keyword,
-			ModelMap model) {
-
-		List<BulletinVO> list;
-		if (status != null && keyword != null && !keyword.isBlank()) {
-			list = bulletinSvc.getByStatusAndTitleLike(status, keyword);
-		} else if (status != null) {
-			list = bulletinSvc.getByStatus(status);
-		} else if (keyword != null && !keyword.isBlank()) {
-			list = bulletinSvc.getByTitleLike(keyword);
-		} else {
-			list = bulletinSvc.getAll();
-		}
-
-		model.addAttribute("bulletinListData", list);
-		return "back-end/bulletin/listAllBulletin";
-	}
-
-	// ===== 依日期區間查詢 =====
-	@PostMapping("searchByDateRange")
-	public String searchByDateRange(
-	        @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-	        @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+	        @RequestParam(value = "status", required = false) Byte status,
+	        @RequestParam(value = "keyword", required = false) String keyword,
+	        @RequestParam(value = "startDate", required = false)
+	        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+	        @RequestParam(value = "endDate", required = false)
+	        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
 	        ModelMap model) {
 
-	    List<BulletinVO> list = bulletinSvc.getByPublishDateBetween(startDate, endDate);
+	    boolean hasKeyword = keyword != null && !keyword.isBlank();
+	    boolean hasDateRange = startDate != null && endDate != null;
+
+	    // 1. 先用「範圍最明確」的條件從資料庫撈出基礎清單
+	    List<BulletinVO> list = hasDateRange
+	            ? bulletinSvc.getByPublishDateBetween(startDate, endDate)
+	            : bulletinSvc.getAll();
+
+	    // 2. 依狀態進一步篩選
+	    if (status != null) {
+	        list = list.stream()
+	                .filter(bulletin -> status.equals(bulletin.getStatus()))
+	                .toList();
+	    }
+
+	    // 3. 依關鍵字篩選：標題「或」標籤有包含到即算符合
+	    if (hasKeyword) {
+	        list = list.stream()
+	                .filter(bulletin ->
+	                        (bulletin.getTitle() != null && bulletin.getTitle().contains(keyword)) ||
+	                        (bulletin.getTags() != null && bulletin.getTags().contains(keyword))
+	                )
+	                .toList();
+	    }
+
 	    model.addAttribute("bulletinListData", list);
+
+	    // 搜尋條件也放回 model，讓表單能回填顯示
+	    model.addAttribute("searchStatus", status);
+	    model.addAttribute("searchKeyword", keyword);
+	    model.addAttribute("searchStartDate", startDate);
+	    model.addAttribute("searchEndDate", endDate);
 	    return "back-end/bulletin/listAllBulletin";
 	}
+	
+	// ===== 查看單筆內容（唯讀，不可修改） =====
+	@PostMapping("viewOne")
+	public String viewOne(@RequestParam("bulletinId") Integer bulletinId, ModelMap model) {
+	    BulletinVO bulletinVO = bulletinSvc.getOneBulletin(bulletinId);
+	    model.addAttribute("bulletinVO", bulletinVO);
+	    return "back-end/bulletin/listOneBulletin";
+	}
+	
+	// ===== 提供員工編號清單 =====
+    @ModelAttribute("employeeListData")
+    protected List<EmployeeVO> referenceEmployeeList() {
+        return employeeRepository.findAll();
+    }
 }

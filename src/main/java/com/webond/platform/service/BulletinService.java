@@ -27,7 +27,17 @@ public class BulletinService {
 		repository.save(bulletin);
 	}
 	
+	/**
+	 * 修改公告：若該筆已經是發布狀態，強制維持發布，
+	 * 不允許透過修改表單把狀態改回草稿（即使前端被繞過送出 status=0 也一樣擋下）。
+	 */
+	@Transactional
 	public void updateBulletin(BulletinVO bulletin) {
+		BulletinVO existing = getOneBulletin(bulletin.getBulletinId());
+		if (existing != null && existing.getStatus() == STATUS_PUBLISHED) {
+			bulletin.setStatus(STATUS_PUBLISHED);
+			bulletin.setPublishDate(existing.getPublishDate()); // 發布日期也一併鎖定，避免被覆蓋成 null
+		}
 		repository.save(bulletin);
 	}
 	
@@ -67,11 +77,12 @@ public class BulletinService {
 		return repository.findByStatusAndTitleLike(status, "%" + keyword + "%");
 	}
 	
-	// ===== 業務邏輯：發布 / 收回 =====
+	// ===== 業務邏輯：發布 =====
 
 	/**
 	 * 發布公告：第一次發布時寫入 publishDate，
 	 * 若已發布過（publishDate 不為 null），不再更動日期。
+	 * 發布後不可收回為草稿。
 	 */
 	@Transactional
 	public void publish(Integer bulletinId) {
@@ -81,15 +92,6 @@ public class BulletinService {
 			bulletin.setPublishDate(LocalDate.now());
 		}
 		bulletin.setStatus(STATUS_PUBLISHED);
-		repository.save(bulletin);
-	}
-
-	/** 收回為草稿，publishDate 依規則不清空，只切換 status。 */
-	@Transactional
-	public void unpublish(Integer bulletinId) {
-		BulletinVO bulletin = getOneBulletin(bulletinId);
-		if (bulletin == null) return;
-		bulletin.setStatus(STATUS_DRAFT);
 		repository.save(bulletin);
 	}
 	
