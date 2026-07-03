@@ -34,12 +34,6 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrderVO, In
     // 服務是否存在於訂單
     boolean existsByServiceId(Integer serviceId);
     
-    @Query(value = """
-    	    SELECT o.*
-    	    FROM SERVICE_ORDER o
-    	    JOIN SERVICE s
-    	      ON o.SERVICE_ID = s.SERVICE_ID
-    	    WHERE s.MEMBER_ID = :sellerMemberId
-    	""", nativeQuery = true)
-    	List<ServiceOrderVO> findBySellerMemberId(@Param("sellerMemberId") Integer sellerMemberId);
+    //查賣方訂單
+    List<ServiceOrderVO> findBySellerMemberId(Integer sellerMemberId);
 }
