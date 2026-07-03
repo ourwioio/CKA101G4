@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Webond 會員註冊與實名認證</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Microsoft JhengHei"; 
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); 
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .register-box { 
+            width: 100%;
+            max-width: 650px; 
+            background: #ffffff; 
+            padding: 40px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(186, 230, 253, 0.6); 
+        }
+        h2 { 
+            text-align: center; 
+            color: #0369a1; 
+            margin-top: 0;
+            margin-bottom: 5px; 
+            font-size: 26px;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .section-title {
+            text-align: left;
+            font-size: 16px;
+            font-weight: bold;
+            color: #0c4a6e;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 6px;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .form-group { 
+            margin-bottom: 15px; 
+            text-align: left;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        label { 
+            display: block; 
+            margin-bottom: 6px; 
+            font-weight: 600; 
+            color: #0c4a6e; 
+            font-size: 14px;
+        }
+        input[type="text"], input[type="email"], input[type="password"], select, input[type="file"] { 
+            width: 100%; 
+            padding: 10px; 
+            box-sizing: border-box; 
+            border: 1.5px solid #cbd5e1; 
+            border-radius: 8px; 
+            font-size: 14px;
+            background-color: #f8fafc;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #38bdf8;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+        }
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            padding-top: 10px;
+        }
+        button { 
+            width: 100%; 
+            padding: 14px; 
+            background: #0ea5e9; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold;
+            transition: background 0.2s ease;
+            margin-top: 25px;
+        }
+        button:hover { 
+            background: #0284c7; 
+        }
+        .error-msg { 
+            color: #b91c1c; 
+            background: #fef2f2; 
+            padding: 10px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            font-size: 14px; 
+            border: 1px solid #fca5a5;
+        }
+        /* 🎯 新增：精緻的欄位專用紅字提示樣式 */
+        .field-error {
+            color: #b91c1c;
+            font-size: 12px;
+            font-weight: 500;
+            margin-top: 5px;
+            display: block;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        .login-link a {
+            color: #0ea5e9;
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-box">
+    <h2>加入 Webond 會員</h2>
+    <p class="subtitle">請填寫以下欄位，註冊同時完成 KYC 實名認證與金流綁定</p>
+    
+    <div class="error-msg" th:if="${errorMsgs != null and !errorMsgs.isEmpty()}">
+        <ul>
+            <li th:each="err : ${errorMsgs}" th:text="${err}">錯誤訊息</li>
+        </ul>
+    </div>
+
+    <form th:action="@{/member/doRegister}" method="post" th:object="${memberVO}" enctype="multipart/form-data">
+        
+        <div class="section-title">🔒 帳戶基本資料</div>
+        <div class="form-grid">
+            
+            <div class="form-group">
+                <label for="email">Email 帳號 (登入用) *</label>
+                <input type="text" id="email" th:field="*{email}" placeholder="example@email.com">
+                <span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">登入密碼 *</label>
+                <input type="password" id="password" name="password" placeholder="請設定登入密碼">
+                <span class="field-error" th:if="${#fields.hasErrors('passwordHash')}" th:errors="*{passwordHash}"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="nickname">會員暱稱 *</label>
+                <input type="text" id="nickname" th:field="*{nickname}" placeholder="填寫社群暱稱">
+                <span class="field-error" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">手機號碼 *</label>
+                <input type="text" id="phone" th:field="*{phone}" placeholder="0912345678">
+                <span class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+            </div>
+            
+            <div class="form-group">
+                <label>性別 *</label>
+                <div class="radio-group">
+                    <label><input type="radio" th:field="*{gender}" value="1"> 男</label>
+                    <label><input type="radio" th:field="*{gender}" value="0"> 女</label>
+                    <label><input type="radio" th:field="*{gender}" value="2"> 其他</label>
+                </div>
+                <span class="field-error" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="memberPicFile">個人大頭貼</label>
+                <input type="file" id="memberPicFile" name="memberPicFile" accept="image/*">
+                <span class="field-error" th:if="${#fields.hasErrors('memberPic')}" th:errors="*{memberPic}"></span>
+            </div>
+            
+            <div class="form-group full-width">
+                <label for="memberIntro">個人簡介</label>
+                <input type="text" id="memberIntro" th:field="*{memberIntro}" placeholder="一兩句話介紹一下自己吧！">
+                <span class="field-error" th:if="${#fields.hasErrors('memberIntro')}" th:errors="*{memberIntro}"></span>
+            </div>
+        </div>
+
+        <div class="section-title">🪪 KYC 實名認證資料</div>
+        <div class="form-grid">
+            
+            <div class="form-group">
+                <label for="realName">真實姓名 *</label>
+                <input type="text" id="realName" th:field="*{realName}" placeholder="需與身分證相同">
+                <span class="field-error" th:if="${#fields.hasErrors('realName')}" th:errors="*{realName}"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="idNumber">身分證字號 *</label>
+                <input type="text" id="idNumber" th:field="*{idNumber}" placeholder="A123456789">
+                <span class="field-error" th:if="${#fields.hasErrors('idNumber')}" th:errors="*{idNumber}"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="idImageFile">身分證件照片 *</label>
+                <input type="file" id="idImageFile" name="idImageFile" accept="image/*">
+                <span class="field-error" th:if="${#fields.hasErrors('idImage')}" th:errors="*{idImage}"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="faceImageFile">現場自拍人臉照片 *</label>
+                <input type="file" id="faceImageFile" name="faceImageFile" accept="image/*">
+                <span class="field-error" th:if="${#fields.hasErrors('faceImage')}" th:errors="*{faceImage}"></span>
+            </div>
+        </div>
+
+        <div class="section-title">💰 提領銀行帳戶綁定</div>
+        <div class="form-grid">
+            
+            <div class="form-group">
+                <label for="bankCode">銀行代碼 (3碼) *</label>
+                <input type="text" id="bankCode" th:field="*{bankCode}" placeholder="例如：822">
+                <span class="field-error" th:if="${#fields.hasErrors('bankCode')}" th:errors="*{bankCode}"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="bankAccount">銀行帳號 *</label>
+                <input type="text" id="bankAccount" th:field="*{bankAccount}" placeholder="10-14位數字">
+                <span class="field-error" th:if="${#fields.hasErrors('bankAccount')}" th:errors="*{bankAccount}"></span>
+            </div>
+        </div>
+
+        <button type="submit">提交註冊並送出實名審核</button>
+    </form>
+    
+    <div class="login-link">
+        已經有帳號了？ <a th:href="@{/member/login}">立即登入</a>
+    </div>
+</div>
+
+</body>
+</html>

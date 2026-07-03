@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Webond 會員中心</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Microsoft JhengHei"; 
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); 
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(186, 230, 253, 0.6);
+            text-align: center;
+        }
+        h1 {
+            color: #0369a1;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .welcome-msg {
+            font-size: 18px;
+            color: #0c4a6e;
+            margin-bottom: 30px;
+            background: #f0f9ff;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 5px solid #0ea5e9;
+        }
+        .welcome-msg span {
+            font-weight: bold;
+            color: #0ea5e9;
+        }
+        .menu-section-title {
+            text-align: left;
+            font-size: 14px;
+            font-weight: bold;
+            color: #64748b;
+            margin: 15px 0 5px 5px;
+            letter-spacing: 1px;
+        }
+        .menu-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .menu-btn {
+            display: block;
+            padding: 14px;
+            background: #0ea5e9;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(14, 165, 233, 0.2);
+            text-align: left;
+            padding-left: 25px;
+        }
+        .menu-btn:hover {
+            background: #0284c7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(2, 132, 199, 0.3);
+        }
+        .menu-btn.secondary {
+            background: #38bdf8;
+        }
+        .menu-btn.secondary:hover {
+            background: #0284c7;
+        }
+        .menu-btn.info {
+            background: #7dd3fc;
+            color: #0369a1;
+        }
+        .menu-btn.info:hover {
+            background: #bae6fd;
+        }
+        .logout-link {
+            display: inline-block;
+            margin-top: 25px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .logout-link:hover {
+            color: #b91c1c;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Webond 會員功能中心</h1>
+    
+    <div class="welcome-msg">
+        親愛的會員 【<span th:text="${session.memberVO != null ? session.memberVO.nickname : '訪客'}">會員暱稱</span>】 您好，歡迎回來！
+    </div>
+    
+    <div class="menu-section-title">👤 帳戶與身分設定</div>
+    <div class="menu-grid">
+        <a th:href="@{/member/register}" class="menu-btn">🪪 查看 / 申請「KYC 實名認證資料」</a>
+        <a th:href="@{/member/updateBasic}" class="menu-btn secondary">✏️ 修改「會員基本資料」(暱稱/電話)</a>
+    </div>
+
+    <div class="menu-section-title">互動與申訴</div>
+    <div class="menu-grid">
+        <a th:href="@{/member/myRating}" class="menu-btn info">⭐ 查看「我的信譽與評價分數」</a>
+        <a th:href="@{/memberreport/select_page}" class="menu-btn secondary">🔍 前往「檢舉申訴功能總覽」</a>
+    </div>
+    
+    <a th:href="@{/member/login}" class="logout-link">↩️ 安全登出系統</a>
+</div>
+
+</body>
+</html>

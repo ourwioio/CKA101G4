@@ -24,7 +24,6 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 @Entity
@@ -62,7 +61,7 @@ public class MemberVO implements java.io.Serializable {
 	private String passwordHash;
 
 	@Column(name = "NICKNAME")
-	@NotEmpty(message = "請勿空白")
+	@NotEmpty(message = "會員綽號請勿空白")
 	private String nickname;
 
 	@Lob
@@ -77,7 +76,7 @@ public class MemberVO implements java.io.Serializable {
 	private String phone;
 
 	@Column(name = "EMAIL", unique = true)
-	@NotEmpty(message = "登入帳號，請勿空白")
+	@NotEmpty(message = "登入帳號（Email）請勿空白")
 	@Email(message = "Email格式不正確")
 	private String email;
 
@@ -121,21 +120,21 @@ public class MemberVO implements java.io.Serializable {
 	private Integer kycId;
 
 	@Column(name = "REAL_NAME")
-	@NotEmpty(message = "請輸入姓名")
+	@NotEmpty(message = "真實姓名請勿空白")
 	private String realName;
 
+	// 🎯【優化修正】拿掉 byte[] 的 @NotNull。圖片改由 Controller 的 MultipartFile 進行驗證與防禦，才不會在裝箱時直接崩潰。
 	@Lob
 	@Column(name = "ID_IMAGE")
-	@NotNull(message = "請上傳身分證件")
 	private byte[] idImage;
 
 	@Lob
 	@Column(name = "FACE_IMAGE")
-	@NotNull(message = "請上傳臉部圖片")
 	private byte[] faceImage;
 
 	@Column(name = "ID_NUMBER")
-	@NotEmpty(message = "請輸入身分證字號")
+	@NotEmpty(message = "身分證字號請勿空白")
+	@Pattern(regexp = "^[A-Z][12]\\d{8}$", message = "身分證字號格式不正確") // 💡 順手幫你加上最強的身分證格式檢查防護！
 	private String idNumber;
 
 	@Column(name = "KYC_STATUS")
@@ -422,5 +421,4 @@ public class MemberVO implements java.io.Serializable {
 	public void setBankAccount(String bankAccount) {
 		this.bankAccount = bankAccount;
 	}
-
 }

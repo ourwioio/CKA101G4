@@ -27,4 +27,16 @@ public class EmployeeVO implements java.io.Serializable  {
 		@OrderBy("serviceReportId")
 		private Set<ServiceReportVO> serviceReports;
 
+
+		public void setEmployeeId(int i) {
+			// TODO Auto-generated method stub
+			
+		}
+
+
+		public String getEmployeeId() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
 }

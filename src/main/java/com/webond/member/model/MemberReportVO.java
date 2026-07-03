@@ -66,7 +66,7 @@ public class MemberReportVO implements Serializable {
     @Column(name = "processed_at")
     private Timestamp processedAt;
     
-    @Column(name = "violation_points", nullable = true)
+    @Column(name = "violation_points", nullable = false)
     private Integer violationPoints;
 
     // ==========================================
@@ -134,4 +134,7 @@ public class MemberReportVO implements Serializable {
 
     public Integer getViolationPoints() { return violationPoints; }
     public void setViolationPoints(Integer violationPoints) { this.violationPoints = violationPoints; }
+
+	
+
 }
