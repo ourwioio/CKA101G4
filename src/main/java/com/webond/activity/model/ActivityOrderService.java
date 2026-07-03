@@ -22,38 +22,49 @@ public class ActivityOrderService {
 	}
 
 	// 查詢單筆
-	public ActivityOrderVO getOneOrder(Integer id) {
-		Optional<ActivityOrderVO> optional = orderRepo.findById(id);
+	public ActivityOrderVO getOneOrder(Integer activityOrderId) {
+		Optional<ActivityOrderVO> optional = orderRepo.findById(activityOrderId);
 		return optional.orElse(null);
 	}
 
 	// 新增
-	public ActivityOrderVO createOrder(ActivityOrderVO orderVO) {
+	public ActivityOrderVO addOrder(ActivityOrderVO orderVO) {
 		return orderRepo.save(orderVO);
 	}
 
 	// 修改
+	public ActivityOrderVO updateOrder(ActivityOrderVO orderVO) {
+		return orderRepo.save(orderVO);
+	}
+
+	// 新增/修改共用
 	public ActivityOrderVO saveOrder(ActivityOrderVO orderVO) {
 		return orderRepo.save(orderVO);
 	}
 
-	// 新增、修改共用 (如果之後想統一呼叫可使用)
-	public ActivityOrderVO save(ActivityOrderVO orderVO) {
+	// 查詢會員自己的訂單
+	public List<ActivityOrderVO> getOrdersByBuyerMemberId(Integer buyerMemberId) {
+		return orderRepo.findByBuyerMemberId(buyerMemberId);
+	}
+
+	// 修改訂單狀態(API使用)
+	public ActivityOrderVO updateOrderStatus(Integer activityOrderId, Byte orderStatus) {
+
+		ActivityOrderVO orderVO = getOneOrder(activityOrderId);
+
+		if (orderVO == null) {
+			throw new RuntimeException("查無此訂單");
+		}
+
+		orderVO.setOrderStatus(orderStatus);
+
 		return orderRepo.save(orderVO);
 	}
 
-	// 修改付款狀態(API使用)
-	public ActivityOrderVO updatePaymentStatus(Integer activityOrderId, Integer newStatus) {
-
-		return orderRepo.findById(activityOrderId).map(order -> {
-			order.setPaymentStatus(newStatus);
-			return orderRepo.save(order);
-		}).orElseThrow(() -> new IllegalArgumentException("訂單不存在"));
-	}
-
 	// 刪除
-	public void deleteOrder(Integer id) {
-		orderRepo.deleteById(id);
+	public void deleteOrder(Integer activityOrderId) {
+		orderRepo.deleteById(activityOrderId);
 	}
+	
 
 }

@@ -27,18 +27,19 @@ public class ActivityOrderPageController {
     public String listAllActivityOrder(Model model) {
 
         model.addAttribute("orderListData", orderSvc.getAll());
+
+        // 活動下拉選單
         model.addAttribute("activityListData", activitySvc.getAll());
 
         return "front-end/activityorder/listAllActivityOrder";
     }
 
-    // =========================
     // 新增頁面
-    // =========================
     @GetMapping("/addActivityOrder")
     public String addActivityOrder(Model model) {
 
         model.addAttribute("activityOrderVO", new ActivityOrderVO());
+
         model.addAttribute("activityListData", activitySvc.getAll());
 
         return "front-end/activityorder/addActivityOrder";
@@ -52,11 +53,13 @@ public class ActivityOrderPageController {
             Model model) {
 
         if (result.hasErrors()) {
+
             model.addAttribute("activityListData", activitySvc.getAll());
+
             return "front-end/activityorder/addActivityOrder";
         }
 
-        orderSvc.saveOrder(orderVO);
+        orderSvc.addOrder(orderVO);
 
         return "redirect:/activityOrder/listAllActivityOrder";
     }
@@ -64,16 +67,17 @@ public class ActivityOrderPageController {
     // 修改頁面
     @GetMapping("/updateActivityOrder")
     public String updateActivityOrder(
-            @RequestParam("id") Integer id,
+            @RequestParam("id") Integer activityOrderId,
             Model model) {
 
-        ActivityOrderVO orderVO = orderSvc.getOneOrder(id);
+        ActivityOrderVO orderVO = orderSvc.getOneOrder(activityOrderId);
 
         if (orderVO == null) {
             return "redirect:/activityOrder/listAllActivityOrder";
         }
 
         model.addAttribute("activityOrderVO", orderVO);
+
         model.addAttribute("activityListData", activitySvc.getAll());
 
         return "front-end/activityorder/updateActivityOrder";
@@ -87,7 +91,9 @@ public class ActivityOrderPageController {
             Model model) {
 
         if (result.hasErrors()) {
+
             model.addAttribute("activityListData", activitySvc.getAll());
+
             return "front-end/activityorder/updateActivityOrder";
         }
 
@@ -98,11 +104,44 @@ public class ActivityOrderPageController {
         }
 
         orderVO.setActivityId(formVO.getActivityId());
-        orderVO.setMemberId(formVO.getMemberId());
-        orderVO.setOrderTotal(formVO.getOrderTotal());
-        orderVO.setPaymentStatus(formVO.getPaymentStatus());
+        orderVO.setBuyerMemberId(formVO.getBuyerMemberId());
+        orderVO.setEmployeeId(formVO.getEmployeeId());
 
-        orderSvc.saveOrder(orderVO);
+        orderVO.setOrderStatus(formVO.getOrderStatus());
+
+        orderVO.setBookingCount(formVO.getBookingCount());
+
+        orderVO.setActivityPrice(formVO.getActivityPrice());
+
+        orderVO.setTotalAmount(formVO.getTotalAmount());
+
+        orderVO.setOrderNote(formVO.getOrderNote());
+
+        orderVO.setActivityPaymentMethod(formVO.getActivityPaymentMethod());
+
+        orderVO.setPaidAt(formVO.getPaidAt());
+
+        orderVO.setActivityCompletedAt(formVO.getActivityCompletedAt());
+
+        orderVO.setBuyerRateSeller(formVO.getBuyerRateSeller());
+
+        orderVO.setBuyerReviewComment(formVO.getBuyerReviewComment());
+
+        orderVO.setBuyerReviewedAt(formVO.getBuyerReviewedAt());
+
+        orderVO.setSellerRateBuyer(formVO.getSellerRateBuyer());
+
+        orderVO.setSellerReviewComment(formVO.getSellerReviewComment());
+
+        orderVO.setSellerReviewedAt(formVO.getSellerReviewedAt());
+
+        orderVO.setPayoutAmount(formVO.getPayoutAmount());
+
+        orderVO.setRefundReason(formVO.getRefundReason());
+
+        orderVO.setRefundStatus(formVO.getRefundStatus());
+
+        orderSvc.updateOrder(orderVO);
 
         return "redirect:/activityOrder/listAllActivityOrder";
     }
@@ -110,9 +149,9 @@ public class ActivityOrderPageController {
     // 刪除
     @PostMapping("/deleteActivityOrder")
     public String deleteActivityOrder(
-            @RequestParam("activityOrderId") Integer id) {
+            @RequestParam("activityOrderId") Integer activityOrderId) {
 
-        orderSvc.deleteOrder(id);
+        orderSvc.deleteOrder(activityOrderId);
 
         return "redirect:/activityOrder/listAllActivityOrder";
     }

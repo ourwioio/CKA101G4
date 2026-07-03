@@ -1,61 +1,101 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>活動列表管理</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .btn-edit { background-color: #f1f5f9; color: #0d9488; padding: 6px 12px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 0.85rem; }
-        .btn-edit:hover { background-color: #ccfbf1; }
-        .btn-delete { background-color: #fff1f2; color: #e11d48; padding: 6px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; font-size: 0.85rem; }
-        .btn-delete:hover { background-color: #ffe4e6; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>活動列表管理</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+.btn-edit {
+	background-color: #f1f5f9;
+	color: #0d9488;
+	padding: 6px 12px;
+	border-radius: 8px;
+	font-weight: bold;
+	text-decoration: none;
+	font-size: 0.85rem;
+}
+
+.btn-edit:hover {
+	background-color: #ccfbf1;
+}
+
+.btn-delete {
+	background-color: #fff1f2;
+	color: #e11d48;
+	padding: 6px 12px;
+	border-radius: 8px;
+	font-weight: bold;
+	cursor: pointer;
+	border: none;
+	font-size: 0.85rem;
+}
+
+.btn-delete:hover {
+	background-color: #ffe4e6;
+}
+</style>
 </head>
 <body class="bg-gray-100 p-8">
 
-    <div class="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">活動項目管理</h1>
-            <a th:href="@{/activity/addActivity}" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-emerald-700 transition">➕ 新增活動</a>
-        </div>
+	<div class="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6">
+		<div class="flex justify-between items-center mb-6">
+			<h1 class="text-2xl font-bold text-gray-800">活動項目管理</h1>
+			<div class="flex gap-3">
 
-        <table class="w-full text-left border-collapse">
-            <thead>
-                <tr class="bg-gray-200 text-gray-700">
-                    <th class="p-3">ID</th>
-                    <th class="p-3">活動名稱</th>
-                    <th class="p-3">價格</th>
-                    <th class="p-3">狀態</th>
-                    <th class="p-3 text-center">功能操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="activity : ${activityListData}" class="border-b hover:bg-gray-50">
-                    <td class="p-3" th:text="${activity.activityId}">1</td>
-                    <td class="p-3 font-semibold" th:text="${activity.activityTitle}">活動名稱</td>
-                    <td class="p-3" th:text="${'$' + activity.activityPrice}">$0</td>
-                    <td class="p-3">
-                        <span th:if="${activity.activityStatus == 0}" class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-bold">正常舉行</span>
-                        <span th:if="${activity.activityStatus == 1}" class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-bold">延期</span>
-                        <span th:if="${activity.activityStatus == 2}" class="px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-bold">取消</span>
-                    </td>
-                    <td class="p-3 text-center">
-                        <div class="flex justify-center gap-2">
-                            <!-- 導向修改頁面，並帶入該活動的 ID -->
-                            <a th:href="@{/activity/updateActivity(id=${activity.activityId})}" class="btn-edit">✏️ 修改</a>
-                            
-                            <!-- 刪除功能 -->
-                            <form th:action="@{/activity/deleteActivity}" method="post" onsubmit="return confirm('確定要刪除嗎？');">
-                                <input type="hidden" name="activityId" th:value="${activity.activityId}">
-                                <button type="submit" class="btn-delete">🗑️ 刪除</button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+				<a th:href="@{/activity/admin/home}"
+					class="bg-slate-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-slate-600 transition">
+					🏠 返回後台首頁 </a>
+
+			</div>
+			<a th:href="@{/activity/addActivity}"
+				class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-emerald-700 transition">➕
+				新增活動</a>
+		</div>
+
+		<table class="w-full text-left border-collapse">
+			<thead>
+				<tr class="bg-gray-200 text-gray-700">
+					<th class="p-3">ID</th>
+					<th class="p-3">活動名稱</th>
+					<th class="p-3">價格</th>
+					<th class="p-3">狀態</th>
+					<th class="p-3 text-center">功能操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="activity : ${activityListData}"
+					class="border-b hover:bg-gray-50">
+					<td class="p-3" th:text="${activity.activityId}">1</td>
+					<td class="p-3 font-semibold" th:text="${activity.activityTitle}">活動名稱</td>
+					<td class="p-3" th:text="${'$' + activity.activityPrice}">$0</td>
+					<td class="p-3"><span th:if="${activity.activityStatus == 0}"
+						class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-bold">正常舉行</span>
+						<span th:if="${activity.activityStatus == 1}"
+						class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-bold">延期</span>
+						<span th:if="${activity.activityStatus == 2}"
+						class="px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-bold">取消</span>
+					</td>
+					<td class="p-3 text-center">
+						<div class="flex justify-center gap-2">
+							<!-- 導向修改頁面，並帶入該活動的 ID -->
+							<a
+								th:href="@{/activity/updateActivity(id=${activity.activityId})}"
+								class="btn-edit">✏️ 修改</a>
+
+							<!-- 刪除功能 -->
+							<form th:action="@{/activity/deleteActivity}" method="post"
+								onsubmit="return confirm('確定要刪除嗎？');">
+								<input type="hidden" name="activityId"
+									th:value="${activity.activityId}">
+								<button type="submit" class="btn-delete">🗑️ 刪除</button>
+							</form>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 
 </body>
 </html>

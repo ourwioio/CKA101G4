@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Webond 活動入口</title>
+
+<style>
+body {
+	margin: 0;
+	padding: 40px;
+	background: #f8fafc;
+	font-family: "Microsoft JhengHei", sans-serif;
+	color: #1e293b;
+}
+
+.header {
+	text-align: center;
+	margin-bottom: 45px;
+}
+
+.header h1 {
+	font-size: 42px;
+	color: #0f172a;
+	margin-bottom: 10px;
+}
+
+.header p {
+	color: #64748b;
+	font-size: 18px;
+}
+
+.card-container {
+	max-width: 1000px;
+	margin: auto;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+	gap: 35px;
+}
+
+.card {
+	background: white;
+	border-radius: 18px;
+	padding: 45px 35px;
+	text-align: center;
+	border: 1px solid #e2e8f0;
+	box-shadow: 0 8px 18px rgba(0, 0, 0, .08);
+	transition: .25s;
+}
+
+.card:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 12px 25px rgba(0, 0, 0, .15);
+}
+
+.icon {
+	font-size: 70px;
+	margin-bottom: 20px;
+}
+
+.card h2 {
+	color: #0f172a;
+	margin-bottom: 15px;
+}
+
+.card p {
+	color: #64748b;
+	line-height: 1.8;
+	min-height: 70px;
+}
+
+.btn {
+	display: inline-block;
+	margin-top: 25px;
+	padding: 13px 30px;
+	border-radius: 10px;
+	color: white;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.front {
+	background: #3b82f6;
+}
+
+.front:hover {
+	background: #2563eb;
+}
+
+.admin {
+	background: #10b981;
+}
+
+.admin:hover {
+	background: #059669;
+}
+</style>
+</head>
+
+<body>
+
+	<div class="header">
+		<h1>🏸 Webond 活動系統</h1>
+		<p>請選擇要進入使用者前台或管理後台</p>
+	</div>
+
+	<div class="card-container">
+
+		<div class="card">
+			<div class="icon">🎯</div>
+			<h2>使用者前台</h2>
+			<p>瀏覽活動、查看活動詳情， 並進行報名與下單。</p>
+
+			<a th:href="@{/activity/front/list}" class="btn front"> 進入前台 </a>
+		</div>
+
+		<div class="card">
+			<div class="icon">🛠️</div>
+			<h2>管理後台</h2>
+			<p>管理活動、活動訂單、 活動類型與後台資料。</p>
+
+			<a th:href="@{/activity/admin/home}" class="btn admin"> 進入後台 </a>
+		</div>
+
+	</div>
+
+</body>
+</html>

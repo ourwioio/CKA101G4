@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>活動列表</title>
+
+<style>
+body {
+	margin: 0;
+	background: #f8fafc;
+	font-family: "Microsoft JhengHei", sans-serif;
+}
+
+.header {
+	max-width: 1200px;
+	margin: 40px auto;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.header h1 {
+	color: #0f172a;
+}
+
+.member {
+	color: #475569;
+	font-weight: bold;
+}
+
+.back-btn {
+	background: #64748b;
+	color: white;
+	text-decoration: none;
+	padding: 10px 18px;
+	border-radius: 8px;
+	font-weight: bold;
+}
+
+.back-btn:hover {
+	background: #475569;
+}
+
+.container {
+	max-width: 1200px;
+	margin: auto;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	gap: 25px;
+}
+
+.card {
+	background: white;
+	border-radius: 15px;
+	padding: 25px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+	transition: .25s;
+}
+
+.card:hover {
+	transform: translateY(-5px);
+}
+
+.card h2 {
+	margin-top: 0;
+	color: #0f172a;
+}
+
+.price {
+	color: #16a34a;
+	font-size: 22px;
+	font-weight: bold;
+	margin: 15px 0;
+}
+
+.desc {
+	color: #64748b;
+	line-height: 1.8;
+	min-height: 90px;
+}
+
+.btn-detail {
+	display: inline-block;
+	margin-top: 15px;
+	background: #2563eb;
+	color: white;
+	text-decoration: none;
+	padding: 10px 18px;
+	border-radius: 8px;
+	font-weight: bold;
+}
+
+.btn-detail:hover {
+	background: #1d4ed8;
+}
+</style>
+
+</head>
+
+<body>
+
+	<div class="header">
+
+		<div>
+			<h1>🎯 活動列表</h1>
+
+			<div class="member">
+				歡迎， <span th:text="${loginMemberName}"></span>
+			</div>
+		</div>
+
+		<div style="display: flex; gap: 12px;">
+
+			<a th:href="@{/activity/front/myOrder}" class="back-btn"> 📋 我的活動
+			</a> <a th:href="@{/activity/home}" class="back-btn"> 🏠 返回活動系統 </a>
+
+		</div>
+
+	</div>
+
+	<div class="container">
+
+		<div class="card" th:each="activity : ${activityListData}">
+
+			<h2 th:text="${activity.activityTitle}">活動名稱</h2>
+
+			<div class="price">
+				NT$ <span th:text="${activity.activityPrice}"></span>
+			</div>
+
+			<div class="desc" th:text="${activity.activityDescription}"></div>
+
+			<a class="btn-detail"
+				th:href="@{/activity/front/detail(id=${activity.activityId})}">
+				查看詳情 </a>
+
+		</div>
+
+	</div>
+
+</body>
+</html>
