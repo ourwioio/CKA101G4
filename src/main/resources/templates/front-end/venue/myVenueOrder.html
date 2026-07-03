@@ -11,11 +11,9 @@ body { font-family: sans-serif; background: #f5f5f5; padding: 2rem; }
 .back-link:hover { color: #1d9e75; }
 h1 { font-size: 24px; font-weight: 600; color: #333; margin-bottom: 1.5rem; }
 
-/* 查無訂單的樣式 */
 .no-orders { background: white; border-radius: 12px; border: 1px solid #e0e0e0; padding: 3rem; text-align: center; color: #888; }
 .btn-browse { display: inline-block; margin-top: 1rem; background: #1d9e75; color: white; border: none; border-radius: 6px; padding: 10px 20px; font-size: 14px; text-decoration: none; cursor: pointer; }
 
-/* 訂單卡片樣式 */
 .order-card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
 .order-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 12px; }
 .order-id { font-size: 14px; font-weight: bold; color: #444; }
@@ -25,14 +23,139 @@ h1 { font-size: 24px; font-weight: 600; color: #333; margin-bottom: 1.5rem; }
 .venue-details h2 { font-size: 18px; font-weight: 500; color: #222; margin-bottom: 6px; }
 .venue-details p { font-size: 14px; color: #666; margin-bottom: 4px; }
 
-/* 標籤（Badge）樣式 */
-.badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
-.badge-payment { background: #e1f5ee; color: #0f6e56; margin-right: 5px; }
+.badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; margin-right: 5px; margin-bottom: 4px; }
+.badge-payment { background: #e1f5ee; color: #0f6e56; }
 .badge-status { background: #f1f3f5; color: #495057; }
+
+/* 🌟 訂單狀態顏色 */
+.status-pending { background: #fff3bf; color: #997404; }
+.status-paid { background: #d3f9d8; color: #2b8a3e; }
+.status-cancel { background: #f1f3f5; color: #868e96; }
+.status-done { background: #d0ebff; color: #1864ab; }
 
 .order-right { text-align: right; }
 .total-amount { font-size: 20px; font-weight: 600; color: #1d9e75; margin-bottom: 10px; }
 .total-amount span { font-size: 14px; font-weight: normal; color: #666; }
+
+.order-right .actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.btn-review, .btn-pay {
+    display: inline-block;
+    padding: 6px 16px;
+    background: #1d9e75;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-review:hover, .btn-pay:hover { background: #157353; }
+
+/* 🌟 前往付款按鈕（用橘色提醒尚未付款） */
+.btn-pay { background: #f76707; }
+.btn-pay:hover { background: #d9600a; }
+
+.btn-report {
+    display: inline-block;
+    padding: 6px 16px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-report:hover { background: #bd2130; }
+
+/* 已評價的星星顯示（唯讀） */
+.review-display { margin-top: 10px; text-align: right; }
+.review-display .stars-readonly { font-size: 16px; color: #ddd; letter-spacing: 1px; }
+.review-display .stars-readonly .filled { color: #f5a623; }
+.review-display .comment-text { font-size: 13px; color: #666; margin-top: 4px; max-width: 220px; word-break: break-word; }
+
+/* Modal 遮罩 */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+}
+.modal-box {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+.modal-box h3 { font-size: 18px; margin-bottom: 1.2rem; color: #333; }
+
+/* 星星選擇器 */
+.star-rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    margin-bottom: 1.2rem;
+}
+.star-rating input { display: none; }
+.star-rating label {
+    font-size: 32px;
+    color: #ddd;
+    cursor: pointer;
+    padding: 0 2px;
+    transition: color 0.15s;
+}
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #f5a623;
+}
+
+.modal-box textarea {
+    width: 100%;
+    min-height: 90px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    margin-bottom: 1.2rem;
+}
+.modal-box textarea:focus { outline: none; border-color: #1d9e75; }
+
+.modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.btn-cancel {
+    background: #f1f3f5;
+    color: #495057;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.btn-submit {
+    background: #1d9e75;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 14px;
+    cursor: pointer;
+}
+.btn-submit:hover { background: #157353; }
 </style>
 </head>
 <body>
@@ -48,45 +171,144 @@ h1 { font-size: 24px; font-weight: 600; color: #333; margin-bottom: 1.5rem; }
 
     <div th:unless="${#lists.isEmpty(venueOrderListData)}">
         <div class="order-card" th:each="order : ${venueOrderListData}">
-            
+
             <div class="order-header">
                 <span class="order-id" th:text="'訂單編號：#' + ${order.venueOrderId}"></span>
-                <span class="order-date" 
+                <span class="order-date"
 			      th:text="'下單時間：' + ${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}">
 				</span>
             </div>
-            
+
             <div class="order-body">
                 <div class="venue-details">
                     <h2 th:text="${order.venueVO.venueName}"></h2>
-                    
+
                     <p>
                         <strong>預約時段：</strong>
                         <span th:text="${order.startAt} + ' ～ ' + ${order.endAt}"></span>
                     </p>
-                    
+
                     <div>
-                        <span class="badge badge-payment" 
-                              th:text="${order.paymentMethod == 0 ? '信用卡' : (order.paymentMethod == 1 ? '銀行轉帳' : '現場付款')}">
+                        <!-- 付款方式：只剩信用卡／銀行轉帳 -->
+                        <span class="badge badge-payment"
+                              th:text="${order.paymentMethod == 0} ? '信用卡' : '銀行轉帳'">
                         </span>
-                        
-                        <span class="badge badge-status" 
-                              th:text="${order.refundStatus == 0 ? '訂單成立' : '有退款申請'}">
+
+                        <!-- 🌟 訂單狀態：0待付款 1已付款 2已取消 3已完成 -->
+                        <span class="badge"
+                              th:classappend="${order.orderStatus == 0} ? 'status-pending' : (${order.orderStatus == 1} ? 'status-paid' : (${order.orderStatus == 2} ? 'status-cancel' : 'status-done'))"
+                              th:text="${order.orderStatus == 0} ? '待付款' : (${order.orderStatus == 1} ? '已付款' : (${order.orderStatus == 2} ? '已取消' : '已完成'))">
+                        </span>
+
+                        <!-- 退款申請狀態 -->
+                        <span class="badge badge-status"
+                              th:if="${order.refundStatus != 0}"
+                              th:text="'有退款申請'">
                         </span>
                     </div>
                 </div>
-                
+
                 <div class="order-right">
                     <div class="total-amount">
                         <span class="currency">NT$ </span>
                         <th:block th:text="${order.totalAmount}"></th:block>
                     </div>
+
+                    <!-- 已評價：顯示星星＋留言 -->
+                    <div class="review-display" th:if="${order.venueRating != null}">
+                        <span class="stars-readonly">
+                            <span th:each="i : ${#numbers.sequence(1,5)}"
+                                  th:text="'★'"
+                                  th:class="${i <= order.venueRating} ? 'filled' : ''"></span>
+                        </span>
+                        <p class="comment-text" th:if="${order.venueComment != null and !order.venueComment.isEmpty()}"
+                           th:text="${order.venueComment}"></p>
+                    </div>
+
+                    <div class="actions">
+
+                        <!-- 🌟 待付款：導去付款頁 -->
+                        <a th:if="${order.orderStatus == 0}"
+                           th:href="@{/front/venueOrder/mockPayment(venueOrderId=${order.venueOrderId})}"
+                           class="btn-pay">前往付款</a>
+
+                        <!-- 🌟 已付款或已完成：可評價、可檢舉 -->
+                        <th:block th:if="${order.orderStatus == 1 or order.orderStatus == 3}">
+                            <button type="button" class="btn-review"
+                                    th:attr="data-order-id=${order.venueOrderId},
+                                             data-rating=${order.venueRating},
+                                             data-comment=${order.venueComment}"
+                                    onclick="openReviewModal(this)"
+                                    th:text="${order.venueRating != null} ? '編輯評價' : '評價場地'">
+                            </button>
+
+                            <a th:href="@{/front/report/add(venueOrderId=${order.venueOrderId})}" class="btn-report">檢舉</a>
+                        </th:block>
+
+                        <!-- 已取消：不顯示操作按鈕 -->
+
+			        </div>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </div>
+
+<!-- 評價 Modal -->
+<div class="modal-overlay" id="reviewModalOverlay">
+    <div class="modal-box">
+        <h3>評價這個場地</h3>
+        <form th:action="@{/front/venueOrder/updateReview}" method="post">
+            <input type="hidden" name="venueOrderId" id="reviewOrderId" />
+
+            <div class="star-rating">
+                <input type="radio" id="star5" name="venueRating" value="5" required><label for="star5">★</label>
+                <input type="radio" id="star4" name="venueRating" value="4"><label for="star4">★</label>
+                <input type="radio" id="star3" name="venueRating" value="3"><label for="star3">★</label>
+                <input type="radio" id="star2" name="venueRating" value="2"><label for="star2">★</label>
+                <input type="radio" id="star1" name="venueRating" value="1"><label for="star1">★</label>
+            </div>
+
+            <textarea name="venueComment" id="reviewComment" placeholder="留下你對這個場地的感想..."></textarea>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeReviewModal()">取消</button>
+                <button type="submit" class="btn-submit">送出評價</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openReviewModal(btn) {
+    var orderId = btn.getAttribute('data-order-id');
+    var rating = btn.getAttribute('data-rating');
+    var comment = btn.getAttribute('data-comment') || '';
+
+    document.getElementById('reviewOrderId').value = orderId;
+    document.getElementById('reviewComment').value = (comment === 'null') ? '' : comment;
+
+    document.querySelectorAll('input[name="venueRating"]').forEach(function (el) {
+        el.checked = false;
+    });
+
+    if (rating && rating !== 'null') {
+        var starEl = document.getElementById('star' + rating);
+        if (starEl) starEl.checked = true;
+    }
+
+    document.getElementById('reviewModalOverlay').style.display = 'flex';
+}
+
+function closeReviewModal() {
+    document.getElementById('reviewModalOverlay').style.display = 'none';
+}
+
+document.getElementById('reviewModalOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeReviewModal();
+});
+</script>
 
 </body>
 </html>

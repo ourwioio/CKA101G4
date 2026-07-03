@@ -72,31 +72,19 @@ public class VenueOrderVO {
 
 	@Column(name = "VENUE_PAYMENT_METHOD")
 	private Byte paymentMethod;
+	
+	@Column(name = "ORDER_STATUS")
+	private Byte orderStatus;
+	
+	@Column(name = "VENUE_SLOT_ID")
+	private Integer venueSlotId;
+	
+	
 
 	public VenueOrderVO() {
 		super();
 	}
 
-	public VenueOrderVO(Integer venueOrderId, VenueVO venueVO, MemberVO member, EmployeeVO empVO, Integer venueRating,
-			String venueComment, Byte payoutAmount, String refundReason, Byte refundStatus, LocalDateTime handledAt,
-			LocalDateTime createdAt, LocalTime startAt, LocalTime endAt, Integer totalAmount, Byte paymentMethod) {
-		super();
-		this.venueOrderId = venueOrderId;
-		this.venueVO = venueVO;
-		this.member = member;
-		this.empVO = empVO;
-		this.venueRating = venueRating;
-		this.venueComment = venueComment;
-		this.payoutAmount = payoutAmount;
-		this.refundReason = refundReason;
-		this.refundStatus = refundStatus;
-		this.handledAt = handledAt;
-		this.createdAt = createdAt;
-		this.startAt = startAt;
-		this.endAt = endAt;
-		this.totalAmount = totalAmount;
-		this.paymentMethod = paymentMethod;
-	}
 
 	public Integer getVenueOrderId() {
 		return venueOrderId;
@@ -218,7 +206,23 @@ public class VenueOrderVO {
 		this.paymentMethod = paymentMethod;
 	}
 
-	
+	public Byte getOrderStatus() {
+		return orderStatus;
+	}
+
+	public void setOrderStatus(Byte orderStatus) {
+		this.orderStatus = orderStatus;
+	}
+
+
+	public Integer getVenueSlotId() {
+		return venueSlotId;
+	}
+
+
+	public void setVenueSlotId(Integer venueSlotId) {
+		this.venueSlotId = venueSlotId;
+	}
 
 	
 

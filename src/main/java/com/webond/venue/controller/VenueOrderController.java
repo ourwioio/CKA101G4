@@ -1,5 +1,6 @@
 package com.webond.venue.controller;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -27,83 +28,162 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/front/venueOrder")
 public class VenueOrderController {
 
+	private static final long PAYMENT_TIMEOUT_MINUTES = 5;
+
 	@Autowired
 	VenueService venueService;
-	
+
 	@Autowired
-	VenueOrderService venueOrderService; 
-	
+	VenueOrderService venueOrderService;
+
 	@Autowired
 	VenueSlotService venueSlotService;
-	
+
 	@Autowired
 	MemberService memberService;
-	
+
 	@GetMapping("addVenueOrder")
 	public String add(@RequestParam("venueId") Integer venueId, Model model, HttpSession session) {
-	    
-	    // 先驗證登入
-	    Integer memberId = (Integer) session.getAttribute("loginMemberId");
-	    if (memberId == null) {
-	        return "redirect:/front/venue/fakeLogin";
-	    }
 
-	    // 撈場地資料顯示在預約頁面
-	    VenueVO venueVO = venueService.getOneVenue(venueId);
-	    model.addAttribute("venueVO", venueVO);
+		Integer memberId = (Integer) session.getAttribute("loginMemberId");
+		if (memberId == null) {
+			return "redirect:/front/venue/fakeLogin";
+		}
 
-	    VenueOrderVO venueOrderVO = new VenueOrderVO();
-	    model.addAttribute("venueOrderVO", venueOrderVO);
+		VenueVO venueVO = venueService.getOneVenue(venueId);
+		model.addAttribute("venueVO", venueVO);
 
-	    return "front-end/venue/addVenueOrder";
+		VenueOrderVO venueOrderVO = new VenueOrderVO();
+		model.addAttribute("venueOrderVO", venueOrderVO);
+
+		return "front-end/venue/addVenueOrder";
 	}
-	
+
 	@PostMapping("insert")
-	public String insert(
-	        @RequestParam("venueId") Integer venueId,
-	        @RequestParam("venueSlotId") Integer venueSlotId,
-	        @RequestParam("startHour") int startHour,
-	        @RequestParam("endHour") int endHour,
-	        @RequestParam("paymentMethod") Byte paymentMethod,
-	        HttpSession session) {
+	public String insert(@RequestParam("venueId") Integer venueId, @RequestParam("venueSlotId") Integer venueSlotId,
+			@RequestParam("startHour") int startHour, @RequestParam("endHour") int endHour,
+			@RequestParam("paymentMethod") Byte paymentMethod, HttpSession session) {
 
-	    // 1. 驗證登入
-	    Integer memberId = (Integer) session.getAttribute("loginMemberId");
-	    if (memberId == null) {
-	        return "redirect:/front/venue/fakeLogin";
-	    }
+		Integer memberId = (Integer) session.getAttribute("loginMemberId");
+		if (memberId == null) {
+			return "redirect:/front/venue/fakeLogin";
+		}
 
-	    // 2. 撈場地和會員資料
-	    VenueVO venueVO = venueService.getOneVenue(venueId);
-	    MemberVO member = memberService.getOneMember(memberId);
+		VenueVO venueVO = venueService.getOneVenue(venueId);
+		MemberVO member = memberService.getOneMember(memberId);
 
-	    // 3. 計算費用
-	    int hours = endHour - startHour;
-	    int totalAmount = hours * venueVO.getHourlyRate();
+		int hours = endHour - startHour;
+		int totalAmount = hours * venueVO.getHourlyRate();
 
-	    // 4. 建立訂單
-	    VenueOrderVO venueOrderVO = new VenueOrderVO();
-	    venueOrderVO.setVenueVO(venueVO);
-	    venueOrderVO.setMember(member);
-	    venueOrderVO.setStartAt(LocalTime.of(startHour, 0));
-	    venueOrderVO.setEndAt(LocalTime.of(endHour == 24 ? 23 : endHour, endHour == 24 ? 59 : 0));
-	    venueOrderVO.setTotalAmount(totalAmount);
-	    venueOrderVO.setPaymentMethod(paymentMethod);
-	    venueOrderVO.setCreatedAt(LocalDateTime.now());
-	    venueOrderVO.setRefundStatus((byte) 0);
+		VenueOrderVO venueOrderVO = new VenueOrderVO();
+		venueOrderVO.setVenueVO(venueVO);
+		venueOrderVO.setMember(member);
+		venueOrderVO.setVenueSlotId(venueSlotId); // 🌟 存下對應的時段，之後釋放要靠這個
+		venueOrderVO.setStartAt(LocalTime.of(startHour, 0));
+		venueOrderVO.setEndAt(LocalTime.of(endHour == 24 ? 23 : endHour, endHour == 24 ? 59 : 0));
+		venueOrderVO.setTotalAmount(totalAmount);
+		venueOrderVO.setPaymentMethod(paymentMethod);
+		venueOrderVO.setCreatedAt(LocalDateTime.now());
+		venueOrderVO.setRefundStatus((byte) 0);
+		venueOrderVO.setOrderStatus((byte) 0); // 0=待付款/預約保留中
 
-	    venueOrderService.addVenueOrder(venueOrderVO);
+		venueOrderService.addVenueOrder(venueOrderVO);
 
-	    // 5. 更新場地時段狀態
-	    venueSlotService.updateSlotStatus(venueSlotId, startHour, endHour);
+		// 鎖定時段
+		venueSlotService.updateSlotStatus(venueSlotId, startHour, endHour);
 
-	    return "redirect:/front/venue/listAllVenue";
+		return "redirect:/front/venueOrder/mockPayment?venueOrderId=" + venueOrderVO.getVenueOrderId();
 	}
-	
+
+	/** 模擬付款頁 */
+	@GetMapping("mockPayment")
+	public String mockPayment(@RequestParam("venueOrderId") Integer venueOrderId, HttpSession session, Model model) {
+
+		Integer memberId = (Integer) session.getAttribute("loginMemberId");
+		if (memberId == null) {
+			return "redirect:/front/venue/fakeLogin";
+		}
+
+		VenueOrderVO order = venueOrderService.getOneVenueOrder(venueOrderId);
+		if (order == null) {
+			return "redirect:/front/venueOrder/myVenueOrder";
+		}
+
+		if (order.getOrderStatus() == 0
+				&& order.getCreatedAt().plusMinutes(PAYMENT_TIMEOUT_MINUTES).isBefore(LocalDateTime.now())) {
+			order.setOrderStatus((byte) 2);
+			venueOrderService.updateVenueOrder(order);
+			releaseSlot(order);
+			return "redirect:/front/venueOrder/myVenueOrder";
+		}
+
+		if (order.getOrderStatus() != 0) {
+			return "redirect:/front/venueOrder/myVenueOrder";
+		}
+
+		long secondsLeft = Duration
+				.between(LocalDateTime.now(), order.getCreatedAt().plusMinutes(PAYMENT_TIMEOUT_MINUTES)).getSeconds();
+
+		model.addAttribute("order", order);
+		model.addAttribute("secondsLeft", Math.max(secondsLeft, 0));
+
+		return "front-end/venue/mockPayment";
+	}
+
+	/** 模擬「付款成功」 */
+	@PostMapping("confirmPayment")
+	public String confirmPayment(@RequestParam("venueOrderId") Integer venueOrderId, HttpSession session) {
+
+		Integer memberId = (Integer) session.getAttribute("loginMemberId");
+		if (memberId == null) {
+			return "redirect:/front/venue/fakeLogin";
+		}
+
+		VenueOrderVO order = venueOrderService.getOneVenueOrder(venueOrderId);
+		if (order != null && order.getOrderStatus() == 0) {
+			if (order.getCreatedAt().plusMinutes(PAYMENT_TIMEOUT_MINUTES).isAfter(LocalDateTime.now())) {
+				order.setOrderStatus((byte) 1); // 已付款/預約成功
+				order.setHandledAt(LocalDateTime.now());
+				venueOrderService.updateVenueOrder(order);
+				// 付款成功，時段維持已預約(1)，不用釋放
+			} else {
+				order.setOrderStatus((byte) 2); // 逾時取消
+				venueOrderService.updateVenueOrder(order);
+				releaseSlot(order);
+			}
+		}
+
+		return "redirect:/front/venueOrder/myVenueOrder";
+	}
+
+	/** 倒數歸零時，前端呼叫這支把訂單標記為逾時取消 */
+	@PostMapping("cancelExpired")
+	public String cancelExpired(@RequestParam("venueOrderId") Integer venueOrderId, HttpSession session) {
+
+		Integer memberId = (Integer) session.getAttribute("loginMemberId");
+		if (memberId == null) {
+			return "redirect:/front/venue/fakeLogin";
+		}
+
+		VenueOrderVO order = venueOrderService.getOneVenueOrder(venueOrderId);
+		if (order != null && order.getOrderStatus() == 0) {
+			order.setOrderStatus((byte) 2);
+			venueOrderService.updateVenueOrder(order);
+			releaseSlot(order);
+		}
+
+		return "redirect:/front/venueOrder/myVenueOrder";
+	}
+
+	@PostMapping("cancelPayment")
+	public String cancelPayment(@RequestParam("venueOrderId") Integer venueOrderId, HttpSession session) {
+		// 直接把工作丟給 cancelExpired 做，自己不重複寫邏輯
+		return cancelExpired(venueOrderId, session);
+	}
+
 	@GetMapping("myVenueOrder")
 	public String myVenue(HttpSession session, ModelMap model) {
-		
-    /*************************** 從 Session 取得登入會員 ***************************/
+
 		Integer memberId = (Integer) session.getAttribute("loginMemberId");
 		if (memberId == null) {
 			return "redirect:/front/venue/fakeLogin";
@@ -113,7 +193,38 @@ public class VenueOrderController {
 		model.addAttribute("venueOrderListData", list);
 		return "front-end/venue/myVenueOrder";
 	}
-	
-	
-	
+
+	@PostMapping("updateReview")
+	public String updateReview(@RequestParam("venueOrderId") Integer venueOrderId,
+			@RequestParam("venueRating") Integer venueRating, @RequestParam("venueComment") String venueComment,
+			HttpSession session) {
+
+		Integer memberId = (Integer) session.getAttribute("loginMemberId");
+		if (memberId == null) {
+			return "redirect:/front/venue/fakeLogin";
+		}
+
+		VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
+
+		if (venueOrderVO != null) {
+			venueOrderVO.setVenueRating(venueRating);
+			venueOrderVO.setVenueComment(venueComment);
+			venueOrderService.updateVenueOrder(venueOrderVO);
+		}
+
+		return "redirect:/front/venueOrder/myVenueOrder";
+	}
+
+	/** 用訂單自己存的 startAt/endAt/venueSlotId 反推並釋放時段 */
+	private void releaseSlot(VenueOrderVO order) {
+		if (order.getVenueSlotId() == null)
+			return;
+
+		int startHour = order.getStartAt().getHour();
+		int endHour = (order.getEndAt().getHour() == 23 && order.getEndAt().getMinute() == 59) ? 24
+				: order.getEndAt().getHour();
+
+		venueSlotService.releaseSlotStatus(order.getVenueSlotId(), startHour, endHour);
+	}
+
 }

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>付款頁面</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: sans-serif; background: #f5f5f5; padding: 2rem; }
+.container { max-width: 480px; margin: 0 auto; }
+.card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; padding: 2rem; }
+h1 { font-size: 20px; color: #333; margin-bottom: 1.2rem; }
+
+.timer-box { text-align: center; background: #fff5f5; border: 1px solid #ffd6d6; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+.timer-label { font-size: 13px; color: #c92a2a; margin-bottom: 4px; }
+.timer-value { font-size: 32px; font-weight: 700; color: #c92a2a; }
+
+.order-info p { font-size: 14px; color: #555; margin-bottom: 8px; }
+.order-info strong { color: #222; }
+.amount { font-size: 24px; font-weight: 700; color: #1d9e75; margin: 1rem 0; }
+
+.method-note { background: #f1f3f5; border-radius: 8px; padding: 12px; font-size: 13px; color: #495057; margin-bottom: 1.5rem; }
+
+.btn-confirm { width: 100%; background: #1d9e75; color: white; border: none; border-radius: 6px; padding: 12px; font-size: 15px; cursor: pointer; }
+.btn-confirm:hover { background: #157353; }
+.btn-cancel-pay {
+    width: 100%;
+    background: white;
+    color: #666;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 15px;
+    cursor: pointer;
+}
+.btn-cancel-pay:hover { background: #f5f5f5; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="card">
+        <h1 th:text="${order.paymentMethod == 0} ? '信用卡付款' : '銀行轉帳付款'"></h1>
+
+        <div class="timer-box">
+            <div class="timer-label">請在時限內完成付款，逾時訂單將自動取消</div>
+            <div class="timer-value" id="countdown">05:00</div>
+        </div>
+
+        <div class="order-info">
+            <p><strong>訂單編號：</strong>#<span th:text="${order.venueOrderId}"></span></p>
+            <p><strong>場地：</strong><span th:text="${order.venueVO.venueName}"></span></p>
+            <p><strong>時段：</strong><span th:text="${order.startAt} + ' ～ ' + ${order.endAt}"></span></p>
+        </div>
+
+        <div class="amount">NT$ <span th:text="${order.totalAmount}"></span></div>
+
+        <div class="method-note" th:if="${order.paymentMethod == 0}">
+            （模擬）請輸入信用卡資訊完成付款，此頁面僅供測試流程，尚未串接真實金流。
+        </div>
+        <div class="method-note" th:if="${order.paymentMethod == 1}">
+            （模擬）請於時限內轉帳至指定帳戶，轉帳完成後點擊下方按鈕確認，此頁面僅供測試流程。
+        </div>
+
+        <form th:action="@{/front/venueOrder/confirmPayment}" method="post">
+            <input type="hidden" name="venueOrderId" th:value="${order.venueOrderId}" />
+            <button type="submit" class="btn-confirm">模擬付款成功</button>
+        </form>
+        <!-- 取消付款 -->
+		<form th:action="@{/front/venueOrder/cancelPayment}" method="post" style="margin-top: 10px;">
+		    <input type="hidden" name="venueOrderId" th:value="${order.venueOrderId}" />
+		    <button type="submit" class="btn-cancel-pay">取消付款</button>
+		</form>
+    </div>
+</div>
+
+<!-- 逾時自動取消用的隱藏表單 -->
+<form id="expireForm" th:action="@{/front/venueOrder/cancelExpired}" method="post" style="display:none;">
+    <input type="hidden" name="venueOrderId" th:value="${order.venueOrderId}" />
+</form>
+
+<script th:inline="javascript">
+var secondsLeft = /*[[${secondsLeft}]]*/ 300;
+
+function updateTimer() {
+    if (secondsLeft <= 0) {
+        document.getElementById('countdown').textContent = '00:00';
+        document.getElementById('expireForm').submit();
+        return;
+    }
+    var m = Math.floor(secondsLeft / 60);
+    var s = secondsLeft % 60;
+    document.getElementById('countdown').textContent =
+        String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    secondsLeft--;
+}
+
+updateTimer();
+setInterval(updateTimer, 1000);
+</script>
+
+</body>
+</html>
