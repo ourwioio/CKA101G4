@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<table>
+	    <tr th:each="n : ${notificationListData}">
+	        <td th:text="${n.notificationId}"></td>
+	        <td th:text="${n.member.memberId}"></td>
+	        <td th:text="${n.title}"></td>
+	        <td th:text="${n.content}"></td>
+	        <td th:text="${n.notificationType}"></td>
+	        <td th:text="${n.isRead}"></td>
+	        <td th:text="${n.report != null ? n.report.reportId : '無'}"></td>
+	        <td th:text="${n.employee.empId}"></td>
+	        <td th:text="${n.createdAt}"></td>
+	    </tr>
+	</table>
+
+</body>
+</html>

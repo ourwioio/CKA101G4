@@ -1,7 +1,7 @@
 package com.webond.venue.controller;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,12 +45,16 @@ public class VenueFrontController {
 
 	@GetMapping("/fakeLogin")
 	public String fakeLogin(HttpSession session) {
-		session.setAttribute("loginMemberId", 8); // 假設用會員8登入
-		return "redirect:/front/venue/myVenue";
+		session.setAttribute("loginMemberId", 8); // 會員假登入
+		return "front-end/venue/myPage";
 	}
 
 	@GetMapping("addVenue")
-	public String addVenue(ModelMap model) {
+	public String addVenue(ModelMap model, HttpSession session) {
+		Integer memberId = (Integer) session.getAttribute("loginMemberId");
+	    if (memberId == null) {
+	        return "redirect:/front/venue/fakeLogin";
+	    }
 		VenueVO venueVO = new VenueVO();
 		model.addAttribute("venueVO", venueVO);
 		return "front-end/venue/addVenue";
@@ -60,12 +64,18 @@ public class VenueFrontController {
 	public String insert(@Valid VenueVO venueVO, BindingResult result, ModelMap model,
 			@RequestParam("upFiles") MultipartFile[] parts,
 			@RequestParam(value = "openDays", required = false) List<Integer> openDays,
-			@RequestParam("startHour") int startHour, @RequestParam("endHour") int endHour,
+			@RequestParam("startHour") int startHour, 
+			@RequestParam("endHour") int endHour,
 			@RequestParam(value = "coverIndex", defaultValue = "0") int coverIndex, 
 			HttpSession session) throws IOException {
-
+		
+		/*************************** 從 Session 取得登入會員 ***************************/
+	    Integer memberId = (Integer) session.getAttribute("loginMemberId");
+	    if (memberId == null) {
+	        return "redirect:/front/venue/fakeLogin";  // 沒登入就導去假登入
+	    }
+		/*************************** 場地類型處理 ***************************/
 		Integer venueTypeId = venueVO.getVenueTypeVO() != null ? venueVO.getVenueTypeVO().getVenueTypeId() : null;
-
 		if (venueTypeId != null) {
 			VenueTypeVO venueTypeVO = venueTypeService.getOneVenueType(venueTypeId);
 			venueVO.setVenueTypeVO(venueTypeVO);
@@ -76,6 +86,7 @@ public class VenueFrontController {
 		model.addAttribute("savedStartHour", startHour);
 		model.addAttribute("savedEndHour", endHour);
 		model.addAttribute("savedOpenDays", openDays);
+		
 		if (venueVO.getAddress() != null && !venueVO.getAddress().isEmpty()) {
 			model.addAttribute("savedAddress", venueVO.getAddress());
 		}
@@ -118,16 +129,11 @@ public class VenueFrontController {
 		}
 		venueVO.setAvailableHours(hoursSb.toString());
 
-		venueVO.setCreatedAt(LocalDate.now());
+		venueVO.setCreatedAt(LocalDateTime.now());
 		venueVO.setVenueStatus((byte) 0);
 		venueVO.setRatingStars(0);
 		venueVO.setRatingcount(0);
 
-		/*************************** 從 Session 取得登入會員 ***************************/
-	    Integer memberId = (Integer) session.getAttribute("loginMemberId");
-	    if (memberId == null) {
-	        return "redirect:/front/venue/fakeLogin";  // 沒登入就導去假登入
-	    }
 	    MemberVO member = memberService.getOneMember(memberId);
 	    venueVO.setMember(member);
 
@@ -166,7 +172,8 @@ public class VenueFrontController {
 	    StringBuilder daysSb = new StringBuilder("0000000");
 	    if (openDays != null) {
 	        for (Integer day : openDays) {
-	            if (day >= 0 && day <= 6) daysSb.setCharAt(day, '1');
+	            if (day >= 0 && day <= 6) 
+	            	daysSb.setCharAt(day, '1');
 	        }
 	    }
 	    venueVO.setOpenDays(daysSb.toString());
@@ -199,9 +206,16 @@ public class VenueFrontController {
 		model.addAttribute("venueListData", list);
 		return "front-end/venue/listAllVenue";
 	}
-
+	
 	@GetMapping("getOneVenue")
 	public String getOne(@RequestParam("venueId") Integer venueId, HttpSession session, ModelMap model) {
+		VenueVO venueVO = venueService.getOneVenue(venueId);
+		model.addAttribute("venueVO", venueVO);
+		return "front-end/venue/listOneVenue";
+	}
+
+	@GetMapping("getOneMyVenue")
+	public String getOneMyvenue(@RequestParam("venueId") Integer venueId, HttpSession session, ModelMap model) {
 		VenueVO venueVO = venueService.getOneVenue(venueId);
 		model.addAttribute("venueVO", venueVO);
 
@@ -216,6 +230,8 @@ public class VenueFrontController {
 
 	@GetMapping("myVenue")
 	public String myVenue(HttpSession session, ModelMap model) {
+		
+    /*************************** 從 Session 取得登入會員 ***************************/
 		Integer memberId = (Integer) session.getAttribute("loginMemberId");
 		if (memberId == null) {
 			return "redirect:/front/venue/fakeLogin";
@@ -236,7 +252,7 @@ public class VenueFrontController {
 			venueService.toggleVenueStatus(venueId);
 		}
 
-		return "redirect:/front/venue/getOneVenue?venueId=" + venueId;
+		return "redirect:/front/venue/getOneMyVenue?venueId=" + venueId;
 	}
 
 	@ModelAttribute("venueTypeData")

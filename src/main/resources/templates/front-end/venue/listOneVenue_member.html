@@ -223,7 +223,7 @@
                 <div class="info-item">
                     <div class="info-label">建立時間</div>
                     <div class="info-value">
-                        <span th:text="${venueVO.createdAt}"></span>
+                        <span th:text="${#temporals.format(venueVO.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
                     </div>
                 </div>
             </div>

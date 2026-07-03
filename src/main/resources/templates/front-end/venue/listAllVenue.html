@@ -75,9 +75,19 @@ h1 {
 	<div
 		style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
 		<h1>場地列表</h1>
-		<a th:href="@{/front/venue/myVenue}"
+	<div class="user-info">
+	    <span th:if="${session.loginMemberId != null}">
+	        當前登入會員編號：<strong th:text="${session.loginMemberId}"></strong>
+	    </span>
+	    
+	    <span th:if="${session.loginMemberId == null}">
+	        目前狀態：<strong>未登入 (訪客)</strong>
+	    </span>
+	</div>		
+
+		<a th:href="@{/front/venue/fakeLogin}"
 			style="display: inline-block; padding: 8px 16px; background: #1d9e75; color: white; border-radius: 6px; font-size: 14px; text-decoration: none;">
-			我的場地 </a>
+			模擬登入 </a>
 		
 		<a th:href="@{/front/venue/addVenue}"
 			style="display: inline-block; padding: 8px 16px; background: #1d9e75; color: white; border-radius: 6px; font-size: 14px; text-decoration: none;">

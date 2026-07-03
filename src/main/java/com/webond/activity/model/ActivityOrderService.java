@@ -1,14 +1,13 @@
 package com.webond.activity.model;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.webond.activity.model.ActivityOrderVO;
 import com.webond.activity.repository.ActivityOrderRepository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -17,23 +16,44 @@ public class ActivityOrderService {
 	@Autowired
 	private ActivityOrderRepository orderRepo;
 
+	// 查詢全部
 	public List<ActivityOrderVO> getAll() {
 		return orderRepo.findAll();
 	}
 
+	// 查詢單筆
+	public ActivityOrderVO getOneOrder(Integer id) {
+		Optional<ActivityOrderVO> optional = orderRepo.findById(id);
+		return optional.orElse(null);
+	}
+
+	// 新增
 	public ActivityOrderVO createOrder(ActivityOrderVO orderVO) {
 		return orderRepo.save(orderVO);
 	}
 
-	public ActivityOrderVO updatePaymentStatus(Integer actOrderId, Integer newStatus) {
-        // 這裡的 findById 是 JpaRepository 內建的，不需要改，只要傳入正確的 ID 即可
-        return orderRepo.findById(actOrderId).map(order -> {
-            order.setPaymentStatus(newStatus);
-            return orderRepo.save(order);
-        }).orElseThrow(() -> new IllegalArgumentException("訂單不存在"));
+	// 修改
+	public ActivityOrderVO saveOrder(ActivityOrderVO orderVO) {
+		return orderRepo.save(orderVO);
 	}
 
+	// 新增、修改共用 (如果之後想統一呼叫可使用)
+	public ActivityOrderVO save(ActivityOrderVO orderVO) {
+		return orderRepo.save(orderVO);
+	}
+
+	// 修改付款狀態(API使用)
+	public ActivityOrderVO updatePaymentStatus(Integer activityOrderId, Integer newStatus) {
+
+		return orderRepo.findById(activityOrderId).map(order -> {
+			order.setPaymentStatus(newStatus);
+			return orderRepo.save(order);
+		}).orElseThrow(() -> new IllegalArgumentException("訂單不存在"));
+	}
+
+	// 刪除
 	public void deleteOrder(Integer id) {
 		orderRepo.deleteById(id);
 	}
+
 }
