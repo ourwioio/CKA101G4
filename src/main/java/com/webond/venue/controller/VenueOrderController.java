@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.webond.member.model.MemberVO;
-import com.webond.member.service.MemberService;
 import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueOrderService;
@@ -39,15 +38,12 @@ public class VenueOrderController {
 	@Autowired
 	VenueSlotService venueSlotService;
 
-	@Autowired
-	MemberService memberService;
-
 	@GetMapping("addVenueOrder")
 	public String add(@RequestParam("venueId") Integer venueId, Model model, HttpSession session) {
 
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
-		if (memberId == null) {
-			return "redirect:/front/venue/fakeLogin";
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
 		}
 
 		VenueVO venueVO = venueService.getOneVenue(venueId);
@@ -64,20 +60,19 @@ public class VenueOrderController {
 			@RequestParam("startHour") int startHour, @RequestParam("endHour") int endHour,
 			@RequestParam("paymentMethod") Byte paymentMethod, HttpSession session) {
 
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
-		if (memberId == null) {
-			return "redirect:/front/venue/fakeLogin";
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
 		}
 
 		VenueVO venueVO = venueService.getOneVenue(venueId);
-		MemberVO member = memberService.getOneMember(memberId);
 
 		int hours = endHour - startHour;
 		int totalAmount = hours * venueVO.getHourlyRate();
 
 		VenueOrderVO venueOrderVO = new VenueOrderVO();
 		venueOrderVO.setVenueVO(venueVO);
-		venueOrderVO.setMember(member);
+		venueOrderVO.setMember(loginMember); // 🌟 直接用 session 裡的會員物件，不用再查一次
 		venueOrderVO.setVenueSlotId(venueSlotId); // 🌟 存下對應的時段，之後釋放要靠這個
 		venueOrderVO.setStartAt(LocalTime.of(startHour, 0));
 		venueOrderVO.setEndAt(LocalTime.of(endHour == 24 ? 23 : endHour, endHour == 24 ? 59 : 0));
@@ -99,9 +94,9 @@ public class VenueOrderController {
 	@GetMapping("mockPayment")
 	public String mockPayment(@RequestParam("venueOrderId") Integer venueOrderId, HttpSession session, Model model) {
 
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
-		if (memberId == null) {
-			return "redirect:/front/venue/fakeLogin";
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
 		}
 
 		VenueOrderVO order = venueOrderService.getOneVenueOrder(venueOrderId);
@@ -134,9 +129,9 @@ public class VenueOrderController {
 	@PostMapping("confirmPayment")
 	public String confirmPayment(@RequestParam("venueOrderId") Integer venueOrderId, HttpSession session) {
 
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
-		if (memberId == null) {
-			return "redirect:/front/venue/fakeLogin";
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
 		}
 
 		VenueOrderVO order = venueOrderService.getOneVenueOrder(venueOrderId);
@@ -160,9 +155,9 @@ public class VenueOrderController {
 	@PostMapping("cancelExpired")
 	public String cancelExpired(@RequestParam("venueOrderId") Integer venueOrderId, HttpSession session) {
 
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
-		if (memberId == null) {
-			return "redirect:/front/venue/fakeLogin";
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
 		}
 
 		VenueOrderVO order = venueOrderService.getOneVenueOrder(venueOrderId);
@@ -184,12 +179,12 @@ public class VenueOrderController {
 	@GetMapping("myVenueOrder")
 	public String myVenue(HttpSession session, ModelMap model) {
 
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
-		if (memberId == null) {
-			return "redirect:/front/venue/fakeLogin";
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
 		}
 
-		List<VenueOrderVO> list = venueOrderService.getVenuesByMember(memberId);
+		List<VenueOrderVO> list = venueOrderService.getVenuesByMember(loginMember.getMemberId());
 		model.addAttribute("venueOrderListData", list);
 		return "front-end/venue/myVenueOrder";
 	}
@@ -199,9 +194,9 @@ public class VenueOrderController {
 			@RequestParam("venueRating") Integer venueRating, @RequestParam("venueComment") String venueComment,
 			HttpSession session) {
 
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
-		if (memberId == null) {
-			return "redirect:/front/venue/fakeLogin";
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
 		}
 
 		VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
