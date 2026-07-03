@@ -77,6 +77,10 @@ public class BulletinService {
 		return repository.findByStatusAndTitleLike(status, "%" + keyword + "%");
 	}
 	
+	public List<BulletinVO> getPublishedOrderByDateDesc() {
+	    return repository.findByStatusOrderByPublishDateDesc(STATUS_PUBLISHED);
+	}
+	
 	// ===== 業務邏輯：發布 =====
 
 	/**
@@ -95,4 +99,20 @@ public class BulletinService {
 		repository.save(bulletin);
 	}
 	
+	/**
+	 * 前台專用：只回傳「已發布」的單筆公告。
+	 * 若該筆不存在，或狀態不是已發布（例如還是草稿），一律回傳 null，
+	 * 避免前台使用者透過網址猜測 ID 看到未發布的內容。
+	 */
+	public BulletinVO getPublishedOne(Integer bulletinId) {
+	    BulletinVO bulletin = getOneBulletin(bulletinId);
+	    if (bulletin != null && bulletin.getStatus() == STATUS_PUBLISHED) {
+	        return bulletin;
+	    }
+	    return null;
+	}
+	
+	public List<BulletinVO> getPublishedByDateRange(LocalDate startDate, LocalDate endDate) {
+	    return repository.findByStatusAndPublishDateBetween(STATUS_PUBLISHED, startDate, endDate);
+	}
 }
