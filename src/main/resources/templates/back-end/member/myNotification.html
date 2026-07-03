@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
-<title>全部通知</title>
+<title>負責的通知</title>
 </head>
 <body>
 	<div>
@@ -18,8 +18,7 @@
 			目前狀態： <strong>未登入</strong>
 		</span>
 	</div>
-	<a th:href="@{/notification/fakeLogin}">員工登入</a>
-	<a th:href="@{/notification/myNotification}">負責的通知</a>
+	<a th:href="@{/notification/listAllNotification}">查看所有通知</a>
 	<a th:href="@{/notification/addNotification}">新增通知</a>
 	<table>
 		<thead>
@@ -37,7 +36,7 @@
 	    </thead>
 	    <tbody>
 	    	
-	    	<tr th:each="n : ${notificationListData}">
+	    	<tr th:each="n : ${notificationEmpListData}">
 		        <td th:text="${n.notificationId}"></td>
 		        <td th:text="${n.member.memberId}"></td>
 		        <td th:text="${n.title}"></td>

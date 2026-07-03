@@ -24,6 +24,9 @@ public class NotificationService {
 		//自動帶入時間
 		notificationVO.setCreatedAt(LocalDate.now());
 		notificationVO.setIsRead((byte) 0);
+		if (notificationVO.getReport() != null) {
+		    notificationVO.setNotificationType((byte) 2);
+		}
 		repository.save(notificationVO);
 	}
 	
@@ -33,6 +36,7 @@ public class NotificationService {
 		if(original != null) {
 			notificationVO.setCreatedAt(original.getCreatedAt());
 		}
+		notificationVO.setIsRead((byte)0);
 		repository.save(notificationVO);
 	}
 	
@@ -56,9 +60,13 @@ public class NotificationService {
 		return notificationVO;
 	}
 
-	
-	public List<NotificationVO> getByMemberId(Integer memberId){
+
+	public List<NotificationVO> getNotificationByMemberId(Integer memberId){
 		return repository.findByMember_MemberId(memberId);
+	}
+
+	public List<NotificationVO> getNotificationByEmployeeId(Integer employeeId){
+		return repository.findByEmployee_EmployeeId(employeeId);
 	}
 	
 	public List<NotificationVO> getAll(){
