@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+      xmlns:sec="http://thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>後端管理中心登入系統</title>
+
+</head>
+<body>
+
+    <div class="login-card">
+        
+        <!-- 標題區域 -->
+        <div class="title-area">
+            <h2>後端管理中心登入系統</h2>
+        </div>
+
+        <!-- 錯誤訊息提示 -->
+        <div th:if="${param.error}" class="error-message">
+            <span>帳號或密碼錯誤，請稍後再試。</span>
+        </div>
+
+        <!-- 登入表單 -->
+        <form th:action="@{/admin/login}" method="post" class="login-form">
+            <div class="form-group">
+                <label>帳號</label>
+                <input type="text" name="username" required class="form-control" placeholder="請輸入帳號">
+            </div>
+
+            <div class="form-group">
+                <label>密碼</label>
+                <input type="password" name="password" autocomplete="new-password" required class="form-control" placeholder="••••••••">
+            </div>
+
+            <div class="form-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="remember-me" id="remember-me">
+                    <span>記住我</span>
+                </label>
+                <a href="#" class="link-primary">忘記密碼？</a>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                立即登入
+            </button>
+        </form>
+
+        
+    </div>
+
+</body>
+</html>

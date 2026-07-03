@@ -19,7 +19,7 @@ public class PermissionVO {
 	@Column(name = "PERMISSION_NAME")
 	private String permName;	
 	
-	@Column(name = "EMP_DESCRIPTION")
+	@Column(name = "PERM_DESCRIPTION")
 	private String permDsc;      
 	
 	public PermissionVO() {

@@ -12,15 +12,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.webond.employee.model.EmployeeVO;
-import com.webond.employee.repository.EmpRepository;
+import com.webond.employee.repository.EmployeeRepository;
 
 
 @Service
 public class AdminUserDetailService implements UserDetailsService{
 
-	private final EmpRepository empRepository;
+	private final EmployeeRepository empRepository;
 	
-	public AdminUserDetailService(EmpRepository empRepository) {
+	public AdminUserDetailService(EmployeeRepository empRepository) {
 		this.empRepository = empRepository;
 	}
 	
