@@ -42,4 +42,11 @@ public interface BulletinRepository extends JpaRepository<BulletinVO, Integer> {
     // 複合條件查詢（狀態 + 標題關鍵字）
     @Query("FROM BulletinVO WHERE status = ?1 AND title LIKE ?2 ORDER BY bulletinId DESC")
     List<BulletinVO> findByStatusAndTitleLike(Byte status, String keyword);
+    
+    // 查詢方法依發布日期排序
+    List<BulletinVO> findByStatusOrderByPublishDateDesc(Byte status);
+    
+    // 查詢方法（已發布 + 日期區間）
+    @Query("FROM BulletinVO WHERE status = ?1 AND publishDate BETWEEN ?2 AND ?3 ORDER BY publishDate DESC")
+    List<BulletinVO> findByStatusAndPublishDateBetween(Byte status, LocalDate startDate, LocalDate endDate);
 }
