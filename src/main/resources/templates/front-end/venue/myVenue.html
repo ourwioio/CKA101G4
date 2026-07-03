@@ -29,6 +29,7 @@ h1 { font-size: 22px; font-weight: 500; }
 	    <span>
 	        當前登入會員：<strong th:text="${session.memberVO.nickname}"></strong>
 	    </span>
+	    <a th:if="${session.memberVO != null}" th:href="@{/member/logout}">登出</a>
 	</div>	
         <a class="btn-add" th:href="@{/front/venueOrder/myVenueOrder}">我的訂單</a>
         <a class="btn-add" th:href="@{/front/venue/listAllVenue}">瀏覽場地頁面</a>

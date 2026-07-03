@@ -58,11 +58,7 @@
 	<div class="card">
 		<form th:action="@{/front/venue/update}" method="post" th:object="${venueVO}">
 			<input type="hidden" th:field="*{venueId}" />
-			<input type="hidden" th:field="*{address}" />
-			<input type="hidden" th:field="*{capacity}" />
-			<input type="hidden" th:field="*{hourlyRate}" />
-			<input type="hidden" th:field="*{venueTypeVO.venueTypeId}" /> 			
- 			
+			<input type="hidden" th:field="*{address}" /> 			
 			<div class="form-grid">
 			    <div class="form-group">
 			        <label>建立時間</label>
@@ -76,19 +72,7 @@
 			        <label>場地地址</label>
 			        <input type="text" th:value="*{address}" disabled />
 			    </div>
-			    <div class="form-group">
-			        <label>容納人數</label>
-			        <input type="text" th:value="*{capacity}" disabled />
-			    </div>
-			    <div class="form-group">
-			        <label>租借費用</label>
-			        <input type="text" th:value="*{hourlyRate}" disabled />
-			    </div>
-			    <div class="form-group">
-			        <label>場地類型</label>
-			        <input type="text" th:value="*{venueTypeVO.typeName}" disabled />
-			    </div>
-			</div>
+			  </div>
 			
 
 			<div class="section-title">場地名稱</div>
@@ -97,7 +81,31 @@
 				<input type="text" th:field="*{venueName}" placeholder="請輸入場地名稱" />
 				<span class="error-text" th:if="${#fields.hasErrors('venueName')}" th:errors="*{venueName}"></span>
 			</div>
-
+			<div class="section-title">場地資訊</div>
+			
+			<div class="form-group">
+			    <label for="capacity">容納人數</label>
+			    <input type="text" th:field="*{capacity}" placeholder="請輸入容納人數" />
+			    <span class="error-text" th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}"></span>
+			</div>
+			
+			<div class="form-group">
+			    <label for="hourlyRate">租借費用</label>
+			    <input type="text" th:field="*{hourlyRate}" placeholder="請輸入每小時租借費用" />
+			    <span class="error-text" th:if="${#fields.hasErrors('hourlyRate')}" th:errors="*{hourlyRate}"></span>
+			</div>
+			
+			<div class="form-group">
+			    <label for="venueTypeId">場地類型</label>
+			    <select th:field="*{venueTypeVO.venueTypeId}">
+			        <option th:each="type : ${venueTypeData}"
+			                th:value="${type.venueTypeId}"
+			                th:text="${type.typeName}"></option>
+			    </select>
+			    <span class="error-text" th:if="${#fields.hasErrors('venueTypeVO')}" th:errors="*{venueTypeVO}"></span>
+			</div>
+			
+			
 			<div class="section-title">營運時間配置</div>
 
 			<div class="form-group">
