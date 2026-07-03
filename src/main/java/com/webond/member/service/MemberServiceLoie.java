@@ -54,7 +54,7 @@ public class MemberServiceLoie {
 		// 🛠️ 依據規格書，自動初始化預設值
 		member.setAccountStatus((byte) 0);   // 0：未驗證
 		member.setKycStatus((byte) 0);       // 0：審核中
-		member.setReportPoints(0);           // 檢舉累計點數初始為 0
+		member.setReportPoints(0);           // 🎯 檢舉累計點數初始為 0
 		member.setCreatedAt(LocalDate.now()); // 建立時間
 		member.setSubmittedAt(LocalDateTime.now()); // 送審時間
 		
@@ -136,19 +136,67 @@ public class MemberServiceLoie {
 	// 🎯 補齊後台功能：依據狀態碼撈取會員清單 (用於前端 kycApproval.html 的待審核表格)
 	// =========================================================================
 	public List<MemberVO> getMembersByStatus(byte b) {
-		// 使用 Java Stream 語法，從所有會員中過濾出 AccountStatus 為 0 的待審核會員
+		// 使用 Java Stream 語法，從所有會員中過濾出 AccountStatus 符合條件的會員
 		return repository.findAll().stream()
 				.filter(m -> m.getAccountStatus() != null && m.getAccountStatus() == b)
 				.toList();
 	}
 
 	// =========================================================================
-	// 🎯 補齊後台功能：更新會員資料 (用於 Controller 提交審核結果存檔)
+	// 🎯 補齊後台功能：更新會員資料 (連動「滿 5 點自動停權」核心商業邏輯)
 	// =========================================================================
 	@Transactional
 	public void updateMember(MemberVO memberVO) {
 		if (memberVO != null && memberVO.getMemberId() != null) {
+			
+			// 🎯 核心自動化防禦：檢查這名會員當前的檢舉點數 reportPoints
+			int currentPoints = memberVO.getReportPoints() != null ? memberVO.getReportPoints() : 0;
+			
+			// 只要點數累計大於等於 5 點，且目前不處於已停權狀態，後端直接強制將狀態改為 3
+			if (currentPoints >= 5 && (memberVO.getAccountStatus() == null || memberVO.getAccountStatus() != 3)) {
+				memberVO.setAccountStatus((byte) 3); // 3 = 已停權
+				System.out.println("==== 🚨 [系統自動化防禦] 會員 ID: " + memberVO.getMemberId() + " 檢舉點數已達 " + currentPoints + " 點，自動執行停權！ ====");
+			}
+			
 			repository.save(memberVO);
 		}
+	}
+
+	// =========================================================================
+	// 🚨 補齊後台功能：被檢舉時點數累加 API（供其他模組/檢舉功能呼叫）
+	// =========================================================================
+	@Transactional
+	public void reportMember(Integer memberId) {
+		Optional<MemberVO> optional = repository.findById(memberId);
+		if (optional.isPresent()) {
+			MemberVO member = optional.get();
+			int currentPoints = member.getReportPoints() != null ? member.getReportPoints() : 0;
+			
+			// 點數累加 1
+			member.setReportPoints(currentPoints + 1);
+			
+			// 🎯 呼叫內部的 updateMember，讓它自動進去觸發「滿 5 點就變更 accountStatus=3」的檢查機制
+			this.updateMember(member);
+		}
+	}
+
+	// =========================================================================
+	// 🔍 補齊後台功能：關鍵字模糊搜尋全體會員（支援 Email、真實姓名、手機）
+	// =========================================================================
+	public List<MemberVO> searchMembers(String keyword) {
+		if (keyword == null || keyword.trim().isEmpty()) {
+			return repository.findAll();
+		}
+		
+		String lowerKeyword = keyword.toLowerCase().trim();
+		
+		// 🎯 最快速直覺的做法：利用 Stream 在記憶體中進行多欄位模糊比對過濾
+		return repository.findAll().stream()
+				.filter(m -> 
+					(m.getEmail() != null && m.getEmail().toLowerCase().contains(lowerKeyword)) ||
+					(m.getRealName() != null && m.getRealName().toLowerCase().contains(lowerKeyword)) ||
+					(m.getPhone() != null && m.getPhone().contains(lowerKeyword))
+				)
+				.toList();
 	}
 }

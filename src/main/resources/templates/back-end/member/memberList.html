@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webond 後台管理 - 全體會員狀態管理總表</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --sky-600: #0284c7;
+            --sky-700: #0369a1;
+            --emerald-600: #16a34a;
+            --emerald-700: #15803d;
+            --rose-600: #e11d48;
+            --rose-700: #be123c;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', "Microsoft JhengHei", sans-serif;
+            background-color: var(--slate-100);
+            color: var(--slate-800);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 32px;
+        }
+
+        /* 頂部標題區 */
+        .header-area {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 24px;
+        }
+
+        .header-area h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--slate-800);
+        }
+
+        /* 🔍 綜合搜尋列 */
+        .search-container {
+            background-color: var(--slate-50);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 12px;
+            max-width: 500px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--sky-600);
+        }
+
+        .btn-search {
+            background-color: var(--sky-600);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-search:hover {
+            background-color: var(--sky-700);
+        }
+
+        /* 提示訊息彈窗 */
+        .alert-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* 表格樣式優化 */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 15px;
+        }
+
+        th {
+            background-color: var(--slate-50);
+            color: var(--slate-700);
+            font-weight: 600;
+            padding: 16px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: middle;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        /* 🚨 系統自動停權（滿 5 點）的會員整行亮淡警告紅 */
+        .auto-suspended-row td {
+            background-color: #fff1f2 !important;
+        }
+
+        .member-info {
+            line-height: 1.5;
+        }
+
+        .member-info .email {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        /* 大頭貼預覽縮圖 */
+        .avatar-wrapper {
+            width: 50px;
+            height: 50px;
+            overflow: hidden;
+            border-radius: 50%;
+            border: 2px solid #e2e8f0;
+            background-color: #e2e8f0;
+        }
+
+        .avatar-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 狀態標籤 */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .badge-active { background-color: #d1fae5; color: #065f46; }
+        .badge-suspended { background-color: #ffe4e6; color: #9f1239; }
+        .badge-unverified { background-color: #f1f5f9; color: #475569; }
+
+        /* 檢舉點數高亮紅字 */
+        .danger-points {
+            color: var(--rose-600);
+            font-weight: 700;
+        }
+
+        .danger-tip {
+            font-size: 12px;
+            color: var(--rose-700);
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        /* 按鈕樣式 */
+        .btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-suspend {
+            background-color: var(--rose-600);
+            color: white;
+        }
+        .btn-suspend:hover { background-color: var(--rose-700); }
+
+        .btn-recover {
+            background-color: var(--emerald-600);
+            color: white;
+        }
+        .btn-recover:hover { background-color: var(--emerald-700); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-area">
+        <h2>👥 會員查詢與權限狀態管理總表</h2>
+    </div>
+    
+    <div class="alert-success" th:if="${successMsg != null}" th:text="${successMsg}"></div>
+
+    <div class="search-container">
+        <form th:action="@{/member/back-end/memberList}" method="get" class="search-box">
+            <input type="text" name="keyword" class="search-input" placeholder="搜尋關鍵字 (真實姓名、Email、手機號碼)..." th:value="${keyword}">
+            <button type="submit" class="btn-search">🔍 搜尋</button>
+        </form>
+    </div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>會員 ID</th>
+                    <th>大頭貼</th>
+                    <th>真實姓名</th>
+                    <th>聯絡資訊</th>
+                    <th>檢舉累計</th>
+                    <th>帳號狀態</th>
+                    <th>管理操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${allMembers == null or allMembers.isEmpty()}">
+                    <td colspan="7" style="text-align: center; color: #94a3b8; padding: 40px 0; font-weight: 500;">
+                        🔍 查無任何相符的會員資料。
+                    </td>
+                </tr>
+                
+                <tr th:each="member : ${allMembers}" 
+                    th:classappend="${(member.reportPoints != null ? member.reportPoints : 0) >= 5} ? 'auto-suspended-row'">
+                    
+                    <td th:text="${member.memberId}" style="font-weight: 600; color: #64748b;"></td>
+                    
+                    <td>
+                        <div class="avatar-wrapper">
+                            <img th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}" alt="大頭貼">
+                        </div>
+                    </td>
+                    
+                    <td th:text="${member.realName}" style="font-weight: 700; color: var(--slate-800);"></td>
+                    
+                    <td>
+                        <div class="member-info">
+                            <div th:text="${member.phone}"></div>
+                            <div class="email" th:text="${member.email}"></div>
+                        </div>
+                    </td>
+                    
+                    <td>
+                        <span th:text="${member.reportPoints != null ? member.reportPoints : 0} + ' / 5 點'"
+                              th:class="${(member.reportPoints != null ? member.reportPoints : 0) >= 5} ? 'danger-points'"></span>
+                        <div th:if="${(member.reportPoints != null ? member.reportPoints : 0) >= 5}" class="danger-tip">
+                            🚨 滿5點系統已自動停權
+                        </div>
+                    </td>
+                    
+                    <td>
+                        <span th:if="${member.accountStatus == 0}" class="status-badge badge-unverified">⏳ 未驗證</span>
+                        <span th:if="${member.accountStatus == 1}" class="status-badge badge-active">🟢 正常</span>
+                        <span th:if="${member.accountStatus == 2}" class="status-badge badge-suspended">❌ 審核失敗</span>
+                        <span th:if="${member.accountStatus == 3}" class="status-badge badge-suspended">🚫 已停權</span>
+                    </td>
+                    
+                    <td>
+                        <form th:if="${member.accountStatus != 3}" th:action="@{/member/back-end/toggleStatus}" method="post" 
+                              onsubmit="return confirm('警告：確定要強制【停權】此會員帳號嗎？')">
+                            <input type="hidden" name="memberId" th:value="${member.memberId}">
+                            <input type="hidden" name="newStatus" value="3">
+                            <button type="submit" class="btn btn-suspend">⛔ 執行停權</button>
+                        </form>
+                        
+                        <form th:if="${member.accountStatus == 3}" th:action="@{/member/back-end/toggleStatus}" method="post"
+                              onsubmit="return confirm('確定要【恢復】該會員的正常使用權限，並將其檢舉點數重置歸零嗎？')">
+                            <input type="hidden" name="memberId" th:value="${member.memberId}">
+                            <input type="hidden" name="newStatus" value="1">
+                            <button type="submit" class="btn btn-recover">✅ 恢復權限</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
