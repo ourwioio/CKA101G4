@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>新增通知</title>
+</head>
+<body>
+	<h1>新增通知</h1>
+
+	<form th:action="@{/notification/insert}" th:object="${notificationVO}"
+		method="post">
+		<div>
+			<label for="">會員編號</label> <input type="text"
+				th:field="*{member.memberId}" placeholder="請輸入會員編號" />
+			<div th:if="${memberError}" th:text="${memberError}"></div>
+		</div>
+
+		<div>
+			<label for="">標題</label> <input type="text" th:field="*{title}"
+				placeholder="請輸入標題" />
+			<div th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+		</div>
+
+		<div>
+			<label for="">內容</label>
+			<textarea type="text" th:field="*{content}" placeholder="請輸入標題"></textarea>
+			<div th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+		</div>
+
+		<div>
+			<label for="">通知類型</label> <select name="" id=""
+				th:field="*{notificationType}">
+				<option value="">請選擇類型</option>
+				<option value="0">訂單通知</option>
+				<option value="1">評價通知</option>
+				<option value="2">系統通知</option>
+				<option value="3">聊天室</option>
+			</select> <span th:if="${#fields.hasErrors('notificationType')}"
+				th:errors="*{notificationType}"></span>
+		</div>
+
+		<p>會員編號</p>
+		<p th:text="${session.loginEmployeeId}"></p>
+		<input type="hidden" name="employee.employeeId"
+			th:value="${session.loginEmployeeId}" />
+
+		<div>
+			<button type="button">
+				<a th:href="@{/notification/listAllNotification}">返回</a>
+			</button>
+			<button type="submit">新增</button>
+		</div>
+	</form>
+</body>
+</html>

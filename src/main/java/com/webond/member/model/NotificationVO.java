@@ -37,6 +37,7 @@ public class NotificationVO implements java.io.Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
+	@NotNull(message = "請選擇類型")
 	private EmployeeVO employee;
 
 //	@OneToMany(cascade = CascadeType.ALL, mappedBy = "employee")

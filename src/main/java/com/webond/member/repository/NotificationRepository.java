@@ -8,5 +8,6 @@ import com.webond.member.model.NotificationVO;
 
 public interface NotificationRepository  extends JpaRepository<NotificationVO, Integer> {
 	List<NotificationVO> findByMember_MemberId(Integer memberId);
+	List<NotificationVO> findByEmployee_EmployeeId(Integer employeeId);
 
 }

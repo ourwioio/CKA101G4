@@ -1,24 +1,82 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 <title>通知更新</title>
 </head>
+
 <body>
+	<form th:action="@{/notification/update}" method="post"
+		th:object="${notificationVO}">
+		<input type="hidden" th:field="*{notificationId}" /> <input
+			type="hidden" th:field="*{member.memberId}" />
+		<div>
+			<label for="">通知編號</label> <input type="text" name="" id=""
+				th:value="*{notificationId}" disabled />
+		</div>
+		<div>
+			<label for="">建立時間</label> <input type="text" th:value="*{createdAt}"
+				disabled />
+		</div>
+		<div>
+			<label for="">是否已讀</label> <input type="text" name="" id=""
+				th:value="*{isRead}" disabled />
+		</div>
+		<div>
+			<label for="">會員編號</label> <input type="text"
+				th:value="*{member.memberId}" placeholder="請輸入會員編號">
+		</div>
+		<div>
+			<label for="">標題</label> <input type="text" th:field="*{title}"
+				placeholder="請輸入標題名稱" /> <label for=""
+				th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></label>
+		</div>
+		<div>
+			<label for="">內容</label>
+			<textarea th:field="*{content}" placeholder="請輸入內容"></textarea>
+		</div>
+		<div>
+			<label for="">通知類型</label> <select name="" id=""
+				th:field="*{notificationType}">
+				<option value="">請選擇類型</option>
+				<option value="0">訂單通知</option>
+				<option value="1">評價通知</option>
+				<option value="2">系統通知</option>
+				<option value="3">聊天室</option>
+			</select> <span th:if="${#fields.hasErrors('notificationType')}"
+				th:errors="*{notificationType}"></span>
+		</div>
+		<div>
+			<label for="">管理員處裡備註</label>
+			<p th:text="${notificationVO.report?.adminNote}"></p>
+		</div>
+		<div>
+			<label for="">檢舉編號</label>
+			<p th:text="${notificationVO.report?.reportId}"></p>
+		</div>
+		<div>
+			<label for="">員工編號</label>
+			<!-- <select th:field="*{employee}">
+          <option value="">請選擇員工</option>
+          <option
+            th:each="emp : ${empList}"
+            th:value="${emp.employeeId}"
+            th:text="${emp.employeeName}"
+          ></option>
+        </select> -->
+			<p th:text="${notificationVO.employee?.employeeId}"></p>
+			<input type="hidden" name="employee.employeeId"
+				th:value="${notificationVO.employee?.employeeId}" />
+		</div>
+		<div>
+			<button type="button">
+				<a th:href="@{/notification/listAllNotification}">返回</a>
+			</button>
 
-	<table>
-		<tr>
-			<td th:text="${notificationVO.notificationId}"></td>
-			<td th:text="${notificationVO.member.memberId}"></td>
-			<td th:text="${notificationVO.title}"></td>
-			<td th:text="${notificationVO.content}"></td>
-			<td th:text="${notificationVO.notificationType}"></td>
-			<td th:text="${notificationVO.isRead}"></td>
-			<td th:text="${notificationVO.report.reportId}"></td>
-			<td th:text="${notificationVO.employee.empId}"></td>
-			<td th:text="${notificationVO.createdAt}"></td>
-		</tr>
-	</table>
-
+			<button type="submit">儲存</button>
+		</div>
+	</form>
 </body>
 </html>
