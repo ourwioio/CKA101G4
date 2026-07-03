@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>活動詳情</title>
+
+<style>
+body {
+	margin: 0;
+	background: #f8fafc;
+	font-family: "Microsoft JhengHei", sans-serif;
+	padding: 40px;
+}
+
+.card {
+	max-width: 900px;
+	margin: auto;
+	background: white;
+	border-radius: 16px;
+	padding: 35px 45px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 1px solid #e2e8f0;
+	padding-bottom: 20px;
+	margin-bottom: 25px;
+}
+
+h1 {
+	color: #0f172a;
+	margin: 0;
+}
+
+.member {
+	color: #64748b;
+	font-weight: bold;
+}
+
+.info {
+	margin: 18px 0;
+	font-size: 17px;
+	color: #334155;
+}
+
+.label {
+	font-weight: bold;
+	color: #0f172a;
+}
+
+.desc {
+	margin-top: 20px;
+	padding: 20px;
+	background: #f8fafc;
+	border-radius: 12px;
+	line-height: 1.8;
+	color: #475569;
+}
+
+.actions {
+	margin-top: 30px;
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+}
+
+.btn-back {
+	background: #64748b;
+	color: white;
+	text-decoration: none;
+	padding: 12px 22px;
+	border-radius: 8px;
+	font-weight: bold;
+}
+
+.btn-order {
+	background: #2563eb;
+	color: white;
+	text-decoration: none;
+	padding: 12px 24px;
+	border-radius: 8px;
+	font-weight: bold;
+}
+
+.btn-order:hover {
+	background: #1d4ed8;
+}
+</style>
+</head>
+
+<body>
+
+	<div class="card">
+
+		<div class="header">
+			<h1 th:text="${activityVO.activityTitle}">活動名稱</h1>
+
+			<div class="member">
+				目前會員： <span th:text="${loginMemberName}">測試會員</span>
+			</div>
+		</div>
+
+		<div class="info">
+			<span class="label">活動價格：</span> NT$ <span
+				th:text="${activityVO.activityPrice}">0</span>
+		</div>
+
+		<div class="info">
+			<span class="label">最低成團人數：</span> <span
+				th:text="${activityVO.minParticipants}">1</span>
+		</div>
+
+		<div class="info">
+			<span class="label">最高人數限制：</span> <span
+				th:text="${activityVO.maxParticipants}">10</span>
+		</div>
+
+		<div class="info">
+			<span class="label">報名開始：</span> <span
+				th:text="${#temporals.format(activityVO.registrationStartTime, 'yyyy-MM-dd HH:mm')}"></span>
+		</div>
+
+		<div class="info">
+			<span class="label">報名截止：</span> <span
+				th:text="${#temporals.format(activityVO.registrationDeadline, 'yyyy-MM-dd HH:mm')}"></span>
+		</div>
+
+		<div class="info">
+			<span class="label">活動結束：</span> <span
+				th:text="${#temporals.format(activityVO.endTime, 'yyyy-MM-dd HH:mm')}"></span>
+		</div>
+
+		<div class="desc" th:text="${activityVO.activityDescription}">
+			活動描述</div>
+
+		<div class="actions">
+			<a th:href="@{/activity/front/list}" class="btn-back"> 返回列表 </a> <a
+				th:href="@{/activity/front/order(activityId=${activityVO.activityId})}"
+				class="btn-order"> 立即報名 </a>
+		</div>
+
+	</div>
+
+</body>
+</html>

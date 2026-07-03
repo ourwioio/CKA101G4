@@ -1,69 +1,191 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>活動類型管理</title>
-    <style>
-        body { background-color: #f8fafc; color: #1e293b; font-family: 'Inter', 'PingFang TC', sans-serif; margin: 0; padding: 40px; }
-        .header-container { max-width: 900px; margin: 0 auto 20px auto; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 20px; }
-        .header-title { font-size: 1.8rem; font-weight: bold; color: #0f172a; }
-        .header-title .highlight { color: #8b5cf6; margin-left: 10px; }
-        
-        .btn-group { display: flex; gap: 10px; }
-        .btn-primary { background-color: #8b5cf6; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; text-decoration: none; transition: all 0.2s; }
-        .btn-primary:hover { background-color: #7c3aed; }
-        .btn-secondary { background-color: #ffffff; color: #475569; border: 1px solid #cbd5e1; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; text-decoration: none; transition: all 0.2s; }
-        .btn-secondary:hover { background-color: #f1f5f9; }
-        
-        .table-card { background-color: #ffffff; max-width: 900px; margin: 0 auto; border-radius: 12px; padding: 20px; color: #1e293b; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; }
-        th { padding: 16px; border-bottom: 2px solid #e2e8f0; text-align: center; color: #475569; font-weight: bold; }
-        td { padding: 16px; border-bottom: 1px solid #f1f5f9; text-align: center; vertical-align: middle; }
-        
-        .badge-type { background-color: #ede9fe; color: #5b21b6; padding: 6px 16px; border-radius: 20px; font-size: 0.95rem; font-weight: bold; display: inline-block; }
-        
-        .action-btns { display: flex; gap: 8px; justify-content: center; }
-        .btn-edit { background-color: #10b981; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 0.85rem; transition: all 0.2s; }
-        .btn-edit:hover { background-color: #059669; }
-        .btn-delete { background-color: #ef4444; color: white; padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: bold; font-size: 0.85rem; transition: all 0.2s; }
-        .btn-delete:hover { background-color: #dc2626; }
-    </style>
+<meta charset="UTF-8">
+<title>活動類型管理</title>
+<style>
+body {
+	background-color: #f8fafc;
+	color: #1e293b;
+	font-family: 'Inter', 'PingFang TC', sans-serif;
+	margin: 0;
+	padding: 40px;
+}
+
+.header-container {
+	max-width: 900px;
+	margin: 0 auto 20px auto;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 2px solid #e2e8f0;
+	padding-bottom: 20px;
+}
+
+.header-title {
+	font-size: 1.8rem;
+	font-weight: bold;
+	color: #0f172a;
+}
+
+.header-title .highlight {
+	color: #8b5cf6;
+	margin-left: 10px;
+}
+
+.btn-group {
+	display: flex;
+	gap: 10px;
+}
+
+.btn-primary {
+	background-color: #8b5cf6;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: bold;
+	text-decoration: none;
+	transition: all 0.2s;
+}
+
+.btn-primary:hover {
+	background-color: #7c3aed;
+}
+
+.btn-secondary {
+	background-color: #ffffff;
+	color: #475569;
+	border: 1px solid #cbd5e1;
+	padding: 10px 20px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: bold;
+	text-decoration: none;
+	transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+	background-color: #f1f5f9;
+}
+
+.table-card {
+	background-color: #ffffff;
+	max-width: 900px;
+	margin: 0 auto;
+	border-radius: 12px;
+	padding: 20px;
+	color: #1e293b;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+	border: 1px solid #e2e8f0;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+th {
+	padding: 16px;
+	border-bottom: 2px solid #e2e8f0;
+	text-align: center;
+	color: #475569;
+	font-weight: bold;
+}
+
+td {
+	padding: 16px;
+	border-bottom: 1px solid #f1f5f9;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.badge-type {
+	background-color: #ede9fe;
+	color: #5b21b6;
+	padding: 6px 16px;
+	border-radius: 20px;
+	font-size: 0.95rem;
+	font-weight: bold;
+	display: inline-block;
+}
+
+.action-btns {
+	display: flex;
+	gap: 8px;
+	justify-content: center;
+}
+
+.btn-edit {
+	background-color: #10b981;
+	color: white;
+	padding: 8px 16px;
+	border-radius: 6px;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 0.85rem;
+	transition: all 0.2s;
+}
+
+.btn-edit:hover {
+	background-color: #059669;
+}
+
+.btn-delete {
+	background-color: #ef4444;
+	color: white;
+	padding: 8px 16px;
+	border-radius: 6px;
+	border: none;
+	cursor: pointer;
+	font-weight: bold;
+	font-size: 0.85rem;
+	transition: all 0.2s;
+}
+
+.btn-delete:hover {
+	background-color: #dc2626;
+}
+</style>
 </head>
 <body>
-    <div class="header-container">
-        <div class="header-title">
-            🏷️ 活動類型字典管理 <span class="highlight"></span>
-        </div>
-        <div class="btn-group">
-            <a th:href="@{/activityType/addActivityType}" class="btn-primary">➕ 新增分類</a>
-            <a th:href="@{/activity/listAllActivity}" class="btn-secondary">📅 回活動列表</a>
-        </div>
-    </div>
-    <div class="table-card">
-        <table>
-            <thead>
-                <tr>
-                    <th width="20%">類型 ID</th>
-                    <th width="50%">分類名稱</th>
-                    <th width="30%">功能操作</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="type : ${typeListData}">
-                    <td th:text="${type.activityTypeId}">1</td>
-                    <td>
-                        <span class="badge-type" th:text="${type.activityTypeName}">球類運動</span>
-                    </td>
-                    <td class="action-btns">
-                        <a class="btn-edit" th:href="@{/activityType/updateActivityType(id=${type.activityTypeId})}">修改</a>
-                        <form th:action="@{/activityType/deleteActivityType}" method="post" onsubmit="return confirm('確定要刪除這個分類嗎？');" style="margin:0;">
-                            <input type="hidden" name="activityTypeId" th:value="${type.activityTypeId}" />
-                            <button type="submit" class="btn-delete">刪除</button>
-                        </form>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+	<div class="header-container">
+		<div class="header-title">
+			🏷️ 活動類型字典管理 <span class="highlight"></span>
+		</div>
+		<div class="btn-group">
+			<a th:href="@{/activityType/addActivityType}" class="btn-primary">➕
+				新增分類</a> <a th:href="@{/activity/admin/home}" class="btn-secondary">🏠
+				返回後台首頁</a>
+		</div>
+	</div>
+	<div class="table-card">
+		<table>
+			<thead>
+				<tr>
+					<th width="20%">類型 ID</th>
+					<th width="50%">分類名稱</th>
+					<th width="30%">功能操作</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="type : ${typeListData}">
+					<td th:text="${type.activityTypeId}">1</td>
+					<td><span class="badge-type"
+						th:text="${type.activityTypeName}">球類運動</span></td>
+					<td class="action-btns"><a class="btn-edit"
+						th:href="@{/activityType/updateActivityType(id=${type.activityTypeId})}">修改</a>
+						<form th:action="@{/activityType/deleteActivityType}"
+							method="post" onsubmit="return confirm('確定要刪除這個分類嗎？');"
+							style="margin: 0;">
+							<input type="hidden" name="activityTypeId"
+								th:value="${type.activityTypeId}" />
+							<button type="submit" class="btn-delete">刪除</button>
+						</form></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 </body>
 </html>
