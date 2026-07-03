@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>會員檢舉管理：首頁</title>
+
+<style>
+  table#table-1 {
+	width: 450px;
+	background-color: #CCCCFF;
+	margin-top: 5px;
+	margin-bottom: 10px;
+    border: 3px ridge Gray;
+    height: 80px;
+    text-align: center;
+  }
+  table#table-1 h4 {
+    color: red;
+    display: block;
+    margin-bottom: 1px;
+  }
+  h4 {
+    color: blue;
+    display: inline;
+  }
+  .error-box {
+    color: red;
+  }
+</style>
+
+</head>
+<body bgcolor='white'>
+
+<table id="table-1">
+   <tr><td><h3>會員檢舉管理：首頁</h3><h4>( Spring Boot MVC )</h4></td></tr>
+</table>
+
+<p>這是會員檢舉模組的 Thymeleaf 導覽首頁</p>
+
+<h3>資料查詢:</h3>
+	
+<div th:if="${errorMsgs != null and !errorMsgs.isEmpty()}">
+	<font class="error-box">請修正以下錯誤:</font>
+	<ul>
+	    <li th:each="message : ${errorMsgs}" class="error-box" th:text="${message}">錯誤訊息</li>
+	</ul>
+</div>
+
+<ul>
+  <li><a th:href="@{/memberreport/listAllReport}">List</a> all Reports. <br><br></li>
+  
+  <li>
+    <form method="post" th:action="@{/memberreport/getOne_For_Display}">
+        <b>輸入檢舉案號 (如 1):</b>
+        <input type="text" name="reportId" th:value="${param.reportId}">
+        <input type="submit" value="送出">
+    </form>
+    <br>
+  </li>
+   
+  <li>
+     <form method="post" th:action="@{/memberreport/getOne_For_Display}">
+       <b>選擇檢舉案號:</b>
+       <select size="1" name="reportId">
+         <option th:each="reportVO : ${memberReportListData}" 
+                 th:value="${reportVO.reportId}" 
+                 th:text="${reportVO.reportId}">1</option>
+       </select>
+       <input type="submit" value="送出">
+    </form>
+    <br>
+  </li>
+  
+  <li>
+     <form method="post" th:action="@{/memberreport/getOne_For_Display}">
+       <b>選擇被檢舉人ID:</b>
+       <select size="1" name="reportId">
+         <option th:each="reportVO : ${memberReportListData}" 
+                 th:value="${reportVO.reportId}" 
+                 th:text="${'案號: ' + reportVO.reportId + ' (被檢舉人: ' + (reportVO.reported != null ? reportVO.reported.memberId : '無') + ')'}">被檢舉人編號</option>
+       </select>
+       <input type="submit" value="送出">
+     </form>
+     <br>
+  </li>
+</ul>
+
+<h3>檢舉案管理</h3>
+
+<ul>
+  <li><a th:href="@{/memberreport/addReport}">Add</a> a new Report.</li>
+</ul>
+
+</body>
+</html>
