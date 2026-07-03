@@ -10,20 +10,25 @@ import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.repository.VenueOrderRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class VenueOrderService {
 
 	@Autowired
 	VenueOrderRepository repository;
 	
+	@Transactional
 	public void addVenueOrder(VenueOrderVO venueOrder) {
 		repository.save(venueOrder);
 	}
 	
+	@Transactional
 	public void updateVenueOrder(VenueOrderVO venueOrder) {
 		repository.save(venueOrder);
 	}
 	
+	@Transactional
 	public void deleteVenueOrder(Integer venueOrderId) {
 		if (repository.existsById(venueOrderId))
 			repository.deleteById(venueOrderId);
