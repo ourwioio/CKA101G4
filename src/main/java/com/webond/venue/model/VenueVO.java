@@ -35,7 +35,7 @@ public class VenueVO {
 	private Set<VenueImagesVO> venueImages = new HashSet<>();
 	
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "venueVO")
-	@OrderBy("venueSlotId asc")
+	@OrderBy("slotDate asc")
 	private Set<VenueSlotVO> venueSlots = new HashSet<>();
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "venueVO")

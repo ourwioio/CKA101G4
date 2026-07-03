@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.webond.member.model.MemberVO;
-import com.webond.member.service.MemberService;
 import com.webond.venue.model.VenueTypeVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueImagesService;
@@ -40,20 +39,11 @@ public class VenueFrontController {
 	@Autowired
 	VenueTypeService venueTypeService;
 
-	@Autowired
-	MemberService memberService;
-
-	@GetMapping("/fakeLogin")
-	public String fakeLogin(HttpSession session) {
-		session.setAttribute("loginMemberId", 8); // 會員假登入
-		return "front-end/venue/myPage";
-	}
-
 	@GetMapping("addVenue")
 	public String addVenue(ModelMap model, HttpSession session) {
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
-		if (memberId == null) {
-			return "redirect:/front/venue/fakeLogin";
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
 		}
 		VenueVO venueVO = new VenueVO();
 		model.addAttribute("venueVO", venueVO);
@@ -68,11 +58,11 @@ public class VenueFrontController {
 			@RequestParam(value = "coverIndex", defaultValue = "0") int coverIndex, HttpSession session)
 			throws IOException {
 
-		/*************************** 從 Session 取得登入會員 ***************************/
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
-		if (memberId == null) {
-			return "redirect:/front/venue/fakeLogin"; // 沒登入就導去假登入
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
 		}
+
 		/*************************** 場地類型處理 ***************************/
 		Integer venueTypeId = venueVO.getVenueTypeVO() != null ? venueVO.getVenueTypeVO().getVenueTypeId() : null;
 		if (venueTypeId != null) {
@@ -133,8 +123,7 @@ public class VenueFrontController {
 		venueVO.setRatingStars(0);
 		venueVO.setRatingcount(0);
 
-		MemberVO member = memberService.getOneMember(memberId);
-		venueVO.setMember(member);
+		venueVO.setMember(loginMember); // 🌟 直接用 session 裡的會員物件，不用再查一次
 
 		venueService.addVenueWithImages(venueVO, imageBytesList, coverIndex);
 
@@ -147,13 +136,13 @@ public class VenueFrontController {
 			@RequestParam("startHour") int startHour, @RequestParam("endHour") int endHour,
 			@RequestParam(value = "coverImageId", required = false) Integer coverImageId, HttpSession session) {
 
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
-		if (memberId == null) {
-			return "redirect:/front/venue/fakeLogin";
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
 		}
 
 		VenueVO existing = venueService.getOneVenue(venueVO.getVenueId());
-		if (!existing.getMember().getMemberId().equals(memberId)) {
+		if (!existing.getMember().getMemberId().equals(loginMember.getMemberId())) {
 			return "redirect:/front/venue/myVenue";
 		}
 
@@ -187,11 +176,7 @@ public class VenueFrontController {
 
 	@PostMapping("getOne_For_Update")
 	public String getOne_For_Update(@RequestParam("venueId") String venueId, ModelMap model) {
-		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
-		/*************************** 2.開始查詢資料 *****************************************/
 		VenueVO venueVO = venueService.getOneVenue(Integer.valueOf(venueId));
-
-		/*************************** 3.查詢完成,準備轉交(Send the Success view) **************/
 		model.addAttribute("venueVO", venueVO);
 		return "front-end/venue/update_venue_input";
 	}
@@ -215,8 +200,8 @@ public class VenueFrontController {
 		VenueVO venueVO = venueService.getOneVenue(venueId);
 		model.addAttribute("venueVO", venueVO);
 
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
-		boolean isOwner = memberId != null && venueVO.getMember().getMemberId().equals(memberId);
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		boolean isOwner = loginMember != null && venueVO.getMember().getMemberId().equals(loginMember.getMemberId());
 
 		if (isOwner) {
 			return "front-end/venue/listOneVenue_member";
@@ -227,24 +212,23 @@ public class VenueFrontController {
 	@GetMapping("myVenue")
 	public String myVenue(HttpSession session, ModelMap model) {
 
-		/*************************** 從 Session 取得登入會員 ***************************/
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
-		if (memberId == null) {
-			return "redirect:/front/venue/fakeLogin";
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
 		}
 
-		List<VenueVO> list = venueService.getVenuesByMember(memberId);
+		List<VenueVO> list = venueService.getVenuesByMember(loginMember.getMemberId());
 		model.addAttribute("venueListData", list);
 		return "front-end/venue/myVenue";
 	}
 
 	@PostMapping("toggleStatus")
 	public String toggleStatus(@RequestParam("venueId") Integer venueId, HttpSession session) {
-		Integer memberId = (Integer) session.getAttribute("loginMemberId");
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 		VenueVO venueVO = venueService.getOneVenue(venueId);
 
 		// 確認是自己的場地才能操作
-		if (memberId != null && venueVO.getMember().getMemberId().equals(memberId)) {
+		if (loginMember != null && venueVO.getMember().getMemberId().equals(loginMember.getMemberId())) {
 			venueService.toggleVenueStatus(venueId);
 		}
 
