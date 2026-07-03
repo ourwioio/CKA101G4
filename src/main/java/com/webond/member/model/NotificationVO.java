@@ -2,7 +2,7 @@ package com.webond.member.model;
 
 import java.time.LocalDate;
 
-import com.webond.employee.model.EmpVO;
+import com.webond.employee.model.EmployeeVO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,7 +37,7 @@ public class NotificationVO implements java.io.Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
-	private EmpVO employee;
+	private EmployeeVO employee;
 
 //	@OneToMany(cascade = CascadeType.ALL, mappedBy = "employee")
 //	@OrderBy("notificationId asc")
@@ -129,11 +129,11 @@ public class NotificationVO implements java.io.Serializable {
 		this.report = report;
 	}
 
-	public EmpVO getEmployee() {
+	public EmployeeVO getEmployee() {
 		return employee;
 	}
 
-	public void setEmployee(EmpVO employee) {
+	public void setEmployee(EmployeeVO employee) {
 		this.employee = employee;
 	}
 

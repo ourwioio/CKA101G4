@@ -2,7 +2,7 @@ package com.webond.activity.model;
 
 import java.sql.Timestamp;
 
-import com.webond.employee.model.EmpVO;
+import com.webond.employee.model.EmployeeVO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,7 +29,7 @@ public class ActRptVO {
 	
 	@ManyToOne
 	@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
-	private EmpVO empId;		
+	private EmployeeVO empId;		
 	
 	@Column(name = "ACTIVITY_REPORT_TIME", updatable = false)
 	private Timestamp actRptTime;	
@@ -72,7 +72,7 @@ public class ActRptVO {
 		super();
 	}
 
-	public ActRptVO(Integer actRptId, ActivityOrderVO actOrdId, EmpVO empId, Timestamp actRptTime, Timestamp updated,
+	public ActRptVO(Integer actRptId, ActivityOrderVO actOrdId, EmployeeVO empId, Timestamp actRptTime, Timestamp updated,
 			Integer rptType, String actRptCom, byte[] actRptImg, String appealContent, byte[] appealImg,
 			Timestamp appealTime, Integer actRptStatus, Integer penaltyType, Integer penaltyValue, String remark) {
 		super();
@@ -109,11 +109,11 @@ public class ActRptVO {
 		this.actOrdId = actOrdId;
 	}
 
-	public EmpVO getEmpId() {
+	public EmployeeVO getEmpId() {
 		return empId;
 	}
 
-	public void setEmpId(EmpVO empId) {
+	public void setEmpId(EmployeeVO empId) {
 		this.empId = empId;
 	}
 
