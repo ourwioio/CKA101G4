@@ -101,6 +101,36 @@ h1 {
 			style="display: inline-block; padding: 8px 16px; background: #1d9e75; color: white; border-radius: 6px; font-size: 14px; text-decoration: none;">
 			新增場地 </a>
 	</div>
+	<form th:action="@{/front/venue/listVenues_ByCompositeQuery}" method="post"
+	      style="background:white; padding:1rem; border-radius:12px; margin-bottom:1.5rem;">
+	    場地名稱: <input type="text" name="venueName" th:value="${param.venueName}"><br>
+	    地址關鍵字: <input type="text" name="address" th:value="${param.address}"><br>
+	
+	    容納人數：
+	    最少 <input type="number" name="capacityMin" th:value="${param.capacityMin}" style="width:80px">
+	    ～
+	    最多 <input type="number" name="capacityMax" th:value="${param.capacityMax}" style="width:80px"><br>
+	
+	    每小時費用：
+	    最低 <input type="number" name="hourlyRateMin" th:value="${param.hourlyRateMin}" style="width:80px">
+	    ～
+	    最高 <input type="number" name="hourlyRateMax" th:value="${param.hourlyRateMax}" style="width:80px"><br>
+	
+	    場地類型:
+	    <select name="venueTypeId">
+	        <option value="">--不限--</option>
+	        <option th:each="type : ${venueTypeData}"
+	                th:value="${type.venueTypeId}"
+	                th:selected="${param.venueTypeId != null and param.venueTypeId[0] == type.venueTypeId.toString()}"
+	                th:text="${type.typeName}"></option>
+	    </select><br>
+	
+	    <input type="submit" value="查詢">
+	    <a th:href="@{/front/venue/listAllVenue}"
+	       style="display:inline-block; padding:6px 16px; background:#999; color:white; border-radius:6px; font-size:13px; text-decoration:none; margin-left:8px;">
+	       清除條件
+	    </a>
+	</form>
 	<div class="venue-grid">
 		<div th:each="venue : ${venueListData}" class="venue-card">
 			<img

@@ -2,9 +2,11 @@ package com.webond.venue.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,10 @@ import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueSlotVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.repository.VenueRepository;
+import com.webond.venue.util.HibernateUtil_CompositeQuery_Venue;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -25,6 +30,9 @@ public class VenueService {
 
 	@Autowired
 	private SessionFactory sessionFactory;
+	
+	@PersistenceContext
+    private EntityManager entityManager;
 
 	public void addVenue(VenueVO venueVO) {
 		repository.save(venueVO);
@@ -166,7 +174,11 @@ public class VenueService {
 	    repository.save(existingVenue);
 	}
 
-	
+	@Transactional
+    public List<VenueVO> getAll(Map<String, String[]> map) {
+        Session session = entityManager.unwrap(Session.class);
+        return HibernateUtil_CompositeQuery_Venue.getAllC(map, session);
+    }
 	
 	
 
