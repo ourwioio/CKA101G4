@@ -6,15 +6,21 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.webond.member.model.MemberVO;
 import com.webond.service.model.ServiceSlotVO;
 import com.webond.service.model.ServiceTypeVO;
 import com.webond.service.model.ServiceVO;
+import com.webond.service.service.ServiceOrderService;
 import com.webond.service.service.ServiceService;
 import com.webond.service.service.ServiceSlotService;
 import com.webond.service.service.ServiceTypeService;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/front/services")
@@ -23,13 +29,16 @@ public class PublicServiceController {
     private final ServiceService serviceSvc;
     private final ServiceTypeService serviceTypeSvc;
     private final ServiceSlotService serviceSlotSvc;
-
+    private final ServiceOrderService serviceOrderSvc;
+    
     public PublicServiceController(ServiceService serviceSvc,
                                    ServiceTypeService serviceTypeSvc,
-                                   ServiceSlotService serviceSlotSvc) {
+                                   ServiceSlotService serviceSlotSvc,
+                                   ServiceOrderService serviceOrderSvc) {
         this.serviceSvc = serviceSvc;
         this.serviceTypeSvc = serviceTypeSvc;
         this.serviceSlotSvc = serviceSlotSvc;
+        this.serviceOrderSvc = serviceOrderSvc;
     }
 
     // 前台公開服務列表：查詢所有已上架服務與服務類型
@@ -98,4 +107,38 @@ public class PublicServiceController {
 
         return "front-end/service/serviceList";
     }
+    
+ // 買家送出預約申請
+ // URL: POST /front/services/{serviceId}/slots/{serviceSlotId}/request
+ @PostMapping("/{serviceId}/slots/{serviceSlotId}/request")
+ public String createServiceRequest(@PathVariable Integer serviceId,
+                                    @PathVariable Integer serviceSlotId,
+                                    @RequestParam(required = false) String buyerRequestNote,
+                                    HttpSession session,
+                                    RedirectAttributes redirectAttributes) {
+
+     MemberVO memberVO = (MemberVO) session.getAttribute("memberVO");
+
+     if (memberVO == null) {
+         redirectAttributes.addFlashAttribute("errorMsg", "請先登入後再預約");
+         return "redirect:/member/services/fakelogin";
+     }
+
+     Integer buyerMemberId = memberVO.getMemberId();
+
+     try {
+         serviceOrderSvc.createRequest(
+                 serviceSlotId,
+                 buyerMemberId,
+                 buyerRequestNote
+         );
+
+         redirectAttributes.addFlashAttribute("successMsg", "預約申請已送出，請等待賣家確認");
+
+     } catch (RuntimeException e) {
+         redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+     }
+
+     return "redirect:/front/services/" + serviceId;
+ }
 }

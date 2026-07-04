@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>我的預約紀錄</title>
+</head>
+<body>
+
+<h1>我的預約紀錄 / 買家訂單管理</h1>
+
+<p>
+    <a th:href="@{/front/services}">回前台服務列表</a>
+    |
+    <a th:href="@{/member/services}">回會員服務中心</a>
+    |
+    <a th:href="@{/member/service-orders/seller}">收到的預約申請</a>
+</p>
+
+<hr>
+
+<!-- 成功 / 錯誤訊息 -->
+<p th:if="${successMsg}" style="color: green;" th:text="${successMsg}">
+    成功訊息
+</p>
+
+<p th:if="${errorMsg}" style="color: red;" th:text="${errorMsg}">
+    錯誤訊息
+</p>
+
+<p>
+    目前登入會員編號：
+    <span th:text="${loginMemberId}">1</span>
+</p>
+
+<hr>
+
+<p th:if="${#lists.isEmpty(orderList)}">
+    目前沒有任何預約申請或訂單。
+</p>
+
+<table border="1" cellpadding="8" cellspacing="0" th:if="${!#lists.isEmpty(orderList)}">
+    <thead>
+        <tr>
+            <th>訂單編號</th>
+            <th>服務名稱</th>
+            <th>賣家</th>
+            <th>預約時段</th>
+            <th>金額</th>
+            <th>狀態</th>
+            <th>詳情</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr th:each="order : ${orderList}">
+            <td th:text="${order.serviceOrderId}">
+                1
+            </td>
+
+            <td>
+                <span th:text="${order.serviceNameSnapshot}">
+                    服務名稱
+                </span>
+                <br>
+                <small>
+                    類型：
+                    <span th:text="${order.serviceTypeNameSnapshot}">
+                        服務類型
+                    </span>
+                </small>
+            </td>
+
+            <td th:text="${order.sellerMemberId}">
+                2
+            </td>
+
+            <td>
+                <span th:text="${#temporals.format(order.slotStartTimeSnapshot, 'yyyy-MM-dd HH:mm')}">
+                    2026-08-10 10:00
+                </span>
+                <br>
+                ～
+                <span th:text="${#temporals.format(order.slotEndTimeSnapshot, 'yyyy-MM-dd HH:mm')}">
+                    2026-08-10 12:00
+                </span>
+            </td>
+
+            <td>
+                NT$
+                <span th:text="${order.totalAmount}">
+                    1000
+                </span>
+                <br>
+                <small>
+                    每小時：
+                    NT$
+                    <span th:text="${order.orderHourlyRate}">
+                        500
+                    </span>
+                </small>
+            </td>
+
+            <td>
+                <span th:if="${order.orderStatus == 0}">待賣家確認</span>
+                <span th:if="${order.orderStatus == 1}">待買家付款</span>
+                <span th:if="${order.orderStatus == 2}">已成立</span>
+                <span th:if="${order.orderStatus == 3}">已完成</span>
+                <span th:if="${order.orderStatus == 4}">已取消 / 已拒絕</span>
+                <span th:if="${order.orderStatus == 5}">已退款</span>
+                <span th:if="${order.orderStatus == 6}">賣家確認逾期</span>
+                <span th:if="${order.orderStatus == 7}">買家付款逾期</span>
+            </td>
+
+            <td>
+                <details>
+                    <summary>查看詳情</summary>
+
+                    <p>
+                        <strong>服務描述：</strong><br>
+                        <span th:text="${order.serviceDescriptionSnapshot}">
+                            服務描述
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>買方備註：</strong><br>
+                        <span th:text="${order.buyerRequestNote != null && !#strings.isEmpty(order.buyerRequestNote) ? order.buyerRequestNote : '買方未填寫備註'}">
+                            買方備註
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>賣方備註：</strong><br>
+                        <span th:text="${order.sellerRequirementNote != null && !#strings.isEmpty(order.sellerRequirementNote) ? order.sellerRequirementNote : '賣方尚未填寫備註'}">
+                            賣方備註
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>付款方式：</strong>
+                        <span th:if="${order.servicePaymentMethod == null}">尚未付款</span>
+                        <span th:if="${order.servicePaymentMethod == 0}">信用卡</span>
+                        <span th:if="${order.servicePaymentMethod == 1}">ATM 轉帳</span>
+                    </p>
+
+                    <p>
+                        <strong>退款狀態：</strong>
+                        <span th:if="${order.refundStatus == 0}">無退款</span>
+                        <span th:if="${order.refundStatus == 1}">審核中</span>
+                        <span th:if="${order.refundStatus == 2}">已退款</span>
+                        <span th:if="${order.refundStatus == 3}">部分退款</span>
+                    </p>
+
+                    <p>
+                        <strong>退款金額：</strong>
+                        NT$
+                        <span th:text="${order.refundAmount}">
+                            0
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>建立時間：</strong>
+                        <span th:text="${#temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm')}">
+                            2026-08-01 10:00
+                        </span>
+                    </p>
+
+                    <p th:if="${order.sellerConfirmExpiresAt != null}">
+                        <strong>賣家確認期限：</strong>
+                        <span th:text="${#temporals.format(order.sellerConfirmExpiresAt, 'yyyy-MM-dd HH:mm')}">
+                            2026-08-02 10:00
+                        </span>
+                    </p>
+
+                    <p th:if="${order.paymentExpiresAt != null}">
+                        <strong>買家付款期限：</strong>
+                        <span th:text="${#temporals.format(order.paymentExpiresAt, 'yyyy-MM-dd HH:mm')}">
+                            2026-08-01 10:30
+                        </span>
+                    </p>
+
+                    <p th:if="${order.serviceCompletedAt != null}">
+                        <strong>完成時間：</strong>
+                        <span th:text="${#temporals.format(order.serviceCompletedAt, 'yyyy-MM-dd HH:mm')}">
+                            2026-08-12 17:00
+                        </span>
+                    </p>
+
+                    <p th:if="${order.cancelReason != null}">
+                        <strong>取消 / 拒絕原因：</strong><br>
+                        <span th:text="${order.cancelReason}">
+                            原因
+                        </span>
+                    </p>
+
+                    <p th:if="${order.cancelledAt != null}">
+                        <strong>取消時間：</strong>
+                        <span th:text="${#temporals.format(order.cancelledAt, 'yyyy-MM-dd HH:mm')}">
+                            2026-08-01 13:00
+                        </span>
+                    </p>
+                </details>
+            </td>
+
+            <td>
+                <!-- 待賣家確認 -->
+                <div th:if="${order.orderStatus == 0}">
+                    等待賣家確認
+                </div>
+
+                <!-- 待買家付款 -->
+                <div th:if="${order.orderStatus == 1}">
+
+                    <form th:action="@{/member/service-orders/{orderId}/pay(orderId=${order.serviceOrderId})}"
+                          method="post"
+                          style="margin-bottom: 8px;">
+
+                        <label>
+                            付款方式：
+                            <select name="paymentMethod">
+                                <option value="0">信用卡</option>
+                                <option value="1">ATM 轉帳</option>
+                            </select>
+                        </label>
+
+                        <br><br>
+
+                        <button type="submit"
+                                onclick="return confirm('確定要付款並成立訂單嗎？');">
+                            付款
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 已成立：買家可以取消 -->
+                <div th:if="${order.orderStatus == 2}">
+
+                    <form th:action="@{/member/service-orders/{orderId}/cancel-by-buyer(orderId=${order.serviceOrderId})}"
+                          method="post">
+
+                        <textarea name="reason"
+                                  rows="2"
+                                  cols="28"
+                                  maxlength="500"
+                                  placeholder="取消原因，可選填"></textarea>
+
+                        <br>
+
+                        <button type="submit"
+                                onclick="return confirm('確定要取消這筆訂單嗎？系統會依退款規則處理。');">
+                            取消訂單
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 已完成 -->
+                <div th:if="${order.orderStatus == 3}">
+                    訂單已完成
+                </div>
+
+                <!-- 已取消 / 已拒絕 -->
+                <div th:if="${order.orderStatus == 4}">
+                    訂單已取消 / 賣家已拒絕
+                </div>
+
+                <!-- 已退款 -->
+                <div th:if="${order.orderStatus == 5}">
+                    訂單已退款
+                </div>
+
+                <!-- 賣家確認逾期 -->
+                <div th:if="${order.orderStatus == 6}">
+                    賣家確認逾期
+                </div>
+
+                <!-- 買家付款逾期 -->
+                <div th:if="${order.orderStatus == 7}">
+                    買家付款逾期
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
