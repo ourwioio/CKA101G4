@@ -8,7 +8,7 @@
 </head>
 <body>
 	<div>
-		<h1>場地列表</h1>
+		<h1>全部通知</h1>
 		<span th:if="${session.loginEmployeeId != null}">
 			當前登入員工編號： 
 			<strong th:text="${session.loginEmployeeId}"></strong>
@@ -23,16 +23,7 @@
 	<a th:href="@{/notification/addNotification}">新增通知</a>
 	<table>
 		<thead>
-			<tr>
-				<th>通知編號</th>
-				<th>會員編號</th>
-				<th>標題</th>
-				<th>內容</th>
-				<th>通知類型</th>
-				<th>是否已讀</th>
-				<th>檢舉編號</th>
-				<th>員工編號</th>
-				<th>建立時間</th>
+			<tr> 	
 			</tr>		    
 	    </thead>
 	    <tbody>
