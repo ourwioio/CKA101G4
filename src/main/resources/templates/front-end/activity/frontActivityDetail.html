@@ -40,6 +40,16 @@ h1 {
 	font-weight: bold;
 }
 
+.alert-error {
+	background: #fee2e2;
+	color: #b91c1c;
+	padding: 14px 18px;
+	border-radius: 8px;
+	margin-bottom: 20px;
+	font-weight: bold;
+	border: 1px solid #fecaca;
+}
+
 .info {
 	margin: 18px 0;
 	font-size: 17px;
@@ -103,6 +113,10 @@ h1 {
 			</div>
 		</div>
 
+		<div th:if="${fullMessage}" class="alert-error">
+			<span th:text="${fullMessage}"></span>
+		</div>
+
 		<div class="info">
 			<span class="label">活動價格：</span> NT$ <span
 				th:text="${activityVO.activityPrice}">0</span>
@@ -115,6 +129,12 @@ h1 {
 
 		<div class="info">
 			<span class="label">最高人數限制：</span> <span
+				th:text="${activityVO.maxParticipants}">10</span>
+		</div>
+
+		<div class="info">
+			<span class="label">目前報名人數：</span> <span
+				th:text="${activityVO.attendeesCount}">0</span> / <span
 				th:text="${activityVO.maxParticipants}">10</span>
 		</div>
 

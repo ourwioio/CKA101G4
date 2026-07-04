@@ -65,6 +65,10 @@ public class ActivityOrderService {
 	public void deleteOrder(Integer activityOrderId) {
 		orderRepo.deleteById(activityOrderId);
 	}
-	
+
+	// 查詢某活動的所有報名訂單
+	public List<ActivityOrderVO> getOrdersByActivityId(Integer activityId) {
+		return orderRepo.findByActivityId(activityId);
+	}
 
 }
