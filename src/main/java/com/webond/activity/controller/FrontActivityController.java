@@ -45,12 +45,18 @@ public class FrontActivityController {
 	}
 
 	@GetMapping("/activity/front/detail")
-	public String frontActivityDetail(@RequestParam("id") Integer activityId, Model model) {
+	public String frontActivityDetail(@RequestParam("id") Integer activityId,
+			@RequestParam(value = "full", required = false) Boolean full, Model model) {
+
 		model.addAttribute("loginMemberId", 1);
 		model.addAttribute("loginMemberName", "測試會員");
 
 		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
 		model.addAttribute("activityVO", activityVO);
+
+		if (Boolean.TRUE.equals(full)) {
+			model.addAttribute("fullMessage", "此活動已額滿，無法再報名！");
+		}
 
 		return "front-end/activity/frontActivityDetail";
 	}
@@ -90,7 +96,15 @@ public class FrontActivityController {
 		orderVO.setTotalAmount(activityPrice * bookingCount);
 		orderVO.setOrderStatus((byte) 0);
 
+		// 檢查是否已滿團
+		if (!activitySvc.canRegister(orderVO.getActivityId(), orderVO.getBookingCount())) {
+
+			return "redirect:/activity/front/detail?id=" + orderVO.getActivityId() + "&full=true";
+		}
+
 		activityOrderSvc.addOrder(orderVO);
+
+		activitySvc.increaseAttendees(orderVO.getActivityId(), orderVO.getBookingCount());
 
 		return "redirect:/activity/front/myOrder";
 	}
@@ -160,5 +174,19 @@ public class FrontActivityController {
 		model.addAttribute("activityListData", activitySvc.getActivitiesByMemberId(loginMemberId));
 
 		return "front-end/activity/myHostActivity";
+	}
+
+	@GetMapping("/activity/front/memberList")
+	public String memberList(@RequestParam("activityId") Integer activityId, Model model) {
+
+		model.addAttribute("loginMemberId", 1);
+		model.addAttribute("loginMemberName", "測試會員");
+
+		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
+		model.addAttribute("activityVO", activityVO);
+
+		model.addAttribute("orderListData", activityOrderSvc.getOrdersByActivityId(activityId));
+
+		return "front-end/activity/frontActivityMemberList";
 	}
 }
