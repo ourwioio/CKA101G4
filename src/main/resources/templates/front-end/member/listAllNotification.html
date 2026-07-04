@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="UTF-8">
-<title>會員全部通知</title>
+    <meta charset="UTF-8">
+    <title>會員全部通知</title>
 </head>
+
 <body>
 
     <div>
@@ -32,14 +34,21 @@
                 <td th:text="${n.title}"></td>
                 <td th:text="${n.content}"></td>
                 <td th:text="${n.notificationType}"></td>
-                <td th:text="${n.isRead}"></td>
+                <td th:text="${n.isRead != null and n.isRead == 1 ? '已讀' : '未讀'}"></td>
                 <td th:text="${n.createdAt}"></td>
+                <td>
+                    <form th:action="@{/front/notification/getOneNotification}" method="get">
+                        <input type="hidden" name="notificationId" th:value="${n.notificationId}" /> 
+                        <button type="submit">查看</button>
+                    </form>
+                </td>
             </tr>
         </tbody>
     </table>
 
 
-	
+
 
 </body>
+
 </html>

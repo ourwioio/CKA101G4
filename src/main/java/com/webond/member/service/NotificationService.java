@@ -41,7 +41,9 @@ public class NotificationService {
 	}
 	
 	public NotificationVO getOneForUpdate(Integer notificationId) {
+		
 	    return repository.findById(notificationId).orElse(null);
+	    
 	}
 	
 	public void deleteNotification(Integer notificationId) {
@@ -71,6 +73,10 @@ public class NotificationService {
 	
 	public List<NotificationVO> getAll(){
 		return repository.findAll();
+	}
+	
+	public void markNotificationAsRead(Integer notificationId) {
+	    repository.markAsRead(notificationId);
 	}
 	
 	
