@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +25,7 @@ import com.webond.venue.service.VenueImagesService;
 import com.webond.venue.service.VenueService;
 import com.webond.venue.service.VenueTypeService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -248,4 +251,14 @@ public class VenueFrontController {
 		List<VenueTypeVO> list = venueTypeService.getAll();
 		return list;
 	}
+	
+	@PostMapping("listVenues_ByCompositeQuery")
+	public String listVenuesByCompositeQuery(HttpServletRequest req, Model model) {
+	    Map<String, String[]> map = req.getParameterMap();
+	    List<VenueVO> list = venueService.getAll(map);
+	    model.addAttribute("venueListData", list);
+	    return "front-end/venue/listAllVenue";
+	}
+	
+	
 }
