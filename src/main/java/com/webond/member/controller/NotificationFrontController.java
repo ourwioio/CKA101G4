@@ -45,6 +45,8 @@ public class NotificationFrontController {
 		}
 		
 		NotificationVO notificationVO = notificationService.getOneNotification(notificationId);
+
+	    notificationService.markNotificationAsRead(notificationId);
 		model.addAttribute("notificationVO",notificationVO);
 		return "front-end/member/listOneNotification";
 	}
