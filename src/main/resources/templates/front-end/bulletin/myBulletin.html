@@ -43,6 +43,9 @@
             </div>
             <p class="mb-1 text-truncate text-muted" th:text="${bulletin.content}"></p>
             <small class="text-muted" th:if="${bulletin.tags != null}" th:text="'標籤：' + ${bulletin.tags}"></small>
+            <small class="text-muted d-block"
+                   th:if="${bulletin.updatedAt != null and bulletin.updatedAt.isAfter(bulletin.createdAt)}"
+                   th:text="'最後更新：' + ${#temporals.format(bulletin.updatedAt, 'yyyy-MM-dd')}"></small>
         </a>
     </div>
 

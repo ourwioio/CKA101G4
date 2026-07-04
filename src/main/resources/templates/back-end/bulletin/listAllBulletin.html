@@ -55,6 +55,9 @@
                 <th>狀態</th>
                 <th>發布日期</th>
                 <th>標籤</th>
+                <th>負責員工</th>
+                <th>建立時間</th>
+                <th>更新時間</th>
                 <th>操作</th>
             </tr>
         </thead>
@@ -73,6 +76,9 @@
                 </td>
                 <td th:text="${bulletin.publishDate != null ? bulletin.publishDate : '-'}"></td>
                 <td th:text="${bulletin.tags}"></td>
+                <td th:text="${bulletin.employeeId} + ' - ' + ${employeeNameMap.get(bulletin.employeeId)}"></td>
+                <td class="small text-muted" th:text="${#temporals.format(bulletin.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                <td class="small text-muted" th:text="${#temporals.format(bulletin.updatedAt, 'yyyy-MM-dd HH:mm')}"></td>
                 <td class="d-flex gap-1">
                     <form th:action="@{/bulletin/getOne_For_Update}" method="post" class="d-inline">
                         <input type="hidden" name="bulletinId" th:value="${bulletin.bulletinId}" />

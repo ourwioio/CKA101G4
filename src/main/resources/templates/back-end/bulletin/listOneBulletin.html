@@ -27,7 +27,9 @@
             <p style="white-space: pre-line;" th:text="${bulletinVO.content}"></p>
 
             <p class="text-muted small mb-0">標籤：<span th:text="${bulletinVO.tags}"></span></p>
-            <p class="text-muted small">負責員工編號：<span th:text="${bulletinVO.employeeId}"></span></p>
+            <p class="text-muted small mb-0">負責員工：<span th:text="${bulletinVO.employeeId} + ' - ' + ${employeeNameMap.get(bulletinVO.employeeId)}"></span></p>
+            <p class="text-muted small mb-0">建立時間：<span th:text="${#temporals.format(bulletinVO.createdAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+            <p class="text-muted small">更新時間：<span th:text="${#temporals.format(bulletinVO.updatedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
         </div>
     </div>
 
