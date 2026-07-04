@@ -14,6 +14,9 @@
         <h2 th:text="${bulletinVO.title}"></h2>
         <p class="text-muted small">
             發布日期：<span th:text="${bulletinVO.publishDate}"></span>
+            <span th:if="${bulletinVO.updatedAt != null and bulletinVO.updatedAt.isAfter(bulletinVO.createdAt)}">
+                （最後更新：<span th:text="${#temporals.format(bulletinVO.updatedAt, 'yyyy-MM-dd')}"></span>）
+            </span>
         </p>
 
         <hr/>

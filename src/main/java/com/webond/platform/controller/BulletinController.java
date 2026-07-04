@@ -2,6 +2,8 @@ package com.webond.platform.controller;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -102,6 +104,7 @@ public class BulletinController {
 	 */
 	@PostMapping("delete")
 	public String delete(@RequestParam("bulletinId") Integer bulletinId, ModelMap model) {
+		
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		/*************************** 2.開始刪除資料 *****************************************/
 		bulletinSvc.deleteBulletin(bulletinId);
@@ -187,5 +190,12 @@ public class BulletinController {
     @ModelAttribute("employeeListData")
     protected List<EmployeeVO> referenceEmployeeList() {
         return employeeRepository.findAll();
+    }
+    
+    // ===== 提供「員工編號 → 姓名」對照表，給列表頁/單筆顯示頁查詢用 =====
+    @ModelAttribute("employeeNameMap")
+    protected Map<Integer, String> referenceEmployeeNameMap() {
+        return employeeRepository.findAll().stream()
+                .collect(Collectors.toMap(EmployeeVO::getEmployeeId, EmployeeVO::getEmpName));
     }
 }
