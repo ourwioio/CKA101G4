@@ -182,7 +182,10 @@ h1 { font-size: 24px; font-weight: 600; color: #333; margin-bottom: 1.5rem; }
             <div class="order-body">
                 <div class="venue-details">
                     <h2 th:text="${order.venueVO.venueName}"></h2>
-
+					<p>
+					    <strong>預約日期：</strong>
+					    <span th:text="${#temporals.format(order.bookDate, 'yyyy-MM-dd')}"></span>
+					</p>
                     <p>
                         <strong>預約時段：</strong>
                         <span th:text="${order.startAt} + ' ～ ' + ${order.endAt}"></span>
