@@ -1,0 +1,25 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: sans-serif; background: #f5f5f5; padding: 2rem; }
+.back-link { display: inline-block; margin-bottom: 1rem; font-size: 13px; color: #888; text-decoration: none; }
+.card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; max-width: 600px; margin: 0 auto; padding: 1.5rem; }
+.venue-info { background: #f8f8f8; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; }
+.venue-info h2 { font-size: 18px; font-weight: 500; margin-bottom: 4px; }
+.venue-info p { font-size: 14px; color: #666; margin-top: 4px; }
+.form-group { margin-bottom: 1.25rem; }
+label { display: block; font-size: 13px; color: #666; margin-bottom: 6px; }
+select { width: 100%; padding: 8px 12px; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 14px; outline: none; }
+select:focus { border-color: #1d9e75; }
+.time-row { display: flex; align-items: center; gap: 10px; }
+.time-row select { width: auto; }
+.time-row span { font-size: 14px; color: #666; }
+.total-amount { background: #e1f5ee; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 16px; font-weight: 500; color: #0f6e56; }
+.error { color: #c0392b; font-size: 12px; margin-top: 4px; }
+.btn-row { display: flex; gap: 10px; margin-top: 1.5rem; }
+.btn-submit { background: #1d9e75; color: white; border: none; border-radius: 6px; padding: 10px 24px; font-size: 14px; cursor: pointer; }
+.btn-back { background: white; color: #666; border: 1px solid #ccc; border-radius: 6px; padding: 10px 24px; font-size: 14px; text-decoration: none; display: inline-flex; align-items: center; }
+.slot-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.slot-btn { padding: 8px 16px; border-radius: 6px; border: 1px solid #e0e0e0; font-size: 13px; cursor: pointer; background: white; }
+.slot-available { border-color: #1d9e75; color: #1d9e75; }
+.slot-available:hover { background: #e1f5ee; }
+.slot-available.selected { background: #1d9e75; color: white; }
+.slot-unavailable { background: #f5f5f5; color: #ccc; cursor: not-allowed; border-color: #e0e0e0; }

@@ -5,75 +5,10 @@
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>場地列表</title>
-<style>
-body {
-	font-family: sans-serif;
-	background: #f5f5f5;
-	padding: 2rem;
-	margin: 0;
-}
-
-h1 {
-	font-size: 22px;
-	font-weight: 500;
-	margin-bottom: 1.5rem;
-}
-
-.venue-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-	gap: 1.25rem;
-}
-
-.venue-card {
-	background: white;
-	border-radius: 12px;
-	border: 1px solid #e0e0e0;
-	overflow: hidden;
-}
-
-.card-img {
-	width: 100%;
-	height: 160px;
-	object-fit: cover;
-	display: block;
-}
-
-.card-body {
-	padding: 1rem;
-}
-
-.card-body h3 {
-	font-size: 16px;
-	font-weight: 500;
-	margin: 0 0 6px;
-}
-
-.card-body p {
-	font-size: 14px;
-	color: #666;
-	margin: 4px 0;
-}
-
-.card-body a {
-	display: inline-block;
-	margin-top: 12px;
-	padding: 6px 16px;
-	background: #1d9e75;
-	color: white;
-	border-radius: 6px;
-	font-size: 13px;
-	text-decoration: none;
-}
-
-.card-body a:hover {
-	background: #0f6e56;
-}
-</style>
+<link rel="stylesheet" th:href="@{/css/front-end/venue/listAllVenue.css}" href="style.css">
 </head>
 <body>
-	<div
-		style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+	<div class="header-bar">
 		<h1>場地列表</h1>
 	<div class="user-info">
 	    <span th:if="${session.memberVO != null}">
@@ -87,22 +22,22 @@ h1 {
 
 		<!-- 未登入才顯示「登入」按鈕，導去真正的登入頁 -->
 		<a th:if="${session.memberVO == null}" th:href="@{/member/login}"
-			style="display: inline-block; padding: 8px 16px; background: #1d9e75; color: white; border-radius: 6px; font-size: 14px; text-decoration: none;">
+			class="btn-primary">
 			登入 </a>
 			
 		<a th:if="${session.memberVO != null}" th:href="@{/member/logout}"
-			style="display: inline-block; padding: 8px 16px; background: #1d9e75; color: white; border-radius: 6px; font-size: 14px; text-decoration: none;">
+			class="btn-primary">
 			登出 </a>
 
 		<a th:href="@{/front/venue/myVenue}"
-			style="display: inline-block; padding: 8px 16px; background: #1d9e75; color: white; border-radius: 6px; font-size: 14px; text-decoration: none;">
+			class="btn-primary">
 			我的場地 </a>
 		<a th:href="@{/front/venue/addVenue}"
-			style="display: inline-block; padding: 8px 16px; background: #1d9e75; color: white; border-radius: 6px; font-size: 14px; text-decoration: none;">
+			class="btn-primary">
 			新增場地 </a>
 	</div>
 	<form th:action="@{/front/venue/listVenues_ByCompositeQuery}" method="post"
-	      style="background:white; padding:1rem; border-radius:12px; margin-bottom:1.5rem;">
+	      class="search-form">
 	    場地名稱: <input type="text" name="venueName" th:value="${param.venueName}"><br>
 	    地址關鍵字: <input type="text" name="address" th:value="${param.address}"><br>
 	
@@ -127,7 +62,7 @@ h1 {
 	
 	    <input type="submit" value="查詢">
 	    <a th:href="@{/front/venue/listAllVenue}"
-	       style="display:inline-block; padding:6px 16px; background:#999; color:white; border-radius:6px; font-size:13px; text-decoration:none; margin-left:8px;">
+	       class="btn-clear">
 	       清除條件
 	    </a>
 	</form>
