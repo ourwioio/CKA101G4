@@ -84,7 +84,7 @@
     </form>
 </div>
 
-<!-- 🌟 把驗證失敗後、後端保留的值，轉成 JS 變數，方便頁面載入時重建畫面狀態 -->
+<!-- 把驗證失敗後、後端保留的值，轉成 JS 變數，方便頁面載入時重建畫面狀態 -->
 <!-- 這段需要 Thymeleaf 注入後端資料，無法抽成純外部 .js 檔案，須留在此處 -->
 <script th:inline="javascript">
     var restoreVenueSlotId = /*[[${venueOrderDTO.venueSlotId}]]*/ null;
@@ -92,6 +92,6 @@
     var restoreEndHour = /*[[${venueOrderDTO.endHour}]]*/ null;
 </script>
 
-<script th:src="@{/js/front-end/venue/addVenueOrder.js}" src="venue-order.js"></script>
+<script th:src="@{/js/front-end/venue/addVenueOrder.js}"></script>
 </body>
 </html>
