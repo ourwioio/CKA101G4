@@ -57,7 +57,8 @@ public class VenueFrontController {
 	public String insert(@Valid VenueVO venueVO, BindingResult result, ModelMap model,
 			@RequestParam("upFiles") MultipartFile[] parts,
 			@RequestParam(value = "openDays", required = false) List<Integer> openDays,
-			@RequestParam("startHour") int startHour, @RequestParam("endHour") int endHour,
+			@RequestParam("startHour") Integer startHour, 
+			@RequestParam("endHour") Integer endHour,
 			@RequestParam(value = "coverIndex", defaultValue = "0") int coverIndex,
 			HttpSession session)
 			throws IOException {
@@ -94,8 +95,14 @@ public class VenueFrontController {
 			model.addAttribute("venueVO", venueVO);
 			return "front-end/venue/addVenue";
 		}
+		
+		String hourError = null;
+		if (startHour == null || endHour == null || endHour <= startHour) {
+		    hourError = "結束時間必須大於開始時間";
+		}
 
-		if (result.hasErrors()) {
+		if (result.hasErrors() || hourError != null) {
+			model.addAttribute("hourError", hourError);
 			return "front-end/venue/addVenue";
 		}
 
