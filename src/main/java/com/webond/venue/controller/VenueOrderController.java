@@ -9,12 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.member.model.MemberVO;
+import com.webond.venue.dto.VenueOrderDTO;
 import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueOrderService;
@@ -22,6 +25,7 @@ import com.webond.venue.service.VenueService;
 import com.webond.venue.service.VenueSlotService;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/front/venueOrder")
@@ -51,43 +55,55 @@ public class VenueOrderController {
 
 		VenueOrderVO venueOrderVO = new VenueOrderVO();
 		model.addAttribute("venueOrderVO", venueOrderVO);
+		model.addAttribute("venueOrderDTO", new VenueOrderDTO());
 
 		return "front-end/venue/addVenueOrder";
 	}
 
 	@PostMapping("insert")
-	public String insert(@RequestParam("venueId") Integer venueId, @RequestParam("venueSlotId") Integer venueSlotId,
-			@RequestParam("startHour") int startHour, @RequestParam("endHour") int endHour,
-			@RequestParam("paymentMethod") Byte paymentMethod, HttpSession session) {
+	public String insert(@Valid VenueOrderDTO venueOrderDTO, 
+	        BindingResult result,
+	        HttpSession session,
+	        Model model) {
 
-		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
-		if (loginMember == null) {
-			return "redirect:/member/login";
-		}
+	    MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+	    if (loginMember == null) {
+	        return "redirect:/member/login";
+	    }
 
-		VenueVO venueVO = venueService.getOneVenue(venueId);
+	    if (result.hasErrors()) {
+	    	VenueVO venueVO = venueService.getOneVenue(venueOrderDTO.getVenueId());
+	    	model.addAttribute("venueVO", venueVO);
+	    	model.addAttribute("venueOrderDTO", venueOrderDTO);
+	    	return "front-end/venue/addVenueOrder";
+	    	
+	    }
 
-		int hours = endHour - startHour;
-		int totalAmount = hours * venueVO.getHourlyRate();
+	    VenueVO venueVO = venueService.getOneVenue(venueOrderDTO.getVenueId());
 
-		VenueOrderVO venueOrderVO = new VenueOrderVO();
-		venueOrderVO.setVenueVO(venueVO);
-		venueOrderVO.setMember(loginMember); // 🌟 直接用 session 裡的會員物件，不用再查一次
-		venueOrderVO.setVenueSlotId(venueSlotId); // 🌟 存下對應的時段，之後釋放要靠這個
-		venueOrderVO.setStartAt(LocalTime.of(startHour, 0));
-		venueOrderVO.setEndAt(LocalTime.of(endHour == 24 ? 23 : endHour, endHour == 24 ? 59 : 0));
-		venueOrderVO.setTotalAmount(totalAmount);
-		venueOrderVO.setPaymentMethod(paymentMethod);
-		venueOrderVO.setCreatedAt(LocalDateTime.now());
-		venueOrderVO.setRefundStatus((byte) 0);
-		venueOrderVO.setOrderStatus((byte) 0); // 0=待付款/預約保留中
+	    int hours = venueOrderDTO.getEndHour() - venueOrderDTO.getStartHour();
+	    int totalAmount = hours * venueVO.getHourlyRate();
 
-		venueOrderService.addVenueOrder(venueOrderVO);
+	    VenueOrderVO venueOrderVO = new VenueOrderVO();
+	    venueOrderVO.setVenueVO(venueVO);
+	    venueOrderVO.setMember(loginMember);
+	    venueOrderVO.setVenueSlotId(venueOrderDTO.getVenueSlotId());
+	    venueOrderVO.setBookDate(venueOrderDTO.getBookDate());
+	    venueOrderVO.setStartAt(LocalTime.of(venueOrderDTO.getStartHour(), 0));
+	    venueOrderVO.setEndAt(LocalTime.of(
+	    		venueOrderDTO.getEndHour() == 24 ? 23 : venueOrderDTO.getEndHour(),
+	    				venueOrderDTO.getEndHour() == 24 ? 59 : 0));
+	    venueOrderVO.setTotalAmount(totalAmount);
+	    venueOrderVO.setPaymentMethod(venueOrderDTO.getPaymentMethod());
+	    venueOrderVO.setCreatedAt(LocalDateTime.now());
+	    venueOrderVO.setRefundStatus((byte) 0);
+	    venueOrderVO.setOrderStatus((byte) 0);
 
-		// 鎖定時段
-		venueSlotService.updateSlotStatus(venueSlotId, startHour, endHour);
+	    venueOrderService.addVenueOrder(venueOrderVO);
 
-		return "redirect:/front/venueOrder/mockPayment?venueOrderId=" + venueOrderVO.getVenueOrderId();
+	    venueSlotService.updateSlotStatus(venueOrderDTO.getVenueSlotId(), venueOrderDTO.getStartHour(), venueOrderDTO.getEndHour());
+
+	    return "redirect:/front/venueOrder/mockPayment?venueOrderId=" + venueOrderVO.getVenueOrderId();
 	}
 
 	/** 模擬付款頁 */

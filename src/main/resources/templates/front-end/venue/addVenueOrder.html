@@ -40,7 +40,7 @@ select:focus { border-color: #1d9e75; }
         <p>每小時 <span th:text="${venueVO.hourlyRate}"></span> 元</p>
     </div>
 
-    <form th:action="@{/front/venueOrder/insert}" method="post">
+    <form th:action="@{/front/venueOrder/insert}" th:object="${venueOrderDTO}" method="post">
         <input type="hidden" name="venueId" th:value="${venueVO.venueId}"/>
         <input type="hidden" id="hourlyRate" th:value="${venueVO.hourlyRate}"/>
 
@@ -63,13 +63,15 @@ select:focus { border-color: #1d9e75; }
                     </button>
                 </div>
             </div>
-            <input type="hidden" name="venueSlotId" id="selectedSlotId" value=""/>
-            <input type="hidden" name="slotDate" id="selectedSlotDate" value=""/>
-            <div class="error" id="slotError" style="display:none;">請選擇預約日期</div>
+            <input type="hidden" th:field="*{venueSlotId}" id="selectedSlotId"/>
+            <input type="hidden" th:field="*{bookDate}" id="selectedSlotDate"/>
+
+            <span th:if="${#fields.hasErrors('venueSlotId')}" th:errors="*{venueSlotId}" class="error"></span>
+            <span th:if="${#fields.hasErrors('bookDate')}" th:errors="*{bookDate}" class="error"></span>
         </div>
 
         <!-- 選擇時段 -->
-        <div class="form-group" id="timeSection" style="display:none;">
+        <div class="form-group" id="timeSection">
             <label>選擇時段</label>
             <div class="time-row">
                 <select name="startHour" id="startHour">
@@ -80,15 +82,20 @@ select:focus { border-color: #1d9e75; }
                     <option value="">結束時間</option>
                 </select>
             </div>
+
+            <span th:if="${#fields.hasErrors('startHour')}" th:errors="*{startHour}" class="error"></span>
+            <span th:if="${#fields.hasErrors('endHour')}" th:errors="*{endHour}" class="error"></span>
         </div>
 
         <!-- 付款方式 -->
         <div class="form-group">
             <label>付款方式</label>
-            <select name="paymentMethod">
+            <select th:field="*{paymentMethod}">
+                <option value="">付款方式</option>
                 <option value="0">信用卡</option>
                 <option value="1">銀行轉帳</option>
             </select>
+            <span th:if="${#fields.hasErrors('paymentMethod')}" th:errors="*{paymentMethod}" class="error"></span>
         </div>
 
         <!-- 費用計算 -->
@@ -103,106 +110,132 @@ select:focus { border-color: #1d9e75; }
     </form>
 </div>
 
+<!-- 🌟 把驗證失敗後、後端保留的值，轉成 JS 變數，方便頁面載入時重建畫面狀態 -->
+<script th:inline="javascript">
+    var restoreVenueSlotId = /*[[${venueOrderDTO.venueSlotId}]]*/ null;
+    var restoreStartHour = /*[[${venueOrderDTO.startHour}]]*/ null;
+    var restoreEndHour = /*[[${venueOrderDTO.endHour}]]*/ null;
+</script>
+
 <script>
-let selectedSlotStatus = '';
-
-document.addEventListener('DOMContentLoaded', function() {
-    // 綁定日期按鈕點擊事件
-    document.querySelectorAll('.slot-btn.slot-available').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            selectSlot(this);
-        });
-    });
-
-    // 綁定開始時間變更事件
-    document.getElementById('startHour').addEventListener('change', function() {
-        updateEndHourOptions();
-        calculateTotal();
-    });
-
-    // 綁定結束時間變更事件
-    document.getElementById('endHour').addEventListener('change', function() {
-        calculateTotal();
-    });
-});
-
-function selectSlot(btn) {
-    // 清除所有選取狀態
-    document.querySelectorAll('.slot-btn.slot-available').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-
-    // 帶入選取的值
-    document.getElementById('selectedSlotId').value = btn.dataset.slotId;
-    document.getElementById('selectedSlotDate').value = btn.dataset.slotDate;
-    document.getElementById('slotError').style.display = 'none';
-
-    // 根據這天的 slotStatus 顯示可用時段
-    selectedSlotStatus = btn.dataset.slotStatus;
-    updateStartHourOptions();
-    document.getElementById('timeSection').style.display = 'block';
-    document.getElementById('totalAmount').style.display = 'none';
-}
-
-function updateStartHourOptions() {
-    const startSelect = document.getElementById('startHour');
-    const endSelect = document.getElementById('endHour');
-    startSelect.innerHTML = '<option value="">開始時間</option>';
-    endSelect.innerHTML = '<option value="">結束時間</option>';
-
-    if (!selectedSlotStatus) return;
-
-    for (let h = 0; h < 24; h++) {
-        if (selectedSlotStatus[h] === '0') {
-            let opt = document.createElement('option');
-            opt.value = h;
-            opt.textContent = h + ':00';
-            startSelect.appendChild(opt);
-        }
-    }
-}
-
-function updateEndHourOptions() {
-    const startHour = parseInt(document.getElementById('startHour').value);
-    const endSelect = document.getElementById('endHour');
-    endSelect.innerHTML = '<option value="">結束時間</option>';
-
-    if (isNaN(startHour)) return;
-
-    for (let h = startHour + 1; h <= 24; h++) {
-        // 結束時間 h 可選的條件是：前一個小時 h-1 是可用的（值為 '0'）
-        if (selectedSlotStatus[h - 1] === '0') {
-            let opt = document.createElement('option');
-            opt.value = h;
-            opt.textContent = h + ':00';
-            endSelect.appendChild(opt);
-        } else {
-            break;
-        }
-    }
-}
-
-function calculateTotal() {
-    const start = parseInt(document.getElementById('startHour').value);
-    const end = parseInt(document.getElementById('endHour').value);
-    const hourlyRate = parseInt(document.getElementById('hourlyRate').value);
-
-    if (!isNaN(start) && !isNaN(end) && end > start) {
-        const hours = end - start;
-        const total = hours * hourlyRate;
-        document.getElementById('totalAmountText').textContent = total;
-        document.getElementById('totalAmount').style.display = 'block';
-    } else {
-        document.getElementById('totalAmount').style.display = 'none';
-    }
-}
-
-function validateForm() {
-    if (!document.getElementById('selectedSlotId').value) {
-        document.getElementById('slotError').style.display = 'block';
-        return false;
-    }
-    return true;
-}
+	let selectedSlotStatus = '';
+	
+	document.addEventListener('DOMContentLoaded', function() {
+	    // 綁定日期按鈕點擊事件
+	    document.querySelectorAll('.slot-btn.slot-available').forEach(function(btn) {
+	        btn.addEventListener('click', function() {
+	            selectSlot(this);
+	        });
+	    });
+	
+	    // 綁定開始時間變更事件
+	    document.getElementById('startHour').addEventListener('change', function() {
+	        updateEndHourOptions();
+	        calculateTotal();
+	    });
+	
+	    // 綁定結束時間變更事件
+	    document.getElementById('endHour').addEventListener('change', function() {
+	        calculateTotal();
+	    });
+	
+	    // 頁面一開始，時段選單先清空（沒選日期前不會有任何小時選項）
+	    updateStartHourOptions();
+	
+	    // 🌟 如果是驗證失敗被導回來的畫面，重新帶回之前選的日期跟時段
+	    restorePreviousSelection();
+	});
+	
+	function selectSlot(btn) {
+	    // 清除所有選取狀態
+	    document.querySelectorAll('.slot-btn.slot-available').forEach(b => b.classList.remove('selected'));
+	    btn.classList.add('selected');
+	
+	    // 帶入選取的值
+	    document.getElementById('selectedSlotId').value = btn.dataset.slotId;
+	    document.getElementById('selectedSlotDate').value = btn.dataset.slotDate;
+	
+	    // 根據這天的 slotStatus 顯示可用時段
+	    selectedSlotStatus = btn.dataset.slotStatus;
+	    updateStartHourOptions();
+	    document.getElementById('totalAmount').style.display = 'none';
+	}
+	
+	function updateStartHourOptions() {
+	    const startSelect = document.getElementById('startHour');
+	    const endSelect = document.getElementById('endHour');
+	    startSelect.innerHTML = '<option value="">開始時間</option>';
+	    endSelect.innerHTML = '<option value="">結束時間</option>';
+	
+	    if (!selectedSlotStatus) return;
+	
+	    for (let h = 0; h < 24; h++) {
+	        if (selectedSlotStatus[h] === '0') {
+	            let opt = document.createElement('option');
+	            opt.value = h;
+	            opt.textContent = h + ':00';
+	            startSelect.appendChild(opt);
+	        }
+	    }
+	}
+	
+	function updateEndHourOptions() {
+	    const startHour = parseInt(document.getElementById('startHour').value);
+	    const endSelect = document.getElementById('endHour');
+	    endSelect.innerHTML = '<option value="">結束時間</option>';
+	
+	    if (isNaN(startHour)) return;
+	
+	    for (let h = startHour + 1; h <= 24; h++) {
+	        // 結束時間 h 可選的條件是：前一個小時 h-1 是可用的（值為 '0'）
+	        if (selectedSlotStatus[h - 1] === '0') {
+	            let opt = document.createElement('option');
+	            opt.value = h;
+	            opt.textContent = h + ':00';
+	            endSelect.appendChild(opt);
+	        } else {
+	            break;
+	        }
+	    }
+	}
+	
+	function calculateTotal() {
+	    const start = parseInt(document.getElementById('startHour').value);
+	    const end = parseInt(document.getElementById('endHour').value);
+	    const hourlyRate = parseInt(document.getElementById('hourlyRate').value);
+	
+	    if (!isNaN(start) && !isNaN(end) && end > start) {
+	        const hours = end - start;
+	        const total = hours * hourlyRate;
+	        document.getElementById('totalAmountText').textContent = total;
+	        document.getElementById('totalAmount').style.display = 'block';
+	    } else {
+	        document.getElementById('totalAmount').style.display = 'none';
+	    }
+	}
+	
+	/** 🌟 驗證失敗被導回來時，重建之前選過的日期跟時段狀態 */
+	function restorePreviousSelection() {
+	    if (!restoreVenueSlotId) return;
+	
+	    const btn = document.querySelector('.slot-btn[data-slot-id="' + restoreVenueSlotId + '"]');
+	    if (!btn) return;
+	
+	    selectSlot(btn);
+	
+	    if (restoreStartHour !== null) {
+	        document.getElementById('startHour').value = restoreStartHour;
+	        updateEndHourOptions();
+	    }
+	    if (restoreEndHour !== null) {
+	        document.getElementById('endHour').value = restoreEndHour;
+	    }
+	    calculateTotal();
+	}
+	
+	function validateForm() {
+	    return true;
+	}
 </script>
 </body>
 </html>

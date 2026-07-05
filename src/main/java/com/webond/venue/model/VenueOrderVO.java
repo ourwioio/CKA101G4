@@ -79,12 +79,12 @@ public class VenueOrderVO {
 	@Column(name = "VENUE_SLOT_ID")
 	private Integer venueSlotId;
 	
+	@Column (name = "BOOKING_DATE")
+	private LocalDate bookDate;
 	
-
 	public VenueOrderVO() {
 		super();
 	}
-
 
 	public Integer getVenueOrderId() {
 		return venueOrderId;
@@ -224,6 +224,15 @@ public class VenueOrderVO {
 		this.venueSlotId = venueSlotId;
 	}
 
+	public LocalDate getBookDate() {
+		return bookDate;
+	}
+
+	public void setBookDate(LocalDate bookDate) {
+		this.bookDate = bookDate;
+	}
+
+	
 	
 
 }
