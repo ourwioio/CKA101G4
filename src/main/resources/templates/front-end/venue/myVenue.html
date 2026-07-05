@@ -3,24 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>我的場地</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: sans-serif; background: #f5f5f5; padding: 2rem; }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-h1 { font-size: 22px; font-weight: 500; }
-.btn-add { padding: 8px 16px; background: #1d9e75; color: white; border-radius: 6px; font-size: 14px; text-decoration: none; }
-.venue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem; }
-.venue-card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden; }
-.card-img { width: 100%; height: 160px; object-fit: cover; display: block; }
-.card-body { padding: 1rem; }
-.card-body h3 { font-size: 16px; font-weight: 500; margin: 0 0 6px; }
-.card-body p { font-size: 14px; color: #666; margin: 4px 0; }
-.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-.badge-up { background: #e1f5ee; color: #0f6e56; }
-.badge-down { background: #f5f5f5; color: #888; }
-.actions { display: flex; gap: 8px; margin-top: 12px; }
-.btn-edit { padding: 6px 16px; background: #1d9e75; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; }
-</style>
+<link rel="stylesheet" th:href="@{/css/front-end/venue/myVenue.css}" href="my-venue.css">
 </head>
 <body>
     <div class="header">
@@ -30,7 +13,7 @@ h1 { font-size: 22px; font-weight: 500; }
 	        當前登入會員：<strong th:text="${session.memberVO.nickname}"></strong>
 	    </span>
 	    <a th:if="${session.memberVO != null}" th:href="@{/member/logout}">登出</a>
-	</div>	
+	</div>
         <a class="btn-add" th:href="@{/front/venueOrder/myVenueOrder}">我的訂單</a>
         <a class="btn-add" th:href="@{/front/venue/listAllVenue}">瀏覽場地頁面</a>
         <a class="btn-add" th:href="@{/front/venue/addVenue}">新增場地</a>
@@ -44,15 +27,15 @@ h1 { font-size: 22px; font-weight: 500; }
 			    <h3 th:text="${venue.venueName}"></h3>
 			    <p th:text="${venue.address}"></p>
 			    <p>容納人數：<span th:text="${venue.capacity}"></span> 人</p>
-			    
-			    <p style="font-size: 12px; color: #999;">
+
+			    <p class="created-at">
 			        建立時間：<span th:text="${#temporals.format(venue.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
 			    </p>
-			    
+
 			    <span th:class="${venue.venueStatus == 0 ? 'badge badge-down' : 'badge badge-up'}"
 			          th:text="${venue.venueStatus == 0 ? '下架' : '上架'}"></span>
 			    <div class="actions">
-			        <a th:href="@{/front/venue/getOneMyVenue(venueId=${venue.venueId})}" class="btn-edit" style="text-decoration: none; display: inline-block;">查看</a>
+			        <a th:href="@{/front/venue/getOneMyVenue(venueId=${venue.venueId})}" class="btn-edit btn-edit-link">查看</a>
 			    </div>
 			</div>
         </div>
