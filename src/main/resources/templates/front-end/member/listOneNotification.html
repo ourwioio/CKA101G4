@@ -2,32 +2,33 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-	<meta charset="UTF-8">
-	<title>會員通知</title>
+<meta charset="UTF-8">
+<title>會員通知</title>
 </head>
 
 <body>
 	<div>
 		<h1>全部通知</h1>
 
-		<span th:if="${session.memberVO != null}">
-			當前登入會員編號：
-			<strong th:text="${session.memberVO?.memberId}"></strong>
-		</span>
-
-		<span th:if="${session.memberVO == null}">
-			目前登入狀態： <strong>未登入</strong>
-		</span>
-
-		<a th:href="@{/front/notification/listAllNotification}">返回通知列表</a>
+		<span th:if="${session.memberVO != null}"> 當前登入會員編號： <strong
+			th:text="${session.memberVO?.memberId}"></strong>
+		</span> <span th:if="${session.memberVO == null}"> 目前登入狀態： <strong>未登入</strong>
+		</span> <a th:href="@{/front/notification/listAllNotification}">返回通知列表</a>
 	</div>
 	<table th:object="${notificationVO}">
+        <thead>
+            <td>標題</td>
+            <td>內容</td>
+            <td>通知類型</td>
+            <td>是否已讀</td>
+            <td>建立時間</td>
+        </thead>
 		<tr>
 			<input type="hidden" th:field="*{notificationId}" />
 			<td th:text="*{title}"></td>
 			<td th:text="*{content}"></td>
 			<td th:text="*{notificationType}"></td>
-			<td th:text="*{isRead}"></td>
+			<td th:text="${notificationVO.isRead != null and notificationVO.isRead == 1 ? '已讀' : '未讀'}"></td>
 			<td th:text="*{createdAt}"></td>
 		</tr>
 	</table>
