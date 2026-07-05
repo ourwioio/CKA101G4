@@ -53,6 +53,14 @@ public class MemberService {
 		return getOneMember(memberId).getVenueOrders();
 	}
 	
+	public void updateMemberStatus(Integer memberId, byte accountStatus) {
+	    MemberVO member = repository.findById(memberId).orElse(null);
+	    if (member != null) {
+	        member.setAccountStatus(accountStatus);
+	        repository.save(member);
+	    }
+	}
+	
 	
 	
 }
