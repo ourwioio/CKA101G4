@@ -1,334 +1,586 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webond 後台管理 - 會員綜合管理中心</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --slate-50: #f8fafc;
-            --slate-100: #f1f5f9;
-            --slate-200: #e2e8f0;
-            --slate-600: #475569;
-            --slate-700: #334155;
-            --slate-800: #1e293b;
-            --sky-600: #0284c7;
-            --sky-700: #0369a1;
-            --emerald-600: #16a34a;
-            --rose-600: #e11d48;
-            --border-color: #e2e8f0;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Webond 後台管理 - 會員綜合管理中心</title>
+<link
+	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+	rel="stylesheet">
+<style>
+:root {
+	--slate-50: #f8fafc;
+	--slate-100: #f1f5f9;
+	--slate-200: #e2e8f0;
+	--slate-600: #475569;
+	--slate-700: #334155;
+	--slate-800: #1e293b;
+	--sky-600: #0284c7;
+	--sky-700: #0369a1;
+	--emerald-600: #16a34a;
+	--rose-600: #e11d48;
+	--border-color: #e2e8f0;
+}
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', "Microsoft JhengHei", sans-serif;
-            background-color: var(--slate-100);
-            color: var(--slate-800);
-            padding: 40px 20px;
-        }
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
+body {
+	font-family: 'Inter', "Microsoft JhengHei", sans-serif;
+	background-color: var(--slate-100);
+	color: var(--slate-800);
+	padding: 40px 20px;
+}
 
-        @media (min-width: 1024px) {
-            .container { grid-template-columns: 1.6fr 1fr; }
-            .main-panel { grid-column: span 1; }
-        }
+.container {
+	max-width: 1400px;
+	margin: 0 auto;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 30px;
+}
 
-        .card-panel {
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            padding: 24px;
-        }
+@media ( min-width : 1024px) {
+	.container {
+		grid-template-columns: 1.6fr 1fr;
+	}
+	.main-panel {
+		grid-column: span 1;
+	}
+}
 
-        .header-area h2 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+.card-panel {
+	background: #ffffff;
+	border-radius: 16px;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+	padding: 24px;
+}
 
-        .tabs-nav {
-            display: flex;
-            border-bottom: 2px solid var(--slate-200);
-            margin-bottom: 20px;
-            gap: 4px;
-        }
+.header-area h2 {
+	font-size: 22px;
+	font-weight: 700;
+	margin-bottom: 20px;
+}
 
-        .tab-btn {
-            padding: 12px 20px;
-            border: none;
-            background: none;
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--slate-600);
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
-            transition: all 0.2s;
-        }
+.tabs-nav {
+	display: flex;
+	border-bottom: 2px solid var(--slate-200);
+	margin-bottom: 20px;
+	gap: 4px;
+}
 
-        .tab-btn:hover { color: var(--sky-600); }
-        .tab-btn.active {
-            color: var(--sky-600);
-            border-bottom: 2px solid var(--sky-600);
-        }
+.tab-btn {
+	padding: 12px 20px;
+	border: none;
+	background: none;
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--slate-600);
+	cursor: pointer;
+	border-bottom: 2px solid transparent;
+	margin-bottom: -2px;
+	transition: all 0.2s;
+}
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+.tab-btn:hover {
+	color: var(--sky-600);
+}
 
-        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        .search-input { flex: 1; padding: 10px; border: 1px solid var(--slate-200); border-radius: 6px; font-size: 14px; }
-        .btn-search { background: var(--sky-600); color: white; border: none; padding: 0 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.tab-btn.active {
+	color: var(--sky-600);
+	border-bottom: 2px solid var(--sky-600);
+}
 
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { background: var(--slate-50); padding: 12px; border-bottom: 2px solid var(--border-color); text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
-        
-        .clickable-row { cursor: pointer; transition: background 0.15s; }
-        .clickable-row:hover { background-color: #f0fdf4 !important; }
-        .auto-suspended-row td { background-color: #fff1f2; }
+.tab-content {
+	display: none;
+}
 
-        .status-badge { padding: 3px 8px; border-radius: 12px; font-size: 12px; font-weight: 600; }
-        .badge-pending { background: #fef9c3; color: #713f12; }
-        .badge-active { background: #d1fae5; color: #065f46; }
-        .badge-suspended { background: #ffe4e6; color: #9f1239; }
+.tab-content.active {
+	display: block;
+}
 
-        .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid var(--slate-200); }
+.search-box {
+	display: flex;
+	gap: 10px;
+	margin-bottom: 20px;
+}
 
-        .detail-panel { position: sticky; top: 40px; align-self: start; background: #ffffff; }
-        .detail-placeholder { text-align: center; color: #94a3b8; padding: 60px 20px; font-weight: 500; }
-        .detail-header { display: flex; align-items: center; gap: 16px; border-bottom: 1px solid var(--slate-200); padding-bottom: 16px; margin-bottom: 16px; }
-        .detail-avatar { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--sky-600); }
-        
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 14px; margin-bottom: 20px; }
-        .info-item { background: var(--slate-50); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); }
-        .info-label { font-size: 12px; color: #64748b; margin-bottom: 4px; font-weight: 600; }
-        .info-value { font-weight: 600; color: var(--slate-800); word-break: break-all; }
+.search-input {
+	flex: 1;
+	padding: 10px;
+	border: 1px solid var(--slate-200);
+	border-radius: 6px;
+	font-size: 14px;
+}
 
-        .kyc-img-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .kyc-img-box img { width: 100%; height: 110px; object-fit: cover; border-radius: 6px; border: 1px solid var(--slate-200); cursor: zoom-in; transition: transform 0.2s; }
-        .kyc-img-box img:hover { transform: scale(1.02); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.btn-search {
+	background: var(--sky-600);
+	color: white;
+	border: none;
+	padding: 0 16px;
+	border-radius: 6px;
+	cursor: pointer;
+	font-weight: 600;
+}
 
-        .btn-action { padding: 8px 14px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-left: 6px;}
-        .btn-suspend { background: var(--rose-600); color: white; }
-        .btn-recover { background: var(--emerald-600); color: white; }
-        .btn-fail { background: var(--slate-600); color: white; }
-        
-        .action-container-box { display: flex; justify-content: flex-end; align-items: center; gap: 4px; }
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+}
 
-        /* 🔍 燈箱彈出視窗樣式 (Image Modal) */
-        .image-modal {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(15, 23, 42, 0.85); /* 深色透明背景 */
-            backdrop-filter: blur(4px); /* 背景模糊效果 */
-            justify-content: center;
-            align-items: center;
-            cursor: zoom-out;
-        }
+th {
+	background: var(--slate-50);
+	padding: 12px;
+	border-bottom: 2px solid var(--border-color);
+	text-align: left;
+}
 
-        .image-modal img {
-            max-width: 90%;
-            max-height: 90%;
-            border-radius: 12px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
-        }
+td {
+	padding: 12px;
+	border-bottom: 1px solid var(--border-color);
+	vertical-align: middle;
+}
 
-        .image-modal.show img { transform: scale(1); }
+.clickable-row {
+	cursor: pointer;
+	transition: background 0.15s;
+}
 
-        .close-modal-btn {
-            position: absolute;
-            top: 20px; right: 30px;
-            color: #ffffff;
-            font-size: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            user-select: none;
-        }
-    </style>
+.clickable-row:hover {
+	background-color: #f0fdf4 !important;
+}
+
+.auto-suspended-row td {
+	background-color: #fff1f2;
+}
+
+.status-badge {
+	padding: 3px 8px;
+	border-radius: 12px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.badge-pending {
+	background: #fef9c3;
+	color: #713f12;
+}
+
+.badge-active {
+	background: #d1fae5;
+	color: #065f46;
+}
+
+.badge-suspended {
+	background: #ffe4e6;
+	color: #9f1239;
+}
+
+.avatar {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 1px solid var(--slate-200);
+}
+
+.detail-panel {
+	position: sticky;
+	top: 40px;
+	align-self: start;
+	background: #ffffff;
+}
+
+.detail-placeholder {
+	text-align: center;
+	color: #94a3b8;
+	padding: 60px 20px;
+	font-weight: 500;
+}
+
+.detail-header {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	border-bottom: 1px solid var(--slate-200);
+	padding-bottom: 16px;
+	margin-bottom: 16px;
+}
+
+.detail-avatar {
+	width: 70px;
+	height: 70px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid var(--sky-600);
+}
+
+.info-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	font-size: 14px;
+	margin-bottom: 20px;
+}
+
+.info-item {
+	background: var(--slate-50);
+	padding: 10px;
+	border-radius: 8px;
+	border: 1px solid var(--border-color);
+}
+
+.info-label {
+	font-size: 12px;
+	color: #64748b;
+	margin-bottom: 4px;
+	font-weight: 600;
+}
+
+.info-value {
+	font-weight: 600;
+	color: var(--slate-800);
+	word-break: break-all;
+}
+
+.kyc-img-box {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-top: 10px;
+}
+
+.kyc-img-box img {
+	width: 100%;
+	height: 110px;
+	object-fit: cover;
+	border-radius: 6px;
+	border: 1px solid var(--slate-200);
+	cursor: zoom-in;
+	transition: transform 0.2s;
+}
+
+.kyc-img-box img:hover {
+	transform: scale(1.02);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-action {
+	padding: 8px 14px;
+	border: none;
+	border-radius: 6px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin-left: 6px;
+}
+
+.btn-suspend {
+	background: var(--rose-600);
+	color: white;
+}
+
+.btn-recover {
+	background: var(--emerald-600);
+	color: white;
+}
+
+.btn-fail {
+	background: var(--slate-600);
+	color: white;
+}
+
+.action-container-box {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 4px;
+}
+
+/* 🔍 燈箱彈出視窗樣式 (Image Modal) */
+.image-modal {
+	display: none;
+	position: fixed;
+	z-index: 9999;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(15, 23, 42, 0.85); /* 深色透明背景 */
+	backdrop-filter: blur(4px); /* 背景模糊效果 */
+	justify-content: center;
+	align-items: center;
+	cursor: zoom-out;
+}
+
+.image-modal img {
+	max-width: 90%;
+	max-height: 90%;
+	border-radius: 12px;
+	box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+	transform: scale(0.95);
+	transition: transform 0.3s ease;
+}
+
+.image-modal.show img {
+	transform: scale(1);
+}
+
+.close-modal-btn {
+	position: absolute;
+	top: 20px;
+	right: 30px;
+	color: #ffffff;
+	font-size: 40px;
+	font-weight: bold;
+	cursor: pointer;
+	user-select: none;
+}
+</style>
 </head>
 <body>
 
-<div class="container">
+	<div class="container">
 
-    <div class="card-panel main-panel">
-        <div class="header-area">
-            <h2>👥 會員權限狀態管理中心</h2>
-        </div>
+		<div class="card-panel main-panel">
+			<div class="header-area">
+				<h2>👥 會員權限狀態管理中心</h2>
+			</div>
 
-        <form th:action="@{/member/back-end/memberList}" method="get" class="search-box">
-            <input type="text" name="keyword" class="search-input" placeholder="快速搜尋 姓名 / Email / 手機..." th:value="${keyword}">
-            <button type="submit" class="btn-search">🔍 搜尋</button>
-        </form>
+			<form th:action="@{/member/back-end/memberList}" method="get"
+				class="search-box">
+				<input type="text" name="keyword" class="search-input"
+					placeholder="快速搜尋 姓名 / Email / 手機..." th:value="${keyword}">
+				<button type="submit" class="btn-search">🔍 搜尋</button>
+			</form>
 
-        <div class="tabs-nav">
-            <button class="tab-btn active" onclick="switchTab(this, 'tab-pending')">⏳ 待核准 / 未驗證</button>
-            <button class="tab-btn" onclick="switchTab(this, 'tab-active')">🟢 已核准正常</button>
-            <button class="tab-btn" onclick="switchTab(this, 'tab-suspended')">🚫 已停權</button>
-        </div>
+			<div class="tabs-nav">
+				<button class="tab-btn active"
+					onclick="switchTab(this, 'tab-pending')">⏳ 待核准 / 未驗證</button>
+				<button class="tab-btn" onclick="switchTab(this, 'tab-active')">🟢
+					已核准正常</button>
+				<button class="tab-btn" onclick="switchTab(this, 'tab-suspended')">🚫
+					已停權</button>
+			</div>
 
-        <div id="tab-pending" class="tab-content active">
-            <table>
-                <thead>
-                    <tr><th>ID</th><th>照片</th><th>真實姓名</th><th>聯絡資訊</th><th>狀態</th></tr>
-                </thead>
-                <tbody>
-                    <tr th:each="member : ${allMembers}" th:if="${member.accountStatus == 0 or member.accountStatus == 2}" 
-                        class="clickable-row"
-                        th:data-id="${member.memberId}"
-                        th:data-realname="${member.realName}"
-                        th:data-nickname="${member.nickname}"
-                        th:data-email="${member.email}"
-                        th:data-phone="${member.phone}"
-                        th:data-idnumber="${member.idNumber}"
-                        th:data-gender="${member.gender}"
-                        th:data-bankcode="${member.bankCode}"
-                        th:data-bankaccount="${member.bankAccount}"
-                        th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
-                        th:data-createdat="${member.createdAt}"
-                        th:data-status="${member.accountStatus}"
-                        onclick="showDetail(this)">
-                        <td th:text="${member.memberId}"></td>
-                        <td><img class="avatar" th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
-                        <td th:text="${member.realName}" style="font-weight: 700;"></td>
-                        <td th:text="${member.email}"></td>
-                        <td>
-                            <span th:if="${member.accountStatus == 0}" class="status-badge badge-pending">⏳ 待審核</span>
-                            <span th:if="${member.accountStatus == 2}" class="status-badge badge-suspended">❌ 審核失敗</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+			<div id="tab-pending" class="tab-content active">
+				<table>
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>照片</th>
+							<th>真實姓名</th>
+							<th>聯絡資訊</th>
+							<th>狀態</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="member : ${allMembers}"
+							th:if="${member.accountStatus == 0 or member.accountStatus == 2}"
+							class="clickable-row" th:data-id="${member.memberId}"
+							th:data-realname="${member.realName}"
+							th:data-nickname="${member.nickname}"
+							th:data-email="${member.email}" th:data-phone="${member.phone}"
+							th:data-idnumber="${member.idNumber}"
+							th:data-gender="${member.gender}"
+							th:data-bankcode="${member.bankCode}"
+							th:data-bankaccount="${member.bankAccount}"
+							th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
+							th:data-createdat="${member.createdAt}"
+							th:data-status="${member.accountStatus}"
+							onclick="showDetail(this)">
+							<td th:text="${member.memberId}"></td>
+							<td><img class="avatar"
+								th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
+							<td th:text="${member.realName}" style="font-weight: 700;"></td>
+							<td th:text="${member.email}"></td>
+							<td><span th:if="${member.accountStatus == 0}"
+								class="status-badge badge-pending">⏳ 待審核</span> <span
+								th:if="${member.accountStatus == 2}"
+								class="status-badge badge-suspended">❌ 審核失敗</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
-        <div id="tab-active" class="tab-content">
-            <table>
-                <thead>
-                    <tr><th>ID</th><th>照片</th><th>真實姓名</th><th>聯絡資訊</th><th>檢舉點數</th><th>狀態</th></tr>
-                </thead>
-                <tbody>
-                    <tr th:each="member : ${allMembers}" th:if="${member.accountStatus == 1}" 
-                        class="clickable-row"
-                        th:data-id="${member.memberId}"
-                        th:data-realname="${member.realName}"
-                        th:data-nickname="${member.nickname}"
-                        th:data-email="${member.email}"
-                        th:data-phone="${member.phone}"
-                        th:data-idnumber="${member.idNumber}"
-                        th:data-gender="${member.gender}"
-                        th:data-bankcode="${member.bankCode}"
-                        th:data-bankaccount="${member.bankAccount}"
-                        th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
-                        th:data-createdat="${member.createdAt}"
-                        th:data-status="${member.accountStatus}"
-                        onclick="showDetail(this)">
-                        <td th:text="${member.memberId}"></td>
-                        <td><img class="avatar" th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
-                        <td th:text="${member.realName}" style="font-weight: 700;"></td>
-                        <td th:text="${member.email}"></td>
-                        <td th:text="${(member.reportPoints != null ? member.reportPoints : 0) + ' / 5 點'}"></td>
-                        <td><span class="status-badge badge-active">🟢 正常使用</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+			<div id="tab-active" class="tab-content">
+				<table>
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>照片</th>
+							<th>真實姓名</th>
+							<th>聯絡資訊</th>
+							<th>檢舉點數</th>
+							<th>狀態</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="member : ${allMembers}"
+							th:if="${member.accountStatus == 1}" class="clickable-row"
+							th:data-id="${member.memberId}"
+							th:data-realname="${member.realName}"
+							th:data-nickname="${member.nickname}"
+							th:data-email="${member.email}" th:data-phone="${member.phone}"
+							th:data-idnumber="${member.idNumber}"
+							th:data-gender="${member.gender}"
+							th:data-bankcode="${member.bankCode}"
+							th:data-bankaccount="${member.bankAccount}"
+							th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
+							th:data-createdat="${member.createdAt}"
+							th:data-status="${member.accountStatus}"
+							onclick="showDetail(this)">
+							<td th:text="${member.memberId}"></td>
+							<td><img class="avatar"
+								th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
+							<td th:text="${member.realName}" style="font-weight: 700;"></td>
+							<td th:text="${member.email}"></td>
+							<td
+								th:text="${(member.reportPoints != null ? member.reportPoints : 0) + ' / 5 點'}"></td>
+							<td><span class="status-badge badge-active">🟢 正常使用</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
-        <div id="tab-suspended" class="tab-content">
-            <table>
-                <thead>
-                    <tr><th>ID</th><th>照片</th><th>真實姓名</th><th>聯絡資訊</th><th>檢舉點數</th><th>狀態</th></tr>
-                </thead>
-                <tbody>
-                    <tr th:each="member : ${allMembers}" th:if="${member.accountStatus == 3}" 
-                        class="clickable-row auto-suspended-row"
-                        th:data-id="${member.memberId}"
-                        th:data-realname="${member.realName}"
-                        th:data-nickname="${member.nickname}"
-                        th:data-email="${member.email}"
-                        th:data-phone="${member.phone}"
-                        th:data-idnumber="${member.idNumber}"
-                        th:data-gender="${member.gender}"
-                        th:data-bankcode="${member.bankCode}"
-                        th:data-bankaccount="${member.bankAccount}"
-                        th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
-                        th:data-createdat="${member.createdAt}"
-                        th:data-status="${member.accountStatus}"
-                        onclick="showDetail(this)">
-                        <td th:text="${member.memberId}"></td>
-                        <td><img class="avatar" th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
-                        <td th:text="${member.realName}" style="font-weight: 700;"></td>
-                        <td th:text="${member.email}"></td>
-                        <td th:text="${(member.reportPoints != null ? member.reportPoints : 0) + ' / 5 點'}" style="color:red; font-weight:700;"></td>
-                        <td><span class="status-badge badge-suspended">🚫 已被停權</span></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+			<div id="tab-suspended" class="tab-content">
+				<table>
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>照片</th>
+							<th>真實姓名</th>
+							<th>聯絡資訊</th>
+							<th>檢舉點數</th>
+							<th>狀態</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="member : ${allMembers}"
+							th:if="${member.accountStatus == 3}"
+							class="clickable-row auto-suspended-row"
+							th:data-id="${member.memberId}"
+							th:data-realname="${member.realName}"
+							th:data-nickname="${member.nickname}"
+							th:data-email="${member.email}" th:data-phone="${member.phone}"
+							th:data-idnumber="${member.idNumber}"
+							th:data-gender="${member.gender}"
+							th:data-bankcode="${member.bankCode}"
+							th:data-bankaccount="${member.bankAccount}"
+							th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
+							th:data-createdat="${member.createdAt}"
+							th:data-status="${member.accountStatus}"
+							onclick="showDetail(this)">
+							<td th:text="${member.memberId}"></td>
+							<td><img class="avatar"
+								th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
+							<td th:text="${member.realName}" style="font-weight: 700;"></td>
+							<td th:text="${member.email}"></td>
+							<td
+								th:text="${(member.reportPoints != null ? member.reportPoints : 0) + ' / 5 點'}"
+								style="color: red; font-weight: 700;"></td>
+							<td><span class="status-badge badge-suspended">🚫
+									已被停權</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
 
 
-    <div class="card-panel detail-panel" id="detailPanel">
-        <div class="detail-placeholder" id="placeholderText">
-            <h3>🫵 請點選左側任意會員</h3>
-            <p style="margin-top: 10px; font-size: 13px;">點選後，此處將自動載入該會員的完整 KYC 實名與評價詳細資料。</p>
-        </div>
-        
-        <div id="detailContent" style="display: none;">
-            <div class="detail-header">
-                <img class="detail-avatar" id="detAvatar" src="" alt="大頭貼">
-                <div>
-                    <h3 id="detRealName" style="font-size: 18px; font-weight: 700;"></h3>
-                    <p id="detNickname" style="color: #64748b; font-size: 14px;"></p>
-                </div>
-            </div>
+		<div class="card-panel detail-panel" id="detailPanel">
+			<div class="detail-placeholder" id="placeholderText">
+				<h3>🫵 請點選左側任意會員</h3>
+				<p style="margin-top: 10px; font-size: 13px;">點選後，此處將自動載入該會員的完整
+					KYC 實名與評價詳細資料。</p>
+			</div>
 
-            <div class="info-grid">
-                <div class="info-item"><div class="info-label">會員 ID</div><div class="info-value" id="detId"></div></div>
-                <div class="info-item"><div class="info-label">手機號碼</div><div class="info-value" id="detPhone"></div></div>
-                <div class="info-item" style="grid-column: span 2;"><div class="info-label">電子信箱</div><div class="info-value" id="detEmail"></div></div>
-                <div class="info-item"><div class="info-label">身分證字號</div><div class="info-value" id="detIdNumber"></div></div>
-                <div class="info-item"><div class="info-label">性別</div><div class="info-value" id="detGender"></div></div>
-                <div class="info-item"><div class="info-label">銀行代碼</div><div class="info-value" id="detBankCode"></div></div>
-                <div class="info-item"><div class="info-label">銀行帳戶</div><div class="info-value" id="detBankAccount"></div></div>
-                <div class="info-item"><div class="info-label">累計檢舉點數</div><div class="info-value" id="detPoints" style="color: var(--rose-600);"></div></div>
-                <div class="info-item"><div class="info-label">註冊日期</div><div class="info-value" id="detCreatedAt"></div></div>
-            </div>
+			<div id="detailContent" style="display: none;">
+				<div class="detail-header">
+					<img class="detail-avatar" id="detAvatar" src="" alt="大頭貼">
+					<div>
+						<h3 id="detRealName" style="font-size: 18px; font-weight: 700;"></h3>
+						<p id="detNickname" style="color: #64748b; font-size: 14px;"></p>
+					</div>
+				</div>
 
-            <div style="margin-bottom: 20px;">
-                <div class="info-label" style="font-weight: 700; color: var(--slate-700);">🪪 KYC 證件照片核對 (點擊照片可放大)</div>
-                <div class="kyc-img-box">
-                    <div>
-                        <span style="font-size: 12px; color: #64748b;">身分證件正面</span>
-                        <img id="detIdImg" src="" alt="身分證" onclick="zoomImage(this)">
-                    </div>
-                    <div>
-                        <span style="font-size: 12px; color: #64748b;">現場自拍人臉</span>
-                        <img id="detFaceImg" src="" alt="自拍圖" onclick="zoomImage(this)">
-                    </div>
-                </div>
-            </div>
+				<div class="info-grid">
+					<div class="info-item">
+						<div class="info-label">會員 ID</div>
+						<div class="info-value" id="detId"></div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">手機號碼</div>
+						<div class="info-value" id="detPhone"></div>
+					</div>
+					<div class="info-item" style="grid-column: span 2;">
+						<div class="info-label">電子信箱</div>
+						<div class="info-value" id="detEmail"></div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">身分證字號</div>
+						<div class="info-value" id="detIdNumber"></div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">性別</div>
+						<div class="info-value" id="detGender"></div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">銀行代碼</div>
+						<div class="info-value" id="detBankCode"></div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">銀行帳戶</div>
+						<div class="info-value" id="detBankAccount"></div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">累計檢舉點數</div>
+						<div class="info-value" id="detPoints"
+							style="color: var(--rose-600);"></div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">註冊日期</div>
+						<div class="info-value" id="detCreatedAt"></div>
+					</div>
+				</div>
 
-            <div id="detActionArea" style="border-top: 1px solid var(--slate-200); padding-top: 16px; text-align: right;">
-            </div>
-        </div>
-    </div>
+				<div style="margin-bottom: 20px;">
+					<div class="info-label"
+						style="font-weight: 700; color: var(--slate-700);">🪪 KYC
+						證件照片核對 (點擊照片可放大)</div>
+					<div class="kyc-img-box">
+						<div>
+							<span style="font-size: 12px; color: #64748b;">身分證件正面</span> <img
+								id="detIdImg" src="" alt="身分證" onclick="zoomImage(this)">
+						</div>
+						<div>
+							<span style="font-size: 12px; color: #64748b;">現場自拍人臉</span> <img
+								id="detFaceImg" src="" alt="自拍圖" onclick="zoomImage(this)">
+						</div>
+					</div>
+				</div>
 
-</div>
+				<div id="detActionArea"
+					style="border-top: 1px solid var(--slate-200); padding-top: 16px; text-align: right;">
+				</div>
+			</div>
+		</div>
 
-<div id="imgModal" class="image-modal" onclick="closeZoom()">
-    <span class="close-modal-btn">&times;</span>
-    <img id="modalTargetImg" src="" alt="放大圖">
-</div>
+	</div>
 
-<script th:inline="javascript">
+	<div id="imgModal" class="image-modal" onclick="closeZoom()">
+		<span class="close-modal-btn">&times;</span> <img id="modalTargetImg"
+			src="" alt="放大圖">
+	</div>
+
+	<script th:inline="javascript">
     // 1. 頁籤切換邏輯
     function switchTab(btn, tabId) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
