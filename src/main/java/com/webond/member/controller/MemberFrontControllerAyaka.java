@@ -1,5 +1,7 @@
 package com.webond.member.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -8,10 +10,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import com.webond.activity.model.ActivityService;
+import com.webond.activity.model.ActivityVO;
 import com.webond.member.model.MemberVO;
 import com.webond.member.service.MemberService;
+import com.webond.service.model.ServiceVO;
+import com.webond.service.service.ServiceService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -22,34 +29,72 @@ public class MemberFrontControllerAyaka {
 	@Autowired
 	MemberService memberService;
 	
+	@Autowired
+	ServiceService serviceService;
+	
+	@Autowired
+	ActivityService activityService;
+	
+	
+	//會員頁面
+	@GetMapping("oneMember")
+	public String getOneMember(@RequestParam("memberId") Integer memberId,ModelMap model) {
+		
+
+		MemberVO memberVO = memberService.getOneMember(memberId);
+		ServiceVO serviceList = serviceService.getOneService(memberId);
+		ActivityVO activityList = activityService.getOneActivity(memberId);
+
+		model.addAttribute("memberVO", memberVO);
+		model.addAttribute("serviceListData", serviceList);
+		model.addAttribute("activityListData", activityList);
+		
+		return "front-end/member/profile";
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	//會員個人頁面
-	@GetMapping("{memberId}")
-	public String getOneMember(@PathVariable Integer memberId,ModelMap model, HttpSession session) {
-		
+	@GetMapping("my")
+	public String getMyMemberPage(@PathVariable Integer memberId,ModelMap model, HttpSession session) {			
 		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 		if(loginMember == null) {
 			return "redirect:/member/login";
 		}
-
 		MemberVO memberVO = memberService.getOneMember(memberId);
 		model.addAttribute("memberVO", memberVO);
 		return "front-end/member/profile";
 	}
+		
 	
 	//會員編輯資料
 	@GetMapping("edit")
-	public String editProfile(@SessionAttribute Integer memberId, ModelMap model) {
-		MemberVO memberVO = memberService.getOneMember(memberId);
+	public String editProfile(@SessionAttribute("memberVO") MemberVO loginMember, ModelMap model) {
+		//只能編輯自己的資料
+		MemberVO memberVO = memberService.getOneMember(loginMember.getMemberId());
 		model.addAttribute(memberVO);
 		return "front-end/member/edit";
 	}
 	
 	@PostMapping("update")
-	public String updateProfile(@Valid MemberVO memberVO,BindingResult result,ModelMap model) {
+	public String updateProfile(@Valid MemberVO memberVO,BindingResult result, @SessionAttribute("memberVO") MemberVO loginMember,ModelMap model) {
 		if(result.hasErrors()) {
 			return "front/member/edit";
 		}
+		
+		if(!loginMember.getMemberId().equals(memberVO.getMemberId())) {
+			model.addAttribute("error", "無修改權限");
+			return "front-end/member/edit";			
+		}
+		
 		memberService.updateMember(memberVO);
 		model.addAttribute("success", "finish");
 		

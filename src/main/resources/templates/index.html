@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>Webond 首頁</title>
+</head>
+<body>
+
+<table>
+      <thead>
+        <tr>
+          <th>會員ID</th>
+
+          <th>會員頁面</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="m : ${memberListData}">
+          <td th:text="${m.memberId}"></td>
+         
+          <td>
+          	<a th:href="@{/front/memberPage/oneMember(memberId=${m.memberId})}">會員頁面</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+</body>
+</html>
