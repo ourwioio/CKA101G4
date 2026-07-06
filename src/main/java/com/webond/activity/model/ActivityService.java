@@ -1,11 +1,16 @@
 package com.webond.activity.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.webond.activity.repository.ActivityRepository;
 
+import jakarta.persistence.criteria.Predicate;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,6 +22,50 @@ public class ActivityService {
 
 	public List<ActivityVO> getAll() {
 		return repository.findAll();
+	}
+
+	public List<ActivityVO> searchActivities(String keyword, Integer typeId, Byte status, Boolean onlyAvailable,
+			String sort) {
+
+		Specification<ActivityVO> spec = (root, query, cb) -> {
+			List<Predicate> predicates = new ArrayList<>();
+
+			if (keyword != null && !keyword.trim().isEmpty()) {
+				String likeKeyword = "%" + keyword.trim().toLowerCase() + "%";
+				predicates.add(cb.or(cb.like(cb.lower(root.<String>get("activityTitle")), likeKeyword),
+						cb.like(cb.lower(root.<String>get("activityDescription")), likeKeyword)));
+			}
+
+			if (typeId != null) {
+				predicates.add(cb.equal(root.get("activityTypeId"), typeId));
+			}
+
+			if (status != null) {
+				predicates.add(cb.equal(root.get("activityStatus"), status));
+			}
+
+			if (Boolean.TRUE.equals(onlyAvailable)) {
+				predicates.add(cb.lessThan(cb.coalesce(root.<Integer>get("attendeesCount"), 0),
+						root.<Integer>get("maxParticipants")));
+			}
+
+			return cb.and(predicates.toArray(new Predicate[0]));
+		};
+
+		return repository.findAll(spec, buildActivitySort(sort));
+	}
+
+	private Sort buildActivitySort(String sort) {
+		if ("priceAsc".equals(sort)) {
+			return Sort.by(Sort.Direction.ASC, "activityPrice");
+		}
+		if ("priceDesc".equals(sort)) {
+			return Sort.by(Sort.Direction.DESC, "activityPrice");
+		}
+		if ("endTimeAsc".equals(sort)) {
+			return Sort.by(Sort.Direction.ASC, "endTime");
+		}
+		return Sort.by(Sort.Direction.DESC, "createdAt");
 	}
 
 	public ActivityVO getOneActivity(Integer id) {

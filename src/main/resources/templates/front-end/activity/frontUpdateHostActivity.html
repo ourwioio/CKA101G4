@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>修改活動</title>
+
+<style>
+body {
+	background: #f8fafc;
+	color: #1e293b;
+	font-family: "Microsoft JhengHei", sans-serif;
+	margin: 0;
+	padding: 40px;
+}
+
+.header-container {
+	max-width: 950px;
+	margin: 0 auto 20px auto;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 2px solid #e2e8f0;
+	padding-bottom: 20px;
+}
+
+.header-title {
+	font-size: 1.8rem;
+	font-weight: bold;
+	color: #0f172a;
+}
+
+.btn-secondary {
+	background: white;
+	color: #475569;
+	border: 1px solid #cbd5e1;
+	padding: 10px 20px;
+	border-radius: 8px;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.form-card {
+	background: white;
+	max-width: 950px;
+	margin: auto;
+	border-radius: 12px;
+	padding: 30px 40px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, .08);
+}
+
+.form-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+}
+
+.col-span-2 {
+	grid-column: span 2;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 8px;
+	font-weight: bold;
+}
+
+.required {
+	color: red;
+}
+
+.form-control {
+	width: 100%;
+	padding: 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	box-sizing: border-box;
+	font-size: 15px;
+}
+
+textarea.form-control {
+	min-height: 120px;
+	resize: vertical;
+}
+
+.error {
+	color: red;
+	font-size: 14px;
+	margin-top: 5px;
+	font-weight: bold;
+}
+
+.input-error {
+	border: 2px solid red !important;
+}
+
+.form-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+	margin-top: 30px;
+	padding-top: 20px;
+	border-top: 1px solid #e2e8f0;
+}
+
+.btn-submit {
+	background: #8b5cf6;
+	color: white;
+	border: none;
+	padding: 12px 24px;
+	border-radius: 8px;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.btn-cancel {
+	background: white;
+	color: #475569;
+	border: 1px solid #cbd5e1;
+	padding: 12px 24px;
+	border-radius: 8px;
+	text-decoration: none;
+	font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+	<div class="header-container">
+		<div class="header-title">✏️ 修改活動</div>
+
+		<a th:href="@{/activity/front/myHostActivity}" class="btn-secondary">
+			🔙 返回我舉辦的活動 </a>
+	</div>
+
+	<div class="form-card">
+
+		<form th:action="@{/activity/front/updateHostActivity}"
+			th:object="${activityVO}" method="post">
+
+			<input type="hidden" th:field="*{activityId}"> <input
+				type="hidden" th:field="*{memberId}"> <input type="hidden"
+				th:field="*{attendeesCount}"> <input type="hidden"
+				th:field="*{activityStatus}">
+
+			<div class="form-grid">
+
+				<div class="form-group col-span-2">
+					<label>活動標題 <span class="required">*</span></label> <input
+						type="text" th:field="*{activityTitle}" class="form-control"
+						placeholder="請輸入活動標題"
+						th:classappend="${#fields.hasErrors('activityTitle')} ? ' input-error'">
+
+					<div class="error" th:if="${#fields.hasErrors('activityTitle')}"
+						th:errors="*{activityTitle}"></div>
+				</div>
+
+				<div class="form-group">
+					<label>活動類型 <span class="required">*</span></label> <select
+						th:field="*{activityTypeId}" class="form-control"
+						th:classappend="${#fields.hasErrors('activityTypeId')} ? ' input-error'">
+						<option value="">請選擇類型</option>
+						<option th:each="type : ${typeListData}"
+							th:value="${type.activityTypeId}"
+							th:text="${type.activityTypeName}"></option>
+					</select>
+
+					<div class="error" th:if="${#fields.hasErrors('activityTypeId')}"
+						th:errors="*{activityTypeId}"></div>
+				</div>
+
+				<div class="form-group">
+					<label>活動費用 <span class="required">*</span></label> <input
+						type="number" th:field="*{activityPrice}" class="form-control"
+						min="0"
+						th:classappend="${#fields.hasErrors('activityPrice')} ? ' input-error'">
+
+					<div class="error" th:if="${#fields.hasErrors('activityPrice')}"
+						th:errors="*{activityPrice}"></div>
+				</div>
+
+				<div class="form-group">
+					<label>最低成團人數 <span class="required">*</span></label> <input
+						type="number" th:field="*{minParticipants}" class="form-control"
+						min="1"
+						th:classappend="${#fields.hasErrors('minParticipants')} ? ' input-error'">
+
+					<div class="error" th:if="${#fields.hasErrors('minParticipants')}"
+						th:errors="*{minParticipants}"></div>
+				</div>
+
+				<div class="form-group">
+					<label>最高人數限制 <span class="required">*</span></label> <input
+						type="number" th:field="*{maxParticipants}" class="form-control"
+						min="1"
+						th:classappend="${#fields.hasErrors('maxParticipants')} ? ' input-error'">
+
+					<div class="error" th:if="${#fields.hasErrors('maxParticipants')}"
+						th:errors="*{maxParticipants}"></div>
+				</div>
+
+				<div class="form-group">
+					<label>報名開始時間 <span class="required">*</span></label> <input
+						type="datetime-local" th:field="*{registrationStartTime}"
+						class="form-control"
+						th:classappend="${#fields.hasErrors('registrationStartTime')} ? ' input-error'">
+
+					<div class="error"
+						th:if="${#fields.hasErrors('registrationStartTime')}"
+						th:errors="*{registrationStartTime}"></div>
+				</div>
+
+				<div class="form-group">
+					<label>報名截止時間 <span class="required">*</span></label> <input
+						type="datetime-local" th:field="*{registrationDeadline}"
+						class="form-control"
+						th:classappend="${#fields.hasErrors('registrationDeadline')} ? ' input-error'">
+
+					<div class="error"
+						th:if="${#fields.hasErrors('registrationDeadline')}"
+						th:errors="*{registrationDeadline}"></div>
+				</div>
+
+				<div class="form-group">
+					<label>活動結束時間 <span class="required">*</span></label> <input
+						type="datetime-local" th:field="*{endTime}" class="form-control"
+						th:classappend="${#fields.hasErrors('endTime')} ? ' input-error'">
+
+					<div class="error" th:if="${#fields.hasErrors('endTime')}"
+						th:errors="*{endTime}"></div>
+				</div>
+
+				<div class="form-group col-span-2">
+					<label>活動描述 <span class="required">*</span></label>
+					<textarea th:field="*{activityDescription}" class="form-control"
+						placeholder="請輸入活動內容"
+						th:classappend="${#fields.hasErrors('activityDescription')} ? ' input-error'"></textarea>
+
+					<div class="error"
+						th:if="${#fields.hasErrors('activityDescription')}"
+						th:errors="*{activityDescription}"></div>
+				</div>
+
+			</div>
+
+			<div class="form-actions">
+				<a th:href="@{/activity/front/myHostActivity}" class="btn-cancel">取消</a>
+				<button type="submit" class="btn-submit">💾 儲存修改</button>
+			</div>
+
+		</form>
+
+	</div>
+
+</body>
+</html>

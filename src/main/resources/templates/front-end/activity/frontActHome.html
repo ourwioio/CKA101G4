@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>使用者前台</title>
+<title>活動前台</title>
 
 <style>
 body {
@@ -17,7 +17,7 @@ body {
 	max-width: 1100px;
 	margin: auto;
 	text-align: center;
-	margin-bottom: 40px;
+	margin-bottom: 28px;
 }
 
 .header h1 {
@@ -29,6 +29,52 @@ body {
 .header p {
 	color: #64748b;
 	font-size: 1.05rem;
+}
+
+.login-panel {
+	max-width: 1100px;
+	margin: 0 auto 32px;
+	background: white;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 18px 20px;
+	box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+}
+
+.login-panel strong {
+	color: #0f172a;
+}
+
+.login-form {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.login-form select {
+	min-width: 220px;
+	padding: 10px 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	font-size: 15px;
+}
+
+.login-form button {
+	background: #2563eb;
+	color: white;
+	border: 0;
+	border-radius: 8px;
+	padding: 10px 18px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.login-form button:hover {
+	background: #1d4ed8;
 }
 
 .card-container {
@@ -111,6 +157,19 @@ body {
 .back:hover {
 	background: #475569;
 }
+
+@media (max-width: 700px) {
+	.login-panel,
+	.login-form {
+		display: block;
+	}
+
+	.login-form select,
+	.login-form button {
+		width: 100%;
+		margin-top: 10px;
+	}
+}
 </style>
 
 </head>
@@ -118,42 +177,60 @@ body {
 <body>
 
 	<div class="header">
-		<h1>🎯 使用者前台</h1>
+		<h1>活動前台</h1>
 		<p>
-			歡迎， <span th:text="${loginMemberName}">測試會員</span> ，請選擇要使用的功能。
+			目前登入：<span th:text="${loginMemberName}">測試會員</span>
+			（會員編號 <span th:text="${loginMemberId}">1</span>）
 		</p>
+	</div>
+
+	<div class="login-panel">
+		<div>
+			<strong>測試登入會員</strong>
+			<div>切換後，「我的報名」和「我的主辦活動」會依這個會員編號查詢。</div>
+		</div>
+
+		<form class="login-form" th:action="@{/activity/front/fakeLogin}" method="post">
+			<select name="memberId">
+				<option th:each="member : ${memberListData}"
+					th:value="${member.memberId}"
+					th:selected="${member.memberId == loginMemberId}"
+					th:text="|會員${member.memberId} - ${member.nickname ?: '未命名'}|">
+				</option>
+			</select>
+			<button type="submit">切換</button>
+		</form>
 	</div>
 
 	<div class="card-container">
 
 		<div class="card">
-			<div class="icon">📅</div>
+			<div class="icon">A</div>
 			<h2>活動列表</h2>
-			<p>瀏覽所有活動，查看活動詳情並進行報名。</p>
-			<a th:href="@{/activity/front/list}" class="btn list"> 查看活動 </a>
+			<p>瀏覽目前活動，查看活動詳情並進行報名。</p>
+			<a th:href="@{/activity/front/list}" class="btn list">查看活動</a>
 		</div>
 
 		<div class="card">
-			<div class="icon">📋</div>
-			<h2>我的活動</h2>
-			<p>查看自己已報名參加的活動與訂單紀錄。</p>
-			<a th:href="@{/activity/front/myOrder}" class="btn my"> 查看我的活動 </a>
+			<div class="icon">O</div>
+			<h2>我的報名</h2>
+			<p>查看目前測試登入會員已報名的活動訂單。</p>
+			<a th:href="@{/activity/front/myOrder}" class="btn my">查看我的報名</a>
 		</div>
 
 		<div class="card">
-			<div class="icon">🎪</div>
-			<h2>我要辦活動</h2>
-			<p>建立自己主辦的活動，讓其他會員報名參加。</p>
-			<a th:href="@{/activity/front/addHostActivity}" class="btn host">
-				建立活動 </a> <a th:href="@{/activity/front/myHostActivity}"
-				class="btn host"> 查看我舉辦的活動 </a>
+			<div class="icon">H</div>
+			<h2>主辦活動</h2>
+			<p>新增主辦活動，或查看目前測試登入會員舉辦的活動。</p>
+			<a th:href="@{/activity/front/addHostActivity}" class="btn host">新增活動</a>
+			<a th:href="@{/activity/front/myHostActivity}" class="btn host">我的主辦活動</a>
 		</div>
 
 		<div class="card">
-			<div class="icon">🏠</div>
-			<h2>返回活動系統</h2>
-			<p>回到活動系統入口，重新選擇前台或後台。</p>
-			<a th:href="@{/activity/home}" class="btn back"> 返回入口 </a>
+			<div class="icon">B</div>
+			<h2>回活動入口</h2>
+			<p>回到活動系統入口，切換前台或後台管理頁。</p>
+			<a th:href="@{/activity/home}" class="btn back">回入口</a>
 		</div>
 
 	</div>
