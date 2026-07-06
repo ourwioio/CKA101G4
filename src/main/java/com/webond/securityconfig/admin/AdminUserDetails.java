@@ -19,11 +19,11 @@ public class AdminUserDetails implements UserDetails{
 		this.authorities = authorities;
 	}
 	
-	public EmployeeVO getEmpVO() {
+	public EmployeeVO getEmployeeVO() {
 		return empVO;
 	}
 	
-	public Integer getEmpId() {
+	public Integer getEmployeeId() {
 		return empVO.getEmployeeId();
 	}
 
