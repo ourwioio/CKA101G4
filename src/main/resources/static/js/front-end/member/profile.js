@@ -1,5 +1,5 @@
 const ITEMS_PER_PAGE = 4;
-const pageState = { service: 1, activity: 1 };
+const pageState = { service: 1, activity: 1, venue: 1 };
 
 function setupPagination(type) {
   const grid = document.getElementById(type + "Grid");
@@ -43,4 +43,5 @@ window.changePage = function (type, direction) {
 document.addEventListener("DOMContentLoaded", function () {
   renderFns.service = setupPagination("service");
   renderFns.activity = setupPagination("activity");
+  renderFns.venue = setupPagination("venue");
 });

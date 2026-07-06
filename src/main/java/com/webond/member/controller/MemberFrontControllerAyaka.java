@@ -1,6 +1,7 @@
 package com.webond.member.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,6 +20,9 @@ import com.webond.member.model.MemberVO;
 import com.webond.member.service.MemberService;
 import com.webond.service.model.ServiceVO;
 import com.webond.service.service.ServiceService;
+import com.webond.venue.model.VenueImagesVO;
+import com.webond.venue.model.VenueVO;
+import com.webond.venue.service.VenueService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -35,21 +39,43 @@ public class MemberFrontControllerAyaka {
 	@Autowired
 	ActivityService activityService;
 	
+	@Autowired
+	VenueService venueService;
+	
+	
+	
+	
 	
 	//會員頁面
 	@GetMapping("oneMember")
-	public String getOneMember(@RequestParam("memberId") Integer memberId,ModelMap model) {
-		
+	public String getOneMember(@RequestParam("memberId") Integer memberId,
+	        @RequestParam(value = "venueId", required = false) Integer venueId,
+	        ModelMap model) {
+	    
+	    MemberVO memberVO = memberService.getOneMember(memberId);
+	    ServiceVO serviceList = serviceService.getOneService(memberId);
+	    ActivityVO activityList = activityService.getOneActivity(memberId);
+	    List<VenueVO> venueList = venueService.getVenuesByMember(memberId);
+	    
+	    // 為每個 venue 載入圖片
+	    if (venueList != null) {
+	        for (VenueVO v : venueList) {
+	            Set<VenueImagesVO> imgs = venueService.getImagesByVenue(v.getVenueId());
+	            v.setVenueImages(imgs);
+	        }
+	    }
+	    
+	    model.addAttribute("memberVO", memberVO);
+	    model.addAttribute("serviceListData", serviceList);
+	    model.addAttribute("activityListData", activityList);
+	    model.addAttribute("venueListData", venueList);
 
-		MemberVO memberVO = memberService.getOneMember(memberId);
-		ServiceVO serviceList = serviceService.getOneService(memberId);
-		ActivityVO activityList = activityService.getOneActivity(memberId);
+	    if (venueId != null) {
+	        Set<VenueImagesVO> venueImgList = venueService.getImagesByVenue(venueId);
+	        model.addAttribute("venueImagesData", venueImgList);
+	    }
 
-		model.addAttribute("memberVO", memberVO);
-		model.addAttribute("serviceListData", serviceList);
-		model.addAttribute("activityListData", activityList);
-		
-		return "front-end/member/profile";
+	    return "front-end/member/profile";
 	}
 	
 	
