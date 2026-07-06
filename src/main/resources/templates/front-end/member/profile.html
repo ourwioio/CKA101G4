@@ -1,0 +1,237 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>會員個人檔案</title>
+    <link rel="stylesheet" th:href="@{/css/front-end/member/profile.css}" />
+    <style>
+      
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- ========== 頭部檔案 ========== -->
+      <div class="profile-header">
+        <div class="profile-avatar">
+          <img
+            th:src="${memberVO.memberPic != null ? memberVO.memberPic : '/images/file.jpeg'}" alt="會員頭貼"
+            class="avatar-img"  th:onerror="'this.src=\'' + @{/images/file.jpeg} + '\''"/>
+        </div>
+
+        <div class="profile-info">
+          <h1 class="member-name" th:text="${memberVO.nickname}">會員暱稱</h1>
+
+          <!-- 身份標章 -->
+          <div class="member-status">
+            <span
+              class="status-badge status0"
+              th:if="${memberVO.accountStatus == 0}">
+              身份未認證
+            </span>
+            <span
+              class="status-badge status1"
+              th:if="${memberVO.accountStatus == 1}">
+              身份已認證
+            </span>
+            <span
+              class="status-badge status3"
+              th:if="${memberVO.accountStatus == 3}">
+              帳號停權
+            </span>
+            <span
+              class="status-badge status4"
+              th:if="${memberVO.accountStatus == 4}">
+              限制參加活動
+            </span>
+          </div>
+
+          
+
+<!--           聯繫資訊 -->
+<!--           <div class="member-contact"> -->
+<!--             <div class="contact-item"> -->
+<!--               <span class="contact-icon">📧</span> -->
+<!--               <span th:text="${memberVO.email}">email@example.com</span> -->
+<!--             </div> -->
+<!--             <div class="contact-item"> -->
+<!--               <span class="contact-icon">📞</span> -->
+<!--               <span th:text="${memberVO.phone}">09xx-xxx-xxx</span> -->
+<!--             </div> -->
+<!--           </div> -->
+
+          <!-- 加入日期 -->
+          <div class="member-contact" style="margin-top: 10px">
+            <div class="contact-item">
+              <span class="contact-icon">📅</span>
+              <span th:text="'加入時間： ' + ${memberVO.createdAt}"></span>
+            </div>
+          </div>
+
+          <!-- 操作按鈕 -->
+          <div class="action-buttons" style="margin-top: 20px">
+            <button class="btn btn-primary" onclick="sendMessage()">
+              💬 傳送訊息
+            </button>
+            <button class="btn btn-secondary" onclick="addFavorite()">
+              ❤ 收藏會員
+            </button>
+
+            <!-- 如果是會員自己，顯示編輯按鈕 -->
+<!--             <a -->
+<!--               th:if="${memberVO.memberId == session.memberVO.memberId}" -->
+<!--               th:href="@{/front/memberPage/edit}" -->
+<!--               class="btn btn-edit"> -->
+<!--               ✎ 編輯資料 -->
+<!--             </a> -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== 自我介紹 ========== -->
+      <div class="section" th:if="${memberVO.memberIntro}">
+        <h2 class="section-title">自我介紹</h2>
+        <p class="intro-text" th:text="${memberVO.memberIntro}"></p>
+      </div>
+
+      <!-- ========== 評分統計卡片 ========== -->
+      <div class="section">
+        <h2 class="section-title">評分統計</h2>
+        <div class="rating-stats">
+          <!-- 參加服務評分 -->
+          <div class="stat-card service">
+            <div class="stat-label">參加服務評分</div>
+            <div class="stat-number" th:text="${memberVO.serviceAvgRate} + ' / 5.0'"></div>
+            <div class="stat-detail" th:text="'共 ' + ${memberVO.serviceRateCount} + ' 次評價'"></div>
+          </div>
+
+          <!-- 提供服務評分 -->
+          <div class="stat-card servicer">
+            <div class="stat-label">提供服務評分</div>
+            <div class="stat-number" th:text="${memberVO.servicerAvgRate} + ' / 5.0'"></div>
+            <div class="stat-detail" th:text="'共 ' + ${memberVO.servicerRateCount} + ' 次評價'"></div>
+          </div>
+
+          <!-- 參加活動評分 -->
+          <div class="stat-card activity">
+          
+            <div class="stat-label">參加活動評分</div>
+            <div class="stat-number" th:text="${memberVO.actAvgRate} + ' / 5.0'"> </div>
+            <div class="stat-detail" th:text="'共 ' + ${memberVO.actRateCount} + ' 次評價'"></div>
+            
+          </div>
+
+          <!-- 舉辦活動評分 -->
+          <div class="stat-card hold">
+            <div class="stat-label">舉辦活動評分</div>
+            <div class="stat-number" th:text="${memberVO.holdactAvgRate} + ' / 5.0'"></div>
+            <div class="stat-detail" th:text="'共 ' + ${memberVO.holdactRateCount} + ' 次評價'">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== 最近評論 ========== -->
+      <div class="section">
+        <h2 class="section-title">最近評論</h2>
+        <div class="reviews-container">
+          <!-- 這裡需要從後端傳來評論列表 -->
+          <div class="no-reviews">
+            <p>📝 暫無評論</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 服務區塊 -->
+        <section class="section">
+        <h2 class="section-title">上架服務</h2>
+        <div class="card-grid" id="serviceGrid">
+            <div th:each="service, iterStat : ${serviceListData}"
+                class="item-card"
+                th:attr="data-index=${iterStat.index}">
+            
+	            <a th:href="@{/front/services/{id}(id=${service.serviceId})}" 
+				   class="item-card-body" 
+				   style="text-decoration: none; color: inherit;">
+	                <div class="item-card-title" th:text="${service.serviceName}"></div>
+	                <div class="item-card-desc" th:text="${service.description}"></div>
+	                <div class="item-card-footer">
+		                <span class="item-price" th:text="'NT ' + ${service.hourlyRate} + ' / 小時'"></span>
+		                <span class="item-date" th:text="${#temporals.format(service.createdAt, 'yyyy-MM-dd')}"></span>
+	                </div>
+	            </a>
+            </div>
+
+            <!-- 沒有資料時顯示 -->
+            <div class="no-items" th:if="${#lists.isEmpty(serviceListData)}">
+            📦 目前尚無上架服務
+            </div>
+        </div>
+
+        <!-- 分頁按鈕（沒有資料時不顯示） -->
+        <div class="pagination" id="servicePagination" th:if="${not #lists.isEmpty(serviceListData)}">
+            <button onclick="changePage('service', -1)" id="servicePrevBtn">上一頁</button>
+            <span class="page-info" id="servicePageInfo">1 / 1</span>
+            <button onclick="changePage('service', 1)" id="serviceNextBtn">下一頁</button>
+        </div>
+        </section>
+
+        <!-- 活動區塊 -->
+        <section class="section">
+        <h2 class="section-title">舉辦活動</h2>
+        <div class="card-grid" id="activityGrid">
+            <div th:each="activity, iterStat : ${activityListData}"
+                class="item-card"
+                th:attr="data-index=${iterStat.index}">
+            
+	           <a th:href="@{/}"
+				   class="item-card-body" 
+				   style="text-decoration: none; color: inherit;">
+	                <div class="item-card-title" th:text="${activity.activityTitle}"></div>
+	                <div class="item-card-desc" th:text="${activity.activityDescription}"></div>
+	                <div class="item-card-footer">
+		                <span class="item-price" th:text="'NT ' + ${activity.activityPrice}"></span>
+                    <span class="item-time" th:text="${#temporals.format(activity.startTime, 'yyyy-MM-dd')+' ~ '+#temporals.format(activity.endTime, 'yyyy-MM-dd')}"></span>
+		                <span th:switch="${activity.activityStatus}">
+		                    <span th:case="0" class="item-status status-normal">正常舉行</span>
+		                    <span th:case="1" class="item-status status-delay">延期</span>
+		                    <span th:case="2" class="item-status status-cancel">取消</span>
+		                </span>
+	                </div>
+	            </a>
+            </div>
+
+            <div class="no-items" th:if="${#lists.isEmpty(activityListData)}">
+            📦 目前尚無舉辦活動
+            </div>
+        </div>
+
+        <div class="pagination" id="activityPagination" th:if="${not #lists.isEmpty(activityListData)}">
+            <button onclick="changePage('activity', -1)" id="activityPrevBtn">上一頁</button>
+            <span class="page-info" id="activityPageInfo">1 / 1</span>
+            <button onclick="changePage('activity', 1)" id="activityNextBtn">下一頁</button>
+        </div>
+        </section>
+    </div>
+    <script th:src="@{/js/front-end/member/profile.js}"></script>
+    <script>
+      function sendMessage() {
+        const memberId =
+          new URLSearchParams(window.location.search).get("memberId") ||
+          window.location.pathname.split("/").pop();
+        alert("跳轉至訊息頁面，傳送給會員 " + memberId);
+        // window.location.href = `/front/message/new?memberId=${memberId}`;
+      }
+
+      function bookService() {
+        alert("跳轉至服務預約頁面");
+        // window.location.href = '/front/service/book';
+      }
+
+      function addFavorite() {
+        alert("已加入收藏");
+        // 這裡可以調用 API 加入收藏
+      }
+    </script>
+  </body>
+</html>

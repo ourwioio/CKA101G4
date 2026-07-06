@@ -421,4 +421,38 @@ public class MemberVO implements java.io.Serializable {
 	public void setBankAccount(String bankAccount) {
 		this.bankAccount = bankAccount;
 	}
+	
+	//評價平均
+	public double getServiceAvgRate() {
+		if(serviceRateCount != null && serviceRateCount > 0) {
+			double result = serviceRateSum.doubleValue() / serviceRateCount;
+			return Math.round(result * 10) / 10.0;
+		}
+		return 0.0;
+	}
+	
+	public double getServicerAvgRate() {
+		if(servicerRateCount != null && servicerRateCount > 0) {
+			double result = servicerRateSum.doubleValue() / servicerRateCount;
+			return Math.round(result * 10) / 10.0;
+		}
+		return 0.0;
+	}
+	
+	public double getActAvgRate() {
+		if(actRateCount != null && actRateCount > 0) {
+			 double result = actRateSum.doubleValue() / actRateCount;
+			 return Math.round(result * 10) / 10.0;
+		}
+		return 0.0;
+	}
+	
+	public double getHoldactAvgRate() {
+		if(holdactRateCount != null && holdactRateCount > 0) {
+			double result = holdactRateSum.doubleValue() / holdactRateCount;
+			return Math.round(result * 10) / 10.0;
+		}
+		return 0.0;
+	}
+	
 }
