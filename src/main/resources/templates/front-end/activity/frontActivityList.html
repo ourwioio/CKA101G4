@@ -13,7 +13,7 @@ body {
 
 .header {
 	max-width: 1200px;
-	margin: 40px auto;
+	margin: 40px auto 24px;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -21,6 +21,7 @@ body {
 
 .header h1 {
 	color: #0f172a;
+	margin-bottom: 8px;
 }
 
 .member {
@@ -39,6 +40,80 @@ body {
 
 .back-btn:hover {
 	background: #475569;
+}
+
+.search-panel {
+	max-width: 1200px;
+	margin: 0 auto 25px;
+	background: white;
+	border-radius: 12px;
+	padding: 20px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+}
+
+.search-form {
+	display: grid;
+	grid-template-columns: 2fr 1fr 1fr 1fr auto auto;
+	gap: 12px;
+	align-items: end;
+}
+
+.form-group label {
+	display: block;
+	margin-bottom: 6px;
+	font-weight: bold;
+	color: #334155;
+	font-size: 14px;
+}
+
+.form-control {
+	width: 100%;
+	box-sizing: border-box;
+	padding: 10px 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	font-size: 15px;
+}
+
+.checkbox-group {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	height: 42px;
+	font-weight: bold;
+	color: #334155;
+}
+
+.btn-search,
+.btn-reset {
+	border: 0;
+	border-radius: 8px;
+	padding: 11px 18px;
+	font-weight: bold;
+	text-decoration: none;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+.btn-search {
+	background: #2563eb;
+	color: white;
+}
+
+.btn-search:hover {
+	background: #1d4ed8;
+}
+
+.btn-reset {
+	background: #e2e8f0;
+	color: #334155;
+}
+
+.result-info {
+	max-width: 1200px;
+	margin: 0 auto 18px;
+	color: #64748b;
+	font-weight: bold;
 }
 
 .container {
@@ -73,6 +148,13 @@ body {
 	margin: 15px 0;
 }
 
+.meta {
+	color: #475569;
+	font-size: 14px;
+	line-height: 1.8;
+	margin-bottom: 12px;
+}
+
 .desc {
 	color: #64748b;
 	line-height: 1.8;
@@ -93,6 +175,48 @@ body {
 .btn-detail:hover {
 	background: #1d4ed8;
 }
+
+.empty {
+	max-width: 1200px;
+	margin: auto;
+	background: white;
+	border-radius: 12px;
+	padding: 45px;
+	text-align: center;
+	color: #94a3b8;
+	font-size: 18px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+}
+
+@media (max-width: 900px) {
+	.search-form {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+@media (max-width: 600px) {
+	.header {
+		display: block;
+		margin: 24px 16px;
+	}
+
+	.header > div:last-child {
+		margin-top: 18px;
+		flex-wrap: wrap;
+	}
+
+	.search-panel,
+	.result-info,
+	.container,
+	.empty {
+		margin-left: 16px;
+		margin-right: 16px;
+	}
+
+	.search-form {
+		grid-template-columns: 1fr;
+	}
+}
 </style>
 
 </head>
@@ -100,42 +224,106 @@ body {
 <body>
 
 	<div class="header">
-
 		<div>
-			<h1>🎯 活動列表</h1>
-
+			<h1>活動列表</h1>
 			<div class="member">
-				歡迎， <span th:text="${loginMemberName}"></span>
+				目前登入：<span th:text="${loginMemberName}"></span>
 			</div>
 		</div>
 
 		<div style="display: flex; gap: 12px;">
-
-			<a th:href="@{/activity/front/myOrder}" class="back-btn"> 📋 我的活動
-			</a> <a th:href="@{/activity/home}" class="back-btn"> 🏠 返回活動系統 </a>
-
+			<a th:href="@{/activity/front/myOrder}" class="back-btn">我的報名</a>
+			<a th:href="@{/activity/home}" class="back-btn">回活動首頁</a>
 		</div>
-
 	</div>
 
-	<div class="container">
+	<div class="search-panel">
+		<form class="search-form" th:action="@{/activity/front/list}" method="get">
+			<div class="form-group">
+				<label>關鍵字</label>
+				<input class="form-control" type="text" name="keyword"
+					placeholder="搜尋活動名稱或內容" th:value="${keyword}">
+			</div>
 
+			<div class="form-group">
+				<label>活動類別</label>
+				<select class="form-control" name="typeId">
+					<option value="">全部類別</option>
+					<option th:each="type : ${typeListData}"
+						th:value="${type.activityTypeId}"
+						th:selected="${selectedTypeId != null and selectedTypeId == type.activityTypeId}"
+						th:text="${type.activityTypeName}"></option>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label>活動狀態</label>
+				<select class="form-control" name="status">
+					<option value="">全部狀態</option>
+					<option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">正常</option>
+					<option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">延期</option>
+					<option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">取消</option>
+				</select>
+			</div>
+
+			<div class="form-group">
+				<label>排序</label>
+				<select class="form-control" name="sort">
+					<option value="" th:selected="${sort == null or sort == ''}">最新建立</option>
+					<option value="priceAsc" th:selected="${sort == 'priceAsc'}">價格低到高</option>
+					<option value="priceDesc" th:selected="${sort == 'priceDesc'}">價格高到低</option>
+					<option value="endTimeAsc" th:selected="${sort == 'endTimeAsc'}">活動時間近到遠</option>
+				</select>
+			</div>
+
+			<label class="checkbox-group">
+				<input type="checkbox" name="onlyAvailable" value="true"
+					th:checked="${onlyAvailable}">
+				未額滿
+			</label>
+
+			<div style="display: flex; gap: 8px;">
+				<button type="submit" class="btn-search">搜尋</button>
+				<a th:href="@{/activity/front/list}" class="btn-reset">清除</a>
+			</div>
+		</form>
+	</div>
+
+	<div class="result-info">
+		共 <span th:text="${#lists.size(activityListData)}">0</span> 筆活動
+	</div>
+
+	<div class="empty" th:if="${#lists.isEmpty(activityListData)}">
+		目前沒有符合條件的活動
+	</div>
+
+	<div class="container" th:unless="${#lists.isEmpty(activityListData)}">
 		<div class="card" th:each="activity : ${activityListData}">
-
 			<h2 th:text="${activity.activityTitle}">活動名稱</h2>
 
 			<div class="price">
 				NT$ <span th:text="${activity.activityPrice}"></span>
 			</div>
 
+			<div class="meta">
+				<div>
+					人數：<span th:text="${activity.attendeesCount ?: 0}"></span>
+					/
+					<span th:text="${activity.maxParticipants}"></span>
+				</div>
+				<div>
+					截止：<span
+						th:text="${#temporals.format(activity.registrationDeadline, 'yyyy-MM-dd HH:mm')}"></span>
+				</div>
+			</div>
+
 			<div class="desc" th:text="${activity.activityDescription}"></div>
 
 			<a class="btn-detail"
 				th:href="@{/activity/front/detail(id=${activity.activityId})}">
-				查看詳情 </a>
-
+				查看詳情
+			</a>
 		</div>
-
 	</div>
 
 </body>

@@ -17,6 +17,16 @@ body {
 	margin: auto;
 }
 
+.alert-error {
+	background: #fee2e2;
+	color: #991b1b;
+	padding: 14px 18px;
+	border-radius: 8px;
+	margin-bottom: 20px;
+	font-weight: bold;
+	border: 1px solid #fecaca;
+}
+
 .header {
 	display: flex;
 	justify-content: space-between;
@@ -47,16 +57,8 @@ body {
 	background: #64748b;
 }
 
-.btn-back:hover {
-	background: #475569;
-}
-
 .btn-add {
 	background: #8b5cf6;
-}
-
-.btn-add:hover {
-	background: #7c3aed;
 }
 
 .table-card {
@@ -137,113 +139,80 @@ tr:hover {
 	font-size: 18px;
 }
 </style>
-
 </head>
 
 <body>
 
 	<div class="container">
 
+		<div th:if="${param.cannotEdit}" class="alert-error">
+			已有會員報名此活動，無法修改活動內容。</div>
+		<div th:if="${param.noPermission}" class="alert-error">
+			您沒有權限修改其他主辦人的活動。</div>
+
 		<div class="header">
-
 			<div>
-
 				<h1>🎪 我舉辦的活動</h1>
 
 				<div class="member">
-
 					主辦人： <span th:text="${loginMemberName}"></span>
-
 				</div>
-
 			</div>
 
 			<div style="display: flex; gap: 12px;">
-
 				<a th:href="@{/activity/front/addHostActivity}" class="btn btn-add">
-
 					➕ 我要辦活動 </a> <a th:href="@{/activity/front/home}" class="btn btn-back">
-
 					🏠 返回前台 </a>
-
 			</div>
-
 		</div>
 
 		<div class="table-card">
-
 			<table>
-
 				<thead>
-
 					<tr>
-
 						<th>活動編號</th>
-
 						<th>活動名稱</th>
-
 						<th>價格</th>
-
 						<th>目前人數</th>
-
 						<th>活動狀態</th>
-
 						<th>操作</th>
-
 					</tr>
-
 				</thead>
 
 				<tbody>
-
 					<tr th:if="${#lists.isEmpty(activityListData)}">
-
 						<td colspan="6" class="empty">目前尚未建立任何活動</td>
-
 					</tr>
 
 					<tr th:each="activity : ${activityListData}">
-
 						<td th:text="${activity.activityId}"></td>
 
 						<td th:text="${activity.activityTitle}"></td>
 
 						<td>NT$ <span th:text="${activity.activityPrice}"></span>
-
 						</td>
 
 						<td><span th:text="${activity.attendeesCount}"></span> / <span
 							th:text="${activity.maxParticipants}"></span></td>
 
-						<td><span th:if="${activity.activityStatus==0}"
+						<td><span th:if="${activity.activityStatus == 0}"
 							class="status normal"> 正常舉行 </span> <span
-							th:if="${activity.activityStatus==1}" class="status delay">
-
-								延期 </span> <span th:if="${activity.activityStatus==2}"
+							th:if="${activity.activityStatus == 1}" class="status delay">
+								延期 </span> <span th:if="${activity.activityStatus == 2}"
 							class="status cancel"> 已取消 </span></td>
 
 						<td>
-
 							<div class="action">
-
 								<a class="btn-edit"
 									th:href="@{/activity/front/updateHostActivity(id=${activity.activityId})}">
-
 									修改 </a> <a class="btn-member"
 									th:href="@{/activity/front/memberList(activityId=${activity.activityId})}">
-
 									報名名單 </a>
-
 							</div>
-
 						</td>
-
 					</tr>
-
 				</tbody>
-
 			</table>
-
 		</div>
 
 	</div>
