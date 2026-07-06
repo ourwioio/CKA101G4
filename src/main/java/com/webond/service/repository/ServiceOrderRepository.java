@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import com.webond.service.model.ServiceOrderVO;
 
@@ -36,4 +35,33 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrderVO, In
     
     //查賣方訂單
     List<ServiceOrderVO> findBySellerMemberId(Integer sellerMemberId);
+    
+ // 依訂單狀態 + 撥款狀態查詢
+    List<ServiceOrderVO> findByOrderStatusAndPayoutStatus(Byte orderStatus, Byte payoutStatus);
+
+    // 已完成訂單總金額
+    @Query("""
+           select coalesce(sum(o.totalAmount), 0)
+           from ServiceOrderVO o
+           where o.orderStatus = 3
+           """)
+    Integer sumCompletedOrderTotalAmount();
+
+    // 已完成但未撥款的訂單總金額
+    @Query("""
+           select coalesce(sum(o.totalAmount), 0)
+           from ServiceOrderVO o
+           where o.orderStatus = 3
+           and o.payoutStatus = 0
+           """)
+    Integer sumCompletedUnpaidTotalAmount();
+
+    // 已完成但未撥款的訂單筆數
+    @Query("""
+           select count(o)
+           from ServiceOrderVO o
+           where o.orderStatus = 3
+           and o.payoutStatus = 0
+           """)
+    Long countCompletedUnpaidOrders();
 }

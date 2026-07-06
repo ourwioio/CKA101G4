@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>後台服務訂單管理</title>
+</head>
+<body>
+
+<h1>後台服務訂單管理</h1>
+
+<p>
+    <a th:href="@{/admin/services}">回後台服務列表</a>
+</p>
+
+<hr>
+
+<!-- 成功 / 錯誤訊息 -->
+<p th:if="${successMsg}" th:text="${successMsg}" style="color: green;"></p>
+<p th:if="${errorMsg}" th:text="${errorMsg}" style="color: red;"></p>
+
+<!-- 查詢區 -->
+<h2>依訂單狀態查詢</h2>
+
+<form th:action="@{/admin/service-orders}" method="get">
+    <select name="orderStatus">
+        <option value="" th:selected="${selectedOrderStatus == null}">
+            全部訂單
+        </option>
+
+        <option value="0" th:selected="${selectedOrderStatus != null and selectedOrderStatus == 0}">
+            0 - 待賣家確認
+        </option>
+
+        <option value="1" th:selected="${selectedOrderStatus != null and selectedOrderStatus == 1}">
+            1 - 待買家付款
+        </option>
+
+        <option value="2" th:selected="${selectedOrderStatus != null and selectedOrderStatus == 2}">
+            2 - 已成立
+        </option>
+
+        <option value="3" th:selected="${selectedOrderStatus != null and selectedOrderStatus == 3}">
+            3 - 已完成
+        </option>
+
+        <option value="4" th:selected="${selectedOrderStatus != null and selectedOrderStatus == 4}">
+            4 - 已取消 / 已拒絕
+        </option>
+
+        <option value="5" th:selected="${selectedOrderStatus != null and selectedOrderStatus == 5}">
+            5 - 已退款
+        </option>
+
+        <option value="6" th:selected="${selectedOrderStatus != null and selectedOrderStatus == 6}">
+            6 - 賣家確認逾期
+        </option>
+
+        <option value="7" th:selected="${selectedOrderStatus != null and selectedOrderStatus == 7}">
+            7 - 買家付款逾期
+        </option>
+    </select>
+
+    <button type="submit">查詢</button>
+
+    <a th:href="@{/admin/service-orders}">清除條件</a>
+</form>
+
+<hr>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>訂單ID</th>
+        <th>服務ID</th>
+        <th>時段ID</th>
+        <th>買家ID</th>
+        <th>賣家ID</th>
+        <th>服務名稱快照</th>
+        <th>服務類型快照</th>
+        <th>開始時間</th>
+        <th>結束時間</th>
+        <th>總金額</th>
+        <th>訂單狀態</th>
+        <th>退款狀態</th>
+        <th>撥款狀態</th>
+        <th>建立時間</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="order : ${orderList}">
+        <td th:text="${order.serviceOrderId}">1</td>
+
+        <td th:text="${order.serviceId}">1</td>
+
+        <td th:text="${order.serviceSlotId}">1</td>
+
+        <td th:text="${order.buyerMemberId}">1001</td>
+
+        <td th:text="${order.sellerMemberId}">1002</td>
+
+        <td th:text="${order.serviceNameSnapshot}">服務名稱</td>
+
+        <td th:text="${order.serviceTypeNameSnapshot}">服務類型</td>
+
+        <td th:text="${order.slotStartTimeSnapshot != null ? #temporals.format(order.slotStartTimeSnapshot, 'yyyy-MM-dd HH:mm') : '-'}">
+            2026-07-06 10:00
+        </td>
+
+        <td th:text="${order.slotEndTimeSnapshot != null ? #temporals.format(order.slotEndTimeSnapshot, 'yyyy-MM-dd HH:mm') : '-'}">
+            2026-07-06 11:00
+        </td>
+
+        <td th:text="${order.totalAmount}">500</td>
+
+        <td>
+            <span th:if="${order.orderStatus == 0}">待賣家確認</span>
+            <span th:if="${order.orderStatus == 1}">待買家付款</span>
+            <span th:if="${order.orderStatus == 2}">已成立</span>
+            <span th:if="${order.orderStatus == 3}">已完成</span>
+            <span th:if="${order.orderStatus == 4}">已取消 / 已拒絕</span>
+            <span th:if="${order.orderStatus == 5}">已退款</span>
+            <span th:if="${order.orderStatus == 6}">賣家確認逾期</span>
+            <span th:if="${order.orderStatus == 7}">買家付款逾期</span>
+            <span th:if="${order.orderStatus == null}">未知</span>
+        </td>
+
+        <td>
+            <span th:if="${order.refundStatus == 0}">無退款</span>
+            <span th:if="${order.refundStatus == 2}">已退款</span>
+            <span th:if="${order.refundStatus == 3}">部分退款</span>
+            <span th:if="${order.refundStatus == null}">-</span>
+        </td>
+
+        <td>
+            <span th:if="${order.payoutStatus == 0}">未撥款</span>
+            <span th:if="${order.payoutStatus == 1}">已撥款</span>
+            <span th:if="${order.payoutStatus == null}">-</span>
+        </td>
+
+        <td th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">
+            2026-07-06 12:00
+        </td>
+    </tr>
+
+    <tr th:if="${orderList == null or #lists.isEmpty(orderList)}">
+        <td colspan="14">查無訂單資料</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
