@@ -195,8 +195,35 @@ public class ServiceService {
 	}
 
 	// =====================
-	// 後台之後再整理
+	// 後台
 	// =====================
+	// 後台：平台停用服務
+	public void disableByAdmin(Integer serviceId) {
+
+	    ServiceVO serviceVO = serviceRepository.findById(serviceId)
+	            .orElseThrow(() -> new IllegalArgumentException("查無此服務"));
+
+	    if (Byte.valueOf(STATUS_ARCHIVED).equals(serviceVO.getStatus())) {
+	        throw new IllegalArgumentException("已封存的服務不能停用");
+	    }
+
+	    serviceVO.setStatus(STATUS_DISABLED);
+	    serviceRepository.save(serviceVO);
+	}
+	
+	// 後台：恢復被平台停用的服務
+	public void restoreByAdmin(Integer serviceId) {
+
+	    ServiceVO serviceVO = serviceRepository.findById(serviceId)
+	            .orElseThrow(() -> new IllegalArgumentException("查無此服務"));
+
+	    if (!Byte.valueOf(STATUS_DISABLED).equals(serviceVO.getStatus())) {
+	        throw new IllegalArgumentException("只有平台停用的服務可以恢復");
+	    }
+
+	    serviceVO.setStatus(STATUS_ACTIVE);
+	    serviceRepository.save(serviceVO);
+	}
 
 	@Transactional(readOnly = true)
 	public ServiceVO getOneService(Integer serviceId) {

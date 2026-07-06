@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>後台服務管理</title>
+</head>
+<body>
+
+<h1>後台服務管理</h1>
+
+<p>
+    <a th:href="@{/front/services}">回前台服務列表</a>
+</p>
+
+<hr>
+
+<!-- 成功 / 錯誤訊息 -->
+<p th:if="${successMsg}" th:text="${successMsg}" style="color: green;"></p>
+<p th:if="${errorMsg}" th:text="${errorMsg}" style="color: red;"></p>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>服務ID</th>
+        <th>服務名稱</th>
+        <th>會員ID</th>
+        <th>服務類型</th>
+        <th>每小時費率</th>
+        <th>狀態</th>
+        <th>建立時間</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="serviceVO : ${serviceList}">
+        <td th:text="${serviceVO.serviceId}">1</td>
+
+        <td th:text="${serviceVO.serviceName}">服務名稱</td>
+
+        <td th:text="${serviceVO.memberId}">會員ID</td>
+
+        <td>
+            <span th:if="${serviceVO.serviceType != null}"
+                  th:text="${serviceVO.serviceType.typeName}">
+                服務類型
+            </span>
+            <span th:if="${serviceVO.serviceType == null}">
+                未分類
+            </span>
+        </td>
+
+        <td th:text="${serviceVO.hourlyRate}">500</td>
+
+        <td>
+            <span th:if="${serviceVO.status == 0}">會員下架</span>
+            <span th:if="${serviceVO.status == 1}">上架中</span>
+            <span th:if="${serviceVO.status == 2}">已封存</span>
+            <span th:if="${serviceVO.status == 3}">平台停用</span>
+        </td>
+
+        <td th:text="${#temporals.format(serviceVO.createdAt, 'yyyy-MM-dd HH:mm')}">
+            2026-07-06 12:00
+        </td>
+
+        <td>
+            <!-- 查看詳情 -->
+            <a th:href="@{/admin/services/{serviceId}(serviceId=${serviceVO.serviceId})}">
+                詳情
+            </a>
+
+            <!-- 平台停用：只有不是已封存、不是平台停用時可以按 -->
+            <form th:if="${serviceVO.status != 2 and serviceVO.status != 3}"
+                  th:action="@{/admin/services/{serviceId}/disable(serviceId=${serviceVO.serviceId})}"
+                  method="post"
+                  style="display:inline;">
+                <button type="submit"
+                        onclick="return confirm('確定要停用這個服務嗎？')">
+                    平台停用
+                </button>
+            </form>
+
+            <!-- 恢復上架：只有平台停用 status = 3 可以按 -->
+            <form th:if="${serviceVO.status == 3}"
+                  th:action="@{/admin/services/{serviceId}/restore(serviceId=${serviceVO.serviceId})}"
+                  method="post"
+                  style="display:inline;">
+                <button type="submit"
+                        onclick="return confirm('確定要恢復這個服務嗎？')">
+                    恢復上架
+                </button>
+            </form>
+        </td>
+    </tr>
+
+    <tr th:if="${serviceList == null or #lists.isEmpty(serviceList)}">
+        <td colspan="8">目前沒有服務資料</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
