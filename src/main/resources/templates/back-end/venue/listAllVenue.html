@@ -4,145 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>場地資料管理</title>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        .wrap {
-            padding: 1.5rem;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.25rem;
-        }
-
-        .title {
-            font-size: 18px;
-            font-weight: 500;
-        }
-
-        .table-wrap {
-            border: 1px solid #e0e0e0;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-
-        thead {
-            background: #f8f8f8;
-        }
-
-        thead th {
-            padding: 10px 14px;
-            font-size: 13px;
-            color: #666;
-            text-align: left;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid #e0e0e0;
-            background: white;
-        }
-
-        tbody tr:last-child {
-            border-bottom: none;
-        }
-
-        tbody tr:hover {
-            background: #fafafa;
-        }
-
-        td {
-            padding: 12px 14px;
-            font-size: 14px;
-            vertical-align: middle;
-        }
-
-        .img-cell img {
-            width: 64px;
-            height: 48px;
-            object-fit: cover;
-            border-radius: 6px;
-            display: block;
-        }
-
-        .no-img {
-            width: 64px;
-            height: 48px;
-            border-radius: 6px;
-            border: 1px dashed #ccc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #aaa;
-            font-size: 11px;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .badge-up {
-            background: #e1f5ee;
-            color: #0f6e56;
-        }
-
-        .badge-down {
-            background: #f5f5f5;
-            color: #888;
-            border: 1px solid #e0e0e0;
-        }
-
-        .actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        .btn-edit {
-            background: white;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            padding: 5px 12px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-edit:hover {
-            background: #f5f5f5;
-            border-color: #999;
-        }
-
-        .btn-del {
-            background: white;
-            border: 1px solid #ffb3b3;
-            border-radius: 6px;
-            padding: 5px 12px;
-            font-size: 13px;
-            color: #c0392b;
-            cursor: pointer;
-        }
-    </style>
+    <th:block th:insert="~{back-end/venue/index}"></th:block>
+    <link rel="stylesheet" th:href="@{/css/back-end/venue/listAllVenue.css}" href="venue-admin-list.css">
 </head>
 <body>
     <div class="wrap">
         <div class="header">
-            <span class="title">後台場地管理</span>
+            <span class="title">瀏覽全部場地</span>
         </div>
         
         <div class="table-wrap">
@@ -175,17 +43,17 @@
                         <td th:text="${venue.hourlyRate}"></td>
                         <td th:text="${#temporals.format(venue.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
 						<td>
-						    <form th:action="@{/venue/toggleStatus}" method="post" style="display: inline;">
+						    <form th:action="@{/venue/toggleStatus}" method="post" class="inline-form">
 						        <input type="hidden" name="venueId" th:value="${venue.venueId}" />
 						        <button type="submit" 
-						                th:style="${venue.venueStatus == 1} ? 'background:#2ecc71; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;' : 'background:#95a5a6; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer;'"
+						                th:class="${venue.venueStatus == 1} ? 'btn-toggle btn-toggle-up' : 'btn-toggle btn-toggle-down'"
 						                th:text="${venue.venueStatus == 1} ? '上架中' : '已下架'"
 						                onclick="return confirm('確定要變更此場地的上下架狀態嗎？');">
 						        </button>
 						    </form>
 						</td>
                         <td>
-                            <form th:action="@{/venue/getOneVenue}" method="get" style="display: inline;">
+                            <form th:action="@{/venue/getOneVenue}" method="get" class="inline-form">
                                 <input type="hidden" name="venueId" th:value="${venue.venueId}" />
                                 <button type="submit" class="btn-edit">查看場地</button>
                             </form>

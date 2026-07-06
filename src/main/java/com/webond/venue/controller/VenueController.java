@@ -40,6 +40,11 @@ public class VenueController {
 	@Autowired
 	VenueTypeService venueTypeService;
 
+	@GetMapping("index")
+	public String index() {
+		return "back-end/venue/index";
+	}
+	
 	@PostMapping("getOne_For_Update")
 	public String getOne_For_Update(@RequestParam("venueId") String venueId, ModelMap model) {
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
@@ -146,7 +151,8 @@ public class VenueController {
 		model.addAttribute("venueListData", list);
 		return "back-end/venue/listAllVenue";
 	}
-
+	
+	
 	// 去除BindingResult中某個欄位的FieldError紀錄
 	public BindingResult removeFieldError(VenueVO venueVO, BindingResult result, String removedFieldname) {
 		// 從原BindingResult中去除removedFieldname這個欄位的紀錄之後，再將其它所保留下來的欄位的FieldError紀錄轉換成errorsListToKeep這個List物件

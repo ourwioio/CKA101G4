@@ -51,10 +51,11 @@
                         </span>
 
                         <!-- 退款申請狀態 -->
-                        <span class="badge badge-status"
-                              th:if="${order.refundStatus != 0}"
-                              th:text="'有退款申請'">
-                        </span>
+						<span class="badge badge-status"
+						      th:if="${order.refundStatus == 0 or order.refundStatus == 1}"
+						      th:classappend="${order.refundStatus == 0} ? 'status-0' : 'status-1'"
+						      th:text="${order.refundStatus == 0} ? '退款進行中' : '退款已完成'">
+						</span>
                     </div>
                 </div>
 
