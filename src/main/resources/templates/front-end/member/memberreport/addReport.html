@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>會員檢舉系統 - 送出檢舉案</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+<style>
+body {
+	background: linear-gradient(185deg, #e6f0fa 0%, #f4f8fc 100%);
+	min-height: 100vh;
+	font-family: "Microsoft JhengHei", sans-serif;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 50px 20px; /* 🎯 放大上下外距 */
+}
+
+.report-container {
+	max-width: 750px; /* 🎯 稍微加寬容器，讓雙欄排版更寬敞 */
+	width: 100%;
+	background: #ffffff;
+	padding: 45px 50px; /* 🎯 放大內襯，上下 45px、左右 50px */
+	border-radius: 16px; 
+	box-shadow: 0 10px 30px rgba(0, 64, 133, 0.05);
+}
+
+.form-title {
+	font-weight: 700;
+	color: #0056b3; 
+	text-align: center;
+	margin-bottom: 12px;
+}
+
+.form-subtitle {
+	color: #6c757d;
+	text-align: center;
+	font-size: 14px;
+	margin-bottom: 35px; /* 🎯 增加標題下方的距離 */
+}
+
+.section-divider {
+	color: #004085;
+	font-weight: 600;
+	border-bottom: 1px solid #dee2e6;
+	padding-bottom: 10px;
+	margin-bottom: 30px; /* 🎯 增加小標題與下方欄位的間距 */
+}
+
+/* 圓潤灰色輸入框 */
+.form-control, .form-select {
+	background-color: #f1f5f9 !important;
+	border: 1px solid #e2e8f0 !important;
+	border-radius: 10px !important; 
+	padding: 12px 16px;
+	color: #334155;
+	width: 100%; /* 🎯 強制撐滿整欄，防止寬度縮回去了 */
+	transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+	background-color: #ffffff !important;
+	border-color: #3b82f6 !important;
+	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
+}
+
+.form-label {
+	font-weight: 600;
+	color: #334155;
+	margin-bottom: 8px; /* 🎯 調整標籤與輸入框的間隙 */
+	font-size: 15px;
+}
+
+.error-block {
+	background-color: #fff3cd;
+	color: #856404;
+	border: 1px solid #ffeeba;
+	border-radius: 10px;
+	padding: 15px 20px;
+	margin-bottom: 25px;
+}
+
+.preview-img {
+	max-width: 100%;
+	max-height: 220px;
+	display: none;
+	margin-top: 15px;
+	border: 1px solid #cbd5e1;
+	border-radius: 10px;
+}
+
+/* Webond 風格按鈕 */
+.btn-submit-webond {
+	background-color: #0056b3;
+	color: white;
+	border: none;
+	border-radius: 10px;
+	padding: 12px 32px; /* 🎯 加寬按鈕 */
+	font-weight: 600;
+	transition: background-color 0.2s;
+}
+.btn-submit-webond:hover {
+	background-color: #004085;
+	color: white;
+}
+
+.btn-cancel-webond {
+	background-color: transparent;
+	color: #64748b;
+	border: 1px solid #cbd5e1;
+	border-radius: 10px;
+	padding: 12px 32px; /* 🎯 加寬按鈕 */
+	font-weight: 600;
+	text-decoration: none;
+	text-align: center;
+}
+.btn-cancel-webond:hover {
+	background-color: #f8fafc;
+	color: #334155;
+}
+</style>
+</head>
+<body>
+
+	<div class="report-container">
+		<h2 class="form-title">建立新檢舉案件</h2>
+		<p class="form-subtitle">請填寫以下欄位，提交後將由系統管理員盡速為您審核辦理</p>
+
+		<!-- 錯誤訊息提示區 -->
+		<div class="error-block" th:if="${errorMsgs != null and !errorMsgs.isEmpty()}">
+			<h6 class="fw-bold mb-2">⚠️ 請修正以下欄位以完成提交：</h6>
+			<ul class="mb-0 ps-3" style="font-size: 14px;">
+				<li th:each="message : ${errorMsgs}" th:text="${message}"></li>
+			</ul>
+		</div>
+
+		<!-- 表單內容 -->
+		<form th:action="@{/backend/memberreport/addReport}" method="post" enctype="multipart/form-data">
+			
+			<div class="section-divider">
+				🛡️ 案件基本資料
+			</div>
+
+			<!-- 🎯 雙欄排版區：全面換成 mb-4 放大垂直行高 -->
+			<div class="row">
+				<div class="col-md-6 mb-4">
+					<label for="reporterId" class="form-label">您的會員編號 (檢舉人) <span class="text-danger">*</span></label> 
+					<input type="number" class="form-control" id="reporterId" name="reporterId"
+						th:value="${param.reporterId != null} ? ${param.reporterId} : ''"
+						placeholder="請輸入您的會員編號">
+				</div>
+
+				<div class="col-md-6 mb-4">
+					<label for="reportedId" class="form-label">被檢舉人編號 <span class="text-danger">*</span></label> 
+					<input type="number" class="form-control" id="reportedId" name="reportedId"
+						th:value="${param.reportedId != null} ? ${param.reportedId} : ''"
+						placeholder="請輸入對方的會員編號">
+				</div>
+			</div>
+
+			<!-- 3. 檢舉類別 -->
+			<div class="mb-4">
+				<label for="reportCategory" class="form-label">檢舉違規類別 <span class="text-danger">*</span></label> 
+				<select class="form-select" id="reportCategory" name="reportCategory">
+					<option value="" th:selected="${param.reportCategory == null}">-- 請選擇檢舉原因 --</option>
+					<option value="0" th:selected="${param.reportCategory != null and param.reportCategory[0] == '0'}">不當言論</option>
+					<option value="1" th:selected="${param.reportCategory != null and param.reportCategory[0] == '1'}">惡意騷擾</option>
+					<option value="2" th:selected="${param.reportCategory != null and param.reportCategory[0] == '2'}">詐騙行為</option>
+					<option value="3" th:selected="${param.reportCategory != null and param.reportCategory[0] == '3'}">其他原因</option>
+				</select>
+			</div>
+
+			<!-- 4. 詳細內容描述 -->
+			<div class="mb-4">
+				<label for="reportContent" class="form-label">詳細內容描述 <span class="text-danger">*</span></label>
+				<textarea class="form-control" id="reportContent" name="reportContent" rows="5" 
+					placeholder="請詳細敘述違規事件經過（時間、聊天室內容等）..." 
+					th:text="${param.reportContent != null} ? ${param.reportContent} : ''"></textarea>
+			</div>
+
+			<!-- 5. 圖片上傳 -->
+			<div class="mb-5"> <!-- 🎯 刻意放大到 mb-5，拉開與下方按鈕的距離 -->
+				<label for="evidencePath" class="form-label">上傳證據截圖 <span class="text-danger">*</span></label> 
+				<input class="form-control" type="file" id="evidencePath" name="evidencePath" accept="image/*"
+					onchange="previewImage(this)"> 
+				<img id="imgPreview" class="preview-img" alt="圖片預覽">
+			</div>
+
+			<!-- 按鈕區 -->
+			<div class="d-flex justify-content-between align-items-center mt-2">
+				<a th:href="@{/backend/memberreport/select_page}" class="btn btn-cancel-webond">返回首頁</a>
+				<button type="submit" class="btn btn-submit-webond">確認送出檢舉</button>
+			</div>
+		</form>
+	</div>
+
+	<script>
+		function previewImage(input) {
+			const preview = document.getElementById('imgPreview');
+			if (input.files && input.files[0]) {
+				const reader = new FileReader();
+				reader.onload = function(e) {
+					preview.src = e.target.result;
+					preview.style.display = 'block';
+				}
+				reader.readAsDataURL(input.files[0]);
+			} else {
+				preview.src = '#';
+				preview.style.display = 'none';
+			}
+		}
+	</script>
+
+</body>
+</html>

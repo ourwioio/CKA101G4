@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webond 後台管理 - 審核檢舉案件</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --sky-600: #0284c7;
+            --sky-700: #0369a1;
+            --emerald-600: #16a34a;
+            --rose-600: #e11d48;
+            --border-color: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', "Microsoft JhengHei", sans-serif;
+            background-color: var(--slate-100);
+            color: var(--slate-800);
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 750px;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            padding: 32px;
+        }
+
+        .form-header {
+            border-bottom: 2px solid var(--slate-100);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .form-header h2 { font-size: 20px; font-weight: 700; color: var(--slate-800); }
+
+        .btn-back {
+            background: var(--slate-100);
+            color: var(--slate-700);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-back:hover { background: var(--slate-200); }
+
+        .readonly-case-box {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            font-size: 14px;
+        }
+        .case-item span { font-weight: 700; color: var(--slate-700); }
+
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; color: var(--slate-700); margin-bottom: 8px; }
+        
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 14px;
+            border: 1px solid var(--slate-200);
+            border-radius: 6px;
+            background-color: #ffffff;
+            color: var(--slate-800);
+            outline: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        input[type="text"]:focus, select:focus, textarea:focus {
+            border-color: var(--sky-600);
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        textarea { resize: vertical; min-height: 100px; }
+
+        .radio-tile-group { display: flex; gap: 16px; }
+        .radio-tile {
+            flex: 1;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .radio-tile input { position: absolute; opacity: 0; }
+        .radio-tile-label { font-size: 14px; font-weight: 600; color: var(--slate-600); }
+        
+        .radio-tile:has(input:checked) { border-color: var(--sky-600); background: #f0f9ff; }
+        .radio-tile:has(input:checked) .radio-tile-label { color: var(--sky-600); }
+
+        .btn-submit {
+            background: var(--sky-600);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+        .btn-submit:hover { background: var(--sky-700); }
+
+        .error-alert {
+            background-color: #ffeef0;
+            border-left: 4px solid var(--rose-600);
+            padding: 14px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .error-alert ul { padding-left: 20px; color: #bf1d1d; font-size: 13px; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <div class="form-header">
+        <h2>🛠️ 處置與核退評估工作台</h2>
+        <a th:href="@{/memberreport/listAllReport}" class="btn-back">🗂️ 返回總表</a>
+    </div>
+
+    <div class="error-alert" th:if="${errorMsgs != null and !errorMsgs.isEmpty()}">
+        <ul class="error-list">
+            <li th:each="message : ${errorMsgs}" th:text="${message}">錯誤訊息</li>
+        </ul>
+    </div>
+
+    <form th:action="@{/backend/memberreport/update}" method="post">
+        <input type="hidden" name="reportId" th:value="${memberReportVO.reportId}">
+
+        <div class="readonly-case-box">
+            <div class="case-item">案件編號：<span th:text="'#' + ${memberReportVO.reportId}"></span></div>
+            <div class="case-item">檢舉類別：
+                <span th:text="${memberReportVO.reportCategory == 0 ? '不當言論' : (memberReportVO.reportCategory == 1 ? '惡意騷擾' : (memberReportVO.reportCategory == 2 ? '詐騙行為' : '其他原因'))}"></span>
+            </div>
+            <div class="case-item">舉報人：<span th:text="${memberReportVO.reporterId}"></span></div>
+            <div class="case-item">被舉報對象：<span th:text="${memberReportVO.reportedId}"></span></div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">經辦人員員工編號</label>
+            <input type="text" name="employeeId" th:value="${memberReportVO.employeeId}" placeholder="請填入您的管理員員工 ID">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">裁決審核結果</label>
+            <div class="radio-tile-group">
+                <label class="radio-tile">
+                    <input type="radio" name="reportStatus" value="1" th:checked="${memberReportVO.reportStatus == 1 or memberReportVO.reportStatus == 0}">
+                    <span class="radio-tile-label">🟢 檢舉成立 (處置)</span>
+                </label>
+                <label class="radio-tile">
+                    <input type="radio" name="reportStatus" value="2" th:checked="${memberReportVO.reportStatus == 2}">
+                    <span class="radio-tile-label">❌ 駁回退件 (不成立)</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">違規扣減點數 (若判定退件請填 0)</label>
+            <input type="text" name="violationPoints" th:value="${memberReportVO.violationPoints != null ? memberReportVO.violationPoints : '0'}" placeholder="請填入數字點數">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">管理員處理備註描述</label>
+            <textarea name="adminNote" th:text="${memberReportVO.adminNote}" placeholder="請詳述處置依據、退件理由或核定說明..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit">💾 確定送出審核處置</button>
+    </form>
+</div>
+
+</body>
+</html>

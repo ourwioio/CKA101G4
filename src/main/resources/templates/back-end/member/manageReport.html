@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webond 後台管理 - 權限五會員檢舉審核中心</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --slate-50: #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-300: #cbd5e1;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1e293b;
+            --sky-600: #0284c7;
+            --sky-700: #0369a1;
+            --emerald-600: #16a34a;
+            --emerald-700: #15803d;
+            --rose-600: #e11d48;
+            --rose-700: #be123c;
+            --amber-600: #d97706;
+            --border-color: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', "Microsoft JhengHei", sans-serif;
+            background-color: var(--slate-100);
+            color: var(--slate-800);
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        @media (min-width: 1024px) {
+            .container { grid-template-columns: 1.5fr 1.1fr; } /* 微調比例，給右側審核區多一點空間 */
+            .main-panel { grid-column: span 1; }
+        }
+        .card-panel {
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 24px;
+        }
+        .header-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header-area h2 { font-size: 22px; font-weight: 700; }
+        .btn-top-action { text-decoration: none; color: var(--sky-600); font-weight: 600; font-size: 14px; }
+        .btn-top-action:hover { color: var(--sky-700); }
+
+        .tabs-container {
+            display: flex;
+            border-bottom: 2px solid var(--slate-200);
+            margin-bottom: 16px;
+            gap: 8px;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--slate-600);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+        .tab-btn:hover { color: var(--sky-600); }
+        .tab-btn.active { color: var(--sky-600); }
+        .tab-btn.active::after {
+            content: ''; position: absolute; bottom: -2px; left: 0; width: 100%; height: 2px; background-color: var(--sky-600);
+        }
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th { background: var(--slate-50); padding: 12px; border-bottom: 2px solid var(--border-color); text-align: left; color: var(--slate-600); font-weight: 600; }
+        td { padding: 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+                    
+        .clickable-row { cursor: pointer; transition: background 0.15s; }
+        .clickable-row:hover { background-color: #f0f9ff !important; }
+        .clickable-row.hidden { display: none !important; }
+
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .badge-pending { background: #fef9c3; color: #713f12; }
+        .badge-approved { background: #d1fae5; color: #065f46; }
+        .badge-rejected { background: #ffe4e6; color: #9f1239; }
+
+        .detail-panel { position: sticky; top: 40px; align-self: start; background: #ffffff; }
+        .detail-placeholder { text-align: center; color: #94a3b8; padding: 8px 20px; font-weight: 500; }
+        .detail-placeholder h3 { font-size: 18px; margin-bottom: 8px; color: var(--slate-700); }
+                    
+        .detail-header { border-bottom: 1px solid var(--slate-200); padding-bottom: 16px; margin-bottom: 16px; }
+        .detail-header h3 { font-size: 18px; font-weight: 700; color: var(--slate-800); }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 14px; margin-bottom: 20px; }
+        .info-item { background: var(--slate-50); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .info-item.full-width { grid-column: span 2; }
+        .info-label { font-size: 12px; color: #64748b; margin-bottom: 4px; font-weight: 600; }
+        .info-value { font-weight: 600; color: var(--slate-800); white-space: pre-wrap; word-break: break-all; }
+        
+        .evidence-img-box { margin-top: 10px; min-height: 50px; display: flex; align-items: center; justify-content: center; background: var(--slate-50); border-radius: 8px; border: 1px dashed var(--slate-200); }
+        .evidence-img-box img { width: 100%; max-height: 180px; object-fit: contain; background: #1e293b; border-radius: 8px; cursor: zoom-in; }
+        .no-img-text { color: #94a3b8; font-size: 13px; font-weight: 500; padding: 15px; }
+        
+        /* 審核表單特有樣式 */
+        .audit-form-section { border-top: 2px dashed var(--slate-200); padding-top: 20px; margin-top: 20px; }
+        .audit-title { font-size: 16px; font-weight: 700; color: var(--slate-800); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--slate-700); margin-bottom: 6px; }
+        .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        
+        .input-control { width: 100%; padding: 10px 12px; border: 1px solid var(--slate-300); border-radius: 8px; font-size: 14px; font-family: inherit; transition: border 0.15s; color: var(--slate-800); font-weight: 500; }
+        .input-control:focus { outline: none; border-color: var(--sky-600); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
+        textarea.input-control { resize: vertical; min-height: 80px; }
+        
+        .btn-submit-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+        .btn-audit-action { padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: white; transition: background 0.15s; }
+        .btn-approve { background: var(--emerald-600); }
+        .btn-approve:hover { background: var(--emerald-700); }
+        .btn-reject { background: var(--rose-600); }
+        .btn-reject:hover { background: var(--rose-700); }
+        
+        .image-modal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); justify-content: center; align-items: center; cursor: zoom-out; }
+        .image-modal img { max-width: 90%; max-height: 90%; border-radius: 12px; }
+        .read-only-box { text-align: center; padding: 16px; background: var(--slate-50); border: 1px dashed var(--slate-200); border-radius: 8px; color: var(--slate-600); font-weight: 600; font-size: 14px; }
+    </style>
+
+    <script>
+        function handleImageError() {
+            let img = document.getElementById('detEvidenceImg');
+            if (img) img.style.display = 'none';
+            let wrapper = document.getElementById('imgWrapper');
+            if (wrapper && !document.getElementById('noImgTxt')) {
+                let txt = document.createElement('div');
+                txt.id = 'noImgTxt'; txt.className = 'no-img-text';
+                txt.innerText = '📁 本案未提供或無有效的證據截圖檔案';
+                wrapper.appendChild(txt);
+            }
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <div class="card-panel main-panel">
+        <div class="header-area">
+            <h2>⚖️ 會員檢舉案審核中心 (權限五專用)</h2>
+            <a th:href="@{/backend/memberreport/select_page}" class="btn-top-action">🏠 回導覽首頁</a>
+        </div>
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="switchTab('all', this)">全部案件</button>
+            <button class="tab-btn" onclick="switchTab('0', this)">⏳ 待處理</button>
+            <button class="tab-btn" onclick="switchTab('1', this)">🟢 審核通過</button>
+            <button class="tab-btn" onclick="switchTab('2', this)">❌ 審核未通過</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>案號</th>
+                    <th>檢舉人 ID</th>
+                    <th>被檢舉人 ID</th>
+                    <th>檢舉類別</th>
+                    <th>檢舉時間</th>
+                    <th>狀態</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="reportVO : ${memberReportListData}" 
+                    class="clickable-row"
+                    th:data-id="${reportVO.reportId}"
+                    th:data-reporter="${reportVO.reporter?.memberId}"
+                    th:data-reported="${reportVO.reported?.memberId}"
+                    th:data-category="${reportVO.reportCategory == 0 ? '不當言論' : (reportVO.reportCategory == 1 ? '惡意騷擾' : (reportVO.reportCategory == 2 ? '詐騙行為' : '其他原因'))}"
+                    th:data-content="${reportVO.reportContent}"
+                    th:data-status="${reportVO.reportStatus}"
+                    th:data-emp="${reportVO.employee?.employeeId}"
+                    th:data-note="${reportVO.adminNote}"
+                    th:data-points="${reportVO.violationPoints != null ? reportVO.violationPoints : 0}"
+                    th:data-time="${#dates.format(reportVO.createdAt, 'yyyy-MM-dd HH:mm')}"
+                    onclick="showReportDetail(this)">
+                                            
+                    <td th:text="${reportVO.reportId}" style="font-weight: 600;"></td>
+                    <td th:text="${reportVO.reporter?.memberId}"></td>
+                    <td th:text="${reportVO.reported?.memberId}"></td>
+                    <td>
+                        <span th:text="${reportVO.reportCategory == 0 ? '🗣️ 不當言論' : (reportVO.reportCategory == 1 ? '⚡ 惡意騷擾' : (reportVO.reportCategory == 2 ? '💸 詐騙行為' : '📁 其他原因'))}"></span>
+                    </td>
+                    <td th:text="${#dates.format(reportVO.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td>
+                        <span th:if="${reportVO.reportStatus == 0}" class="status-badge badge-pending">⏳ 待處理</span>
+                        <span th:if="${reportVO.reportStatus == 1}" class="status-badge badge-approved">🟢 檢舉成立</span>
+                        <span th:if="${reportVO.reportStatus == 2}" class="status-badge badge-rejected">❌ 退件/不成立</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card-panel detail-panel" id="detailPanel">
+        <div class="detail-placeholder" id="placeholderText">
+            <h3>📑 請點選左側任意案件</h3>
+            <p style="font-size: 13px; margin-top: 6px;">點選待處理案件即可進入審核判定流程。</p>
+        </div>                
+        <div id="detailContent" style="display: none;">
+            <div class="detail-header">
+                <h3>案號 #<span id="detReportId"></span> 詳細資訊</h3>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-item"><div class="info-label">檢舉人 ID</div><div class="info-value" id="detReporter"></div></div>
+                <div class="info-item"><div class="info-label">被檢舉人 ID</div><div class="info-value" id="detReported"></div></div>
+                <div class="info-item"><div class="info-label">檢舉類別</div><div class="info-value" id="detCategory"></div></div>
+                <div class="info-item"><div class="info-label">檢舉時間</div><div class="info-value" id="detTime"></div></div>                                
+                <div class="info-item full-width">
+                    <div class="info-label">📋 詳細具體事證描述</div>
+                    <div class="info-value" id="detContentDesc" style="line-height: 1.6;"></div>
+                </div>
+                <div class="info-item full-width">
+                    <div class="info-label">📸 檢舉事證截圖 (點擊可放大)</div>
+                    <div class="evidence-img-box" id="imgWrapper">
+                        <img id="detEvidenceImg" src="" alt="證據截圖" onclick="zoomEvidence(this)" onerror="handleImageError()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="audit-form-section">
+                <form id="auditForm" action="/backend/memberreport/updateReportStatus" method="post" onsubmit="return validateAuditForm()">
+                    <input type="hidden" id="formReportId" name="reportId">
+                    <input type="hidden" id="formReportStatus" name="reportStatus">
+
+                    <div id="auditInteractiveArea">
+                        <div class="audit-title">🛠️ 權限五審核判定作業</div>
+                        
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="employeeId"><span style="color:var(--rose-600)">*</span> 經辦員工編號</label>
+                                <input type="text" id="employeeId" name="employeeId" class="input-control" placeholder="請輸入您的員工編號" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="violationPoints"><span style="color:var(--rose-600)">*</span> 裁決扣除點數</label>
+                                <input type="number" id="violationPoints" name="violationPoints" class="input-control" min="0" max="100" value="0" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="adminNote">💬 審核處理批註</label>
+                            <textarea id="adminNote" name="adminNote" class="input-control" placeholder="請在此留下審核決定之具體理由或批註..."></textarea>
+                        </div>
+
+                        <div class="btn-submit-group">
+                            <button type="button" class="btn-audit-action btn-approve" onclick="submitAudit(1)">🟢 審核通過 (成立)</button>
+                            <button type="button" class="btn-audit-action btn-reject" onclick="submitAudit(2)">❌ 審核駁回 (不成立)</button>
+                        </div>
+                    </div>
+
+                    <div id="auditReadOnlyArea" style="display: none;">
+                        <div class="info-grid" style="margin-bottom: 0;">
+                            <div class="info-item"><div class="info-label">經辦員工編號</div><div class="info-value" id="lblEmpId"></div></div>
+                            <div class="info-item"><div class="info-label">裁決扣除點數</div><div class="info-value" id="lblPoints" style="color: var(--rose-600);"></div></div>                                
+                            <div class="info-item full-width">
+                                <div class="info-label">💬 審核處理批註歷史紀錄</div>
+                                <div class="info-value" id="lblAdminNote" style="color: var(--slate-600); font-weight: 500;"></div>
+                            </div>
+                        </div>
+                        <div class="read-only-box" style="margin-top: 14px;" id="lblStatusBox">🔒 本案已審核結案（唯讀歷史紀錄）</div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="imgModal" class="image-modal" onclick="closeEvidenceZoom()">
+    <img id="modalTargetImg" src="" alt="放大證據圖">
+</div>
+
+<script>
+    function switchTab(statusType, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.clickable-row').forEach(row => {
+            if (statusType === 'all' || row.dataset.status === statusType) {
+                row.classList.remove('hidden');
+            } else {
+                row.classList.add('hidden');
+            }
+        });
+    }
+
+    function showReportDetail(row) {
+        if (!row) return;                
+        let id = row.dataset.id;
+        let reporter = row.dataset.reporter;
+        let reported = row.dataset.reported;
+        let category = row.dataset.category;
+        let content = row.dataset.content;
+        let status = row.dataset.status; // 0=待處理, 1=通過, 2=駁回
+        let emp = row.dataset.emp;
+        let note = row.dataset.note;
+        let points = row.dataset.points;
+        let time = row.dataset.time;                
+        
+        document.getElementById('placeholderText').style.display = 'none';
+        document.getElementById('detailContent').style.display = 'block';                
+        
+        // 渲染基本案情資料
+        document.getElementById('detReportId').innerText = id;
+        document.getElementById('formReportId').value = id; // 同步寫入表單隱藏欄位
+        document.getElementById('detReporter').innerText = reporter;
+        document.getElementById('detReported').innerText = reported;
+        document.getElementById('detCategory').innerText = category;
+        document.getElementById('detTime').innerText = time;
+        document.getElementById('detContentDesc').innerText = content || '無文字描述';
+        
+        // 處理圖片事證
+        let img = document.getElementById('detEvidenceImg');
+        if (img) img.style.display = 'block';
+        let oldTxt = document.getElementById('noImgTxt');
+        if (oldTxt) oldTxt.remove();
+        if (img) img.src = '/backend/memberreport/DBGifReader?reportId=' + id;                
+        
+        // 【核心邏輯判定】：根據案件狀態，切換「審核輸入模式」或「結案唯讀模式」
+        if (status === "0") {
+            // 待處理：重置並開啟輸入表單區
+            document.getElementById('auditInteractiveArea').style.display = 'block';
+            document.getElementById('auditReadOnlyArea').style.display = 'none';
+            
+            document.getElementById('employeeId').value = '';
+            document.getElementById('violationPoints').value = '0';
+            document.getElementById('adminNote').value = '';
+        } else {
+            // 已結案（1或2）：隱藏表單，顯示唯讀歷程
+            document.getElementById('auditInteractiveArea').style.display = 'none';
+            document.getElementById('auditReadOnlyArea').style.display = 'block';
+            
+            document.getElementById('lblEmpId').innerText = emp || '系統自動結案';
+            document.getElementById('lblPoints').innerText = (points || 0) + ' 點';
+            document.getElementById('lblAdminNote').innerText = note || '無處理批註';
+            
+            let statusBox = document.getElementById('lblStatusBox');
+            if (status === "1") {
+                statusBox.className = "read-only-box";
+                statusBox.style.borderColor = "var(--emerald-600)";
+                statusBox.innerHTML = "🔒 🟢 本案已由主管判定【檢舉成立】並結案";
+            } else {
+                statusBox.className = "read-only-box";
+                statusBox.style.borderColor = "var(--rose-600)";
+                statusBox.innerHTML = "🔒 ❌ 本案已由主管判定【退件/駁回不成立】並結案";
+            }
+        }
+    }
+
+    // 按鈕點擊事件：設定審核代碼並提交表單
+    function submitAudit(statusType) {
+        document.getElementById('formReportStatus').value = statusType;
+        
+        // 如果選擇駁回(2)，點數自動校正歸 0 較符合常規
+        if (statusType === 2) {
+            document.getElementById('violationPoints').value = '0';
+        }
+        
+        let confirmMsg = statusType === 1 ? '確定要通過此檢舉案並執行扣點嗎？' : '確定要駁回此檢舉案件嗎？';
+        if (confirm(confirmMsg)) {
+            document.getElementById('auditForm').submit();
+        }
+    }
+
+    // 表單前端安全驗證
+    function validateAuditForm() {
+        let empId = document.getElementById('employeeId').value.trim();
+        let points = document.getElementById('violationPoints').value;
+        
+        if (!empId) {
+            alert('請填寫經辦員工編號以利責任追蹤！');
+            return false;
+        }
+        if (points < 0 || points > 100) {
+            alert('裁決扣點範圍必須介於 0 至 100 之間！');
+            return false;
+        }
+        return true;
+    }
+    
+    function zoomEvidence(img) {
+        if (!img || img.style.display === 'none' || !img.src) return;
+        let modal = document.getElementById('imgModal');
+        let modalImg = document.getElementById('modalTargetImg');
+        modalImg.src = img.src;
+        modal.style.display = 'flex';
+    }
+    
+    function closeEvidenceZoom() {
+        let modal = document.getElementById('imgModal');
+        modal.style.display = 'none';
+    }
+</script>
+</body>
+</html>

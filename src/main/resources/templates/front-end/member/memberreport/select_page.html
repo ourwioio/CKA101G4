@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>會員檢舉管理：首頁</title>
+
+<style>
+  /* 全域基本樣式：淡藍灰色背景 */
+  body {
+    font-family: "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+    background-color: #f0f4f8;
+    color: #334e68;
+    margin: 0;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* 頂部標題區塊：微漸層與現代陰影 */
+  .header-container {
+    width: 100%;
+    max-width: 650px;
+    background: linear-gradient(135deg, #62b4f3 0%, #4793e3 100%);
+    color: white;
+    padding: 24px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(71, 147, 227, 0.2);
+    margin-bottom: 25px;
+  }
+  .header-container h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .header-container h4 {
+    margin: 8px 0 0 0;
+    font-size: 14px;
+    font-weight: 400;
+    opacity: 0.9;
+  }
+
+  /* 功能卡片通用樣式 */
+  .card {
+    width: 100%;
+    max-width: 650px;
+    background-color: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(51, 78, 104, 0.05);
+    margin-bottom: 25px;
+    box-sizing: border-box;
+  }
+  
+  .card-title {
+    font-size: 18px;
+    color: #102a43;
+    margin-top: 0;
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #d9e2ec;
+    font-weight: 600;
+  }
+
+  /* 傳統 <ul> 樣式改為結構化列表 */
+  .feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .feature-item {
+    padding: 15px 0;
+    border-bottom: 1px dashed #bcccdc;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .feature-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  /* 表單排版優化 */
+  .form-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .form-label {
+    font-size: 15px;
+    font-weight: 500;
+    color: #486581;
+    min-width: 160px;
+  }
+
+  /* 輸入框與下拉選單設計 */
+  input[type="text"], select {
+    padding: 8px 14px;
+    font-size: 14px;
+    border: 1px solid #bcccdc;
+    border-radius: 6px;
+    background-color: #f0f4f8;
+    color: #102a43;
+    outline: none;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 180px;
+  }
+  input[type="text"]:focus, select:focus {
+    border-color: #4793e3;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(71, 147, 227, 0.15);
+  }
+
+  /* 現代化按鈕與連結樣式 */
+  input[type="submit"], .btn-link {
+    background-color: #4793e3;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+  }
+  input[type="submit"]:hover, .btn-link:hover {
+    background-color: #2b76c6;
+  }
+  input[type="submit"]:active, .btn-link:active {
+    transform: scale(0.98);
+  }
+
+  /* 特別突出的功能連結按鈕（如 List All / Add） */
+  .btn-action {
+    background-color: #e1f0ff;
+    color: #1967d2;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .btn-action:hover {
+    background-color: #4793e3;
+    color: white;
+  }
+
+  /* 錯誤訊息美化：柔和紅點綴 */
+  .error-box-container {
+    background-color: #ffeef0;
+    border-left: 4px solid #ef4e4e;
+    padding: 15px 20px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 650px;
+    box-sizing: border-box;
+  }
+  .error-title {
+    color: #bf1d1d;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 15px;
+  }
+  .error-list {
+    margin: 0;
+    padding-left: 20px;
+    color: #bf1d1d;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+</style>
+
+</head>
+<body>
+
+  <div class="header-container">
+     <h3>會員檢舉管理</h3>
+     <h4>Spring Boot MVC × Thymeleaf 後台系統</h4>
+  </div>
+
+  <div class="error-box-container" th:if="${errorMsgs != null and !errorMsgs.isEmpty()}">
+     <div class="error-title">⚠️ 請修正以下錯誤：</div>
+     <ul class="error-list">
+         <li th:each="message : ${errorMsgs}" th:text="${message}">錯誤訊息</li>
+     </ul>
+  </div>
+
+  <div class="card">
+     <div class="card-title">🔍 資料查詢</div>
+     
+     <ul class="feature-list">
+        <li class="feature-item" style="flex-direction: row; justify-content: space-between; align-items: center;">
+           <span class="form-label" style="color: #102a43; font-weight: 600;">檢舉案總覽大表格</span>
+           <a class="btn-action" th:href="@{/backend/memberreport/listAllReport}">
+              📊 瀏覽全部檢舉案
+           </a>
+        </li>
+        
+        <li class="feature-item">
+           <form class="form-group" method="post" th:action="@{/backend/memberreport/getOne_For_Display}">
+              <span class="form-label">輸入檢舉案號 (如 1)：</span>
+              <input type="text" name="reportId" th:value="${param.reportId}" placeholder="請輸入案號...">
+              <input type="submit" value="送出">
+           </form>
+        </li>
+         
+        <li class="feature-item">
+           <form class="form-group" method="post" th:action="@{/backend/memberreport/getOne_For_Display}">
+              <span class="form-label">選擇檢舉案號：</span>
+              <select name="reportId">
+                 <option value="" disabled selected>請選擇案號...</option>
+                 <option th:each="reportVO : ${memberReportListData}" 
+                         th:value="${reportVO.reportId}" 
+                         th:text="${'案號: ' + reportVO.reportId}">1</option>
+              </select>
+              <input type="submit" value="送出">
+           </form>
+        </li>
+        
+        <li class="feature-item">
+           <form class="form-group" method="post" th:action="@{/backend/memberreport/getOne_For_Display}">
+              <span class="form-label">選擇被檢舉人 ID：</span>
+              <select name="reportId">
+                 <option value="" disabled selected>請選擇對象...</option>
+                 <option th:each="reportVO : ${memberReportListData}" 
+                         th:value="${reportVO.reportId}" 
+                         th:text="${'案號: ' + reportVO.reportId + ' (被檢舉人: ' + (reportVO.reported != null ? reportVO.reported.memberId : '無') + ')'}">被檢舉人編號</option>
+              </select>
+              <input type="submit" value="送出">
+           </form>
+        </li>
+     </ul>
+  </div>
+
+</body>
+</html>
