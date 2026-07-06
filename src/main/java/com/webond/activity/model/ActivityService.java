@@ -13,12 +13,18 @@ import jakarta.persistence.criteria.Predicate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Service
 public class ActivityService {
 
+	private static final boolean ENFORCE_REGISTRATION_TIME = false;
+
 	@Autowired
 	private ActivityRepository repository;
+
+	@Autowired
+	private ActivityOrderService activityOrderSvc;
 
 	public List<ActivityVO> getAll() {
 		return repository.findAll();
@@ -81,6 +87,26 @@ public class ActivityService {
 		repository.deleteById(id);
 	}
 
+	@Transactional
+	public void syncAttendeesFromOrders() {
+		for (ActivityVO activityVO : repository.findAll()) {
+			syncAttendeesFromOrders(activityVO.getActivityId());
+		}
+	}
+
+	@Transactional
+	public void syncAttendeesFromOrders(Integer activityId) {
+		ActivityVO activityVO = getOneActivity(activityId);
+
+		if (activityVO == null) {
+			return;
+		}
+
+		Integer activeBookingCount = activityOrderSvc.getActiveBookingCount(activityId);
+		activityVO.setAttendeesCount(activeBookingCount == null ? 0 : activeBookingCount);
+		repository.save(activityVO);
+	}
+
 	public List<ActivityVO> getActivitiesByMemberId(Integer memberId) {
 		return repository.findByMemberId(memberId);
 	}
@@ -119,6 +145,14 @@ public class ActivityService {
 			return false;
 		}
 
+		if (activityVO.getActivityStatus() == null || activityVO.getActivityStatus() != 0) {
+			return false;
+		}
+
+		if (ENFORCE_REGISTRATION_TIME && !isRegistrationOpen(activityId)) {
+			return false;
+		}
+
 		Integer current = activityVO.getAttendeesCount();
 		Integer max = activityVO.getMaxParticipants();
 
@@ -141,10 +175,34 @@ public class ActivityService {
 			return false;
 		}
 
-		if (activityVO.getRegistrationDeadline() == null) {
+		if (activityVO.getActivityStatus() == null || activityVO.getActivityStatus() != 0) {
+			return false;
+		}
+
+		if (!ENFORCE_REGISTRATION_TIME) {
 			return true;
 		}
 
-		return java.time.LocalDateTime.now().isBefore(activityVO.getRegistrationDeadline());
+		LocalDateTime now = LocalDateTime.now();
+
+		if (activityVO.getRegistrationStartTime() != null && now.isBefore(activityVO.getRegistrationStartTime())) {
+			return false;
+		}
+
+		if (activityVO.getRegistrationDeadline() != null && now.isAfter(activityVO.getRegistrationDeadline())) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public boolean isActivityEnded(Integer activityId) {
+		ActivityVO activityVO = getOneActivity(activityId);
+
+		if (activityVO == null || activityVO.getEndTime() == null) {
+			return false;
+		}
+
+		return LocalDateTime.now().isAfter(activityVO.getEndTime());
 	}
 }

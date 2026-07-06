@@ -72,6 +72,11 @@ public class ActivityVO implements Serializable {
 	@Column(name = "CREATED_AT", insertable = false, updatable = false)
 	private LocalDateTime createdAt;
 
+	@NotNull(message = "請選擇活動開始時間")
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+	@Column(name = "START_TIME")
+	private LocalDateTime startTime;
+
 	@NotNull(message = "請選擇活動結束時間")
 	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 	@Column(name = "END_TIME")
@@ -181,6 +186,14 @@ public class ActivityVO implements Serializable {
 
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
+	}
+
+	public LocalDateTime getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(LocalDateTime startTime) {
+		this.startTime = startTime;
 	}
 
 	public LocalDateTime getEndTime() {

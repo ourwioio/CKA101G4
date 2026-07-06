@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>活動訂單管理</title>
+<title>報名審核</title>
 
 <style>
 body {
@@ -14,7 +14,7 @@ body {
 
 .page-card {
 	background: white;
-	max-width: 1300px;
+	max-width: 1400px;
 	margin: 0 auto;
 	border-radius: 16px;
 	padding: 30px 35px;
@@ -25,7 +25,7 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 25px;
+	margin-bottom: 18px;
 }
 
 .header h2 {
@@ -33,33 +33,38 @@ body {
 	margin: 0;
 }
 
-.header-actions {
-	display: flex;
-	gap: 12px;
+.employee {
+	color: #64748b;
+	font-weight: bold;
+	margin-bottom: 20px;
 }
 
-.btn-add, .btn-back {
+.notice {
+	border-radius: 10px;
+	padding: 12px 16px;
+	margin-bottom: 16px;
+	font-weight: bold;
+}
+
+.success {
+	background: #dcfce7;
+	color: #166534;
+	border: 1px solid #bbf7d0;
+}
+
+.error {
+	background: #fee2e2;
+	color: #991b1b;
+	border: 1px solid #fecaca;
+}
+
+.btn-back {
+	background: #64748b;
 	color: white;
 	text-decoration: none;
 	padding: 10px 18px;
 	border-radius: 8px;
 	font-weight: bold;
-}
-
-.btn-add {
-	background: #3b82f6;
-}
-
-.btn-add:hover {
-	background: #2563eb;
-}
-
-.btn-back {
-	background: #64748b;
-}
-
-.btn-back:hover {
-	background: #475569;
 }
 
 .table-card {
@@ -76,16 +81,49 @@ th {
 	background: #e2e8f0;
 	padding: 14px;
 	text-align: center;
+	white-space: nowrap;
 }
 
 td {
 	padding: 14px;
 	text-align: center;
 	border-bottom: 1px solid #eee;
+	vertical-align: top;
 }
 
-tr:hover {
-	background: #f8fafc;
+.note {
+	max-width: 240px;
+	text-align: left;
+	white-space: pre-wrap;
+}
+
+.status {
+	padding: 5px 12px;
+	border-radius: 20px;
+	font-size: 13px;
+	font-weight: bold;
+	display: inline-block;
+	white-space: nowrap;
+}
+
+.pending {
+	background: #dbeafe;
+	color: #1d4ed8;
+}
+
+.active {
+	background: #dcfce7;
+	color: #166534;
+}
+
+.cancel {
+	background: #fee2e2;
+	color: #991b1b;
+}
+
+.refund {
+	background: #fef3c7;
+	color: #92400e;
 }
 
 .action {
@@ -94,33 +132,22 @@ tr:hover {
 	gap: 10px;
 }
 
-.btn-edit {
-	background: #10b981;
-	color: white;
-	text-decoration: none;
-	padding: 8px 15px;
-	border-radius: 6px;
-}
-
-.btn-edit:hover {
-	background: #059669;
-}
-
-.btn-delete {
-	background: #ef4444;
+.btn-approve,
+.btn-reject {
 	color: white;
 	border: none;
 	padding: 8px 15px;
 	border-radius: 6px;
 	cursor: pointer;
-}
-
-.btn-delete:hover {
-	background: #dc2626;
-}
-
-.status {
 	font-weight: bold;
+}
+
+.btn-approve {
+	background: #16a34a;
+}
+
+.btn-reject {
+	background: #dc2626;
 }
 </style>
 </head>
@@ -128,16 +155,19 @@ tr:hover {
 <body>
 
 	<div class="page-card">
-
 		<div class="header">
-			<h2>📋 活動訂單管理</h2>
-
-			<div class="header-actions">
-				<a th:href="@{/activity/admin/home}" class="btn-back"> 🏠 返回後台首頁 </a>
-				<a th:href="@{/activityOrder/addActivityOrder}" class="btn-add">
-					➕ 新增訂單 </a>
-			</div>
+			<h2>報名審核</h2>
+			<a th:href="@{/activity/admin/home}" class="btn-back">回後台首頁</a>
 		</div>
+
+		<div class="employee">
+			目前員工：<span th:text="${loginEmployeeName}"></span>
+			（員工編號 <span th:text="${loginEmployeeId}"></span>）
+		</div>
+
+		<div th:if="${param.approveSuccess}" class="notice success">已通過申請，等待會員付款。</div>
+		<div th:if="${param.rejectSuccess}" class="notice success">已退回報名申請。</div>
+		<div th:if="${param.approveFailed}" class="notice error">通過失敗：活動可能已額滿、下架或不開放報名。</div>
 
 		<div class="table-card">
 			<table>
@@ -146,10 +176,12 @@ tr:hover {
 						<th>訂單編號</th>
 						<th>活動名稱</th>
 						<th>會員ID</th>
-						<th>訂單狀態</th>
+						<th>狀態</th>
 						<th>報名人數</th>
 						<th>總金額</th>
+						<th>申請備註</th>
 						<th>付款方式</th>
+						<th>審核員工ID</th>
 						<th>操作</th>
 					</tr>
 				</thead>
@@ -158,44 +190,55 @@ tr:hover {
 					<tr th:each="order : ${orderListData}">
 						<td th:text="${order.activityOrderId}"></td>
 
-						<td><span th:each="activity : ${activityListData}"
-							th:if="${activity.activityId == order.activityId}"
-							th:text="${activity.activityTitle}"> </span></td>
+						<td>
+							<span th:each="activity : ${activityListData}"
+								th:if="${activity.activityId == order.activityId}"
+								th:text="${activity.activityTitle}">
+							</span>
+						</td>
 
 						<td th:text="${order.buyerMemberId}"></td>
 
-						<td><span th:if="${order.orderStatus == 0}" class="status">已完成</span>
-							<span th:if="${order.orderStatus == 1}" class="status">已取消</span>
-							<span th:if="${order.orderStatus == 2}" class="status">已退款</span>
+						<td>
+							<span th:if="${order.orderStatus == 3}" class="status pending">待審核</span>
+							<span th:if="${order.orderStatus == 4}" class="status pending">待付款</span>
+							<span th:if="${order.orderStatus == 0}" class="status active">已付款</span>
+							<span th:if="${order.orderStatus == 1}" class="status cancel">已取消/退回</span>
+							<span th:if="${order.orderStatus == 2}" class="status refund">退款申請中</span>
 						</td>
 
 						<td th:text="${order.bookingCount}"></td>
-						<td th:text="${order.totalAmount}"></td>
-
-						<td><span th:if="${order.activityPaymentMethod == 0}">信用卡</span>
-							<span th:if="${order.activityPaymentMethod == 1}">ATM轉帳</span></td>
+						<td>NT$ <span th:text="${order.totalAmount}"></span></td>
+						<td class="note" th:text="${order.orderNote ?: '-'}"></td>
 
 						<td>
-							<div class="action">
-								<a class="btn-edit"
-									th:href="@{/activityOrder/updateActivityOrder(id=${order.activityOrderId})}">
-									修改 </a>
+							<span th:if="${order.activityPaymentMethod == 0}">信用卡</span>
+							<span th:if="${order.activityPaymentMethod == 1}">ATM轉帳</span>
+							<span th:if="${order.activityPaymentMethod == null}">未付款</span>
+						</td>
 
-								<form th:action="@{/activityOrder/deleteActivityOrder}"
-									method="post">
+						<td th:text="${order.employeeId ?: '-'}"></td>
+
+						<td>
+							<div class="action" th:if="${order.orderStatus == 3}">
+								<form th:action="@{/activityOrder/approve}" method="post">
 									<input type="hidden" name="activityOrderId"
 										th:value="${order.activityOrderId}">
+									<button class="btn-approve" type="submit">通過</button>
+								</form>
 
-									<button class="btn-delete" onclick="return confirm('確定刪除？')">
-										刪除</button>
+								<form th:action="@{/activityOrder/reject}" method="post">
+									<input type="hidden" name="activityOrderId"
+										th:value="${order.activityOrderId}">
+									<button class="btn-reject" type="submit">退回</button>
 								</form>
 							</div>
+							<span th:unless="${order.orderStatus == 3}">-</span>
 						</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
-
 	</div>
 
 </body>

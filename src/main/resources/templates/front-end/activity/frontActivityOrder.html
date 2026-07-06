@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>活動報名</title>
+<title>活動報名申請</title>
 
 <style>
 body {
@@ -75,10 +75,6 @@ label {
 	cursor: pointer;
 	font-weight: bold;
 }
-
-.btn-submit:hover {
-	background: #1d4ed8;
-}
 </style>
 
 </head>
@@ -86,67 +82,48 @@ label {
 <body>
 
 	<div class="card">
-
-		<h2>📝 確認活動報名</h2>
+		<h2>活動報名申請</h2>
 
 		<form th:action="@{/activity/front/order/save}"
 			th:object="${activityOrderVO}" method="post">
 
-			<!-- 隱藏欄位 -->
-			<input type="hidden" th:field="*{activityId}"> <input
-				type="hidden" th:field="*{buyerMemberId}"> <input
-				type="hidden" th:field="*{activityPrice}"> <input
-				type="hidden" th:field="*{totalAmount}"> <input
-				type="hidden" th:field="*{orderStatus}">
+			<input type="hidden" th:field="*{activityId}">
+			<input type="hidden" th:field="*{buyerMemberId}">
+			<input type="hidden" th:field="*{activityPrice}">
+			<input type="hidden" th:field="*{totalAmount}">
+			<input type="hidden" th:field="*{orderStatus}">
+			<input type="hidden" th:field="*{activityPaymentMethod}">
 
 			<div class="form-group">
-				<label>活動名稱</label> <input class="form-control readonly"
-					th:value="${activityVO.activityTitle}" readonly>
+				<label>活動名稱</label>
+				<input class="form-control readonly" th:value="${activityVO.activityTitle}" readonly>
 			</div>
 
 			<div class="form-group">
-				<label>目前登入會員</label> <input class="form-control readonly"
-					th:value="${loginMemberName}" readonly>
+				<label>申請會員</label>
+				<input class="form-control readonly" th:value="${loginMemberName}" readonly>
 			</div>
 
 			<div class="form-group">
-				<label>活動價格</label> <input class="form-control readonly"
-					th:value="${activityVO.activityPrice}" readonly>
+				<label>活動價格</label>
+				<input class="form-control readonly" th:value="${activityVO.activityPrice}" readonly>
 			</div>
 
 			<div class="form-group">
-				<label>報名人數</label> <input type="number" min="1"
-					th:field="*{bookingCount}" class="form-control">
-			</div>
-
-			<div class="form-group">
-				<label>付款方式</label> <select class="form-control"
-					th:field="*{activityPaymentMethod}">
-
-					<option value="0">信用卡</option>
-					<option value="1">ATM轉帳</option>
-
-				</select>
+				<label>報名人數</label>
+				<input type="number" min="1" th:field="*{bookingCount}" class="form-control">
 			</div>
 
 			<div class="form-group">
 				<label>備註</label>
-
-				<textarea class="form-control" rows="4" th:field="*{orderNote}">
-        </textarea>
-
+				<textarea class="form-control" rows="4" th:field="*{orderNote}"></textarea>
 			</div>
 
 			<div class="btn-area">
-
-				<a th:href="@{/activity/front/list}" class="btn-back"> 返回 </a>
-
-				<button type="submit" class="btn-submit">確認報名</button>
-
+				<a th:href="@{/activity/front/list}" class="btn-back">返回</a>
+				<button type="submit" class="btn-submit">送出申請</button>
 			</div>
-
 		</form>
-
 	</div>
 
 </body>
