@@ -53,7 +53,7 @@ public class AdminSecurityConfig {
             	
             	.usernameParameter("username")	 
             	.passwordParameter("password")   
-            	.defaultSuccessUrl("/admin/page", false) 
+            	.defaultSuccessUrl("/admin/adminPage", false) 
             	.failureUrl("/admin/login?error=true")      
             )
             .logout(logout -> logout

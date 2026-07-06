@@ -14,14 +14,12 @@ public class AdminController {
 		return"/back-end/employee/login";
 	}
 	
-	//後台主畫面
-	@GetMapping("/page")
+	@GetMapping("/adminPage")
 	public String adminPage() {
-		return "/back-end/employee/index";
+		return"back-end/employee/index";
 	}
-	
-	
-	
+
+
 }
 
 

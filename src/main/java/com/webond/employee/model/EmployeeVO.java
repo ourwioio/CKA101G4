@@ -17,6 +17,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "EMPLOYEE")
@@ -24,16 +25,18 @@ public class EmployeeVO implements java.io.Serializable{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Pattern(regexp = "^[(\u4e00-\u9fa5)(a-zA-Z0-9_)]{2,10}$", message = "員工姓名: 只能是中、英文字母、數字和_ , 且長度必需在2到10之間")
-	@Column(name = "EMPLOYEE_ID", updatable = false)
+	@Column(name = "EMPLOYEE_ID", updatable = false, unique = true, nullable = false)
 	private Integer employeeId;
 	
+	@Pattern(regexp = "^[a-zA-Z0-9]{5,10}@webond\\.com$", message = "前綴必須為 5 到 10 碼的英文或數字，並以 @webond.com 結尾")
 	@Column(name = "EMP_ACCOUNT", unique = true, nullable = false)
 	private String empAccount;
 	
 	@Column(name = "PASSWORD_HASH", nullable = false)
 	private String empPassword;
 	
+	@Size(min = 2, max = 10, message = "員工姓名長度必須在 2 到 10 之間")
+	@Pattern(regexp = "^[\\u4e00-\\u9fa5a-zA-Z]{2,10}$", message = "員工姓名只能包含中文或英文字母")
 	@Column(name = "EMP_NAME")
 	private String empName;
 	

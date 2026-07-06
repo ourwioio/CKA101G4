@@ -2,30 +2,30 @@
 <html xmlns:th="http://thymeleaf.org"
       xmlns:sec="http://thymeleaf.org/extras/spring-security">
 <head>
-    <title>後台管理系統</title>
+    <meta charset="UTF-8">
+    <title>後台管理系統 - 首頁</title>
 </head>
-<body>
-    <h1>歡迎回來，後台管理員！</h1>
+<!-- 1. 外層維持與其他頁面百分之百相同的置中樣式 -->
+<body style="text-align: center; font-family: Arial, sans-serif; padding: 20px;">
 
-    <ul>
-        <!-- 只有擁有 EMP_MGR 權限才能看到此按鈕 -->
-        <li sec:authorize="hasAuthority('管理員工')">
-            <a th:href="@{/admin/employee/list}">員工管理系統</a>
-        </li>
+    <h1 style="white-space: nowrap; margin-bottom: 20px;">後台管理系統</h1>
 
-        <!-- 只有擁有 VENUE_MGR 權限才能看到此按鈕 -->
-        <li sec:authorize="hasAnyAuthority('管理員工','管理服務訂單')">
-            <a th:href="@{/admin/venue/list}">服務管理系統</a>
-        </li>
+    <!-- 2. 建立大框架表格（與 empPage 寬度、結構完全一致） -->
+    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; max-width: 1500px; table-layout: fixed; margin: 0 auto;">
+        <tr>
+            <!-- 【左側欄位】：直接引用主框架的 sidebar，原地取代 -->
+            <td th:replace="~{back-end/employee/adminPage :: sidebar}"></td>
 
-        <!-- 只有擁有 ACT_MGR 權限才能看到此按鈕 -->
-        <li sec:authorize="hasAuthority('管理場地')">
-            <a th:href="@{/admin/activity/list}">活動管理系統</a>
-        </li>
-    </ul>
+            <!-- 【右側欄位】：專心放你的歡迎文字 -->
+            <td style="vertical-align: top; text-align: center; padding: 40px 20px;">
+                
+                <!-- 這裡就是你原本右邊畫面的核心內容 -->
+                <h1>歡迎回來，後台管理員！</h1>
+                <p style="color: #666; font-size: 16px;">請選擇左側管理項目。</p>
 
-    <form th:action="@{/admin/logout}" method="post">
-        <button type="submit">登出</button>
-    </form>
+            </td>
+        </tr>
+    </table>
+
 </body>
 </html>
