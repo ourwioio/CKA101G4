@@ -1,159 +1,95 @@
 package com.webond.activity.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.webond.activity.model.ActivityOrderService;
 import com.webond.activity.model.ActivityOrderVO;
 import com.webond.activity.model.ActivityService;
+import com.webond.employee.model.EmployeeVO;
+import com.webond.employee.repository.EmployeeRepository;
+
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/activityOrder")
 public class ActivityOrderPageController {
 
-    @Autowired
-    private ActivityOrderService orderSvc;
+	private static final String ACTIVITY_ADMIN_EMPLOYEE_ID = "activityAdminEmployeeId";
 
-    @Autowired
-    private ActivityService activitySvc;
+	@Autowired
+	private ActivityOrderService orderSvc;
 
-    // 查詢全部
-    @GetMapping("/listAllActivityOrder")
-    public String listAllActivityOrder(Model model) {
+	@Autowired
+	private ActivityService activitySvc;
 
-        model.addAttribute("orderListData", orderSvc.getAll());
+	@Autowired
+	private EmployeeRepository employeeRepo;
 
-        // 活動下拉選單
-        model.addAttribute("activityListData", activitySvc.getAll());
+	@GetMapping("/listAllActivityOrder")
+	public String listAllActivityOrder(Model model, HttpSession session) {
+		model.addAttribute("orderListData", orderSvc.getAll());
+		model.addAttribute("activityListData", activitySvc.getAll());
+		addFakeEmployee(model, session);
 
-        return "front-end/activityorder/listAllActivityOrder";
-    }
+		return "front-end/activityorder/listAllActivityOrder";
+	}
 
-    // 新增頁面
-    @GetMapping("/addActivityOrder")
-    public String addActivityOrder(Model model) {
+	@PostMapping("/approve")
+	public String approveOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
+		ActivityOrderVO orderVO = orderSvc.getOneOrder(activityOrderId);
 
-        model.addAttribute("activityOrderVO", new ActivityOrderVO());
+		if (orderVO != null && activitySvc.canRegister(orderVO.getActivityId(), orderVO.getBookingCount())) {
+			orderSvc.approveOrder(activityOrderId, getLoginEmployeeId(session));
+			activitySvc.syncAttendeesFromOrders(orderVO.getActivityId());
+			return "redirect:/activityOrder/listAllActivityOrder?approveSuccess=true";
+		}
 
-        model.addAttribute("activityListData", activitySvc.getAll());
+		return "redirect:/activityOrder/listAllActivityOrder?approveFailed=true";
+	}
 
-        return "front-end/activityorder/addActivityOrder";
-    }
+	@PostMapping("/reject")
+	public String rejectOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
+		ActivityOrderVO orderVO = orderSvc.rejectOrder(activityOrderId, getLoginEmployeeId(session));
 
-    // 新增
-    @PostMapping("/insert")
-    public String insert(
-            @Valid @ModelAttribute("activityOrderVO") ActivityOrderVO orderVO,
-            BindingResult result,
-            Model model) {
+		if (orderVO != null) {
+			activitySvc.syncAttendeesFromOrders(orderVO.getActivityId());
+		}
 
-        if (result.hasErrors()) {
+		return "redirect:/activityOrder/listAllActivityOrder?rejectSuccess=true";
+	}
 
-            model.addAttribute("activityListData", activitySvc.getAll());
+	private void addFakeEmployee(Model model, HttpSession session) {
+		Integer employeeId = getLoginEmployeeId(session);
+		EmployeeVO employeeVO = employeeId == null ? null : employeeRepo.findById(employeeId).orElse(null);
+		String employeeName = employeeVO != null && employeeVO.getEmpName() != null
+				&& !employeeVO.getEmpName().trim().isEmpty() ? employeeVO.getEmpName()
+						: employeeId == null ? "No employee" : "Employee " + employeeId;
 
-            return "front-end/activityorder/addActivityOrder";
-        }
+		model.addAttribute("loginEmployeeId", employeeId);
+		model.addAttribute("loginEmployeeName", employeeName);
+		model.addAttribute("employeeListData", employeeRepo.findAll(Sort.by(Sort.Direction.ASC, "employeeId")));
+	}
 
-        orderSvc.addOrder(orderVO);
+	private Integer getLoginEmployeeId(HttpSession session) {
+		Object employeeId = session.getAttribute(ACTIVITY_ADMIN_EMPLOYEE_ID);
+		if (employeeId instanceof Integer && employeeRepo.existsById((Integer) employeeId)) {
+			return (Integer) employeeId;
+		}
 
-        return "redirect:/activityOrder/listAllActivityOrder";
-    }
-
-    // 修改頁面
-    @GetMapping("/updateActivityOrder")
-    public String updateActivityOrder(
-            @RequestParam("id") Integer activityOrderId,
-            Model model) {
-
-        ActivityOrderVO orderVO = orderSvc.getOneOrder(activityOrderId);
-
-        if (orderVO == null) {
-            return "redirect:/activityOrder/listAllActivityOrder";
-        }
-
-        model.addAttribute("activityOrderVO", orderVO);
-
-        model.addAttribute("activityListData", activitySvc.getAll());
-
-        return "front-end/activityorder/updateActivityOrder";
-    }
-
-    // 修改
-    @PostMapping("/update")
-    public String update(
-            @Valid @ModelAttribute("activityOrderVO") ActivityOrderVO formVO,
-            BindingResult result,
-            Model model) {
-
-        if (result.hasErrors()) {
-
-            model.addAttribute("activityListData", activitySvc.getAll());
-
-            return "front-end/activityorder/updateActivityOrder";
-        }
-
-        ActivityOrderVO orderVO = orderSvc.getOneOrder(formVO.getActivityOrderId());
-
-        if (orderVO == null) {
-            return "redirect:/activityOrder/listAllActivityOrder";
-        }
-
-        orderVO.setActivityId(formVO.getActivityId());
-        orderVO.setBuyerMemberId(formVO.getBuyerMemberId());
-        orderVO.setEmployeeId(formVO.getEmployeeId());
-
-        orderVO.setOrderStatus(formVO.getOrderStatus());
-
-        orderVO.setBookingCount(formVO.getBookingCount());
-
-        orderVO.setActivityPrice(formVO.getActivityPrice());
-
-        orderVO.setTotalAmount(formVO.getTotalAmount());
-
-        orderVO.setOrderNote(formVO.getOrderNote());
-
-        orderVO.setActivityPaymentMethod(formVO.getActivityPaymentMethod());
-
-        orderVO.setPaidAt(formVO.getPaidAt());
-
-        orderVO.setActivityCompletedAt(formVO.getActivityCompletedAt());
-
-        orderVO.setBuyerRateSeller(formVO.getBuyerRateSeller());
-
-        orderVO.setBuyerReviewComment(formVO.getBuyerReviewComment());
-
-        orderVO.setBuyerReviewedAt(formVO.getBuyerReviewedAt());
-
-        orderVO.setSellerRateBuyer(formVO.getSellerRateBuyer());
-
-        orderVO.setSellerReviewComment(formVO.getSellerReviewComment());
-
-        orderVO.setSellerReviewedAt(formVO.getSellerReviewedAt());
-
-        orderVO.setPayoutAmount(formVO.getPayoutAmount());
-
-        orderVO.setRefundReason(formVO.getRefundReason());
-
-        orderVO.setRefundStatus(formVO.getRefundStatus());
-
-        orderSvc.updateOrder(orderVO);
-
-        return "redirect:/activityOrder/listAllActivityOrder";
-    }
-
-    // 刪除
-    @PostMapping("/deleteActivityOrder")
-    public String deleteActivityOrder(
-            @RequestParam("activityOrderId") Integer activityOrderId) {
-
-        orderSvc.deleteOrder(activityOrderId);
-
-        return "redirect:/activityOrder/listAllActivityOrder";
-    }
-
+		Integer defaultEmployeeId = employeeRepo.findAll(Sort.by(Sort.Direction.ASC, "employeeId")).stream()
+				.map(EmployeeVO::getEmployeeId)
+				.findFirst()
+				.orElse(null);
+		if (defaultEmployeeId != null) {
+			session.setAttribute(ACTIVITY_ADMIN_EMPLOYEE_ID, defaultEmployeeId);
+		}
+		return defaultEmployeeId;
+	}
 }

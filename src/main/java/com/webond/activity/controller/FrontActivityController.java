@@ -53,6 +53,12 @@ public class FrontActivityController {
 		return "redirect:/activity/front/home";
 	}
 
+	@PostMapping("/activity/front/syncAttendees")
+	public String syncAttendeesFromOrders() {
+		activitySvc.syncAttendeesFromOrders();
+		return "redirect:/activity/front/home?syncSuccess=true";
+	}
+
 	@GetMapping("/activity/front/list")
 	public String frontActivityList(@RequestParam(value = "keyword", required = false) String keyword,
 			@RequestParam(value = "typeId", required = false) Integer typeId,
@@ -74,7 +80,10 @@ public class FrontActivityController {
 
 	@GetMapping("/activity/front/detail")
 	public String frontActivityDetail(@RequestParam("id") Integer activityId,
-			@RequestParam(value = "full", required = false) Boolean full, Model model, HttpSession session) {
+			@RequestParam(value = "full", required = false) Boolean full,
+			@RequestParam(value = "duplicate", required = false) Boolean duplicate,
+			@RequestParam(value = "owner", required = false) Boolean owner,
+			@RequestParam(value = "closed", required = false) Boolean closed, Model model, HttpSession session) {
 
 		addFakeLoginMember(model, session);
 
@@ -82,7 +91,19 @@ public class FrontActivityController {
 		model.addAttribute("activityVO", activityVO);
 
 		if (Boolean.TRUE.equals(full)) {
-			model.addAttribute("fullMessage", "Activity is full.");
+			model.addAttribute("fullMessage", "活動已額滿，無法報名。");
+		}
+
+		if (Boolean.TRUE.equals(duplicate)) {
+			model.addAttribute("duplicateMessage", "你已經報名過這個活動，不能重複報名。");
+		}
+
+		if (Boolean.TRUE.equals(owner)) {
+			model.addAttribute("ownerMessage", "主辦者不能報名自己舉辦的活動。");
+		}
+
+		if (Boolean.TRUE.equals(closed)) {
+			model.addAttribute("closedMessage", "目前不在報名開放時間內，無法報名。");
 		}
 
 		return "front-end/activity/frontActivityDetail";
@@ -95,13 +116,26 @@ public class FrontActivityController {
 
 		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
 
+		if (activityVO == null) {
+			return "redirect:/activity/front/list";
+		}
+
+		if (loginMemberId.equals(activityVO.getMemberId())) {
+			return "redirect:/activity/front/detail?id=" + activityId + "&owner=true";
+		}
+
+		if (!activitySvc.isRegistrationOpen(activityId)) {
+			return "redirect:/activity/front/detail?id=" + activityId + "&closed=true";
+		}
+
 		ActivityOrderVO orderVO = new ActivityOrderVO();
 		orderVO.setActivityId(activityVO.getActivityId());
 		orderVO.setBuyerMemberId(loginMemberId);
 		orderVO.setBookingCount(1);
 		orderVO.setActivityPrice(activityVO.getActivityPrice());
 		orderVO.setTotalAmount(activityVO.getActivityPrice());
-		orderVO.setOrderStatus((byte) 0);
+		orderVO.setOrderStatus((byte) 3);
+		orderVO.setActivityPaymentMethod((byte) 0);
 
 		model.addAttribute("activityVO", activityVO);
 		model.addAttribute("activityOrderVO", orderVO);
@@ -113,24 +147,93 @@ public class FrontActivityController {
 	public String saveFrontOrder(@ModelAttribute("activityOrderVO") ActivityOrderVO orderVO, HttpSession session) {
 		Integer bookingCount = orderVO.getBookingCount();
 		Integer activityPrice = orderVO.getActivityPrice();
+		Integer loginMemberId = getLoginMemberId(session);
+		ActivityVO activityVO = activitySvc.getOneActivity(orderVO.getActivityId());
 
 		if (bookingCount == null || bookingCount < 1) {
 			bookingCount = 1;
 		}
 
-		orderVO.setBuyerMemberId(getLoginMemberId(session));
+		if (activityVO == null) {
+			return "redirect:/activity/front/list";
+		}
+
+		if (loginMemberId.equals(activityVO.getMemberId())) {
+			return "redirect:/activity/front/detail?id=" + orderVO.getActivityId() + "&owner=true";
+		}
+
+		if (!activitySvc.isRegistrationOpen(orderVO.getActivityId())) {
+			return "redirect:/activity/front/detail?id=" + orderVO.getActivityId() + "&closed=true";
+		}
+
+		orderVO.setBuyerMemberId(loginMemberId);
 		orderVO.setBookingCount(bookingCount);
 		orderVO.setTotalAmount(activityPrice * bookingCount);
-		orderVO.setOrderStatus((byte) 0);
+		orderVO.setOrderStatus((byte) 3);
+
+		if (activityOrderSvc.hasActiveOrder(orderVO.getActivityId(), loginMemberId)) {
+			return "redirect:/activity/front/detail?id=" + orderVO.getActivityId() + "&duplicate=true";
+		}
 
 		if (!activitySvc.canRegister(orderVO.getActivityId(), orderVO.getBookingCount())) {
 			return "redirect:/activity/front/detail?id=" + orderVO.getActivityId() + "&full=true";
 		}
 
 		activityOrderSvc.addOrder(orderVO);
-		activitySvc.increaseAttendees(orderVO.getActivityId(), orderVO.getBookingCount());
 
 		return "redirect:/activity/front/myOrder";
+	}
+
+	@PostMapping("/activity/front/order/cancel")
+	public String cancelOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
+		ActivityOrderVO existingOrder = activityOrderSvc.getOneOrder(activityOrderId);
+
+		if (existingOrder != null && activitySvc.isActivityEnded(existingOrder.getActivityId())) {
+			return "redirect:/activity/front/myOrder?cannotCancelEnded=true";
+		}
+
+		ActivityOrderVO orderVO = activityOrderSvc.cancelOrder(activityOrderId, getLoginMemberId(session));
+
+		if (orderVO != null) {
+			activitySvc.syncAttendeesFromOrders(orderVO.getActivityId());
+		}
+
+		return "redirect:/activity/front/myOrder";
+	}
+
+	@PostMapping("/activity/front/order/refund")
+	public String requestRefund(@RequestParam("activityOrderId") Integer activityOrderId,
+			@RequestParam(value = "refundReason", required = false) String refundReason, HttpSession session) {
+		ActivityOrderVO orderVO = activityOrderSvc.requestRefund(activityOrderId, getLoginMemberId(session), refundReason);
+
+		if (orderVO != null) {
+			activitySvc.syncAttendeesFromOrders(orderVO.getActivityId());
+		}
+
+		return "redirect:/activity/front/myOrder";
+	}
+
+	@PostMapping("/activity/front/order/pay")
+	public String payOrder(@RequestParam("activityOrderId") Integer activityOrderId,
+			@RequestParam("activityPaymentMethod") Byte activityPaymentMethod, HttpSession session) {
+		ActivityOrderVO orderVO = activityOrderSvc.getOneOrder(activityOrderId);
+
+		if (orderVO == null) {
+			return "redirect:/activity/front/myOrder";
+		}
+
+		if (!activitySvc.canRegister(orderVO.getActivityId(), orderVO.getBookingCount())) {
+			return "redirect:/activity/front/myOrder?cannotPay=true";
+		}
+
+		ActivityOrderVO paidOrder = activityOrderSvc.payOrder(activityOrderId, getLoginMemberId(session),
+				activityPaymentMethod);
+
+		if (paidOrder != null) {
+			activitySvc.syncAttendeesFromOrders(paidOrder.getActivityId());
+		}
+
+		return "redirect:/activity/front/myOrder?paySuccess=true";
 	}
 
 	@GetMapping("/activity/front/myOrder")

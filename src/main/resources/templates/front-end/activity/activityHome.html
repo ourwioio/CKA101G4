@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>活動管理系統</title>
+<title>活動後台</title>
 
 <style>
 body {
@@ -17,7 +17,7 @@ body {
 	max-width: 1100px;
 	margin: auto;
 	text-align: center;
-	margin-bottom: 40px;
+	margin-bottom: 28px;
 }
 
 .header h1 {
@@ -29,6 +29,64 @@ body {
 .header p {
 	color: #64748b;
 	font-size: 1.05rem;
+}
+
+.top-actions {
+	max-width: 1100px;
+	margin: 0 auto 20px;
+	display: flex;
+	justify-content: flex-end;
+}
+
+.btn-home {
+	background: #64748b;
+	color: white;
+	text-decoration: none;
+	padding: 10px 18px;
+	border-radius: 8px;
+	font-weight: bold;
+}
+
+.login-panel {
+	max-width: 1100px;
+	margin: 0 auto 32px;
+	background: white;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 18px 20px;
+	box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 16px;
+}
+
+.login-panel strong {
+	color: #0f172a;
+}
+
+.login-form {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.login-form select {
+	min-width: 220px;
+	padding: 10px 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	font-size: 15px;
+}
+
+.login-form button {
+	background: #2563eb;
+	color: white;
+	border: 0;
+	border-radius: 8px;
+	padding: 10px 18px;
+	font-weight: bold;
+	cursor: pointer;
 }
 
 .card-container {
@@ -46,17 +104,6 @@ body {
 	text-align: center;
 	border: 1px solid #e2e8f0;
 	box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
-	transition: .25s;
-}
-
-.card:hover {
-	transform: translateY(-6px);
-	box-shadow: 0 10px 20px rgba(0, 0, 0, .15);
-}
-
-.icon {
-	font-size: 60px;
-	margin-bottom: 15px;
 }
 
 .card h2 {
@@ -78,99 +125,73 @@ body {
 	color: white;
 	text-decoration: none;
 	font-weight: bold;
-	transition: .2s;
 }
 
 .activity {
 	background: #3b82f6;
 }
 
-.activity:hover {
-	background: #2563eb;
-}
-
 .type {
 	background: #8b5cf6;
-}
-
-.type:hover {
-	background: #7c3aed;
 }
 
 .order {
 	background: #10b981;
 }
-
-.order:hover {
-	background: #059669;
-}
-
-.footer {
-	margin-top: 50px;
-	text-align: center;
-	color: #94a3b8;
-}
 </style>
-
 </head>
 
 <body>
 
+	<div class="top-actions">
+		<a th:href="@{/activity/home}" class="btn-home">回活動首頁</a>
+	</div>
+
 	<div class="header">
+		<h1>活動後台</h1>
+		<p>
+			目前員工：<span th:text="${loginEmployeeName}">測試員工</span>
+			（員工編號 <span th:text="${loginEmployeeId}">1</span>）
+		</p>
+	</div>
 
-		<h1>🎯 活動管理系統</h1>
+	<div class="login-panel">
+		<div>
+			<strong>測試後台員工</strong>
+			<div>切換後，訂單審核會記錄目前選到的員工編號。</div>
+		</div>
 
-		<p>歡迎使用活動管理後台，請選擇要管理的功能。</p>
-		<a th:href="@{/activity/home}" class="btn activity"> 🏠 返回活動系統 </a>
+		<form class="login-form" th:action="@{/activity/admin/fakeLogin}" method="post">
+			<select name="employeeId">
+				<option th:each="employee : ${employeeListData}"
+					th:value="${employee.employeeId}"
+					th:selected="${employee.employeeId == loginEmployeeId}"
+					th:text="|員工${employee.employeeId} - ${employee.empName ?: '未命名'}|">
+				</option>
+			</select>
+			<button type="submit">切換</button>
+		</form>
 	</div>
 
 	<div class="card-container">
-
-		<!-- 活動管理 -->
 		<div class="card">
-
-			<div class="icon">📋</div>
-
 			<h2>活動管理</h2>
-
-			<p>新增、修改、刪除活動資訊， 管理活動內容與報名資訊。</p>
-
-			<a class="btn activity" th:href="@{/activity/listAllActivity}">
-				進入管理 </a>
-
+			<p>後台只可查看活動與下架活動，不提供新增或修改活動。</p>
+			<a class="btn activity" th:href="@{/activity/listAllActivity}">進入活動管理</a>
 		</div>
 
-		<!-- 活動類型 -->
 		<div class="card">
-
-			<div class="icon">🏷️</div>
-
-			<h2>活動類型管理</h2>
-
-			<p>建立與維護所有活動分類， 方便活動歸類管理。</p>
-
-			<a class="btn type" th:href="@{/activityType/listAllActivityType}">
-				進入管理 </a>
-
+			<h2>活動類別管理</h2>
+			<p>管理活動分類資料。</p>
+			<a class="btn type" th:href="@{/activityType/listAllActivityType}">進入類別管理</a>
 		</div>
 
-		<!-- 活動訂單 -->
 		<div class="card">
-
-			<div class="icon">🧾</div>
-
-			<h2>活動訂單管理</h2>
-
-			<p>查看所有活動訂單， 修改付款狀態及管理訂單。</p>
-
-			<a class="btn order" th:href="@{/activityOrder/listAllActivityOrder}">
-				進入管理 </a>
-
+			<h2>報名審核</h2>
+			<p>審核前台會員送出的活動報名申請。</p>
+			<a class="btn order" th:href="@{/activityOrder/listAllActivityOrder}">進入報名審核</a>
 		</div>
-
 	</div>
-
-	<div class="footer"></div>
 
 </body>
 </html>

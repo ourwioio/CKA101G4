@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
@@ -127,10 +127,10 @@ textarea.form-control {
 <body>
 
 	<div class="header-container">
-		<div class="header-title">🎪 我要辦活動</div>
+		<div class="header-title">我要辦活動</div>
 
-		<a th:href="@{/activity/front/home}" class="btn-secondary"> 🔙
-			返回使用者首頁 </a>
+		<a th:href="@{/activity/front/home}" class="btn-secondary">
+			返回使用者首頁</a>
 	</div>
 
 	<div class="form-card">
@@ -158,7 +158,7 @@ textarea.form-control {
 					<label>活動類型 <span class="required">*</span></label> <select
 						th:field="*{activityTypeId}" class="form-control"
 						th:classappend="${#fields.hasErrors('activityTypeId')} ? ' input-error'">
-						<option value="">請選擇類型</option>
+						<option value="">請選擇活動類別</option>
 						<option th:each="type : ${typeListData}"
 							th:value="${type.activityTypeId}"
 							th:text="${type.activityTypeName}"></option>
@@ -221,6 +221,15 @@ textarea.form-control {
 				</div>
 
 				<div class="form-group">
+					<label>活動開始時間 <span class="required">*</span></label> <input
+						type="datetime-local" th:field="*{startTime}" class="form-control"
+						th:classappend="${#fields.hasErrors('startTime')} ? ' input-error'">
+
+					<div class="error" th:if="${#fields.hasErrors('startTime')}"
+						th:errors="*{startTime}"></div>
+				</div>
+
+				<div class="form-group">
 					<label>活動結束時間 <span class="required">*</span></label> <input
 						type="datetime-local" th:field="*{endTime}" class="form-control"
 						th:classappend="${#fields.hasErrors('endTime')} ? ' input-error'">
@@ -232,7 +241,7 @@ textarea.form-control {
 				<div class="form-group col-span-2">
 					<label>活動描述 <span class="required">*</span></label>
 					<textarea th:field="*{activityDescription}" class="form-control"
-						placeholder="請輸入活動內容"
+						placeholder="請輸入活動描述"
 						th:classappend="${#fields.hasErrors('activityDescription')} ? ' input-error'"></textarea>
 
 					<div class="error"
@@ -244,7 +253,7 @@ textarea.form-control {
 
 			<div class="form-actions">
 				<a th:href="@{/activity/front/home}" class="btn-cancel">取消</a>
-				<button type="submit" class="btn-submit">💾 建立活動</button>
+				<button type="submit" class="btn-submit">建立活動</button>
 			</div>
 
 		</form>

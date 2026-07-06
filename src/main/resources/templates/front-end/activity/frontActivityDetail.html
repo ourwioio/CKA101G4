@@ -117,6 +117,18 @@ h1 {
 			<span th:text="${fullMessage}"></span>
 		</div>
 
+		<div th:if="${duplicateMessage}" class="alert-error">
+			<span th:text="${duplicateMessage}"></span>
+		</div>
+
+		<div th:if="${ownerMessage}" class="alert-error">
+			<span th:text="${ownerMessage}"></span>
+		</div>
+
+		<div th:if="${closedMessage}" class="alert-error">
+			<span th:text="${closedMessage}"></span>
+		</div>
+
 		<div class="info">
 			<span class="label">活動價格：</span> NT$ <span
 				th:text="${activityVO.activityPrice}">0</span>
@@ -150,6 +162,11 @@ h1 {
 
 		<div class="info">
 			<span class="label">活動結束：</span> <span
+				th:text="${#temporals.format(activityVO.startTime, 'yyyy-MM-dd HH:mm')}"></span>
+		</div>
+
+		<div class="info">
+			<span class="label">活動結束時間：</span> <span
 				th:text="${#temporals.format(activityVO.endTime, 'yyyy-MM-dd HH:mm')}"></span>
 		</div>
 
