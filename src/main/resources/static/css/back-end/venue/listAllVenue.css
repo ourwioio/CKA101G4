@@ -1,0 +1,151 @@
+* {
+    box-sizing: border-box;
+}
+
+.wrap {
+    padding: 1.5rem;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.title {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.table-wrap {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+thead {
+    background: #f8f8f8;
+}
+
+thead th {
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #666;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    background: white;
+}
+
+tbody tr:last-child {
+    border-bottom: none;
+}
+
+tbody tr:hover {
+    background: #fafafa;
+}
+
+td {
+    padding: 12px 14px;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.img-cell img {
+    width: 64px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+}
+
+.no-img {
+    width: 64px;
+    height: 48px;
+    border-radius: 6px;
+    border: 1px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 11px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.badge-up {
+    background: #e1f5ee;
+    color: #0f6e56;
+}
+
+.badge-down {
+    background: #f5f5f5;
+    color: #888;
+    border: 1px solid #e0e0e0;
+}
+
+.actions {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-edit {
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-edit:hover {
+    background: #f5f5f5;
+    border-color: #999;
+}
+
+.btn-del {
+    background: white;
+    border: 1px solid #ffb3b3;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 13px;
+    color: #c0392b;
+    cursor: pointer;
+}
+
+.inline-form {
+    display: inline;
+}
+
+.btn-toggle {
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-toggle-up {
+    background: #2ecc71;
+}
+
+.btn-toggle-down {
+    background: #95a5a6;
+}
