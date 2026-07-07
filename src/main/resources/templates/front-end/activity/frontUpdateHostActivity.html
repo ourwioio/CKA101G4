@@ -93,6 +93,22 @@ textarea.form-control {
 	border: 2px solid red !important;
 }
 
+.hint {
+	color: #64748b;
+	font-size: 13px;
+	margin-top: 6px;
+}
+
+.image-preview {
+	width: 160px;
+	height: 120px;
+	object-fit: cover;
+	border-radius: 8px;
+	border: 1px solid #e2e8f0;
+	margin: 8px 0;
+	display: block;
+}
+
 .form-actions {
 	display: flex;
 	justify-content: flex-end;
@@ -136,7 +152,7 @@ textarea.form-control {
 	<div class="form-card">
 
 		<form th:action="@{/activity/front/updateHostActivity}"
-			th:object="${activityVO}" method="post">
+			th:object="${activityVO}" method="post" enctype="multipart/form-data">
 
 			<input type="hidden" th:field="*{activityId}"> <input
 				type="hidden" th:field="*{memberId}"> <input type="hidden"
@@ -250,6 +266,17 @@ textarea.form-control {
 						th:errors="*{activityDescription}"></div>
 				</div>
 
+				<div class="form-group col-span-2">
+					<label>活動圖片</label>
+					<img id="activityImagePreview" class="image-preview"
+						th:src="@{/activity/front/image(id=${activityVO.activityId})}"
+						alt="目前活動圖片">
+					<input id="activityImageFile" type="file" name="activityImageFile" class="form-control"
+						accept="image/jpeg,image/png">
+					<div class="hint">未重新選擇圖片時會保留原圖片；若原本沒有圖片，會顯示預設活動圖片。</div>
+					<div class="error" th:if="${imageError}" th:text="${imageError}"></div>
+				</div>
+
 			</div>
 
 			<div class="form-actions">
@@ -260,6 +287,22 @@ textarea.form-control {
 		</form>
 
 	</div>
+
+	<script>
+		const activityImageFile = document.getElementById('activityImageFile');
+		const activityImagePreview = document.getElementById('activityImagePreview');
+		const originalPreviewSrc = activityImagePreview.src;
+
+		activityImageFile.addEventListener('change', function() {
+			const file = this.files && this.files[0];
+			if (!file) {
+				activityImagePreview.src = originalPreviewSrc;
+				return;
+			}
+
+			activityImagePreview.src = URL.createObjectURL(file);
+		});
+	</script>
 
 </body>
 </html>

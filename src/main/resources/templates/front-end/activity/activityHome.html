@@ -155,10 +155,10 @@ body {
 		</p>
 	</div>
 
-	<div class="login-panel">
+		<div class="login-panel">
 		<div>
 			<strong>測試後台員工</strong>
-			<div>切換後，訂單審核會記錄目前選到的員工編號。</div>
+			<div>後台員工可查看活動資料與下架活動；報名審核由活動主辦會員處理。</div>
 		</div>
 
 		<form class="login-form" th:action="@{/activity/admin/fakeLogin}" method="post">
@@ -187,9 +187,9 @@ body {
 		</div>
 
 		<div class="card">
-			<h2>報名審核</h2>
-			<p>審核前台會員送出的活動報名申請。</p>
-			<a class="btn order" th:href="@{/activityOrder/listAllActivityOrder}">進入報名審核</a>
+			<h2>報名紀錄</h2>
+			<p>查看活動報名狀態；報名申請由活動主辦會員審核。</p>
+			<a class="btn order" th:href="@{/activityOrder/listAllActivityOrder}">進入報名紀錄</a>
 		</div>
 	</div>
 

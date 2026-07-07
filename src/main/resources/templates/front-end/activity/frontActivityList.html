@@ -141,6 +141,26 @@ body {
 	color: #0f172a;
 }
 
+.activity-image {
+	width: 100%;
+	aspect-ratio: 16/9;
+	object-fit: cover;
+	border-radius: 10px;
+	margin-bottom: 16px;
+	background: #e2e8f0;
+}
+
+.registration-status {
+	display: inline-block;
+	background: #e0f2fe;
+	color: #075985;
+	padding: 6px 12px;
+	border-radius: 999px;
+	font-size: 13px;
+	font-weight: bold;
+	margin-bottom: 12px;
+}
+
 .price {
 	color: #16a34a;
 	font-size: 22px;
@@ -299,7 +319,12 @@ body {
 
 	<div class="container" th:unless="${#lists.isEmpty(activityListData)}">
 		<div class="card" th:each="activity : ${activityListData}">
+			<img class="activity-image"
+				th:src="@{/activity/front/image(id=${activity.activityId})}"
+				alt="活動圖片">
 			<h2 th:text="${activity.activityTitle}">活動名稱</h2>
+			<span class="registration-status"
+				th:text="${registrationStatusMap[activity.activityId]}">報名中</span>
 
 			<div class="price">
 				NT$ <span th:text="${activity.activityPrice}"></span>

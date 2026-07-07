@@ -93,6 +93,22 @@ textarea.form-control {
 	border: 2px solid red !important;
 }
 
+.hint {
+	color: #64748b;
+	font-size: 13px;
+	margin-top: 6px;
+}
+
+.image-preview {
+	width: 160px;
+	height: 120px;
+	object-fit: cover;
+	border-radius: 8px;
+	border: 1px solid #e2e8f0;
+	margin: 8px 0;
+	display: block;
+}
+
 .form-actions {
 	display: flex;
 	justify-content: flex-end;
@@ -127,20 +143,21 @@ textarea.form-control {
 <body>
 
 	<div class="header-container">
-		<div class="header-title">我要辦活動</div>
+		<div class="header-title" th:text="${formTitle ?: '我要辦活動'}">我要辦活動</div>
 
-		<a th:href="@{/activity/front/home}" class="btn-secondary">
-			返回使用者首頁</a>
+		<a th:href="${cancelUrl ?: '/activity/front/home'}" class="btn-secondary"
+			th:text="${cancelText ?: '返回使用者首頁'}">返回使用者首頁</a>
 	</div>
 
 	<div class="form-card">
 
 		<form th:action="@{/activity/front/insertHostActivity}"
-			th:object="${activityVO}" method="post">
+			th:object="${activityVO}" method="post" enctype="multipart/form-data">
 
 			<input type="hidden" th:field="*{memberId}"> <input
 				type="hidden" th:field="*{attendeesCount}"> <input
 				type="hidden" th:field="*{activityStatus}">
+			<input type="hidden" name="sourceActivityId" th:value="${sourceActivityId}">
 
 			<div class="form-grid">
 
@@ -148,6 +165,7 @@ textarea.form-control {
 					<label>活動標題 <span class="required">*</span></label> <input
 						type="text" th:field="*{activityTitle}" class="form-control"
 						placeholder="請輸入活動標題"
+						th:readonly="${sourceActivityId != null}"
 						th:classappend="${#fields.hasErrors('activityTitle')} ? ' input-error'">
 
 					<div class="error" th:if="${#fields.hasErrors('activityTitle')}"
@@ -157,12 +175,15 @@ textarea.form-control {
 				<div class="form-group">
 					<label>活動類型 <span class="required">*</span></label> <select
 						th:field="*{activityTypeId}" class="form-control"
+						th:disabled="${sourceActivityId != null}"
 						th:classappend="${#fields.hasErrors('activityTypeId')} ? ' input-error'">
 						<option value="">請選擇活動類別</option>
 						<option th:each="type : ${typeListData}"
 							th:value="${type.activityTypeId}"
 							th:text="${type.activityTypeName}"></option>
 					</select>
+					<input th:if="${sourceActivityId != null}" type="hidden"
+						th:field="*{activityTypeId}">
 
 					<div class="error" th:if="${#fields.hasErrors('activityTypeId')}"
 						th:errors="*{activityTypeId}"></div>
@@ -172,6 +193,7 @@ textarea.form-control {
 					<label>活動費用 <span class="required">*</span></label> <input
 						type="number" th:field="*{activityPrice}" class="form-control"
 						min="0"
+						th:readonly="${sourceActivityId != null}"
 						th:classappend="${#fields.hasErrors('activityPrice')} ? ' input-error'">
 
 					<div class="error" th:if="${#fields.hasErrors('activityPrice')}"
@@ -182,6 +204,7 @@ textarea.form-control {
 					<label>最低成團人數 <span class="required">*</span></label> <input
 						type="number" th:field="*{minParticipants}" class="form-control"
 						min="1"
+						th:readonly="${sourceActivityId != null}"
 						th:classappend="${#fields.hasErrors('minParticipants')} ? ' input-error'">
 
 					<div class="error" th:if="${#fields.hasErrors('minParticipants')}"
@@ -192,6 +215,7 @@ textarea.form-control {
 					<label>最高人數限制 <span class="required">*</span></label> <input
 						type="number" th:field="*{maxParticipants}" class="form-control"
 						min="1"
+						th:readonly="${sourceActivityId != null}"
 						th:classappend="${#fields.hasErrors('maxParticipants')} ? ' input-error'">
 
 					<div class="error" th:if="${#fields.hasErrors('maxParticipants')}"
@@ -249,16 +273,46 @@ textarea.form-control {
 						th:errors="*{activityDescription}"></div>
 				</div>
 
+				<div class="form-group col-span-2">
+					<label>活動圖片</label>
+					<img id="activityImagePreview" class="image-preview"
+						th:src="${previewImageUrl ?: '/images/activity/default-activity.jpg'}"
+						alt="活動圖片預覽">
+					<input th:if="${sourceActivityId == null}" id="activityImageFile" type="file" name="activityImageFile" class="form-control"
+						accept="image/jpeg,image/png">
+					<div class="hint" th:if="${sourceActivityId == null}">未選擇圖片時會顯示預設活動圖片，圖片格式限 JPG 或 PNG。</div>
+					<div class="hint" th:if="${sourceActivityId != null}">再次舉辦會沿用原活動圖片。</div>
+					<div class="error" th:if="${imageError}" th:text="${imageError}"></div>
+				</div>
+
 			</div>
 
 			<div class="form-actions">
-				<a th:href="@{/activity/front/home}" class="btn-cancel">取消</a>
-				<button type="submit" class="btn-submit">建立活動</button>
+				<a th:href="${cancelUrl ?: '/activity/front/home'}" class="btn-cancel">取消</a>
+				<button type="submit" class="btn-submit" th:text="${submitText ?: '建立活動'}">建立活動</button>
 			</div>
 
 		</form>
 
 	</div>
+
+	<script>
+		const activityImageFile = document.getElementById('activityImageFile');
+		const activityImagePreview = document.getElementById('activityImagePreview');
+		const defaultPreviewSrc = activityImagePreview.src;
+
+		if (activityImageFile) {
+			activityImageFile.addEventListener('change', function() {
+				const file = this.files && this.files[0];
+				if (!file) {
+					activityImagePreview.src = defaultPreviewSrc;
+					return;
+				}
+
+				activityImagePreview.src = URL.createObjectURL(file);
+			});
+		}
+	</script>
 
 </body>
 </html>

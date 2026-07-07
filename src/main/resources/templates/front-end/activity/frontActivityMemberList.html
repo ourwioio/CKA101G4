@@ -93,6 +93,86 @@ tr:hover{
     color:#92400e;
 }
 
+.pending{
+    background:#dbeafe;
+    color:#1d4ed8;
+}
+
+.paying{
+    background:#e0e7ff;
+    color:#3730a3;
+}
+
+.action{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.btn-approve,
+.btn-reject{
+    color:white;
+    border:none;
+    padding:8px 15px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-approve{
+    background:#16a34a;
+}
+
+.btn-reject{
+    background:#dc2626;
+}
+
+.notice{
+    border-radius:10px;
+    padding:12px 16px;
+    margin-bottom:16px;
+    font-weight:bold;
+}
+
+.success{
+    background:#dcfce7;
+    color:#166534;
+    border:1px solid #bbf7d0;
+}
+
+.error{
+    background:#fee2e2;
+    color:#991b1b;
+    border:1px solid #fecaca;
+}
+
+.group-status{
+    background:white;
+    border-radius:12px;
+    padding:16px 18px;
+    margin-bottom:16px;
+    box-shadow:0 4px 10px rgba(0,0,0,.06);
+    color:#334155;
+    font-weight:bold;
+}
+
+.group-status strong{
+    color:#0f172a;
+}
+
+.group-ok{
+    color:#166534;
+}
+
+.group-wait{
+    color:#92400e;
+}
+
+.group-full{
+    color:#991b1b;
+}
+
 .empty{
     text-align:center;
     padding:50px;
@@ -120,6 +200,24 @@ tr:hover{
         </a>
     </div>
 
+    <div th:if="${param.approveSuccess}" class="notice success">已通過申請，等待會員付款。</div>
+    <div th:if="${param.rejectSuccess}" class="notice success">已退回報名申請。</div>
+    <div th:if="${param.approveFailed}" class="notice error">通過失敗：活動可能已額滿、下架或不開放報名。</div>
+
+    <div class="group-status">
+        目前已付款人數：
+        <strong th:text="${activityVO.attendeesCount ?: 0}">0</strong>
+        /
+        <strong th:text="${activityVO.maxParticipants}">0</strong>
+        <span th:if="${hasReachedMinimum}" class="group-ok">已達成團人數</span>
+        <span th:unless="${hasReachedMinimum}" class="group-wait">
+            尚未成團，最低需要
+            <strong th:text="${activityVO.minParticipants}">1</strong>
+            人
+        </span>
+        <span th:if="${isFull}" class="group-full">，活動已額滿，剩餘待審核申請會自動退回</span>
+    </div>
+
     <div class="table-card">
 
         <table>
@@ -131,13 +229,15 @@ tr:hover{
                     <th>總金額</th>
                     <th>付款方式</th>
                     <th>訂單狀態</th>
+                    <th>申請備註</th>
+                    <th>審核操作</th>
                 </tr>
             </thead>
 
             <tbody>
 
                 <tr th:if="${#lists.isEmpty(orderListData)}">
-                    <td colspan="6" class="empty">
+                    <td colspan="8" class="empty">
                         目前尚無會員報名此活動
                     </td>
                 </tr>
@@ -166,8 +266,33 @@ tr:hover{
                         </span>
 
                         <span th:if="${order.orderStatus == 2}" class="status refund">
-                            已退款
+                            退款申請中
                         </span>
+
+                        <span th:if="${order.orderStatus == 3}" class="status pending">
+                            待主辦審核
+                        </span>
+
+                        <span th:if="${order.orderStatus == 4}" class="status paying">
+                            待付款
+                        </span>
+                    </td>
+                    <td th:text="${order.orderNote ?: '-'}"></td>
+                    <td>
+                        <div class="action" th:if="${order.orderStatus == 3}">
+                            <form th:action="@{/activity/front/memberList/approve}" method="post">
+                                <input type="hidden" name="activityOrderId"
+                                    th:value="${order.activityOrderId}">
+                                <button class="btn-approve" type="submit">通過</button>
+                            </form>
+
+                            <form th:action="@{/activity/front/memberList/reject}" method="post">
+                                <input type="hidden" name="activityOrderId"
+                                    th:value="${order.activityOrderId}">
+                                <button class="btn-reject" type="submit">退回</button>
+                            </form>
+                        </div>
+                        <span th:unless="${order.orderStatus == 3}">-</span>
                     </td>
                 </tr>
 

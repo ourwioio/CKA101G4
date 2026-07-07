@@ -16,6 +16,8 @@ public interface ActivityOrderRepository extends JpaRepository<ActivityOrderVO, 
 
 	List<ActivityOrderVO> findByActivityIdAndOrderStatus(Integer activityId, Byte orderStatus);
 
+	Long countByActivityIdAndOrderStatus(Integer activityId, Byte orderStatus);
+
 	boolean existsByActivityIdAndBuyerMemberIdAndOrderStatus(Integer activityId, Integer buyerMemberId, Byte orderStatus);
 
 	boolean existsByActivityIdAndBuyerMemberIdAndOrderStatusIn(Integer activityId, Integer buyerMemberId,

@@ -221,10 +221,10 @@ body {
 
 		<form class="login-form" th:action="@{/activity/front/fakeLogin}" method="post">
 			<select name="memberId">
-				<option th:each="member : ${memberListData}"
-					th:value="${member.memberId}"
-					th:selected="${member.memberId == loginMemberId}"
-					th:text="|會員${member.memberId} - ${member.nickname ?: '未命名'}|">
+				<option th:each="memberId : ${memberListData}"
+					th:value="${memberId}"
+					th:selected="${memberId == loginMemberId}"
+					th:text="|會員${memberId}|">
 				</option>
 			</select>
 			<button type="submit">切換</button>

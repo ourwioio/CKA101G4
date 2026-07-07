@@ -48,8 +48,13 @@
 							class="px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-bold">已下架</span>
 					</td>
 					<td class="p-3 text-center">
+						<a th:href="@{/activity/front/detail(id=${activity.activityId}, from='admin')}"
+							class="inline-block bg-indigo-600 text-white px-3 py-2 rounded-lg font-bold hover:bg-indigo-700 mr-2">
+							詳情
+						</a>
 						<form th:if="${activity.activityStatus != 2}"
 							th:action="@{/activity/takeDown}" method="post"
+							class="inline-block"
 							onsubmit="return confirm('確定要下架這個活動嗎？');">
 							<input type="hidden" name="activityId" th:value="${activity.activityId}">
 							<button type="submit"

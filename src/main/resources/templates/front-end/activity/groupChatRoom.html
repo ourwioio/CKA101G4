@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>活動聊天室</title>
+<style>
+body {
+	margin: 0;
+	padding: 40px;
+	background: #f8fafc;
+	font-family: "Microsoft JhengHei", sans-serif;
+	color: #0f172a;
+}
+
+.chat-page {
+	max-width: 900px;
+	margin: auto;
+	background: white;
+	border-radius: 14px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+	overflow: hidden;
+}
+
+.chat-header {
+	padding: 22px 28px;
+	border-bottom: 1px solid #e2e8f0;
+	display: flex;
+	justify-content: space-between;
+	gap: 16px;
+	align-items: center;
+}
+
+.chat-header h1 {
+	margin: 0;
+	font-size: 24px;
+}
+
+.chat-header p {
+	margin: 8px 0 0;
+	color: #64748b;
+	font-weight: bold;
+}
+
+.btn-back {
+	background: #64748b;
+	color: white;
+	text-decoration: none;
+	padding: 10px 16px;
+	border-radius: 8px;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+.message-list {
+	padding: 24px 28px;
+	min-height: 360px;
+	max-height: 560px;
+	overflow-y: auto;
+	background: #f8fafc;
+}
+
+.message {
+	max-width: 70%;
+	margin-bottom: 16px;
+	padding: 12px 14px;
+	border-radius: 12px;
+	background: white;
+	border: 1px solid #e2e8f0;
+}
+
+.message.mine {
+	margin-left: auto;
+	background: #dbeafe;
+	border-color: #bfdbfe;
+}
+
+.sender {
+	font-size: 13px;
+	color: #475569;
+	font-weight: bold;
+	margin-bottom: 6px;
+}
+
+.content {
+	white-space: pre-wrap;
+	line-height: 1.6;
+}
+
+.time {
+	margin-top: 8px;
+	font-size: 12px;
+	color: #94a3b8;
+	text-align: right;
+}
+
+.empty {
+	color: #94a3b8;
+	text-align: center;
+	padding: 80px 0;
+	font-weight: bold;
+}
+
+.chat-form {
+	padding: 18px 28px;
+	display: flex;
+	gap: 12px;
+	border-top: 1px solid #e2e8f0;
+}
+
+.chat-form textarea {
+	flex: 1;
+	min-height: 52px;
+	resize: vertical;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	padding: 10px 12px;
+	font-family: inherit;
+	font-size: 15px;
+}
+
+.chat-form button {
+	background: #2563eb;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	padding: 0 22px;
+	font-weight: bold;
+	cursor: pointer;
+}
+</style>
+</head>
+<body>
+	<div class="chat-page">
+		<div class="chat-header">
+			<div>
+				<h1 th:text="${activityVO.activityTitle}">活動聊天室</h1>
+				<p>
+					目前會員：<span th:text="${loginMemberName}">會員1</span>
+				</p>
+			</div>
+			<a class="btn-back" th:href="@{/activity/front/home}">返回活動前台</a>
+		</div>
+
+		<div class="message-list">
+			<div class="empty" th:if="${#lists.isEmpty(messageListData)}">
+				目前還沒有訊息
+			</div>
+
+			<div class="message" th:each="message : ${messageListData}"
+				th:classappend="${message.senderMemberId == loginMemberId} ? ' mine'">
+				<div class="sender" th:text="|會員${message.senderMemberId}|">會員1</div>
+				<div class="content" th:text="${message.content}">訊息內容</div>
+				<div class="time"
+					th:text="${message.sentAt == null ? '' : #temporals.format(message.sentAt, 'yyyy-MM-dd HH:mm')}">
+				</div>
+			</div>
+		</div>
+
+		<form class="chat-form" th:action="@{/activity/front/chat/send}" method="post">
+			<input type="hidden" name="activityId" th:value="${activityVO.activityId}">
+			<textarea name="content" maxlength="500" placeholder="輸入訊息..." required></textarea>
+			<button type="submit">送出</button>
+		</form>
+	</div>
+</body>
+</html>

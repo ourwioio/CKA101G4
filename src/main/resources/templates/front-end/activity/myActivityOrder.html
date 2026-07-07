@@ -104,16 +104,32 @@ td {
 .actions {
 	display: grid;
 	gap: 10px;
-	min-width: 180px;
+	width: 220px;
+	margin: 0 auto;
+	justify-items: stretch;
+}
+
+.actions form {
+	width: 100%;
 }
 
 .btn-small {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	min-height: 48px;
+	box-sizing: border-box;
 	border: 0;
 	border-radius: 8px;
-	padding: 8px 12px;
+	padding: 10px 14px;
 	color: white;
 	font-weight: bold;
 	cursor: pointer;
+	text-decoration: none;
+	text-align: center;
+	font-size: 16px;
+	line-height: 1.25;
 }
 
 .btn-cancel {
@@ -239,6 +255,11 @@ td {
 
 						<td>
 							<div class="actions" th:if="${order.orderStatus == 0}">
+								<a class="btn-small btn-pay"
+									th:href="@{/activity/front/chat(activityId=${order.activityId})}">
+									進入聊天室
+								</a>
+
 								<form th:action="@{/activity/front/order/cancel}" method="post"
 									onsubmit="return confirm('確定要取消這筆報名嗎？');">
 									<input type="hidden" name="activityOrderId"

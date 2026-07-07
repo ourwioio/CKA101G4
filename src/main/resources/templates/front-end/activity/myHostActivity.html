@@ -88,6 +88,14 @@ tr:hover {
 	background: #f8fafc;
 }
 
+.activity-thumb {
+	width: 90px;
+	height: 64px;
+	object-fit: cover;
+	border-radius: 8px;
+	background: #e2e8f0;
+}
+
 .status {
 	padding: 5px 12px;
 	border-radius: 20px;
@@ -113,11 +121,20 @@ tr:hover {
 .action {
 	display: flex;
 	justify-content: center;
+	flex-wrap: wrap;
 	gap: 10px;
 }
 
 .btn-edit {
 	background: #3b82f6;
+	color: white;
+	text-decoration: none;
+	padding: 8px 16px;
+	border-radius: 6px;
+}
+
+.btn-detail {
+	background: #6366f1;
 	color: white;
 	text-decoration: none;
 	padding: 8px 16px;
@@ -130,6 +147,33 @@ tr:hover {
 	text-decoration: none;
 	padding: 8px 16px;
 	border-radius: 6px;
+}
+
+.btn-repeat {
+	background: #f59e0b;
+	color: white;
+	text-decoration: none;
+	padding: 8px 16px;
+	border-radius: 6px;
+}
+
+.btn-chat {
+	background: #0f766e;
+	color: white;
+	text-decoration: none;
+	padding: 8px 16px;
+	border-radius: 6px;
+}
+
+.review-badge {
+	display: inline-block;
+	margin-top: 8px;
+	background: #f97316;
+	color: white;
+	padding: 5px 10px;
+	border-radius: 999px;
+	font-size: 13px;
+	font-weight: bold;
 }
 
 .empty {
@@ -171,6 +215,7 @@ tr:hover {
 				<thead>
 					<tr>
 						<th>活動編號</th>
+						<th>圖片</th>
 						<th>活動名稱</th>
 						<th>價格</th>
 						<th>目前人數</th>
@@ -181,13 +226,26 @@ tr:hover {
 
 				<tbody>
 					<tr th:if="${#lists.isEmpty(activityListData)}">
-						<td colspan="6" class="empty">目前尚未建立任何活動</td>
+						<td colspan="7" class="empty">目前尚未建立任何活動</td>
 					</tr>
 
 					<tr th:each="activity : ${activityListData}">
 						<td th:text="${activity.activityId}"></td>
 
-						<td th:text="${activity.activityTitle}"></td>
+						<td>
+							<img class="activity-thumb"
+								th:src="@{/activity/front/image(id=${activity.activityId})}"
+								alt="活動圖片">
+						</td>
+
+						<td>
+							<div th:text="${activity.activityTitle}"></div>
+							<span class="review-badge"
+								th:if="${pendingReviewCountMap[activity.activityId] != null and pendingReviewCountMap[activity.activityId] > 0}"
+								th:text="|待審核 ${pendingReviewCountMap[activity.activityId]} 筆|">
+								待審核 1 筆
+							</span>
+						</td>
 
 						<td>NT$ <span th:text="${activity.activityPrice}"></span>
 						</td>
@@ -203,11 +261,17 @@ tr:hover {
 
 						<td>
 							<div class="action">
-								<a class="btn-edit"
+								<a class="btn-detail"
+									th:href="@{/activity/front/detail(id=${activity.activityId}, from='host')}">
+									詳情 </a> <a class="btn-edit"
 									th:href="@{/activity/front/updateHostActivity(id=${activity.activityId})}">
 									修改 </a> <a class="btn-member"
 									th:href="@{/activity/front/memberList(activityId=${activity.activityId})}">
-									報名名單 </a>
+									報名名單 </a> <a class="btn-repeat"
+									th:href="@{/activity/front/repeatHostActivity(id=${activity.activityId})}">
+									再次舉辦 </a> <a class="btn-chat"
+									th:href="@{/activity/front/chat(activityId=${activity.activityId})}">
+									聊天室 </a>
 							</div>
 						</td>
 					</tr>
