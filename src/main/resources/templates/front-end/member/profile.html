@@ -209,8 +209,8 @@
             <!-- 顯示圖片 -->
             <div class="item-card-img">
               <!-- 只顯示第一張圖 -->
-              <img th:if="${venue.venueImages != null && venue.venueImages.size() > 0}"
-                th:src="'data:image/jpeg;base64,' + ${venue.venueImages.stream().findFirst().orElse(null).images}"
+              <img th:if="${venue.coverImage != null}"
+                th:src="@{/front/venue/getImage(imagesId=${venue.coverImage.imagesId})}"
                 alt="場地圖片" class="venue-thumbnail" th:onerror="this.src='/images/default-venue.jpeg'" />
 
               <!-- 如果沒圖片用預設 -->

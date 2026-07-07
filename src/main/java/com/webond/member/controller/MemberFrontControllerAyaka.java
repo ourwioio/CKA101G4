@@ -58,22 +58,22 @@ public class MemberFrontControllerAyaka {
 	    List<VenueVO> venueList = venueService.getVenuesByMember(memberId);
 	    
 	    // 為每個 venue 載入圖片
-	    if (venueList != null) {
-	        for (VenueVO v : venueList) {
-	            Set<VenueImagesVO> imgs = venueService.getImagesByVenue(v.getVenueId());
-	            v.setVenueImages(imgs);
-	        }
-	    }
+//	    if (venueList != null) {
+//	        for (VenueVO v : venueList) {
+//	            Set<VenueImagesVO> imgs = venueService.getImagesByVenue(v.getVenueId());
+//	            v.setVenueImages(imgs);
+//	        }
+//	    }
 	    
 	    model.addAttribute("memberVO", memberVO);
 	    model.addAttribute("serviceListData", serviceList);
 	    model.addAttribute("activityListData", activityList);
 	    model.addAttribute("venueListData", venueList);
 
-	    if (venueId != null) {
-	        Set<VenueImagesVO> venueImgList = venueService.getImagesByVenue(venueId);
-	        model.addAttribute("venueImagesData", venueImgList);
-	    }
+//	    if (venueId != null) {
+//	        Set<VenueImagesVO> venueImgList = venueService.getImagesByVenue(venueId);
+//	        model.addAttribute("venueImagesData", venueImgList);
+//	    }
 
 	    return "front-end/member/profile";
 	}
