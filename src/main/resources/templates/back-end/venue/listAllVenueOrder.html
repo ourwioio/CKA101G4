@@ -8,6 +8,51 @@
 <body>
 	<span>全部訂單 listAllVenue.html</span>
 	
+	<form th:action="@{/venueOrder/listAllVenueOrder}" method="get">
+	
+	    訂單建立日期：
+	    <input type="date" name="createdAtStart" th:value="${params.createdAtStart}">
+	    ~
+	    <input type="date" name="createdAtEnd" th:value="${params.createdAtEnd}">
+	
+	    付款狀態：
+	    <select name="orderStatus">
+	        <option value="">全部</option>
+	        <option value="0" th:selected="${params.orderStatus == 0}">待撥款</option>
+	        <option value="1" th:selected="${params.orderStatus == 1}">已付款</option>
+	        <option value="2" th:selected="${params.orderStatus == 2}">已取消</option>
+	        <option value="3" th:selected="${params.orderStatus == 3}">已完成</option>
+	    </select>
+	
+	    撥款狀態：
+	    <select name="payoutAmount">
+	        <option value="">全部</option>
+	        <option value="0" th:selected="${params.payoutAmount == 0}">未撥款</option>
+	        <option value="1" th:selected="${params.payoutAmount == 1}">已撥款</option>
+	    </select>
+	
+	    退款狀態：
+	    <select name="refundStatus">
+	        <option value="">全部</option>
+	        <option value="0" th:selected="${params.refundStatus == 0}">進行中</option>
+	        <option value="1" th:selected="${params.refundStatus == 1}">完成</option>
+	        <option value="2" th:selected="${params.refundStatus == 2}">未申請</option>
+	    </select>
+	
+	    處理員工：
+	    <select name="employeeId">
+	        <option value="">全部</option>
+	        <th:block th:each="emp : ${empList}">
+	            <option th:value="${emp.employeeId}" 
+	                    th:text="${emp.employeeId}" 
+	                    th:selected="${params.employeeId == emp.employeeId}"></option>
+	        </th:block>
+	    </select>
+	
+	    <button type="submit">查詢</button>
+	    <a th:href="@{/venueOrder/listAllVenueOrder}">清除條件</a>
+	</form>
+	
 	<table>
 		<thead>
 			<tr>
@@ -17,6 +62,7 @@
 				<th>付款狀態</th>
 				<th>撥款狀態</th>
 				<th>退款狀態</th>
+				<th>處理員工</th>
 				<th>詳細</th>
 			</tr>
 		</thead>
@@ -42,10 +88,11 @@
 						<span th:case="1">完成</span>
 						<span th:case="2">未申請</span>
 					</td>
+					<td th:text="${venueOrderVO.empVO != null ? venueOrderVO.empVO.employeeId : '沒有處理員工'}"></td>
 					<td>
 						<form th:action="@{/venueOrder/getOneVenueOrder}" method="get">
 							<input type="hidden" name="venueOrderId" th:value="${venueOrderVO.venueOrderId}">
-							<button type="submit">查看場地</button>
+							<button type="submit">查看詳細</button>
 						</form>
 					</td>
 				</tr>
