@@ -26,7 +26,7 @@
         <!-- 身份標章 -->
         <div class="member-status">
           <span class="status-badge status0" th:if="${memberVO.accountStatus == 0}">
-            身份未認證
+            <a th:href="@{/member/register}">身份未認證</a>
           </span>
           <span class="status-badge status1" th:if="${memberVO.accountStatus == 1}">
             身份已認證
@@ -40,18 +40,16 @@
         </div>
 
 
-
-        <!--           聯繫資訊 -->
-        <!--           <div class="member-contact"> -->
-        <!--             <div class="contact-item"> -->
-        <!--               <span class="contact-icon">📧</span> -->
-        <!--               <span th:text="${memberVO.email}">email@example.com</span> -->
-        <!--             </div> -->
-        <!--             <div class="contact-item"> -->
-        <!--               <span class="contact-icon">📞</span> -->
-        <!--               <span th:text="${memberVO.phone}">09xx-xxx-xxx</span> -->
-        <!--             </div> -->
-        <!--           </div> -->
+                  <div class="member-contact">
+                    <div class="contact-item">
+                      <span class="contact-icon">📧</span>
+                      <span th:text="${memberVO.email}">email@example.com</span>
+                    </div>
+                    <div class="contact-item">
+                      <span class="contact-icon">📞</span>
+                      <span th:text="${memberVO.phone}">09xx-xxx-xxx</span>
+                    </div>
+                  </div>
 
         <!-- 加入日期 -->
         <div class="member-contact" style="margin-top: 10px">
@@ -61,22 +59,8 @@
           </div>
         </div>
 
-        <!-- 操作按鈕 -->
-        <div class="action-buttons" style="margin-top: 20px">
-          <button class="btn btn-primary" onclick="sendMessage()">
-            💬 傳送訊息
-          </button>
-          <button class="btn btn-secondary" onclick="addFavorite()">
-            ❤ 收藏會員
-          </button>
-
           <!-- 如果是會員自己，顯示編輯按鈕 -->
-          <!--             <a -->
-          <!--               th:if="${memberVO.memberId == session.memberVO.memberId}" -->
-          <!--               th:href="@{/front/memberPage/edit}" -->
-          <!--               class="btn btn-edit"> -->
-          <!--               ✎ 編輯資料 -->
-          <!--             </a> -->
+		<a th:href="@{/front/memberPage/edit}" class="btn btn-edit"> ✎ 編輯資料 </a>
         </div>
       </div>
     </div>
@@ -229,15 +213,14 @@
               </span>
             </div>
           </a>
-        </div>
+        </div>        
       </div>
-
-
+      
       <div>
-        <div class="no-items" th:if="${#lists.isEmpty(venueListData)}">
-          📦 目前尚無場地提供
+          <div class="no-items" th:if="${#lists.isEmpty(venueListData)}">
+            📦 目前尚無場地提供
+          </div>
         </div>
-      </div>
 
       <div class="pagination" id="venuePagination" th:if="${!#lists.isEmpty(venueListData)}">
         <button onclick="changePage('venue', -1)" id="venuePrevBtn">上一頁</button>

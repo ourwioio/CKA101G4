@@ -13,6 +13,8 @@ import com.webond.member.model.NotificationVO;
 import com.webond.member.repository.MemberRepository;
 import com.webond.venue.model.VenueOrderVO;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class MemberService {
 	
@@ -26,6 +28,7 @@ public class MemberService {
 		repository.save(memberVO);
 	}
 	
+
 	public void updateMember(MemberVO memberVO) {
 		repository.save(memberVO);
 	}

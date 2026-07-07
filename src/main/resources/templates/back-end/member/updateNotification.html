@@ -10,11 +10,10 @@
 <body>
 	<form th:action="@{/notification/update}" method="post"
 		th:object="${notificationVO}">
-		<input type="hidden" th:field="*{notificationId}" /> <input
-			type="hidden" th:field="*{member.memberId}" />
+		<input type="hidden" th:field="*{notificationId}" /> 
+		<input type="hidden" th:field="*{member.memberId}" />
 		<div>
-			<label for="">通知編號</label> <input type="text" name="" id=""
-				th:value="*{notificationId}" disabled />
+			<label for="">通知編號</label> <input type="text" name="" id="" th:value="*{notificationId}" disabled />
 		</div>
 		<div>
 			<label for="">建立時間</label> <input type="text" th:value="*{createdAt}"

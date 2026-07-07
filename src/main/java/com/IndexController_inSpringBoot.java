@@ -22,6 +22,8 @@ public class IndexController_inSpringBoot {
 		public String myMethod1(ModelMap model) { 
 
 			List<MemberVO> list = memberService.getALL();
+			
+			
 			model.addAttribute("memberListData", list);
 			return "index";    // --> src/main/resources/templates/index.html
 		}

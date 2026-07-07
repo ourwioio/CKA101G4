@@ -7,11 +7,24 @@
 <body>
 
 <table>
+  <div>
+    <!-- 已登入 -->
+ 
+		<a th:if="${session.memberVO != null}"   th:href="@{/front/memberPage/my(memberId=${session.memberVO.memberId})}" >自己的頁面</a>
+	
+    
+    
+    <!-- 沒登入 -->
+    <a th:if="${session.memberVO == null}" 
+       th:href="@{/member/login}">
+        自己的頁面
+    </a>
+</div>
       <thead>
         <tr>
           <th>會員ID</th>
 
-          <th>會員頁面</th>
+          <th>查看會員頁面</th>
         </tr>
       </thead>
       <tbody>
