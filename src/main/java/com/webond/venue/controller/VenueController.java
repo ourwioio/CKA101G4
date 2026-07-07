@@ -114,11 +114,7 @@ public class VenueController {
 		return "back-end/venue/listAllVenue";
 	}
 
-	@GetMapping("getImage")
-	@ResponseBody
-	public byte[] getImage(@RequestParam("imagesId") Integer imagesId) {
-		return venueImagesService.getOneImage(imagesId).getImages();
-	}
+	
 	
 	@GetMapping("getOneVenue")
 	public String getOne(@RequestParam("venueId") Integer venueId, ModelMap model) {

@@ -70,7 +70,7 @@
 		<div th:each="venue : ${venueListData}" class="venue-card">
 			<img
 				th:if="${venue.coverImage != null}"
-				th:src="@{/venue/getImage(imagesId=${venue.coverImage.imagesId})}"
+				th:src="@{/front/venue/getImage(imagesId=${venue.coverImage.imagesId})}"
 				class="card-img" />
 			<div class="card-body">
 				<h3 th:text="${venue.venueName}"></h3>
