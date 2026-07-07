@@ -1,14 +1,13 @@
 package com.webond.member.controller;
 
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,11 +15,11 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.webond.activity.model.ActivityService;
 import com.webond.activity.model.ActivityVO;
+import com.webond.member.dto.ProfileUpdateDTO;
 import com.webond.member.model.MemberVO;
 import com.webond.member.service.MemberService;
 import com.webond.service.model.ServiceVO;
 import com.webond.service.service.ServiceService;
-import com.webond.venue.model.VenueImagesVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueService;
 
@@ -111,13 +110,23 @@ public class MemberFrontControllerAyaka {
 	public String editProfile(@SessionAttribute("memberVO") MemberVO loginMember, ModelMap model) {
 		//只能編輯自己的資料
 		MemberVO memberVO = memberService.getOneMember(loginMember.getMemberId());
-		model.addAttribute("memberVO", memberVO);
+
+	    ProfileUpdateDTO dto = new ProfileUpdateDTO();
+	    dto.setMemberId(memberVO.getMemberId());
+	    dto.setNickname(memberVO.getNickname());
+	    dto.setMemberIntro(memberVO.getMemberIntro());
+	    dto.setGender(memberVO.getGender());
+	    dto.setEmail(memberVO.getEmail());
+	    dto.setPhone(memberVO.getPhone());
+	    
+		model.addAttribute("memberVO", dto);
 		return "front-end/member/edit";
 	}
 	
 	@PostMapping("update")
-	public String updateProfile(MemberVO formData,BindingResult result, @SessionAttribute("memberVO") MemberVO loginMember,ModelMap model) {
+	public String updateProfile(@Valid @ModelAttribute("memberVO")  ProfileUpdateDTO formData,BindingResult result, @SessionAttribute("memberVO") MemberVO loginMember,ModelMap model) {
 		if(result.hasErrors()) {
+			 result.getAllErrors().forEach(e -> System.out.println(e));
 			model.addAttribute("memberVO", formData);
 			return "front-end/member/edit";
 		}

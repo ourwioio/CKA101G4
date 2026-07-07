@@ -3,7 +3,7 @@
 
 <head>
 <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>編輯會員個人頁面</title>
 </head>
 <body>
@@ -11,50 +11,55 @@
         <input type="hidden" th:field="*{memberId}" />
 
         
-     <!-- ========== 頭部檔案 ========== -->
+        <!-- ========== 頭部檔案 ========== -->
         <div class="profile-header">
-        <div class="profile-avatar">
-            <img th:src="${memberVO.memberPic != null ? memberVO.memberPic : '/images/file.jpeg'}" alt="會員頭貼"
-            class="avatar-img" th:onerror="'this.src=\'' + @{/images/file.jpeg} + '\''" />
-        </div>
+            <div class="profile-avatar">
+                <img th:src="${memberVO.memberPic != null ? memberVO.memberPic : '/images/file.jpeg'}" alt="會員頭貼"
+                class="avatar-img" th:onerror="'this.src=\'' + @{/images/file.jpeg} + '\''" />
+            </div>
         
         
-        <div class="profile-info">
-            <input type="text" th:field="*{nickname}" />
-        </div>
+            <div class="profile-info">
+                <input type="text" th:field="*{nickname}" />
+                <div th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></div>
+            </div>
 
-        <div class="profile-info">
-            <input type="text" th:field="*{memberIntro}" />
-        </div>
+            <div class="profile-info">
+                <input type="text" th:field="*{memberIntro}" />
+            </div>
 
-        <!-- <div class="">
-            <input type="text" th:field="*{passwordHash}">
-        </div> -->
+            <!-- <div class="">
+                <input type="text" th:field="*{passwordHash}">
+            </div> -->
 
-        <div class="">
-            <select th:field="*{gender}">
-                <option value="0">男性</option>
-                <option value="1">女性</option>
-                <option value="2">其他</option>
-            </select>
-        </div>
+            <div class="">
+                <select th:field="*{gender}">
+                    <option value="0">男性</option>
+                    <option value="1">女性</option>
+                    <option value="2">其他</option>
+                </select>
+                <div th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></div>
+            </div>
         
-        <div class="">
-            <input type="text" th:field="*{email}">
-        </div>
+            <div class="">
+                <input type="text" th:field="*{email}">
+                <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            </div>
         
-        <div class="">
-            <input type="text" th:field="*{phone}">
-        </div>
+            <div class="">
+                <input type="text" th:field="*{phone}">
+                <div th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></div>
+            </div>
 
-        <button type="button">
-            <a href="" onclick="">刪除帳號</a>
-        </button>
-        <button type="button">
-            <a th:href="@{/front/memberPage/my(memberId=${session.memberVO.memberId})}" onclick="">關閉</a>
-        </button>
+            <button type="button">
+                <a href="" onclick="">刪除帳號</a>
+            </button>
+            <button type="button">
+                <a th:href="@{/front/memberPage/my(memberId=${session.memberVO.memberId})}" onclick="">關閉</a>
+            </button>
 
-        <button type="submit">儲存</button>
+            <button type="submit">儲存</button>
+            </div>
     </form>
 </body>
 </html>
