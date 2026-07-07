@@ -12,16 +12,9 @@
 	
 		訂單編號：
 		<input type="text" name="venueOrderId" th:value="${params.venueOrderId}">
-<!-- 		<div class="error" style="color: red" -->
-<!--          th:if="${#fields.hasErrors('venueOrderQueryDTO.venueOrderId')}"  -->
-<!--          th:text="${#fields.errors('venueOrderQueryDTO.venueOrderId')[0]}"></div>		 -->
-		
 		<div class="error" style="color: red"
 		     th:if="${#fields.hasErrors('venueOrderQueryDTO.venueOrderId')}"
 		     th:errors="${venueOrderQueryDTO.venueOrderId}"></div>	
-	
-	
-	
 	
 	    訂單建立日期：
 	    <input type="date" name="createdAtStart" th:value="${params.createdAtStart}">
