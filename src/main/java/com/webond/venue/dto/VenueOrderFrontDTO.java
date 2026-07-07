@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-public class VenueOrderDTO {
+public class VenueOrderFrontDTO {
 
     @NotNull(message = "請選擇場地")
     private Integer venueId;
@@ -30,7 +30,7 @@ public class VenueOrderDTO {
     @NotNull(message = "請選擇付款方式")
     private Byte paymentMethod;
 
-    public VenueOrderDTO() {
+    public VenueOrderFrontDTO() {
     }
 
     public Integer getVenueId() {
