@@ -78,26 +78,31 @@ public class MemberFrontControllerAyaka {
 	    return "front-end/member/profile";
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	
 	//會員個人頁面
 	@GetMapping("my")
-	public String getMyMemberPage(@PathVariable Integer memberId,ModelMap model, HttpSession session) {			
+	public String getMyMemberPage(@RequestParam("memberId") Integer memberId,
+	        @RequestParam(value = "venueId", required = false) Integer venueId,
+	        ModelMap model, HttpSession session) {	
+		
 		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 		if(loginMember == null) {
 			return "redirect:/member/login";
 		}
+		
 		MemberVO memberVO = memberService.getOneMember(memberId);
-		model.addAttribute("memberVO", memberVO);
-		return "front-end/member/profile";
+	    ServiceVO serviceList = serviceService.getOneService(memberId);
+	    ActivityVO activityList = activityService.getOneActivity(memberId);
+	    List<VenueVO> venueList = venueService.getVenuesByMember(memberId);
+	    
+	    model.addAttribute("memberVO", memberVO);
+	    model.addAttribute("serviceListData", serviceList);
+	    model.addAttribute("activityListData", activityList);
+	    model.addAttribute("venueListData", venueList);
+	    
+		return "front-end/member/myProfile";
 	}
 		
 	
@@ -106,25 +111,39 @@ public class MemberFrontControllerAyaka {
 	public String editProfile(@SessionAttribute("memberVO") MemberVO loginMember, ModelMap model) {
 		//只能編輯自己的資料
 		MemberVO memberVO = memberService.getOneMember(loginMember.getMemberId());
-		model.addAttribute(memberVO);
+		model.addAttribute("memberVO", memberVO);
 		return "front-end/member/edit";
 	}
 	
 	@PostMapping("update")
-	public String updateProfile(@Valid MemberVO memberVO,BindingResult result, @SessionAttribute("memberVO") MemberVO loginMember,ModelMap model) {
+	public String updateProfile(MemberVO formData,BindingResult result, @SessionAttribute("memberVO") MemberVO loginMember,ModelMap model) {
 		if(result.hasErrors()) {
-			return "front/member/edit";
+			model.addAttribute("memberVO", formData);
+			return "front-end/member/edit";
 		}
 		
-		if(!loginMember.getMemberId().equals(memberVO.getMemberId())) {
+		
+		
+		if(!loginMember.getMemberId().equals(formData.getMemberId())) {
 			model.addAttribute("error", "無修改權限");
 			return "front-end/member/edit";			
 		}
 		
-		memberService.updateMember(memberVO);
-		model.addAttribute("success", "finish");
+		MemberVO memberVO = memberService.getOneMember(formData.getMemberId());
+
+	    // 只覆蓋表單有出現的欄位
+	    memberVO.setNickname(formData.getNickname());
+	    memberVO.setMemberIntro(formData.getMemberIntro());
+	    memberVO.setGender(formData.getGender());
+	    memberVO.setEmail(formData.getEmail());
+	    memberVO.setPhone(formData.getPhone());
+
 		
-		return "redirect:/memberPage/" + memberVO.getMemberId();
+		
+		memberService.updateMember(memberVO);
+		model.addAttribute("memberVO", memberVO);
+		
+		return "front-end/member/edit";
 		
 	}
 	

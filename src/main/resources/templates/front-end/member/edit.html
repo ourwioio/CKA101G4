@@ -1,10 +1,60 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>編輯會員個人頁面</title>
 </head>
 <body>
+    <form th:action="@{/front/memberPage/update}" method="post" th:object="${memberVO}">
+        <input type="hidden" th:field="*{memberId}" />
 
+        
+     <!-- ========== 頭部檔案 ========== -->
+        <div class="profile-header">
+        <div class="profile-avatar">
+            <img th:src="${memberVO.memberPic != null ? memberVO.memberPic : '/images/file.jpeg'}" alt="會員頭貼"
+            class="avatar-img" th:onerror="'this.src=\'' + @{/images/file.jpeg} + '\''" />
+        </div>
+        
+        
+        <div class="profile-info">
+            <input type="text" th:field="*{nickname}" />
+        </div>
+
+        <div class="profile-info">
+            <input type="text" th:field="*{memberIntro}" />
+        </div>
+
+        <!-- <div class="">
+            <input type="text" th:field="*{passwordHash}">
+        </div> -->
+
+        <div class="">
+            <select th:field="*{gender}">
+                <option value="0">男性</option>
+                <option value="1">女性</option>
+                <option value="2">其他</option>
+            </select>
+        </div>
+        
+        <div class="">
+            <input type="text" th:field="*{email}">
+        </div>
+        
+        <div class="">
+            <input type="text" th:field="*{phone}">
+        </div>
+
+        <button type="button">
+            <a href="" onclick="">刪除帳號</a>
+        </button>
+        <button type="button">
+            <a th:href="@{/front/memberPage/my(memberId=${session.memberVO.memberId})}" onclick="">關閉</a>
+        </button>
+
+        <button type="submit">儲存</button>
+    </form>
 </body>
 </html>
