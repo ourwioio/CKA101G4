@@ -129,7 +129,7 @@
 			        <div class="gallery-item" th:each="img : *{venueImages}"
 			             th:classappend="${img.cover != null and img.cover == 1} ? 'is-cover' : ''"
 			             th:onclick="|setExistingCover(${img.imagesId}, this)|">
-			            <img th:src="@{/venue/getImage(imagesId=${img.imagesId})}" alt="場地環境圖" />
+			            <img th:src="@{/front/venue/getImage(imagesId=${img.imagesId})}" alt="場地環境圖" />
 			            <div class="cover-tag" th:text="${img.cover != null and img.cover == 1} ? '目前封面' : '設為封面'"></div>
 			        </div>
 			    </div>
