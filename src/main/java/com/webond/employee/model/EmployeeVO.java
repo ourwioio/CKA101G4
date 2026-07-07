@@ -1,9 +1,15 @@
 package com.webond.employee.model;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.webond.employee.model.EmployeeVO.ValidGroup;
 import com.webond.service.model.ServiceReportVO;
 
 import jakarta.persistence.CascadeType;
@@ -16,9 +22,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
+import jakarta.validation.GroupSequence;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 
+@GroupSequence({ValidGroup.First.class, ValidGroup.Second.class, EmployeeVO.class})
 @Entity
 @Table(name = "EMPLOYEE")
 public class EmployeeVO implements java.io.Serializable{
@@ -28,32 +37,40 @@ public class EmployeeVO implements java.io.Serializable{
 	@Column(name = "EMPLOYEE_ID", updatable = false, unique = true, nullable = false)
 	private Integer employeeId;
 	
-	@Pattern(regexp = "^[a-zA-Z0-9]{5,10}@webond\\.com$", message = "前綴必須為 5 到 10 碼的英文或數字，並以 @webond.com 結尾")
+	@NotBlank(message = "帳號請勿空白", groups = ValidGroup.First.class)
+	@Pattern(regexp = "^[a-zA-Z0-9]{8,20}@webond\\.com$", message = "帳號長度為 8 到 20 的英文或數字，@webond.com 結尾", groups = ValidGroup.Second.class)
 	@Column(name = "EMP_ACCOUNT", unique = true, nullable = false)
 	private String empAccount;
 	
+	@NotBlank(message = "密碼請勿空白", groups = ValidGroup.First.class)
 	@Column(name = "PASSWORD_HASH", nullable = false)
 	private String empPassword;
 	
-	@Size(min = 2, max = 10, message = "員工姓名長度必須在 2 到 10 之間")
-	@Pattern(regexp = "^[\\u4e00-\\u9fa5a-zA-Z]{2,10}$", message = "員工姓名只能包含中文或英文字母")
+	@NotBlank(message = "姓名請勿空白", groups = ValidGroup.First.class)
+	@Pattern(regexp = "^[\\u4e00-\\u9fa5a-zA-Z]{2,10}$", message = "姓名長度為 2 到 10 的中文或英文", groups = ValidGroup.Second.class)
 	@Column(name = "EMP_NAME")
 	private String empName;
 	
+	@NotNull(message = "職稱請勿空白", groups = ValidGroup.First.class)
 	@Column(name = "ROLE_TITLE")
-	private String roleTitle;
+	private Integer roleTitle;
 	
 	@Column(name = "EMP_STATUS")
 	private Integer empStatus;
 	
+	@CreationTimestamp
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8") 
 	@Column(name = "CREATED_AT", updatable = false)
 	private Timestamp createdAt;
 	
 	@Column(name = "UPDATED_AT")
 	private Timestamp updatedAt;
 	
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") 
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8") 
 	@Column(name = "LAST_LOGIN_AT")
-	private Timestamp lastLoginAt;
+	private LocalDateTime lastLoginAt;
 	
 	@Column(name = "EMP_IMG", columnDefinition = "longblob")
 	private byte[] empImg;
@@ -72,8 +89,8 @@ public class EmployeeVO implements java.io.Serializable{
 
 
 	public EmployeeVO(
-			Integer employeeId,String empAccount, String empPassword, String empName, String roleTitle, Integer empStatus,
-			Timestamp createdAt, Timestamp updatedAt, Timestamp lastLoginAt, byte[] empImg, Set<EmpPermVO> empPermVO) {
+			Integer employeeId,String empAccount, String empPassword, String empName, Integer roleTitle, Integer empStatus,
+			Timestamp createdAt, Timestamp updatedAt, LocalDateTime lastLoginAt, byte[] empImg, Set<EmpPermVO> empPermVO) {
 		this.employeeId = employeeId;
 		this.empAccount = empAccount;
 		this.empPassword = empPassword;
@@ -120,11 +137,11 @@ public class EmployeeVO implements java.io.Serializable{
 		this.empName = empName;
 	}
 
-	public String getRoleTitle() {
+	public Integer getRoleTitle() {
 		return roleTitle;
 	}
 
-	public void setRoleTitle(String roleTitle) {
+	public void setRoleTitle(Integer roleTitle) {
 		this.roleTitle = roleTitle;
 	}
 
@@ -152,11 +169,11 @@ public class EmployeeVO implements java.io.Serializable{
 		this.updatedAt = updatedAt;
 	}
 
-	public Timestamp getLastLoginAt() {
+	public LocalDateTime getLastLoginAt() {
 		return lastLoginAt;
 	}
 
-	public void setLastLoginAt(Timestamp lastLoginAt) {
+	public void setLastLoginAt(LocalDateTime lastLoginAt) {
 		this.lastLoginAt = lastLoginAt;
 	}
 
@@ -188,5 +205,10 @@ public class EmployeeVO implements java.io.Serializable{
 	
 	
 	
+	
+	public interface ValidGroup {
+	    interface First {}  
+	    interface Second {}
+	}
 	
 }

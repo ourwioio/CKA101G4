@@ -7,8 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -21,20 +19,26 @@ public class AdminSecurityConfig {
 
 	private final DataSource dataSource;
 	private final AdminUserDetailService userDetailsService;
+	private final AdminLoginSuccessHandler successHandler;
 	
-	public AdminSecurityConfig(DataSource dataSource, AdminUserDetailService userDetailsService) {
+
+	public AdminSecurityConfig(DataSource dataSource, AdminUserDetailService userDetailsService,
+			AdminLoginSuccessHandler successHandler) {
 		this.dataSource = dataSource;
 		this.userDetailsService = userDetailsService;
+		this.successHandler = successHandler;
 	}
-	
+
+
 	@Bean
 	@Order(1) 
 	public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception{
 		http
-			.securityMatcher("/admin/**") 
+			.securityMatcher("/admin/**")
 		
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/admin/login").permitAll()
+				.requestMatchers("/admin/employees/updatePassword").authenticated() 
 				
 				.requestMatchers("/admin/employees/**").hasAuthority("管理員工")
 				.requestMatchers("/admin/service-orders/**").hasAuthority("管理服務訂單")
@@ -52,8 +56,10 @@ public class AdminSecurityConfig {
             	.loginProcessingUrl("/admin/login")  
             	
             	.usernameParameter("username")	 
-            	.passwordParameter("password")   
-            	.defaultSuccessUrl("/admin/adminPage", false) 
+            	.passwordParameter("password") 
+            	
+            	.successHandler(successHandler)
+            	
             	.failureUrl("/admin/login?error=true")      
             )
             .logout(logout -> logout
@@ -85,13 +91,4 @@ public class AdminSecurityConfig {
 		return tokenRepository;
 	}
 	
-  // Spring 官方推薦：目前業界主流、抗暴力破解的密碼加密方案-- BCrypt
-  // 抗暴力破解：即便兩個使用者的密碼一模一樣（例如都是 password123），加密後的結果也會完全不同
-  // 如果全站（含前台）沒有在其他地方宣告此 Bean，請解除以下註解以啟用
-  
-//  @Bean
-//  public PasswordEncoder passwordEncoder() {
-//      return new BCryptPasswordEncoder();
-//  }
-//    
 }

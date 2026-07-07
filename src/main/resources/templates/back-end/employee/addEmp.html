@@ -16,43 +16,53 @@
 			<table border="0" cellpadding="5">
 				<tr>
 					<td style="white-space: nowrap;">姓名：</td>
-					<td><input type="text" id="empNameInput" th:field="*{empName}"
-						onclick="clearNativeError(this);" required
+					<td><input type="text" th:field="*{empName}"
 						style="width: 100%; max-width: 250px; padding: 6px; border: 1px solid #7a7a7a !important; border-radius: 4px; box-sizing: border-box;">
+
 						<span th:if="${#fields.hasErrors('empName')}"
-						th:text="${#fields.errors('empName')}" class="error"
-						data-target="#empNameInput" style="display: none;"> </span></td>
+						th:errors="*{empName}" class="error"
+						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;">
+					</span></td>
 				</tr>
+
+
 
 				<tr>
 					<td style="white-space: nowrap;">帳號：</td>
-					<td><input type="text" id="empAccountInput" th:field="*{empAccount}"
-						onclick="hideContent('empAccount.errors');" required
+					<td><input type="text" th:field="*{empAccount}"
 						style="width: 100%; max-width: 250px; padding: 6px; border: 1px solid #7a7a7a !important; border-radius: 4px; box-sizing: border-box;"
-						placeholder="請輸入英文或數字帳號"></td>
-					<td><span th:if="${#fields.hasErrors('empAccount')}"
-						th:errors="*{empAccount}" class="error" data-target="#empAccountInput" style="display: none;"></span></td>
-
+						placeholder="請輸入英文或數字帳號"> <span
+						th:if="${#fields.hasErrors('empAccount')}"
+						th:errors="*{empAccount}" class="error"
+						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;"></span>
+					</td>
 				</tr>
+
 				<tr>
 					<td style="white-space: nowrap;">密碼：</td>
 					<td><input type="password" th:field="*{empPassword}"
-						onclick="hideContent('empPassword.errors');" required
 						style="width: 100%; max-width: 250px; padding: 6px; border: 1px solid #7a7a7a !important; border-radius: 4px; box-sizing: border-box;"
-						placeholder="請輸入密碼"></td>
-					<td><span th:if="${#fields.hasErrors('empPassword')}"
-						th:errors="*{empPassword}" class="error" id="empPassword.errors"></span></td>
+						placeholder="請輸入密碼"> <span
+						th:if="${#fields.hasErrors('empPassword')}"
+						th:errors="*{empPassword}" class="error"
+						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;"></span></td>
 
 				</tr>
 
 				<tr>
 					<td style="white-space: nowrap;">職稱：</td>
-					<td><input type="text" th:field="*{roleTitle}"
-						onclick="hideContent('roleTitle.errors');" required
+					<td><select th:field="*{roleTitle}"
 						style="width: 100%; max-width: 250px; padding: 6px; border: 1px solid #7a7a7a !important; border-radius: 4px; box-sizing: border-box;">
-					</td>
-					<td><span th:if="${#fields.hasErrors('roleTitle')}"
-						th:errors="*{roleTitle}" class="error" id="roleTitle.errors"></span></td>
+							<option value="">-- 請選擇職稱 --</option>
+							<option value="0">系統管理員</option>
+							<option value="1">營運總監</option>
+							<option value="2">客服專員</option>
+							<option value="3">場地審核專員</option>
+							<option value="4">財務專員</option>
+							<option value="5">行銷專員</option>
+					</select> <span th:if="${#fields.hasErrors('roleTitle')}"
+						th:errors="*{roleTitle}" class="error"
+						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;"></span></td>
 
 				</tr>
 				<tr>
@@ -63,15 +73,15 @@
 							<th:block th:each="perms : ${permVO}">
 								<label
 									style="display: inline-flex; align-items: center; white-space: nowrap; cursor: pointer; background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 13px;">
-									<input type="checkbox" name="permIds"
-									onclick="hideContent('empPermVO.errors');"
-									th:value="${perms.permId}" style="margin-right: 4px;">
+									<input type="checkbox" name="permIds" 
+									th:value="${perms.permId}" th:checked="${selectedPermIds != null && selectedPermIds.contains(perms.permId)}" style="margin-right: 4px;">
 									<span th:text="${perms.permName}"></span>
 
 								</label>
 							</th:block>
 						</div> <span th:if="${#fields.hasErrors('empPermVO')}"
-						th:errors="*{empPermVO}" class="error" id="empPermVO.errors"></span>
+						th:errors="*{empPermVO}" class="error"
+						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;"></span>
 
 					</td>
 				</tr>
@@ -79,8 +89,7 @@
 				<tr>
 					<td
 						style="white-space: nowrap; color: black; vertical-align: top; padding-top: 8px;">員工照片：</td>
-					<td><input type="file" name="upImg"
-						onclick="hideContent('empImg.errors');" accept="image/*"
+					<td><input type="file" name="upImg" accept="image/*"
 						onchange="previewImage(this);" style="margin-bottom: 12px;"><br>
 						<div
 							style="width: 120px; height: 120px; border: 2px dashed #a0a0a0; border-radius: 6px; padding: 4px; background-color: #fafafa; display: flex; justify-content: center; align-items: center; box-sizing: border-box;">
@@ -91,8 +100,8 @@
 
 							<img id="imagePreview" alt="圖片預覽"
 								style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px; display: none;" />
-							<span class="error" th:utext="${errorMessage}"
-								id="upFiles.errors"></span>
+							<span class="error" th:errors="*{empImg}"
+								style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;"></span>
 
 						</div></td>
 				</tr>
@@ -101,7 +110,9 @@
 			</table>
 			<br>
 			<button type="submit">確認儲存</button>
-			<button type="button" th:onclick="|window.location.href='@{/admin/empPage}'|" onclick="closeEmpModal()">取消</button>
+			<button type="button"
+				th:onclick="|window.location.href='@{/admin/empPage}'|"
+				onclick="closeEmpModal()">取消</button>
 		</form>
 	</div>
 

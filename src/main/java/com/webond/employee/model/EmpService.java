@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.webond.employee.dto.EmpPasswordDTO;
 import com.webond.employee.repository.EmpPermRepository;
 import com.webond.employee.repository.EmployeeRepository;
 
@@ -25,32 +25,33 @@ public class EmpService {
 	private EmployeeRepository repository;
 
 	@Autowired
-	private PasswordEncoder passwordEncoder;
-	
-	@Autowired
 	private EmpPermRepository empPermRepo;
+	
+	private final PasswordEncoder passwordEncoder;
+	public EmpService(PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
+	}
+
+	
 	
 	public void addEmp(EmployeeVO empVO) {
 		repository.save(empVO);
 	}
-	
 	public void updateEmp(EmployeeVO empVO) {
 		repository.save(empVO);
 	}
-	
 	public void deleteEmp(Integer employeeId) {
 		if(repository.existsById(employeeId))
 			repository.deleteById(employeeId);
 	}
-	
 	public EmployeeVO getOneEmp(Integer employeeId) {
 		Optional<EmployeeVO> optional = repository.findById(employeeId);
 		return optional.orElse(null);
 	}
-	
 	public List<EmployeeVO> getAll(){
 		return repository.findAll();
 	}
+	
 	
 	
 	//  查全部(分頁)
@@ -83,13 +84,15 @@ public class EmpService {
 		 String hashedPassword = passwordEncoder.encode(empVO.getEmpPassword());
 	     empVO.setEmpPassword(hashedPassword);
 	     
+	     
 	     // 新增預設狀態
 	     empVO.setEmpStatus(0);
 	     
 	     
 	     // 先儲存員工基本資料 (流水號)
 	     EmployeeVO savedEmp = repository.save(empVO);
-	         
+	     
+	     
 	     
 	     // 拿出員工，綁上權限存入empPerm
 	     if(permIds != null && !permIds.isEmpty()) {  	 	//拿到有勾的權限ID
@@ -117,6 +120,31 @@ public class EmpService {
     }
 	
 	
-	
+//=== 第一次登入修改密碼 === //
+    
+    //檢查舊密碼是否正確
+    public boolean checkOldPassword(String empAccount, EmpPasswordDTO empPasswordDTO) {
+    	
+    	Optional<EmployeeVO> empOptional = repository.findByEmpAccount(empAccount);
+    	EmployeeVO emp = empOptional.orElseThrow(()-> new RuntimeException("找不到該使用者"));
+    	
+    	return passwordEncoder.matches(empPasswordDTO.getCurrentPassword(), emp.getEmpPassword());
+    }
+    
+    @Transactional
+    public void updatePassword(String empAccount, EmpPasswordDTO empPasswordDTO) {
+    	Optional<EmployeeVO> empOptional = repository.findByEmpAccount(empAccount);
+    	EmployeeVO emp = empOptional.orElseThrow(()-> new RuntimeException("找不到該使用者"));
+    	
+    	emp.setEmpPassword(passwordEncoder.encode(empPasswordDTO.getNewPassword()));
+    	emp.setEmpStatus(1);
+    	repository.save(emp);
+    }
+    
+    
+    
+    
+    
+    
 	
 }
