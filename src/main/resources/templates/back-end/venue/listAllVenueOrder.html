@@ -10,10 +10,24 @@
 	
 	<form th:action="@{/venueOrder/listAllVenueOrder}" method="get">
 	
+		訂單編號：
+		<input type="text" name="venueOrderId" th:value="${params.venueOrderId}">
+<!-- 		<div class="error" style="color: red" -->
+<!--          th:if="${#fields.hasErrors('venueOrderQueryDTO.venueOrderId')}"  -->
+<!--          th:text="${#fields.errors('venueOrderQueryDTO.venueOrderId')[0]}"></div>		 -->
+		
+		<div class="error" style="color: red"
+		     th:if="${#fields.hasErrors('venueOrderQueryDTO.venueOrderId')}"
+		     th:errors="${venueOrderQueryDTO.venueOrderId}"></div>	
+	
+	
+	
+	
 	    訂單建立日期：
 	    <input type="date" name="createdAtStart" th:value="${params.createdAtStart}">
 	    ~
 	    <input type="date" name="createdAtEnd" th:value="${params.createdAtEnd}">
+	    <br>
 	
 	    付款狀態：
 	    <select name="orderStatus">
@@ -51,7 +65,14 @@
 	
 	    <button type="submit">查詢</button>
 	    <a th:href="@{/venueOrder/listAllVenueOrder}">清除條件</a>
+	    
+		<div th:if="${noDataMessage != null}" style="color:orange;">
+		    <p th:text="${noDataMessage}"></p>
+		</div>
+		
 	</form>
+	
+	<br>
 	
 	<table>
 		<thead>
