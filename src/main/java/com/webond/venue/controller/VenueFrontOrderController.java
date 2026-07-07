@@ -14,10 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.member.model.MemberVO;
-import com.webond.venue.dto.VenueOrderDTO;
+import com.webond.venue.dto.VenueOrderFrontDTO;
 import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueOrderService;
@@ -55,13 +54,13 @@ public class VenueFrontOrderController {
 
 		VenueOrderVO venueOrderVO = new VenueOrderVO();
 		model.addAttribute("venueOrderVO", venueOrderVO);
-		model.addAttribute("venueOrderDTO", new VenueOrderDTO());
+		model.addAttribute("venueOrderDTO", new VenueOrderFrontDTO());
 
 		return "front-end/venue/addVenueOrder";
 	}
 
 	@PostMapping("insert")
-	public String insert(@Valid VenueOrderDTO venueOrderDTO, 
+	public String insert(@Valid VenueOrderFrontDTO venueOrderDTO, 
 	        BindingResult result,
 	        HttpSession session,
 	        Model model) {
