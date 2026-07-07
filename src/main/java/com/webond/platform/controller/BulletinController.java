@@ -163,7 +163,8 @@ public class BulletinController {
 	        list = list.stream()
 	                .filter(bulletin ->
 	                        (bulletin.getTitle() != null && bulletin.getTitle().contains(keyword)) ||
-	                        (bulletin.getTags() != null && bulletin.getTags().contains(keyword))
+	                        (bulletin.getTags() != null && bulletin.getTags().contains(keyword)) ||
+	                        (bulletin.getContent() != null && bulletin.getContent().contains(keyword))
 	                )
 	                .toList();
 	    }

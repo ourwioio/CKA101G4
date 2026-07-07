@@ -151,9 +151,12 @@ public class PlatformSpecificationController {
 		}
 
 		if (hasKeyword) {
-			list = list.stream()
-					.filter(spec -> spec.getTitle() != null && spec.getTitle().contains(keyword))
-					.toList();
+		    list = list.stream()
+		            .filter(spec ->
+		                    (spec.getTitle() != null && spec.getTitle().contains(keyword)) ||
+		                    (spec.getDescription() != null && spec.getDescription().contains(keyword))
+		            )
+		            .toList();
 		}
 
 		model.addAttribute("specListData", list);

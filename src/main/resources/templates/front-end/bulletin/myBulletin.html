@@ -12,10 +12,6 @@
 
     <form th:action="@{/announcements}" method="get" class="row g-2 mb-4 align-items-center">
         <div class="col-auto">
-            <input type="text" name="keyword" class="form-control" placeholder="搜尋標題或標籤"
-                   th:value="${searchKeyword}" />
-        </div>
-        <div class="col-auto">
             <label class="col-form-label">發布日期</label>
         </div>
         <div class="col-auto">
@@ -24,6 +20,10 @@
         <div class="col-auto">～</div>
         <div class="col-auto">
             <input type="date" name="endDate" class="form-control" th:value="${searchEndDate}" />
+        </div>
+        <div class="col-auto">
+            <input type="text" name="keyword" class="form-control" placeholder="搜尋標題、內容或標籤"
+                   th:value="${searchKeyword}" />
         </div>
         <div class="col-auto">
             <button type="submit" class="btn btn-primary">搜尋</button>

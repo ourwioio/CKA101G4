@@ -22,7 +22,7 @@ public class BulletinFrontController {
 	@Autowired
     private BulletinService bulletinSvc;
 
-    // ===== 公告列表（只顯示已發布，可用關鍵字搜尋標題/標籤） =====
+    // ===== 公告列表（只顯示已發布，可用關鍵字搜尋標題/標籤/內容） =====
     @GetMapping
     public String list(
     		@RequestParam(value = "keyword", required = false) String keyword,
@@ -42,7 +42,8 @@ public class BulletinFrontController {
             list = list.stream()
                     .filter(bulletin ->
                             (bulletin.getTitle() != null && bulletin.getTitle().contains(keyword)) ||
-                            (bulletin.getTags() != null && bulletin.getTags().contains(keyword))
+                            (bulletin.getTags() != null && bulletin.getTags().contains(keyword)) ||
+                            (bulletin.getContent() != null && bulletin.getContent().contains(keyword))
                     )
                     .toList();
         }
