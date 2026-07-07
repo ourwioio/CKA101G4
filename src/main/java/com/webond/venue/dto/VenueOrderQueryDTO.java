@@ -3,16 +3,25 @@ package com.webond.venue.dto;
 import java.time.LocalDate;
 
 public class VenueOrderQueryDTO {
-	
+
+	private Integer venueOrderId;
 	private LocalDate createdAtStart;
-    private LocalDate createdAtEnd;
-    private Byte orderStatus;   
-    private Byte payoutAmount;   
-    private Byte refundStatus;   
-    private Integer employeeId;  
-    
+	private LocalDate createdAtEnd;
+	private Byte orderStatus;
+	private Byte payoutAmount;
+	private Byte refundStatus;
+	private Integer employeeId;
+
 	public VenueOrderQueryDTO() {
 		super();
+	}
+
+	public Integer getVenueOrderId() {
+		return venueOrderId;
+	}
+
+	public void setVenueOrderId(Integer venueOrderId) {
+		this.venueOrderId = venueOrderId;
 	}
 
 	public LocalDate getCreatedAtStart() {
@@ -63,5 +72,4 @@ public class VenueOrderQueryDTO {
 		this.employeeId = employeeId;
 	}
 
-    
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -21,18 +22,21 @@ public class VenueOrderController {
 
 	@Autowired
 	VenueOrderService venueOrderService;
-	
+
 	@Autowired
 	VenueService venueService;
-	
-	VenueOrderQueryDTO venueOrderQueryDTO;
-	
+
 	@Autowired
 	EmpService empService;
 
 	@GetMapping("listAllVenueOrder")
-	public String listAllVenueOrder(VenueOrderQueryDTO params ,Model model) {
+	public String listAllVenueOrder(VenueOrderQueryDTO params, BindingResult result, Model model) {
+
 		List<VenueOrderVO> list = venueOrderService.search(params);
+		if (list.isEmpty()) {
+			model.addAttribute("noDataMessage", "查無符合條件的訂單資料");
+		}
+
 		model.addAttribute("venueListData", list);
 		model.addAttribute("empList", empService.getAll());
 		model.addAttribute("params", params); // 讓表單上記住使用者打了什麼
