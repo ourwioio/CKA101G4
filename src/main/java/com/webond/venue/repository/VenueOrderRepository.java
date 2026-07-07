@@ -3,11 +3,12 @@ package com.webond.venue.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.webond.venue.model.VenueOrderVO;
-import com.webond.venue.model.VenueVO;
 
-public interface VenueOrderRepository extends JpaRepository<VenueOrderVO, Integer>{
-	
+public interface VenueOrderRepository
+		extends JpaRepository<VenueOrderVO, Integer>, JpaSpecificationExecutor<VenueOrderVO> {
+
 	List<VenueOrderVO> findByMember_MemberId(Integer memberId);
 }
