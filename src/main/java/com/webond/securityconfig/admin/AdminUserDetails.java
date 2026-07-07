@@ -66,7 +66,7 @@ public class AdminUserDetails implements UserDetails{
 
 	@Override
 	public boolean isEnabled() {	
-		return empVO.getEmpStatus() == 1;
+		return empVO.getEmpStatus() == 1 || empVO.getEmpStatus() == 0 ;
 	}
 	
 }

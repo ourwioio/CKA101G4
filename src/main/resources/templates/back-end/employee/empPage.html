@@ -73,7 +73,11 @@
 										無</div></td>
 
 								<!-- 職稱 -->
-								<td th:text="${empVO.roleTitle}" style="text-align: center;"></td>
+								<td th:switch="${empVO.roleTitle}" style="text-align: center;">
+									<span th:case="0">系統管理員</span> <span th:case="1">營運總監</span> <span
+									th:case="2">客服專員</span> <span th:case="3">場地審核專員</span> <span
+									th:case="4">財務專員</span> <span th:case="5">行銷專員</span>
+								</td>
 								<!-- 權限範圍 -->
 								<td style="text-align: center;"><span
 									th:each="empPerm, stat : ${empVO.empPermVO}"> <span
@@ -87,7 +91,9 @@
 									style="color: gray;">停權</span>
 								</td>
 								<!-- 最後登入時間 -->
-								<td th:text="${empVO.lastLoginAt}" style="text-align: center;"></td>
+								<td
+									th:text="${empVO.lastLoginAt != null ? #temporals.format(empVO.lastLoginAt, 'yyyy-MM-dd HH:mm') : '未登入'}"
+									style="text-align: center;"></td>
 								<!-- 建立時間 -->
 								<td th:text="${empVO.createdAt}" style="text-align: center;"></td>
 								<!-- 修改時間 -->
@@ -145,137 +151,78 @@
 
 	</table>
 
-	<!-- 2. 新增燈箱外殼 -->
+	<!-- 新增燈箱外殼 -->
+	<!-- 將 display: none 改為由後端變數 ${openAddModal} 直接決定！ -->
 	<div id="addEmpModal"
-		style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid black; padding: 25px; z-index: 1000; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); width: 450px; box-sizing: border-box; white-space: nowrap; text-align: left !important; display: flow-root; display: none;">
+		th:style="'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid black; padding: 25px; z-index: 1000; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); width: 500px; box-sizing: border-box; white-space: nowrap; text-align: left !important; display: flow-root; display: ' + (${openAddModal} ? 'block' : 'none') + ';'">
 
 		<div th:insert="~{back-end/employee/addEmp :: formContent}"></div>
 
 	</div>
 
 
-	<script th:inline="javascript">
-document.addEventListener("DOMContentLoaded", function () {
-        
-        // 這裡的 [[${openAddModal}]] 就是對應後端 addAttribute 的第一個參數名稱！
-        var shouldOpenModal = /*[[${openAddModal}]]*/ false;
-
-        
-        // 瀏覽器實際執行時，上面那行會被 Thymeleaf 自動動態渲染成：
-        // var shouldOpenModal = true || false;  (當後端傳 true 時)
-        // var shouldOpenModal = false || false; (當後端傳 false 時)
-        
-        if (shouldOpenModal) {
-            var modal = document.getElementById("addEmpModal");
-            if (modal) {
-                modal.style.display = "block"; // 自動打開燈箱
-            }
-        }
-    });
-	
-	
-		//清除提示信息
+	<script>
+		// 清除提示信息
 		function hideContent(d) {
-			document.getElementById(d).style.display = "none";
+			var element = document.getElementById(d);
+			if (element) {
+				element.style.display = "none";
+			}
 		}
 
+		// 照片預覽機制
 		function previewImage(input) {
 			var noImageCircle = document.getElementById('noImageCircle');
 			var imagePreview = document.getElementById('imagePreview');
 
-			// 檢查是否有選取檔案
 			if (input.files && input.files[0]) {
 				var reader = new FileReader();
-
-				// 檔案讀取完成後的觸發事件
 				reader.onload = function(e) {
-					imagePreview.src = e.target.result; // 將讀取到的圖片帶入 src
-					imagePreview.style.display = 'block'; // 顯示圖片預覽
-					noImageCircle.style.display = 'none'; // 隱藏灰色「無」字圓圈
+					imagePreview.src = e.target.result;
+					imagePreview.style.display = 'block';
+					noImageCircle.style.display = 'none';
 				}
-
-				reader.readAsDataURL(input.files[0]); // 開始讀取圖片檔案
+				reader.readAsDataURL(input.files[0]);
 			} else {
-				// 如果使用者點選取消上傳，恢復成預設無圖片狀態
 				imagePreview.src = '';
 				imagePreview.style.display = 'none';
 				noImageCircle.style.display = 'block';
 			}
 		}
-		
-		// 打開彈窗
-	    function openEmpModal() {
-	        var modal = document.getElementById("addEmpModal");
-	        if (modal) {
-	        	
-	            // 1. 重設所有文字與檔案輸入框
-	            var form = modal.querySelector("form");
-	            if (form) {
-	                form.reset(); 
-	            }
-	            
-	         // 2. 還原照片預覽區域的狀態
-	            var noImageCircle = document.getElementById("noImageCircle");
-	            var imagePreview = document.getElementById("imagePreview");
-	            
-	            if (noImageCircle && imagePreview) {
-	                // 清空圖片路徑
-	                imagePreview.src = "";
-	                // 隱藏圖片標籤
-	                imagePreview.style.display = "none";
-	                // 重新顯示「無」的灰色圓圈
-	                noImageCircle.style.display = "block";
-	            }
-	            
-	            // 3. (選填) 如果有錯誤訊息殘留，也可以順便清掉
-	            var errorSpan = document.getElementById("upFiles.errors");
-	            if (errorSpan) {
-	                errorSpan.textContent = "";
-	            }
-	            
-	            modal.style.display = "block"; // 從 none 改為 block
-	        }
-	    }
 
-	    // 關閉彈窗
-	    function closeEmpModal() {
-	        var modal = document.getElementById("addEmpModal");
-	        if (modal) {
-	            modal.style.display = "none"; // 隱藏
-	        }
-	        
-	    }
-		
-	    // 錯誤訊息彈窗
-	    document.addEventListener("DOMContentLoaded", function () {
-	        // 檢查燈箱是否為打開狀態
-	        var modal = document.getElementById("addEmpModal");
-	        if (modal && modal.style.display === "block") {
-	            
-	            // 自動搜集畫面上所有後端傳回的錯誤
-	            var errorElements = document.querySelectorAll(".error");
-	            
-	            errorElements.forEach(function (span) {
-	                var targetSelector = span.getAttribute("data-target");
-	                var inputField = document.querySelector(targetSelector);
-	                var errorText = span.textContent.trim();
-	                
-	                if (inputField && errorText) {
-	                    // 塞入原生驗證訊息並立刻彈出氣泡
-	                    inputField.setCustomValidity(errorText);
-	                    inputField.reportValidity();
-	                }
-	            });
-	        }
-	    });
+		// 手動點擊按鈕打開彈窗
+		function openEmpModal() {
+			var modal = document.getElementById("addEmpModal");
+			if (modal) {
+				var form = modal.querySelector("form");
+				if (form) {
+					form.reset();
+				}
 
-	    // 當使用者點擊輸入框準備修改時，立刻解除原生錯誤鎖定，表單才能順利送出
-	    function clearNativeError(input) {
-	        input.setCustomValidity("");
-	    }
-	    
-	    
+				var noImageCircle = document.getElementById("noImageCircle");
+				var imagePreview = document.getElementById("imagePreview");
+
+				if (noImageCircle && imagePreview) {
+					imagePreview.src = "";
+					imagePreview.style.display = "none";
+					noImageCircle.style.display = "block";
+				}
+
+				// 手動打開時一樣要給它 block
+				modal.style.setProperty("display", "block", "important");
+			}
+		}
+
+		// 關閉彈窗
+		function closeEmpModal() {
+			var modal = document.getElementById("addEmpModal");
+			if (modal) {
+				modal.style.setProperty("display", "none", "important");
+			}
+		}
 	</script>
+
+
 
 
 </body>

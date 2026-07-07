@@ -32,7 +32,6 @@ public class AdminUserDetailService implements UserDetailsService{
 				.orElseThrow(()-> new UsernameNotFoundException("員工帳號["+ empAccount +"] 不存在"));
 		
 
-		
 		List<GrantedAuthority> authorities = empVO.getEmpPermVO().stream()
 				.map(empPerm -> new SimpleGrantedAuthority(empPerm.getPerms().getPermName()))
 				.collect(Collectors.toList());
