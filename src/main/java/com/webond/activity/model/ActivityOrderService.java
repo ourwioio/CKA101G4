@@ -60,6 +60,11 @@ public class ActivityOrderService {
 						ORDER_STATUS_PENDING_PAYMENT));
 	}
 
+	public boolean hasPaidOrder(Integer activityId, Integer buyerMemberId) {
+		return orderRepo.existsByActivityIdAndBuyerMemberIdAndOrderStatus(activityId, buyerMemberId,
+				ORDER_STATUS_ACTIVE);
+	}
+
 	// 修改訂單狀態(API使用)
 	public ActivityOrderVO updateOrderStatus(Integer activityOrderId, Byte orderStatus) {
 
@@ -122,6 +127,11 @@ public class ActivityOrderService {
 		return orderRepo.sumBookingCountByActivityIdAndOrderStatus(activityId, ORDER_STATUS_ACTIVE);
 	}
 
+	public Integer getPendingReviewCount(Integer activityId) {
+		Long count = orderRepo.countByActivityIdAndOrderStatus(activityId, ORDER_STATUS_PENDING_REVIEW);
+		return count == null ? 0 : count.intValue();
+	}
+
 	public ActivityOrderVO approveOrder(Integer activityOrderId, Integer employeeId) {
 		ActivityOrderVO orderVO = getOneOrder(activityOrderId);
 
@@ -131,6 +141,17 @@ public class ActivityOrderService {
 
 		orderVO.setOrderStatus(ORDER_STATUS_PENDING_PAYMENT);
 		orderVO.setEmployeeId(employeeId);
+		return orderRepo.save(orderVO);
+	}
+
+	public ActivityOrderVO approveOrderByHost(Integer activityOrderId) {
+		ActivityOrderVO orderVO = getOneOrder(activityOrderId);
+
+		if (orderVO == null || !ORDER_STATUS_PENDING_REVIEW.equals(orderVO.getOrderStatus())) {
+			return orderVO;
+		}
+
+		orderVO.setOrderStatus(ORDER_STATUS_PENDING_PAYMENT);
 		return orderRepo.save(orderVO);
 	}
 
@@ -146,6 +167,17 @@ public class ActivityOrderService {
 		return orderRepo.save(orderVO);
 	}
 
+	public ActivityOrderVO rejectOrderByHost(Integer activityOrderId) {
+		ActivityOrderVO orderVO = getOneOrder(activityOrderId);
+
+		if (orderVO == null || !ORDER_STATUS_PENDING_REVIEW.equals(orderVO.getOrderStatus())) {
+			return orderVO;
+		}
+
+		orderVO.setOrderStatus(ORDER_STATUS_CANCELLED);
+		return orderRepo.save(orderVO);
+	}
+
 	public void rejectPendingOrdersByActivity(Integer activityId, Integer employeeId) {
 		List<ActivityOrderVO> pendingOrders = orderRepo.findByActivityIdAndOrderStatus(activityId,
 				ORDER_STATUS_PENDING_REVIEW);
@@ -153,6 +185,16 @@ public class ActivityOrderService {
 		for (ActivityOrderVO orderVO : pendingOrders) {
 			orderVO.setOrderStatus(ORDER_STATUS_CANCELLED);
 			orderVO.setEmployeeId(employeeId);
+			orderRepo.save(orderVO);
+		}
+	}
+
+	public void rejectPendingOrdersByFullActivity(Integer activityId) {
+		List<ActivityOrderVO> pendingOrders = orderRepo.findByActivityIdAndOrderStatus(activityId,
+				ORDER_STATUS_PENDING_REVIEW);
+
+		for (ActivityOrderVO orderVO : pendingOrders) {
+			orderVO.setOrderStatus(ORDER_STATUS_CANCELLED);
 			orderRepo.save(orderVO);
 		}
 	}

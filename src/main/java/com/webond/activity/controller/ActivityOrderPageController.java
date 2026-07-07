@@ -43,26 +43,12 @@ public class ActivityOrderPageController {
 
 	@PostMapping("/approve")
 	public String approveOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
-		ActivityOrderVO orderVO = orderSvc.getOneOrder(activityOrderId);
-
-		if (orderVO != null && activitySvc.canRegister(orderVO.getActivityId(), orderVO.getBookingCount())) {
-			orderSvc.approveOrder(activityOrderId, getLoginEmployeeId(session));
-			activitySvc.syncAttendeesFromOrders(orderVO.getActivityId());
-			return "redirect:/activityOrder/listAllActivityOrder?approveSuccess=true";
-		}
-
-		return "redirect:/activityOrder/listAllActivityOrder?approveFailed=true";
+		return "redirect:/activityOrder/listAllActivityOrder?hostReviewOnly=true";
 	}
 
 	@PostMapping("/reject")
 	public String rejectOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
-		ActivityOrderVO orderVO = orderSvc.rejectOrder(activityOrderId, getLoginEmployeeId(session));
-
-		if (orderVO != null) {
-			activitySvc.syncAttendeesFromOrders(orderVO.getActivityId());
-		}
-
-		return "redirect:/activityOrder/listAllActivityOrder?rejectSuccess=true";
+		return "redirect:/activityOrder/listAllActivityOrder?hostReviewOnly=true";
 	}
 
 	private void addFakeEmployee(Model model, HttpSession session) {

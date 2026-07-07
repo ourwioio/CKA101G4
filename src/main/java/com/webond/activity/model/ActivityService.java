@@ -32,6 +32,11 @@ public class ActivityService {
 
 	public List<ActivityVO> searchActivities(String keyword, Integer typeId, Byte status, Boolean onlyAvailable,
 			String sort) {
+		return searchActivities(keyword, typeId, status, onlyAvailable, sort, null);
+	}
+
+	public List<ActivityVO> searchActivities(String keyword, Integer typeId, Byte status, Boolean onlyAvailable,
+			String sort, Integer excludeMemberId) {
 
 		Specification<ActivityVO> spec = (root, query, cb) -> {
 			List<Predicate> predicates = new ArrayList<>();
@@ -48,6 +53,10 @@ public class ActivityService {
 
 			if (status != null) {
 				predicates.add(cb.equal(root.get("activityStatus"), status));
+			}
+
+			if (excludeMemberId != null) {
+				predicates.add(cb.notEqual(root.get("memberId"), excludeMemberId));
 			}
 
 			if (Boolean.TRUE.equals(onlyAvailable)) {
@@ -105,6 +114,26 @@ public class ActivityService {
 		Integer activeBookingCount = activityOrderSvc.getActiveBookingCount(activityId);
 		activityVO.setAttendeesCount(activeBookingCount == null ? 0 : activeBookingCount);
 		repository.save(activityVO);
+
+		if (isFull(activityVO)) {
+			activityOrderSvc.rejectPendingOrdersByFullActivity(activityId);
+		}
+	}
+
+	public boolean isFull(ActivityVO activityVO) {
+		if (activityVO == null || activityVO.getMaxParticipants() == null) {
+			return false;
+		}
+		Integer attendeesCount = activityVO.getAttendeesCount() == null ? 0 : activityVO.getAttendeesCount();
+		return attendeesCount >= activityVO.getMaxParticipants();
+	}
+
+	public boolean hasReachedMinimum(ActivityVO activityVO) {
+		if (activityVO == null || activityVO.getMinParticipants() == null) {
+			return false;
+		}
+		Integer attendeesCount = activityVO.getAttendeesCount() == null ? 0 : activityVO.getAttendeesCount();
+		return attendeesCount >= activityVO.getMinParticipants();
 	}
 
 	public List<ActivityVO> getActivitiesByMemberId(Integer memberId) {

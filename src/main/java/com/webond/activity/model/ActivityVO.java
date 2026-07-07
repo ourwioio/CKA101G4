@@ -37,6 +37,13 @@ public class ActivityVO implements Serializable {
 	@Column(name = "ACTIVITY_DESCRIPTION")
 	private String activityDescription;
 
+	@Lob
+	@Column(name = "ACTIVITY_IMAGE")
+	private byte[] activityImage;
+
+	@Column(name = "ACTIVITY_IMAGE_TYPE")
+	private String activityImageType;
+
 	@NotNull(message = "請輸入活動費用")
 	@PositiveOrZero(message = "活動費用不可小於0")
 	@Column(name = "ACTIVITY_PRICE")
@@ -122,6 +129,22 @@ public class ActivityVO implements Serializable {
 
 	public void setActivityDescription(String activityDescription) {
 		this.activityDescription = activityDescription;
+	}
+
+	public byte[] getActivityImage() {
+		return activityImage;
+	}
+
+	public void setActivityImage(byte[] activityImage) {
+		this.activityImage = activityImage;
+	}
+
+	public String getActivityImageType() {
+		return activityImageType;
+	}
+
+	public void setActivityImageType(String activityImageType) {
+		this.activityImageType = activityImageType;
 	}
 
 	public Integer getActivityPrice() {

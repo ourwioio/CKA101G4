@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>報名審核</title>
+<title>報名紀錄</title>
 
 <style>
 body {
@@ -156,7 +156,7 @@ td {
 
 	<div class="page-card">
 		<div class="header">
-			<h2>報名審核</h2>
+			<h2>報名紀錄</h2>
 			<a th:href="@{/activity/admin/home}" class="btn-back">回後台首頁</a>
 		</div>
 
@@ -165,9 +165,7 @@ td {
 			（員工編號 <span th:text="${loginEmployeeId}"></span>）
 		</div>
 
-		<div th:if="${param.approveSuccess}" class="notice success">已通過申請，等待會員付款。</div>
-		<div th:if="${param.rejectSuccess}" class="notice success">已退回報名申請。</div>
-		<div th:if="${param.approveFailed}" class="notice error">通過失敗：活動可能已額滿、下架或不開放報名。</div>
+		<div th:if="${param.hostReviewOnly}" class="notice error">報名申請由活動主辦會員審核，後台僅提供查看。</div>
 
 		<div class="table-card">
 			<table>
@@ -181,8 +179,7 @@ td {
 						<th>總金額</th>
 						<th>申請備註</th>
 						<th>付款方式</th>
-						<th>審核員工ID</th>
-						<th>操作</th>
+						<th>備註</th>
 					</tr>
 				</thead>
 
@@ -217,24 +214,7 @@ td {
 							<span th:if="${order.activityPaymentMethod == null}">未付款</span>
 						</td>
 
-						<td th:text="${order.employeeId ?: '-'}"></td>
-
-						<td>
-							<div class="action" th:if="${order.orderStatus == 3}">
-								<form th:action="@{/activityOrder/approve}" method="post">
-									<input type="hidden" name="activityOrderId"
-										th:value="${order.activityOrderId}">
-									<button class="btn-approve" type="submit">通過</button>
-								</form>
-
-								<form th:action="@{/activityOrder/reject}" method="post">
-									<input type="hidden" name="activityOrderId"
-										th:value="${order.activityOrderId}">
-									<button class="btn-reject" type="submit">退回</button>
-								</form>
-							</div>
-							<span th:unless="${order.orderStatus == 3}">-</span>
-						</td>
+						<td>報名審核由主辦會員處理</td>
 					</tr>
 				</tbody>
 			</table>
