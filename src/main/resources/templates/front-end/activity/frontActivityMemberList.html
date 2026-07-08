@@ -103,6 +103,11 @@ tr:hover{
     color:#3730a3;
 }
 
+.expired{
+    background:#e5e7eb;
+    color:#374151;
+}
+
 .action{
     display:flex;
     justify-content:center;
@@ -276,6 +281,10 @@ tr:hover{
                         <span th:if="${order.orderStatus == 4}" class="status paying">
                             待付款
                         </span>
+
+                        <span th:if="${order.orderStatus == 5}" class="status expired">
+                            付款逾期
+                        </span>
                     </td>
                     <td th:text="${order.orderNote ?: '-'}"></td>
                     <td>
@@ -302,6 +311,12 @@ tr:hover{
     </div>
 
 </div>
+
+<script th:if="${shouldAutoRefreshOrder}">
+    setTimeout(function() {
+        window.location.reload();
+    }, 5000);
+</script>
 
 </body>
 </html>

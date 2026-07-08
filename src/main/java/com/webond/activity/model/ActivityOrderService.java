@@ -1,5 +1,6 @@
 package com.webond.activity.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +19,9 @@ public class ActivityOrderService {
 	private static final Byte ORDER_STATUS_REFUND_REQUESTED = 2;
 	private static final Byte ORDER_STATUS_PENDING_REVIEW = 3;
 	private static final Byte ORDER_STATUS_PENDING_PAYMENT = 4;
+	private static final Byte ORDER_STATUS_PAYMENT_EXPIRED = 5;
 	private static final Byte REFUND_STATUS_REQUESTED = 0;
+	private static final int PAYMENT_TIMEOUT_SECONDS = 20;
 
 	@Autowired
 	private ActivityOrderRepository orderRepo;
@@ -141,6 +144,7 @@ public class ActivityOrderService {
 
 		orderVO.setOrderStatus(ORDER_STATUS_PENDING_PAYMENT);
 		orderVO.setEmployeeId(employeeId);
+		orderVO.setApprovedAt(LocalDateTime.now());
 		return orderRepo.save(orderVO);
 	}
 
@@ -152,6 +156,7 @@ public class ActivityOrderService {
 		}
 
 		orderVO.setOrderStatus(ORDER_STATUS_PENDING_PAYMENT);
+		orderVO.setApprovedAt(LocalDateTime.now());
 		return orderRepo.save(orderVO);
 	}
 
@@ -210,10 +215,40 @@ public class ActivityOrderService {
 			return orderVO;
 		}
 
+		if (isPaymentExpired(orderVO)) {
+			orderVO.setOrderStatus(ORDER_STATUS_PAYMENT_EXPIRED);
+			return orderRepo.save(orderVO);
+		}
+
 		orderVO.setActivityPaymentMethod(paymentMethod);
 		orderVO.setOrderStatus(ORDER_STATUS_ACTIVE);
-		orderVO.setPaidAt(java.time.LocalDateTime.now());
+		orderVO.setPaidAt(LocalDateTime.now());
 		return orderRepo.save(orderVO);
+	}
+
+	public int expireOverduePendingPaymentOrders() {
+		for (ActivityOrderVO orderVO : orderRepo.findByOrderStatus(ORDER_STATUS_PENDING_PAYMENT)) {
+			if (orderVO.getApprovedAt() == null) {
+				orderVO.setApprovedAt(LocalDateTime.now());
+				orderRepo.save(orderVO);
+			}
+		}
+
+		LocalDateTime deadline = LocalDateTime.now().minusSeconds(PAYMENT_TIMEOUT_SECONDS);
+		List<ActivityOrderVO> overdueOrders = orderRepo.findByOrderStatusAndApprovedAtBefore(
+				ORDER_STATUS_PENDING_PAYMENT, deadline);
+
+		for (ActivityOrderVO orderVO : overdueOrders) {
+			orderVO.setOrderStatus(ORDER_STATUS_PAYMENT_EXPIRED);
+			orderRepo.save(orderVO);
+		}
+
+		return overdueOrders.size();
+	}
+
+	private boolean isPaymentExpired(ActivityOrderVO orderVO) {
+		return orderVO.getApprovedAt() != null
+				&& orderVO.getApprovedAt().plusSeconds(PAYMENT_TIMEOUT_SECONDS).isBefore(LocalDateTime.now());
 	}
 
 }

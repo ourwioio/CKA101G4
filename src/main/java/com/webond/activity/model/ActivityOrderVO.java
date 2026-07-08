@@ -71,6 +71,10 @@ public class ActivityOrderVO implements Serializable {
 	@Column(name = "PAID_AT")
 	private LocalDateTime paidAt;
 
+	// 主辦審核通過時間
+	@Column(name = "APPROVED_AT")
+	private LocalDateTime approvedAt;
+
 	// 完成時間
 	@Column(name = "ACTIVITY_COMPLETED_AT")
 	private LocalDateTime activityCompletedAt;
@@ -202,6 +206,14 @@ public class ActivityOrderVO implements Serializable {
 
 	public void setPaidAt(LocalDateTime paidAt) {
 		this.paidAt = paidAt;
+	}
+
+	public LocalDateTime getApprovedAt() {
+		return approvedAt;
+	}
+
+	public void setApprovedAt(LocalDateTime approvedAt) {
+		this.approvedAt = approvedAt;
 	}
 
 	public LocalDateTime getActivityCompletedAt() {

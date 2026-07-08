@@ -89,6 +89,17 @@ body {
 	cursor: pointer;
 }
 
+.warning {
+	max-width: 1100px;
+	margin: 0 auto 20px;
+	background: #fef3c7;
+	color: #92400e;
+	border: 1px solid #fde68a;
+	border-radius: 10px;
+	padding: 14px 18px;
+	font-weight: bold;
+}
+
 .card-container {
 	max-width: 1100px;
 	margin: auto;
@@ -136,7 +147,7 @@ body {
 }
 
 .order {
-	background: #10b981;
+	background: #0f766e;
 }
 </style>
 </head>
@@ -150,19 +161,24 @@ body {
 	<div class="header">
 		<h1>活動後台</h1>
 		<p>
-			目前員工：<span th:text="${loginEmployeeName}">測試員工</span>
-			（員工編號 <span th:text="${loginEmployeeId}">1</span>）
+			目前狀態：<span th:text="${loginEmployeeName}">未登入</span>
+			<span th:if="${isLoginEmployee}">（員工編號 <span th:text="${loginEmployeeId}">1</span>）</span>
 		</p>
 	</div>
 
-		<div class="login-panel">
+	<div th:if="${param.loginRequired}" class="warning">
+		請先登入後台員工，才能進入活動管理功能。
+	</div>
+
+	<div class="login-panel">
 		<div>
 			<strong>測試後台員工</strong>
-			<div>後台員工可查看活動資料與下架活動；報名審核由活動主辦會員處理。</div>
+			<div>預設未登入；登入後台員工後，才可查看活動資料與下架活動。</div>
 		</div>
 
 		<form class="login-form" th:action="@{/activity/admin/fakeLogin}" method="post">
 			<select name="employeeId">
+				<option value="" th:selected="${!isLoginEmployee}">未登入</option>
 				<option th:each="employee : ${employeeListData}"
 					th:value="${employee.employeeId}"
 					th:selected="${employee.employeeId == loginEmployeeId}"
@@ -173,7 +189,11 @@ body {
 		</form>
 	</div>
 
-	<div class="card-container">
+	<div th:unless="${isLoginEmployee}" class="warning">
+		目前尚未登入後台員工，管理功能已鎖定。
+	</div>
+
+	<div class="card-container" th:if="${isLoginEmployee}">
 		<div class="card">
 			<h2>活動管理</h2>
 			<p>後台只可查看活動與下架活動，不提供新增或修改活動。</p>
@@ -187,9 +207,9 @@ body {
 		</div>
 
 		<div class="card">
-			<h2>報名紀錄</h2>
-			<p>查看活動報名狀態；報名申請由活動主辦會員審核。</p>
-			<a class="btn order" th:href="@{/activityOrder/listAllActivityOrder}">進入報名紀錄</a>
+			<h2>訂單紀錄</h2>
+			<p>查看活動報名與付款狀態，提供退款與檢舉流程查詢來源；報名審核仍由主辦會員處理。</p>
+			<a class="btn order" th:href="@{/activityOrder/listAllActivityOrder}">查看訂單紀錄</a>
 		</div>
 	</div>
 

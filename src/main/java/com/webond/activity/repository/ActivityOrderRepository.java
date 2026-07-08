@@ -1,5 +1,6 @@
 package com.webond.activity.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +16,10 @@ public interface ActivityOrderRepository extends JpaRepository<ActivityOrderVO, 
 	List<ActivityOrderVO> findByBuyerMemberId(Integer buyerMemberId);
 
 	List<ActivityOrderVO> findByActivityIdAndOrderStatus(Integer activityId, Byte orderStatus);
+
+	List<ActivityOrderVO> findByOrderStatus(Byte orderStatus);
+
+	List<ActivityOrderVO> findByOrderStatusAndApprovedAtBefore(Byte orderStatus, LocalDateTime approvedAt);
 
 	Long countByActivityIdAndOrderStatus(Integer activityId, Byte orderStatus);
 

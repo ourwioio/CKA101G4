@@ -35,9 +35,12 @@ public class ActivityHomeController {
 	}
 
 	@PostMapping("/admin/fakeLogin")
-	public String switchFakeEmployee(@RequestParam("employeeId") Integer employeeId, HttpSession session) {
+	public String switchFakeEmployee(@RequestParam(value = "employeeId", required = false) Integer employeeId,
+			HttpSession session) {
 		if (employeeId != null && employeeRepo.existsById(employeeId)) {
 			session.setAttribute(ACTIVITY_ADMIN_EMPLOYEE_ID, employeeId);
+		} else {
+			session.removeAttribute(ACTIVITY_ADMIN_EMPLOYEE_ID);
 		}
 		return "redirect:/activity/admin/home";
 	}
@@ -51,6 +54,7 @@ public class ActivityHomeController {
 
 		model.addAttribute("loginEmployeeId", employeeId);
 		model.addAttribute("loginEmployeeName", employeeName);
+		model.addAttribute("isLoginEmployee", employeeId != null);
 		model.addAttribute("employeeListData", employeeRepo.findAll(Sort.by(Sort.Direction.ASC, "employeeId")));
 	}
 
@@ -60,13 +64,6 @@ public class ActivityHomeController {
 			return (Integer) employeeId;
 		}
 
-		Integer defaultEmployeeId = employeeRepo.findAll(Sort.by(Sort.Direction.ASC, "employeeId")).stream()
-				.map(EmployeeVO::getEmployeeId)
-				.findFirst()
-				.orElse(null);
-		if (defaultEmployeeId != null) {
-			session.setAttribute(ACTIVITY_ADMIN_EMPLOYEE_ID, defaultEmployeeId);
-		}
-		return defaultEmployeeId;
+		return null;
 	}
 }

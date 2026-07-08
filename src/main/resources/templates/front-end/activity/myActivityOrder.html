@@ -101,6 +101,11 @@ td {
 	color: #1d4ed8;
 }
 
+.expired {
+	background: #e5e7eb;
+	color: #374151;
+}
+
 .actions {
 	display: grid;
 	gap: 10px;
@@ -251,6 +256,7 @@ td {
 							<span th:if="${order.orderStatus == 2}" class="status refund">退款申請中</span>
 							<span th:if="${order.orderStatus == 3}" class="status pending">待審核</span>
 							<span th:if="${order.orderStatus == 4}" class="status pending">待付款</span>
+							<span th:if="${order.orderStatus == 5}" class="status expired">付款逾期</span>
 						</td>
 
 						<td>
@@ -309,6 +315,12 @@ td {
 			</table>
 		</div>
 	</div>
+
+	<script th:if="${shouldAutoRefreshOrder}">
+		setTimeout(function() {
+			window.location.reload();
+		}, 5000);
+	</script>
 
 </body>
 </html>
