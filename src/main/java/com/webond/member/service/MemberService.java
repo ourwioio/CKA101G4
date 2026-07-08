@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.webond.member.model.MemberVO;
@@ -23,6 +24,9 @@ public class MemberService {
 	
 	@Autowired
 	private SessionFactory sessionFactory;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	public void addMember(MemberVO memberVO) {
 		repository.save(memberVO);
@@ -62,6 +66,27 @@ public class MemberService {
 	        member.setAccountStatus(accountStatus);
 	        repository.save(member);
 	    }
+	}
+	
+	@Transactional
+	public void changePassword(Integer memberId, String oldPassword, String newPassword) {
+
+	    MemberVO member = repository.findById(memberId).orElse(null);
+	    
+	    if(member == null) {
+	    	throw new IllegalArgumentException("查無此會員");
+	    }
+		
+		if(!passwordEncoder.matches(oldPassword, member.getPasswordHash())) {
+			throw new IllegalArgumentException("原密碼輸入錯誤");
+		}
+		
+		if(passwordEncoder.matches(newPassword, oldPassword)) {
+			throw new IllegalArgumentException("新密碼不可與原密碼相同");
+		}
+		
+		member.setPasswordHash(passwordEncoder.encode(newPassword));
+		repository.save(member);
 	}
 	
 	
