@@ -81,7 +81,7 @@ public class MemberService {
 			throw new IllegalArgumentException("原密碼輸入錯誤");
 		}
 		
-		if(passwordEncoder.matches(newPassword, oldPassword)) {
+		if(passwordEncoder.matches(newPassword,  member.getPasswordHash())) {
 			throw new IllegalArgumentException("新密碼不可與原密碼相同");
 		}
 		
