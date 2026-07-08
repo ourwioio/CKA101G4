@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.webond.activity.model.ActivityService;
 import com.webond.activity.model.ActivityVO;
+import com.webond.member.dto.ChangePasswordDTO;
 import com.webond.member.dto.ProfileUpdateDTO;
 import com.webond.member.model.MemberVO;
 import com.webond.member.service.MemberService;
@@ -118,15 +120,15 @@ public class MemberFrontControllerAyaka {
 	    dto.setEmail(memberVO.getEmail());
 	    dto.setPhone(memberVO.getPhone());
 	    
-		model.addAttribute("memberVO", dto);
+		model.addAttribute("profileUpdateDTO", dto);
 		return "front-end/member/edit";
 	}
 	
 	@PostMapping("update")
 	public String updateProfile(@Valid ProfileUpdateDTO formData,BindingResult result, @SessionAttribute("memberVO") MemberVO loginMember,ModelMap model) {
 		if(result.hasErrors()) {
-			 result.getAllErrors().forEach(e -> System.out.println(e));
-			model.addAttribute("memberVO", formData);
+//			result.getAllErrors().forEach(e -> System.out.println(e));
+			model.addAttribute("profileUpdateDTO", formData);
 			return "front-end/member/edit";
 		}
 		
@@ -149,23 +151,23 @@ public class MemberFrontControllerAyaka {
 		
 		
 		memberService.updateMember(memberVO);
-		model.addAttribute("memberVO", memberVO);
 		
 		return "front-end/member/edit";		
 	}
 	
+	
+	
 	//密碼更新
 	@GetMapping("changePassword")
-	public String changePasswordPage(@SessionAttribute("memberVO") MemberVO loginMember, ModelMap model) {
-		 
-		ProfileUpdateDTO dto = new ProfileUpdateDTO();
+	public String changePasswordPage(@SessionAttribute("memberVO") MemberVO loginMember, ModelMap model) {			 
+		ChangePasswordDTO dto = new ChangePasswordDTO();
 		dto.setMemberId(loginMember.getMemberId());
 		model.addAttribute("memberVO", dto);
 	    return "front-end/member/changePassword";
 	}
 	
 	@PostMapping("changePassword")
-	public String changePassword(@Valid ProfileUpdateDTO formData, BindingResult result, @SessionAttribute("memberVO") MemberVO loginMember, ModelMap model) {
+	public String changePassword(@Valid @ModelAttribute("memberVO") ChangePasswordDTO formData, BindingResult result, @SessionAttribute("memberVO") MemberVO loginMember, ModelMap model) {
 		 if (result.hasErrors()) {
 		        model.addAttribute("memberVO", formData);
 		        return "front-end/member/changePassword";
@@ -185,7 +187,7 @@ public class MemberFrontControllerAyaka {
 			 memberService.changePassword(formData.getMemberId(), formData.getOldPassword(), formData.getNewPassword());
 		 }catch (IllegalArgumentException e){
 		        model.addAttribute("error", e.getMessage());
-		        model.addAttribute("changePasswordDTO", formData);
+		        model.addAttribute("memberVO", formData);
 		        return "front-end/member/changePassword";			 
 		 }
 		 return "redirect:/member/logout";

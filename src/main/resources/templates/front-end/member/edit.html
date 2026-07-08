@@ -7,14 +7,14 @@
 <title>編輯會員個人頁面</title>
 </head>
 <body>
-    <form th:action="@{/front/memberPage/update}" method="post" th:object="${memberVO}">
+    <form th:action="@{/front/memberPage/update}" method="post" th:object="${profileUpdateDTO}">
         <input type="hidden" th:field="*{memberId}" />
 
         
         <!-- ========== 頭部檔案 ========== -->
         <div class="profile-header">
             <div class="profile-avatar">
-                <img th:src="${memberVO.memberPic != null ? memberVO.memberPic : '/images/file.jpeg'}" alt="會員頭貼"
+                <img th:src="${profileUpdateDTO.memberPic != null ? profileUpdateDTO.memberPic : '/images/file.jpeg'}" alt="會員頭貼"
                 class="avatar-img" th:onerror="'this.src=\'' + @{/images/file.jpeg} + '\''" />
             </div>
         
