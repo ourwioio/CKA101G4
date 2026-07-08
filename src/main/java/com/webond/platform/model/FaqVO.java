@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -18,6 +19,7 @@ public class FaqVO implements java.io.Serializable {
     private Integer faqId;
 
     @Column(name = "FAQ_TYPE")
+    @NotNull(message = "請選擇FAQ類型")
     private Byte faqType;
 
     @Column(name = "QUESTION")
@@ -33,6 +35,7 @@ public class FaqVO implements java.io.Serializable {
     private Byte status = (byte) 0; // 預設草稿
 
     @Column(name = "EMPLOYEE_ID")
+    @NotNull(message = "請選擇負責員工")
     private Integer employeeId;
 
     @Column(name = "CREATED_AT", insertable = false, updatable = false)
