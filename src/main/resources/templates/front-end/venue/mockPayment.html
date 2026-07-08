@@ -25,15 +25,35 @@
         <div class="amount">NT$ <span th:text="${order.totalAmount}"></span></div>
 
         <div class="method-note" th:if="${order.paymentMethod == 0}">
-            （模擬）請輸入信用卡資訊完成付款，此頁面僅供測試流程，尚未串接真實金流。
+		    <div class="form-group">
+		        <label for="card-name">持卡人姓名</label>
+		        <input type="text" id="card-name" autocomplete="cc-name" required placeholder="王小明">
+		    </div>
+		
+		    <div class="form-group">
+		        <label for="card-number">信用卡卡號</label>
+		        <input type="text" id="card-number" inputmode="numeric" pattern="\d{13,19}" autocomplete="cc-number" maxlength="19" required placeholder="XXXX XXXX XXXX XXXX">
+		    </div>
+		
+		    <div class="row">
+		        <div class="form-group">
+		            <label for="expiry-date">有效年月</label>
+		            <input type="text" id="expiry-date" inputmode="numeric" pattern="\d{2}/\d{2}" autocomplete="cc-exp" maxlength="5" required placeholder="MM/YY">
+		        </div>
+		        <div class="form-group">
+		            <label for="cvv">安全碼 (CVV)</label>
+		            <input type="text" id="cvv" inputmode="numeric" pattern="\d{3,4}" autocomplete="cc-csc" maxlength="4" required placeholder="123">
+		        </div>
+		    </div>
         </div>
         <div class="method-note" th:if="${order.paymentMethod == 1}">
-            （模擬）請於時限內轉帳至指定帳戶，轉帳完成後點擊下方按鈕確認，此頁面僅供測試流程。
+            請於時限內轉帳至指定帳戶，轉帳完成後點擊下方按鈕確認。<br>
+            822-00000000000000
         </div>
 
         <form th:action="@{/front/venueOrder/confirmPayment}" method="post">
             <input type="hidden" name="venueOrderId" th:value="${order.venueOrderId}" />
-            <button type="submit" class="btn-confirm">模擬付款成功</button>
+            <button type="submit" class="btn-confirm">付款</button>
         </form>
         <!-- 取消付款 -->
 		<form th:action="@{/front/venueOrder/cancelPayment}" method="post" style="margin-top: 10px;">
