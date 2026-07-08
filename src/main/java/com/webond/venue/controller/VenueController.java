@@ -60,7 +60,8 @@ public class VenueController {
 	public String update(@Valid VenueVO venueVO, BindingResult result, ModelMap model,
 			@RequestParam("upFiles") MultipartFile[] parts,
 			@RequestParam(value = "openDays", required = false) List<Integer> openDays,
-			@RequestParam("startHour") int startHour, @RequestParam("endHour") int endHour) throws IOException {
+			@RequestParam("startHour") int startHour, 
+			@RequestParam("endHour") int endHour) throws IOException {
 
 		if (result.hasErrors()) {
 			return "back-end/venue/update_venue_input";
