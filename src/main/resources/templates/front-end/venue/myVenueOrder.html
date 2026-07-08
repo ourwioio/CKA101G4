@@ -17,6 +17,7 @@
     </div>
 
     <div th:unless="${#lists.isEmpty(venueOrderListData)}">
+    	<div id="orderListContainer">
         <div class="order-card" th:each="order : ${venueOrderListData}">
 
             <div class="order-header">
@@ -100,6 +101,8 @@
             </div>
 
         </div>
+        </div>
+        <div class="pagination" id="pagination"></div>
     </div>
 </div>
 

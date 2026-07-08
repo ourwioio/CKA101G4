@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -60,11 +61,11 @@ public class VenueFrontOrderController {
 	}
 
 	@PostMapping("insert")
-	public String insert(@Valid VenueOrderFrontDTO venueOrderDTO, 
+	public String insert(@ModelAttribute("venueOrderDTO")@Valid VenueOrderFrontDTO venueOrderDTO, 
 	        BindingResult result,
 	        HttpSession session,
 	        Model model) {
-
+		
 	    MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 	    if (loginMember == null) {
 	        return "redirect:/member/login";
