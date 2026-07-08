@@ -57,9 +57,15 @@
             <button type="button">
                 <a th:href="@{/front/memberPage/my(memberId=${session.memberVO.memberId})}" onclick="">關閉</a>
             </button>
+            
+            
 
             <button type="submit">儲存</button>
             </div>
     </form>
+    <button>
+            	<a th:href="@{/front/memberPage/changePassword}" >修改密碼</a>
+	
+            </button>
 </body>
 </html>
