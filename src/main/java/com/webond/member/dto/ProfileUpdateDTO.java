@@ -31,20 +31,6 @@ public class ProfileUpdateDTO {
 		@Pattern(regexp = "^09\\d{8}$", message = "手機號碼需為09開頭的10碼數字")
 		private String phone;
 		
-
-	    @NotBlank(message = "請輸入原密碼")
-	    private String oldPassword;
-
-	    @NotBlank(message = "請輸入新密碼")
-	    @Pattern(
-	        regexp = "^(?=.*[A-Za-z])(?=.*\\d).{8,}$",
-	        message = "新密碼至少需8碼，並包含英文字母與數字"
-	    )
-	    private String newPassword;
-
-	    @NotBlank(message = "請再次輸入新密碼")
-	    private String confirmPassword;
-		
 		public ProfileUpdateDTO() {}
 
 		public byte[] getMemberPic() {
@@ -101,30 +87,6 @@ public class ProfileUpdateDTO {
 
 		public void setPhone(String phone) {
 			this.phone = phone;
-		}
-
-		public String getOldPassword() {
-			return oldPassword;
-		}
-
-		public void setOldPassword(String oldPassword) {
-			this.oldPassword = oldPassword;
-		}
-
-		public String getNewPassword() {
-			return newPassword;
-		}
-
-		public void setNewPassword(String newPassword) {
-			this.newPassword = newPassword;
-		}
-
-		public String getConfirmPassword() {
-			return confirmPassword;
-		}
-
-		public void setConfirmPassword(String confirmPassword) {
-			this.confirmPassword = confirmPassword;
 		}
 
 		
