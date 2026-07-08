@@ -1,6 +1,7 @@
 package com.webond.employee.model;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,8 @@ import com.webond.employee.dto.EmpPasswordDTO;
 import com.webond.employee.repository.EmpPermRepository;
 import com.webond.employee.repository.EmployeeRepository;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class EmpService {
 	
@@ -34,13 +37,13 @@ public class EmpService {
 
 	
 	
-	public void addEmp(EmployeeVO empVO) {
+	public void addEmployee(EmployeeVO empVO) {
 		repository.save(empVO);
 	}
-	public void updateEmp(EmployeeVO empVO) {
+	public void updateEmployee(EmployeeVO empVO) {
 		repository.save(empVO);
 	}
-	public void deleteEmp(Integer employeeId) {
+	public void deleteEmployee(Integer employeeId) {
 		if(repository.existsById(employeeId))
 			repository.deleteById(employeeId);
 	}
@@ -142,8 +145,108 @@ public class EmpService {
     }
     
     
+//=== 修改時去資料庫拿圖片 ===//    
+    public byte[] getEmpImage(Integer employeeId) throws IOException{
+    	EmployeeVO emp = repository.findById(employeeId).orElse(null);
+    	
+    	if(emp !=null && emp.getEmpImg() != null && emp.getEmpImg().length > 0) {
+    		return emp.getEmpImg();
+    	}
+    	
+    	return null;
+    }
+    
+// === 處理圖片改過的狀態 ===//
+    public EmployeeVO processEmpImg(
+    		EmployeeVO formEmp, 
+    		MultipartFile upImg,
+    		byte[] sessionImg ) throws IOException{
+    	
+    	
+    	if(formEmp.getEmployeeId() == null) {
+    		return formEmp;
+    	}
+    	
+    	EmployeeVO oldEmp = repository.findById(formEmp.getEmployeeId()).orElse(null);
+    	
+    	if(oldEmp != null) {
+    		if(upImg != null && !upImg.isEmpty()) {
+    			formEmp.setEmpImg(upImg.getBytes());
+    		}else {
+    			
+                if (sessionImg != null && sessionImg.length > 0) {
+                    formEmp.setEmpImg(sessionImg);
+                } else {
+                    formEmp.setEmpImg(oldEmp.getEmpImg());
+                }
+    		}
+    	}
+    	return formEmp;
+    }
     
     
+// === 為了(送出)修改寫的 === //
+    @Transactional
+	public void updateEmp(
+			EmployeeVO formEmp, 
+			List<Integer> permIds, 
+			MultipartFile empImg ) throws IOException{
+		
+    	
+    	EmployeeVO currentEmp = repository.findById(formEmp.getEmployeeId())
+    			.orElseThrow(() -> new EntityNotFoundException("找不到此員工，ID : " + formEmp.getEmployeeId()));
+    	
+    	
+		// 圖片處理
+		if(empImg != null && !empImg.isEmpty()) {
+			byte[] imgBytes = empImg.getBytes();
+			currentEmp.setEmpImg(imgBytes);
+			formEmp.setEmpImg(imgBytes);
+		} else {
+	        formEmp.setEmpImg(currentEmp.getEmpImg());
+	    }
+	     
+	    currentEmp.setEmpName(formEmp.getEmpName());
+	    currentEmp.setEmpStatus(formEmp.getEmpStatus());
+	    currentEmp.setRoleTitle(formEmp.getRoleTitle());
+	    
+	    currentEmp.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
+	     
+	     EmployeeVO savedEmp = repository.save(currentEmp);
+	     
+	     empPermRepo.deleteByEmps(savedEmp);
+	     
+	     // 拿出員工，綁上權限存入empPerm
+	     if(permIds != null && !permIds.isEmpty()) {  	 	
+	    	 for(Integer permId :permIds) {
+	    		 EmpPermVO empPermVO = new EmpPermVO();  	
+	    		 empPermVO.setEmps(savedEmp);  			 	
+	    		 
+	    		 
+	    		 PermissionVO permVO = new PermissionVO();	
+	    		 permVO.setPermId(permId);			 		
+	    		 empPermVO.setPerms(permVO);    			
+	    		 
+	    		 empPermRepo.save(empPermVO); 
+	    		 
+	    	 }
+	     }
+	     
+	}
+    
+    
+// === 為了刪除寫的 === //
+    @Transactional
+    public void deleteEmp(Integer employeeId) {
+    	EmployeeVO currentEmp = getOneEmp(employeeId);
+    	if(currentEmp == null) {
+    		throw new EntityNotFoundException("找不到此員工，ID : " + employeeId);
+    	}
+    	
+    	empPermRepo.deleteByEmps(currentEmp);
+    
+    	repository.delete(currentEmp);
+    }
     
     
 	
