@@ -180,12 +180,14 @@ public class MemberFrontControllerAyaka {
 		 
 		 if(!formData.getNewPassword().equals(formData.getConfirmPassword())) {
 			 model.addAttribute("error", "兩次輸入新密碼不一致");
-			 return "fornt-end/member/changePassword";
+			 return "front-end/member/changePassword";
 		 }
 		 
 		 try {
 			 memberService.changePassword(formData.getMemberId(), formData.getOldPassword(), formData.getNewPassword());
+			 	System.out.print("0");
 		 }catch (IllegalArgumentException e){
+			 	System.out.print("1");
 		        model.addAttribute("error", e.getMessage());
 		        model.addAttribute("memberVO", formData);
 		        return "front-end/member/changePassword";			 
