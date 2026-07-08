@@ -1,37 +1,50 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>規範內容</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<meta charset="UTF-8">
+<title>規範內容</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet">
 </head>
 <body class="bg-light">
-<div class="container py-4">
+	<div class="container py-4">
 
-    <div class="alert alert-success" th:if="${success != null}" th:text="${success}"></div>
+		<div class="alert alert-success" th:if="${success != null}"
+			th:text="${success}"></div>
 
-    <div class="card">
-        <div class="card-body">
-            <h3 class="card-title" th:text="${specVO.title}"></h3>
+		<div class="card">
+			<div class="card-body">
+				<h3 class="card-title" th:text="${specVO.title}"></h3>
 
-            <p class="mb-1">
-                <span th:if="${specVO.status == 1}" class="badge bg-success">已發布</span>
-                <span th:if="${specVO.status == 0}" class="badge bg-secondary">草稿</span>
-                <span class="text-muted small ms-2" th:text="${specTypeListData.get(specVO.specType)}"></span>
-            </p>
+				<p class="mb-1">
+					<span th:if="${specVO.status == 1}" class="badge bg-success">已發布</span>
+					<span th:if="${specVO.status == 0}" class="badge bg-secondary">草稿</span>
+					<span class="text-muted small ms-2"
+						th:text="${specTypeListData.get(specVO.specType)}"></span>
+				</p>
 
-            <hr/>
+				<hr />
 
-            <p style="white-space: pre-line;" th:text="${specVO.description}"></p>
+				<p style="white-space: pre-line;" th:text="${specVO.description}"></p>
 
-            <p class="text-muted small mb-0">負責員工編號：<span th:text="${specVO.employeeId}"></span></p>
-            <p class="text-muted small mb-0">建立時間：<span th:text="${#temporals.format(specVO.createdAt, 'yyyy-MM-dd HH:mm')}"></span></p>
-			<p class="text-muted small mb-0">更新時間：<span th:text="${#temporals.format(specVO.updatedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
-        </div>
-    </div>
+				<p class="text-muted small mb-0">
+					負責員工編號：<span th:text="${specVO.employeeId}"></span>
+				</p>
+				<p class="text-muted small mb-0">
+					建立時間：<span
+						th:text="${#temporals.format(specVO.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+				</p>
+				<p class="text-muted small mb-0">
+					更新時間：<span
+						th:text="${#temporals.format(specVO.updatedAt, 'yyyy-MM-dd HH:mm')}"></span>
+				</p>
+			</div>
+		</div>
 
-    <a th:href="@{/platformSpecification/listAllSpec}" class="btn btn-secondary mt-3">回列表</a>
+		<a th:href="@{/platformSpecification/listAllSpec}"
+			class="btn btn-secondary mt-3">回列表</a>
 
-</div>
+	</div>
 </body>
 </html>

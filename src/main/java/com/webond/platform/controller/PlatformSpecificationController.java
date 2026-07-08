@@ -28,9 +28,9 @@ public class PlatformSpecificationController {
 
 	@Autowired
 	private PlatformSpecificationService specSvc;
-	
-    @Autowired
-    private EmployeeRepository employeeRepository;
+
+	@Autowired
+	private EmployeeRepository employeeRepository;
 
 	// ===== 新增：顯示表單 =====
 	@GetMapping("addSpec")
@@ -41,7 +41,7 @@ public class PlatformSpecificationController {
 
 	// ===== 新增：送出表單 =====
 	@PostMapping("insert")
-	public String insert(@Valid PlatformSpecificationVO specVO, BindingResult result, ModelMap model) {
+	public String insert(@Valid @ModelAttribute("specVO") PlatformSpecificationVO specVO, BindingResult result, ModelMap model) {
 
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		if (result.hasErrors()) {
@@ -62,7 +62,7 @@ public class PlatformSpecificationController {
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		/*************************** 2.開始查詢資料 *****************************************/
 		PlatformSpecificationVO specVO = specSvc.getOneSpec(specId);
-		
+
 		/*************************** 3.查詢完成,準備轉交(Send the Success view) **************/
 		model.addAttribute("specVO", specVO);
 		return "back-end/platformSpecification/update_spec_input"; // 查詢完成後轉交update_spec_input.html
@@ -70,7 +70,8 @@ public class PlatformSpecificationController {
 
 	// ===== 修改 =====
 	@PostMapping("update")
-	public String update(@Valid PlatformSpecificationVO specVO, BindingResult result, ModelMap model, RedirectAttributes redirectAttrs) {
+	public String update(@Valid @ModelAttribute("specVO") PlatformSpecificationVO specVO, BindingResult result, ModelMap model,
+			RedirectAttributes redirectAttrs) {
 
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		if (result.hasErrors()) {
@@ -79,22 +80,22 @@ public class PlatformSpecificationController {
 
 		/*************************** 2.開始修改資料 *****************************************/
 		specSvc.updateSpec(specVO);
-		
+
 		/*************************** 3.修改完成,準備轉交(Send the Success view) **************/
 		// 用 FlashAttribute 保存訊息，確保 redirect 後列表頁仍能用 ${success} 抓到它
-	    redirectAttrs.addFlashAttribute("success", "- (修改成功)");
-	 // 安全地重導向回列表頁，徹底解決上一頁 404 的問題
+		redirectAttrs.addFlashAttribute("success", "- (修改成功)");
+		// 安全地重導向回列表頁，徹底解決上一頁 404 的問題
 		return "redirect:/platformSpecification/listAllSpec";
 	}
 
 	// ===== 刪除 =====
 	@PostMapping("delete")
 	public String delete(@RequestParam("specId") Integer specId, ModelMap model) {
-		
+
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		/*************************** 2.開始刪除資料 *****************************************/
 		specSvc.deleteSpec(specId);
-		
+
 		/*************************** 3.刪除完成,準備轉交(Send the Success view) **************/
 		List<PlatformSpecificationVO> list = specSvc.getAll();
 		model.addAttribute("specListData", list);
@@ -128,35 +129,25 @@ public class PlatformSpecificationController {
 
 	// ===== 複合查詢：狀態 + 規範類型 + 標題關鍵字，任意組合 =====
 	@PostMapping("search")
-	public String search(
-			@RequestParam(value = "status", required = false) Byte status,
+	public String search(@RequestParam(value = "status", required = false) Byte status,
 			@RequestParam(value = "specType", required = false) Byte specType,
-			@RequestParam(value = "keyword", required = false) String keyword,
-			ModelMap model) {
+			@RequestParam(value = "keyword", required = false) String keyword, ModelMap model) {
 
 		boolean hasKeyword = keyword != null && !keyword.isBlank();
 
 		List<PlatformSpecificationVO> list = specSvc.getAll();
 
 		if (status != null) {
-			list = list.stream()
-					.filter(spec -> status.equals(spec.getStatus()))
-					.toList();
+			list = list.stream().filter(spec -> status.equals(spec.getStatus())).toList();
 		}
 
 		if (specType != null) {
-			list = list.stream()
-					.filter(spec -> specType.equals(spec.getSpecType()))
-					.toList();
+			list = list.stream().filter(spec -> specType.equals(spec.getSpecType())).toList();
 		}
 
 		if (hasKeyword) {
-		    list = list.stream()
-		            .filter(spec ->
-		                    (spec.getTitle() != null && spec.getTitle().contains(keyword)) ||
-		                    (spec.getDescription() != null && spec.getDescription().contains(keyword))
-		            )
-		            .toList();
+			list = list.stream().filter(spec -> (spec.getTitle() != null && spec.getTitle().contains(keyword))
+					|| (spec.getDescription() != null && spec.getDescription().contains(keyword))).toList();
 		}
 
 		model.addAttribute("specListData", list);
@@ -171,17 +162,17 @@ public class PlatformSpecificationController {
 	protected Map<Byte, String> referenceSpecTypeList() {
 		return PlatformSpecificationService.SPEC_TYPE_LABELS;
 	}
-	
+
 	// ===== 提供員工編號清單 =====
-    @ModelAttribute("employeeListData")
-    protected List<EmployeeVO> referenceEmployeeList() {
-        return employeeRepository.findAll();
-    }
-    
-    // ===== 提供「員工編號 → 姓名」對照表，給列表頁/單筆顯示頁查詢用 =====
-    @ModelAttribute("employeeNameMap")
-    protected Map<Integer, String> referenceEmployeeNameMap() {
-        return employeeRepository.findAll().stream()
-                .collect(Collectors.toMap(EmployeeVO::getEmployeeId, EmployeeVO::getEmpName));
-    }
+	@ModelAttribute("employeeListData")
+	protected List<EmployeeVO> referenceEmployeeList() {
+		return employeeRepository.findAll();
+	}
+
+	// ===== 提供「員工編號 → 姓名」對照表，給列表頁/單筆顯示頁查詢用 =====
+	@ModelAttribute("employeeNameMap")
+	protected Map<Integer, String> referenceEmployeeNameMap() {
+		return employeeRepository.findAll().stream()
+				.collect(Collectors.toMap(EmployeeVO::getEmployeeId, EmployeeVO::getEmpName));
+	}
 }
