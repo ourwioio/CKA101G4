@@ -34,7 +34,7 @@
 					<div
 						style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; white-space: nowrap; position: sticky; left: 0; width: 100%; box-sizing: border-box; padding-right: 5px;">
 						<button type="button" class="btn btn-primary"
-							onclick="openEmpModal()">新增員工</button>
+							onclick="openAddEmpModal()">新增員工</button>
 					</div>
 
 					<!-- 員工資料數據表格（純右側表格） -->
@@ -80,7 +80,7 @@
 								</td>
 								<!-- 權限範圍 -->
 								<td style="text-align: center;"><span
-									th:each="empPerm, stat : ${empVO.empPermVO}"> <span
+									th:each="empPerm, stat : ${empVO.empPermVO}" class="perm-item" th:data-permid="${empPerm.perms.permId}"> <span
 										th:text="${empPerm.perms.permName} + (${stat.last}? '': '、')"></span>
 								</span></td>
 								<!-- 帳號狀態 -->
@@ -103,7 +103,7 @@
 								<!-- 修改按鈕 -->
 								<td align="center">
 									<button type="button"
-										th:onclick="openEditModal([[${empVO.employeeId}]],[[${empVO.empImg}]], [[${empVO.empName}]], [[${empVO.roleTitle}]],[[${empVO.empStatus}]])">
+										th:onclick="openEditEmpModal([[${empVO.employeeId}]],[[${empVO.empAccount}]],[[${empVO.empPassword}]], [[${empVO.empName}]], [[${empVO.roleTitle}]],[[${empVO.empStatus}]], [[${empVO.empImg != null && empVO.empImg.length > 0}]], this)">
 										修改</button>
 								</td>
 
@@ -111,7 +111,7 @@
 								<td align="center">
 									<form method="post" th:action="@{/admin/empDelete}"
 										style="margin: 0px;">
-										<input type="hidden" name="id" th:value="${empVO.employeeId}">
+										<input type="hidden" name="employeeId" th:value="${empVO.employeeId}">
 										<input type="submit" value="刪除" style="color: red;"
 											onclick="return confirm('確定要刪除這位員工嗎？');">
 									</form>
@@ -154,9 +154,16 @@
 	<!-- 新增燈箱外殼 -->
 	<!-- 將 display: none 改為由後端變數 ${openAddModal} 直接決定！ -->
 	<div id="addEmpModal"
-		th:style="'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid black; padding: 25px; z-index: 1000; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); width: 500px; box-sizing: border-box; white-space: nowrap; text-align: left !important; display: flow-root; display: ' + (${openAddModal} ? 'block' : 'none') + ';'">
+		th:style="'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid black; padding: 25px; z-index: 1000; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); width: 500px; box-sizing: border-box; white-space: nowrap; text-align: left !important; display: flow-root; display: ' + (${openAddEmpModal} ? 'block' : 'none') + ';'">
 
-		<div th:insert="~{back-end/employee/addEmp :: formContent}"></div>
+		<div th:insert="~{back-end/employee/addEmp :: addContent}"></div>
+
+	</div>
+
+	<div id="editEmpModal"
+		th:style="'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid black; padding: 25px; z-index: 1000; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); width: 500px; box-sizing: border-box; white-space: nowrap; text-align: left !important; display: flow-root; display: ' + (${openEditEmpModal} ? 'block' : 'none') + ';'">
+
+		<div th:insert="~{back-end/employee/updateEmp :: updateContent}"></div>
 
 	</div>
 
@@ -190,8 +197,8 @@
 			}
 		}
 
-		// 手動點擊按鈕打開彈窗
-		function openEmpModal() {
+		// 新增按鈕的 (點擊按鈕打開彈窗)
+		function openAddEmpModal() {
 			var modal = document.getElementById("addEmpModal");
 			if (modal) {
 				var form = modal.querySelector("form");
@@ -213,6 +220,77 @@
 			}
 		}
 
+		// 修改按鈕的 (點擊按鈕打開彈窗)
+		function openEditEmpModal(employeeId,  empAccount, empPassword,empName, roleTitle, empStatus, hasImg, btnElement) {
+			var modal = document.getElementById("editEmpModal");
+			if (modal) {
+				var form = modal.querySelector("form");
+				if (form) {
+					form.reset();
+				}
+
+				if (document.getElementById("editEmployeeId"))
+					document.getElementById("editEmployeeId").value = employeeId;
+				if (document.getElementById("editEmpAccount"))
+					document.getElementById("editEmpAccount").value = empAccount;
+				if (document.getElementById("editEmpPassword"))
+					document.getElementById("editEmpPassword").value = empPassword;
+				if (document.getElementById("editEmpName"))
+					document.getElementById("editEmpName").value = empName;
+				if (document.getElementById("editRoleTitle"))
+					document.getElementById("editRoleTitle").value = roleTitle;
+				if (document.getElementById("editEmpStatus"))
+					document.getElementById("editEmpStatus").value = empStatus;
+				
+	
+				//拿權限編號
+				var permIdsArray =[];
+				if(btnElement){
+					var currentRow = btnElement.closest('tr');
+					if(currentRow){
+						var permSpans = currentRow.querySelectorAll('.perm-item');
+						permSpans.forEach(function(span){
+							if(span.dataset.permid){
+								permIdsArray.push(span.dataset.permid);
+							}
+						});
+					}
+				}
+				
+				
+				var checkboxes = modal.querySelectorAll("input[name='permIds']");
+				
+				checkboxes.forEach(function(checkbox){
+					if(permIdsArray.includes(checkbox.value)){
+						checkbox.checked = true;
+					}
+				});
+				
+				
+				
+				var editNoImageCircle = document
+						.getElementById("editNoImageCircle");
+				var editImagePreview = document
+						.getElementById("editImagePreview");
+
+				if (editNoImageCircle && editImagePreview) {
+					if (hasImg && employeeId) {
+						// 指向後端撈取圖片的 Controller 途徑，並帶上員工 ID
+						editImagePreview.src = "/admin/dbgUpdateImg/"
+								+ employeeId;
+		                    editImagePreview.style.display = "block";
+		                    editNoImageCircle.style.display = "none";
+					} else {
+						editImagePreview.src = "";
+						editImagePreview.style.display = "none";
+						editNoImageCircle.style.display = "block";
+					}
+				}
+				// 手動打開時一樣要給它 block
+				modal.style.setProperty("display", "block", "important");
+			}
+		}
+
 		// 關閉彈窗
 		function closeEmpModal() {
 			var modal = document.getElementById("addEmpModal");
@@ -220,6 +298,30 @@
 				modal.style.setProperty("display", "none", "important");
 			}
 		}
+		// 修改用(關閉彈窗)
+		function closeEditEmpModal() {
+		    var modal = document.getElementById("editEmpModal");
+		    if (modal) {
+		        modal.style.setProperty("display", "none", "important");
+		    }
+		}
+		
+		// 照片即時預覽機制（修改燈箱專用）
+		function previewEditImage(input) {
+		    var noImageCircle = document.getElementById('editNoImageCircle');
+		    var imagePreview = document.getElementById('editImagePreview');
+
+		    if (input.files && input.files[0]) {
+		        var reader = new FileReader();
+		        reader.onload = function(e) {
+		            imagePreview.src = e.target.result;
+		            imagePreview.style.display = 'block';
+		            noImageCircle.style.display = 'none';
+		        }
+		        reader.readAsDataURL(input.files[0]);
+		    }
+		}
+		
 	</script>
 
 

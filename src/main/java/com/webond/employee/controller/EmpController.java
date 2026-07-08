@@ -20,6 +20,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,9 +30,13 @@ import com.webond.employee.model.EmployeeVO;
 import com.webond.employee.model.PermissionService;
 import com.webond.employee.model.PermissionVO;
 
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
+@RequestMapping("/admin")
 public class EmpController {
 
 	@Autowired
@@ -41,13 +46,11 @@ public class EmpController {
 	PermissionService permSvc;
 
 //	 =====================查詢所有員工
-	@GetMapping("/admin/empPage")
+	@GetMapping("/empPage")
 	public String getEmpList(
-			// 接收前端網址列傳來的 page 參數（例如：/emp/empAll?page=1）
-			// 如果前端第一次進來沒傳參數，預設給 0（代表第 1 頁）
 			@RequestParam(value = "p", defaultValue = "0") Integer p, Model model,
-			// 補上這行：手動接收網址傳來的 openAddModal 參數（如果是點擊超連結過來的，就會是 true）
-			@RequestParam(value = "openAddModal", required = false) Boolean openAddModal) {
+			@RequestParam(value = "openAddEmpModal", required = false) Boolean openAddEmpModal,
+			@RequestParam(value = "openEditEmpModal", required = false) Boolean openEditEmpModal) {
 
 //====== 全部員工========//
 		// 呼叫Service拿資料
@@ -56,53 +59,45 @@ public class EmpController {
 		// 對應前端
 		model.addAttribute("empListData", empPage.getContent());
 
-		// 傳遞分頁控制參數給前端 Thymeleaf 畫版
+		// 傳遞分頁控制參數給前端
 		model.addAttribute("currentPage", p); // 當前頁碼（從 0 開始）
 		model.addAttribute("totalPages", empPage.getTotalPages()); // 總頁數
 
 		// =========新遭按鈕用========================//
-		model.addAttribute("openAddModal", openAddModal);
-		// =========新增燈箱用(權限)===================//
+		model.addAttribute("openAddEmpModal", openAddEmpModal);
+		// =========修改按鈕用========================//
+		model.addAttribute("openEditEmpModal", openEditEmpModal);
+		// =========燈箱用(權限)===================//
 		List<PermissionVO> permListData = permSvc.getAll();
 		model.addAttribute("permVO", permListData);
-
-		// ==========新增燈箱用(給空empVO)================//
-		model.addAttribute("employeeVO", new EmployeeVO());
-
+		// ==========新箱用(接收錯誤或給空)================//
+	    if (!model.containsAttribute("employeeVO")) {
+	        model.addAttribute("employeeVO", new EmployeeVO());
+	    }
+	    
 		// 指定頁面
 		return "back-end/employee/empPage";
 
 	}
 
 //	=========================查詢所有員工的圖片
-	// @GetMapping("/employee/photo/{id}")：定義一個動態路由。{id} 是一個預留位置（Placeholder），代表員工的
-	// ID。
-	// @PathVariable Long id：把網址列上的 {id} 傳進來當作方法的參數（例如網址是 /employee/photo/5，那 id 就等於
-	// 5）。
-	// @ResponseBody：非常重要！ 預設情況下，@Controller 裡的方法回傳 String 時，Spring 會去尋找對應的 HTML
-	// 檔案（模板）。加上 @ResponseBody 就是告訴 Spring：
-	// ResponseEntity<byte[]>：這是 Spring 提供的強大工具，用來精準控制 HTTP 回傳狀態（如 200 OK、404 Not
-	// Found）、Header（回傳標頭）以及 Body（這裡就是圖片的二進位陣列 byte[]）。
-	@GetMapping("/admin/empImg/{employeeId}")
+	@GetMapping("/empImg/{employeeId}")
 	@ResponseBody
-	public ResponseEntity<byte[]> getEmpImage(@PathVariable Integer employeeId) {
+	public ResponseEntity<byte[]> getEmpImage(
+			@PathVariable Integer employeeId) {
 
-		// 如果透過ID查不到員工
 		EmployeeVO empVO = empSvc.getOneEmp(employeeId);
 		if (empVO == null) {
 			System.out.println("查無此員工");
 		}
 
 		byte[] imgBytes = empVO.getEmpImg();
-		// 預設格式，防範無法偵測時的狀況
 		String imgType = "image/jpeg";
 
 		try {
-			// 動態從二進位資料串流中，偵測圖片的正確 Type (例如: image/png)
 			imgType = URLConnection
 					.guessContentTypeFromStream(new BufferedInputStream(new ByteArrayInputStream(imgBytes)));
 
-			// 如果完全偵測不出來，給予通用的二進位串流格式
 			if (imgType == null) {
 				imgType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
 			}
@@ -110,13 +105,9 @@ public class EmpController {
 			System.out.println("圖片格式錯誤");
 		}
 
-		// ResponseEntity.ok()：設定 HTTP 狀態碼為 200 OK，代表請求成功。
 		return ResponseEntity.ok()
-				// 動態帶入偵測到的 img Type 字串
 				.contentType(MediaType.parseMediaType(imgType))
-				// 效能優化，告訴瀏覽器把這張圖片快取（Cache）3600 秒（1 小時）。
 				.header("Cache-Control", "max-age=3600")
-				// .body(photoBytes)
 				.body(imgBytes);
 
 	}
@@ -134,15 +125,19 @@ public class EmpController {
 		List<PermissionVO> permVO = permSvc.getAll();
 		model.addAttribute("permVO", permVO);
 
-		return "back-end/employee/addEmp :: formContent";
+		return "back-end/employee/addEmp :: addContent";
 
 	}
 
 //=====新增員工  (抓確認送出資料)========================//
-	@PostMapping("/admin/insert")
-	public String insert(@Valid EmployeeVO employeeVO, BindingResult result, ModelMap model,
+	@PostMapping("/add")
+	public String insert(
+			@Valid EmployeeVO employeeVO, 
+			BindingResult result, 
+			ModelMap model,
 			@RequestParam(value = "permIds", required = false) List<Integer> permIds, // 手動接收前端Checkbox陣列
-			@RequestParam("upImg") MultipartFile upImg) throws IOException {
+			@RequestParam("upImg") MultipartFile upImg,
+			HttpSession session ) throws IOException {
 
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		// 排除前端傳來List<Integer>導致的empPermVO (<EmpPermVO>)屬性型態不合產生的錯誤
@@ -192,11 +187,23 @@ public class EmpController {
 		
 		// 檢查其他錯誤格式
 		if (result.hasErrors()) {
+			
+	        if (upImg != null && !upImg.isEmpty()) {
+	            session.setAttribute("addSessionImg", upImg.getBytes());
+	            employeeVO.setEmpImg(upImg.getBytes()); 
+	        }
+	        
+	        if (session.getAttribute("addSessionImg") != null) {
+	            model.addAttribute("hasTempImg", true);
+	        }
+	        
+	        model.addAttribute("employeeVO", employeeVO);
 			model.addAttribute("selectedPermIds", permIds);
-			return returnToFormWithError(model,result);
+			return addError(model,result);
 		}
 
 		/*************************** 2.開始新增資料 *****************************************/
+		
 		empSvc.saveEmp(employeeVO, permIds, upImg);
 
 		/*************************** 3.新增完成,準備轉交(Send the Success view) **************/
@@ -206,6 +213,143 @@ public class EmpController {
 		// 使用 redirect 重新導向回主列表（防止使用者按 F5 重新整理網頁導致重複儲存）
 		return "redirect:/admin/empPage";
 	}
+	
+//=== 新增的圖片處理 === //
+			@GetMapping("/dbgAddImg")
+			public void dbgAddImg(
+					HttpServletResponse response,
+					HttpSession session ) throws IOException {
+				
+			    byte[] imageBytes = (byte[]) session.getAttribute("addSessionImg");
+				
+			    if (imageBytes != null && imageBytes.length > 0) {
+			        response.setContentType("image/jpeg"); 
+			        try (ServletOutputStream out = response.getOutputStream()) {
+			            out.write(imageBytes);
+			            out.flush();
+			        }
+			    }
+				
+			}
+			
+			
+			
+			
+	
+	
+	
+	
+//====修改員工燈箱畫面=========================//
+		@GetMapping("/empPage/editEmpModel")
+		public String getEditEmpModal(Model model) {
+
+			if (!model.containsAttribute("employeeVO")) {
+				model.addAttribute("employeeVO", new EmployeeVO());
+			}
+
+			List<PermissionVO> permVO = permSvc.getAll();
+			model.addAttribute("permVO", permVO);
+
+			return "back-end/employee/updateEmp :: updateContent";
+
+		}
+		
+//=====修改員工  (抓確認送出資料)========================//
+		@PostMapping("/update")
+		public String update(@Valid EmployeeVO employeeVO, 
+				BindingResult result, 
+				ModelMap model,
+				@RequestParam(value = "permIds", required = false) List<Integer> permIds, // 手動接收前端Checkbox陣列
+				@RequestParam("upImg") MultipartFile upImg,
+				HttpSession session) throws IOException {
+
+			/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
+			result = removeFieldError(employeeVO, result, "empPermVO");
+			
+			
+			//把出錯時上傳的圖片填進去
+			byte[] sessionImg =(byte[]) session.getAttribute("sessionImg" + employeeVO.getEmployeeId());
+			employeeVO = empSvc.processEmpImg(employeeVO, upImg, sessionImg);
+			
+			// 權限範圍不能空白
+			if (permIds == null || permIds.isEmpty()) {
+			    result.rejectValue("empPermVO", "permIdsBlank", "權限範圍請勿空白");
+			}
+
+			
+			// 檢查其他錯誤格式
+			if (result.hasErrors()) {
+				
+				if(upImg !=null && !upImg.isEmpty()) {
+					session.setAttribute("sessionImg" + employeeVO.getEmployeeId(), upImg.getBytes());
+				}
+				
+				model.addAttribute("selectedPermIds", permIds);
+				model.addAttribute("employeeVO",employeeVO);
+				return updateError(model,result);
+			}
+
+			/*************************** 2.開始修改資料 *****************************************/
+			empSvc.updateEmp(employeeVO, permIds, upImg);
+			/*************************** 3.修改完成,準備轉交(Send the Success view) **************/
+
+			return "redirect:/admin/empPage";
+		}
+		
+//=== 修改的圖片處理 === //
+		@GetMapping("/dbgUpdateImg/{employeeId}")
+		public void dbgImg(
+				@PathVariable("employeeId") Integer employeeId,
+				HttpServletResponse response,
+				HttpSession session,
+				Model model) throws IOException {
+			
+		    byte[] imageBytes = (byte[]) session.getAttribute("sessionImg" + employeeId);
+			
+		    if(imageBytes ==null) {
+		    	imageBytes = empSvc.getEmpImage(employeeId);
+		    }
+		    
+			if(imageBytes !=null && imageBytes.length > 0) {
+				response.setContentType("image/jpeg");
+				ServletOutputStream out = response.getOutputStream();
+				out.write(imageBytes);
+				out.flush();
+				out.close();
+			}
+			
+		}
+	
+
+	// === 刪除員工(確認送出) ===//
+		@PostMapping("/empDelete")
+		public String deleteEmp(
+				@RequestParam("employeeId") Integer employeeId,
+				ModelMap model ) {
+			/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
+			/*************************** 2.開始刪除資料 *****************************************/
+			empSvc.deleteEmp(Integer.valueOf(employeeId));
+			/*************************** 3.刪除完成,準備轉交(Send the Success view) **************/
+			List<EmployeeVO> list = empSvc.getAll();
+			model.addAttribute("empListData", list); // for listAllEmp.html 第85行用
+			model.addAttribute("success", "- (刪除成功)");
+			
+			return "redirect:/admin/empPage";
+			
+		}
+	
+		
+		
+		
+		
+		
+	
+	
+	
+	
+	
+	
+	
 
 // === 新的紀錄本 ===//
 	public BindingResult removeFieldError(EmployeeVO employeeVO, BindingResult result, String removedFieldname) {
@@ -220,32 +364,22 @@ public class EmpController {
 
 	}
 
-// === 輔助 : 封裝失敗時要塞給前端的變數 === //
-	private String returnToFormWithError(ModelMap model, BindingResult result) {
-		// 補回前端渲染需要的資料
-		// 為了讓燈箱退回原頁面時，畫面的「權限清單 Checkbox」不會消失，必須補塞回 Model
-		// 因為送出資料當下的東西相當於送出去後重新渲染，所以需要在抓一次
+// === 輔助(新增) : 封裝失敗時要塞給前端的變數 === //
+	private String addError(ModelMap model, BindingResult result) {
 		List<PermissionVO> permListData = permSvc.getAll();
 		model.addAttribute("permVO", permListData);
 		
-	    // ================== 【核心關鍵：破壞 Spring 預設快取】 ==================
 	    if (result.hasErrors()) {
 	        
-	        // 2. 強制 new 一個全新的、乾淨的紀錄本
 	        BeanPropertyBindingResult cleanResult = new BeanPropertyBindingResult(result.getTarget(), "employeeVO");
 	        
-	        
-	        // 使用迴圈，把原本 result 裡面的「所有錯誤」全部搬過去，不要只拿 get(0)
 	        for (FieldError fieldError : result.getFieldErrors()) {
 	            cleanResult.addError(fieldError);
 	        }
 	        
-	        // 4. 強制覆蓋 Spring 內部預設的 BindingResult 快取
 	        String bindingResultKey = BindingResult.MODEL_KEY_PREFIX + "employeeVO";
 	        model.put(bindingResultKey, cleanResult);
 	    }
-	    // =====================================================================
-		
 		
 
 		// 補齊分頁預設變數，防止燈箱退回時背景的主畫面列表破版
@@ -254,12 +388,40 @@ public class EmpController {
 		model.addAttribute("currentPage", 0);
 		model.addAttribute("totalPages", empPage.getTotalPages());
 		// 傳變數給前端，跟他說出錯了，請自動打開(不然出錯可能會關掉?)
-		model.addAttribute("openAddModal", true);
-
-		// 塞入一個標記，告訴前端「要把燈箱打開」
-		model.addAttribute("openAddModal", true);
+		model.addAttribute("openAddEmpModal", true);
+		model.addAttribute("openEditEmpModal", false); 
 		
 		return "back-end/employee/empPage";
 	}
+	
+// === 輔助(新增) : 封裝失敗時要塞給前端的變數 === //
+		private String updateError(ModelMap model, BindingResult result) {
+			List<PermissionVO> permListData = permSvc.getAll();
+			model.addAttribute("permVO", permListData);
+			
+		    if (result.hasErrors()) {
+		        
+		        BeanPropertyBindingResult cleanResult = new BeanPropertyBindingResult(result.getTarget(), "employeeVO");
+		        
+		        for (FieldError fieldError : result.getFieldErrors()) {
+		            cleanResult.addError(fieldError);
+		        }
+		        
+		        String bindingResultKey = BindingResult.MODEL_KEY_PREFIX + "employeeVO";
+		        model.put(bindingResultKey, cleanResult);
+		    }
+			
+
+			// 補齊分頁預設變數，防止燈箱退回時背景的主畫面列表破版
+			Page<EmployeeVO> empPage = empSvc.getAllByPage(0);
+			model.addAttribute("empListData", empPage.getContent());
+			model.addAttribute("currentPage", 0);
+			model.addAttribute("totalPages", empPage.getTotalPages());
+			// 傳變數給前端，跟他說出錯了，請自動打開(不然出錯可能會關掉?)
+			model.addAttribute("openEditEmpModal", true);
+			model.addAttribute("openAddEmpModal", false); 
+			
+			return "back-end/employee/empPage";
+		}
 
 }
