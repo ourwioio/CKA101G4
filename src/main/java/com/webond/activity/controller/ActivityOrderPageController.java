@@ -34,6 +34,10 @@ public class ActivityOrderPageController {
 
 	@GetMapping("/listAllActivityOrder")
 	public String listAllActivityOrder(Model model, HttpSession session) {
+		if (!isLoginEmployee(session)) {
+			return "redirect:/activity/admin/home?loginRequired=true";
+		}
+
 		model.addAttribute("orderListData", orderSvc.getAll());
 		model.addAttribute("activityListData", activitySvc.getAll());
 		addFakeEmployee(model, session);
@@ -43,11 +47,17 @@ public class ActivityOrderPageController {
 
 	@PostMapping("/approve")
 	public String approveOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
+		if (!isLoginEmployee(session)) {
+			return "redirect:/activity/admin/home?loginRequired=true";
+		}
 		return "redirect:/activityOrder/listAllActivityOrder?hostReviewOnly=true";
 	}
 
 	@PostMapping("/reject")
 	public String rejectOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
+		if (!isLoginEmployee(session)) {
+			return "redirect:/activity/admin/home?loginRequired=true";
+		}
 		return "redirect:/activityOrder/listAllActivityOrder?hostReviewOnly=true";
 	}
 
@@ -69,13 +79,10 @@ public class ActivityOrderPageController {
 			return (Integer) employeeId;
 		}
 
-		Integer defaultEmployeeId = employeeRepo.findAll(Sort.by(Sort.Direction.ASC, "employeeId")).stream()
-				.map(EmployeeVO::getEmployeeId)
-				.findFirst()
-				.orElse(null);
-		if (defaultEmployeeId != null) {
-			session.setAttribute(ACTIVITY_ADMIN_EMPLOYEE_ID, defaultEmployeeId);
-		}
-		return defaultEmployeeId;
+		return null;
+	}
+
+	private boolean isLoginEmployee(HttpSession session) {
+		return getLoginEmployeeId(session) != null;
 	}
 }

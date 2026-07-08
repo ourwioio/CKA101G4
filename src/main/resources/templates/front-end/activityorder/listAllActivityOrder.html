@@ -126,29 +126,11 @@ td {
 	color: #92400e;
 }
 
-.action {
-	display: flex;
-	justify-content: center;
-	gap: 10px;
+.expired {
+	background: #e5e7eb;
+	color: #374151;
 }
 
-.btn-approve,
-.btn-reject {
-	color: white;
-	border: none;
-	padding: 8px 15px;
-	border-radius: 6px;
-	cursor: pointer;
-	font-weight: bold;
-}
-
-.btn-approve {
-	background: #16a34a;
-}
-
-.btn-reject {
-	background: #dc2626;
-}
 </style>
 </head>
 
@@ -202,6 +184,7 @@ td {
 							<span th:if="${order.orderStatus == 0}" class="status active">已付款</span>
 							<span th:if="${order.orderStatus == 1}" class="status cancel">已取消/退回</span>
 							<span th:if="${order.orderStatus == 2}" class="status refund">退款申請中</span>
+							<span th:if="${order.orderStatus == 5}" class="status expired">付款逾期</span>
 						</td>
 
 						<td th:text="${order.bookingCount}"></td>

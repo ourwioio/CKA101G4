@@ -102,6 +102,17 @@ body {
 	font-weight: bold;
 }
 
+.warning {
+	max-width: 1100px;
+	margin: 0 auto 20px;
+	background: #fef3c7;
+	color: #92400e;
+	border: 1px solid #fde68a;
+	border-radius: 10px;
+	padding: 14px 18px;
+	font-weight: bold;
+}
+
 .card-container {
 	max-width: 1100px;
 	margin: auto;
@@ -149,6 +160,11 @@ body {
 	color: white;
 	text-decoration: none;
 	font-weight: bold;
+}
+
+.disabled {
+	background: #94a3b8;
+	cursor: not-allowed;
 }
 
 .list {
@@ -204,9 +220,17 @@ body {
 	<div class="header">
 		<h1>活動前台</h1>
 		<p>
-			目前登入：<span th:text="${loginMemberName}">測試會員</span>
-			（會員編號 <span th:text="${loginMemberId}">1</span>）
+			目前狀態：<span th:text="${loginMemberName}">未登入</span>
+			<span th:if="${isLoginMember}">（會員編號 <span th:text="${loginMemberId}">1</span>）</span>
 		</p>
+	</div>
+
+	<div th:if="${param.loginRequired}" class="warning">
+		請先登入會員，才能使用報名、付款、主辦活動或聊天室功能。
+	</div>
+
+	<div th:if="${param.chatDenied}" class="warning">
+		只有主辦人或已付款會員可以進入活動聊天室。
 	</div>
 
 	<div th:if="${param.syncSuccess}" class="success">
@@ -216,11 +240,12 @@ body {
 	<div class="login-panel">
 		<div>
 			<strong>測試登入會員</strong>
-			<div>切換後，「我的報名」和「我的主辦活動」會依這個會員編號查詢。</div>
+			<div>預設未登入；登入後才可以報名、付款、主辦活動與進入聊天室。</div>
 		</div>
 
 		<form class="login-form" th:action="@{/activity/front/fakeLogin}" method="post">
 			<select name="memberId">
+				<option value="" th:selected="${!isLoginMember}">未登入</option>
 				<option th:each="memberId : ${memberListData}"
 					th:value="${memberId}"
 					th:selected="${memberId == loginMemberId}"
@@ -231,7 +256,7 @@ body {
 		</form>
 	</div>
 
-	<div class="login-panel">
+	<div class="login-panel" th:if="${isLoginMember}">
 		<div>
 			<strong>同步活動報名人數</strong>
 			<div>用有效訂單重新計算每個活動的人數，適合整理假資料時使用。</div>
@@ -255,15 +280,17 @@ body {
 			<div class="icon">O</div>
 			<h2>我的報名</h2>
 			<p>查看目前測試登入會員已報名的活動訂單。</p>
-			<a th:href="@{/activity/front/myOrder}" class="btn my">查看我的報名</a>
+			<a th:if="${isLoginMember}" th:href="@{/activity/front/myOrder}" class="btn my">查看我的報名</a>
+			<span th:unless="${isLoginMember}" class="btn disabled">請先登入</span>
 		</div>
 
 		<div class="card">
 			<div class="icon">H</div>
 			<h2>主辦活動</h2>
 			<p>新增主辦活動，或查看目前測試登入會員舉辦的活動。</p>
-			<a th:href="@{/activity/front/addHostActivity}" class="btn host">新增活動</a>
-			<a th:href="@{/activity/front/myHostActivity}" class="btn host">我的主辦活動</a>
+			<a th:if="${isLoginMember}" th:href="@{/activity/front/addHostActivity}" class="btn host">新增活動</a>
+			<a th:if="${isLoginMember}" th:href="@{/activity/front/myHostActivity}" class="btn host">我的主辦活動</a>
+			<span th:unless="${isLoginMember}" class="btn disabled">請先登入</span>
 		</div>
 
 		<div class="card">

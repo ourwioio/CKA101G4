@@ -17,7 +17,6 @@ import jakarta.servlet.http.HttpSession;
 @Controller
 public class GroupChatController {
 
-	private static final Integer DEFAULT_FAKE_LOGIN_MEMBER_ID = 1;
 	private static final String ACTIVITY_LOGIN_MEMBER_ID = "activityLoginMemberId";
 
 	@Autowired
@@ -75,7 +74,6 @@ public class GroupChatController {
 			return (Integer) memberId;
 		}
 
-		session.setAttribute(ACTIVITY_LOGIN_MEMBER_ID, DEFAULT_FAKE_LOGIN_MEMBER_ID);
-		return DEFAULT_FAKE_LOGIN_MEMBER_ID;
+		return null;
 	}
 }

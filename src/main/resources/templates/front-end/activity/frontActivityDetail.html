@@ -69,6 +69,16 @@ h1 {
 	border: 1px solid #fecaca;
 }
 
+.alert-warning {
+	background: #fef3c7;
+	color: #92400e;
+	padding: 14px 18px;
+	border-radius: 8px;
+	margin-bottom: 20px;
+	font-weight: bold;
+	border: 1px solid #fde68a;
+}
+
 .info {
 	margin: 18px 0;
 	font-size: 17px;
@@ -132,8 +142,12 @@ h1 {
 			<h1 th:text="${activityVO.activityTitle}">活動名稱</h1>
 
 			<div class="member">
-				目前會員： <span th:text="${loginMemberName}">測試會員</span>
+				目前狀態： <span th:text="${loginMemberName}">未登入</span>
 			</div>
+		</div>
+
+		<div th:if="${showLoginPrompt}" class="alert-warning">
+			未登入只能瀏覽活動詳情，請先登入會員後再報名。
 		</div>
 
 		<div th:if="${fullMessage}" class="alert-error">
@@ -205,6 +219,7 @@ h1 {
 
 		<div class="actions">
 			<a th:href="${backUrl}" class="btn-back" th:text="${backText}">返回列表</a> <a
+				th:if="${showOrderButton}"
 				th:href="@{/activity/front/order(activityId=${activityVO.activityId})}"
 				class="btn-order"> 立即報名 </a>
 		</div>
