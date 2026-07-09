@@ -54,7 +54,8 @@ public class MemberServiceLoie {
 		member.setBankAccount(bankAccount);
 		
 		// 🛠️ 初始化預設值
-		member.setAccountStatus((byte) 0);   // 0：未驗證/待審核
+		// 狀態說明：0：未驗證, 1：正常, 2：註銷, 3：停權, 4：限制參加活動
+		member.setAccountStatus((byte) 0);   // 預設為 0 (未驗證/待審核)
 		member.setKycStatus((byte) 0);       // 0：審核中
 		member.setReportPoints(0);           // 累計點數初始為 0
 		member.setCreatedAt(LocalDate.now()); 
@@ -73,6 +74,7 @@ public class MemberServiceLoie {
 	public void registerMember(MemberVO memberVO) {
 		if (memberVO == null) return;
 		
+		// 狀態說明：0：未驗證, 1：正常, 2：註銷, 3：停權, 4：限制參加活動
 		memberVO.setAccountStatus((byte) 0);
 		memberVO.setKycStatus((byte) 0);
 		memberVO.setReportPoints(0);
@@ -103,11 +105,13 @@ public class MemberServiceLoie {
 			member.setKycStatus(kycStatus);             // 1：審核通過, 2：審核失敗
 			member.setReviewedAt(LocalDateTime.now());   
 			
-			// 3. 連動邏輯：KYC 審核通過 -> 帳號狀態同步改為 1 (正常)；失敗則改為 2 (失敗)
+			// 3. 連動邏輯：
+			// kycStatus == 1 (通過) -> accountStatus 改為 1 (正常)
+			// kycStatus == 2 (不通過) -> accountStatus 保持或改為 0 (未驗證)
 			if (Byte.valueOf((byte) 1).equals(kycStatus)) {
 				member.setAccountStatus((byte) 1); 
 			} else if (Byte.valueOf((byte) 2).equals(kycStatus)) {
-				member.setAccountStatus((byte) 2);
+				member.setAccountStatus((byte) 0);
 			}
 			
 			return repository.saveAndFlush(member);
@@ -131,12 +135,11 @@ public class MemberServiceLoie {
 	// 🎯 補齊後台功能：依據帳戶狀態碼撈取會員清單
 	// =========================================================================
 	public List<MemberVO> getMembersByStatus(byte status) {
-		// 優先透過 Repository 原生方法過濾，避免全表撈取效能問題
 		return repository.findByAccountStatus(status);
 	}
 
 	// =========================================================================
-	// 🎯 補齊後台功能：安全更新會員資料 (防止覆蓋照片與密碼 + 滿 5 點自動停權)
+	// 🎯 補齊後台功能：安全更新會員資料 (滿 5 點自動停權 status = 3)
 	// =========================================================================
 	@Transactional
 	public void updateMember(MemberVO memberVO) {
@@ -144,12 +147,10 @@ public class MemberServiceLoie {
 			return;
 		}
 
-		// 1. 從資料庫撈出最新的持久化物件，確保舊資料（密碼、照片）不遺失
 		Optional<MemberVO> opt = repository.findById(memberVO.getMemberId());
 		if (opt.isPresent()) {
 			MemberVO dbMember = opt.get();
 			
-			// 2. 更新狀態與點數 (如果有傳入新數值)
 			if (memberVO.getReportPoints() != null) {
 				dbMember.setReportPoints(memberVO.getReportPoints());
 			}
@@ -158,13 +159,12 @@ public class MemberServiceLoie {
 				dbMember.setAccountStatus(memberVO.getAccountStatus());
 			}
 			
-			// 3. 🚨 核心自動化防禦：檢查累計違規點數
+			// 🚨 核心自動化防禦：檢查累計違規點數 (>= 5 點自動將狀態改為 3：已停權)
 			int currentPoints = dbMember.getReportPoints() != null ? dbMember.getReportPoints() : 0;
 			
-			// 只要點數累計 >= 5 點，且目前不處於停權狀態，自動將狀態改為 3 (已停權)
 			if (currentPoints >= 5 && (dbMember.getAccountStatus() == null || dbMember.getAccountStatus() != 3)) {
 				dbMember.setAccountStatus((byte) 3);
-				System.out.println("==== 🚨 [系統自動化防禦] 會員 ID: " + dbMember.getMemberId() + " 檢舉點數已達 " + currentPoints + " 點，自動執行停權！ ====");
+				System.out.println("==== 🚨 [系統自動化防禦] 會員 ID: " + dbMember.getMemberId() + " 檢舉點數已達 " + currentPoints + " 點，自動執行停權 (Status=3)！ ====");
 			}
 
 			repository.saveAndFlush(dbMember);
@@ -183,10 +183,7 @@ public class MemberServiceLoie {
 			MemberVO member = optional.get();
 			int currentPoints = member.getReportPoints() != null ? member.getReportPoints() : 0;
 			
-			// 點數 + 1
 			member.setReportPoints(currentPoints + 1);
-			
-			// 觸發自動安全防禦檢查存檔
 			this.updateMember(member);
 		}
 	}
@@ -200,7 +197,6 @@ public class MemberServiceLoie {
 		}
 		
 		String kw = keyword.trim();
-		// 使用 Repository JPA 自訂查詢法，直接由 SQL 處理 LIKE 過濾提升效能
 		return repository.findByEmailContainingOrRealNameContainingOrPhoneContaining(kw, kw, kw);
 	}
 
