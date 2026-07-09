@@ -390,8 +390,6 @@ td {
 							th:data-email="${member.email}" th:data-phone="${member.phone}"
 							th:data-idnumber="${member.idNumber}"
 							th:data-gender="${member.gender}"
-							th:data-bankcode="${member.bankCode}"
-							th:data-bankaccount="${member.bankAccount}"
 							th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
 							th:data-createdat="${member.createdAt}"
 							th:data-status="${member.accountStatus}"
@@ -431,8 +429,6 @@ td {
 							th:data-email="${member.email}" th:data-phone="${member.phone}"
 							th:data-idnumber="${member.idNumber}"
 							th:data-gender="${member.gender}"
-							th:data-bankcode="${member.bankCode}"
-							th:data-bankaccount="${member.bankAccount}"
 							th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
 							th:data-createdat="${member.createdAt}"
 							th:data-status="${member.accountStatus}"
@@ -472,8 +468,6 @@ td {
 							th:data-email="${member.email}" th:data-phone="${member.phone}"
 							th:data-idnumber="${member.idNumber}"
 							th:data-gender="${member.gender}"
-							th:data-bankcode="${member.bankCode}"
-							th:data-bankaccount="${member.bankAccount}"
 							th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
 							th:data-createdat="${member.createdAt}"
 							th:data-status="${member.accountStatus}"
@@ -531,14 +525,6 @@ td {
 					<div class="info-item">
 						<div class="info-label">性別</div>
 						<div class="info-value" id="detGender"></div>
-					</div>
-					<div class="info-item">
-						<div class="info-label">銀行代碼</div>
-						<div class="info-value" id="detBankCode"></div>
-					</div>
-					<div class="info-item">
-						<div class="info-label">銀行帳戶</div>
-						<div class="info-value" id="detBankAccount"></div>
 					</div>
 					<div class="info-item">
 						<div class="info-label">累計檢舉點數</div>
@@ -601,8 +587,6 @@ td {
         let phone = row.dataset.phone;
         let idNumber = row.dataset.idnumber;
         let gender = row.dataset.gender;
-        let bankCode = row.dataset.bankcode;
-        let bankAccount = row.dataset.bankaccount;
         let points = row.dataset.points;
         let createdAt = row.dataset.createdat;
         let accountStatus = row.dataset.status;
@@ -617,8 +601,6 @@ td {
         document.getElementById('detPhone').innerText = phone || '無';
         document.getElementById('detIdNumber').innerText = idNumber || '未送審';
         document.getElementById('detGender').innerText = (gender == 1) ? '👨 男' : ((gender == 2) ? '👩 女' : '秘密');
-        document.getElementById('detBankCode').innerText = bankCode || '無';
-        document.getElementById('detBankAccount').innerText = bankAccount || '無';
         document.getElementById('detPoints').innerText = points + ' / 5 點';
         document.getElementById('detCreatedAt').innerText = createdAt || '未知';
         

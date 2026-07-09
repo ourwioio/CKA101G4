@@ -21,11 +21,14 @@ public class MemberServiceLoie {
 	private MemberRepository repository;
 
 	// =========================================================================
-	// 🔐 1. 登入功能：從資料庫查詢登入的使用者 (完全對齊老師的 UserService 邏輯)
+	// 🔐 1. 登入功能：從資料庫查詢登入的使用者
 	// =========================================================================
 	public MemberVO findByEmail(String email) {
-		Optional<MemberVO> optional = repository.findByEmail(email);
-		return optional.orElse(null); // 如果值存在就回傳，否則回傳 null
+		if (email == null || email.trim().isEmpty()) {
+			return null;
+		}
+		Optional<MemberVO> optional = repository.findByEmail(email.trim());
+		return optional.orElse(null);
 	}
 
 	// =========================================================================
@@ -38,7 +41,6 @@ public class MemberServiceLoie {
 		
 		MemberVO member = new MemberVO();
 		
-		// 填入前端傳來的必要欄位
 		member.setEmail(email);
 		member.setPasswordHash(passwordHash); 
 		member.setNickname(nickname);
@@ -51,28 +53,39 @@ public class MemberServiceLoie {
 		member.setBankCode(bankCode);
 		member.setBankAccount(bankAccount);
 		
-		// 🛠️ 依據規格書，自動初始化預設值
-		member.setAccountStatus((byte) 0);   // 0：未驗證
+		// 🛠️ 初始化預設值
+		member.setAccountStatus((byte) 0);   // 0：未驗證/待審核
 		member.setKycStatus((byte) 0);       // 0：審核中
-		member.setReportPoints(0);           // 🎯 檢舉累計點數初始為 0
-		member.setCreatedAt(LocalDate.now()); // 建立時間
-		member.setSubmittedAt(LocalDateTime.now()); // 送審時間
+		member.setReportPoints(0);           // 累計點數初始為 0
+		member.setCreatedAt(LocalDate.now()); 
+		member.setSubmittedAt(LocalDateTime.now());
 		
-		// 初始化四種評價總分與次數（規格書標記：預設 0）
-		member.setServiceRateSum(BigDecimal.ZERO);
-		member.setServiceRateCount(0);
-		member.setServicerRateSum(BigDecimal.ZERO);
-		member.setServicerRateCount(0);
-		member.setActRateSum(BigDecimal.ZERO);
-		member.setActRateCount(0);
-		member.setHoldactRateSum(BigDecimal.ZERO);
-		member.setHoldactRateCount(0);
+		// 初始化四種評價總分與次數
+		initMemberRatings(member);
 		
 		return repository.save(member);
 	}
 
 	// =========================================================================
-	// 💻 3. 後台管理：管理員審核 KYC 實名認證 (保留你原有的嚴謹審核邏輯)
+	// 🎯 接收 MemberVO 的註冊存檔實作 ( Controller doRegister 專用)
+	// =========================================================================
+	@Transactional
+	public void registerMember(MemberVO memberVO) {
+		if (memberVO == null) return;
+		
+		memberVO.setAccountStatus((byte) 0);
+		memberVO.setKycStatus((byte) 0);
+		memberVO.setReportPoints(0);
+		memberVO.setCreatedAt(LocalDate.now());
+		memberVO.setSubmittedAt(LocalDateTime.now());
+		
+		initMemberRatings(memberVO);
+		
+		repository.save(memberVO);
+	}
+
+	// =========================================================================
+	// 💻 3. 後台管理：管理員審核 KYC 實名認證 (連動帳號狀態)
 	// =========================================================================
 	@Transactional
 	public MemberVO reviewKycStatus(Integer memberId, Integer employeeId, Byte kycStatus) {
@@ -81,122 +94,127 @@ public class MemberServiceLoie {
 		if (optional.isPresent()) {
 			MemberVO member = optional.get();
 			
-			// 1. 綁定審核員工的外殼物件 (EMPLOYEE_ID 外來鍵)
+			// 1. 綁定經辦員工
 			EmployeeVO employee = new EmployeeVO();
 			employee.setEmployeeId(employeeId);
 			member.setEmployee(employee);
 			
 			// 2. 更新審核狀態與時間
 			member.setKycStatus(kycStatus);             // 1：審核通過, 2：審核失敗
-			member.setReviewedAt(LocalDateTime.now());   // 填入審核時間
+			member.setReviewedAt(LocalDateTime.now());   
 			
-			// 3. 連動邏輯：如果 KYC 審核通過，帳號狀態自動同步開通為「1：正常」
-			if (kycStatus == 1) {
+			// 3. 連動邏輯：KYC 審核通過 -> 帳號狀態同步改為 1 (正常)；失敗則改為 2 (失敗)
+			if (Byte.valueOf((byte) 1).equals(kycStatus)) {
 				member.setAccountStatus((byte) 1); 
+			} else if (Byte.valueOf((byte) 2).equals(kycStatus)) {
+				member.setAccountStatus((byte) 2);
 			}
 			
-			return repository.save(member);
+			return repository.saveAndFlush(member);
 		}
 		return null;
 	}
 
 	// =========================================================================
-	// 🔍 後台輔助查詢：列出所有會員大總表
+	// 🔍 後台輔助查詢
 	// =========================================================================
 	public List<MemberVO> getAllMembers() {
 		return repository.findAll();
 	}
 	
-	// 🔍 後台輔助查詢：取得單一會員詳細資料 (審核細頁、圖片顯示用)
 	public MemberVO getOneMember(Integer memberId) {
+		if (memberId == null) return null;
 		return repository.findById(memberId).orElse(null);
 	}
 
 	// =========================================================================
-	// 🎯 接收 MemberVO 的註冊存檔實作 (完美對齊 Controller doRegister 呼叫)
+	// 🎯 補齊後台功能：依據帳戶狀態碼撈取會員清單
 	// =========================================================================
-	@Transactional
-	public void registerMember(MemberVO memberVO) {
-		// 初始化規格書要求的評價預設值
-		memberVO.setReportPoints(0);
-		memberVO.setServiceRateSum(BigDecimal.ZERO);
-		memberVO.setServiceRateCount(0);
-		memberVO.setServicerRateSum(BigDecimal.ZERO);
-		memberVO.setServicerRateCount(0);
-		memberVO.setActRateSum(BigDecimal.ZERO);
-		memberVO.setActRateCount(0);
-		memberVO.setHoldactRateSum(BigDecimal.ZERO);
-		memberVO.setHoldactRateCount(0);
-		
-		// 真正呼叫 repository 送進資料庫
-		repository.save(memberVO);
+	public List<MemberVO> getMembersByStatus(byte status) {
+		// 優先透過 Repository 原生方法過濾，避免全表撈取效能問題
+		return repository.findByAccountStatus(status);
 	}
 
 	// =========================================================================
-	// 🎯 補齊後台功能：依據狀態碼撈取會員清單 (用於前端 kycApproval.html 的待審核表格)
-	// =========================================================================
-	public List<MemberVO> getMembersByStatus(byte b) {
-		// 使用 Java Stream 語法，從所有會員中過濾出 AccountStatus 符合條件的會員
-		return repository.findAll().stream()
-				.filter(m -> m.getAccountStatus() != null && m.getAccountStatus() == b)
-				.toList();
-	}
-
-	// =========================================================================
-	// 🎯 補齊後台功能：更新會員資料 (連動「滿 5 點自動停權」核心商業邏輯)
+	// 🎯 補齊後台功能：安全更新會員資料 (防止覆蓋照片與密碼 + 滿 5 點自動停權)
 	// =========================================================================
 	@Transactional
 	public void updateMember(MemberVO memberVO) {
-		if (memberVO != null && memberVO.getMemberId() != null) {
+		if (memberVO == null || memberVO.getMemberId() == null) {
+			return;
+		}
+
+		// 1. 從資料庫撈出最新的持久化物件，確保舊資料（密碼、照片）不遺失
+		Optional<MemberVO> opt = repository.findById(memberVO.getMemberId());
+		if (opt.isPresent()) {
+			MemberVO dbMember = opt.get();
 			
-			// 🎯 核心自動化防禦：檢查這名會員當前的檢舉點數 reportPoints
-			int currentPoints = memberVO.getReportPoints() != null ? memberVO.getReportPoints() : 0;
-			
-			// 只要點數累計大於等於 5 點，且目前不處於已停權狀態，後端直接強制將狀態改為 3
-			if (currentPoints >= 5 && (memberVO.getAccountStatus() == null || memberVO.getAccountStatus() != 3)) {
-				memberVO.setAccountStatus((byte) 3); // 3 = 已停權
-				System.out.println("==== 🚨 [系統自動化防禦] 會員 ID: " + memberVO.getMemberId() + " 檢舉點數已達 " + currentPoints + " 點，自動執行停權！ ====");
+			// 2. 更新狀態與點數 (如果有傳入新數值)
+			if (memberVO.getReportPoints() != null) {
+				dbMember.setReportPoints(memberVO.getReportPoints());
 			}
 			
-			repository.save(memberVO);
+			if (memberVO.getAccountStatus() != null) {
+				dbMember.setAccountStatus(memberVO.getAccountStatus());
+			}
+			
+			// 3. 🚨 核心自動化防禦：檢查累計違規點數
+			int currentPoints = dbMember.getReportPoints() != null ? dbMember.getReportPoints() : 0;
+			
+			// 只要點數累計 >= 5 點，且目前不處於停權狀態，自動將狀態改為 3 (已停權)
+			if (currentPoints >= 5 && (dbMember.getAccountStatus() == null || dbMember.getAccountStatus() != 3)) {
+				dbMember.setAccountStatus((byte) 3);
+				System.out.println("==== 🚨 [系統自動化防禦] 會員 ID: " + dbMember.getMemberId() + " 檢舉點數已達 " + currentPoints + " 點，自動執行停權！ ====");
+			}
+
+			repository.saveAndFlush(dbMember);
 		}
 	}
 
 	// =========================================================================
-	// 🚨 補齊後台功能：被檢舉時點數累加 API（供其他模組/檢舉功能呼叫）
+	// 🚨 補齊後台功能：被檢舉時點數累加 API
 	// =========================================================================
 	@Transactional
 	public void reportMember(Integer memberId) {
+		if (memberId == null) return;
+
 		Optional<MemberVO> optional = repository.findById(memberId);
 		if (optional.isPresent()) {
 			MemberVO member = optional.get();
 			int currentPoints = member.getReportPoints() != null ? member.getReportPoints() : 0;
 			
-			// 點數累加 1
+			// 點數 + 1
 			member.setReportPoints(currentPoints + 1);
 			
-			// 🎯 呼叫內部的 updateMember，讓它自動進去觸發「滿 5 點就變更 accountStatus=3」的檢查機制
+			// 觸發自動安全防禦檢查存檔
 			this.updateMember(member);
 		}
 	}
 
 	// =========================================================================
-	// 🔍 補齊後台功能：關鍵字模糊搜尋全體會員（支援 Email、真實姓名、手機）
+	// 🔍 補齊後台功能：關鍵字模糊搜尋全體會員
 	// =========================================================================
 	public List<MemberVO> searchMembers(String keyword) {
 		if (keyword == null || keyword.trim().isEmpty()) {
 			return repository.findAll();
 		}
 		
-		String lowerKeyword = keyword.toLowerCase().trim();
-		
-		// 🎯 最快速直覺的做法：利用 Stream 在記憶體中進行多欄位模糊比對過濾
-		return repository.findAll().stream()
-				.filter(m -> 
-					(m.getEmail() != null && m.getEmail().toLowerCase().contains(lowerKeyword)) ||
-					(m.getRealName() != null && m.getRealName().toLowerCase().contains(lowerKeyword)) ||
-					(m.getPhone() != null && m.getPhone().contains(lowerKeyword))
-				)
-				.toList();
+		String kw = keyword.trim();
+		// 使用 Repository JPA 自訂查詢法，直接由 SQL 處理 LIKE 過濾提升效能
+		return repository.findByEmailContainingOrRealNameContainingOrPhoneContaining(kw, kw, kw);
+	}
+
+	// =========================================================================
+	// 🛠️ 私有輔助工具：評價預設值初始化
+	// =========================================================================
+	private void initMemberRatings(MemberVO member) {
+		member.setServiceRateSum(BigDecimal.ZERO);
+		member.setServiceRateCount(0);
+		member.setServicerRateSum(BigDecimal.ZERO);
+		member.setServicerRateCount(0);
+		member.setActRateSum(BigDecimal.ZERO);
+		member.setActRateCount(0);
+		member.setHoldactRateSum(BigDecimal.ZERO);
+		member.setHoldactRateCount(0);
 	}
 }

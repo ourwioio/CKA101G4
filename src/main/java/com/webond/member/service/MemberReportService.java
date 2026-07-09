@@ -63,7 +63,7 @@ public class MemberReportService {
 			employee.setEmployeeId(employeeId);
 			memberReportVO.setEmployee(employee); 
 			
-			// 2. 防呆機制：若駁回不成立，扣點一律歸 0
+			// 2. 防呆機制：若駁回不成立(2)，違規點數一律歸 0
 			if (Integer.valueOf(2).equals(reportStatus)) {
 				violationPoints = 0;
 			}
@@ -73,36 +73,49 @@ public class MemberReportService {
 			memberReportVO.setViolationPoints(violationPoints); 
 			memberReportVO.setProcessedAt(new Timestamp(System.currentTimeMillis())); 
 			
-			// 3. 🚀【核心連動】審核通過 (1)，扣除被檢舉人的會員點數
+			// 3. 🚀【核心連動】審核通過 (1)，將裁決點數「累加」至被檢舉人的會員累計點數 (reportPoints)
 			if (Integer.valueOf(1).equals(reportStatus) && violationPoints != null && violationPoints > 0) {
-				MemberVO reportedMember = memberReportVO.getReported(); 
+				MemberVO proxyReported = memberReportVO.getReported(); 
 				
-				if (reportedMember != null && reportedMember.getMemberId() != null) {
-					Optional<MemberVO> memberOpt = memberRepository.findById(reportedMember.getMemberId());
+				if (proxyReported != null && proxyReported.getMemberId() != null) {
+					Optional<MemberVO> memberOpt = memberRepository.findById(proxyReported.getMemberId());
 					if (memberOpt.isPresent()) {
 						MemberVO actualMember = memberOpt.get();
 						
-						// =============================================================
-						// 🔍 【請依據你的 MemberVO 實際欄位名稱微調此處】
-						// 範例：若欄位是 memPoints，請改成 actualMember.getMemPoints();
-						// =============================================================
+						// 取得目前累計點數 (防呆處理 null)
 						Integer currentPoints = actualMember.getReportPoints(); 
-						if (currentPoints == null) currentPoints = 0;
+						if (currentPoints == null) {
+							currentPoints = 0;
+						}
 						
-						// 執行扣點（防呆最低為 0）
-						int newPoints = Math.max(0, currentPoints - violationPoints);
-						actualMember.setReportPoints(newPoints);
-						// =============================================================
+						// 🎯【重大修正】：這裡是累計點數，要用「加法 (+)」！
+						int newTotalPoints = currentPoints + violationPoints;
+						actualMember.setReportPoints(newTotalPoints);
 						
-						// 儲存更新後的會員資料
-						memberRepository.save(actualMember);
-						System.out.println("成功對會員 ID " + actualMember.getMemberId() + " 扣除 " + violationPoints + " 點！");
+						// 🚨【自動停權防禦】：當違規總點數達到 5 點時，自動切換帳號狀態為 3 (停權)
+						if (newTotalPoints >= 5) {
+							actualMember.setAccountStatus((byte) 3);
+							System.out.println("🚨 [系統自動停權] 會員 ID: " + actualMember.getMemberId() + " 違規累計已達 " + newTotalPoints + " 點！");
+						}
+						
+						// 🎯 使用 saveAndFlush 強制立刻寫入資料庫
+						MemberVO updatedMember = memberRepository.saveAndFlush(actualMember);
+						
+						// 重新塞回 Report 物件，維持永續上下文一致
+						memberReportVO.setReported(updatedMember);
+						
+						System.out.println("✅ [成功累計違規點數] 會員 ID: " + updatedMember.getMemberId() 
+								+ " 原點數: " + currentPoints 
+								+ " + 本次裁決: " + violationPoints 
+								+ " => 最新總點數: " + updatedMember.getReportPoints());
+					} else {
+						System.err.println("❌ [錯誤] 資料庫查無 ID 為 " + proxyReported.getMemberId() + " 的會員！");
 					}
 				}
 			}
 			
 			// 4. 儲存檢舉案件狀態
-			repository.save(memberReportVO);
+			repository.saveAndFlush(memberReportVO);
 			
 		} else {
 			System.err.println("⚠️ 警告：案號 " + reportId + " 已不存在於資料庫，無法進行審核！");

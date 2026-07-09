@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.member.model.MemberReportVO;
 import com.webond.member.service.MemberReportService;
@@ -35,23 +36,52 @@ public class MemberReportController {
 	}
 
 	// =========================================================================
-	// 🟢 【後台功能 1】權限五管理員專用審核後台進入點
+	// 🟢 【後台功能 1】審核中心主頁 (全後端主導 + 支援 activeTab 與 reportId 自動選取)
 	// =========================================================================
 	@GetMapping("/manageReport")
-	public String manageReport(HttpSession session, ModelMap model) {
+	public String manageReport(
+			@RequestParam(value = "reportId", required = false) Integer reportId,
+			@RequestParam(value = "activeTab", defaultValue = "all") String activeTab,
+			HttpSession session, ModelMap model) {
 
 		if (!hasPermissionFive(session)) {
 			model.addAttribute("errorMsg", "權限不足！此頁面僅限高級審核主管存取。");
 			return "front-end/member/memberreport/error_page";
 		}
 
+		// 1. 撈出所有檢舉清單
 		List<MemberReportVO> list = reportSvc.getAll();
 		model.addAttribute("memberReportListData", list);
 		model.addAttribute("isManager", true);
+		model.addAttribute("activeTab", activeTab); // 帶給 Thymeleaf 決定哪一個 Tab 亮起
 
-		System.out.println("====== [Debug] 權限五專用管理後台 /manageReport 載入成功 ======");
+		// 2. 自動決定右側面板要顯示的案件 (selectedReport)
+		MemberReportVO selectedReport = null;
+		
+		if (reportId != null) {
+			// 有指定案號，優先讀取該案號
+			selectedReport = reportSvc.getOneMemberReport(reportId);
+		} 
+		
+		// 3. 防呆機制：若未指定 reportId 或指定的案號無效，則依據目前的 Tab 預設抓取第一筆
+		if (selectedReport == null && !list.isEmpty()) {
+			for (MemberReportVO vo : list) {
+				if ("all".equals(activeTab) || String.valueOf(vo.getReportStatus()).equals(activeTab)) {
+					selectedReport = vo;
+					break;
+				}
+			}
+			// 若該 Tab 下完全沒有案件，則退回列表的第一筆
+			if (selectedReport == null) {
+				selectedReport = list.get(0);
+			}
+		}
+		
+		model.addAttribute("selectedReport", selectedReport);
 
-		// 🎯 對齊資料夾結構：templates/back-end/member/manageReport.html
+		System.out.println("====== [Debug] 後台 /manageReport 載入成功，目前選取案號 #" 
+				+ (selectedReport != null ? selectedReport.getReportId() : "無") + ", 頁籤: " + activeTab + " ======");
+
 		return "back-end/member/manageReport";
 	}
 
@@ -90,13 +120,24 @@ public class MemberReportController {
 	}
 
 	// =========================================================================
-	// 🟢 【後台功能 4】新版權限五管理員送出審核結果
+	// 🛡️ 【防呆 GET 路由】防止審核後手動 F5 重新整理導致 HTTP 400 崩潰
+	// =========================================================================
+	@GetMapping("/updateReportStatus")
+	public String handleGetUpdateReportStatus() {
+		return "redirect:/backend/memberreport/manageReport";
+	}
+
+	// =========================================================================
+	// 🟢 【後台功能 4】審核提交 (執行業務邏輯，精準帶回提示訊息與鎖定分頁案件)
 	// =========================================================================
 	@PostMapping("/updateReportStatus")
 	public String updateReportStatus(@RequestParam("reportId") Integer reportId,
-			@RequestParam("reportStatus") Integer reportStatus, @RequestParam("employeeId") String employeeIdStr,
+			@RequestParam("reportStatus") Integer reportStatus, 
+			@RequestParam("employeeId") String employeeIdStr,
 			@RequestParam(value = "violationPoints", required = false) String violationPointsStr,
-			@RequestParam(value = "adminNote", required = false) String adminNote, HttpSession session,
+			@RequestParam(value = "adminNote", required = false) String adminNote, 
+			HttpSession session,
+			RedirectAttributes redirectAttributes,
 			ModelMap model) {
 
 		if (!hasPermissionFive(session)) {
@@ -105,7 +146,6 @@ public class MemberReportController {
 		}
 
 		List<String> errorMsgs = new LinkedList<>();
-		model.addAttribute("errorMsgs", errorMsgs);
 
 		// 1. 驗證員工編號
 		Integer employeeId = null;
@@ -137,35 +177,44 @@ public class MemberReportController {
 			violationPoints = 0;
 		}
 
-		// 4. 有錯誤則返回後台頁面
+		// 4. 有驗證錯誤時，停留在原頁面並拋出錯誤訊息
 		if (!errorMsgs.isEmpty()) {
+			model.addAttribute("errorMsgs", errorMsgs);
 			model.addAttribute("memberReportListData", reportSvc.getAll());
+			model.addAttribute("selectedReport", reportSvc.getOneMemberReport(reportId));
+			model.addAttribute("activeTab", "0"); // 失敗時留在待處理頁籤
 			model.addAttribute("isManager", true);
-			return "back-end/member/manageReport"; 
+			return "back-end/member/manageReport";
 		}
 
 		try {
+			// 5. 呼叫 Service 執行業務邏輯 (扣點、自動停權、saveAndFlush 強制寫入)
 			reportSvc.jombackProcessReport(reportId, employeeId, reportStatus, adminNote, violationPoints);
+			
+			// 提示訊息：透過 RedirectAttributes 在重導向後顯示
+			String statusText = (reportStatus == 1) ? "審核成立 (扣除 " + violationPoints + " 點)" : "審核駁回";
+			redirectAttributes.addFlashAttribute("successMsg", "案號 #" + reportId + " 已成功處理為【" + statusText + "】！");
+			
 		} catch (Exception e) {
 			errorMsgs.add("資料庫更新失敗：" + e.getMessage());
+			model.addAttribute("errorMsgs", errorMsgs);
 			model.addAttribute("memberReportListData", reportSvc.getAll());
+			model.addAttribute("selectedReport", reportSvc.getOneMemberReport(reportId));
+			model.addAttribute("activeTab", "0");
 			model.addAttribute("isManager", true);
-			return "back-end/member/manageReport"; 
+			return "back-end/member/manageReport";
 		}
 
-		// 審核成功重導向回管理首頁
-		return "redirect:/backend/memberreport/manageReport";
+		// 6. 🎯【核心重導向】：帶上 reportId 與 activeTab=reportStatus，讓頁面切換到對應已結案分頁並選中該案
+		return "redirect:/backend/memberreport/manageReport?reportId=" + reportId + "&activeTab=" + reportStatus;
 	}
 
 	// =========================================================================
-	// 🟢 【前台功能 1】開啟前台新增檢舉案的網頁 (🎯 解決 405 Method Not Allowed 錯誤)
+	// 🟢 【前台功能 1】開啟前台新增檢舉案的網頁
 	// =========================================================================
 	@GetMapping("/addReport")
 	public String showAddReportPage(ModelMap model) {
-		// 預先帶入空的 VO 以供網頁基本物件綁定防錯
 		model.addAttribute("memberReportVO", new MemberReportVO());
-		
-		// 🎯 對齊前台資料夾結構
 		return "front-end/member/memberreport/addReport";
 	}
 
@@ -177,10 +226,14 @@ public class MemberReportController {
 			@RequestParam(value = "reportedId", required = false) String reportedIdStr,
 			@RequestParam(value = "reportCategory", required = false) String reportCategoryStr,
 			@RequestParam(value = "reportContent", required = false) String reportContent,
-			@RequestParam("evidencePath") MultipartFile file, ModelMap model) {
+			@RequestParam("evidencePath") MultipartFile file, 
+			RedirectAttributes redirectAttributes,
+			ModelMap model) {
+		
 		List<String> errorMsgs = new LinkedList<>();
 		model.addAttribute("errorMsgs", errorMsgs);
 		MemberReportVO memberReportVO = new MemberReportVO();
+		
 		try {
 			Integer reporterId = null;
 			if (reporterIdStr == null || reporterIdStr.trim().length() == 0) {
@@ -236,8 +289,12 @@ public class MemberReportController {
 				return "front-end/member/memberreport/addReport";
 			}
 
+			// 送出新增
 			reportSvc.addMemberReport(reporterId, reportedId, reportCategory, reportContent, evidence);
-			return "redirect:/backend/memberreport/select_page";
+			
+			redirectAttributes.addFlashAttribute("successMsg", "檢舉案已成功送出，管理員將儘速進行審核！");
+			return "redirect:/backend/memberreport/addReport";
+			
 		} catch (Exception e) {
 			errorMsgs.add("送出檢舉失敗：" + e.getMessage());
 			model.addAttribute("memberReportVO", memberReportVO);
