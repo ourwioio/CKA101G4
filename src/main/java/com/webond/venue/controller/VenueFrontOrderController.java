@@ -31,7 +31,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/front/venueOrder")
 public class VenueFrontOrderController {
 
-	private static final long PAYMENT_TIMEOUT_MINUTES = 5;
+	private static final long PAYMENT_TIMEOUT_MINUTES = 1;
 
 	@Autowired
 	VenueService venueService;
@@ -61,48 +61,59 @@ public class VenueFrontOrderController {
 	}
 
 	@PostMapping("insert")
-	public String insert(@ModelAttribute("venueOrderDTO")@Valid VenueOrderFrontDTO venueOrderDTO, 
-	        BindingResult result,
-	        HttpSession session,
-	        Model model) {
-		
-	    MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
-	    if (loginMember == null) {
-	        return "redirect:/member/login";
-	    }
+	public String insert(@ModelAttribute("venueOrderDTO") @Valid VenueOrderFrontDTO venueOrderDTO, BindingResult result,
+			HttpSession session, Model model) {
 
-	    if (result.hasErrors()) {
-	    	VenueVO venueVO = venueService.getOneVenue(venueOrderDTO.getVenueId());
-	    	model.addAttribute("venueVO", venueVO);
-	    	model.addAttribute("venueOrderDTO", venueOrderDTO);
-	    	return "front-end/venue/addVenueOrder";
-	    	
-	    }
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
+		}
 
-	    VenueVO venueVO = venueService.getOneVenue(venueOrderDTO.getVenueId());
+		if (result.hasErrors()) {
+			VenueVO venueVO = venueService.getOneVenue(venueOrderDTO.getVenueId());
+			model.addAttribute("venueVO", venueVO);
+			model.addAttribute("venueOrderDTO", venueOrderDTO);
+			return "front-end/venue/addVenueOrder";
 
-	    int hours = venueOrderDTO.getEndHour() - venueOrderDTO.getStartHour();
-	    int totalAmount = hours * venueVO.getHourlyRate();
+		}
 
-	    VenueOrderVO venueOrderVO = new VenueOrderVO();
-	    venueOrderVO.setVenueVO(venueVO);
-	    venueOrderVO.setMember(loginMember);
-	    venueOrderVO.setVenueSlotId(venueOrderDTO.getVenueSlotId());
-	    venueOrderVO.setBookDate(venueOrderDTO.getBookDate());
-	    venueOrderVO.setStartAt(LocalTime.of(venueOrderDTO.getStartHour(), 0));
-	    venueOrderVO.setEndAt(LocalTime.of(
-	    		venueOrderDTO.getEndHour() == 24 ? 23 : venueOrderDTO.getEndHour(),
-	    				venueOrderDTO.getEndHour() == 24 ? 59 : 0));
-	    venueOrderVO.setTotalAmount(totalAmount);
-	    venueOrderVO.setPaymentMethod(venueOrderDTO.getPaymentMethod());
-	    venueOrderVO.setCreatedAt(LocalDateTime.now());
-	    venueOrderVO.setOrderStatus((byte) 0);
+		VenueVO venueVO = venueService.getOneVenue(venueOrderDTO.getVenueId());
 
-	    venueOrderService.addVenueOrder(venueOrderVO);
+		if (venueVO != null && venueVO.getVenueSlots() != null) {
+			venueVO.getVenueSlots().size(); // 呼叫 .size() 就能成功觸發 Lazy Loading
+		}
 
-	    venueSlotService.updateSlotStatus(venueOrderDTO.getVenueSlotId(), venueOrderDTO.getStartHour(), venueOrderDTO.getEndHour());
+		int hours = venueOrderDTO.getEndHour() - venueOrderDTO.getStartHour();
+		int totalAmount = hours * venueVO.getHourlyRate();
 
-	    return "redirect:/front/venueOrder/mockPayment?venueOrderId=" + venueOrderVO.getVenueOrderId();
+		VenueOrderVO venueOrderVO = new VenueOrderVO();
+		venueOrderVO.setVenueVO(venueVO);
+		venueOrderVO.setMember(loginMember);
+		venueOrderVO.setVenueSlotId(venueOrderDTO.getVenueSlotId());
+		venueOrderVO.setBookDate(venueOrderDTO.getBookDate());
+		venueOrderVO.setStartAt(LocalTime.of(venueOrderDTO.getStartHour(), 0));
+		venueOrderVO.setEndAt(LocalTime.of(venueOrderDTO.getEndHour() == 24 ? 23 : venueOrderDTO.getEndHour(),
+				venueOrderDTO.getEndHour() == 24 ? 59 : 0));
+		venueOrderVO.setTotalAmount(totalAmount);
+		venueOrderVO.setPaymentMethod(venueOrderDTO.getPaymentMethod());
+		venueOrderVO.setCreatedAt(LocalDateTime.now());
+		venueOrderVO.setOrderStatus((byte) 0);
+
+		try {
+			// 呼叫 Service，這步會啟動悲觀鎖並把字串改成 '3'
+			venueOrderService.addVenueOrder(venueOrderVO);
+		} catch (RuntimeException e) {
+			// 💡 關鍵：如果被別人搶先一步佔用，Service會噴錯，這裡會抓住它
+			// 把錯誤訊息掛在 startHour 欄位上，讓前端網頁顯示紅字
+			result.rejectValue("startHour", "error.venueOrderDTO", e.getMessage());
+
+			// 重新準備資料，讓使用者留在原頁面看錯誤訊息
+			model.addAttribute("venueVO", venueVO);
+			model.addAttribute("venueOrderDTO", venueOrderDTO);
+			return "front-end/venue/addVenueOrder";
+		}
+
+		return "redirect:/front/venueOrder/mockPayment?venueOrderId=" + venueOrderVO.getVenueOrderId();
 	}
 
 	/** 模擬付款頁 */
@@ -119,15 +130,17 @@ public class VenueFrontOrderController {
 			return "redirect:/front/venueOrder/myVenueOrder";
 		}
 
-		if (order.getOrderStatus() == 0
-				&& order.getCreatedAt().plusMinutes(PAYMENT_TIMEOUT_MINUTES).isBefore(LocalDateTime.now())) {
-			order.setOrderStatus((byte) 2);
-			venueOrderService.updateVenueOrder(order);
-			releaseSlot(order);
+		// 已經不是「待付款」狀態（已付款或已取消），不用再顯示付款頁
+		if (order.getOrderStatus() != 0) {
 			return "redirect:/front/venueOrder/myVenueOrder";
 		}
 
-		if (order.getOrderStatus() != 0) {
+		// 真的超過付款時限了，才標記逾時取消、釋放時段
+		if (order.getCreatedAt().plusMinutes(PAYMENT_TIMEOUT_MINUTES).isBefore(LocalDateTime.now())) {
+			order.setOrderStatus((byte) 2);
+			order.setHandledAt(LocalDateTime.now());
+			venueOrderService.updateVenueOrder(order);
+			releaseSlot(order);
 			return "redirect:/front/venueOrder/myVenueOrder";
 		}
 
@@ -155,7 +168,7 @@ public class VenueFrontOrderController {
 				order.setOrderStatus((byte) 1); // 已付款/預約成功
 				order.setHandledAt(LocalDateTime.now());
 				venueOrderService.updateVenueOrder(order);
-				// 付款成功，時段維持已預約(1)，不用釋放
+				confirmSlot(order); // ⚙️ 新增：把時段字串從 '3' 正式扶正為 '1'
 			} else {
 				order.setOrderStatus((byte) 2); // 逾時取消
 				venueOrderService.updateVenueOrder(order);
@@ -234,7 +247,20 @@ public class VenueFrontOrderController {
 		int endHour = (order.getEndAt().getHour() == 23 && order.getEndAt().getMinute() == 59) ? 24
 				: order.getEndAt().getHour();
 
-		venueSlotService.releaseSlotStatus(order.getVenueSlotId(), startHour, endHour);
+		// ⚙️ 改為呼叫帶有防呆機制、只針對 '3' 進行還原的方法
+		venueSlotService.releaseTimeoutSlot(order.getVenueSlotId(), startHour, endHour);
+	}
+	
+	/** 用訂單自己存的 startAt/endAt/venueSlotId 反推並確認時段（'3' 扶正為 '1'） */
+	private void confirmSlot(VenueOrderVO order) {
+		if (order.getVenueSlotId() == null)
+			return;
+
+		int startHour = order.getStartAt().getHour();
+		int endHour = (order.getEndAt().getHour() == 23 && order.getEndAt().getMinute() == 59) ? 24
+				: order.getEndAt().getHour();
+
+		venueSlotService.confirmSlotPayment(order.getVenueSlotId(), startHour, endHour);
 	}
 
 }

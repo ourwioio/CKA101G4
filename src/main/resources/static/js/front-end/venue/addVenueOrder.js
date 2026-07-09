@@ -103,14 +103,6 @@ function restorePreviousSelection() {
 
     selectSlot(btn);
 
-    if (restoreStartHour !== null) {
-        document.getElementById('startHour').value = restoreStartHour;
-        updateEndHourOptions();
-    }
-    if (restoreEndHour !== null) {
-        document.getElementById('endHour').value = restoreEndHour;
-    }
-    calculateTotal();
 }
 
 function validateForm() {
