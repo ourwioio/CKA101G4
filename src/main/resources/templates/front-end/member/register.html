@@ -99,7 +99,7 @@ input:focus, select:focus {
 	padding-top: 10px;
 }
 
-button {
+button[type="submit"] {
 	width: 100%;
 	padding: 14px;
 	background: #0ea5e9;
@@ -113,7 +113,7 @@ button {
 	margin-top: 25px;
 }
 
-button:hover {
+button[type="submit"]:hover {
 	background: #0284c7;
 }
 
@@ -147,7 +147,8 @@ button:hover {
 	text-decoration: none;
 	font-weight: bold;
 }
-/* 📸 新增：已上傳圖片預覽樣式 */
+
+/* 📸 已上傳圖片預覽樣式 */
 .img-preview {
 	margin-top: 8px;
 	max-width: 100%;
@@ -161,6 +162,47 @@ button:hover {
 	font-size: 12px;
 	color: #0284c7;
 	margin-top: 4px;
+}
+
+/* ✉️ Email 驗證按鈕與輸入框組合樣式 */
+.input-with-btn {
+	display: flex;
+	gap: 8px;
+}
+
+.input-with-btn input {
+	flex: 1;
+}
+
+.btn-send-otp {
+	width: auto;
+	padding: 0 14px;
+	margin-top: 0;
+	background: #0284c7;
+	color: white;
+	border: none;
+	font-size: 13px;
+	font-weight: 600;
+	white-space: nowrap;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background 0.2s ease;
+}
+
+.btn-send-otp:hover {
+	background: #0369a1;
+}
+
+.btn-send-otp:disabled {
+	background: #94a3b8;
+	cursor: not-allowed;
+}
+
+.otp-msg {
+	font-size: 12px;
+	margin-top: 5px;
+	display: block;
+	font-weight: 500;
 }
 </style>
 </head>
@@ -178,21 +220,32 @@ button:hover {
 		</div>
 
 		<form th:action="@{/member/doRegister}" method="post"
-			th:object="${memberVO}" enctype="multipart/form-data">
+			th:object="${memberVO}" enctype="multipart/form-data" onsubmit="return validateFormBeforeSubmit()">
 
 			<div class="section-title">🔒 帳戶基本資料</div>
 			<div class="form-grid">
 
-				<div class="form-group">
-					<label for="email">Email 帳號 (登入用) *</label> <input type="text"
-						id="email" th:field="*{email}" placeholder="example@email.com">
-					<span class="field-error" th:if="${#fields.hasErrors('email')}"
-						th:errors="*{email}"></span>
+				<div class="form-group full-width">
+					<label for="email">Email 帳號 (登入用) *</label>
+					<div class="input-with-btn">
+						<input type="email" id="email" th:field="*{email}" placeholder="example@email.com">
+						<button type="button" class="btn-send-otp" id="sendOtpBtn" onclick="sendOtp()">取得驗證碼</button>
+					</div>
+					<span id="otpMsg" class="otp-msg"></span>
+					<span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+				</div>
+
+				<div class="form-group full-width">
+					<label for="otpCode">Email 驗證碼 *</label>
+					<div class="input-with-btn">
+						<input type="text" id="otpCode" name="otpCode" maxlength="6" placeholder="請輸入 6 位數字驗證碼">
+						<button type="button" class="btn-send-otp" id="verifyOtpBtn" style="background:#059669;" onclick="verifyOtp()">核對驗證碼</button>
+					</div>
+					<span id="verifyMsg" class="otp-msg"></span>
 				</div>
 
 				<div class="form-group">
 					<label for="password">登入密碼 *</label>
-					<!-- 保留輸入過的密碼 -->
 					<input type="password" id="password" name="password"
 						th:value="${rawPassword}" placeholder="請設定登入密碼"> <span
 						class="field-error" th:if="${#fields.hasErrors('passwordHash')}"
@@ -228,7 +281,6 @@ button:hover {
 				<div class="form-group">
 					<label for="memberPicFile">個人大頭貼</label> <input type="file"
 						id="memberPicFile" name="memberPicFile" accept="image/*">
-					<!-- 隱藏欄位暫存 Base64 資料 -->
 					<input type="hidden" name="tempMemberPic"
 						th:value="${tempMemberPic}">
 					<div class="img-preview-container"
@@ -321,6 +373,128 @@ button:hover {
 			已經有帳號了？ <a th:href="@{/member/login}">立即登入</a>
 		</div>
 	</div>
+
+	<script>
+		let cooldownSeconds = 0;
+		let timer = null;
+		let isEmailVerified = false; // 追蹤是否完成 Email 驗證
+
+		// 1. 點擊按鈕發送 OTP 驗證碼
+		function sendOtp() {
+			const emailInput = document.getElementById('email');
+			const email = emailInput.value.trim();
+			const otpMsg = document.getElementById('otpMsg');
+			const sendBtn = document.getElementById('sendOtpBtn');
+
+			if (!email) {
+				otpMsg.style.color = '#b91c1c';
+				otpMsg.innerText = '⚠️ 請先輸入 Email 帳號！';
+				return;
+			}
+
+			sendBtn.disabled = true;
+			otpMsg.style.color = '#0284c7';
+			otpMsg.innerText = '⏳ 驗證碼發送中，請稍候...';
+
+			const params = new URLSearchParams();
+			params.append('email', email);
+
+			fetch('/api/auth/send-otp', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: params
+			})
+			.then(response => response.json().then(data => ({ status: response.status, body: data })))
+			.then(res => {
+				if (res.status === 200) {
+					otpMsg.style.color = '#16a34a';
+					otpMsg.innerText = '✓ ' + (res.body.message || '驗證碼已寄出，請至信箱查收！');
+					startCooldown(60); // 啟動 60 秒倒數
+				} else {
+					otpMsg.style.color = '#b91c1c';
+					otpMsg.innerText = '❌ ' + (res.body.message || res.body);
+					sendBtn.disabled = false;
+				}
+			})
+			.catch(err => {
+				otpMsg.style.color = '#b91c1c';
+				otpMsg.innerText = '❌ 系統發送失敗，請稍後再試！';
+				sendBtn.disabled = false;
+			});
+		}
+
+		// 2. 點擊按鈕核對 OTP 驗證碼
+		function verifyOtp() {
+			const email = document.getElementById('email').value.trim();
+			const otpCode = document.getElementById('otpCode').value.trim();
+			const verifyMsg = document.getElementById('verifyMsg');
+
+			if (!email || !otpCode) {
+				verifyMsg.style.color = '#b91c1c';
+				verifyMsg.innerText = '⚠️ 請完整填寫 Email 與 6 位數驗證碼！';
+				return;
+			}
+
+			const params = new URLSearchParams();
+			params.append('email', email);
+			params.append('inputOtp', otpCode);
+
+			fetch('/api/auth/verify-otp', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body: params
+			})
+			.then(response => response.json().then(data => ({ status: response.status, body: data })))
+			.then(res => {
+				if (res.status === 200) {
+					verifyMsg.style.color = '#16a34a';
+					verifyMsg.innerText = '🎉 ' + (res.body.message || 'Email 驗證成功！');
+					isEmailVerified = true;
+					
+					// 驗證成功後鎖定輸入框，避免修改
+					document.getElementById('email').readOnly = true;
+					document.getElementById('otpCode').readOnly = true;
+					document.getElementById('verifyOtpBtn').disabled = true;
+					document.getElementById('sendOtpBtn').disabled = true;
+				} else {
+					verifyMsg.style.color = '#b91c1c';
+					verifyMsg.innerText = '❌ ' + (res.body.message || res.body);
+					isEmailVerified = false;
+				}
+			})
+			.catch(err => {
+				verifyMsg.style.color = '#b91c1c';
+				verifyMsg.innerText = '❌ 驗證失敗，請再試一次！';
+			});
+		}
+
+		// 3. 60 秒冷卻倒數計時器
+		function startCooldown(seconds) {
+			cooldownSeconds = seconds;
+			const sendBtn = document.getElementById('sendOtpBtn');
+			
+			clearInterval(timer);
+			timer = setInterval(() => {
+				if (cooldownSeconds > 0) {
+					sendBtn.innerText = `重新發送 (${cooldownSeconds}s)`;
+					cooldownSeconds--;
+				} else {
+					clearInterval(timer);
+					sendBtn.innerText = '取得驗證碼';
+					sendBtn.disabled = false;
+				}
+			}, 1000);
+		}
+
+		// 4. 表單提交前的前端檢查 (確保已經過 Email 驗證)
+		function validateFormBeforeSubmit() {
+			if (!isEmailVerified) {
+				alert('請先完成 Email 驗證碼核對後再提交註冊表單！');
+				return false;
+			}
+			return true;
+		}
+	</script>
 
 </body>
 </html>

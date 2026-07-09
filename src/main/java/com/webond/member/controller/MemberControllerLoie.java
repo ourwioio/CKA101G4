@@ -63,6 +63,10 @@ public class MemberControllerLoie {
 		return "front-end/member/login";
 	}
 
+	// =========================================================================
+	// 🔐 登入驗證（包含完善的帳號狀態管制）
+	// 狀態定義：0:未驗證/待審核, 1:正常, 2:註銷/審核失敗, 3:停權, 4:限制參加活動
+	// =========================================================================
 	@PostMapping("/logincontroller")
 	public String handleLogin(@RequestParam String email, 
 							  @RequestParam String password,
@@ -71,21 +75,38 @@ public class MemberControllerLoie {
 
 		MemberVO memberVO = memberService.findByEmail(email);
 
+		// 1. 驗證帳號存在與密碼匹配
 		if (memberVO != null && passwordEncoder.matches(password, memberVO.getPasswordHash())) {
-			// 🛡️ 登入防禦增強：停權(3)或審核失敗(2)皆不可登入
-			if (memberVO.getAccountStatus() != null && memberVO.getAccountStatus() == 3) {
-				model.addAttribute("email", email);
-				model.addAttribute("errorMsgs", "您的帳號已被停權，無法登入！");
-				return "front-end/member/login";
+			
+			Byte status = memberVO.getAccountStatus();
+
+			// 🛡️ 2. 帳號狀態權限控管
+			if (status != null) {
+				if (status == 0) {
+					model.addAttribute("email", email);
+					model.addAttribute("errorMsgs", "您的帳號尚在審核中，請等待管理員核准後再登入！");
+					return "front-end/member/login";
+				} else if (status == 2) {
+					model.addAttribute("email", email);
+					model.addAttribute("errorMsgs", "此帳號已被註銷或實名認證未通過！");
+					return "front-end/member/login";
+				} else if (status == 3) {
+					model.addAttribute("email", email);
+					model.addAttribute("errorMsgs", "您的帳號因違規已被系統停權，無法登入！");
+					return "front-end/member/login";
+				}
 			}
+
+			// 3. 通過驗證 (status == 1 正常 或 4 限制參加活動)，允許登入寫入 Session
 			session.setAttribute("memberVO", memberVO);
 			session.setAttribute("account", memberVO.getEmail());
 
 			String location = (String) session.getAttribute("location");
 			return "redirect:" + (location != null ? location : "/member/memberSelect_page");
+
 		} else {
 			model.addAttribute("email", email);
-			model.addAttribute("errorMsgs", "你的帳號, 密碼無效!");
+			model.addAttribute("errorMsgs", "您的帳號或密碼無效！");
 			return "front-end/member/login";
 		}
 	}
@@ -127,7 +148,7 @@ public class MemberControllerLoie {
 			result.rejectValue("faceImage", "error.faceImage", "請務必上傳自拍人臉圖片");
 		}
 
-		// 預設帳號與實名狀態
+		// 預設帳號與實名狀態：0 代表待審核/未驗證
 		memberVO.setAccountStatus((byte) 0);
 		memberVO.setKycStatus((byte) 0);
 		memberVO.setCreatedAt(java.time.LocalDate.now());
@@ -202,7 +223,7 @@ public class MemberControllerLoie {
 			String msg = "會員 [ID: " + memberId + "] 狀態已成功更新！";
 			if (newStatus == 3) msg = "該會員已被成功停權！";
 			if (newStatus == 1) msg = "該會員帳號已核准正常使用（檢舉點數已重置）！";
-			if (newStatus == 2) msg = "該會員已被標記為實名認證失敗！";
+			if (newStatus == 2) msg = "該會員已被標記為實名認證失敗/註銷！";
 
 			redirectAttributes.addFlashAttribute("successMsg", msg);
 		} else {

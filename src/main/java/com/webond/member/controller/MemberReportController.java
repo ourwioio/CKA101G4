@@ -63,7 +63,7 @@ public class MemberReportController {
 		MemberReportVO selectedReport = null;
 		if (reportId != null) {
 			selectedReport = reportSvc.getOneMemberReport(reportId);
-		} 
+		}
 
 		if (selectedReport == null && !list.isEmpty()) {
 			for (MemberReportVO vo : list) {
@@ -76,7 +76,7 @@ public class MemberReportController {
 				selectedReport = list.get(0);
 			}
 		}
-		
+
 		model.addAttribute("selectedReport", selectedReport);
 		return "back-end/member/manageReport";
 	}
@@ -121,10 +121,10 @@ public class MemberReportController {
 	// =========================================================================
 	@PostMapping("/updateReportStatus")
 	public String updateReportStatus(@RequestParam("reportId") Integer reportId,
-			@RequestParam("reportStatus") Integer reportStatus, 
+			@RequestParam("reportStatus") Integer reportStatus,
 			@RequestParam("employeeId") String employeeIdStr,
 			@RequestParam(value = "violationPoints", required = false) String violationPointsStr,
-			@RequestParam(value = "adminNote", required = false) String adminNote, 
+			@RequestParam(value = "adminNote", required = false) String adminNote,
 			HttpSession session,
 			RedirectAttributes redirectAttributes,
 			ModelMap model) {
@@ -194,7 +194,6 @@ public class MemberReportController {
 	// =========================================================================
 	@GetMapping("/addReport")
 	public String showAddReportPage(ModelMap model) {
-		// 🎯 傳給前端綁定的改為 AddMemberReportDTO
 		model.addAttribute("addMemberReportDTO", new AddMemberReportDTO());
 		return "front-end/member/memberreport/addReport";
 	}
@@ -204,64 +203,64 @@ public class MemberReportController {
 	// =========================================================================
 	@PostMapping("/addReport")
 	public String addReport(
-	        @Valid @ModelAttribute("addMemberReportDTO") AddMemberReportDTO dto,
-	        BindingResult result,
-	        RedirectAttributes redirectAttributes,
-	        ModelMap model) {
+			@Valid @ModelAttribute("addMemberReportDTO") AddMemberReportDTO dto,
+			BindingResult result,
+			RedirectAttributes redirectAttributes,
+			ModelMap model) {
 
-	    MultipartFile[] files = dto.getEvidencePath();
-	    boolean hasValidFile = false;
+		MultipartFile[] files = dto.getEvidencePath();
+		boolean hasValidFile = false;
 
-	    // 1. 檢查圖片陣列 (不可用 dto.getEvidencePath().isEmpty())
-	    if (files != null && files.length > 0) {
-	        for (MultipartFile file : files) {
-	            if (!file.isEmpty()) {
-	                hasValidFile = true;
-	                String contentType = file.getContentType();
-	                if (contentType == null || !contentType.startsWith("image/")) {
-	                    result.addError(new FieldError("addMemberReportDTO", "evidencePath", "上傳的檔案必須全為圖片格式"));
-	                    break;
-	                }
-	            }
-	        }
-	    }
+		// 1. 檢查圖片陣列
+		if (files != null && files.length > 0) {
+			for (MultipartFile file : files) {
+				if (!file.isEmpty()) {
+					hasValidFile = true;
+					String contentType = file.getContentType();
+					if (contentType == null || !contentType.startsWith("image/")) {
+						result.addError(new FieldError("addMemberReportDTO", "evidencePath", "上傳的檔案必須全為圖片格式"));
+						break;
+					}
+				}
+			}
+		}
 
-	    if (!hasValidFile) {
-	        result.addError(new FieldError("addMemberReportDTO", "evidencePath", "請至少上傳一張證據截圖"));
-	    }
+		if (!hasValidFile) {
+			result.addError(new FieldError("addMemberReportDTO", "evidencePath", "請至少上傳一張證據截圖"));
+		}
 
-	    // 2. 若有驗證錯誤，直接 return 頁面（這時欄位下方紅字錯誤就會正常顯現）
-	    if (result.hasErrors()) {
-	        return "front-end/member/memberreport/addReport";
-	    }
+		// 2. 若有驗證錯誤，直接 return 頁面
+		if (result.hasErrors()) {
+			return "front-end/member/memberreport/addReport";
+		}
 
-	    // 3. 驗證完全通過，執行新增
-	    try {
-	        // 取出第一張照片作為主圖傳給 Service（或者依你的業務需求處理多圖存檔）
-	        byte[] evidence = null;
-	        for (MultipartFile file : files) {
-	            if (!file.isEmpty()) {
-	                evidence = file.getBytes();
-	                break;
-	            }
-	        }
+		// 3. 驗證完全通過，執行新增
+		try {
+			byte[] evidence = null;
+			for (MultipartFile file : files) {
+				if (!file.isEmpty()) {
+					evidence = file.getBytes();
+					break;
+				}
+			}
 
-	        reportSvc.addMemberReport(
-	            dto.getReporterId(), 
-	            dto.getReportedId(), 
-	            dto.getReportCategory(), 
-	            dto.getReportContent(), 
-	            evidence
-	        );
+			reportSvc.addMemberReport(
+				dto.getReporterId(), 
+				dto.getReportedId(), 
+				dto.getReportCategory(), 
+				dto.getReportContent(), 
+				evidence
+			);
 
-	        redirectAttributes.addFlashAttribute("successMsg", "檢舉案已成功送出，管理員將儘速進行審核！");
-	        return "redirect:/backend/memberreport/addReport";
+			redirectAttributes.addFlashAttribute("successMsg", "檢舉案已成功送出，管理員將儘速進行審核！");
+			return "redirect:/backend/memberreport/addReport";
 
-	    } catch (Exception e) {
-	        model.addAttribute("errorMsg", "送出檢舉失敗：" + e.getMessage());
-	        return "front-end/member/memberreport/addReport";
-	    }
+		} catch (Exception e) {
+			model.addAttribute("errorMsg", "送出檢舉失敗：" + e.getMessage());
+			return "front-end/member/memberreport/addReport";
+		}
 	}
+
 	// =========================================================================
 	// 🟢 其他輔助頁面進入點
 	// =========================================================================
