@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.json.JsonWriter.Member;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -87,6 +88,13 @@ public class MemberService {
 		
 		member.setPasswordHash(passwordEncoder.encode(newPassword));
 		repository.save(member);
+	}
+	
+	public void updateAccountStatus(Integer memberId, Byte status) {
+	    MemberVO member = repository.findById(memberId)
+	            .orElseThrow(() -> new RuntimeException("查無此會員"));
+	    member.setAccountStatus(status);
+	    repository.save(member);
 	}
 	
 	

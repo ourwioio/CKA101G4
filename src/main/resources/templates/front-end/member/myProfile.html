@@ -14,15 +14,15 @@
 <body>
   <div class="container">
     <!-- ========== 頭部檔案 ========== -->
-    <div class="profile-header">
-      <div class="profile-avatar">
-        <img th:src="${memberVO.memberPic != null ? memberVO.memberPic : '/images/file.jpeg'}" alt="會員頭貼"
-          class="avatar-img" th:onerror="'this.src=\'' + @{/images/file.jpeg} + '\''" />
-      </div>
+<!-- ========== 頭部檔案 ========== -->
+<div class="profile-header">
+  <div class="profile-avatar">
+    <img th:src="@{'/front/memberPage/pic/' + ${memberVO.memberId}}" 
+    alt="會員頭貼" class="avatar-img" th:onerror="'this.src=\'' + @{/images/file.jpeg} + '\''" />
+  </div>
 
-      <div class="profile-info">
-        <h1 class="member-name" th:text="${memberVO.nickname}">會員暱稱</h1>
-
+  <div class="profile-info">
+    <h1 class="member-name" th:text="${memberVO.nickname}">會員暱稱</h1>
         <!-- 身份標章 -->
         <div class="member-status">
           <span class="status-badge status0" th:if="${memberVO.accountStatus == 0}">
