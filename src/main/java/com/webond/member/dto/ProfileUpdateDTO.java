@@ -10,9 +10,6 @@ import jakarta.validation.constraints.Pattern;
 
 public class ProfileUpdateDTO {
 	 
-		@Lob
-		@Column(name = "MEMBER_PIC")
-		private byte[] memberPic;
 	
 		@NotNull
 	    private Integer memberId;
@@ -33,13 +30,6 @@ public class ProfileUpdateDTO {
 		
 		public ProfileUpdateDTO() {}
 
-		public byte[] getMemberPic() {
-			return memberPic;
-		}
-
-		public void setMemberPic(byte[] memberPic) {
-			this.memberPic = memberPic;
-		}
 
 		public Integer getMemberId() {
 			return memberId;

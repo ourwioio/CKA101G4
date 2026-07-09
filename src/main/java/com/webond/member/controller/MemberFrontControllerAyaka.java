@@ -1,17 +1,31 @@
 package com.webond.member.controller;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.webond.activity.model.ActivityService;
 import com.webond.activity.model.ActivityVO;
@@ -41,6 +55,9 @@ public class MemberFrontControllerAyaka {
 	
 	@Autowired
 	VenueService venueService;
+	
+	@Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 	
 	
 	
@@ -108,9 +125,11 @@ public class MemberFrontControllerAyaka {
 	
 	//會員編輯資料
 	@GetMapping("edit")
-	public String editProfile(@SessionAttribute("memberVO") MemberVO loginMember, ModelMap model) {
+	public String editProfile(@SessionAttribute("memberVO") MemberVO memberVO, ModelMap model, HttpSession session) {
 		//只能編輯自己的資料
-		MemberVO memberVO = memberService.getOneMember(loginMember.getMemberId());
+		if(memberVO == null) {
+			return "redirect:/member/login";
+		}
 
 	    ProfileUpdateDTO dto = new ProfileUpdateDTO();
 	    dto.setMemberId(memberVO.getMemberId());
@@ -118,21 +137,25 @@ public class MemberFrontControllerAyaka {
 	    dto.setMemberIntro(memberVO.getMemberIntro());
 	    dto.setGender(memberVO.getGender());
 	    dto.setEmail(memberVO.getEmail());
-	    dto.setPhone(memberVO.getPhone());
+	    dto.setPhone(memberVO.getPhone());   
 	    
 		model.addAttribute("profileUpdateDTO", dto);
+	    model.addAttribute("hasProfilePic", memberVO.getMemberPic() != null);
 		return "front-end/member/edit";
 	}
 	
+	
 	@PostMapping("update")
-	public String updateProfile(@Valid ProfileUpdateDTO formData,BindingResult result, @SessionAttribute("memberVO") MemberVO loginMember,ModelMap model) {
+	public String updateProfile(@Valid ProfileUpdateDTO formData,BindingResult result, 
+								@SessionAttribute("memberVO") MemberVO loginMember,
+								@RequestParam(value = "picFile", required = false) MultipartFile picFile,
+								ModelMap model, HttpSession session) throws IOException {
 		if(result.hasErrors()) {
 //			result.getAllErrors().forEach(e -> System.out.println(e));
 			model.addAttribute("profileUpdateDTO", formData);
+		    model.addAttribute("hasProfilePic", loginMember.getMemberPic() != null);
 			return "front-end/member/edit";
-		}
-		
-		
+		}		
 		
 		if(!loginMember.getMemberId().equals(formData.getMemberId())) {
 			model.addAttribute("error", "無修改權限");
@@ -148,13 +171,97 @@ public class MemberFrontControllerAyaka {
 	    memberVO.setEmail(formData.getEmail());
 	    memberVO.setPhone(formData.getPhone());
 
-		
+        if (picFile != null && !picFile.isEmpty()) {
+            memberVO.setMemberPic(picFile.getBytes());
+        } 		
 		
 		memberService.updateMember(memberVO);
+	    session.setAttribute("memberVO", memberVO);
+	    model.addAttribute("hasProfilePic", memberVO.getMemberPic() != null);
 		
 		return "front-end/member/edit";		
 	}
 	
+	
+	//更新個人圖片
+	@GetMapping("pic/{memberId}")
+	@ResponseBody
+	public ResponseEntity<byte[]> getMemberPic(@PathVariable Integer memberId) throws IOException {
+	    MemberVO member = memberService.getOneMember(memberId);	    
+
+	    if (member == null || member.getMemberPic() == null) {
+	        return ResponseEntity.notFound().build();
+	    }
+
+	    byte[] picData = member.getMemberPic();
+	    String contentType = URLConnection.guessContentTypeFromStream(new ByteArrayInputStream(picData));
+	    MediaType mediaType = (contentType != null) ? MediaType.parseMediaType(contentType) : MediaType.IMAGE_JPEG;
+
+	    return ResponseEntity.ok()
+	            .contentType(mediaType)
+	            .cacheControl(CacheControl.noCache()) 
+	            .body(member.getMemberPic());
+	}
+	
+
+	
+	
+	//刪除個人圖片
+	@PostMapping("deletePic")
+	@ResponseBody
+	public ResponseEntity<?> getDeleteMemberPic(@SessionAttribute("memberVO") MemberVO loginMember, HttpSession session)  {
+		
+		if (loginMember == null) {
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("請先登入");
+	    }
+		
+	    MemberVO memberVO = memberService.getOneMember(loginMember.getMemberId());
+
+	    if (memberVO == null || memberVO.getMemberPic() == null) {
+	        return ResponseEntity.notFound().build();
+	    }
+
+	    memberVO.setMemberPic(null);
+	    memberService.updateMember(memberVO);
+
+	    // 同步更新 session，避免其他頁面還撈到舊圖
+	    session.setAttribute("memberVO", memberVO);
+
+	    return ResponseEntity.ok().build();
+	}
+	
+	
+	//刪除個人帳號
+	@PostMapping("delete/{memberId}")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> deleteAccount(
+	        @PathVariable Integer memberId,
+	        @RequestBody Map<String, String> body,
+	        HttpSession session) {
+
+	    Map<String, Object> result = new HashMap<>();
+	    String rawPassword = body.get("password");
+
+	    MemberVO member = memberService.getOneMember(memberId);
+	    if (member == null) {
+	        result.put("success", false);
+	        result.put("message", "查無此會員");
+	        return ResponseEntity.badRequest().body(result);
+	    }
+
+	
+	    if (!passwordEncoder.matches(rawPassword, member.getPasswordHash())) {
+	        result.put("success", false);
+	        result.put("message", "密碼錯誤");
+	        return ResponseEntity.badRequest().body(result);
+	    }
+
+	    memberService.updateAccountStatus(memberId, (byte)3); // 3 = 停權
+	    session.invalidate(); // 登出
+
+	    result.put("success", true);
+	    return ResponseEntity.ok(result);
+	}
 	
 	
 	//密碼更新
