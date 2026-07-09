@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>會員檢舉系統 - 送出檢舉案</title>
+<title>Webond 會員系統 - 送出檢舉案</title>
 <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 <style>
 body {
@@ -12,14 +12,14 @@ body {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 50px 20px; /* 🎯 放大上下外距 */
+	padding: 50px 20px;
 }
 
 .report-container {
-	max-width: 750px; /* 🎯 稍微加寬容器，讓雙欄排版更寬敞 */
+	max-width: 750px;
 	width: 100%;
 	background: #ffffff;
-	padding: 45px 50px; /* 🎯 放大內襯，上下 45px、左右 50px */
+	padding: 45px 50px;
 	border-radius: 16px; 
 	box-shadow: 0 10px 30px rgba(0, 64, 133, 0.05);
 }
@@ -35,7 +35,7 @@ body {
 	color: #6c757d;
 	text-align: center;
 	font-size: 14px;
-	margin-bottom: 35px; /* 🎯 增加標題下方的距離 */
+	margin-bottom: 35px;
 }
 
 .section-divider {
@@ -43,58 +43,113 @@ body {
 	font-weight: 600;
 	border-bottom: 1px solid #dee2e6;
 	padding-bottom: 10px;
-	margin-bottom: 30px; /* 🎯 增加小標題與下方欄位的間距 */
+	margin-bottom: 30px;
 }
 
-/* 圓潤灰色輸入框 */
+.success-msg {
+	color: #15803d;
+	background: #f0fdf4;
+	padding: 12px 20px;
+	border-radius: 10px;
+	margin-bottom: 25px;
+	font-size: 14px;
+	border: 1px solid #86efac;
+}
+
 .form-control, .form-select {
-	background-color: #f1f5f9 !important;
-	border: 1px solid #e2e8f0 !important;
+	background-color: #f1f5f9;
+	border: 1px solid #e2e8f0;
 	border-radius: 10px !important; 
 	padding: 12px 16px;
 	color: #334155;
-	width: 100%; /* 🎯 強制撐滿整欄，防止寬度縮回去了 */
+	width: 100%;
 	transition: all 0.2s ease;
 }
 
 .form-control:focus, .form-select:focus {
-	background-color: #ffffff !important;
-	border-color: #3b82f6 !important;
-	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15) !important;
+	background-color: #ffffff;
+	border-color: #3b82f6;
+	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
 }
 
 .form-label {
 	font-weight: 600;
 	color: #334155;
-	margin-bottom: 8px; /* 🎯 調整標籤與輸入框的間隙 */
+	margin-bottom: 8px;
 	font-size: 15px;
 }
 
-.error-block {
-	background-color: #fff3cd;
-	color: #856404;
-	border: 1px solid #ffeeba;
-	border-radius: 10px;
-	padding: 15px 20px;
-	margin-bottom: 25px;
+.field-error {
+	color: #b91c1c;
+	font-size: 12px;
+	font-weight: 500;
+	margin-top: 5px;
+	display: block;
 }
 
-.preview-img {
-	max-width: 100%;
-	max-height: 220px;
-	display: none;
+/* 📸 📸 多張圖片預覽網格樣式 */
+.preview-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
 	margin-top: 15px;
-	border: 1px solid #cbd5e1;
-	border-radius: 10px;
 }
 
-/* Webond 風格按鈕 */
+.preview-item {
+	position: relative;
+	width: 100px;
+	height: 100px;
+	border-radius: 10px;
+	overflow: hidden;
+	border: 1px solid #cbd5e1;
+	background-color: #f8fafc;
+}
+
+.preview-item img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* 刪除按鈕 (紅色 ✕) */
+.delete-btn {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	background: rgba(220, 38, 38, 0.85);
+	color: white;
+	border: none;
+	border-radius: 50%;
+	width: 22px;
+	height: 22px;
+	font-size: 13px;
+	line-height: 20px;
+	text-align: center;
+	cursor: pointer;
+	padding: 0;
+	transition: background 0.2s;
+}
+
+.delete-btn:hover {
+	background: rgba(185, 28, 28, 1);
+}
+
+/* 🎯 底部按鈕區塊 */
+.button-group-container {
+	margin-top: 35px;
+	padding-top: 15px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 15px;
+}
+
 .btn-submit-webond {
 	background-color: #0056b3;
 	color: white;
 	border: none;
 	border-radius: 10px;
-	padding: 12px 32px; /* 🎯 加寬按鈕 */
+	padding: 12px 32px;
 	font-weight: 600;
 	transition: background-color 0.2s;
 }
@@ -108,7 +163,7 @@ body {
 	color: #64748b;
 	border: 1px solid #cbd5e1;
 	border-radius: 10px;
-	padding: 12px 32px; /* 🎯 加寬按鈕 */
+	padding: 12px 32px;
 	font-weight: 600;
 	text-decoration: none;
 	text-align: center;
@@ -125,90 +180,217 @@ body {
 		<h2 class="form-title">建立新檢舉案件</h2>
 		<p class="form-subtitle">請填寫以下欄位，提交後將由系統管理員盡速為您審核辦理</p>
 
-		<!-- 錯誤訊息提示區 -->
-		<div class="error-block" th:if="${errorMsgs != null and !errorMsgs.isEmpty()}">
-			<h6 class="fw-bold mb-2">⚠️ 請修正以下欄位以完成提交：</h6>
-			<ul class="mb-0 ps-3" style="font-size: 14px;">
-				<li th:each="message : ${errorMsgs}" th:text="${message}"></li>
-			</ul>
-		</div>
+		<div class="success-msg" th:if="${successMsg != null}" th:text="${successMsg}"></div>
 
-		<!-- 表單內容 -->
-		<form th:action="@{/backend/memberreport/addReport}" method="post" enctype="multipart/form-data">
+		<form th:action="@{/backend/memberreport/addReport}" th:object="${addMemberReportDTO}" method="post" enctype="multipart/form-data">
 			
 			<div class="section-divider">
 				🛡️ 案件基本資料
 			</div>
 
-			<!-- 🎯 雙欄排版區：全面換成 mb-4 放大垂直行高 -->
 			<div class="row">
 				<div class="col-md-6 mb-4">
 					<label for="reporterId" class="form-label">您的會員編號 (檢舉人) <span class="text-danger">*</span></label> 
-					<input type="number" class="form-control" id="reporterId" name="reporterId"
-						th:value="${param.reporterId != null} ? ${param.reporterId} : ''"
-						placeholder="請輸入您的會員編號">
+					<input type="number" class="form-control" id="reporterId" th:field="*{reporterId}" placeholder="請輸入您的會員編號">
+					<span class="field-error" th:if="${#fields.hasErrors('reporterId')}" th:errors="*{reporterId}"></span>
 				</div>
 
 				<div class="col-md-6 mb-4">
 					<label for="reportedId" class="form-label">被檢舉人編號 <span class="text-danger">*</span></label> 
-					<input type="number" class="form-control" id="reportedId" name="reportedId"
-						th:value="${param.reportedId != null} ? ${param.reportedId} : ''"
-						placeholder="請輸入對方的會員編號">
+					<input type="number" class="form-control" id="reportedId" th:field="*{reportedId}" placeholder="請輸入對方的會員編號">
+					<span class="field-error" th:if="${#fields.hasErrors('reportedId')}" th:errors="*{reportedId}"></span>
 				</div>
 			</div>
 
-			<!-- 3. 檢舉類別 -->
 			<div class="mb-4">
 				<label for="reportCategory" class="form-label">檢舉違規類別 <span class="text-danger">*</span></label> 
-				<select class="form-select" id="reportCategory" name="reportCategory">
-					<option value="" th:selected="${param.reportCategory == null}">-- 請選擇檢舉原因 --</option>
-					<option value="0" th:selected="${param.reportCategory != null and param.reportCategory[0] == '0'}">不當言論</option>
-					<option value="1" th:selected="${param.reportCategory != null and param.reportCategory[0] == '1'}">惡意騷擾</option>
-					<option value="2" th:selected="${param.reportCategory != null and param.reportCategory[0] == '2'}">詐騙行為</option>
-					<option value="3" th:selected="${param.reportCategory != null and param.reportCategory[0] == '3'}">其他原因</option>
+				<select class="form-select" id="reportCategory" th:field="*{reportCategory}">
+					<option value="">-- 請選擇檢舉原因 --</option>
+					<option value="0">不當言論</option>
+					<option value="1">惡意騷擾</option>
+					<option value="2">詐騙行為</option>
+					<option value="3">其他原因</option>
 				</select>
+				<span class="field-error" th:if="${#fields.hasErrors('reportCategory')}" th:errors="*{reportCategory}"></span>
 			</div>
 
-			<!-- 4. 詳細內容描述 -->
 			<div class="mb-4">
 				<label for="reportContent" class="form-label">詳細內容描述 <span class="text-danger">*</span></label>
-				<textarea class="form-control" id="reportContent" name="reportContent" rows="5" 
-					placeholder="請詳細敘述違規事件經過（時間、聊天室內容等）..." 
-					th:text="${param.reportContent != null} ? ${param.reportContent} : ''"></textarea>
+				<textarea class="form-control" id="reportContent" th:field="*{reportContent}" rows="5" 
+					placeholder="請詳細敘述違規事件經過（時間、聊天室內容等）..."></textarea>
+				<span class="field-error" th:if="${#fields.hasErrors('reportContent')}" th:errors="*{reportContent}"></span>
 			</div>
 
-			<!-- 5. 圖片上傳 -->
-			<div class="mb-5"> <!-- 🎯 刻意放大到 mb-5，拉開與下方按鈕的距離 -->
-				<label for="evidencePath" class="form-label">上傳證據截圖 <span class="text-danger">*</span></label> 
-				<input class="form-control" type="file" id="evidencePath" name="evidencePath" accept="image/*"
-					onchange="previewImage(this)"> 
-				<img id="imgPreview" class="preview-img" alt="圖片預覽">
+			<div class="mb-4">
+				<label for="evidenceInput" class="form-label">上傳證據截圖 (可複選多張) <span class="text-danger">*</span></label> 
+				<input class="form-control" type="file" id="evidenceInput" accept="image/*" multiple onchange="handleFileSelect(this)"> 
+				
+				<input type="file" id="realEvidenceInput" th:field="*{evidencePath}" multiple style="display: none;">
+
+				<span class="field-error" th:if="${#fields.hasErrors('evidencePath')}" th:errors="*{evidencePath}"></span>
+
+				<div class="preview-grid" id="previewContainer"></div>
 			</div>
 
-			<!-- 按鈕區 -->
-			<div class="d-flex justify-content-between align-items-center mt-2">
-				<a th:href="@{/backend/memberreport/select_page}" class="btn btn-cancel-webond">返回首頁</a>
+			<div class="button-group-container">
+				<a th:href="@{/backend/memberreport/select_page}" class="btn btn-cancel-webond">返回管理</a>
 				<button type="submit" class="btn btn-submit-webond">確認送出檢舉</button>
 			</div>
 		</form>
 	</div>
 
 	<script>
-		function previewImage(input) {
-			const preview = document.getElementById('imgPreview');
-			if (input.files && input.files[0]) {
-				const reader = new FileReader();
-				reader.onload = function(e) {
-					preview.src = e.target.result;
-					preview.style.display = 'block';
-				}
-				reader.readAsDataURL(input.files[0]);
-			} else {
-				preview.src = '#';
-				preview.style.display = 'none';
+	// 使用 DataTransfer 來管理即將提交給後端的 File 物件
+	const fileStore = new DataTransfer();
+
+	document.addEventListener("DOMContentLoaded", function () {
+		// 檢測若有成功訊息，則清空圖片暫存
+		const successMsg = document.querySelector('.success-msg');
+		if (successMsg && successMsg.innerText.trim() !== '') {
+			sessionStorage.removeItem('uploaded_evidence_files');
+			return;
+		}
+
+		// 頁面載入時自動還原暫存照片
+		restoreFromSessionStorage();
+	});
+
+	// 當使用者選取檔案時
+	async function handleFileSelect(input) {
+		const files = input.files;
+		if (!files || files.length === 0) return;
+
+		for (let i = 0; i < files.length; i++) {
+			const file = files[i];
+			fileStore.items.add(file);
+
+			try {
+				// 使用 Promise 確保 Base64 讀取完成後再存入 Session
+				const base64 = await readFileAsBase64(file);
+				saveFileToSession(file.name, base64);
+			} catch (err) {
+				console.error("圖片讀取失敗:", err);
 			}
 		}
-	</script>
+
+		// 同步檔案與重新繪製預覽
+		syncFileInput();
+		renderPreviews();
+
+		// 清空選擇器，讓使用者可重複選擇同名檔案
+		input.value = '';
+	}
+
+	function removeFile(index) {
+		const fileToRemove = fileStore.files[index];
+		if (fileToRemove) {
+			removeFileFromSession(fileToRemove.name);
+		}
+
+		// 刪除指定索引的檔案
+		fileStore.items.remove(index);
+
+		// 同步與重新繪製
+		syncFileInput();
+		renderPreviews();
+	}
+
+	function syncFileInput() {
+		const realInput = document.getElementById('realEvidenceInput');
+		if (realInput) {
+			realInput.files = fileStore.files;
+		}
+	}
+
+	// 🎨 穩定版預覽渲染邏輯 (使用 URL.createObjectURL，即時且不卡頓)
+	function renderPreviews() {
+		const container = document.getElementById('previewContainer');
+		if (!container) return;
+		
+		container.innerHTML = ''; // 清空舊預覽
+
+		const files = fileStore.files;
+		for (let i = 0; i < files.length; i++) {
+			const file = files[i];
+			// 直接產生暫存 Blob URL 作為預覽，速度比 Base64 快很多
+			const objectUrl = URL.createObjectURL(file);
+
+			const itemWrapper = document.createElement('div');
+			itemWrapper.className = 'preview-item';
+
+			itemWrapper.innerHTML = `
+				<img src="${objectUrl}" alt="預覽照片" onload="URL.revokeObjectURL(this.src)">
+				<button type="button" class="delete-btn" onclick="removeFile(${i})" title="刪除照片">✕</button>
+			`;
+
+			container.appendChild(itemWrapper);
+		}
+	}
+
+	// Helper: 將檔案轉成 Base64 字串 (供 SessionStorage 備份)
+	function readFileAsBase64(file) {
+		return new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onload = () => resolve(reader.result);
+			reader.onerror = error => reject(error);
+			reader.readAsDataURL(file);
+		});
+	}
+
+	// =========================================================================
+	// 💾 SessionStorage 管理 (驗證失敗重載時還原圖片)
+	// =========================================================================
+
+	function getStoredFiles() {
+		try {
+			return JSON.parse(sessionStorage.getItem('uploaded_evidence_files') || '[]');
+		} catch (e) {
+			return [];
+		}
+	}
+
+	function saveFileToSession(name, base64) {
+		const list = getStoredFiles();
+		if (!list.some(item => item.name === name)) {
+			list.push({ name: name, base64: base64 });
+			sessionStorage.setItem('uploaded_evidence_files', JSON.stringify(list));
+		}
+	}
+
+	function removeFileFromSession(name) {
+		let list = getStoredFiles();
+		list = list.filter(item => item.name !== name);
+		sessionStorage.setItem('uploaded_evidence_files', JSON.stringify(list));
+	}
+
+	function base64ToFile(base64, filename) {
+		const arr = base64.split(',');
+		const mime = arr[0].match(/:(.*?);/)[1];
+		const bstr = atob(arr[1]);
+		let n = bstr.length;
+		const u8arr = new Uint8Array(n);
+		while (n--) {
+			u8arr[n] = bstr.charCodeAt(n);
+		}
+		return new File([u8arr], filename, { type: mime });
+	}
+
+	function restoreFromSessionStorage() {
+		const list = getStoredFiles();
+		if (list.length > 0) {
+			list.forEach(item => {
+				try {
+					const file = base64ToFile(item.base64, item.name);
+					fileStore.items.add(file);
+				} catch (e) {
+					console.error("還原圖片失敗:", e);
+				}
+			});
+			syncFileInput();
+			renderPreviews();
+		}
+	}
+</script>
 
 </body>
 </html>
