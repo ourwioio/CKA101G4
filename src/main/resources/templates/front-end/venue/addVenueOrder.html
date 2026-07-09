@@ -88,8 +88,6 @@
 <!-- 這段需要 Thymeleaf 注入後端資料，無法抽成純外部 .js 檔案，須留在此處 -->
 <script th:inline="javascript">
     var restoreVenueSlotId = /*[[${venueOrderDTO.venueSlotId}]]*/ null;
-    var restoreStartHour = /*[[${venueOrderDTO.startHour}]]*/ null;
-    var restoreEndHour = /*[[${venueOrderDTO.endHour}]]*/ null;
 </script>
 
 <script th:src="@{/js/front-end/venue/addVenueOrder.js}"></script>

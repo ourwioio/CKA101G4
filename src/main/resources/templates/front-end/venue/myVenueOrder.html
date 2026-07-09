@@ -46,10 +46,12 @@
                         </span>
 
                         <!--  訂單狀態：0待付款 1已付款 2已取消 3已完成 -->
-                        <span class="badge"
-                              th:classappend="${order.orderStatus == 0} ? 'status-pending' : (${order.orderStatus == 1} ? 'status-paid' : (${order.orderStatus == 2} ? 'status-cancel' : 'status-done'))"
-                              th:text="${order.orderStatus == 0} ? '待付款' : (${order.orderStatus == 1} ? '已付款' : (${order.orderStatus == 2} ? '已取消' : '已完成'))">
-                        </span>
+                        <th:block th:switch="${order.orderStatus}">
+						    <span th:case="0" class="badge status-pending">待付款</span>
+						    <span th:case="1" class="badge status-paid">已付款</span>
+						    <span th:case="2" class="badge status-cancel">已取消</span>
+						    <span th:case="3" class="badge status-done">已完成</span>
+						</th:block>
 
                         <!-- 退款申請狀態 -->
 						<span class="badge badge-status"

@@ -19,6 +19,7 @@
         <div class="order-info">
             <p><strong>訂單編號：</strong>#<span th:text="${order.venueOrderId}"></span></p>
             <p><strong>場地：</strong><span th:text="${order.venueVO.venueName}"></span></p>
+            <p><strong>日期：</strong><span th:text="${order.bookDate}"></span></p>
             <p><strong>時段：</strong><span th:text="${order.startAt} + ' ～ ' + ${order.endAt}"></span></p>
         </div>
 
