@@ -20,6 +20,8 @@ public class NotificationService {
 	@Autowired
 	private SessionFactory sessionFactory;
 	
+	
+	
 	public void addNotification(NotificationVO notificationVO) {
 		//自動帶入時間
 		notificationVO.setCreatedAt(LocalDate.now());
@@ -78,6 +80,10 @@ public class NotificationService {
 	public void markNotificationAsRead(Integer notificationId) {
 	    repository.markAsRead(notificationId);
 	}
+	
+	public int countUnread(Integer memberId) {
+        return repository.countByMember_MemberIdAndIsRead(memberId, 0);
+    }
 	
 	
 	

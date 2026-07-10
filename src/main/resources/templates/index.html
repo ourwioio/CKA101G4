@@ -2,40 +2,588 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Webond 首頁</title>
-</head>
-<body>
 
-<table>
-  <div>
-    <!-- 已登入 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  /* ==========================================================
+     Webond Design Tokens
+     ========================================================== */
+  :root{
+    --color-primary:      #6C5CE7;
+    --color-primary-dark: #4B3AAE;
+    --color-primary-light:#A79DF2;
+    --color-bg:           #F6F5FC;
+    --color-surface:      #FFFFFF;
+    --color-text:         #2B2740;
+    --color-text-soft:    #6B6580;
+    --color-border:       #E9E6F7;
  
-		<a th:if="${session.memberVO != null}"   th:href="@{/front/memberPage/my(memberId=${session.memberVO.memberId})}" >自己的頁面</a>
-	
-    
-    
-    <!-- 沒登入 -->
-    <a th:if="${session.memberVO == null}" 
-       th:href="@{/member/login}">
-        自己的頁面
-    </a>
-</div>
-      <thead>
-        <tr>
-          <th>會員ID</th>
+    --color-rental:  #FF7A59;   /* 個人出租 */
+    --color-group:   #23BFA6;   /* 團體活動 */
+    --color-venue:   #FFAE42;   /* 場地推薦 */
+    --color-notice:  #FF5C8D;   /* 系統公告 */
+ 
+    --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+    --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+ 
+    --radius-lg: 20px;
+    --radius-md: 14px;
+    --radius-full: 999px;
+ 
+    --shadow-sm: 0 2px 8px rgba(43, 39, 64, 0.06);
+    --shadow-md: 0 10px 30px rgba(76, 58, 174, 0.12);
+    --shadow-hover: 0 16px 36px rgba(76, 58, 174, 0.18);
+ 
+    --header-height: 68px;
+  }
+ 
+  *{ box-sizing: border-box; }
+ 
+  body{
+    margin:0;
+    font-family: var(--font-body);
+    background: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+ 
+  a{ text-decoration:none; color:inherit; }
+  h1,h2,h3{ font-family: var(--font-display); margin:0; }
+ 
+  :focus-visible{
+    outline: 3px solid var(--color-primary-light);
+    outline-offset: 2px;
+  }
+ 
+  /* ==========================================================
+     固定導覽列 Header
+     ========================================================== */
+  .site-header{
+    position: fixed;
+    top:0; left:0; right:0;
+    height: var(--header-height);
+    z-index: 100;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--color-border);
+  }
+ 
+  .header-inner{
+    max-width: 1200px;
+    height: 100%;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+ 
+  /* --- Logo（預留放置位置） --- */
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-shrink:0;
+  }
+ 
+  .logo-mark{
+    width:38px; height:38px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+    color:#fff;
+    box-shadow: var(--shadow-sm);
+    flex-shrink:0;
+  }
+  .logo-mark svg{ width:20px; height:20px; }
+ 
+  .logo-text{
+    display:flex;
+    flex-direction:column;
+    line-height:1.1;
+  }
+  .logo-text .logo-title{
+    font-weight:800;
+    font-size:18px;
+    color: var(--color-primary-dark);
+    letter-spacing: 0.5px;
+  }
+  .logo-text .logo-sub{
+    font-size:11px;
+    color: var(--color-text-soft);
+    font-weight:500;
+  }
+ 
+  /* --- 導覽列右側動作區 --- */
+  .header-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+ 
+  .icon-btn{
+    position:relative;
+    width:42px; height:42px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-primary-dark);
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .icon-btn svg{ width:20px; height:20px; }
+ 
+  .icon-btn:hover{
+    background: var(--color-primary);
+    color:#fff;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+  }
+ 
+  .icon-btn--member{
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+    color:#fff;
+    border:none;
+  }
+  .icon-btn--member:hover{ box-shadow: var(--shadow-md); }
+ 
+  /* 聊天室：功能預留中 */
+  .icon-btn[aria-disabled="true"]{ cursor: default; opacity: 0.85; }
+  .icon-badge{
+    position:absolute;
+    top:-4px; right:-6px;
+    font-size:9px;
+    font-weight:700;
+    padding:1px 5px;
+    border-radius: var(--radius-full);
+    background: var(--color-notice);
+    color:#fff;
+    letter-spacing:0.3px;
+    text-transform: uppercase;
+  }
+ 
+  /* 未讀通知徽章：小紅點＋數字，有未讀才會被渲染出來（th:if 控制） */
+  .icon-badge--unread{
+    min-width:18px;
+    height:18px;
+    padding: 0 4px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:10px;
+    text-transform:none;
+    border: 2px solid var(--color-surface);
+    animation: badge-pop .25s ease;
+  }
+  @keyframes badge-pop{
+    from{ transform: scale(0); }
+    to{ transform: scale(1); }
+  }
+ 
+  /* ==========================================================
+     主要內容
+     ========================================================== */
+  .site-main{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: calc(var(--header-height) + 28px) 20px 60px;
+  }
+ 
+  .section-title{
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--color-text);
+    margin-bottom: 18px;
+    padding-left: 14px;
+    border-left: 6px solid var(--color-primary);
+  }
+ 
+  /* ==========================================================
+     分類快速入口（預留連結）
+     ========================================================== */
+  .category-nav{ margin-bottom: 44px; }
+ 
+  .category-grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+ 
+  .category-card{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding: 22px 12px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+ 
+  .category-card:hover{
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    border-color: transparent;
+  }
+ 
+  .category-icon{
+    width:52px; height:52px;
+    border-radius: 16px;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff;
+  }
+  .category-icon svg{ width:26px; height:26px; }
+ 
+  .category-card--rental .category-icon{ background: linear-gradient(135deg, var(--color-rental), #FFA486); }
+  .category-card--group  .category-icon{ background: linear-gradient(135deg, var(--color-group), #6FE0CC); }
+  .category-card--venue  .category-icon{ background: linear-gradient(135deg, var(--color-venue), #FFCB7A); }
+  .category-card--notice .category-icon{ background: linear-gradient(135deg, var(--color-notice), #FF93B4); }
+ 
+  .category-label{
+    font-weight:700;
+    font-size:15px;
+    color: var(--color-text);
+  }
+ 
+  /* ==========================================================
+     內容區塊共用樣式（沿用原有 class 名稱，不更動 HTML 結構）
+     ========================================================== */
+  .home-section{ margin-bottom: 48px; }
+ 
+  .card-grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 20px;
+  }
+ 
+  .card{
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    overflow:hidden;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .card:hover{
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-hover);
+  }
+  .card > a{ display:block; color:inherit; }
+ 
+  .card-img, .activity-image, .venue-thumbnail{
+    width:100%;
+    height:150px;
+    object-fit:cover;
+    display:block;
+    background: linear-gradient(135deg, var(--color-primary-light), var(--color-bg));
+  }
+ 
+  .card-body{ padding: 14px 16px 18px; }
+  .card-body h3{ font-size:16px; margin-bottom:6px; }
+  .card-body p{ margin:0; color: var(--color-text-soft); font-size:14px; }
+ 
+  /* 團體活動卡片（原生結構為 <a class="btn-detail"> 直接包內容） */
+  .btn-detail{
+    display:block;
+    padding: 0 0 16px;
+  }
+  .btn-detail h2{
+    font-size:16px;
+    padding: 14px 16px 4px;
+  }
+  .btn-detail .price{
+    padding: 0 16px;
+    font-weight:700;
+    color: var(--color-rental);
+    font-size:14px;
+  }
+  .btn-detail .meta{
+    padding: 8px 16px 0;
+    font-size:12px;
+    color: var(--color-text-soft);
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .btn-detail .desc{
+    padding: 8px 16px 0;
+    font-size:13px;
+    color: var(--color-text-soft);
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+    overflow:hidden;
+  }
+ 
+  .empty-hint{
+    padding: 28px;
+    text-align:center;
+    color: var(--color-text-soft);
+    background: var(--color-surface);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+  }
+ 
+  /* ==========================================================
+     會員清單（原有 table，僅美化外觀）
+     ========================================================== */
+  .member-list-panel{
+    margin-bottom: 48px;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    overflow:hidden;
+  }
+  .member-list-panel table{
+    width:100%;
+    border-collapse: collapse;
+  }
+  .member-list-panel thead{
+    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+    color:#fff;
+  }
+  .member-list-panel th{
+    text-align:left;
+    padding: 12px 18px;
+    font-size:13px;
+    font-weight:700;
+  }
+  .member-list-panel td{
+    padding: 12px 18px;
+    border-top: 1px solid var(--color-border);
+    font-size:14px;
+  }
+  .member-list-panel tbody tr:hover{ background: var(--color-bg); }
+  .member-list-panel a{
+    color: var(--color-primary-dark);
+    font-weight:700;
+  }
+  .member-list-panel a:hover{ text-decoration: underline; }
+ 
+  /* ==========================================================
+     RWD
+     ========================================================== */
+  @media (max-width: 860px){
+    .category-grid{ grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 520px){
+    .logo-sub{ display:none; }
+    .card-grid{ grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  }
+</style>
+</head>
+  <body>
 
-          <th>查看會員頁面</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:each="m : ${memberListData}">
-          <td th:text="${m.memberId}"></td>
-         
-          <td>
-          	<a th:href="@{/front/memberPage/oneMember(memberId=${m.memberId})}">會員頁面</a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-</body>
+  <!-- ========== 固定導覽列 ========== -->
+  <header class="site-header">
+    <div class="header-inner">
+
+      <!-- Logo 放置位置：可替換為 <img th:src="@{/images/logo.png}"> -->
+      <a class="logo" href="/">
+        <span class="logo-mark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"/></svg>
+        </span>
+        <span class="logo-text">
+          <span class="logo-title">Webond</span>
+          <span class="logo-sub">閒人出租</span>
+        </span>
+      </a>
+
+      <nav class="header-actions">
+
+        <!-- 聊天室按鈕（預留） -->
+        <a class="icon-btn icon-btn--chat" href="javascript:void(0);" title="聊天室" aria-disabled="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          <span class="icon-badge" th:if="${session.memberVO != null}">0</span>
+        </a>
+
+        <!-- 個人通知按鈕（預留） -->
+        <a class="icon-btn icon-btn--notify" th:href="@{/front/notification/listAllNotification}" title="通知" aria-disabled="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="icon-badge icon-badge--unread"
+              th:if="${unreadNotificationCount != null and unreadNotificationCount > 0}"
+              th:text="${unreadNotificationCount > 99} ? '99+' : ${unreadNotificationCount}">
+          </span>
+          
+        </a>
+
+        <!-- 會員個人頁面（原有邏輯，僅移入導覽列並加上 icon） -->
+        <a th:if="${session.memberVO != null}"
+          class="icon-btn icon-btn--member"
+          th:href="@{/front/memberPage/my(memberId=${session.memberVO.memberId})}"
+          title="自己的頁面">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+        <a th:if="${session.memberVO == null}"
+          class="icon-btn icon-btn--member"
+          th:href="@{/member/login}"
+          title="自己的頁面">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+
+      </nav>
+    </div>
+  </header>
+
+  <main class="site-main">
+
+    <!-- ========== 分類快速入口（預留連結，請依實際路由調整 th:href） ========== -->
+    <section class="category-nav">
+      <div class="category-grid">
+
+        <a class="category-card category-card--rental" th:href="@{front/services}">
+          <span class="category-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41L13.42 20.59a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          </span>
+          <span class="category-label">個人出租</span>
+        </a>
+
+        <a class="category-card category-card--group" th:href="@{/activity/front/list}">
+          <span class="category-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </span>
+          <span class="category-label">團體活動</span>
+        </a>
+
+        <a class="category-card category-card--venue" th:href="@{/front/venue/listAllVenue}">
+          <span class="category-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><line x1="9" y1="9" x2="9" y2="9.01"/><line x1="9" y1="12" x2="9" y2="12.01"/><line x1="9" y1="15" x2="9" y2="15.01"/></svg>
+          </span>
+          <span class="category-label">場地推薦</span>
+        </a>
+
+        <a class="category-card category-card--notice" th:href="@{/}">
+          <span class="category-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a2 2 0 1 1-3.2 2.4"/></svg>
+          </span>
+          <span class="category-label">系統公告</span>
+        </a>
+
+      </div>
+    </section>
+
+
+    <!-- ========== 個人出租推薦 ========== -->
+    <section class="home-section recommended-services">
+      <h2 class="section-title">精選個人出租</h2>
+
+      <div class="card-grid" th:if="${not #lists.isEmpty(recommendedServices)}">
+        <div class="card" th:each="service : ${recommendedServices}">
+          <a th:href="@{/front/services/{id}(id=${service.serviceId})}">
+            <!-- <img class="card-img" th:src="@{/service/pic/{id}(id=${service.serviceId})}" alt="服務圖片" /> -->
+            <div class="card-body">
+              <h3 th:text="${service.serviceName}">服務標題</h3>
+              <p th:text="${service.hourlyRate} + ' 元'">價格</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <p class="empty-hint" th:if="${#lists.isEmpty(recommendedServices)}">
+        目前尚無推薦服務
+      </p>
+    </section>
+
+
+    <!-- ========== 即將截止的團體活動 ========== -->
+    <section class="home-section ending-soon-activities">
+      <h2 class="section-title">團體活動</h2>
+
+      <div class="card-grid" th:if="${not #lists.isEmpty(endingSoonActivities)}">
+        <div class="card" th:each="activity : ${endingSoonActivities}">
+          <a class="btn-detail"
+            th:href="@{/activity/front/detail(id=${activity.activityId})}">
+            <img class="activity-image" th:src="@{/activity/front/image(id=${activity.activityId})}" alt="活動圖片">
+            <h2 th:text="${activity.activityTitle}">活動名稱</h2>
+
+            <div class="price">
+              NT$ <span th:text="${activity.activityPrice}"></span>
+            </div>
+
+            <div class="meta">
+              <div>
+                人數：<span th:text="${activity.attendeesCount ?: 0}"></span>
+                /
+                <span th:text="${activity.maxParticipants}"></span>
+              </div>
+              <div>
+                截止：<span th:text="${#temporals.format(activity.registrationDeadline, 'yyyy-MM-dd HH:mm')}"></span>
+              </div>
+            </div>
+
+            <div class="desc" th:text="${activity.activityDescription}"></div>
+          </a>
+        </div>
+      </div>
+
+      <p class="empty-hint" th:if="${#lists.isEmpty(endingSoonActivities)}">
+        目前尚無即將截止的活動
+      </p>
+    </section>
+
+
+    <!-- ========== 場地隨機推薦 ========== -->
+    <section class="home-section random-venues">
+      <h2 class="section-title">場地推薦</h2>
+
+      <div class="card-grid" th:if="${not #lists.isEmpty(randomVenues)}">
+        <div class="card" th:each="venue : ${randomVenues}">
+          <a th:href="@{/front/venue/getOneVenue(venueId=${venue.venueId})}">
+            <img th:if="${venue.coverImage != null}"
+                th:src="@{/front/venue/getImage(imagesId=${venue.coverImage.imagesId})}"
+                alt="場地圖片" class="venue-thumbnail" th:onerror="this.src='/images/default-venue.jpeg'" />
+
+            <!-- 如果沒圖片用預設 -->
+            <img th:if="${venue.venueImages == null || venue.venueImages.isEmpty()}" src="/images/default-venue.jpeg"
+                alt="暫無圖片" class="venue-thumbnail" />
+
+            <div class="card-body">
+              <h3 th:text="${venue.venueName}">場地名稱</h3>
+              <p th:text="${venue.address}">地點</p>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <p class="empty-hint" th:if="${#lists.isEmpty(randomVenues)}">
+        目前尚無場地資料
+      </p>
+    </section>
+
+  </main>
+  </body>
+  <script>
+  async function refreshUnreadBadge() {
+    try {
+      const res = await fetch('/notification/unread-count');
+      const count = await res.json(); // controller 回傳 int
+      const badge = document.querySelector('.icon-btn--notify .icon-badge--unread');
+      if (count > 0) {
+        if (!badge) {
+          // 動態建立徽章
+          const newBadge = document.createElement('span');
+          newBadge.className = 'icon-badge icon-badge--unread';
+          newBadge.textContent = count > 99 ? '99+' : count;
+          document.querySelector('.icon-btn--notify').appendChild(newBadge);
+        } else {
+          badge.textContent = count > 99 ? '99+' : count;
+        }
+      } else if (badge) {
+        badge.remove();
+      }
+    } catch (e) { console.error(e); }
+  }
+  setInterval(refreshUnreadBadge, 30000); // 每 30 秒查一次
+  </script>
 </html>
