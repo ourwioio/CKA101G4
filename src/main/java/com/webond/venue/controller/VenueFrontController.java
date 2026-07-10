@@ -142,61 +142,68 @@ public class VenueFrontController {
 
 	@PostMapping("update")
 	public String update(@Valid VenueVO venueVO, BindingResult result, ModelMap model,
-	        @RequestParam(value = "openDays", required = false) List<Integer> openDays,
-	        @RequestParam("startHour") int startHour,
-	        @RequestParam("endHour") int endHour,
-	        @RequestParam(value = "upFiles", required = false) MultipartFile[] parts,
-	        @RequestParam(value = "coverImageId", required = false) Integer coverImageId,
-	        @RequestParam(value = "coverNewIndex", required = false) Integer coverNewIndex,
-	        @RequestParam(value = "deleteImageIds", required = false) List<Integer> deleteImageIds,
-	        HttpSession session) throws IOException {
+			@RequestParam(value = "openDays", required = false) List<Integer> openDays,
+			@RequestParam("startHour") int startHour, @RequestParam("endHour") int endHour,
+			@RequestParam(value = "upFiles", required = false) MultipartFile[] parts,
+			@RequestParam(value = "coverImageId", required = false) Integer coverImageId,
+			@RequestParam(value = "coverNewIndex", required = false) Integer coverNewIndex,
+			@RequestParam(value = "deleteImageIds", required = false) List<Integer> deleteImageIds, HttpSession session)
+			throws IOException {
 
-	    MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
-	    if (loginMember == null) {
-	        return "redirect:/member/login";
-	    }
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
+		}
 
-	    if (result.hasErrors()) {
-	        venueVO.setVenueImages(venueVO.getVenueImages());
-	        venueVO.setCreatedAt(venueVO.getCreatedAt());
-	        venueVO.setVenueStatus(venueVO.getVenueStatus());
-	        venueVO.setAddress(venueVO.getAddress());
-	        return "front-end/venue/update_venue_input";
-	    }
+		if (result.hasErrors()) {
+			venueVO.setVenueImages(venueVO.getVenueImages());
+			venueVO.setCreatedAt(venueVO.getCreatedAt());
+			venueVO.setVenueStatus(venueVO.getVenueStatus());
+			venueVO.setAddress(venueVO.getAddress());
+			return "front-end/venue/update_venue_input";
+		}
 
-	    StringBuilder daysSb = new StringBuilder("0000000");
-	    if (openDays != null) {
-	        for (Integer day : openDays) {
-	            if (day >= 0 && day <= 6)
-	                daysSb.setCharAt(day, '1');
-	        }
-	    }
-	    venueVO.setOpenDays(daysSb.toString());
+		StringBuilder daysSb = new StringBuilder("0000000");
+		if (openDays != null) {
+			for (Integer day : openDays) {
+				if (day >= 0 && day <= 6)
+					daysSb.setCharAt(day, '1');
+			}
+		}
+		venueVO.setOpenDays(daysSb.toString());
 
-	    StringBuilder hoursSb = new StringBuilder("222222222222222222222222");
-	    for (int h = startHour; h < endHour; h++) {
-	        if (h >= 0 && h < 24)
-	            hoursSb.setCharAt(h, '0');
-	    }
-	    venueVO.setAvailableHours(hoursSb.toString());
+		StringBuilder hoursSb = new StringBuilder("222222222222222222222222");
+		for (int h = startHour; h < endHour; h++) {
+			if (h >= 0 && h < 24)
+				hoursSb.setCharAt(h, '0');
+		}
+		venueVO.setAvailableHours(hoursSb.toString());
 
-	    List<byte[]> newImageBytesList = new ArrayList<>();
-	    if (parts != null) {
-	        for (MultipartFile file : parts) {
-	            if (file != null && !file.isEmpty()) {
-	                newImageBytesList.add(file.getBytes());
-	            }
-	        }
-	    }
+		List<byte[]> newImageBytesList = new ArrayList<>();
+		if (parts != null) {
+			for (MultipartFile file : parts) {
+				if (file != null && !file.isEmpty()) {
+					newImageBytesList.add(file.getBytes());
+				}
+			}
+		}
 
-	    venueService.updateVenueCover(venueVO, newImageBytesList, coverImageId, coverNewIndex, deleteImageIds);
+		venueService.updateVenueCover(venueVO, newImageBytesList, coverImageId, coverNewIndex, deleteImageIds);
 
-	    return "redirect:/front/venue/myVenue";
+		return "redirect:/front/venue/myVenue";
 	}
 
 	@PostMapping("getOne_For_Update")
-	public String getOne_For_Update(@RequestParam("venueId") String venueId, ModelMap model) {
+	public String getOne_For_Update(@RequestParam("venueId") String venueId, HttpSession session, ModelMap model) {
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
+		}
+
 		VenueVO venueVO = venueService.getOneVenue(Integer.valueOf(venueId));
+		if (venueVO == null || !venueVO.getMember().getMemberId().equals(loginMember.getMemberId())) {
+			return "redirect:/front/venue/myVenue";
+		}
 		model.addAttribute("venueVO", venueVO);
 		return "front-end/venue/update_venue_input";
 	}
