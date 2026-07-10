@@ -22,6 +22,7 @@ public class VenueReviewVO implements java.io.Serializable {
     private Integer venueId;
 
     @Column(name = "EMPLOYEE_ID")
+    @NotNull(message = "請選擇負責員工")
     private Integer employeeId;
 
     @Column(name = "REVIEW_STATUS")
