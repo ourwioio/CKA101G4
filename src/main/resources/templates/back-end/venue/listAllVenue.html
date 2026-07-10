@@ -47,8 +47,11 @@
 						        <input type="hidden" name="venueId" th:value="${venue.venueId}" />
 						        <button type="submit" 
 						                th:class="${venue.venueStatus == 1} ? 'btn-toggle btn-toggle-up' : 'btn-toggle btn-toggle-down'"
-						                th:text="${venue.venueStatus == 1} ? '上架中' : '已下架'"
+						                th:switch="${venue.venueStatus}"
 						                onclick="return confirm('確定要變更此場地的上下架狀態嗎？');">
+						                <span th:case="0">上架中</span>
+						                <span th:case="1">已下架</span>
+						                <span th:case="2">審核中</span>
 						        </button>
 						    </form>
 						</td>
