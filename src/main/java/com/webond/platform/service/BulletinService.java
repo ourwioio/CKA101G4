@@ -22,9 +22,9 @@ public class BulletinService {
 	public static final byte STATUS_PUBLISHED = 1;
 	
 	// ===== 新增 / 修改 =====
-	public void addBulletin(BulletinVO bulletin) {
-		bulletin.setBulletinId(null); // 確保走 INSERT，不會被誤當成更新
-		repository.save(bulletin);
+	public void addBulletin(BulletinVO bulletinVO) {
+		bulletinVO.setBulletinId(null); // 確保走 INSERT，不會被誤當成更新
+		repository.save(bulletinVO);
 	}
 	
 	/**
@@ -32,13 +32,13 @@ public class BulletinService {
 	 * 不允許透過修改表單把狀態改回草稿（即使前端被繞過送出 status=0 也一樣擋下）。
 	 */
 	@Transactional
-	public void updateBulletin(BulletinVO bulletin) {
-		BulletinVO existing = getOneBulletin(bulletin.getBulletinId());
-		if (existing != null && existing.getStatus() == STATUS_PUBLISHED) {
-			bulletin.setStatus(STATUS_PUBLISHED);
-			bulletin.setPublishDate(existing.getPublishDate()); // 發布日期也一併鎖定，避免被覆蓋成 null
+	public void updateBulletin(BulletinVO bulletinVO) {
+		BulletinVO existingBulletin = getOneBulletin(bulletinVO.getBulletinId());
+		if (existingBulletin != null && existingBulletin.getStatus() == STATUS_PUBLISHED) {
+			bulletinVO.setStatus(STATUS_PUBLISHED);
+			bulletinVO.setPublishDate(existingBulletin.getPublishDate()); // 發布日期也一併鎖定，避免被覆蓋成 null
 		}
-		repository.save(bulletin);
+		repository.save(bulletinVO);
 	}
 	
 	// ===== 刪除 =====
@@ -90,13 +90,13 @@ public class BulletinService {
 	 */
 	@Transactional
 	public void publish(Integer bulletinId) {
-		BulletinVO bulletin = getOneBulletin(bulletinId);
-		if (bulletin == null) return;
-		if (bulletin.getPublishDate() == null) {
-			bulletin.setPublishDate(LocalDate.now());
+		BulletinVO bulletinVO = getOneBulletin(bulletinId);
+		if (bulletinVO == null) return;
+		if (bulletinVO.getPublishDate() == null) {
+			bulletinVO.setPublishDate(LocalDate.now());
 		}
-		bulletin.setStatus(STATUS_PUBLISHED);
-		repository.save(bulletin);
+		bulletinVO.setStatus(STATUS_PUBLISHED);
+		repository.save(bulletinVO);
 	}
 	
 	/**
@@ -105,9 +105,9 @@ public class BulletinService {
 	 * 避免前台使用者透過網址猜測 ID 看到未發布的內容。
 	 */
 	public BulletinVO getPublishedOne(Integer bulletinId) {
-	    BulletinVO bulletin = getOneBulletin(bulletinId);
-	    if (bulletin != null && bulletin.getStatus() == STATUS_PUBLISHED) {
-	        return bulletin;
+	    BulletinVO bulletinVO = getOneBulletin(bulletinId);
+	    if (bulletinVO != null && bulletinVO.getStatus() == STATUS_PUBLISHED) {
+	        return bulletinVO;
 	    }
 	    return null;
 	}

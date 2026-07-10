@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.webond.platform.model.BulletinVO;
 import com.webond.platform.model.PlatformSpecificationVO;
 import com.webond.platform.repository.PlatformSpecificationRepository;
 
@@ -34,9 +33,9 @@ public class PlatformSpecificationService {
 	public static final byte TYPE_OTHER = 7;                // 其他
 	
 	// ===== 新增 =====
-	public void addSpec(PlatformSpecificationVO spec) {
-		spec.setSpecId(null); // 確保走 INSERT，不會被誤當成更新
-		repository.save(spec);
+	public void addSpec(PlatformSpecificationVO platformSpecificationVO) {
+		platformSpecificationVO.setSpecId(null); // 確保走 INSERT，不會被誤當成更新
+		repository.save(platformSpecificationVO);
 	}
 	
 	// ===== 修改 =====
@@ -45,12 +44,12 @@ public class PlatformSpecificationService {
 	 * 不允許透過修改表單把狀態改回草稿。
 	 */
 	@Transactional
-	public void updateSpec(PlatformSpecificationVO spec) {
-		PlatformSpecificationVO existing = getOneSpec(spec.getSpecId());
-		if (existing != null && existing.getStatus() == STATUS_PUBLISHED) {
-			spec.setStatus(STATUS_PUBLISHED);
+	public void updateSpec(PlatformSpecificationVO platformSpecificationVO) {
+		PlatformSpecificationVO existingPlatformSpecification = getOneSpec(platformSpecificationVO.getSpecId());
+		if (existingPlatformSpecification != null && existingPlatformSpecification.getStatus() == STATUS_PUBLISHED) {
+			platformSpecificationVO.setStatus(STATUS_PUBLISHED);
 		}
-		repository.save(spec);
+		repository.save(platformSpecificationVO);
 	}
 	
 	// ===== 刪除 =====
@@ -92,10 +91,10 @@ public class PlatformSpecificationService {
 	 */
 	@Transactional
 	public void publish(Integer specId) {
-		PlatformSpecificationVO spec = getOneSpec(specId);
-		if (spec == null) return;
-		spec.setStatus(STATUS_PUBLISHED);
-		repository.save(spec);
+		PlatformSpecificationVO platformSpecificationVO = getOneSpec(specId);
+		if (platformSpecificationVO == null) return;
+		platformSpecificationVO.setStatus(STATUS_PUBLISHED);
+		repository.save(platformSpecificationVO);
 	}
 	
 	public static final Map<Byte, String> SPEC_TYPE_LABELS;

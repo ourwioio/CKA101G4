@@ -33,9 +33,9 @@ public class FaqService {
 	public static final byte TYPE_OTHER = 7; // 其他
 
 	// ===== 新增 =====
-	public void addFaq(FaqVO faq) {
-		faq.setFaqId(null); // 確保走 INSERT，不會被誤當成更新
-		repository.save(faq);
+	public void addFaq(FaqVO faqVO) {
+		faqVO.setFaqId(null); // 確保走 INSERT，不會被誤當成更新
+		repository.save(faqVO);
 	}
 
 	// ===== 修改 =====
@@ -43,12 +43,12 @@ public class FaqService {
 	 * 修改 FAQ：若該筆已經是發布狀態，強制維持發布，不允許透過修改表單把狀態改回草稿。
 	 */
 	@Transactional
-	public void updateFaq(FaqVO faq) {
-		FaqVO existing = getOneFaq(faq.getFaqId());
-		if (existing != null && existing.getStatus() == STATUS_PUBLISHED) {
-			faq.setStatus(STATUS_PUBLISHED);
+	public void updateFaq(FaqVO faqVO) {
+		FaqVO existingFaq = getOneFaq(faqVO.getFaqId());
+		if (existingFaq != null && existingFaq.getStatus() == STATUS_PUBLISHED) {
+			faqVO.setStatus(STATUS_PUBLISHED);
 		}
-		repository.save(faq);
+		repository.save(faqVO);
 	}
 
 	// ===== 刪除 =====
@@ -89,11 +89,11 @@ public class FaqService {
 	 */
 	@Transactional
 	public void publish(Integer faqId) {
-		FaqVO faq = getOneFaq(faqId);
-		if (faq == null)
+		FaqVO faqVO = getOneFaq(faqId);
+		if (faqVO == null)
 			return;
-		faq.setStatus(STATUS_PUBLISHED);
-		repository.save(faq);
+		faqVO.setStatus(STATUS_PUBLISHED);
+		repository.save(faqVO);
 	}
 
 	public static final Map<Byte, String> FAQ_TYPE_LABELS;
