@@ -77,12 +77,6 @@
                         <input type="hidden" name="venueId" th:value="${venueVO.venueId}"/>
                         <button type="submit" class="btn-book">修改場地</button>
                     </form>
-                    <form th:action="@{/front/venue/toggleStatus}" method="post">
-                        <input type="hidden" name="venueId" th:value="${venueVO.venueId}"/>
-                        <button type="submit" class="btn-toggle">
-                            <span th:text="${venueVO.venueStatus == 0 ? '上架' : '下架'}"></span>
-                        </button>
-                    </form>
                 </div>
             </div>
         </div>

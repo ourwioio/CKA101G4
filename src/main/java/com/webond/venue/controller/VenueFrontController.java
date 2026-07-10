@@ -58,10 +58,8 @@ public class VenueFrontController {
 	public String insert(@Valid VenueVO venueVO, BindingResult result, ModelMap model,
 			@RequestParam("upFiles") MultipartFile[] parts,
 			@RequestParam(value = "openDays", required = false) List<Integer> openDays,
-			@RequestParam("startHour") Integer startHour, 
-			@RequestParam("endHour") Integer endHour,
-			@RequestParam(value = "coverIndex", defaultValue = "0") int coverIndex,
-			HttpSession session)
+			@RequestParam("startHour") Integer startHour, @RequestParam("endHour") Integer endHour,
+			@RequestParam(value = "coverIndex", defaultValue = "0") int coverIndex, HttpSession session)
 			throws IOException {
 
 		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
@@ -96,10 +94,10 @@ public class VenueFrontController {
 			model.addAttribute("venueVO", venueVO);
 			return "front-end/venue/addVenue";
 		}
-		
+
 		String hourError = null;
 		if (startHour == null || endHour == null || endHour <= startHour) {
-		    hourError = "結束時間必須大於開始時間";
+			hourError = "結束時間必須大於開始時間";
 		}
 
 		if (result.hasErrors() || hourError != null) {
@@ -131,7 +129,7 @@ public class VenueFrontController {
 		venueVO.setAvailableHours(hoursSb.toString());
 
 		venueVO.setCreatedAt(LocalDateTime.now());
-		venueVO.setVenueStatus((byte) 0);
+		venueVO.setVenueStatus((byte) 2);
 		venueVO.setRatingStars(0);
 		venueVO.setRatingcount(0);
 
@@ -144,53 +142,56 @@ public class VenueFrontController {
 
 	@PostMapping("update")
 	public String update(@Valid VenueVO venueVO, BindingResult result, ModelMap model,
-			@RequestParam(value = "openDays", required = false) List<Integer> openDays,
-			@RequestParam("startHour") int startHour, 
-			@RequestParam("endHour") int endHour,
-			@RequestParam(value = "coverImageId", required = false) Integer coverImageId, 
-			HttpSession session) {
+	        @RequestParam(value = "openDays", required = false) List<Integer> openDays,
+	        @RequestParam("startHour") int startHour,
+	        @RequestParam("endHour") int endHour,
+	        @RequestParam(value = "upFiles", required = false) MultipartFile[] parts,
+	        @RequestParam(value = "coverImageId", required = false) Integer coverImageId,
+	        @RequestParam(value = "coverNewIndex", required = false) Integer coverNewIndex,
+	        @RequestParam(value = "deleteImageIds", required = false) List<Integer> deleteImageIds,
+	        HttpSession session) throws IOException {
 
-		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
-		if (loginMember == null) {
-			return "redirect:/member/login";
-		}
-		
-		// 防止從前端使用者用瀏覽器開發者工具
-		// 把隱藏欄位 venueId 的值改成別人的場地 ID,再送出表單
-//		VenueVO existing = venueService.getOneVenue(venueVO.getVenueId());
-//		if (!existing.getMember().getMemberId().equals(loginMember.getMemberId())) {
-//			return "redirect:/front/venue/myVenue";
-//		}
-		
-		//  只要有欄位不通過驗證
-		if (result.hasErrors()) {
-			venueVO.setVenueImages(venueVO.getVenueImages());
-			venueVO.setCreatedAt(venueVO.getCreatedAt());
-			venueVO.setVenueStatus(venueVO.getVenueStatus());
-			venueVO.setAddress(venueVO.getAddress()); 
+	    MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+	    if (loginMember == null) {
+	        return "redirect:/member/login";
+	    }
 
-			return "front-end/venue/update_venue_input";
-		}
+	    if (result.hasErrors()) {
+	        venueVO.setVenueImages(venueVO.getVenueImages());
+	        venueVO.setCreatedAt(venueVO.getCreatedAt());
+	        venueVO.setVenueStatus(venueVO.getVenueStatus());
+	        venueVO.setAddress(venueVO.getAddress());
+	        return "front-end/venue/update_venue_input";
+	    }
 
-		StringBuilder daysSb = new StringBuilder("0000000");
-		if (openDays != null) {
-			for (Integer day : openDays) {
-				if (day >= 0 && day <= 6)
-					daysSb.setCharAt(day, '1');
-			}
-		}
-		venueVO.setOpenDays(daysSb.toString());
+	    StringBuilder daysSb = new StringBuilder("0000000");
+	    if (openDays != null) {
+	        for (Integer day : openDays) {
+	            if (day >= 0 && day <= 6)
+	                daysSb.setCharAt(day, '1');
+	        }
+	    }
+	    venueVO.setOpenDays(daysSb.toString());
 
-		StringBuilder hoursSb = new StringBuilder("222222222222222222222222");
-		for (int h = startHour; h < endHour; h++) {
-			if (h >= 0 && h < 24)
-				hoursSb.setCharAt(h, '0');
-		}
-		venueVO.setAvailableHours(hoursSb.toString());
+	    StringBuilder hoursSb = new StringBuilder("222222222222222222222222");
+	    for (int h = startHour; h < endHour; h++) {
+	        if (h >= 0 && h < 24)
+	            hoursSb.setCharAt(h, '0');
+	    }
+	    venueVO.setAvailableHours(hoursSb.toString());
 
-		venueService.updateVenueCover(venueVO, coverImageId);
+	    List<byte[]> newImageBytesList = new ArrayList<>();
+	    if (parts != null) {
+	        for (MultipartFile file : parts) {
+	            if (file != null && !file.isEmpty()) {
+	                newImageBytesList.add(file.getBytes());
+	            }
+	        }
+	    }
 
-		return "redirect:/front/venue/myVenue";
+	    venueService.updateVenueCover(venueVO, newImageBytesList, coverImageId, coverNewIndex, deleteImageIds);
+
+	    return "redirect:/front/venue/myVenue";
 	}
 
 	@PostMapping("getOne_For_Update")
@@ -240,7 +241,7 @@ public class VenueFrontController {
 		model.addAttribute("venueListData", list);
 		return "front-end/venue/myVenue";
 	}
-	
+
 	@GetMapping("getImage")
 	@ResponseBody
 	public byte[] getImage(@RequestParam("imagesId") Integer imagesId) {
@@ -265,14 +266,13 @@ public class VenueFrontController {
 		List<VenueTypeVO> list = venueTypeService.getAll();
 		return list;
 	}
-	
+
 	@PostMapping("listVenues_ByCompositeQuery")
 	public String listVenuesByCompositeQuery(HttpServletRequest req, Model model) {
-	    Map<String, String[]> map = req.getParameterMap();
-	    List<VenueVO> list = venueService.getAll(map);
-	    model.addAttribute("venueListData", list);
-	    return "front-end/venue/listAllVenue";
+		Map<String, String[]> map = req.getParameterMap();
+		List<VenueVO> list = venueService.getAll(map);
+		model.addAttribute("venueListData", list);
+		return "front-end/venue/listAllVenue";
 	}
-	
-	
+
 }

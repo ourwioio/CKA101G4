@@ -31,6 +31,8 @@ input:focus, select:focus { border-color: #0f6e56; box-shadow: 0 0 0 3px rgba(15
 .gallery-item.is-cover .cover-tag { background: #e1f5ee; color: #0f6e56; font-weight: 500; }
 .btn-delete-img { text-align: center; background: #fff1f2; color: #e11d48; font-size: 12px; padding: 6px 0; text-decoration: none; border-top: 1px solid #fecdd3; font-weight: 500; }
 .btn-delete-img:hover { background: #ffe4e6; }
+.gallery-item.is-deleted { opacity: 0.4; filter: grayscale(1); }
+.gallery-item.is-deleted .btn-delete-img { background: #e1f5ee; color: #0f6e56; }
 .action-bar { margin-top: 2.5rem; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #e2e8f0; padding-top: 1.5rem; }
 .btn { padding: 10px 24px; font-size: 14px; font-weight: 500; border-radius: 6px; cursor: pointer; text-decoration: none; }
 .btn-secondary { background: #ffffff; border: 1px solid #cbd5e1; color: #475569; }

@@ -30,7 +30,7 @@ public class VenueVO {
 	@Column(name = "VENUE_ID", updatable = false)
 	private Integer venueId;
 
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "venueVO")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "venueVO", orphanRemoval = true)
 	@OrderBy("imagesId asc")
 	private Set<VenueImagesVO> venueImages = new HashSet<>();
 	

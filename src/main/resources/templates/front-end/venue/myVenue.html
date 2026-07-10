@@ -33,7 +33,11 @@
 			    </p>
 
 			    <span th:class="${venue.venueStatus == 0 ? 'badge badge-down' : 'badge badge-up'}"
-			          th:text="${venue.venueStatus == 0 ? '下架' : '上架'}"></span>
+			          th:switch="${venue.venueStatus}">
+			          <span th:case="0">下架</span>
+			          <span th:case="1">上架</span>
+			          <span th:case="2" style="color:orange;" >審核中</span>
+			    </span>
 			    <div class="actions">
 			        <a th:href="@{/front/venue/getOneMyVenue(venueId=${venue.venueId})}" class="btn-edit btn-edit-link">查看</a>
 			    </div>

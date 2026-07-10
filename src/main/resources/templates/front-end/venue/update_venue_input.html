@@ -15,7 +15,7 @@
 	</div>
 
 	<div class="card">
-		<form th:action="@{/front/venue/update}" method="post" th:object="${venueVO}">
+		<form th:action="@{/front/venue/update}" method="post" th:object="${venueVO}" enctype="multipart/form-data">
 			<input type="hidden" th:field="*{venueId}" />
 			<input type="hidden" th:field="*{address}" /> 			
 			<div class="form-grid">
@@ -24,15 +24,19 @@
 			        <input type="text" th:value="${#temporals.format(venueVO.createdAt, 'yyyy-MM-dd HH:mm')}" disabled />
 			    </div>
 			    <div class="form-group">
-			        <label>場地狀態</label>
-			        <input type="text" th:value="${venueVO.venueStatus == 0 ? '下架' : '上架'}" disabled />
-			    </div>
-			    <div class="form-group">
 			        <label>場地地址</label>
 			        <input type="text" th:value="*{address}" disabled />
 			    </div>
-			  </div>
-			
+			    <div class="form-group">
+			        <label>場地狀態</label>
+			        <input type="hidden" th:field="*{venueStatus}" id="venueStatusInput"/>
+			        <button type="button" class="btn btn-secondary" id="statusToggleBtn"
+			                th:if="${venueVO.venueStatus != 2}"
+			                th:text="${venueVO.venueStatus == 0 ? '目前：下架（點擊改為上架）' : '目前：上架（點擊改為下架）'}"
+			                onclick="toggleVenueStatusField()"></button>
+			        <input type="text" th:if="${venueVO.venueStatus == 2}" value="審核中" disabled />
+			    </div>
+			</div>			
 
 			<div class="section-title">場地名稱</div>
 			<div class="form-group">
@@ -125,20 +129,34 @@
 			    <div th:if="*{venueImages == null || venueImages.isEmpty()}" style="color:#94a3b8; font-size:14px; padding:8px 0;">
 			        目前本場地沒有上傳任何照片。
 			    </div>
-			    <div class="gallery" th:if="*{venueImages != null && !venueImages.isEmpty()}">
-			        <div class="gallery-item" th:each="img : *{venueImages}"
-			             th:classappend="${img.cover != null and img.cover == 1} ? 'is-cover' : ''"
-			             th:onclick="|setExistingCover(${img.imagesId}, this)|">
-			            <img th:src="@{/front/venue/getImage(imagesId=${img.imagesId})}" alt="場地環境圖" />
-			            <div class="cover-tag" th:text="${img.cover != null and img.cover == 1} ? '目前封面' : '設為封面'"></div>
-			        </div>
-			    </div>
+				<div class="gallery" th:if="*{venueImages != null && !venueImages.isEmpty()}">
+				    <div class="gallery-item" th:each="img : *{venueImages}"
+				         th:id="${'img-item-' + img.imagesId}"
+				         th:classappend="${img.cover != null and img.cover == 1} ? 'is-cover' : ''"
+				         th:onclick="|setExistingCover(${img.imagesId}, this)|">
+				        <img th:src="@{/front/venue/getImage(imagesId=${img.imagesId})}" alt="場地環境圖" />
+				        <div class="cover-tag" th:text="${img.cover != null and img.cover == 1} ? '目前封面' : '設為封面'"></div>
+				        <a href="#" class="btn-delete-img"
+				           th:onclick="|event.stopPropagation(); event.preventDefault(); toggleDeleteMark(${img.imagesId}, this)|">
+				           刪除
+				        </a>
+				        <input type="checkbox" name="deleteImageIds" th:value="${img.imagesId}"
+				               th:id="${'del-check-' + img.imagesId}" style="display:none;" />
+				    </div>
+				</div>
 			    <input type="hidden" name="coverImageId" id="coverImageId" value=""/>
+			    <input type="hidden" name="coverNewIndex" id="coverNewIndex" value=""/>
+			</div>
+			
+			<div class="form-group">
+			    <label for="upFiles">上傳新照片</label>
+			    <input type="file" name="upFiles" id="upFiles" accept="image/*" multiple onchange="handleFileSelect(event)" />
+			    <div class="gallery" id="newPreviewGallery"></div>
 			</div>
 			
 			<div class="action-bar">
-				<a th:href="@{/front/venue/myVenue}" class="btn btn-secondary">取消並返回</a>
-				<button type="submit" class="btn btn-primary">儲存變更</button>
+			    <a th:href="@{/front/venue/myVenue}" class="btn btn-secondary">取消並返回</a>
+			    <button type="submit" class="btn btn-primary">儲存變更</button>
 			</div>
 		</form>
 	</div>
