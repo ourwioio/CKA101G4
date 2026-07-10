@@ -15,17 +15,17 @@ import com.webond.member.service.MemberService;
 
 @Controller
 public class IndexController_inSpringBoot {
-	@Autowired
-	MemberService memberService;
-	
-		@GetMapping("/")
-		public String myMethod1(ModelMap model) { 
-
-			List<MemberVO> list = memberService.getALL();
-			
-			
-			model.addAttribute("memberListData", list);
-			return "index";    // --> src/main/resources/templates/index.html
-		}
+//	@Autowired
+//	MemberService memberService;
+//	
+//		@GetMapping("/")
+//		public String myMethod1(ModelMap model) { 
+//
+//			List<MemberVO> list = memberService.getALL();
+//			
+//			
+//			model.addAttribute("memberListData", list);
+//			return "index";    // --> src/main/resources/templates/index.html
+//		}
 
 }
