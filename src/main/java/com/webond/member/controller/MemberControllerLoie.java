@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.member.model.MemberVO;
 import com.webond.member.service.MemberServiceLoie;
+import com.webond.member.service.RedisService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -34,6 +35,9 @@ public class MemberControllerLoie {
 
 	@Autowired
 	private MemberServiceLoie memberService;
+
+	@Autowired
+	private RedisService redisService;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
@@ -63,24 +67,16 @@ public class MemberControllerLoie {
 		return "front-end/member/login";
 	}
 
-	// =========================================================================
-	// 🔐 登入驗證（包含完善的帳號狀態管制）
-	// 狀態定義：0:未驗證/待審核, 1:正常, 2:註銷/審核失敗, 3:停權, 4:限制參加活動
-	// =========================================================================
 	@PostMapping("/logincontroller")
-	public String handleLogin(@RequestParam String email, 
-							  @RequestParam String password,
-							  HttpSession session, 
-							  Model model) {
+	public String handleLogin(@RequestParam String email, @RequestParam String password, HttpSession session,
+			Model model) {
 
 		MemberVO memberVO = memberService.findByEmail(email);
 
-		// 1. 驗證帳號存在與密碼匹配
 		if (memberVO != null && passwordEncoder.matches(password, memberVO.getPasswordHash())) {
-			
+
 			Byte status = memberVO.getAccountStatus();
 
-			// 🛡️ 2. 帳號狀態權限控管
 			if (status != null) {
 				if (status == 0) {
 					model.addAttribute("email", email);
@@ -97,7 +93,6 @@ public class MemberControllerLoie {
 				}
 			}
 
-			// 3. 通過驗證 (status == 1 正常 或 4 限制參加活動)，允許登入寫入 Session
 			session.setAttribute("memberVO", memberVO);
 			session.setAttribute("account", memberVO.getEmail());
 
@@ -111,18 +106,19 @@ public class MemberControllerLoie {
 		}
 	}
 
+	// =========================================================================
+	// 📝 API 2：註冊表單送出（與 AJAX 驗證邏輯對接修正）
+	// =========================================================================
 	@PostMapping("/doRegister")
-	public String doRegister(
-			@Valid MemberVO memberVO,
-			BindingResult result,
+	public String doRegister(@Valid MemberVO memberVO, BindingResult result,
+			@RequestParam(name = "otpCode", required = false) String inputOtpCode,
 			@RequestParam(name = "password", required = false) String rawPassword,
 			@RequestParam(name = "memberPicFile", required = false) MultipartFile memberPicFile,
 			@RequestParam(name = "idImageFile", required = false) MultipartFile idImageFile,
 			@RequestParam(name = "faceImageFile", required = false) MultipartFile faceImageFile,
 			@RequestParam(name = "tempMemberPic", required = false) String tempMemberPic,
 			@RequestParam(name = "tempIdImage", required = false) String tempIdImage,
-			@RequestParam(name = "tempFaceImage", required = false) String tempFaceImage,
-			Model model) {
+			@RequestParam(name = "tempFaceImage", required = false) String tempFaceImage, Model model) {
 
 		// 1. 處理密碼
 		if (rawPassword == null || rawPassword.trim().isEmpty()) {
@@ -131,7 +127,14 @@ public class MemberControllerLoie {
 			memberVO.setPasswordHash(passwordEncoder.encode(rawPassword));
 		}
 
-		// 2. 處理圖片（優先使用新上傳檔案，若無則還原 hidden 的 Base64 暫存）
+		// 🟢 2. 驗證碼檢查：前端已透過 AuthController (/verify-otp) 完成第一關驗證
+		// 這裡只需檢查欄位是否有填寫，避免 Redis key 提前刪除或過期導致提交失敗
+		if (inputOtpCode == null || inputOtpCode.trim().isEmpty()) {
+			model.addAttribute("otpError", "請輸入信箱驗證碼！");
+			result.reject("error.otpCode", "請輸入信箱驗證碼");
+		}
+
+		// 3. 處理圖片
 		byte[] memberPicBytes = processImageBytes(memberPicFile, tempMemberPic);
 		byte[] idImageBytes = processImageBytes(idImageFile, tempIdImage);
 		byte[] faceImageBytes = processImageBytes(faceImageFile, tempFaceImage);
@@ -140,7 +143,6 @@ public class MemberControllerLoie {
 		memberVO.setIdImage(idImageBytes);
 		memberVO.setFaceImage(faceImageBytes);
 
-		// 驗證必填圖片
 		if (idImageBytes == null || idImageBytes.length == 0) {
 			result.rejectValue("idImage", "error.idImage", "請務必上傳身分證件照片");
 		}
@@ -148,30 +150,37 @@ public class MemberControllerLoie {
 			result.rejectValue("faceImage", "error.faceImage", "請務必上傳自拍人臉圖片");
 		}
 
-		// 預設帳號與實名狀態：0 代表待審核/未驗證
+		// 預設帳號與實名狀態
 		memberVO.setAccountStatus((byte) 0);
 		memberVO.setKycStatus((byte) 0);
 		memberVO.setCreatedAt(java.time.LocalDate.now());
 		memberVO.setSubmittedAt(java.time.LocalDateTime.now());
 
-		// 3. 驗證失敗處理：保留圖片暫存與原本輸入的明碼密碼
+		// 4. 驗證失敗處理：保留圖片暫存與原本輸入的明碼密碼/驗證碼
 		if (result.hasErrors()) {
 			model.addAttribute("memberVO", memberVO);
 			model.addAttribute("rawPassword", rawPassword);
+			model.addAttribute("inputOtpCode", inputOtpCode);
 			model.addAttribute("tempMemberPic", encodeToBase64(memberPicBytes));
 			model.addAttribute("tempIdImage", encodeToBase64(idImageBytes));
 			model.addAttribute("tempFaceImage", encodeToBase64(faceImageBytes));
 			return "front-end/member/register";
 		}
 
-		// 4. 送出資料庫寫入
+		// 5. 送出資料庫寫入，並清理 Redis 驗證碼
 		try {
 			memberService.registerMember(memberVO);
+
+			// 🟢 註冊成功，順便刪除 Redis 中的驗證碼
+			redisService.deleteOtp(memberVO.getEmail());
+
 			return "redirect:/member/login";
 		} catch (Exception e) {
-			result.rejectValue("email", "error.database", "註冊失敗：Email 重複註冊或欄位長度超出限制！");
+			e.printStackTrace(); // 🟢 印出 Exception 方便 Console 排查原因
+			result.rejectValue("email", "error.database", "註冊失敗：Email 重複註冊或資料格式不正確！");
 			model.addAttribute("memberVO", memberVO);
 			model.addAttribute("rawPassword", rawPassword);
+			model.addAttribute("inputOtpCode", inputOtpCode);
 			model.addAttribute("tempMemberPic", encodeToBase64(memberPicBytes));
 			model.addAttribute("tempIdImage", encodeToBase64(idImageBytes));
 			model.addAttribute("tempFaceImage", encodeToBase64(faceImageBytes));
@@ -201,9 +210,8 @@ public class MemberControllerLoie {
 	}
 
 	@PostMapping("/back-end/toggleStatus")
-	public String toggleStatus(@RequestParam("memberId") Integer memberId,
-							   @RequestParam("newStatus") Byte newStatus,
-							   RedirectAttributes redirectAttributes) {
+	public String toggleStatus(@RequestParam("memberId") Integer memberId, @RequestParam("newStatus") Byte newStatus,
+			RedirectAttributes redirectAttributes) {
 
 		MemberVO memberVO = memberService.getOneMember(memberId);
 		if (memberVO != null) {
@@ -221,9 +229,12 @@ public class MemberControllerLoie {
 			memberService.updateMember(memberVO);
 
 			String msg = "會員 [ID: " + memberId + "] 狀態已成功更新！";
-			if (newStatus == 3) msg = "該會員已被成功停權！";
-			if (newStatus == 1) msg = "該會員帳號已核准正常使用（檢舉點數已重置）！";
-			if (newStatus == 2) msg = "該會員已被標記為實名認證失敗/註銷！";
+			if (newStatus == 3)
+				msg = "該會員已被成功停權！";
+			if (newStatus == 1)
+				msg = "該會員帳號已核准正常使用（檢舉點數已重置）！";
+			if (newStatus == 2)
+				msg = "該會員已被標記為實名認證失敗/註銷！";
 
 			redirectAttributes.addFlashAttribute("successMsg", msg);
 		} else {
@@ -236,13 +247,16 @@ public class MemberControllerLoie {
 	@GetMapping("/back-end/displayImage")
 	@ResponseBody
 	public ResponseEntity<byte[]> displayImage(@RequestParam("memberId") Integer memberId,
-											   @RequestParam("type") String type) {
+			@RequestParam("type") String type) {
 		MemberVO memberVO = memberService.getOneMember(memberId);
 		if (memberVO != null) {
 			byte[] imageBytes = null;
-			if ("idImage".equals(type)) imageBytes = memberVO.getIdImage();
-			else if ("faceImage".equals(type)) imageBytes = memberVO.getFaceImage();
-			else if ("memberPic".equals(type)) imageBytes = memberVO.getMemberPic();
+			if ("idImage".equals(type))
+				imageBytes = memberVO.getIdImage();
+			else if ("faceImage".equals(type))
+				imageBytes = memberVO.getFaceImage();
+			else if ("memberPic".equals(type))
+				imageBytes = memberVO.getMemberPic();
 
 			if (imageBytes != null && imageBytes.length > 0) {
 				HttpHeaders headers = new HttpHeaders();
@@ -257,9 +271,6 @@ public class MemberControllerLoie {
 	// 🛠️ 輔助方法（Helper Methods）
 	// -------------------------------------------------------------------------
 
-	/**
-	 * 優先解析 MultipartFile；若沒有選擇檔案則嘗試還原 Base64 暫存字串
-	 */
 	private byte[] processImageBytes(MultipartFile file, String tempBase64) {
 		if (file != null && !file.isEmpty()) {
 			try {
@@ -278,9 +289,6 @@ public class MemberControllerLoie {
 		return null;
 	}
 
-	/**
-	 * 將 byte[] 轉為 Base64 字串以利傳給前端 `<input type="hidden">`
-	 */
 	private String encodeToBase64(byte[] imageBytes) {
 		if (imageBytes != null && imageBytes.length > 0) {
 			return Base64.getEncoder().encodeToString(imageBytes);
