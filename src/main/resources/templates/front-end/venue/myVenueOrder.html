@@ -89,7 +89,7 @@
                            class="btn-pay">前往付款</a>
 
                         <!-- 🌟 已付款或已完成：可評價、可檢舉 -->
-                        <th:block th:if="${order.orderStatus == 1 or order.orderStatus == 3}">
+                        <th:block th:if="${order.orderStatus == 3}">
                             <button type="button" class="btn-review"
                                     th:attr="data-order-id=${order.venueOrderId},
                                              data-rating=${order.venueRating},

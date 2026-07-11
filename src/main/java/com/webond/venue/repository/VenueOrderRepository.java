@@ -25,4 +25,6 @@ public interface VenueOrderRepository
 			""")
 	List<VenueOrderVO> findPaidOrdersByVenueOwner(@Param("ownerMemberId") Integer ownerMemberId,
 			@Param("orderStatus") Byte orderStatus);
+	
+	 List<VenueOrderVO> findByOrderStatus(Byte orderStatus);
 }
