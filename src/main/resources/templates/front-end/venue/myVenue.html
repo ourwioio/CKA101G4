@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>我的場地</title>
-<link rel="stylesheet" th:href="@{/css/front-end/venue/myVenue.css}" href="my-venue.css">
+<link rel="stylesheet" th:href="@{/css/front-end/venue/myVenue.css}">
 </head>
 <body>
-    <div class="header">
+	<div th:replace="~{front-end/venue/venueHeader :: header}"></div>
+    <!-- <div class="header">
         <h1>我的場地</h1>
         <div class="user-info">
 	    <span>
@@ -14,10 +15,11 @@
 	    </span>
 	    <a th:if="${session.memberVO != null}" th:href="@{/member/logout}">登出</a>
 	</div>
+        <a class="btn-add" th:href="@{/front/venueOrder/myVenuesReservations}">場地預約狀況</a>
         <a class="btn-add" th:href="@{/front/venueOrder/myVenueOrder}">我的訂單</a>
         <a class="btn-add" th:href="@{/front/venue/listAllVenue}">瀏覽場地頁面</a>
         <a class="btn-add" th:href="@{/front/venue/addVenue}">新增場地</a>
-    </div>
+    </div> -->
     <div class="venue-grid">
         <div th:each="venue : ${venueListData}" class="venue-card">
             <img th:if="${venue.coverImage != null}"

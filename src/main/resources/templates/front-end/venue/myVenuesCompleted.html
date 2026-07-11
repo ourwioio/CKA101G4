@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>場地預約狀況</title>
+<link rel="stylesheet" th:href="@{/css/front-end/venue/myVenue.css}">
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 8px 12px;
+        text-align: center;
+    }
+    thead tr {
+        border-bottom: 2px solid #333;
+    }
+</style>
+</head>
+<body>
+	<div th:replace="~{front-end/venue/venueHeader :: header}"></div>
+	<span>我的場地評價 myVenuesCompleted.html</span>
+
+	<table>
+		<thead>
+			<tr>
+				<th>訂單編號</th>
+				<th>場地編號</th>
+				<th>買方會員編號</th>
+				<th>場地名稱</th>
+				<th>撥款狀態</th>
+				<th>預約日期</th>
+				<th>預約時段</th>
+				<th>場地評價星數</th>
+				<th>場地評價內容</th>
+			</tr>
+		</thead>
+		<tbody>
+			<th:block th:each="venueOrderVO : ${myAllCompletedlist}">
+				<tr>
+					<td th:text="${venueOrderVO.venueOrderId}"></td>
+					<td th:text="${venueOrderVO.venueVO.venueId}"></td>
+					<td th:text="${venueOrderVO.member.memberId}"></td>
+					<td th:text="${venueOrderVO.venueVO.venueName}"></td>
+					<td th:switch="${venueOrderVO.payoutAmount}">
+			        	<span th:case="0">未撥款</span>
+			        	<span th:case="1">已撥款</span>
+			        </td>
+			        <td th:text="${venueOrderVO.bookDate}"></td>
+			        <td th:text="${venueOrderVO.startAt} + '~' + ${venueOrderVO.endAt}"></td>
+			        <td th:text="${venueOrderVO.venueRating}"></td>
+			        <td th:text="${venueOrderVO.venueComment}"></td>
+		        </tr>
+			</th:block>
+		</tbody>
+	</table>
+</body>
+</html>

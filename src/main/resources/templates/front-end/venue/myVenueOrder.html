@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <title>我的場地訂單</title>
-<link rel="stylesheet" th:href="@{/css/front-end/venue/myVenueOrder.css}" href="my-orders.css">
+<link rel="stylesheet" th:href="@{/css/front-end/venue/myVenue.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/venue/myVenueOrder.css}">
 </head>
 <body>
+<div th:replace="~{front-end/venue/venueHeader :: header}"></div>
 
 <div class="container">
-    <a class="back-link" th:href="@{/front/venue/listAllVenue}">← 返回場地瀏覽</a>
+    <a class="back-link" th:href="@{/front/venue/myVenue}">← 返回我的場地</a>
     <h1>我的場地訂單</h1>
 
     <div class="no-orders" th:if="${#lists.isEmpty(venueOrderListData)}">
