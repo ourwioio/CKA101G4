@@ -51,8 +51,10 @@ public class ServiceReportVO implements java.io.Serializable {
 	@Column(name = "SERVICE_REPORT_STATUS", columnDefinition = "byte default 0")
 	private Byte serviceReportStatus;
 
-	@Column(name = "REPORT_RESULT_ROLE")
-	private Byte reportResultRole;
+	
+	public ServiceReportVO() {
+		super();
+	}
 
 	public Integer getServiceReportId() {
 		return serviceReportId;
@@ -118,12 +120,6 @@ public class ServiceReportVO implements java.io.Serializable {
 		this.serviceReportStatus = serviceReportStatus;
 	}
 
-	public Byte getReportResultRole() {
-		return reportResultRole;
-	}
 
-	public void setReportResultRole(Byte reportResultRole) {
-		this.reportResultRole = reportResultRole;
-	}
 
 }
