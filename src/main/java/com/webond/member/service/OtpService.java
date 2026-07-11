@@ -28,11 +28,11 @@ public class OtpService {
 		return Boolean.TRUE.equals(isFirstTime);
 	}
 
-	// 3. 儲存驗證碼至 Redis (設定 5 分鐘自動過期)
+	// 3. 儲存驗證碼至 Redis (設定 10 分鐘自動過期)
 	public void saveOtp(String email, String otpCode) {
 		String otpKey = "auth:otp:" + email;
-		// 寫入 Redis 並設定 TTL 為 5 分鐘
-		redisTemplate.opsForValue().set(otpKey, otpCode, 5, TimeUnit.MINUTES);
+		// 寫入 Redis 並設定 TTL 為 10 分鐘
+		redisTemplate.opsForValue().set(otpKey, otpCode, 10, TimeUnit.MINUTES);
 	}
 
 	// 4. 驗證使用者輸入的驗證碼

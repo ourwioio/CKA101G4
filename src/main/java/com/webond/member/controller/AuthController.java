@@ -1,56 +1,85 @@
 package com.webond.member.controller;
 
-import com.webond.member.service.MailService;
-import com.webond.member.service.OtpService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.webond.member.service.EmailService;
+import com.webond.member.service.OtpService;
+
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/member") // 🟢 1. 修改路徑，對齊前端 /member/send-otp
 public class AuthController {
 
     @Autowired
     private OtpService otpService;
 
     @Autowired
-    private MailService mailService;
+    private EmailService emailService; // 🟢 2. 修正變數名稱
 
-    // 1. 發送 Email 驗證碼 API
+    // =========================================================================
+    // 1. 發送 Email 驗證碼 API (前端點擊「取得驗證碼」時呼叫)
+    // =========================================================================
     @PostMapping("/send-otp")
-    public ResponseEntity<?> sendOtp(@RequestParam String email) {
-        // A. 檢查是否在 60 秒冷卻期內
-        if (!otpService.canSendOtp(email)) {
-            return ResponseEntity.badRequest().body("請求過於頻繁，請於 60 秒後再試！");
+    public ResponseEntity<?> sendOtp(@RequestParam("email") String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "請輸入有效的 Email！"));
         }
 
-        // B. 產生 6 位數驗證碼
-        String otpCode = otpService.generateOtpCode();
+        String cleanEmail = email.trim();
 
-        // C. 存入 Redis (有效期限 5 分鐘)
-        otpService.saveOtp(email, otpCode);
+        // A. 檢查是否在 60 秒冷卻期內
+        if (!otpService.canSendOtp(cleanEmail)) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(Map.of("success", false, "message", "請求過於頻繁，請於 60 秒後再試！"));
+        }
 
-        // D. 異步或直接呼叫 MailService 寄信
-        String subject = "Webond 會員系統 - 驗證碼通知";
-        String content = "您好！您的驗證碼為：" + otpCode + "\n請於 5 分鐘內輸入完成驗證。若非本人操作請忽略此信。";
-        
-        // 為了不讓寄信卡住 HTTP 請求，可以開線程執行或直接呼叫
-        new Thread(() -> mailService.sendMail(email, subject, content)).start();
+        try {
+            // B. 產生 6 位數驗證碼
+            String otpCode = otpService.generateOtpCode();
 
-        return ResponseEntity.ok(Map.of("success", true, "message", "驗證碼已寄出，請至信箱查收！"));
+            // C. 存入 Redis (有效期限 5 分鐘，並寫入 60 秒冷卻 Key)
+            otpService.saveOtp(cleanEmail, otpCode);
+
+            // D. 開獨立線程非同步寄信，避免 HTTP 請求被卡住
+            String subject = "【Webond 平台】會員系統 - 驗證碼通知";
+            String content = "您好！您的註冊驗證碼為：" + otpCode + "\n\n請於 10 分鐘內輸入完成驗證。若非本人操作請忽略此信。";
+            
+            new Thread(() -> emailService.sendOtpEmail(cleanEmail, otpCode)).start();
+
+            return ResponseEntity.ok(Map.of("success", true, "message", "驗證碼已寄出，請至信箱查收！"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("success", false, "message", "郵件發送失敗，請稍後再試。"));
+        }
     }
 
-    // 2. 核對驗證碼 API (註冊/登入/重設密碼時呼叫)
+    // =========================================================================
+    // 2. 核對驗證碼 API (可供獨立驗證或二階段驗證使用)
+    // =========================================================================
     @PostMapping("/verify-otp")
-    public ResponseEntity<?> verifyOtp(@RequestParam String email, @RequestParam String inputOtp) {
-        boolean isValid = otpService.verifyOtp(email, inputOtp);
+    public ResponseEntity<?> verifyOtp(@RequestParam("email") String email, @RequestParam("inputOtp") String inputOtp) {
+        if (email == null || inputOtp == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "請輸入 Email 與驗證碼！"));
+        }
+
+        boolean isValid = otpService.verifyOtp(email.trim(), inputOtp.trim());
 
         if (isValid) {
+            // 🟢 3. 驗證成功後，可選擇呼叫 deleteOtp 刪除驗證碼，防止重複使用
+            // otpService.deleteOtp(email.trim()); 
+            
             return ResponseEntity.ok(Map.of("success", true, "message", "驗證成功！"));
         } else {
-            return ResponseEntity.badRequest().body("驗證碼錯誤或已過期，請重新取得！");
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "驗證碼錯誤或已過期，請重新取得！"));
         }
     }
 }
