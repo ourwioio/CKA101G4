@@ -22,7 +22,7 @@
 	    <input type="date" name="createdAtEnd" th:value="${params.createdAtEnd}">
 	    <br>
 	
-	    付款狀態：
+	    訂單狀態：
 	    <select name="orderStatus">
 	        <option value="">全部</option>
 	        <option value="0" th:selected="${params.orderStatus == 0}">待付款</option>
@@ -73,7 +73,7 @@
 				<th>訂單編號</th>
 				<th>訂單建立時間</th>
 				<th>總金額</th>
-				<th>付款狀態</th>
+				<th>訂單狀態</th>
 				<th>撥款狀態</th>
 				<th>退款狀態</th>
 				<th>處理員工</th>

@@ -65,6 +65,13 @@ public class VenueOrderService {
 	public List<VenueOrderVO> search(VenueOrderQueryDTO params) {
 		return repository.findAll(VenueOrderSpecification.search(params));
 	}
+	
+	public List<VenueOrderVO> getMyAllReservations(Integer memberId){
+		return repository.findPaidOrdersByVenueOwner(memberId, (byte) 1);
+	}
+	public List<VenueOrderVO> getMyAllCompletedBookings(Integer memberId){
+		return repository.findPaidOrdersByVenueOwner(memberId, (byte) 3);
+	}
 
 	
 }

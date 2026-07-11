@@ -10,11 +10,11 @@
 <body>
 	<div class="header-bar">
 		<h1>場地列表</h1>
+		<a th:href="@{/}" class="btn-primary">回首頁</a>
 	<div class="user-info">
 	    <span th:if="${session.memberVO != null}">
 	        當前登入會員：<strong th:text="${session.memberVO.nickname}"></strong>
 	    </span>
-
 	    <span th:if="${session.memberVO == null}">
 	        目前狀態：<strong>未登入 (訪客)</strong>
 	    </span>
@@ -29,9 +29,7 @@
 			class="btn-primary">
 			登出 </a>
 
-		<a th:href="@{/front/venue/myVenue}"
-			class="btn-primary">
-			我的場地 </a>
+		<a th:href="@{/front/venue/myVenue}" class="btn-primary"> 我的場地 </a>
 		<a th:href="@{/front/venue/addVenue}"
 			class="btn-primary">
 			新增場地 </a>

@@ -98,6 +98,7 @@ public class VenueFrontOrderController {
 		venueOrderVO.setPaymentMethod(venueOrderDTO.getPaymentMethod());
 		venueOrderVO.setCreatedAt(LocalDateTime.now());
 		venueOrderVO.setOrderStatus((byte) 0);
+		venueOrderVO.setPayoutAmount((byte) 0);
 
 		try {
 			// 呼叫 Service，這步會啟動悲觀鎖並把字串改成 '3'
@@ -238,6 +239,35 @@ public class VenueFrontOrderController {
 		return "redirect:/front/venueOrder/myVenueOrder";
 	}
 
+	@GetMapping("myVenuesReservations")
+	public String getBookingsForMyVenues(Model model, HttpSession session) {
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
+		}
+		List<VenueOrderVO> list = venueOrderService.getMyAllReservations(loginMember.getMemberId());
+		model.addAttribute("myReservationslist", list);
+		return "front-end/venue/myVenuesReservations";
+	}
+	
+	@GetMapping("getOneReservations")
+	public String getOneReservations(@RequestParam("venueOrderId") Integer venueOrderId, Model model) {
+		VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
+		model.addAttribute("venueOrderVO", venueOrderVO);
+		return "front-end/venue/getOneReservations";
+	}
+	
+	@GetMapping("myVenuesCompleted")
+	public String getMyVenuesCompleted(Model model, HttpSession session) {
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
+		}
+		List<VenueOrderVO> list = venueOrderService.getMyAllCompletedBookings(loginMember.getMemberId());
+		model.addAttribute("myAllCompletedlist", list);
+		return "front-end/venue/myVenuesCompleted";
+	}
+
 	/** 用訂單自己存的 startAt/endAt/venueSlotId 反推並釋放時段 */
 	private void releaseSlot(VenueOrderVO order) {
 		if (order.getVenueSlotId() == null)
@@ -250,8 +280,8 @@ public class VenueFrontOrderController {
 		// ⚙️ 改為呼叫帶有防呆機制、只針對 '3' 進行還原的方法
 		venueSlotService.releaseTimeoutSlot(order.getVenueSlotId(), startHour, endHour);
 	}
-	
-	/** 用訂單自己存的 startAt/endAt/venueSlotId 反推並確認時段（'3' 扶正為 '1'） */
+
+	/** 用訂單自己存的 startAt/endAt/venueSlotId 反推並確認時段（'3' 改為為 '1'） */
 	private void confirmSlot(VenueOrderVO order) {
 		if (order.getVenueSlotId() == null)
 			return;

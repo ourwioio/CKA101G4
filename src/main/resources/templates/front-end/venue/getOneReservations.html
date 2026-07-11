@@ -2,15 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>訂單詳細</title>
+<title>訂單詳細資訊</title>
 </head>
 <body>
-	<a th:href="@{/venueOrder/listAllVenueOrder}">回到訂單管理</a><br>
+<a th:href="@{/front/venueOrder/myVenuesReservations}">回到我的場地資訊</a><br>
 	<h3><span>查詢結果 :</span></h3>
 	<span>訂單編號：</span><span th:text="${venueOrderVO.venueOrderId}"></span><br>
-	<span>場地提供者：</span><span th:text="${venueOrderVO.venueVO.member.memberId}"></span><br>
-	<span>買方會員編號：</span><span th:text="${venueOrderVO.member.memberId}"></span><br>
-	<span>處理員工編號：</span><span th:text="${venueOrderVO.empVO != null ? venueOrderVO.empVO.employeeId : '沒有處理員工'}"></span><br>
+	<span>買方會員姓名：</span><a th:href="@{/front/memberPage/my(memberId=${venueOrderVO.member.memberId})}"><span th:text="${venueOrderVO.member.realName}"></span></a><br>
+<!-- 	<span>買方會員姓名：</span><span th:text="${venueOrderVO.member.realName}"></span><br> -->
+	<span>買方會員電話：</span><span th:text="${venueOrderVO.member.phone}"></span><br>
+	<span>場地名稱：</span><span th:text="${venueOrderVO.venueVO.venueName}"></span><br>
+	<span>場地地址：</span><span th:text="${venueOrderVO.venueVO.address}"></span><br>
 	<span>預約日期：</span><span th:text="${venueOrderVO.bookDate}"></span><br>
 	<span>預約時段：</span><span th:text="${venueOrderVO.startAt} + '~' + ${venueOrderVO.endAt}"></span><br>
 	<span>訂單建立時間：</span><span th:text="${#temporals.format(venueOrderVO.createdAt, 'yyyy-MM-dd HH:mm')}"></span><br>
@@ -25,11 +27,12 @@
 		<span th:case="0">未撥款</span>
 		<span th:case="1">已撥款</span>
 	</span><br>
-	<span>退款狀態：</span><span th:switch="${venueOrderVO.refundStatus}">
-		<span th:case="0">進行中</span>
-		<span th:case="1">完成</span>
-		<span th:case="2">未申請</span>
-	</span><br>
-
+	<span th:if="${venueOrderVO.refundStatus == 0 || venueOrderVO.refundStatus == 1 }">
+		<span>退款狀態：</span><span th:switch="${venueOrderVO.refundStatus}">
+			<span th:case="0">進行中</span>
+			<span th:case="1">完成</span>
+			<span th:case="2">未申請</span>
+		</span><br>
+	</span>
 </body>
 </html>

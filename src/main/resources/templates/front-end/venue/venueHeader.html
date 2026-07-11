@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <div class="header" th:fragment="header">
+        <h1>我的場地</h1>
+        <div class="user-info">
+            <span>
+                當前登入會員:<strong th:text="${session.memberVO.nickname}"></strong>
+            </span>
+            <a th:if="${session.memberVO != null}" th:href="@{/member/logout}">登出</a>
+        </div>
+        <a class="btn-add" th:href="@{/front/venue/myVenue}">我的場地</a>
+        <a class="btn-add" th:href="@{/front/venueOrder/myVenuesReservations}">場地預約狀況</a>
+        <a class="btn-add" th:href="@{/front/venueOrder/myVenuesCompleted}">我的場地評價</a>
+        <a class="btn-add" th:href="@{/front/venueOrder/myVenueOrder}">我的訂單</a>
+        <a class="btn-add" th:href="@{/front/venue/listAllVenue}">瀏覽場地頁面</a>
+        <a class="btn-add" th:href="@{/front/venue/addVenue}">新增場地</a>
+    </div>
+</body>
+</html>
