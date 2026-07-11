@@ -1,0 +1,83 @@
+
+    body {
+        font-family: "Microsoft JhengHei", "Segoe UI", sans-serif;
+        background: #f4f5f9;
+        margin: 0;
+        padding: 40px;
+        color: #2d2d3a;
+    }
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 30px;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    }
+    h2 {
+        margin-top: 0;
+        margin-bottom: 24px;
+        color: #4b3f9e;
+    }
+    table.report-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+    .report-table th {
+        background: #6c5ce7;
+        color: #fff;
+        text-align: left;
+        padding: 12px 10px;
+        white-space: nowrap;
+    }
+    .report-table td {
+        padding: 10px;
+        border-bottom: 1px solid #ececf3;
+        vertical-align: middle;
+    }
+    .report-table tr:hover td {
+        background: #f8f7ff;
+    }
+    .content-cell {
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .status-pending {
+        background: #fff3cd;
+        color: #8a6d00;
+    }
+    .status-approved {
+        background: #d7f5e3;
+        color: #157347;
+    }
+    .status-rejected {
+        background: #fbdada;
+        color: #b42318;
+    }
+    .btn-process {
+        background: #6c5ce7;
+        color: #fff;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+    .btn-process:hover {
+        background: #5a4bd1;
+    }
+    .empty-msg {
+        text-align: center;
+        color: #999;
+        padding: 30px 0;
+    }
