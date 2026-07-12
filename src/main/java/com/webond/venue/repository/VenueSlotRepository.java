@@ -1,5 +1,6 @@
 package com.webond.venue.repository;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,7 @@ public interface VenueSlotRepository extends JpaRepository<VenueSlotVO, Integer>
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT v FROM VenueSlotVO v WHERE v.venueSlotId = :id")
     Optional<VenueSlotVO> findByIdForUpdate(@Param("id") Integer id);
+    
+	@Query("SELECT MAX(s.slotDate) FROM VenueSlotVO s WHERE s.venueVO.venueId = :venueId")
+	LocalDate findMaxSlotDateByVenueId(@Param("venueId") Integer venueId);
 }
