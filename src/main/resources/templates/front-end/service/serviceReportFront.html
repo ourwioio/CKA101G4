@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<div class="report-card">
+    <h3>檢舉訂單</h3>
+
+    <p>
+        訂單編號：
+        <a th:href="@{/admin/order/detail(orderId=${order.serviceOrderId})}" target="_blank">
+            <span th:text="${order.serviceOrderId}"></span>
+        </a>
+    </p>
+
+    <form th:action="@{front/reportService/submit}" th:object="${serviceReportDTO}" method="post">
+        <input type="hidden" name="orderId" th:value="${order.serviceOrderId}" />
+
+        <div class="form-group">
+            <label>檢舉內容</label>
+            <textarea th:field="*{serviceReportCom}" maxlength="500" rows="5"></textarea>
+            <span class="error-text" th:if="${#fields.hasErrors('serviceReportCom')}"
+                  th:errors="*{serviceReportCom}"></span>
+        </div>
+
+        <button type="submit">送出檢舉</button>
+    </form>
+</div>
+</body>
+</html>

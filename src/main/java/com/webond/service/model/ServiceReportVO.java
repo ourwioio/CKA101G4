@@ -1,6 +1,7 @@
 package com.webond.service.model;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import com.webond.employee.model.EmployeeVO;
 import com.webond.member.model.MemberVO;
@@ -12,7 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -27,13 +28,13 @@ public class ServiceReportVO implements java.io.Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer serviceReportId;
 
-	@OneToOne
-	@JoinColumn(name = "SERVICE_ORDER_ID", referencedColumnName = "SERVICE_ORDER_ID")
-	private ServiceOrderVO serviceOrder;
+    @ManyToOne
+    @JoinColumn(name = "SERVICE_ORDER_ID", nullable = false)
+    private ServiceOrderVO serviceOrder;
 
-	@ManyToOne
-	@JoinColumn(name = "REPORTER_MEMBER_ID", referencedColumnName = "MEMBER_ID")
-	private MemberVO reporterMember;
+    @ManyToOne
+    @JoinColumn(name = "REPORTER_MEMBER_ID", nullable = false)
+    private MemberVO reporterMember;
 	
 	@ManyToOne
 	@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
@@ -43,13 +44,21 @@ public class ServiceReportVO implements java.io.Serializable {
 	private String serviceReportCom;
 
 	@Column(name = "SERVICE_REPORT_TIME")
-	private Timestamp serviceReportTime;
+	private LocalDateTime serviceReportTime;
 
 	@Column(name = "SERVICE_REPORT_HANDLE_TIME")
 	private Timestamp serviceReportHandleTime;
 
 	@Column(name = "SERVICE_REPORT_STATUS", columnDefinition = "byte default 0")
 	private Byte serviceReportStatus;
+	
+	@PrePersist
+	public void prePersist() {
+	    this.serviceReportTime = LocalDateTime.now();   // 自動填「現在時間」
+	    if (this.serviceReportStatus == null) {
+	        this.serviceReportStatus = 0;                // 沒設定的話，自動補預設值 0
+	    }
+	}
 
 	
 	public ServiceReportVO() {
@@ -88,11 +97,11 @@ public class ServiceReportVO implements java.io.Serializable {
 		this.serviceReportCom = serviceReportCom;
 	}
 
-	public Timestamp getServiceReportTime() {
+	public LocalDateTime getServiceReportTime() {
 		return serviceReportTime;
 	}
 
-	public void setServiceReportTime(Timestamp serviceReportTime) {
+	public void setServiceReportTime(LocalDateTime serviceReportTime) {
 		this.serviceReportTime = serviceReportTime;
 	}
 
