@@ -45,14 +45,14 @@ public class EmpController {
 	@Autowired
 	PermissionService permSvc;
 
-//	 =====================查詢所有員工
+// === 所有員工 === //
 	@GetMapping("/empPage")
 	public String getEmpList(
-			@RequestParam(value = "p", defaultValue = "0") Integer p, Model model,
+			@RequestParam(value = "p", defaultValue = "0") Integer p, 
+			Model model,
 			@RequestParam(value = "openAddEmpModal", required = false) Boolean openAddEmpModal,
 			@RequestParam(value = "openEditEmpModal", required = false) Boolean openEditEmpModal) {
 
-//====== 全部員工========//
 		// 呼叫Service拿資料
 		Page<EmployeeVO> empPage = empSvc.getAllByPage(p);
 
@@ -113,7 +113,7 @@ public class EmpController {
 	}
 
 //====新增員工燈箱畫面=========================//
-	@GetMapping("/empPage/addEmpModel")
+	@GetMapping("/empPage/addEmpModal")
 	public String getAddEmpModal(Model model) {
 
 		// 1. 補上空的表單物件，供 Thymeleaf 的 th:object 表單綁定使用
@@ -240,7 +240,7 @@ public class EmpController {
 	
 	
 //====修改員工燈箱畫面=========================//
-		@GetMapping("/empPage/editEmpModel")
+		@GetMapping("/empPage/editEmpModal")
 		public String getEditEmpModal(Model model) {
 
 			if (!model.containsAttribute("employeeVO")) {
@@ -256,7 +256,8 @@ public class EmpController {
 		
 //=====修改員工  (抓確認送出資料)========================//
 		@PostMapping("/update")
-		public String update(@Valid EmployeeVO employeeVO, 
+		public String update(
+				@Valid EmployeeVO employeeVO, 
 				BindingResult result, 
 				ModelMap model,
 				@RequestParam(value = "permIds", required = false) List<Integer> permIds, // 手動接收前端Checkbox陣列
@@ -296,6 +297,7 @@ public class EmpController {
 			return "redirect:/admin/empPage";
 		}
 		
+		
 //=== 修改的圖片處理 === //
 		@GetMapping("/dbgUpdateImg/{employeeId}")
 		public void dbgImg(
@@ -331,7 +333,7 @@ public class EmpController {
 			empSvc.deleteEmp(Integer.valueOf(employeeId));
 			/*************************** 3.刪除完成,準備轉交(Send the Success view) **************/
 			List<EmployeeVO> list = empSvc.getAll();
-			model.addAttribute("empListData", list); // for listAllEmp.html 第85行用
+			model.addAttribute("empListData", list); 
 			model.addAttribute("success", "- (刪除成功)");
 			
 			return "redirect:/admin/empPage";
@@ -394,7 +396,7 @@ public class EmpController {
 		return "back-end/employee/empPage";
 	}
 	
-// === 輔助(新增) : 封裝失敗時要塞給前端的變數 === //
+// === 輔助(修改) : 封裝失敗時要塞給前端的變數 === //
 		private String updateError(ModelMap model, BindingResult result) {
 			List<PermissionVO> permListData = permSvc.getAll();
 			model.addAttribute("permVO", permListData);
