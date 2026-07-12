@@ -16,6 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.webond.employee.dto.EmpPasswordDTO;
+import com.webond.employee.model.EmpPermVO;
+import com.webond.employee.model.EmployeeVO;
+import com.webond.employee.model.PermissionVO;
 import com.webond.employee.repository.EmpPermRepository;
 import com.webond.employee.repository.EmployeeRepository;
 
@@ -98,19 +101,19 @@ public class EmpService {
 	     
 	     
 	     // 拿出員工，綁上權限存入empPerm
-	     if(permIds != null && !permIds.isEmpty()) {  	 	//拿到有勾的權限ID
+	     if(permIds != null && !permIds.isEmpty()) {  	 	
 	    	 for(Integer permId :permIds) {
-	    		 EmpPermVO empPermVO = new EmpPermVO();  	//建立新的員工權限物件
-	    		 empPermVO.setEmps(savedEmp);  			 	//把員工權限ID 綁定新增的資料
+	    		 EmpPermVO empPermVO = new EmpPermVO();  	
+	    		 empPermVO.setEmps(savedEmp);  			 	
 	    		 
-	    		 // EX. 員工權限編號: 1 , 員工編號 7001
 	    		 
-	    		 PermissionVO permVO = new PermissionVO();	// 建立權限物件
-	    		 permVO.setPermId(permId);			 		// 把有勾的權限ID資料放進物件
-	    		 empPermVO.setPerms(permVO);    			// 把權限員工ID 綁定有勾的權限
-	    		 // Ex. 員工權限編號: 1 , 員工編號 7001 , 權限編號 2
+	    		 PermissionVO permVO = new PermissionVO();
+	    		 permVO.setPermId(permId);			 		
+	    		 empPermVO.setPerms(permVO);  
 	    		 
-	    		 empPermRepo.save(empPermVO);  //存入上面的資料
+	    		 empPermVO.setAssignedAt(new Timestamp(System.currentTimeMillis()));
+	    		 
+	    		 empPermRepo.save(empPermVO); 
 	    		 
 	    	 }
 	     }
@@ -214,7 +217,7 @@ public class EmpService {
 	     
 	     EmployeeVO savedEmp = repository.save(currentEmp);
 	     
-	     empPermRepo.deleteByEmps(savedEmp);
+	     empPermRepo.deleteByEmployeeId(savedEmp.getEmployeeId());
 	     
 	     // 拿出員工，綁上權限存入empPerm
 	     if(permIds != null && !permIds.isEmpty()) {  	 	
@@ -225,7 +228,9 @@ public class EmpService {
 	    		 
 	    		 PermissionVO permVO = new PermissionVO();	
 	    		 permVO.setPermId(permId);			 		
-	    		 empPermVO.setPerms(permVO);    			
+	    		 empPermVO.setPerms(permVO);    
+	    		 
+	    		 empPermVO.setAssignedAt(new Timestamp(System.currentTimeMillis()));
 	    		 
 	    		 empPermRepo.save(empPermVO); 
 	    		 
@@ -243,7 +248,7 @@ public class EmpService {
     		throw new EntityNotFoundException("找不到此員工，ID : " + employeeId);
     	}
     	
-    	empPermRepo.deleteByEmps(currentEmp);
+    	empPermRepo.deleteByEmployeeId(currentEmp.getEmployeeId());
     
     	repository.delete(currentEmp);
     }

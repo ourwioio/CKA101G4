@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org"
+	xmlns:sec="http://thymeleaf.org/extras/spring-security">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<!-- ================= 修改員工權限燈箱 ================= -->
+	<div th:fragment="updatePermContent">
+
+		<h3>修改員工資料</h3>
+		<form th:action="@{/admin/updatePerm}" method="POST"
+			th:object="${permissionVO}" >
+			<tr>
+				<td style="white-space: nowrap;">權限編號：</td>
+				<td><input type="text" id="editPermId" name="permId"
+					th:value="*{permId}" readonly
+					style="border: none; background: transparent; pointer-events: none; outline: none; padding: 0;" />
+				</td>
+			</tr>
+
+
+
+
+			<table border="0" cellpadding="5">
+				<tr>
+					<td style="white-space: nowrap;">權限名稱：</td>
+					<td><input type="text" th:field="*{permName}" id="editPermName"
+						style="width: 100%; max-width: 250px; padding: 6px; border: 1px solid #7a7a7a !important; border-radius: 4px; box-sizing: border-box;">
+
+						<span th:if="${#fields.hasErrors('permName')}"
+						th:errors="*{permName}" class="error"
+						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;">
+					</span></td>
+				</tr>
+
+				<tr>
+					<td style="white-space: nowrap;">權限內容：</td>
+					<td><textarea type="text" th:field="*{permDsc}" id="editPermDsc"
+							style="width: 100%; max-width: 250px; padding: 6px; border: 1px solid #7a7a7a !important; border-radius: 4px; box-sizing: border-box;">
+						</textarea> <span th:if="${#fields.hasErrors('permDsc')}"
+						th:errors="*{permDsc}" class="error"
+						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;">
+					</span></td>
+				</tr>
+
+
+			</table>
+			<br>
+			<button type="submit">確認儲存</button>
+			<button type="button"
+				th:onclick="|window.location.href='@{/admin/empPermPage}'|"
+				onclick="closeEditModal()">取消</button>
+		</form>
+	</div>
+
+
+</body>
+</html>

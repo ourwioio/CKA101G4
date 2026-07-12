@@ -7,7 +7,7 @@
 
 </head>
 <!-- 1. 外層維持與主框架相同的置中樣式 -->
-<body>
+<body style="text-align: center; font-family: Arial, sans-serif; padding: 20px;">
 
 
 	<!-- 2. 建立大框架表格（1 row, 2 columns） -->
@@ -33,7 +33,7 @@
 
 					<div
 						style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; white-space: nowrap; position: sticky; left: 0; width: 100%; box-sizing: border-box; padding-right: 5px;">
-						<button type="button" class="btn btn-primary"
+						<button type="button" 
 							onclick="openAddEmpModal()">新增員工</button>
 					</div>
 
@@ -120,23 +120,18 @@
 						</tbody>
 
 					</table>
-					<!-- 💡 核心新增：表格下方的「上一頁 / 下一頁」分頁按鈕控制區 -->
-					<!-- 為了美觀，加上了簡單的行內樣式，你可以自由調整 -->
 					<div
 						style="text-align: center; margin-top: 20px; font-family: Arial, sans-serif;">
 
-						<!-- 1. 上一頁按鈕：只有當前頁碼大於 0 時才顯示 -->
 						<a th:if="${currentPage > 0}"
 							th:href="@{/admin/empPage(p=${(currentPage ?: 0) - 1})}"
 							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
 							上一頁 </a>
 
-						<!-- 2. 顯示目前分頁進度（因為 Java 頁碼從 0 開始，畫面上呈現要 +1 才是符合人類直覺的第 1 頁） -->
 						<span style="margin: 0 10px; font-weight: bold; color: #555;"
 							th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?:1} + ' 頁'">
 							第 1 頁 / 共 1 頁 </span>
 
-						<!-- 3. 下一頁按鈕：只有當前頁碼小於 (總頁數 - 1) 時才顯示 -->
 						<a th:if="${(currentPage ?: 0) < (totalPages?: 1) - 1}"
 							th:href="@{/admin/empPage(p=${currentPage + 1})}"
 							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
@@ -151,8 +146,6 @@
 
 	</table>
 
-	<!-- 新增燈箱外殼 -->
-	<!-- 將 display: none 改為由後端變數 ${openAddModal} 直接決定！ -->
 	<div id="addEmpModal"
 		th:style="'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid black; padding: 25px; z-index: 1000; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); width: 500px; box-sizing: border-box; white-space: nowrap; text-align: left !important; display: flow-root; display: ' + (${openAddEmpModal} ? 'block' : 'none') + ';'">
 
@@ -169,13 +162,6 @@
 
 
 	<script>
-		// 清除提示信息
-		function hideContent(d) {
-			var element = document.getElementById(d);
-			if (element) {
-				element.style.display = "none";
-			}
-		}
 
 		// 照片預覽機制
 		function previewImage(input) {

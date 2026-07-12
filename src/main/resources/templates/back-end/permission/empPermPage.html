@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>後台管理系統 - 員工權限管理</title>
+</head>
+<body
+	style="text-align: center; font-family: Arial, sans-serif; padding: 20px;">
+
+	<table border="1" cellpadding="10" cellspacing="0"
+		style="width: 100%; max-width: 1500px; table-layout: fixed; margin: 0 auto;">
+		<tr>
+			<td th:replace="~{back-end/employee/adminPage :: sidebar}"></td>
+
+
+			<td >
+				<div
+					style="display: block; width: 100%; overflow-x: auto; white-space: nowrap;">
+					<div style="text-align: center;">
+						<h2>員工權限管理</h2>
+					</div>
+
+
+					<div
+						style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; white-space: nowrap; position: sticky; left: 0; width: 100%; box-sizing: border-box; padding-right: 5px;">
+						<button type="button" onclick="openAddModal()">新增權限</button>
+					</div>
+
+					<table border="1" cellpadding="5" cellspacing="0"
+						style="width: 100%; white-space: nowrap;">
+						<thead>
+							<tr>
+								<th style="text-align: center;">權限編號</th>
+								<th style="text-align: center;">權限名稱</th>
+								<th style="text-align: center;">權限內容</th>
+								<th style="text-align: center;">權限更新時間</th>
+								<th style="text-align: center;">員工編號 & 授權時間</th>
+								<th style="text-align: center;">修改</th>
+								<th style="text-align: center;">刪除</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="permVO : ${permListData}">
+								<!-- 權限編號 -->
+								<td th:text="${permVO.permId }" style="text-align: center;"></td>
+								<!-- 權限名稱 -->
+								<td th:text="${permVO.permName}" style="text-align: center;"></td>
+								<!-- 權限內容 -->
+								<td th:text="${permVO.permDsc}" style="text-align: center;"></td>
+								<!-- 權限更新時間 -->
+								<td th:text="${permVO.permUpdatedAt ?: '未更新'}" style="text-align: center;"></td>
+								<!-- 員工編號與授權時間 -->
+								<td style="text-align: left; padding: 8px;"><span
+									th:each="empPermVO, stat : ${permVO.empPermVO}"> 員工編號：<th:block
+											th:text="${empPermVO.emps.employeeId}"></th:block> ｜ 時間：<span
+										th:text="${empPermVO.assignedAt != null ?  #dates.format(empPermVO.assignedAt, 'yyyy-MM-dd HH:mm') : '未紀錄'}"></span>
+
+										<br th:if="${!stat.last}" />
+								</span> <span th:if="${#lists.isEmpty(permVO.empPermVO)}"
+									style="color: #999; font-style: italic;"> 目前無授權員工 </span></td>
+
+								<td align="center">
+									<button type="button"
+										th:onclick="openEditModal([[${permVO.permId}]], [[${permVO.permName}]], [[${permVO.permDsc}]])">
+										修改</button>
+								</td>
+
+								<td align="center">
+									<form method="post" th:action="@{/admin/permDelete}"
+										style="margin: 0px;">
+										<input type="hidden" name="permId" th:value="${permVO.permId}">
+										<input type="submit" value="刪除" style="color: red;"
+											onclick="return confirm('確定要刪除此員工權限嗎？');">
+									</form>
+								</td>
+							</tr>
+						</tbody>
+
+					</table>
+
+					<div
+						style="text-align: center; margin-top: 20px; font-family: Arial, sans-serif;">
+
+						<a th:if="${currentPage > 0}"
+							th:href="@{/admin/empPermPage(p=${(currentPage ?: 0) - 1})}"
+							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
+							上一頁 </a> <span
+							style="margin: 0 10px; font-weight: bold; color: #555;"
+							th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?:1} + ' 頁'">
+							第 1 頁 / 共 1 頁 </span> <a
+							th:if="${(currentPage ?: 0) < (totalPages?: 1) - 1}"
+							th:href="@{/admin/empPermPage(p=${currentPage + 1})}"
+							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
+							下一頁 </a>
+
+					</div>
+				</div>
+			</td>
+		</tr>
+
+
+	</table>
+
+<div id="addModal" 
+    th:style="'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid black; padding: 25px; z-index: 1000; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); width: 500px; box-sizing: border-box; white-space: nowrap; text-align: left !important; display: flow-root; display: ' + (${openAddModal} ? 'block' : 'none') + ';'">
+    <div th:insert="~{back-end/permission/addPerm :: addPermContent}"></div>
+</div>
+
+
+	<div id="editModal"
+		th:style="'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid black; padding: 25px; z-index: 1000; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); width: 500px; box-sizing: border-box; white-space: nowrap; text-align: left !important; display: flow-root; display: ' + (${openEditModal} ? 'block' : 'none') + ';'">
+
+		<div th:insert="~{back-end/permission/updatePerm :: updatePermContent}"></div>
+
+	</div>
+
+<script>
+
+//新增按鈕的 (點擊按鈕打開燈箱)
+function openAddModal() {
+	var modal = document.getElementById("addModal");
+	if (modal) {
+		var form = modal.querySelector("form");
+		if (form) {
+			form.reset();
+		}
+		// 手動打開時一樣要給它 block
+		modal.style.setProperty("display", "block", "important");
+	}
+}
+
+// 新增頁面的取消按鈕 (關閉燈箱)
+function closeAddModal() {
+	var modal = document.getElementById("addModal");
+	if (modal) {
+		modal.style.setProperty("display", "none", "important");
+	}
+}
+
+//修改按鈕的 (點擊按鈕打開燈箱)
+function openEditModal(permId, permName, permDsc) {
+	var modal = document.getElementById("editModal");
+	if (modal) {
+		var form = modal.querySelector("form");
+		if (form) {
+			form.reset();
+		}
+		
+		if (document.getElementById("editPermId"))
+			document.getElementById("editPermId").value = permId;
+		if (document.getElementById("editPermName"))
+			document.getElementById("editPermName").value = permName;
+		if (document.getElementById("editPermDsc"))
+			document.getElementById("editPermDsc").value = permDsc;
+		
+		
+		modal.style.setProperty("display", "block", "important");
+	}
+}
+
+// 修改頁面的取消按鈕 (關閉燈箱)
+function closeEditModal() {
+	var modal = document.getElementById("EditModal");
+	if (modal) {
+		modal.style.setProperty("display", "none", "important");
+	}
+}
+
+</script>
+
+
+</body>
+</html>
