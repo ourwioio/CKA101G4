@@ -108,13 +108,6 @@ public class VenueFrontOrderController {
 		try {
 			// 呼叫 Service，這步會啟動悲觀鎖並把字串改成 '3'
 			venueOrderService.addVenueOrder(venueOrderVO);
-			// 新增通知給場地主
-			NotificationVO notificationVO = new NotificationVO();
-			notificationVO.setMember(venueVO.getMember());
-			notificationVO.setTitle("您的" + venueVO.getVenueName() + "被預約");
-			notificationVO.setContent("預約的時段是" + venueOrderVO.getStartAt() + " ~ " + venueOrderVO.getEndAt());
-			notificationVO.setNotificationType((byte) 0);
-			notificationService.addNotification(notificationVO);
 			
 		} catch (RuntimeException e) {
 			// 💡 關鍵：如果被別人搶先一步佔用，Service會噴錯，這裡會抓住它
@@ -177,7 +170,7 @@ public class VenueFrontOrderController {
 		if (loginMember == null) {
 			return "redirect:/member/login";
 		}
-
+		
 		VenueOrderVO order = venueOrderService.getOneVenueOrder(venueOrderId);
 		if (order != null && order.getOrderStatus() == 0) {
 			if (order.getCreatedAt().plusMinutes(PAYMENT_TIMEOUT_MINUTES).isAfter(LocalDateTime.now())) {
@@ -185,6 +178,16 @@ public class VenueFrontOrderController {
 				order.setHandledAt(LocalDateTime.now());
 				venueOrderService.updateVenueOrder(order);
 				confirmSlot(order); // ⚙️ 新增：把時段字串從 '3' 正式扶正為 '1'
+				
+				VenueVO venueVO = venueService.getOneVenue(order.getVenueVO().getVenueId());
+				// 新增通知給場地主
+				NotificationVO notificationVO = new NotificationVO();
+				notificationVO.setMember(venueVO.getMember());
+				notificationVO.setTitle("您的" + venueVO.getVenueName() + "被預約");
+				notificationVO.setContent("預約的時段是" + order.getStartAt() + " ~ " + order.getEndAt());
+				notificationVO.setNotificationType((byte) 0);
+				notificationService.addNotification(notificationVO);
+				
 			} else {
 				order.setOrderStatus((byte) 2); // 逾時取消
 				venueOrderService.updateVenueOrder(order);
