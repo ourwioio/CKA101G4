@@ -16,6 +16,7 @@ import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueSlotVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.repository.VenueRepository;
+import com.webond.venue.repository.VenueSlotRepository;
 import com.webond.venue.util.HibernateUtil_CompositeQuery_Venue;
 
 import jakarta.persistence.EntityManager;
@@ -27,6 +28,9 @@ public class VenueService {
 
 	@Autowired
 	VenueRepository repository;
+	
+	@Autowired
+	VenueSlotRepository venueSlotRepository;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -56,7 +60,7 @@ public class VenueService {
 		String availableHours = venueVO.getAvailableHours(); // 長度24的字串
 		String closedHours = "2".repeat(24); // 不可預約的全天字串
 
-		for (int i = 0; i <= 15; i++) {
+		for (int i = 0; i < 15; i++) {
 			LocalDate slotDate = today.plusDays(i);
 			int dayOfWeek = slotDate.getDayOfWeek().getValue() - 1; // 週一=0, 週日=6
 
@@ -224,6 +228,32 @@ public class VenueService {
 		}
 
 		repository.save(existingVenue);
+	}
+	
+	// 排程器用讓場地都有15天可以讓人預約
+	@Transactional
+	public void generateNextDaySlotsForAllVenues() {
+		List<VenueVO> venues = repository.findByVenueStatus((byte) 1);
+		LocalDate targetDate = LocalDate.now().plusDays(14);
+		String closedHours = "2".repeat(24);
+
+		for (VenueVO venue : venues) {
+			LocalDate maxExistingDate = venueSlotRepository.findMaxSlotDateByVenueId(venue.getVenueId());
+			LocalDate startDate = (maxExistingDate == null) ? LocalDate.now() : maxExistingDate.plusDays(1);
+
+			for (LocalDate date = startDate; !date.isAfter(targetDate); date = date.plusDays(1)) {
+				int dayOfWeek = date.getDayOfWeek().getValue() - 1;
+				String slotStatus = (venue.getOpenDays().charAt(dayOfWeek) == '1')
+						? venue.getAvailableHours()
+						: closedHours;
+
+				VenueSlotVO slotVO = new VenueSlotVO();
+				slotVO.setVenueVO(venue);
+				slotVO.setSlotDate(date);
+				slotVO.setSlotStatus(slotStatus);
+				venueSlotRepository.save(slotVO);
+			}
+		}
 	}
 
 }
