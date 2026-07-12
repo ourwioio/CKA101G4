@@ -13,9 +13,8 @@ public class VenueSlotScheduler {
 	private VenueService venueService;
 
 	@Scheduled(cron = "0 10 0 * * *")
-//	@Scheduled(fixedRate = 60000)
+//	@Scheduled(fixedRate = 60000)  // 測試用
 	public void generateNextDaySlots() {
 		venueService.generateNextDaySlotsForAllVenues();
-		System.out.println("已更新下一天時段");
 	}
 }

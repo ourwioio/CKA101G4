@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.webond.member.model.MemberVO;
+import com.webond.member.model.NotificationVO;
+import com.webond.member.service.NotificationService;
 import com.webond.venue.dto.VenueOrderFrontDTO;
 import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueVO;
@@ -41,6 +43,9 @@ public class VenueFrontOrderController {
 
 	@Autowired
 	VenueSlotService venueSlotService;
+	
+	@Autowired
+	NotificationService notificationService;
 
 	@GetMapping("addVenueOrder")
 	public String add(@RequestParam("venueId") Integer venueId, Model model, HttpSession session) {
@@ -63,7 +68,7 @@ public class VenueFrontOrderController {
 	@PostMapping("insert")
 	public String insert(@ModelAttribute("venueOrderDTO") @Valid VenueOrderFrontDTO venueOrderDTO, BindingResult result,
 			HttpSession session, Model model) {
-
+		
 		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 		if (loginMember == null) {
 			return "redirect:/member/login";
@@ -103,6 +108,14 @@ public class VenueFrontOrderController {
 		try {
 			// 呼叫 Service，這步會啟動悲觀鎖並把字串改成 '3'
 			venueOrderService.addVenueOrder(venueOrderVO);
+			// 新增通知給場地主
+			NotificationVO notificationVO = new NotificationVO();
+			notificationVO.setMember(venueVO.getMember());
+			notificationVO.setTitle("您的" + venueVO.getVenueName() + "被預約");
+			notificationVO.setContent("預約的時段是" + venueOrderVO.getStartAt() + " ~ " + venueOrderVO.getEndAt());
+			notificationVO.setNotificationType((byte) 0);
+			notificationService.addNotification(notificationVO);
+			
 		} catch (RuntimeException e) {
 			// 💡 關鍵：如果被別人搶先一步佔用，Service會噴錯，這裡會抓住它
 			// 把錯誤訊息掛在 startHour 欄位上，讓前端網頁顯示紅字
@@ -113,6 +126,8 @@ public class VenueFrontOrderController {
 			model.addAttribute("venueOrderDTO", venueOrderDTO);
 			return "front-end/venue/addVenueOrder";
 		}
+		
+		
 
 		return "redirect:/front/venueOrder/mockPayment?venueOrderId=" + venueOrderVO.getVenueOrderId();
 	}
