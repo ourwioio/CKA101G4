@@ -87,7 +87,7 @@ body {
 	display: block;
 }
 
-/* 📸 📸 多張圖片預覽網格樣式 */
+/* 📸 多張圖片預覽網格樣式 */
 .preview-grid {
 	display: flex;
 	flex-wrap: wrap;
@@ -182,7 +182,7 @@ body {
 
 		<div class="success-msg" th:if="${successMsg != null}" th:text="${successMsg}"></div>
 
-		<form th:action="@{/backend/memberreport/addReport}" th:object="${addMemberReportDTO}" method="post" enctype="multipart/form-data">
+		<form id="reportForm" th:action="@{/backend/memberreport/addReport}" th:object="${addMemberReportDTO}" method="post" enctype="multipart/form-data">
 			
 			<div class="section-divider">
 				🛡️ 案件基本資料
@@ -233,7 +233,7 @@ body {
 			</div>
 
 			<div class="button-group-container">
-				<a th:href="@{/backend/memberreport/select_page}" class="btn btn-cancel-webond">返回管理</a>
+				<a th:href="@{/}" class="btn btn-cancel-webond">返回首頁</a>
 				<button type="submit" class="btn btn-submit-webond">確認送出檢舉</button>
 			</div>
 		</form>
@@ -253,6 +253,14 @@ body {
 
 		// 頁面載入時自動還原暫存照片
 		restoreFromSessionStorage();
+
+		// 綁定表單提交事件，確保最後一刻同步 fileStore 到 realEvidenceInput
+		const form = document.getElementById('reportForm');
+		if (form) {
+			form.addEventListener('submit', function (e) {
+				syncFileInput();
+			});
+		}
 	});
 
 	// 當使用者選取檔案時
@@ -298,11 +306,12 @@ body {
 	function syncFileInput() {
 		const realInput = document.getElementById('realEvidenceInput');
 		if (realInput) {
+			// 將 DataTransfer 儲存的檔案賦予給實際提交的 input
 			realInput.files = fileStore.files;
 		}
 	}
 
-	// 🎨 穩定版預覽渲染邏輯 (使用 URL.createObjectURL，即時且不卡頓)
+	// 🎨 預覽渲染邏輯 (使用 URL.createObjectURL，即時且不卡頓)
 	function renderPreviews() {
 		const container = document.getElementById('previewContainer');
 		if (!container) return;
@@ -312,7 +321,6 @@ body {
 		const files = fileStore.files;
 		for (let i = 0; i < files.length; i++) {
 			const file = files[i];
-			// 直接產生暫存 Blob URL 作為預覽，速度比 Base64 快很多
 			const objectUrl = URL.createObjectURL(file);
 
 			const itemWrapper = document.createElement('div');
@@ -378,6 +386,11 @@ body {
 	function restoreFromSessionStorage() {
 		const list = getStoredFiles();
 		if (list.length > 0) {
+			// 先防呆清空 fileStore，避免重複載入
+			while (fileStore.items.length > 0) {
+				fileStore.items.remove(0);
+			}
+
 			list.forEach(item => {
 				try {
 					const file = base64ToFile(item.base64, item.name);

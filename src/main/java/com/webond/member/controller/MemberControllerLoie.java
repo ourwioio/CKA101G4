@@ -107,18 +107,22 @@ public class MemberControllerLoie {
 	}
 
 	// =========================================================================
-	// 📝 API 2：註冊表單送出（與 AJAX 驗證邏輯對接修正）
+	// 📝 API 2：註冊表單送出（已修正身分證正反面分開處理與暫存問題）
 	// =========================================================================
 	@PostMapping("/doRegister")
 	public String doRegister(@Valid MemberVO memberVO, BindingResult result,
 			@RequestParam(name = "otpCode", required = false) String inputOtpCode,
 			@RequestParam(name = "password", required = false) String rawPassword,
 			@RequestParam(name = "memberPicFile", required = false) MultipartFile memberPicFile,
-			@RequestParam(name = "idImageFile", required = false) MultipartFile idImageFile,
+			@RequestParam(name = "idFrontImageFile", required = false) MultipartFile idFrontImageFile, // 🟢 正面
+			@RequestParam(name = "idBackImageFile", required = false) MultipartFile idBackImageFile,   // 🟢 反面
 			@RequestParam(name = "faceImageFile", required = false) MultipartFile faceImageFile,
 			@RequestParam(name = "tempMemberPic", required = false) String tempMemberPic,
-			@RequestParam(name = "tempIdImage", required = false) String tempIdImage,
-			@RequestParam(name = "tempFaceImage", required = false) String tempFaceImage, Model model) {
+			@RequestParam(name = "tempIdFrontImage", required = false) String tempIdFrontImage,         // 🟢 正面暫存
+			@RequestParam(name = "tempIdBackImage", required = false) String tempIdBackImage,           // 🟢 反面暫存
+			@RequestParam(name = "tempIdImage", required = false) String tempIdImage,                   // 🟢 相容舊隱藏欄位
+			@RequestParam(name = "tempFaceImage", required = false) String tempFaceImage, 
+			HttpSession session, Model model) { // 🟢 修正：補上 HttpSession session 參數
 
 		// 1. 處理密碼
 		if (rawPassword == null || rawPassword.trim().isEmpty()) {
@@ -127,24 +131,40 @@ public class MemberControllerLoie {
 			memberVO.setPasswordHash(passwordEncoder.encode(rawPassword));
 		}
 
-		// 🟢 2. 驗證碼檢查：前端已透過 AuthController (/verify-otp) 完成第一關驗證
-		// 這裡只需檢查欄位是否有填寫，避免 Redis key 提前刪除或過期導致提交失敗
+		// 2. 驗證碼檢查
 		if (inputOtpCode == null || inputOtpCode.trim().isEmpty()) {
 			model.addAttribute("otpError", "請輸入信箱驗證碼！");
 			result.reject("error.otpCode", "請輸入信箱驗證碼");
 		}
 
-		// 3. 處理圖片
+		// 3. 處理圖片（頭像與人臉）
 		byte[] memberPicBytes = processImageBytes(memberPicFile, tempMemberPic);
-		byte[] idImageBytes = processImageBytes(idImageFile, tempIdImage);
 		byte[] faceImageBytes = processImageBytes(faceImageFile, tempFaceImage);
 
+		// 🟢 處理身分證（正面與反面）
+		byte[] idFrontBytes = processImageBytes(idFrontImageFile, tempIdFrontImage);
+		byte[] idBackBytes = processImageBytes(idBackImageFile, tempIdBackImage);
+
+		// 💡 相容性處置：若前端只傳單一 tempIdImage，備用為正面檔
+		if ((idFrontBytes == null || idFrontBytes.length == 0) && tempIdImage != null && !tempIdImage.trim().isEmpty()) {
+			idFrontBytes = processImageBytes(null, tempIdImage);
+		}
+
+		// 組合身分證 bytes (若正反都有，合存入 idImage 欄位；亦可只拿正面作為主要標示)
+		byte[] finalIdImageBytes = idFrontBytes;
+		if (idFrontBytes != null && idFrontBytes.length > 0 && idBackBytes != null && idBackBytes.length > 0) {
+			// 將正反兩張合存成 JSON / 字串格式存入資料庫 byte[]，或優先取正面
+			String combinedBase64 = "{\"front\":\"" + encodeToBase64(idFrontBytes) + "\",\"back\":\"" + encodeToBase64(idBackBytes) + "\"}";
+			finalIdImageBytes = combinedBase64.getBytes();
+		}
+
 		memberVO.setMemberPic(memberPicBytes != null ? memberPicBytes : new byte[0]);
-		memberVO.setIdImage(idImageBytes);
+		memberVO.setIdImage(finalIdImageBytes);
 		memberVO.setFaceImage(faceImageBytes);
 
-		if (idImageBytes == null || idImageBytes.length == 0) {
-			result.rejectValue("idImage", "error.idImage", "請務必上傳身分證件照片");
+		// 🟢 嚴格檢查：正面與反面都必須存在！
+		if (idFrontBytes == null || idFrontBytes.length == 0 || idBackBytes == null || idBackBytes.length == 0) {
+			result.rejectValue("idImage", "error.idImage", "請務必上傳身分證件照片（包含正面與反面）");
 		}
 		if (faceImageBytes == null || faceImageBytes.length == 0) {
 			result.rejectValue("faceImage", "error.faceImage", "請務必上傳自拍人臉圖片");
@@ -156,13 +176,15 @@ public class MemberControllerLoie {
 		memberVO.setCreatedAt(java.time.LocalDate.now());
 		memberVO.setSubmittedAt(java.time.LocalDateTime.now());
 
-		// 4. 驗證失敗處理：保留圖片暫存與原本輸入的明碼密碼/驗證碼
+		// 🟢 4. 驗證失敗處理：將正面、反面、人臉及頭像暫存分別存入 Model 返回前端渲染！
 		if (result.hasErrors()) {
 			model.addAttribute("memberVO", memberVO);
 			model.addAttribute("rawPassword", rawPassword);
 			model.addAttribute("inputOtpCode", inputOtpCode);
 			model.addAttribute("tempMemberPic", encodeToBase64(memberPicBytes));
-			model.addAttribute("tempIdImage", encodeToBase64(idImageBytes));
+			model.addAttribute("tempIdFrontImage", encodeToBase64(idFrontBytes)); // 正面暫存
+			model.addAttribute("tempIdBackImage", encodeToBase64(idBackBytes));   // 反面暫存
+			model.addAttribute("tempIdImage", encodeToBase64(finalIdImageBytes));
 			model.addAttribute("tempFaceImage", encodeToBase64(faceImageBytes));
 			return "front-end/member/register";
 		}
@@ -171,18 +193,26 @@ public class MemberControllerLoie {
 		try {
 			memberService.registerMember(memberVO);
 
-			// 🟢 註冊成功，順便刪除 Redis 中的驗證碼
+			// 註冊成功，清理 Redis 驗證碼
 			redisService.deleteOtp(memberVO.getEmail());
 
-			return "redirect:/member/login";
+			// 🟢【登入與跳轉】自動將註冊帳號寫入 Session 保持登入狀態
+			session.setAttribute("memberVO", memberVO);
+			session.setAttribute("account", memberVO.getEmail());
+
+			// 🟢【重定向】跳轉回首頁 (若專案首頁路由是 /index，請自行調整為 return "redirect:/index";)
+			return "redirect:/"; 
+
 		} catch (Exception e) {
-			e.printStackTrace(); // 🟢 印出 Exception 方便 Console 排查原因
+			e.printStackTrace();
 			result.rejectValue("email", "error.database", "註冊失敗：Email 重複註冊或資料格式不正確！");
 			model.addAttribute("memberVO", memberVO);
 			model.addAttribute("rawPassword", rawPassword);
 			model.addAttribute("inputOtpCode", inputOtpCode);
 			model.addAttribute("tempMemberPic", encodeToBase64(memberPicBytes));
-			model.addAttribute("tempIdImage", encodeToBase64(idImageBytes));
+			model.addAttribute("tempIdFrontImage", encodeToBase64(idFrontBytes));
+			model.addAttribute("tempIdBackImage", encodeToBase64(idBackBytes));
+			model.addAttribute("tempIdImage", encodeToBase64(finalIdImageBytes));
 			model.addAttribute("tempFaceImage", encodeToBase64(faceImageBytes));
 			return "front-end/member/register";
 		}
@@ -281,7 +311,12 @@ public class MemberControllerLoie {
 		}
 		if (tempBase64 != null && !tempBase64.trim().isEmpty()) {
 			try {
-				return Base64.getDecoder().decode(tempBase64);
+				// 🟢 自動去除 Base64 前綴，防止字串解碼失敗
+				String cleanBase64 = tempBase64;
+				if (cleanBase64.contains(",")) {
+					cleanBase64 = cleanBase64.split(",")[1];
+				}
+				return Base64.getDecoder().decode(cleanBase64.trim());
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			}

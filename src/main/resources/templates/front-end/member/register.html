@@ -322,22 +322,34 @@ button[type="submit"]:hover {
 				</div>
 
 				<div class="form-group">
-					<label for="idImageFile">身分證件照片 *</label> <input type="file"
-						id="idImageFile" name="idImageFile" accept="image/*"> <input
-						type="hidden" name="tempIdImage" th:value="${tempIdImage}">
+					<label for="idFrontImageFile">身分證正面照片 *</label> <input type="file"
+						id="idFrontImageFile" name="idFrontImageFile" accept="image/*"> 
+					<input type="hidden" id="tempIdFrontImage" name="tempIdFrontImage" th:value="${tempIdFrontImage}">
 					<div class="img-preview-container"
-						th:if="${tempIdImage != null and !tempIdImage.isEmpty()}">
-						<span>✓ 已暫存先前上傳的身分證照片：</span><br> <img class="img-preview"
-							th:src="'data:image/jpeg;base64,' + ${tempIdImage}" alt="身分證預覽">
+						th:if="${tempIdFrontImage != null and !tempIdFrontImage.isEmpty()}">
+						<span>✓ 已暫存身分證正面照片：</span><br> <img class="img-preview"
+							th:src="'data:image/jpeg;base64,' + ${tempIdFrontImage}" alt="身分證正面預覽">
 					</div>
 					<span class="field-error" th:if="${#fields.hasErrors('idImage')}"
 						th:errors="*{idImage}"></span>
 				</div>
 
 				<div class="form-group">
+					<label for="idBackImageFile">身分證反面照片 *</label> <input type="file"
+						id="idBackImageFile" name="idBackImageFile" accept="image/*"> 
+					<input type="hidden" id="tempIdBackImage" name="tempIdBackImage" th:value="${tempIdBackImage}">
+					<div class="img-preview-container"
+						th:if="${tempIdBackImage != null and !tempIdBackImage.isEmpty()}">
+						<span>✓ 已暫存身分證反面照片：</span><br> <img class="img-preview"
+							th:src="'data:image/jpeg;base64,' + ${tempIdBackImage}" alt="身分證反面預覽">
+					</div>
+					<span class="field-error" th:if="${idBackImageError != null}" th:text="${idBackImageError}"></span>
+				</div>
+
+				<div class="form-group full-width">
 					<label for="faceImageFile">現場自拍人臉照片 *</label> <input type="file"
 						id="faceImageFile" name="faceImageFile" accept="image/*">
-					<input type="hidden" name="tempFaceImage"
+					<input type="hidden" id="tempFaceImage" name="tempFaceImage"
 						th:value="${tempFaceImage}">
 					<div class="img-preview-container"
 						th:if="${tempFaceImage != null and !tempFaceImage.isEmpty()}">
@@ -494,6 +506,23 @@ button[type="submit"]:hover {
 				alert('請先點擊「核對驗證碼」成功完成 Email 驗證後，再提交註冊表單！');
 				return false;
 			}
+
+			// 檢查身分證正面 (當前無選檔 且 無暫存檔)
+			const frontFile = document.getElementById('idFrontImageFile').files.length;
+			const tempFront = document.getElementById('tempIdFrontImage').value;
+			if (frontFile === 0 && !tempFront) {
+				alert('請選擇身分證【正面】照片！');
+				return false;
+			}
+
+			// 檢查身分證反面 (當前無選檔 且 無暫存檔)
+			const backFile = document.getElementById('idBackImageFile').files.length;
+			const tempBack = document.getElementById('tempIdBackImage').value;
+			if (backFile === 0 && !tempBack) {
+				alert('請選擇身分證【反面】照片！');
+				return false;
+			}
+
 			return true;
 		}
 	</script>
