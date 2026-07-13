@@ -9,11 +9,16 @@
 	<h1>一對一服務列表</h1>
 
 	<p>
-		<a th:href="@{/member/services}">我的服務</a> <span
-			th:if="${session.memberVO != null}"> ｜目前假登入會員編號： <span
-			th:text="${session.memberVO.memberId}"></span> ｜<a
-			th:href="@{/member/services/fakelogout}">假登出</a>
-		</span> <span th:if="${session.memberVO == null}"> ｜尚未假登入 </span>
+		<a th:href="@{/member/services}">我的服務</a>
+		<span th:if="${session.memberVO != null}">
+			｜目前假登入會員編號：
+			<span th:text="${session.memberVO.memberId}"></span>
+			｜
+			<a th:href="@{/member/services/fakelogout}">假登出</a>
+		</span>
+		<span th:if="${session.memberVO == null}">
+			｜尚未假登入
+		</span>
 	</p>
 
 	<!-- 錯誤訊息 -->
@@ -39,13 +44,19 @@
 	<h2>服務類型</h2>
 
 	<ul>
-		<li><a th:href="@{/front/services}"> 全部服務 </a></li>
+		<li>
+			<a th:href="@{/front/services}">全部服務</a>
+		</li>
 
-		<li th:each="type : ${serviceTypeList}"><a
-			th:href="@{/front/services/type/{id}(id=${type.svcTypeID})}"
-			th:text="${type.typeName}"> 服務類型名稱 </a> <span
-			th:if="${selectedServiceTypeId != null and selectedServiceTypeId == type.svcTypeID}">
-				← 目前選取 </span></li>
+		<li th:each="type : ${serviceTypeList}">
+			<a th:href="@{/front/services/type/{id}(id=${type.svcTypeID})}"
+			   th:text="${type.typeName}">
+				服務類型名稱
+			</a>
+			<span th:if="${selectedServiceTypeId != null and selectedServiceTypeId == type.svcTypeID}">
+				← 目前選取
+			</span>
+		</li>
 	</ul>
 
 	<hr>
@@ -59,6 +70,7 @@
 		th:if="${!#lists.isEmpty(serviceList)}">
 		<thead>
 			<tr>
+				<th>服務圖片</th>
 				<th>服務編號</th>
 				<th>服務類型</th>
 				<th>服務名稱</th>
@@ -71,11 +83,19 @@
 
 		<tbody>
 			<tr th:each="service : ${serviceList}">
+
+				<!-- 服務圖片：有上傳顯示資料庫圖片，沒上傳顯示 default-activity.jpg -->
+				<td>
+					<img th:src="@{/front/services/image/{serviceId}(serviceId=${service.serviceId})}"
+					     alt="服務圖片"
+					     style="width: 120px; height: 80px; object-fit: cover; border: 1px solid #ccc;">
+				</td>
+
 				<td th:text="${service.serviceId}">1</td>
 
-				<td
-					th:text="${service.serviceType != null ? service.serviceType.typeName : '無類型'}">
-					服務類型</td>
+				<td th:text="${service.serviceType != null ? service.serviceType.typeName : '無類型'}">
+					服務類型
+				</td>
 
 				<td th:text="${service.serviceName}">服務名稱</td>
 
@@ -83,12 +103,17 @@
 
 				<td th:text="${service.memberId}">1</td>
 
-				<td>NT$ <span th:text="${service.hourlyRate}">500</span> / 小時
+				<td>
+					NT$
+					<span th:text="${service.hourlyRate}">500</span>
+					/ 小時
 				</td>
 
-				<td><a
-					th:href="@{/front/services/{id}(id=${service.serviceId})}">
-						查看詳情 </a></td>
+				<td>
+					<a th:href="@{/front/services/{id}(id=${service.serviceId})}">
+						查看詳情
+					</a>
+				</td>
 			</tr>
 		</tbody>
 	</table>

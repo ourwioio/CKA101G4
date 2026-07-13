@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -11,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -19,7 +21,7 @@ import jakarta.persistence.Table;
 public class ServiceVO {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue	(strategy = GenerationType.IDENTITY)
     @Column(name = "SERVICE_ID")
     private Integer serviceId;
 
@@ -50,8 +52,33 @@ public class ServiceVO {
     @CreationTimestamp
     @Column(name = "CREATED_AT", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+    
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    @Column(name = "SERVICE_IMAGE", columnDefinition = "LONGBLOB")
+    private byte[] serviceImage;
 
-    public Integer getServiceId() {
+    @Column(name = "SERVICE_IMAGE_TYPE")
+    private String serviceImageType;
+    
+    
+    public byte[] getServiceImage() {
+		return serviceImage;
+	}
+
+	public void setServiceImage(byte[] serviceImage) {
+		this.serviceImage = serviceImage;
+	}
+
+	public String getServiceImageType() {
+		return serviceImageType;
+	}
+
+	public void setServiceImageType(String serviceImageType) {
+		this.serviceImageType = serviceImageType;
+	}
+
+	public Integer getServiceId() {
         return serviceId;
     }
 
@@ -127,4 +154,6 @@ public class ServiceVO {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+    
+    
 }

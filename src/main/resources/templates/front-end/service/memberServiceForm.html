@@ -22,7 +22,8 @@
                     ? @{/member/services/add} 
                     : @{/member/services/{id}/edit(id=${serviceId})}"
       th:object="${serviceRequest}"
-      method="post">
+      method="post"
+      enctype="multipart/form-data">
 
     <!-- 服務類型 -->
     <p>
@@ -71,6 +72,31 @@
        th:text="${errors['hourlyRate']}"
        style="color:red;"></p>
 
+    <!-- 服務封面圖片 -->
+    <p>
+        <label>服務封面圖片：</label>
+        <input type="file"
+               id="serviceImageFile"
+               name="serviceImageFile"
+               accept="image/*">
+    </p>
+
+    <p style="color: gray;">
+        可不選圖片；未上傳時會顯示預設圖片
+    </p>
+
+    <!-- 圖片預覽區 -->
+    <div>
+        <p>目前服務圖片：</p>
+
+        <img id="serviceImagePreview"
+             th:src="${mode == 'edit' and serviceId != null}
+                        ? @{/front/services/image/{serviceId}(serviceId=${serviceId})}
+                        : @{/images/activity/default-activity.jpg}"
+             alt="服務圖片預覽"
+             style="width: 300px; height: 200px; object-fit: cover; border: 1px solid #ccc;">
+    </div>
+
     <hr>
 
     <button type="submit" th:text="${mode == 'add' ? '新增服務' : '儲存修改'}">
@@ -80,6 +106,48 @@
     <a th:href="@{/member/services}">取消</a>
 
 </form>
+
+<script>
+    const fileInput = document.getElementById("serviceImageFile");
+    const previewImg = document.getElementById("serviceImagePreview");
+
+    const originalPreviewSrc = previewImg.src;
+
+    fileInput.addEventListener("change", function () {
+        const file = this.files[0];
+
+        // 使用者取消選檔，恢復原圖
+        if (!file) {
+            previewImg.src = originalPreviewSrc;
+            return;
+        }
+
+        // 檢查檔案格式
+        if (!file.type.startsWith("image/")) {
+            alert("請選擇圖片檔案");
+            this.value = "";
+            previewImg.src = originalPreviewSrc;
+            return;
+        }
+
+        // 前端先擋 5MB
+        if (file.size > 5 * 1024 * 1024) {
+            alert("圖片大小不可超過 5MB");
+            this.value = "";
+            previewImg.src = originalPreviewSrc;
+            return;
+        }
+
+        // 預覽新圖片
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            previewImg.src = e.target.result;
+        };
+
+        reader.readAsDataURL(file);
+    });
+</script>
 
 </body>
 </html>
