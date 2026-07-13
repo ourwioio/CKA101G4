@@ -2,6 +2,8 @@ package com.webond.member.controller;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,17 +16,20 @@ import com.webond.member.service.EmailService;
 import com.webond.member.service.OtpService;
 
 @RestController
-@RequestMapping("/member") // 🟢 1. 修改路徑，對齊前端 /member/send-otp
+@RequestMapping("/member")
 public class AuthController {
 
     @Autowired
     private OtpService otpService;
 
     @Autowired
-    private EmailService emailService; // 🟢 2. 修正變數名稱
+    private EmailService emailService;
+    
+ // 🟢 手動宣告 log 物件 (紅線保證立刻消失)
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     // =========================================================================
-    // 1. 發送 Email 驗證碼 API (前端點擊「取得驗證碼」時呼叫)
+    // 1. 發送 Email 驗證碼 API
     // =========================================================================
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestParam("email") String email) {
@@ -34,49 +39,52 @@ public class AuthController {
 
         String cleanEmail = email.trim();
 
-        // A. 檢查是否在 60 秒冷卻期內
+        // A. 檢查是否在 60 秒冷卻期內（防刷）
         if (!otpService.canSendOtp(cleanEmail)) {
             return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
                     .body(Map.of("success", false, "message", "請求過於頻繁，請於 60 秒後再試！"));
         }
 
         try {
-            // B. 產生 6 位數驗證碼
+            // B. 產生並寫入 Redis (包含 OTP 與 60s 冷卻 Key)
             String otpCode = otpService.generateOtpCode();
-
-            // C. 存入 Redis (有效期限 5 分鐘，並寫入 60 秒冷卻 Key)
             otpService.saveOtp(cleanEmail, otpCode);
 
-            // D. 開獨立線程非同步寄信，避免 HTTP 請求被卡住
-            String subject = "【Webond 平台】會員系統 - 驗證碼通知";
-            String content = "您好！您的註冊驗證碼為：" + otpCode + "\n\n請於 10 分鐘內輸入完成驗證。若非本人操作請忽略此信。";
-            
-            new Thread(() -> emailService.sendOtpEmail(cleanEmail, otpCode)).start();
+            // C. 呼叫 EmailService 發送驗證碼
+            // 🟢 2. 移除 new Thread，由 EmailService 的 @Async 或內建邏輯處理非同步
+            emailService.sendOtpEmail(cleanEmail, otpCode);
 
             return ResponseEntity.ok(Map.of("success", true, "message", "驗證碼已寄出，請至信箱查收！"));
 
         } catch (Exception e) {
-            e.printStackTrace();
+            // 🟢 3. 此時 @Slf4j 注入的 log 物件將正常運作，不再紅字報錯！
+            log.error("發送 OTP 驗證碼失敗, Email: {}", cleanEmail, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("success", false, "message", "郵件發送失敗，請稍後再試。"));
+                    .body(Map.of("success", false, "message", "系統產生驗證碼失敗，請稍後再試。"));
         }
     }
 
     // =========================================================================
-    // 2. 核對驗證碼 API (可供獨立驗證或二階段驗證使用)
+    // 2. 核對驗證碼 API
     // =========================================================================
     @PostMapping("/verify-otp")
-    public ResponseEntity<?> verifyOtp(@RequestParam("email") String email, @RequestParam("inputOtp") String inputOtp) {
-        if (email == null || inputOtp == null) {
+    public ResponseEntity<?> verifyOtp(
+            @RequestParam("email") String email, 
+            @RequestParam("inputOtp") String inputOtp) {
+
+        if (email == null || email.isBlank() || inputOtp == null || inputOtp.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "請輸入 Email 與驗證碼！"));
         }
 
-        boolean isValid = otpService.verifyOtp(email.trim(), inputOtp.trim());
+        String cleanEmail = email.trim();
+        String cleanOtp = inputOtp.trim();
+
+        boolean isValid = otpService.verifyOtp(cleanEmail, cleanOtp);
 
         if (isValid) {
-            // 🟢 3. 驗證成功後，可選擇呼叫 deleteOtp 刪除驗證碼，防止重複使用
-            // otpService.deleteOtp(email.trim()); 
-            
+            // 🟢 4. 驗證成功後立即刪除 Redis 中的驗證碼，防止二次重用
+            otpService.deleteOtp(cleanEmail);
+
             return ResponseEntity.ok(Map.of("success", true, "message", "驗證成功！"));
         } else {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "驗證碼錯誤或已過期，請重新取得！"));

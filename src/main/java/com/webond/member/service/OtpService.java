@@ -53,4 +53,9 @@ public class OtpService {
 
 		return false;
 	}
+
+	public void deleteOtp(String cleanEmail) {
+		// TODO Auto-generated method stub
+		
+	}
 }

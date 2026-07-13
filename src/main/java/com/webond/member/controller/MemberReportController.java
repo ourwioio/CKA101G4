@@ -1,6 +1,9 @@
 package com.webond.member.controller;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,8 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-// 🎯 匯入你的 DTO
-import com.webond.member.model.AddMemberReportDTO;
+import com.webond.member.dto.AddMemberReportDTO;
 import com.webond.member.model.MemberReportVO;
 import com.webond.member.service.MemberReportService;
 
@@ -26,6 +28,7 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import tools.jackson.databind.ObjectMapper;
 
 @Controller
 @RequestMapping("/backend/memberreport")
@@ -33,6 +36,9 @@ public class MemberReportController {
 
 	@Autowired
 	private MemberReportService reportSvc;
+
+	// 全域 ObjectMapper 用於處理 JSON 轉換
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	// =========================================================================
 	// 🔑 【私有權限檢查工具方法】 (免登入測試版)
@@ -93,15 +99,42 @@ public class MemberReportController {
 	}
 
 	// =========================================================================
-	// 📸 【後台功能 3】影像資料串流讀取器
+	// 📸 【後台功能 3】影像資料串流讀取器 (支援多圖 JSON 讀取與舊檔相容)
 	// =========================================================================
 	@GetMapping("/DBGifReader")
-	public void dbGifReader(@RequestParam("reportId") Integer reportId, HttpServletResponse response) {
-		response.setContentType("image/gif");
+	public void dbGifReader(
+			@RequestParam("reportId") Integer reportId,
+			@RequestParam(value = "index", defaultValue = "0") Integer index,
+			HttpServletResponse response) {
+		
 		try (ServletOutputStream out = response.getOutputStream()) {
 			MemberReportVO memberReportVO = reportSvc.getOneMemberReport(reportId);
 			if (memberReportVO != null && memberReportVO.getEvidence() != null) {
-				out.write(memberReportVO.getEvidence());
+				byte[] rawData = memberReportVO.getEvidence();
+				String dataStr = new String(rawData, StandardCharsets.UTF_8).trim();
+
+				// 判斷是否為多圖 JSON 格式 (以 "[" 開頭)
+				if (dataStr.startsWith("[")) {
+					List<String> base64List = objectMapper.readValue(dataStr, List.class);
+					if (index >= 0 && index < base64List.size()) {
+						String base64Image = base64List.get(index);
+						
+						// 解析 Content-Type (例如 data:image/png;base64,...)
+						if (base64Image.contains(",")) {
+							String mimeType = base64Image.substring(5, base64Image.indexOf(";"));
+							response.setContentType(mimeType);
+							String pureBase64 = base64Image.substring(base64Image.indexOf(",") + 1);
+							out.write(Base64.getDecoder().decode(pureBase64));
+						} else {
+							response.setContentType("image/png");
+							out.write(Base64.getDecoder().decode(base64Image));
+						}
+					}
+				} else {
+					// 舊式傳統單檔直接輸出的 byte[] 處理
+					response.setContentType("image/jpeg");
+					out.write(rawData);
+				}
 			}
 		} catch (IOException e) {
 			System.out.println("[Error] 讀取圖片發生串流異常: " + e.getMessage());
@@ -199,7 +232,7 @@ public class MemberReportController {
 	}
 
 	// =========================================================================
-	// 🟢 【前台功能 2】送出檢舉案資料驗證 (支援多圖 MultipartFile[])
+	// 🟢 【前台功能 2】送出檢舉案資料驗證 (支援多圖轉 JSON 陣列存入原始 Blob 欄位)
 	// =========================================================================
 	@PostMapping("/addReport")
 	public String addReport(
@@ -234,15 +267,22 @@ public class MemberReportController {
 			return "front-end/member/memberreport/addReport";
 		}
 
-		// 3. 驗證完全通過，執行新增
+		// 3. 驗證完全通過，將多張圖片轉為 Base64 JSON 陣列
 		try {
-			byte[] evidence = null;
+			List<String> base64ImageList = new ArrayList<>();
+			
 			for (MultipartFile file : files) {
 				if (!file.isEmpty()) {
-					evidence = file.getBytes();
-					break;
+					String contentType = file.getContentType();
+					String base64Str = Base64.getEncoder().encodeToString(file.getBytes());
+					// 組合 Data URL 格式 (方便前端圖片預覽與 DBGifReader 判讀)
+					base64ImageList.add("data:" + contentType + ";base64," + base64Str);
 				}
 			}
+
+			// 將 List<String> 轉為 JSON 字串並轉作 byte[] 陣列
+			String jsonImageArrayStr = objectMapper.writeValueAsString(base64ImageList);
+			byte[] evidence = jsonImageArrayStr.getBytes(StandardCharsets.UTF_8);
 
 			reportSvc.addMemberReport(
 				dto.getReporterId(), 
