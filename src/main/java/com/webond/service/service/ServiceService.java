@@ -1,5 +1,6 @@
 package com.webond.service.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -68,25 +69,35 @@ public class ServiceService {
 	// =====================
 
 	// 會員新增服務
-	public ServiceVO addBySeller(Integer loginMemberId, Integer serviceTypeId, String serviceName, String description,
-			Integer hourlyRate) {
+	public ServiceVO addBySeller(
+	        Integer loginMemberId,
+	        Integer serviceTypeId,
+	        String serviceName,
+	        String description,
+	        Integer hourlyRate,
+	        byte[] serviceImage,
+	        String serviceImageType) {
 
-		validateMemberServiceRequest(serviceTypeId, serviceName, description, hourlyRate);
+	    validateMemberServiceRequest(serviceTypeId, serviceName, description, hourlyRate);
 
-		ServiceVO serviceVO = new ServiceVO();
+	    ServiceVO serviceVO = new ServiceVO();
 
-		ServiceTypeVO serviceType = serviceTypeRepository.getReferenceById(serviceTypeId);
-		serviceVO.setServiceType(serviceType);
+	    ServiceTypeVO serviceType = serviceTypeRepository.getReferenceById(serviceTypeId);
+	    serviceVO.setServiceType(serviceType);
 
-		serviceVO.setMemberId(loginMemberId);
-		serviceVO.setServiceName(serviceName.trim());
-		serviceVO.setDescription(description.trim());
-		serviceVO.setHourlyRate(hourlyRate);
+	    serviceVO.setMemberId(loginMemberId);
+	    serviceVO.setServiceName(serviceName.trim());
+	    serviceVO.setDescription(description.trim());
+	    serviceVO.setHourlyRate(hourlyRate);
 
-		// 會員新增後預設上架
-		serviceVO.setStatus(STATUS_ACTIVE);
+	    // 圖片
+	    serviceVO.setServiceImage(serviceImage);
+	    serviceVO.setServiceImageType(serviceImageType);
 
-		return serviceRepository.save(serviceVO);
+	    // 會員新增後預設上架
+	    serviceVO.setStatus(STATUS_ACTIVE);
+
+	    return serviceRepository.save(serviceVO);
 	}
 
 	// 會員修改服務前，查自己的服務給表單回填

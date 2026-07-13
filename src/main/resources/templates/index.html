@@ -474,26 +474,33 @@
     </section>
 
 
-    <!-- ========== 個人出租推薦 ========== -->
-    <section class="home-section recommended-services">
-      <h2 class="section-title">精選個人出租</h2>
+<!-- ========== 個人出租推薦 ========== -->
+<section class="home-section recommended-services">
+  <h2 class="section-title">精選個人出租</h2>
 
-      <div class="card-grid" th:if="${not #lists.isEmpty(recommendedServices)}">
-        <div class="card" th:each="service : ${recommendedServices}">
-          <a th:href="@{/front/services/{id}(id=${service.serviceId})}">
-            <!-- <img class="card-img" th:src="@{/service/pic/{id}(id=${service.serviceId})}" alt="服務圖片" /> -->
-            <div class="card-body">
-              <h3 th:text="${service.serviceName}">服務標題</h3>
-              <p th:text="${service.hourlyRate} + ' 元'">價格</p>
-            </div>
-          </a>
+  <div class="card-grid" th:if="${not #lists.isEmpty(recommendedServices)}">
+    <div class="card" th:each="service : ${recommendedServices}">
+      <a th:href="@{/front/services/{id}(id=${service.serviceId})}">
+
+        <!-- 服務圖片：有上傳顯示資料庫圖片，沒上傳顯示 default-activity.jpg -->
+        <img class="card-img"
+             th:src="@{/front/services/image/{serviceId}(serviceId=${service.serviceId})}"
+             alt="服務圖片">
+
+        <div class="card-body">
+          <h3 th:text="${service.serviceName}">服務標題</h3>
+          <p>
+            NT$ <span th:text="${service.hourlyRate}">500</span> / 小時
+          </p>
         </div>
-      </div>
+      </a>
+    </div>
+  </div>
 
-      <p class="empty-hint" th:if="${#lists.isEmpty(recommendedServices)}">
-        目前尚無推薦服務
-      </p>
-    </section>
+  <p class="empty-hint" th:if="${#lists.isEmpty(recommendedServices)}">
+    目前尚無推薦服務
+  </p>
+</section>
 
 
     <!-- ========== 即將截止的團體活動 ========== -->

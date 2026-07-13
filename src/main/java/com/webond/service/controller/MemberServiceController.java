@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.member.model.MemberVO;
@@ -61,33 +62,67 @@ public class MemberServiceController {
 	// 會員新增服務
 	// URL: POST /member/services/add
 	@PostMapping("/add")
-	public String addService(@ModelAttribute ServiceRequest request, HttpSession session, Model model,
-			RedirectAttributes redirectAttributes) {
+	public String addService(@ModelAttribute ServiceRequest request,
+	                         @RequestParam(value = "serviceImageFile", required = false) MultipartFile serviceImageFile,
+	                         HttpSession session,
+	                         Model model,
+	                         RedirectAttributes redirectAttributes) {
 
-		Integer loginMemberId = getLoginMemberId(session);
+	    Integer loginMemberId = getLoginMemberId(session);
 
-		if (loginMemberId == null) {
-			return "redirect:/member/services/fakelogin";
-		}
+	    if (loginMemberId == null) {
+	        return "redirect:/member/services/fakelogin";
+	    }
 
-		try {
-			serviceSvc.addBySeller(loginMemberId, request.getServiceTypeId(), request.getServiceName(),
-					request.getDescription(), request.getHourlyRate());
+	    try {
+	        byte[] serviceImage = null;
+	        String serviceImageType = null;
 
-			redirectAttributes.addFlashAttribute("successMsg", "新增服務成功");
+	        if (serviceImageFile != null && !serviceImageFile.isEmpty()) {
 
-			return "redirect:/member/services";
+	            serviceImageType = serviceImageFile.getContentType();
 
-		} catch (IllegalArgumentException e) {
-			model.addAttribute("errorMsg", e.getMessage());
-			model.addAttribute("serviceRequest", request);
-			model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
-			model.addAttribute("mode", "add");
+	            if (!"image/jpeg".equals(serviceImageType)
+	                    && !"image/png".equals(serviceImageType)
+	                    && !"image/webp".equals(serviceImageType)
+	                    && !"image/gif".equals(serviceImageType)) {
+	                throw new IllegalArgumentException("圖片格式只支援 JPG、PNG、WEBP、GIF");
+	            }
 
-			return "front-end/service/memberServiceForm";
-		}
+	            serviceImage = serviceImageFile.getBytes();
+	        }
+
+	        serviceSvc.addBySeller(
+	                loginMemberId,
+	                request.getServiceTypeId(),
+	                request.getServiceName(),
+	                request.getDescription(),
+	                request.getHourlyRate(),
+	                serviceImage,
+	                serviceImageType
+	        );
+
+	        redirectAttributes.addFlashAttribute("successMsg", "新增服務成功");
+
+	        return "redirect:/member/services";
+
+	    } catch (IllegalArgumentException e) {
+	        model.addAttribute("errorMsg", e.getMessage());
+	        model.addAttribute("serviceRequest", request);
+	        model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
+	        model.addAttribute("mode", "add");
+
+	        return "front-end/service/memberServiceForm";
+
+	    } catch (Exception e) {
+	        model.addAttribute("errorMsg", "圖片上傳失敗");
+	        model.addAttribute("serviceRequest", request);
+	        model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
+	        model.addAttribute("mode", "add");
+
+	        return "front-end/service/memberServiceForm";
+	    }
 	}
-
 	// 前往會員修改服務頁面
 	// URL: GET /member/services/{serviceId}/edit
 	@GetMapping("/{serviceId}/edit")
