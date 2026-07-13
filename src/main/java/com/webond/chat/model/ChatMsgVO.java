@@ -2,13 +2,11 @@ package com.webond.chat.model;
 
 import java.sql.Timestamp;
 
-import com.webond.member.model.MemberVO;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -16,12 +14,15 @@ import jakarta.persistence.Table;
 public class ChatMsgVO {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "MESSAGE_ID", updatable = false)
 	private Integer msgId;
 
-	@ManyToOne
-	@JoinColumn(name = "SENDER_MEMBER_ID", referencedColumnName = "MEMBER_ID")
-	private MemberVO sendMemId;
+	@Column(name = "SENDER_MEMBER_ID")
+	private Integer senderId;
+	
+	@Column(name = "RECEIVER_MEMBER_ID")
+	private Integer receiverId;
 
 	@Column(name = "CONTENT")
 	private String content;
@@ -32,71 +33,97 @@ public class ChatMsgVO {
 	@Column(name = "IS_READ")
 	private Integer isRead;
 
-	@ManyToOne
-	@JoinColumn(name = "CHAT_ROOM_ID", referencedColumnName = "CHAT_ROOM_ID")
-	private ChatRoomVO chatRoomVO;
+
 
 	public ChatMsgVO() {
 		super();
 	}
 
-	public ChatMsgVO(Integer msgId, MemberVO sendMemId, String content, Timestamp sentAt, Integer isRead,
-			ChatRoomVO chatRoomVO) {
+
+
+	public ChatMsgVO(Integer msgId, Integer senderId, Integer receiverId, String content, Timestamp sentAt,
+			Integer isRead) {
 		super();
 		this.msgId = msgId;
-		this.sendMemId = sendMemId;
+		this.senderId = senderId;
+		this.receiverId = receiverId;
 		this.content = content;
 		this.sentAt = sentAt;
 		this.isRead = isRead;
-		this.chatRoomVO = chatRoomVO;
 	}
+
+
 
 	public Integer getMsgId() {
 		return msgId;
 	}
 
+
+
 	public void setMsgId(Integer msgId) {
 		this.msgId = msgId;
 	}
 
-	public MemberVO getSendMemId() {
-		return sendMemId;
+
+
+	public Integer getSenderId() {
+		return senderId;
 	}
 
-	public void setSendMemId(MemberVO sendMemId) {
-		this.sendMemId = sendMemId;
+
+
+	public void setSenderId(Integer senderId) {
+		this.senderId = senderId;
 	}
+
+
+
+	public Integer getReceiverId() {
+		return receiverId;
+	}
+
+
+
+	public void setReceiverId(Integer receiverId) {
+		this.receiverId = receiverId;
+	}
+
+
 
 	public String getContent() {
 		return content;
 	}
 
+
+
 	public void setContent(String content) {
 		this.content = content;
 	}
+
+
 
 	public Timestamp getSentAt() {
 		return sentAt;
 	}
 
+
+
 	public void setSentAt(Timestamp sentAt) {
 		this.sentAt = sentAt;
 	}
+
+
 
 	public Integer getIsRead() {
 		return isRead;
 	}
 
+
+
 	public void setIsRead(Integer isRead) {
 		this.isRead = isRead;
 	}
 
-	public void setChatRoomVO(ChatRoomVO chatRoomVO) {
-		this.chatRoomVO = chatRoomVO;
-	}
-
-	public ChatRoomVO getChatRoomVO() {
-		return chatRoomVO;
-	}
+	
 
 }
