@@ -18,7 +18,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.webond.employee.model.EmployeeVO;
 import com.webond.employee.repository.EmployeeRepository;
 import com.webond.venue.model.VenueReviewVO;
+import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueReviewService;
+import com.webond.venue.service.VenueService;
 
 import jakarta.validation.Valid;
 
@@ -31,6 +33,9 @@ public class VenueReviewController {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
+	
+	@Autowired
+	VenueService venueService;
 
 	// ===== 新增：顯示表單 =====
 	@GetMapping("addVenueReview")
@@ -114,6 +119,8 @@ public class VenueReviewController {
 	@GetMapping("viewOne")
 	public String viewOne(@RequestParam("venueReviewId") Integer venueReviewId, ModelMap model) {
 		VenueReviewVO venueReviewVO = venueReviewSvc.getOneVenueReview(venueReviewId);
+		VenueVO venueVO = venueService.getOneVenue(venueReviewVO.getVenueId());		
+		model.addAttribute("venueVO", venueVO);
 		model.addAttribute("venueReviewVO", venueReviewVO);
 		return "back-end/venueReview/listOneVenueReview";
 	}

@@ -237,7 +237,7 @@ select:focus, textarea:focus {
 				<div class="info-group">
 					<div class="info-label">負責員工</div>
 					<div class="info-value"
-						th:text="*{employeeId != null ? employeeNameMap.get(employeeId) : '尚未指派'}"></div>
+						th:text="${venueReviewVO.employeeId != null ? venueReviewVO.employeeId + ' - ' + employeeNameMap.get(venueReviewVO.employeeId) : '尚未指派'}"></div>
 				</div>
 				<div class="info-group full-width">
 					<div class="info-label">審核備註</div>
@@ -249,6 +249,12 @@ select:focus, textarea:focus {
 					<div class="info-value"
 						th:text="*{reviewedAt != null ? #temporals.format(reviewedAt, 'yyyy-MM-dd HH:mm') : '尚未審核'}"></div>
 				</div>
+				<div class="section-title">場地照片</div>
+				<div class="img-grid">
+					<img th:each="img : ${venueVO.venueImages}"
+						th:src="@{/front/venue/getImage(imagesId=${img.imagesId})}"
+						style="width: 150px; height: 100px" />
+				</div>
 			</div>
 
 			<!-- 審核操作區：只有「審核中」狀態才顯示，已審核過的紀錄不再顯示操作按鈕 -->
@@ -256,61 +262,79 @@ select:focus, textarea:focus {
 				<div class="section-title">審核操作</div>
 
 				<div class="action-form">
-					<label
-						style="font-weight: 600; color: #0f6e56; margin-bottom: 10px;">✅
-						審核通過</label>
-					<form th:action="@{/venueReview/approve}" method="post">
+					<label for="reviewEmployeeId">審核員工</label> <select
+						id="reviewEmployeeId" required>
+						<option value="">請選擇審核員工</option>
+						<option th:each="emp : ${employeeListData}"
+							th:value="${emp.employeeId}"
+							th:text="${emp.employeeId} + ' - ' + ${emp.empName}"></option>
+					</select> <label for="reviewNoteInput">審核備註／退件理由</label>
+					<textarea id="reviewNoteInput" rows="3"
+						placeholder="通過可留空；未通過請務必填寫理由，以便場地方修改"></textarea>
+
+					<!-- 實際送出的表單：approve -->
+					<form th:action="@{/venueReview/approve}" method="post"
+						id="approveForm" style="display: none;">
 						<input type="hidden" name="venueReviewId"
-							th:value="*{venueReviewId}" /> <label for="approveEmployeeId">審核員工</label>
-						<select name="employeeId" id="approveEmployeeId" required>
-							<option value="">請選擇審核員工</option>
-							<option th:each="emp : ${employeeListData}"
-								th:value="${emp.employeeId}" th:text="${emp.empName}">
-							</option>
-						</select> <label for="approveNote">審核備註（選填）</label>
-						<textarea name="reviewNote" id="approveNote" rows="3"
-							placeholder="請輸入審核備註"></textarea>
-
-						<div class="action-bar"
-							style="border-top: none; padding-top: 0; margin-top: 0.5rem;">
-							<button type="submit" class="btn btn-approve"
-								onclick="return confirm('確定要通過此場地審核嗎？');">審核通過</button>
-						</div>
+							th:value="*{venueReviewId}" /> <input type="hidden"
+							name="employeeId" id="approveEmployeeId" /> <input type="hidden"
+							name="reviewNote" id="approveReviewNote" />
 					</form>
-				</div>
 
-				<div class="action-form" style="margin-top: 1.5rem;">
-					<label
-						style="font-weight: 600; color: #dc2626; margin-bottom: 10px;">❌
-						審核未通過</label>
-					<form th:action="@{/venueReview/reject}" method="post">
+					<!-- 實際送出的表單：reject -->
+					<form th:action="@{/venueReview/reject}" method="post"
+						id="rejectForm" style="display: none;">
 						<input type="hidden" name="venueReviewId"
-							th:value="*{venueReviewId}" /> <label for="rejectEmployeeId">審核員工</label>
-						<select name="employeeId" id="rejectEmployeeId" required>
-							<option value="">請選擇審核員工</option>
-							<option th:each="emp : ${employeeListData}"
-								th:value="${emp.employeeId}" th:text="${emp.empName}">
-							</option>
-						</select> <label for="rejectNote">退件理由（必填）</label>
-						<textarea name="reviewNote" id="rejectNote" rows="3"
-							placeholder="請說明退件理由，以便場地方修改" required></textarea>
-
-						<div class="action-bar"
-							style="border-top: none; padding-top: 0; margin-top: 0.5rem;">
-							<button type="submit" class="btn btn-reject"
-								onclick="return confirm('確定要標記此場地審核未通過嗎？');">審核未通過</button>
-						</div>
+							th:value="*{venueReviewId}" /> <input type="hidden"
+							name="employeeId" id="rejectEmployeeId" /> <input type="hidden"
+							name="reviewNote" id="rejectReviewNote" />
 					</form>
+
+					<div class="action-bar"
+						style="border-top: none; padding-top: 0; margin-top: 0.5rem;">
+						<button type="button" class="btn btn-approve"
+							onclick="submitReview('approve')">審核通過</button>
+						<button type="button" class="btn btn-reject"
+							onclick="submitReview('reject')">審核未通過</button>
+					</div>
 				</div>
 			</div>
 
-			<div class="action-bar"
-				th:unless="${venueReviewVO.reviewStatus == 0}">
-				<a th:href="@{/venueReview/listAllVenueReview}"
-					class="btn btn-secondary">返回列表</a>
-			</div>
 		</div>
 	</div>
+
+	<script>
+		function submitReview(action) {
+			const employeeId = document.getElementById('reviewEmployeeId').value;
+			const reviewNote = document.getElementById('reviewNoteInput').value;
+
+			if (!employeeId) {
+				alert('請選擇審核員工');
+				return;
+			}
+			if (action === 'reject'
+					&& (!reviewNote || reviewNote.trim() === '')) {
+				alert('審核未通過時，須填寫退件理由');
+				return;
+			}
+
+			const confirmMsg = action === 'approve' ? '確定要通過此場地審核嗎？'
+					: '確定要標記此場地審核未通過嗎？';
+			if (!confirm(confirmMsg)) {
+				return;
+			}
+
+			if (action === 'approve') {
+				document.getElementById('approveEmployeeId').value = employeeId;
+				document.getElementById('approveReviewNote').value = reviewNote;
+				document.getElementById('approveForm').submit();
+			} else {
+				document.getElementById('rejectEmployeeId').value = employeeId;
+				document.getElementById('rejectReviewNote').value = reviewNote;
+				document.getElementById('rejectForm').submit();
+			}
+		}
+	</script>
 
 </body>
 </html>
