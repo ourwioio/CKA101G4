@@ -330,7 +330,7 @@ select:focus, textarea:focus {
 				<form th:action="@{/venueReview/approve}" method="post"
 					id="approveForm" style="display: none;">
 					<input type="hidden" name="venueReviewId"
-						th:value="*{venueReviewId}" /> <input type="hidden"
+						th:value="${venueReviewVO.venueReviewId}" /> <input type="hidden"
 						name="employeeId" id="approveEmployeeId" /> <input type="hidden"
 						name="reviewNote" id="approveReviewNote" />
 				</form>
