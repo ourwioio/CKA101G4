@@ -291,6 +291,14 @@ public class VenueFrontOrderController {
 		return "front-end/venue/myVenuesCompleted";
 	}
 	
+	@GetMapping("cancelOrder")
+	public String cancelOrder(@RequestParam("venueOrderId") Integer venueOrderId, Model model) {
+		VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
+		venueOrderVO.setOrderStatus((byte) 4);
+		venueOrderService.updateVenueOrder(venueOrderVO);
+		return "redirect:/front/venueOrder/myVenueOrder";
+	}
+	
 	@ModelAttribute("venueTypeData")
 	protected List<VenueTypeVO> listData(){
 		List<VenueTypeVO> list = venueTypeService.getAll();
