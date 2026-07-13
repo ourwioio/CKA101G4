@@ -21,10 +21,12 @@ import com.webond.member.model.NotificationVO;
 import com.webond.member.service.NotificationService;
 import com.webond.venue.dto.VenueOrderFrontDTO;
 import com.webond.venue.model.VenueOrderVO;
+import com.webond.venue.model.VenueTypeVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueOrderService;
 import com.webond.venue.service.VenueService;
 import com.webond.venue.service.VenueSlotService;
+import com.webond.venue.service.VenueTypeService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -46,6 +48,9 @@ public class VenueFrontOrderController {
 	
 	@Autowired
 	NotificationService notificationService;
+	
+	@Autowired
+	VenueTypeService venueTypeService;
 
 	@GetMapping("addVenueOrder")
 	public String add(@RequestParam("venueId") Integer venueId, Model model, HttpSession session) {
@@ -284,6 +289,12 @@ public class VenueFrontOrderController {
 		List<VenueOrderVO> list = venueOrderService.getMyAllCompletedBookings(loginMember.getMemberId());
 		model.addAttribute("myAllCompletedlist", list);
 		return "front-end/venue/myVenuesCompleted";
+	}
+	
+	@ModelAttribute("venueTypeData")
+	protected List<VenueTypeVO> listData(){
+		List<VenueTypeVO> list = venueTypeService.getAll();
+		return list;
 	}
 
 	/** 用訂單自己存的 startAt/endAt/venueSlotId 反推並釋放時段 */
