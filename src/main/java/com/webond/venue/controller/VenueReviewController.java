@@ -1,5 +1,6 @@
 package com.webond.venue.controller;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.employee.model.EmployeeVO;
 import com.webond.employee.repository.EmployeeRepository;
+import com.webond.venue.model.VenueImagesVO;
 import com.webond.venue.model.VenueReviewVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueReviewService;
@@ -33,7 +35,7 @@ public class VenueReviewController {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
-	
+
 	@Autowired
 	VenueService venueService;
 
@@ -119,8 +121,16 @@ public class VenueReviewController {
 	@GetMapping("viewOne")
 	public String viewOne(@RequestParam("venueReviewId") Integer venueReviewId, ModelMap model) {
 		VenueReviewVO venueReviewVO = venueReviewSvc.getOneVenueReview(venueReviewId);
-		VenueVO venueVO = venueService.getOneVenue(venueReviewVO.getVenueId());		
+		VenueVO venueVO = venueService.getOneVenue(venueReviewVO.getVenueId());
+
+		// 排序：封面照片排最前面，其他照片維持原本順序接在後面
+		List<VenueImagesVO> sortedImages = venueVO.getVenueImages().stream()
+				.sorted(Comparator
+						.comparing((VenueImagesVO img) -> (img.getCover() != null && img.getCover() == 1) ? 0 : 1))
+				.toList();
+		
 		model.addAttribute("venueVO", venueVO);
+		model.addAttribute("sortedImages", sortedImages);
 		model.addAttribute("venueReviewVO", venueReviewVO);
 		return "back-end/venueReview/listOneVenueReview";
 	}

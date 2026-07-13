@@ -15,11 +15,6 @@
 			<span class="title">場地審核清單</span>
 		</div>
 
-		<div class="alert-success" th:if="${success != null}"
-			style="margin-bottom: 1rem;">
-			✨ 提示訊息：<span th:text="${success}"></span>
-		</div>
-
 		<!-- 搜尋區 -->
 		<form th:action="@{/venueReview/search}" method="post"
 			style="margin-bottom: 1.5rem; display: flex; gap: 12px; flex-wrap: wrap;">
