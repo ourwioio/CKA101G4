@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>場地審核詳細資訊</title>
+
+<style>
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		Arial, sans-serif;
+	background-color: #f4f6f9;
+	color: #333;
+	margin: 0;
+	padding: 2rem 1rem;
+}
+
+.container {
+	max-width: 900px;
+	margin: 0 auto;
+}
+
+.page-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1.5rem;
+}
+
+.page-title {
+	font-size: 24px;
+	font-weight: 600;
+	color: #2c3e50;
+}
+
+.alert-success {
+	background-color: #d1e7dd;
+	color: #0f5132;
+	border: 1px solid #badbcc;
+	padding: 12px 16px;
+	border-radius: 6px;
+	margin-bottom: 1.5rem;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.card {
+	background: #ffffff;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	padding: 2.5rem;
+}
+
+.section-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: #0f6e56;
+	border-left: 4px solid #0f6e56;
+	padding-left: 8px;
+	margin: 1.5rem 0 1rem 0;
+}
+
+.info-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1.5rem;
+	margin-bottom: 1rem;
+}
+
+.info-group {
+	border-bottom: 1px solid #f1f5f9;
+	padding-bottom: 10px;
+}
+
+.info-group.full-width {
+	grid-column: span 2;
+}
+
+.info-label {
+	font-size: 13px;
+	font-weight: 500;
+	color: #64748b;
+	margin-bottom: 4px;
+}
+
+.info-value {
+	font-size: 15px;
+	font-weight: 600;
+	color: #1e293b;
+}
+
+.status-badge {
+	display: inline-block;
+	padding: 4px 12px;
+	border-radius: 50px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.status-reviewing {
+	background-color: #fef3c7;
+	color: #b45309;
+}
+
+.status-approved {
+	background-color: #dcfce7;
+	color: #15803d;
+}
+
+.status-rejected {
+	background-color: #fee2e2;
+	color: #b91c1c;
+}
+
+.action-form {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	padding: 1.5rem;
+	margin-top: 1rem;
+}
+
+label {
+	display: block;
+	font-size: 14px;
+	font-weight: 500;
+	margin-bottom: 0.5rem;
+	color: #4a5568;
+}
+
+select, textarea {
+	width: 100%;
+	padding: 10px 12px;
+	font-size: 14px;
+	border: 1px solid #cbd5e1;
+	border-radius: 6px;
+	outline: none;
+	background-color: #fff;
+	margin-bottom: 1rem;
+}
+
+select:focus, textarea:focus {
+	border-color: #0f6e56;
+	box-shadow: 0 0 0 3px rgba(15, 110, 86, 0.15);
+}
+
+.action-bar {
+	margin-top: 2.5rem;
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+	border-top: 1px solid #e2e8f0;
+	padding-top: 1.5rem;
+}
+
+.btn {
+	padding: 10px 24px;
+	font-size: 14px;
+	font-weight: 500;
+	border-radius: 6px;
+	cursor: pointer;
+	text-decoration: none;
+	transition: all 0.2s;
+	border: none;
+}
+
+.btn-secondary {
+	background: #ffffff;
+	border: 1px solid #cbd5e1;
+	color: #475569;
+}
+
+.btn-secondary:hover {
+	background: #f8fafc;
+}
+
+.btn-approve {
+	background: #0f6e56;
+	color: #ffffff;
+}
+
+.btn-approve:hover {
+	background: #0b5240;
+}
+
+.btn-reject {
+	background: #dc2626;
+	color: #ffffff;
+}
+
+.btn-reject:hover {
+	background: #b91c1c;
+}
+</style>
+</head>
+<body>
+
+	<div class="container">
+
+		<div class="alert-success" th:if="${success != null}">
+			✨ 提示訊息：<span th:text="${success}"></span>
+		</div>
+
+		<div class="page-header">
+			<h1 class="page-title">場地審核詳細資訊</h1>
+			<a th:href="@{/venueReview/listAllVenueReview}"
+				class="btn btn-secondary">返回列表</a>
+		</div>
+
+		<div class="card" th:object="${venueReviewVO}">
+
+			<div class="section-title">審核基本資訊</div>
+			<div class="info-grid">
+				<div class="info-group">
+					<div class="info-label">審核編號</div>
+					<div class="info-value" th:text="*{venueReviewId}"></div>
+				</div>
+				<div class="info-group">
+					<div class="info-label">場地編號</div>
+					<div class="info-value" th:text="*{venueId}"></div>
+				</div>
+				<div class="info-group">
+					<div class="info-label">審核狀態</div>
+					<div>
+						<span class="status-badge status-reviewing"
+							th:if="*{reviewStatus == 0}">審核中</span> <span
+							class="status-badge status-approved" th:if="*{reviewStatus == 1}">審核通過</span>
+						<span class="status-badge status-rejected"
+							th:if="*{reviewStatus == 2}">審核未通過</span>
+					</div>
+				</div>
+				<div class="info-group">
+					<div class="info-label">負責員工</div>
+					<div class="info-value"
+						th:text="*{employeeId != null ? employeeNameMap.get(employeeId) : '尚未指派'}"></div>
+				</div>
+				<div class="info-group full-width">
+					<div class="info-label">審核備註</div>
+					<div class="info-value"
+						th:text="*{reviewNote != null ? reviewNote : '無'}"></div>
+				</div>
+				<div class="info-group full-width">
+					<div class="info-label">審核時間</div>
+					<div class="info-value"
+						th:text="*{reviewedAt != null ? #temporals.format(reviewedAt, 'yyyy-MM-dd HH:mm') : '尚未審核'}"></div>
+				</div>
+			</div>
+
+			<!-- 審核操作區：只有「審核中」狀態才顯示，已審核過的紀錄不再顯示操作按鈕 -->
+			<div th:if="${venueReviewVO.reviewStatus == 0}">
+				<div class="section-title">審核操作</div>
+
+				<div class="action-form">
+					<label
+						style="font-weight: 600; color: #0f6e56; margin-bottom: 10px;">✅
+						審核通過</label>
+					<form th:action="@{/venueReview/approve}" method="post">
+						<input type="hidden" name="venueReviewId"
+							th:value="*{venueReviewId}" /> <label for="approveEmployeeId">審核員工</label>
+						<select name="employeeId" id="approveEmployeeId" required>
+							<option value="">請選擇審核員工</option>
+							<option th:each="emp : ${employeeListData}"
+								th:value="${emp.employeeId}" th:text="${emp.empName}">
+							</option>
+						</select> <label for="approveNote">審核備註（選填）</label>
+						<textarea name="reviewNote" id="approveNote" rows="3"
+							placeholder="請輸入審核備註"></textarea>
+
+						<div class="action-bar"
+							style="border-top: none; padding-top: 0; margin-top: 0.5rem;">
+							<button type="submit" class="btn btn-approve"
+								onclick="return confirm('確定要通過此場地審核嗎？');">審核通過</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="action-form" style="margin-top: 1.5rem;">
+					<label
+						style="font-weight: 600; color: #dc2626; margin-bottom: 10px;">❌
+						審核未通過</label>
+					<form th:action="@{/venueReview/reject}" method="post">
+						<input type="hidden" name="venueReviewId"
+							th:value="*{venueReviewId}" /> <label for="rejectEmployeeId">審核員工</label>
+						<select name="employeeId" id="rejectEmployeeId" required>
+							<option value="">請選擇審核員工</option>
+							<option th:each="emp : ${employeeListData}"
+								th:value="${emp.employeeId}" th:text="${emp.empName}">
+							</option>
+						</select> <label for="rejectNote">退件理由（必填）</label>
+						<textarea name="reviewNote" id="rejectNote" rows="3"
+							placeholder="請說明退件理由，以便場地方修改" required></textarea>
+
+						<div class="action-bar"
+							style="border-top: none; padding-top: 0; margin-top: 0.5rem;">
+							<button type="submit" class="btn btn-reject"
+								onclick="return confirm('確定要標記此場地審核未通過嗎？');">審核未通過</button>
+						</div>
+					</form>
+				</div>
+			</div>
+
+			<div class="action-bar"
+				th:unless="${venueReviewVO.reviewStatus == 0}">
+				<a th:href="@{/venueReview/listAllVenueReview}"
+					class="btn btn-secondary">返回列表</a>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>

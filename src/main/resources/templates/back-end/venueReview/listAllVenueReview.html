@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>場地審核管理</title>
+<th:block th:insert="~{back-end/venue/index}"></th:block>
+<link rel="stylesheet" th:href="@{/css/back-end/venue/listAllVenue.css}"
+	href="venue-admin-list.css">
+</head>
+<body>
+	<div class="wrap">
+		<div class="header">
+			<span class="title">場地審核清單</span>
+		</div>
+
+		<div class="alert-success" th:if="${success != null}"
+			style="margin-bottom: 1rem;">
+			✨ 提示訊息：<span th:text="${success}"></span>
+		</div>
+
+		<!-- 搜尋區 -->
+		<form th:action="@{/venueReview/search}" method="post"
+			style="margin-bottom: 1.5rem; display: flex; gap: 12px; flex-wrap: wrap;">
+			<select name="reviewStatus">
+				<option value="">-- 全部狀態 --</option>
+				<option value="0"
+					th:selected="${searchReviewStatus != null && searchReviewStatus == 0}">審核中</option>
+				<option value="1"
+					th:selected="${searchReviewStatus != null && searchReviewStatus == 1}">審核通過</option>
+				<option value="2"
+					th:selected="${searchReviewStatus != null && searchReviewStatus == 2}">審核未通過</option>
+			</select> <input type="number" name="venueId" placeholder="場地編號"
+				th:value="${searchVenueId}" style="width: 120px;" /> <select
+				name="employeeId">
+				<option value="">-- 全部審核員工 --</option>
+				<option th:each="emp : ${employeeListData}"
+					th:value="${emp.employeeId}" th:text="${emp.empName}"
+					th:selected="${searchEmployeeId != null && searchEmployeeId == emp.employeeId}">
+				</option>
+			</select>
+
+			<button type="submit" class="btn-edit">搜尋</button>
+		</form>
+
+		<div class="table-wrap">
+			<table>
+				<thead>
+					<tr>
+						<th>審核編號</th>
+						<th>場地編號</th>
+						<th>審核狀態</th>
+						<th>負責員工</th>
+						<th>審核備註</th>
+						<th>審核時間</th>
+						<th>查看詳情</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="venueReview : ${venueReviewListData}">
+						<td th:text="${venueReview.venueReviewId}"></td>
+						<td th:text="${venueReview.venueId}"></td>
+						<td><span th:switch="${venueReview.reviewStatus}"> <span
+								th:case="0" class="btn-toggle btn-toggle-down"
+								style="pointer-events: none;">審核中</span> <span th:case="1"
+								class="btn-toggle btn-toggle-up" style="pointer-events: none;">審核通過</span>
+								<span th:case="2" class="btn-toggle btn-toggle-down"
+								style="pointer-events: none;">審核未通過</span>
+						</span></td>
+						<td
+							th:text="${venueReview.employeeId != null ? employeeNameMap.get(venueReview.employeeId) : '尚未指派'}"></td>
+						<td th:text="${venueReview.reviewNote}"></td>
+						<td
+							th:text="${venueReview.reviewedAt != null ? #temporals.format(venueReview.reviewedAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+						<td>
+							<form th:action="@{/venueReview/viewOne}" method="get"
+								class="inline-form">
+								<input type="hidden" name="venueReviewId"
+									th:value="${venueReview.venueReviewId}" />
+								<button type="submit" class="btn-edit">查看詳情</button>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+</html>
