@@ -145,6 +145,7 @@ public class VenueFrontController {
 		VenueReviewVO venueReviewVO = new VenueReviewVO();
 		venueReviewVO.setVenueId(venueVO.getVenueId());
 		venueReviewVO.setReviewStatus((byte) 0);
+		venueReviewService.addVenueReview(venueReviewVO);
 		
 		return "redirect:/front/venue/myVenue";
 	}
