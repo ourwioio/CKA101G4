@@ -20,9 +20,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.webond.member.model.MemberVO;
+import com.webond.venue.model.VenueReviewVO;
 import com.webond.venue.model.VenueTypeVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueImagesService;
+import com.webond.venue.service.VenueReviewService;
 import com.webond.venue.service.VenueService;
 import com.webond.venue.service.VenueTypeService;
 
@@ -42,6 +44,9 @@ public class VenueFrontController {
 
 	@Autowired
 	VenueTypeService venueTypeService;
+	
+	@Autowired
+	VenueReviewService venueReviewService;
 
 	@GetMapping("addVenue")
 	public String addVenue(ModelMap model, HttpSession session) {
@@ -136,7 +141,11 @@ public class VenueFrontController {
 		venueVO.setMember(loginMember); // 直接用 session 裡的會員物件，不用再查一次
 
 		venueService.addVenueWithImages(venueVO, imageBytesList, coverIndex);
-
+		
+		VenueReviewVO venueReviewVO = new VenueReviewVO();
+		venueReviewVO.setVenueId(venueVO.getVenueId());
+		venueReviewVO.setReviewStatus((byte) 0);
+		
 		return "redirect:/front/venue/myVenue";
 	}
 
