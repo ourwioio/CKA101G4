@@ -69,7 +69,7 @@
 								style="pointer-events: none;">審核未通過</span>
 						</span></td>
 						<td
-							th:text="${venueReview.employeeId != null ? employeeNameMap.get(venueReview.employeeId) : '尚未指派'}"></td>
+							th:text="${venueReview.employeeId != null ? venueReview.employeeId + ' - ' + employeeNameMap.get(venueReview.employeeId) : '尚未指派'}"></td>
 						<td th:text="${venueReview.reviewNote}"></td>
 						<td
 							th:text="${venueReview.reviewedAt != null ? #temporals.format(venueReview.reviewedAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
