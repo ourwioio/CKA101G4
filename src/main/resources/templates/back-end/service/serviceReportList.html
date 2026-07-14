@@ -31,8 +31,8 @@
                 <td th:text="${report.reporterMember != null ? report.reporterMember.memberId : '-'}">1</td>
                 <td th:text="${report.employee != null ? report.employee.employeeId : '未指派'}">-</td>
                 <td class="content-cell" th:text="${report.serviceReportCom}" th:title="${report.serviceReportCom}">檢舉內容...</td>
-                <td th:text="${#dates.format(report.serviceReportTime, 'yyyy-MM-dd HH:mm')}">2026-01-01</td>
-                <td th:text="${report.serviceReportHandleTime != null ? #dates.format(report.serviceReportHandleTime, 'yyyy-MM-dd HH:mm') : '尚未處理'}">-</td>
+                <td th:text="${#temporals.format(report.serviceReportTime, 'yyyy-MM-dd HH:mm')}">2026-01-01</td>
+                <td th:text="${report.serviceReportHandleTime != null ? #temporals.format(report.serviceReportTime, 'yyyy-MM-dd HH:mm') : '尚未處理'}">-</td>
                 <td>
                     <span class="status-badge"
                           th:class="${report.serviceReportStatus == 0} ? 'status-badge status-pending' : (${report.serviceReportStatus == 1} ? 'status-badge status-approved' : 'status-badge status-rejected')"
