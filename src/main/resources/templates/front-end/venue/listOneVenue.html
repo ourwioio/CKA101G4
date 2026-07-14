@@ -28,6 +28,9 @@
 					</div>
 				</div>
 			</div>
+			<div class="section-title">場地介紹：</div>
+			<div class="venue-desc" th:if="${venueVO.venueDescription != null and !venueVO.venueDescription.isEmpty()}" 
+     th:text="${venueVO.venueDescription}"></div>
 			<hr />
 			<div class="section-title">場地照片</div>
 			<div class="img-grid">

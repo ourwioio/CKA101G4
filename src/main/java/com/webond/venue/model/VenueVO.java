@@ -20,6 +20,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "VENUE")
@@ -33,7 +34,7 @@ public class VenueVO {
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "venueVO", orphanRemoval = true)
 	@OrderBy("imagesId asc")
 	private Set<VenueImagesVO> venueImages = new HashSet<>();
-	
+
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "venueVO")
 	@OrderBy("slotDate asc")
 	private Set<VenueSlotVO> venueSlots = new HashSet<>();
@@ -86,6 +87,10 @@ public class VenueVO {
 	@Column(name = "RATING_COUNT")
 	private Integer ratingCount;
 
+	@Column(name = "VENUE_DESCRIPTION")
+	@Size(max = 200, message = "場地介紹：請勿超過 200 字")
+	private String venueDescription;
+
 	public VenueVO() {
 		super();
 	}
@@ -105,14 +110,14 @@ public class VenueVO {
 	public void setVenueImages(Set<VenueImagesVO> venueImages) {
 		this.venueImages = venueImages;
 	}
-	
+
 	public VenueImagesVO getCoverImage() {
-	    for (VenueImagesVO image : venueImages) {
-	        if (image.getCover() != null && image.getCover() == 1) {
-	            return image; // 回傳封面
-	        }
-	    }
-	    return null; // 防呆
+		for (VenueImagesVO image : venueImages) {
+			if (image.getCover() != null && image.getCover() == 1) {
+				return image; // 回傳封面
+			}
+		}
+		return null; // 防呆
 	}
 
 	public Set<VenueSlotVO> getVenueSlots() {
@@ -187,8 +192,6 @@ public class VenueVO {
 		this.venueStatus = venueStatus;
 	}
 
-	
-
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
@@ -235,6 +238,21 @@ public class VenueVO {
 
 	public void setRatingcount(Integer ratingcount) {
 		this.ratingCount = ratingcount;
+	}
+
+	public String getVenueDescription() {
+		return venueDescription;
+	}
+
+	public void setVenueDescription(String venueDescription) {
+		this.venueDescription = venueDescription;
+	}
+
+	public Double getAverageRating() {
+		if (ratingCount == null || ratingCount == 0) {
+			return null; // 尚未評分
+		}
+		return ratingStars.doubleValue() / ratingCount;
 	}
 
 }

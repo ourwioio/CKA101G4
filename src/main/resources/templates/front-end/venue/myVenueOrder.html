@@ -111,16 +111,14 @@
 
                         <!-- 🌟 已付款或已完成：可評價、可檢舉 -->
                         <th:block th:if="${order.orderStatus == 3}">
-                            <button type="button" class="btn-review"
-                                    th:attr="data-order-id=${order.venueOrderId},
-                                             data-rating=${order.venueRating},
-                                             data-comment=${order.venueComment}"
-                                    onclick="openReviewModal(this)"
-                                    th:text="${order.venueRating != null} ? '編輯評價' : '評價場地'">
-                            </button>
-
-                            <a th:href="@{/front/report/add(venueOrderId=${order.venueOrderId})}" class="btn-report">檢舉</a>
-                        </th:block>
+						    <button type="button" class="btn-review"
+						            th:if="${order.venueRating == null}"
+						            th:attr="data-order-id=${order.venueOrderId}"
+						            onclick="openReviewModal(this)">評價場地</button>
+						
+						    <a th:href="@{/front/report/add(venueOrderId=${order.venueOrderId})}" class="btn-report">檢舉</a>
+						    <span class="badge status-done" th:if="${order.venueRating != null}">已評價</span>
+						</th:block>
 			        </div>
                 </div>
             </div>
