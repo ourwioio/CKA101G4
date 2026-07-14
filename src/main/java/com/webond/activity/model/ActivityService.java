@@ -114,10 +114,6 @@ public class ActivityService {
 		Integer activeBookingCount = activityOrderSvc.getActiveBookingCount(activityId);
 		activityVO.setAttendeesCount(activeBookingCount == null ? 0 : activeBookingCount);
 		repository.save(activityVO);
-
-		if (isFull(activityVO)) {
-			activityOrderSvc.rejectPendingOrdersByFullActivity(activityId);
-		}
 	}
 
 	public boolean isFull(ActivityVO activityVO) {

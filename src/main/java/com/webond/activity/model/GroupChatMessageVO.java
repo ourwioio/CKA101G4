@@ -18,7 +18,7 @@ public class GroupChatMessageVO {
 	@Column(name = "GROUP_CHAT_MESSAGE_ID")
 	private Integer groupChatMessageId;
 
-	@Column(name = "ACTIVITY_ID")
+	@Column(name = "GROUP_CHAT_ROOM_ID")
 	private Integer activityId;
 
 	@Column(name = "SENDER_MEMBER_ID")

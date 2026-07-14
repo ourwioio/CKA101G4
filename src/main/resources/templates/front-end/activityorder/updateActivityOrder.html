@@ -3,7 +3,7 @@
 
 <head>
 <meta charset="UTF-8">
-<title>修改活動訂單</title>
+<title>?鞈?僱?謘橫打???畾?雓?/title>
 
 <style>
 body {
@@ -148,10 +148,10 @@ textarea {
 <body>
 
 	<div class="header-container">
-		<div class="header-title">✏️ 修改活動訂單</div>
+		<div class="header-title">??? ?鞈?僱?謘橫打???畾?雓?/div>
 
 		<a th:href="@{/activityOrder/listAllActivityOrder}"
-			class="btn-secondary"> 🔙 返回列表 </a>
+			class="btn-secondary"> ?? ?????雓飢??</a>
 	</div>
 
 	<div class="form-card">
@@ -163,15 +163,15 @@ textarea {
 
 			<div class="form-grid">
 
-				<div class="section-title">基本訂單資料</div>
+				<div class="section-title">???蝘?畾?雓???</div>
 
-				<!-- 活動 -->
+				<!-- ???? -->
 				<div class="form-group">
-					<label>活動 <span class="required">*</span></label> <select
+					<label>???? <span class="required">*</span></label> <select
 						th:field="*{activityId}" class="form-control"
 						th:classappend="${#fields.hasErrors('activityId')} ? ' input-error'">
 
-						<option value="">請選擇活動</option>
+						<option value="">?嚚?頩??????/option>
 
 						<option th:each="activity : ${activityListData}"
 							th:value="${activity.activityId}"
@@ -182,9 +182,9 @@ textarea {
 						th:errors="*{activityId}"></div>
 				</div>
 
-				<!-- 買家會員 -->
+				<!-- ???????? -->
 				<div class="form-group">
-					<label>買家會員ID <span class="required">*</span></label> <input
+					<label>????????ID <span class="required">*</span></label> <input
 						type="number" th:field="*{buyerMemberId}" class="form-control"
 						th:classappend="${#fields.hasErrors('buyerMemberId')} ? ' input-error'">
 
@@ -192,160 +192,158 @@ textarea {
 						th:errors="*{buyerMemberId}"></div>
 				</div>
 
-				<!-- 員工 -->
+				<!-- ????? -->
 				<div class="form-group">
-					<label>員工ID</label> <input type="number" th:field="*{employeeId}"
+					<label>?????ID</label> <input type="number" th:field="*{employeeId}"
 						class="form-control">
 				</div>
 
-				<!-- 訂單狀態 -->
+				<!-- ?畾?雓????-->
 				<div class="form-group">
-					<label>訂單狀態</label> <select th:field="*{orderStatus}"
-						class="form-control">
-						<option value="0">已完成</option>
-						<option value="1">已取消</option>
-						<option value="2">已退款</option>
+					<label>?畾?雓????/label>
+					<select th:field="*{orderStatus}" class="form-control">
+						<option value="0">&#24050;&#20184;&#27454;</option>
+						<option value="1">&#24050;&#21462;&#28040;</option>
+						<option value="2">&#24453;&#23529;&#26680;</option>
+						<option value="3">&#24453;&#20184;&#27454;</option>
+						<option value="4">&#24050;&#23436;&#25104;</option>
 					</select>
 				</div>
 
-				<!-- 報名人數 -->
+				<!-- ????????-->
 				<div class="form-group">
-					<label>報名人數</label> <input type="number" th:field="*{bookingCount}"
+					<label>????????/label> <input type="number" th:field="*{bookingCount}"
 						class="form-control">
 				</div>
 
-				<!-- 活動價格 -->
+				<!-- ??????筏??-->
 				<div class="form-group">
-					<label>活動價格</label> <input type="number"
+					<label>??????筏??/label> <input type="number"
 						th:field="*{activityPrice}" class="form-control">
 				</div>
-				<!-- 訂單總金額 -->
+				<!-- ?畾?雓豰????-->
 
 				<div class="form-group">
-					<label>訂單總金額</label> <input type="number" th:field="*{totalAmount}"
+					<label>?畾?雓豰????/label> <input type="number" th:field="*{totalAmount}"
 						class="form-control">
 				</div>
 
-				<!-- 付款方式 -->
+				<!-- ?豯剜???? -->
 
 				<div class="form-group">
-					<label>付款方式</label> <select th:field="*{activityPaymentMethod}"
+					<label>?豯剜????</label> <select th:field="*{activityPaymentMethod}"
 						class="form-control">
 
-						<option value="0">信用卡</option>
-						<option value="1">ATM轉帳</option>
+						<option value="0">?鞈????/option>
+						<option value="1">ATM??察???/option>
 
 					</select>
 				</div>
 
-				<!-- 訂單備註 -->
+				<!-- ?畾?雓?雓?? -->
 
 				<div class="form-group col-span-2">
-					<label>訂單備註</label>
+					<label>?畾?雓?雓??</label>
 
 					<textarea th:field="*{orderNote}" class="form-control"></textarea>
 
 				</div>
 
-				<div class="section-title">付款 / 完成資訊</div>
+				<div class="section-title">?豯剜??/ ??ㄞ????</div>
 
-				<!-- 付款時間 -->
+				<!-- ?豯剜??頩? -->
 
 				<div class="form-group">
 
-					<label>付款時間</label> <input type="datetime-local"
+					<label>?豯剜??頩?</label> <input type="datetime-local"
 						th:field="*{paidAt}" class="form-control">
 
 				</div>
 
-				<!-- 完成時間 -->
+				<!-- ??ㄞ??頩? -->
 
 				<div class="form-group">
 
-					<label>完成時間</label> <input type="datetime-local"
+					<label>??ㄞ??頩?</label> <input type="datetime-local"
 						th:field="*{activityCompletedAt}" class="form-control">
 
 				</div>
 
-				<div class="section-title">退款資訊</div>
+				<div class="section-title">????????/div>
 
-				<!-- 撥款狀態 -->
+				<!-- ??剜?????-->
 
 				<div class="form-group">
 
-					<label>撥款狀態</label> <select th:field="*{payoutAmount}"
+					<label>??剜?????/label> <select th:field="*{payoutAmount}"
 						class="form-control">
 
-						<option th:value="false">未撥款</option>
-						<option th:value="true">已撥款</option>
+						<option th:value="false">??????/option>
+						<option th:value="true">??踝?????/option>
 
 					</select>
 
 				</div>
 
-				<!-- 退款狀態 -->
+				<!-- ????????-->
 
 				<div class="form-group">
 
-					<label>退款狀態</label> <select th:field="*{refundStatus}"
-						class="form-control">
-
-						<option value="">請選擇</option>
-						<option value="0">審核中</option>
-						<option value="1">成立</option>
-						<option value="2">不成立</option>
-
+					<label>????????/label> <select th:field="*{refundStatus}" class="form-control">
+						<option value="0">&#28961;&#36864;&#27454;</option>
+						<option value="1">&#24453;&#36864;&#27454;</option>
+						<option value="2">&#24050;&#36864;&#27454;</option>
 					</select>
 
 				</div>
 
-				<!-- 退款原因 -->
+				<!-- ????????-->
 
 				<div class="form-group col-span-2">
 
-					<label>退款原因</label>
+					<label>????????/label>
 
 					<textarea th:field="*{refundReason}" class="form-control">
     </textarea>
 
 				</div>
 
-				<div class="section-title">評價資訊</div>
+				<div class="section-title">????????</div>
 
-				<!-- 買家評分 -->
+				<!-- ?????恃??? -->
 
 				<div class="form-group">
 
-					<label>買家評分</label> <input type="number" min="1" max="5"
+					<label>?????恃???</label> <input type="number" min="1" max="5"
 						th:field="*{buyerRateSeller}" class="form-control">
 
 				</div>
 
-				<!-- 賣家評分 -->
+				<!-- ????恃??? -->
 
 				<div class="form-group">
 
-					<label>賣家評分</label> <input type="number" min="1" max="5"
+					<label>????恃???</label> <input type="number" min="1" max="5"
 						th:field="*{sellerRateBuyer}" class="form-control">
 
 				</div>
 
-				<!-- 買家評論 -->
+				<!-- ?????恃??? -->
 
 				<div class="form-group col-span-2">
 
-					<label>買家評論</label>
+					<label>?????恃???</label>
 
 					<textarea th:field="*{buyerReviewComment}" class="form-control">
     </textarea>
 
 				</div>
 
-				<!-- 賣家評論 -->
+				<!-- ????恃??? -->
 
 				<div class="form-group col-span-2">
 
-					<label>賣家評論</label>
+					<label>????恃???</label>
 
 					<textarea th:field="*{sellerReviewComment}" class="form-control">
     </textarea>
@@ -357,9 +355,9 @@ textarea {
 			<div class="form-actions">
 
 				<a th:href="@{/activityOrder/listAllActivityOrder}"
-					class="btn-cancel"> 取消 </a>
+					class="btn-cancel"> ?雓? </a>
 
-				<button type="submit" class="btn-submit">💾 儲存修改</button>
+				<button type="submit" class="btn-submit">???????鞈?僱??/button>
 
 			</div>
 

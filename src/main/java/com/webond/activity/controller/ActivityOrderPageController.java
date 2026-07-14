@@ -45,6 +45,47 @@ public class ActivityOrderPageController {
 		return "front-end/activityorder/listAllActivityOrder";
 	}
 
+	@GetMapping("/detail")
+	public String orderDetail(@RequestParam("activityOrderId") Integer activityOrderId, Model model,
+			HttpSession session) {
+		if (!isLoginEmployee(session)) {
+			return "redirect:/activity/admin/home?loginRequired=true";
+		}
+
+		ActivityOrderVO orderVO = orderSvc.getOneOrder(activityOrderId);
+		if (orderVO == null) {
+			return "redirect:/activityOrder/listAllActivityOrder";
+		}
+
+		model.addAttribute("orderVO", orderVO);
+		model.addAttribute("activityVO", activitySvc.getOneActivity(orderVO.getActivityId()));
+		addFakeEmployee(model, session);
+
+		return "front-end/activityorder/activityOrderDetail";
+	}
+
+	@PostMapping("/confirmRefund")
+	public String confirmRefund(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
+		Integer employeeId = getLoginEmployeeId(session);
+		if (employeeId == null) {
+			return "redirect:/activity/admin/home?loginRequired=true";
+		}
+
+		orderSvc.confirmRefund(activityOrderId, employeeId);
+		return "redirect:/activityOrder/detail?activityOrderId=" + activityOrderId + "&refundSuccess=true";
+	}
+
+	@PostMapping("/confirmPayout")
+	public String confirmPayout(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
+		Integer employeeId = getLoginEmployeeId(session);
+		if (employeeId == null) {
+			return "redirect:/activity/admin/home?loginRequired=true";
+		}
+
+		orderSvc.confirmPayout(activityOrderId, employeeId);
+		return "redirect:/activityOrder/detail?activityOrderId=" + activityOrderId + "&payoutSuccess=true";
+	}
+
 	@PostMapping("/approve")
 	public String approveOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
 		if (!isLoginEmployee(session)) {

@@ -1,4 +1,4 @@
-﻿package com.webond.activity.controller;
+package com.webond.activity.controller;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -203,7 +203,7 @@ public class FrontActivityController {
 		orderVO.setBookingCount(1);
 		orderVO.setActivityPrice(activityVO.getActivityPrice());
 		orderVO.setTotalAmount(activityVO.getActivityPrice());
-		orderVO.setOrderStatus((byte) 3);
+		orderVO.setOrderStatus((byte) 2);
 		orderVO.setActivityPaymentMethod((byte) 0);
 
 		model.addAttribute("activityVO", activityVO);
@@ -241,7 +241,7 @@ public class FrontActivityController {
 		orderVO.setBuyerMemberId(loginMemberId);
 		orderVO.setBookingCount(bookingCount);
 		orderVO.setTotalAmount(activityPrice * bookingCount);
-		orderVO.setOrderStatus((byte) 3);
+		orderVO.setOrderStatus((byte) 2);
 
 		if (activityOrderSvc.hasActiveOrder(orderVO.getActivityId(), loginMemberId)) {
 			return "redirect:/activity/front/detail?id=" + orderVO.getActivityId() + "&duplicate=true";
@@ -306,15 +306,19 @@ public class FrontActivityController {
 			return "redirect:/activity/front/myOrder";
 		}
 
-		if (!activitySvc.canRegister(orderVO.getActivityId(), orderVO.getBookingCount())) {
-			return "redirect:/activity/front/myOrder?cannotPay=true";
-		}
-
+		boolean hasCapacity = activitySvc.canRegister(orderVO.getActivityId(), orderVO.getBookingCount());
 		ActivityOrderVO paidOrder = activityOrderSvc.payOrder(activityOrderId, getLoginMemberId(session),
-				activityPaymentMethod);
+				activityPaymentMethod, hasCapacity);
 
 		if (paidOrder != null) {
 			activitySvc.syncAttendeesFromOrders(paidOrder.getActivityId());
+			ActivityVO activityVO = activitySvc.getOneActivity(paidOrder.getActivityId());
+			if (activitySvc.isFull(activityVO)) {
+				activityOrderSvc.failPendingPaymentOrdersByFullActivity(paidOrder.getActivityId());
+			}
+			if (paidOrder.getOrderStatus() != null && paidOrder.getOrderStatus() == 1) {
+				return "redirect:/activity/front/myOrder?paymentCancelled=true";
+			}
 		}
 
 		return "redirect:/activity/front/myOrder?paySuccess=true";
@@ -331,8 +335,8 @@ public class FrontActivityController {
 		List<ActivityOrderVO> orderList = activityOrderSvc.getOrdersByBuyerMemberId(loginMemberId);
 		model.addAttribute("orderListData", orderList);
 		model.addAttribute("activityListData", activitySvc.getAll());
-		model.addAttribute("shouldAutoRefreshOrder", hasOrderStatus(orderList, (byte) 3)
-				|| hasOrderStatus(orderList, (byte) 4));
+		model.addAttribute("shouldAutoRefreshOrder", hasOrderStatus(orderList, (byte) 2)
+				|| hasOrderStatus(orderList, (byte) 3));
 
 		return "front-end/activity/myActivityOrder";
 	}
@@ -482,8 +486,8 @@ public class FrontActivityController {
 		model.addAttribute("activityVO", activityVO);
 		List<ActivityOrderVO> orderList = activityOrderSvc.getOrdersByActivityId(activityId);
 		model.addAttribute("orderListData", orderList);
-		model.addAttribute("shouldAutoRefreshOrder", hasOrderStatus(orderList, (byte) 3)
-				|| hasOrderStatus(orderList, (byte) 4));
+		model.addAttribute("shouldAutoRefreshOrder", hasOrderStatus(orderList, (byte) 2)
+				|| hasOrderStatus(orderList, (byte) 3));
 		model.addAttribute("hasReachedMinimum", activitySvc.hasReachedMinimum(activityVO));
 		model.addAttribute("isFull", activitySvc.isFull(activityVO));
 
@@ -504,10 +508,6 @@ public class FrontActivityController {
 
 		if (!isLoginMemberActivityHost(orderVO.getActivityId(), session)) {
 			return "redirect:/activity/front/myHostActivity?noPermission=true";
-		}
-
-		if (!activitySvc.canRegister(orderVO.getActivityId(), orderVO.getBookingCount())) {
-			return "redirect:/activity/front/memberList?activityId=" + orderVO.getActivityId() + "&approveFailed=true";
 		}
 
 		activityOrderSvc.approveOrderByHost(activityOrderId);

@@ -15,7 +15,7 @@ import jakarta.persistence.Table;
 
 
 @Entity
-@Table(name = "activity_report")
+@Table(name = "ACTIVITY_REPORT")
 public class ActRptVO {
 	
 	@Id
