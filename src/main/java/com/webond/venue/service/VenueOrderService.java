@@ -118,5 +118,8 @@ public class VenueOrderService {
 		venueRepository.save(venue);
 	}
 
+	public List<VenueOrderVO> getReviewsByVenue(Integer venueId) {
+	    return repository.findByVenueVO_VenueIdAndVenueRatingIsNotNullOrderByHandledAtDesc(venueId);
+	}
 	
 }

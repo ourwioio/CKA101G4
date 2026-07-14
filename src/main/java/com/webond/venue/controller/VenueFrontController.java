@@ -20,10 +20,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.webond.member.model.MemberVO;
+import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueReviewVO;
 import com.webond.venue.model.VenueTypeVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueImagesService;
+import com.webond.venue.service.VenueOrderService;
 import com.webond.venue.service.VenueReviewService;
 import com.webond.venue.service.VenueService;
 import com.webond.venue.service.VenueTypeService;
@@ -47,6 +49,9 @@ public class VenueFrontController {
 	
 	@Autowired
 	VenueReviewService venueReviewService;
+	
+	@Autowired
+	VenueOrderService venueOrderService;
 
 	@GetMapping("addVenue")
 	public String addVenue(ModelMap model, HttpSession session) {
@@ -227,9 +232,13 @@ public class VenueFrontController {
 
 	@GetMapping("getOneVenue")
 	public String getOne(@RequestParam("venueId") Integer venueId, HttpSession session, ModelMap model) {
-		VenueVO venueVO = venueService.getOneVenue(venueId);
-		model.addAttribute("venueVO", venueVO);
-		return "front-end/venue/listOneVenue";
+	    VenueVO venueVO = venueService.getOneVenue(venueId);
+	    model.addAttribute("venueVO", venueVO);
+
+	    List<VenueOrderVO> reviewList = venueOrderService.getReviewsByVenue(venueId);
+	    model.addAttribute("reviewList", reviewList);
+
+	    return "front-end/venue/listOneVenue";
 	}
 
 	@GetMapping("getOneMyVenue")
@@ -277,6 +286,7 @@ public class VenueFrontController {
 
 		return "redirect:/front/venue/getOneMyVenue?venueId=" + venueId;
 	}
+	
 
 	@ModelAttribute("venueTypeData")
 	protected List<VenueTypeVO> venueTypeListData() {

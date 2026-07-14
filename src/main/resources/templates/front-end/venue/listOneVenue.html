@@ -46,5 +46,47 @@
 			</div>
 		</div>
 	</div>
+
+		<hr />
+		
+		<div class="section-title">場地評價</div>
+		
+		<!-- 平均分數摘要 -->
+		<div class="rating-summary">
+<!-- 		    <span th:if="${venueVO.ratingCount == null or venueVO.ratingCount == 0}">尚未有人評分</span> -->
+		    <span th:unless="${venueVO.ratingCount == null or venueVO.ratingCount == 0}"
+		          th:text="${#numbers.formatDecimal(venueVO.averageRating, 1, 1)} + '/5 星（共 ' + ${venueVO.ratingCount} + ' 則評價）'">
+		    </span>
+		</div>
+		
+		<!-- 逐筆評價卡片 -->
+		<div class="review-grid" th:if="${!#lists.isEmpty(reviewList)}">
+		    <div class="review-card" th:each="review : ${reviewList}">
+		        <div class="review-header">
+		            <span class="reviewer-name" th:text="${review.member.nickname}"></span>
+		            <span class="review-date"
+		                  th:text="${#temporals.format(review.handledAt, 'yyyy-MM-dd')}"></span>
+		        </div>
+		
+		        <div class="stars-readonly">
+		            <span th:each="i : ${#numbers.sequence(1,5)}"
+		                  th:text="'★'"
+		                  th:class="${i <= review.venueRating} ? 'filled' : ''"></span>
+		        </div>
+		
+		        <p class="review-comment"
+		           th:if="${review.venueComment != null and !review.venueComment.isEmpty()}"
+		           th:text="${review.venueComment}"></p>
+		        <p class="review-comment review-empty"
+		           th:if="${review.venueComment == null or review.venueComment.isEmpty()}">
+		            （這位使用者沒有留下文字評論）
+		        </p>
+		    </div>
+		</div>
+		
+		<div class="no-reviews" th:if="${#lists.isEmpty(reviewList)}">
+		    目前還沒有評價
+		</div>
+
 </body>
 </html>

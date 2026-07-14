@@ -80,10 +80,10 @@
 					每小時：<span th:text="${venue.hourlyRate}"></span> 元
 				</p>
 				<p>
-				    評分：
+				    評論：
 				    <span th:if="${venue.ratingCount == null or venue.ratingCount == 0}">尚未評分</span>
 				    <span th:unless="${venue.ratingCount == null or venue.ratingCount == 0}"
-				          th:text="${#numbers.formatDecimal(venue.averageRating, 1, 1)} + '/5 分（' + ${venue.ratingCount} + ' 則）'">
+				          th:text="${#numbers.formatDecimal(venue.averageRating, 1, 1)} + '/5 星（' + ${venue.ratingCount} + ' 則）'">
 				    </span>
 				</p>
 				<a th:href="@{/front/venue/getOneVenue(venueId=${venue.venueId})}">查看詳情</a>
