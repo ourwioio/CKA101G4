@@ -1,122 +1,605 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+
 <head>
-<meta charset="UTF-8">
-<title>一對一服務列表</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>一對一服務列表</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+          rel="stylesheet">
+
+    <!-- Service 前台共用 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/service/common.css}">
+
+    <!-- 服務列表專屬 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/service/serviceList.css}">
 </head>
+
 <body>
 
-	<h1>一對一服務列表</h1>
+<!-- ==========================================================
+     固定導覽列
+     ========================================================== -->
+<header class="site-header">
 
-	<p>
-		<a th:href="@{/member/services}">我的服務</a>
-		<span th:if="${session.memberVO != null}">
-			｜目前假登入會員編號：
-			<span th:text="${session.memberVO.memberId}"></span>
-			｜
-			<a th:href="@{/member/services/fakelogout}">假登出</a>
-		</span>
-		<span th:if="${session.memberVO == null}">
-			｜尚未假登入
-		</span>
-	</p>
+    <div class="header-inner">
 
-	<!-- 錯誤訊息 -->
-	<p th:if="${errorMsg != null}" th:text="${errorMsg}"
-		style="color: red;"></p>
+        <!-- Logo -->
+        <a class="logo" th:href="@{/}">
 
-	<!-- 搜尋區 -->
-	<h2>搜尋服務</h2>
+            <span class="logo-mark">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
 
-	<form th:action="@{/front/services/search}" method="get">
-		<input type="text" name="keyword" th:value="${keyword}"
-			placeholder="請輸入服務名稱或描述">
-		<button type="submit">搜尋</button>
-	</form>
+                    <path d="M3 11l9-7 9 7"></path>
 
-	<p>
-		<a th:href="@{/front/services}">清除搜尋 / 回全部服務</a>
-	</p>
+                    <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path>
+                </svg>
+            </span>
 
-	<hr>
+            <span class="logo-text">
 
-	<!-- 服務類型分類 -->
-	<h2>服務類型</h2>
+                <span class="logo-title">
+                    Webond
+                </span>
 
-	<ul>
-		<li>
-			<a th:href="@{/front/services}">全部服務</a>
-		</li>
+                <span class="logo-sub">
+                    閒人出租
+                </span>
 
-		<li th:each="type : ${serviceTypeList}">
-			<a th:href="@{/front/services/type/{id}(id=${type.svcTypeID})}"
-			   th:text="${type.typeName}">
-				服務類型名稱
-			</a>
-			<span th:if="${selectedServiceTypeId != null and selectedServiceTypeId == type.svcTypeID}">
-				← 目前選取
-			</span>
-		</li>
-	</ul>
+            </span>
+        </a>
 
-	<hr>
+        <!-- 右側按鈕 -->
+        <nav class="header-actions">
 
-	<!-- 服務列表 -->
-	<h2>服務列表</h2>
+            <!-- 聊天室 -->
+            <a class="icon-btn icon-btn--chat"
+               href="javascript:void(0);"
+               title="聊天室"
+               aria-disabled="true">
 
-	<p th:if="${#lists.isEmpty(serviceList)}">目前沒有符合條件的服務。</p>
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
 
-	<table border="1" cellpadding="8" cellspacing="0"
-		th:if="${!#lists.isEmpty(serviceList)}">
-		<thead>
-			<tr>
-				<th>服務圖片</th>
-				<th>服務編號</th>
-				<th>服務類型</th>
-				<th>服務名稱</th>
-				<th>服務描述</th>
-				<th>提供者會員編號</th>
-				<th>每小時費率</th>
-				<th>操作</th>
-			</tr>
-		</thead>
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8
+                             8.5 8.5 0 0 1-7.6 4.7
+                             8.38 8.38 0 0 1-3.8-.9
+                             L3 21l1.9-5.7
+                             a8.38 8.38 0 0 1-.9-3.8
+                             8.5 8.5 0 0 1 4.7-7.6
+                             8.38 8.38 0 0 1 3.8-.9
+                             h.5a8.48 8.48 0 0 1 8 8v.5z">
+                    </path>
+                </svg>
 
-		<tbody>
-			<tr th:each="service : ${serviceList}">
+                <span class="icon-badge"
+                      th:if="${session.memberVO != null}">
+                    0
+                </span>
+            </a>
 
-				<!-- 服務圖片：有上傳顯示資料庫圖片，沒上傳顯示 default-activity.jpg -->
-				<td>
-					<img th:src="@{/front/services/image/{serviceId}(serviceId=${service.serviceId})}"
-					     alt="服務圖片"
-					     style="width: 120px; height: 80px; object-fit: cover; border: 1px solid #ccc;">
-				</td>
+            <!-- 通知 -->
+            <a class="icon-btn icon-btn--notify"
+               th:href="@{/front/notification/listAllNotification}"
+               title="通知">
 
-				<td th:text="${service.serviceId}">1</td>
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
 
-				<td th:text="${service.serviceType != null ? service.serviceType.typeName : '無類型'}">
-					服務類型
-				</td>
+                    <path d="M18 8a6 6 0 0 0-12 0
+                             c0 7-3 9-3 9h18s-3-2-3-9">
+                    </path>
 
-				<td th:text="${service.serviceName}">服務名稱</td>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0">
+                    </path>
+                </svg>
 
-				<td th:text="${service.description}">服務描述</td>
+                <span class="icon-badge icon-badge--unread"
+                      th:if="${unreadNotificationCount != null
+                               and unreadNotificationCount > 0}"
+                      th:text="${unreadNotificationCount > 99}
+                               ? '99+'
+                               : ${unreadNotificationCount}">
+                </span>
+            </a>
 
-				<td th:text="${service.memberId}">1</td>
+            <!-- 已登入會員 -->
+            <a th:if="${session.memberVO != null}"
+               class="icon-btn icon-btn--member"
+               th:href="@{/front/memberPage/my(memberId=${session.memberVO.memberId})}"
+               title="會員中心">
 
-				<td>
-					NT$
-					<span th:text="${service.hourlyRate}">500</span>
-					/ 小時
-				</td>
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
 
-				<td>
-					<a th:href="@{/front/services/{id}(id=${service.serviceId})}">
-						查看詳情
-					</a>
-				</td>
-			</tr>
-		</tbody>
-	</table>
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8
+                             a4 4 0 0 0-4 4v2">
+                    </path>
+
+                    <circle cx="12"
+                            cy="7"
+                            r="4">
+                    </circle>
+                </svg>
+            </a>
+
+            <!-- 未登入會員 -->
+            <a th:if="${session.memberVO == null}"
+               class="icon-btn icon-btn--member"
+               th:href="@{/member/login}"
+               title="登入">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8
+                             a4 4 0 0 0-4 4v2">
+                    </path>
+
+                    <circle cx="12"
+                            cy="7"
+                            r="4">
+                    </circle>
+                </svg>
+            </a>
+
+        </nav>
+    </div>
+</header>
+
+<!-- ==========================================================
+     主要內容
+     ========================================================== -->
+<main class="site-main">
+
+    <!-- ======================================================
+         頁面標題
+         ====================================================== -->
+    <section class="service-page-heading">
+
+        <div>
+
+            <p class="service-page-eyebrow">
+                個人出租
+            </p>
+
+            <h1 class="page-title">
+                一對一服務列表
+            </h1>
+
+            <p class="service-page-description">
+                依照服務類型或關鍵字，尋找適合你的陪伴服務。
+            </p>
+
+        </div>
+
+        <!-- 測試登入狀態 -->
+        <div class="service-login-status">
+
+            <span th:if="${session.memberVO != null}">
+
+                目前測試會員：
+
+                <strong th:text="${session.memberVO.memberId}">
+                    1
+                </strong>
+
+                ｜
+
+                <a th:href="@{/member/services}">
+                    我的服務
+                </a>
+
+                ｜
+
+                <a th:href="@{/member/services/fakelogout}">
+                    假登出
+                </a>
+
+            </span>
+
+            <span th:if="${session.memberVO == null}">
+
+                尚未假登入 ｜
+
+                <a th:href="@{/member/services/fakelogin}">
+                    前往假登入
+                </a>
+
+            </span>
+
+        </div>
+    </section>
+
+    <!-- ======================================================
+         錯誤訊息
+         ====================================================== -->
+    <div class="alert alert-error"
+         th:if="${errorMsg != null}"
+         th:text="${errorMsg}">
+
+        錯誤訊息
+
+    </div>
+
+    <!-- ======================================================
+         左側分類 + 右側內容
+         ====================================================== -->
+    <div class="service-layout">
+
+        <!-- ==================================================
+             左側服務分類
+             ================================================== -->
+        <aside class="panel service-category-panel">
+
+            <h2 class="service-category-title">
+                服務類型
+            </h2>
+
+            <nav class="service-category-list">
+
+                <!-- 全部服務 -->
+                <a class="service-category-item"
+                   th:classappend="${selectedServiceTypeId == null}
+                                  ? ' active'
+                                  : ''"
+                   th:href="@{/front/services}">
+
+                    全部服務
+
+                </a>
+
+                <!-- 各服務類型 -->
+                <a class="service-category-item"
+                   th:each="type : ${serviceTypeList}"
+                   th:href="@{/front/services/type/{id}(id=${type.svcTypeID})}"
+                   th:text="${type.typeName}"
+                   th:classappend="${selectedServiceTypeId != null
+                                    and selectedServiceTypeId == type.svcTypeID}
+                                   ? ' active'
+                                   : ''">
+
+                    服務類型名稱
+
+                </a>
+
+            </nav>
+        </aside>
+
+        <!-- ==================================================
+             右側服務內容
+             ================================================== -->
+        <section class="service-content">
+
+            <!-- 搜尋區 -->
+            <section class="panel service-search-panel">
+
+                <div class="service-search-heading">
+
+                    <div>
+
+                        <h2>
+                            搜尋服務
+                        </h2>
+
+                        <p>
+                            可依服務名稱或描述搜尋
+                        </p>
+
+                    </div>
+
+                    <a class="service-clear-link"
+                       th:href="@{/front/services}">
+
+                        清除搜尋
+
+                    </a>
+
+                </div>
+
+                <form class="service-search-form"
+                      th:action="@{/front/services/search}"
+                      method="get">
+
+                    <input class="form-control service-search-input"
+                           type="search"
+                           name="keyword"
+                           th:value="${keyword}"
+                           placeholder="例如：散步、咖啡聊天、網球陪打">
+
+                    <button class="btn service-search-button"
+                            type="submit">
+
+                        搜尋
+
+                    </button>
+
+                </form>
+            </section>
+
+            <!-- 結果標題 -->
+            <div class="service-result-heading">
+
+                <div>
+
+                    <h2>
+                        服務列表
+                    </h2>
+
+                    <p th:if="${keyword != null
+                               and !keyword.trim().isEmpty()}">
+
+                        搜尋關鍵字：
+
+                        <strong th:text="${keyword}">
+                            關鍵字
+                        </strong>
+
+                    </p>
+
+                </div>
+
+                <span class="service-result-count"
+                      th:text="|共 ${#lists.size(serviceList)} 筆|">
+
+                    共 0 筆
+
+                </span>
+            </div>
+
+            <!-- ==================================================
+                 無資料
+                 ================================================== -->
+            <section class="service-empty-state"
+                     th:if="${#lists.isEmpty(serviceList)}">
+
+                <div class="service-empty-icon">
+                    ⌕
+                </div>
+
+                <h3>
+                    目前沒有符合條件的服務
+                </h3>
+
+                <p>
+                    可以更換搜尋文字，或重新查看全部服務。
+                </p>
+
+                <a class="btn btn-primary"
+                   th:href="@{/front/services}">
+
+                    查看全部服務
+
+                </a>
+            </section>
+
+            <!-- ==================================================
+                 服務卡片列表
+                 ================================================== -->
+            <section class="service-grid"
+                     th:if="${!#lists.isEmpty(serviceList)}">
+
+                <article class="service-card"
+                         th:each="service : ${serviceList}">
+
+                    <!-- 服務圖片 -->
+                    <a class="service-card-image-wrap"
+                       th:href="@{/front/services/{id}(id=${service.serviceId})}">
+
+                        <img class="service-card-image"
+                             th:src="@{/front/services/image/{serviceId}(serviceId=${service.serviceId})}"
+                             th:onerror="this.src='/images/activity/default-activity.jpg'"
+                             alt="服務圖片">
+
+                        <span class="service-type-badge"
+                              th:text="${service.serviceType != null
+                                       ? service.serviceType.typeName
+                                       : '無類型'}">
+
+                            服務類型
+
+                        </span>
+                    </a>
+
+                    <!-- 卡片內容 -->
+                    <div class="service-card-body">
+
+                        <!-- 名稱與編號 -->
+                        <div class="service-card-title-row">
+
+                            <h3 class="service-card-title">
+
+                                <a th:href="@{/front/services/{id}(id=${service.serviceId})}"
+                                   th:text="${service.serviceName}">
+
+                                    服務名稱
+
+                                </a>
+
+                            </h3>
+
+                            <span class="service-card-id"
+                                  th:text="|#${service.serviceId}|">
+
+                                #1
+
+                            </span>
+                        </div>
+
+                        <!-- 縣市行政區 -->
+                        <p class="service-card-location">
+
+                            <span class="service-location-icon"></span>
+
+                            <span th:text="|${service.serviceCity} ${service.serviceDistrict}|">
+
+                                桃園市 中壢區
+
+                            </span>
+
+                        </p>
+
+                        <!-- 地點說明 -->
+                        <p class="service-card-place"
+                           th:text="${service.serviceLocation}">
+
+                            中壢火車站附近
+
+                        </p>
+
+                        <!-- 服務描述 -->
+                        <p class="service-card-description"
+                           th:text="${service.description}">
+
+                            服務描述
+
+                        </p>
+
+                        <!-- 提供者 -->
+                        <p class="service-card-provider">
+
+                            提供者會員編號：
+
+                            <span th:text="${service.memberId}">
+                                1
+                            </span>
+
+                        </p>
+
+                        <!-- 價格與按鈕 -->
+                        <div class="service-card-footer">
+
+                            <div class="service-price">
+
+                                <span class="service-price-currency">
+                                    NT$
+                                </span>
+
+                                <strong th:text="${service.hourlyRate}">
+                                    500
+                                </strong>
+
+                                <span>
+                                    / 小時
+                                </span>
+
+                            </div>
+
+                            <a class="btn service-detail-button"
+                               th:href="@{/front/services/{id}(id=${service.serviceId})}">
+
+                                查看詳情
+
+                            </a>
+                        </div>
+
+                    </div>
+                </article>
+
+            </section>
+
+        </section>
+    </div>
+
+</main>
+
+<!-- 通知更新 JS -->
+<script>
+    async function refreshUnreadBadge() {
+
+        try {
+
+            const response =
+                await fetch('/notification/unread-count');
+
+            if (!response.ok) {
+                return;
+            }
+
+            const count =
+                await response.json();
+
+            const notifyButton =
+                document.querySelector('.icon-btn--notify');
+
+            if (!notifyButton) {
+                return;
+            }
+
+            let badge =
+                notifyButton.querySelector(
+                    '.icon-badge--unread'
+                );
+
+            if (count > 0) {
+
+                if (!badge) {
+
+                    badge =
+                        document.createElement('span');
+
+                    badge.className =
+                        'icon-badge icon-badge--unread';
+
+                    notifyButton.appendChild(badge);
+                }
+
+                badge.textContent =
+                    count > 99 ? '99+' : count;
+
+            } else if (badge) {
+
+                badge.remove();
+            }
+
+        } catch (error) {
+
+            console.error(
+                '更新通知數量失敗：',
+                error
+            );
+        }
+    }
+
+    refreshUnreadBadge();
+
+    setInterval(
+        refreshUnreadBadge,
+        30000
+    );
+</script>
 
 </body>
 </html>

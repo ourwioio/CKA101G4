@@ -61,6 +61,14 @@ public class ServiceVO {
     @Column(name = "SERVICE_IMAGE_TYPE")
     private String serviceImageType;
     
+    @Column(name = "SERVICE_CITY")
+    private String serviceCity;
+
+    @Column(name = "SERVICE_DISTRICT")
+    private String serviceDistrict;
+
+    @Column(name = "SERVICE_LOCATION")
+    private String serviceLocation;
     
     public byte[] getServiceImage() {
 		return serviceImage;
@@ -154,6 +162,30 @@ public class ServiceVO {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+	public String getServiceCity() {
+		return serviceCity;
+	}
+
+	public void setServiceCity(String serviceCity) {
+		this.serviceCity = serviceCity;
+	}
+
+	public String getServiceDistrict() {
+		return serviceDistrict;
+	}
+
+	public void setServiceDistrict(String serviceDistrict) {
+		this.serviceDistrict = serviceDistrict;
+	}
+
+	public String getServiceLocation() {
+		return serviceLocation;
+	}
+
+	public void setServiceLocation(String serviceLocation) {
+		this.serviceLocation = serviceLocation;
+	}
     
     
 }

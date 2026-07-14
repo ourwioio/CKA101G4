@@ -1,151 +1,829 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
-    <title>我的服務</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>我的服務｜Webond</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+          rel="stylesheet">
+
+    <!-- Service 前台共用 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/service/common.css}">
+
+    <!-- 我的服務列表專屬 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/service/memberServiceList.css}">
 </head>
+
 <body>
 
-<h1>我的服務</h1>
+<!-- ==========================================================
+     固定導覽列
+     ========================================================== -->
+<header class="site-header">
 
-<!-- 目前登入資訊 -->
-<p>
-    目前假登入會員編號：
-    <span th:text="${loginMemberId}">1</span>
-</p>
+    <div class="header-inner">
 
-<!-- 上方操作區 -->
-<p>
-    <a th:href="@{/front/services}">回前台服務列表</a>
-    |
-    <a th:href="@{/member/services/add}">新增服務</a>
-    |
-    <a th:href="@{/member/services/fakelogout}">假登出</a>
-</p>
-<p>
-    <a th:href="@{/member/service-orders/buyer}">我的預約紀錄</a>
-    |
-    <a th:href="@{/member/service-orders/seller}">收到的預約申請</a>
-</p>
+        <!-- Logo -->
+        <a class="logo"
+           th:href="@{/}">
 
-<hr>
+            <span class="logo-mark">
 
-<!-- 錯誤訊息 -->
-<p th:if="${errorMsg != null}" th:text="${errorMsg}" style="color:red;"></p>
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
 
-<!-- 成功訊息 -->
-<p th:if="${successMsg != null}" th:text="${successMsg}" style="color:green;"></p>
+                    <path d="M3 11l9-7 9 7"></path>
 
-<!-- 沒有資料 -->
-<p th:if="${#lists.isEmpty(serviceList)}">
-    你目前沒有可管理的服務。
-</p>
+                    <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path>
+                </svg>
 
-<!-- 我的服務列表 -->
-<table border="1" cellpadding="8" cellspacing="0" th:if="${!#lists.isEmpty(serviceList)}">
-    <thead>
-        <tr>
-            <th>服務編號</th>
-            <th>服務類型</th>
-            <th>服務名稱</th>
-            <th>描述</th>
-            <th>每小時費率</th>
-            <th>狀態</th>
-            <th>操作</th>
-        </tr>
-    </thead>
+            </span>
 
-    <tbody>
-        <tr th:each="service : ${serviceList}">
-            <!-- 服務編號 裡面帶入的值只是假資料 真正執行的時候會被渲染掉-->
-            <td th:text="${service.serviceId}">
-                1
-            </td>
+            <span class="logo-text">
 
-            <!-- 服務類型 -->
-            <td th:text="${service.serviceType != null ? service.serviceType.typeName : '無類型'}">
-                程式教學
-            </td>
-
-            <!-- 服務名稱 -->
-            <td th:text="${service.serviceName}">
-                Java 家教
-            </td>
-
-            <!-- 描述 -->
-            <td th:text="${service.description}">
-                協助 Java Spring Boot 專題開發
-            </td>
-
-            <!-- 價格 -->
-            <td>
-                NT$
-                <span th:text="${service.hourlyRate}">500</span>
-                / 小時
-            </td>
-
-            <!-- 狀態 -->
-            <td>
-                <span th:if="${service.status == 1}">上架中</span>
-                <span th:if="${service.status == 0}">已下架</span>
-                <span th:if="${service.status == 2}">已封存</span>
-                <span th:if="${service.status != 0 and service.status != 1 and service.status != 2}">
-                    未知狀態
+                <span class="logo-title">
+                    Webond
                 </span>
-            </td>
 
-            <!-- 操作 -->
-            <td>
-                <!-- 修改 -->
-                <a th:href="@{/member/services/{id}/edit(id=${service.serviceId})}">
-                    修改
+                <span class="logo-sub">
+                    閒人出租
+                </span>
+
+            </span>
+        </a>
+
+        <!-- 右側功能 -->
+        <nav class="header-actions">
+
+            <!-- 聊天室 -->
+            <a class="icon-btn icon-btn--chat"
+               href="javascript:void(0);"
+               title="聊天室"
+               aria-disabled="true">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8
+                             8.5 8.5 0 0 1-7.6 4.7
+                             8.38 8.38 0 0 1-3.8-.9
+                             L3 21l1.9-5.7
+                             a8.38 8.38 0 0 1-.9-3.8
+                             8.5 8.5 0 0 1 4.7-7.6
+                             8.38 8.38 0 0 1 3.8-.9
+                             h.5a8.48 8.48 0 0 1 8 8v.5z">
+                    </path>
+                </svg>
+
+                <span class="icon-badge"
+                      th:if="${session.memberVO != null}">
+                    0
+                </span>
+            </a>
+
+            <!-- 通知 -->
+            <a class="icon-btn icon-btn--notify"
+               th:href="@{/front/notification/listAllNotification}"
+               title="通知">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M18 8a6 6 0 0 0-12 0
+                             c0 7-3 9-3 9h18s-3-2-3-9">
+                    </path>
+
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0">
+                    </path>
+                </svg>
+
+                <span class="icon-badge icon-badge--unread"
+                      th:if="${unreadNotificationCount != null
+                               and unreadNotificationCount > 0}"
+                      th:text="${unreadNotificationCount > 99
+                               ? '99+'
+                               : unreadNotificationCount}">
+                </span>
+            </a>
+
+            <!-- 會員中心 -->
+            <a class="icon-btn icon-btn--member"
+               th:if="${session.memberVO != null}"
+               th:href="@{/front/memberPage/my(memberId=${session.memberVO.memberId})}"
+               title="會員中心">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8
+                             a4 4 0 0 0-4 4v2">
+                    </path>
+
+                    <circle cx="12"
+                            cy="7"
+                            r="4">
+                    </circle>
+                </svg>
+            </a>
+
+        </nav>
+    </div>
+</header>
+
+<!-- ==========================================================
+     主要內容
+     ========================================================== -->
+<main class="site-main">
+
+    <!-- ======================================================
+         頁面標題
+         ====================================================== -->
+    <section class="member-service-heading">
+
+        <div class="member-service-heading-main">
+
+            <p class="member-service-eyebrow">
+                服務管理中心
+            </p>
+
+            <h1 class="page-title">
+                我的服務
+            </h1>
+
+            <p class="member-service-description">
+                管理你建立的服務、上下架狀態與可預約時段。
+            </p>
+
+        </div>
+
+        <div class="member-service-heading-actions">
+
+            <a class="btn btn-secondary"
+               th:href="@{/front/services}">
+                查看公開服務
+            </a>
+
+            <a class="btn member-service-add-button"
+               th:href="@{/member/services/add}">
+                ＋ 新增服務
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- ======================================================
+         功能導覽
+         ====================================================== -->
+    <nav class="member-service-nav">
+
+        <a class="member-service-nav-link"
+           th:href="@{/front/services}">
+            服務首頁
+        </a>
+
+        <a class="member-service-nav-link"
+           th:href="@{/member/service-orders/seller}">
+            收到的預約
+        </a>
+
+        <a class="member-service-nav-link"
+           th:href="@{/member/service-orders/buyer}">
+            我的預約
+        </a>
+
+        <a class="member-service-nav-link"
+           th:href="@{/member/services/fakelogout}">
+            假登出
+        </a>
+
+        <span class="member-service-login-status">
+
+            目前會員：
+
+            <strong th:text="${loginMemberId}">
+                1
+            </strong>
+
+        </span>
+
+    </nav>
+
+    <!-- ======================================================
+         成功與錯誤訊息
+         ====================================================== -->
+    <div class="alert alert-success"
+         th:if="${successMsg != null}"
+         th:text="${successMsg}">
+        操作成功
+    </div>
+
+    <div class="alert alert-error"
+         th:if="${errorMsg != null}"
+         th:text="${errorMsg}">
+        操作失敗
+    </div>
+
+    <!-- ======================================================
+         統計摘要
+         ====================================================== -->
+    <section class="member-service-summary"
+             th:if="${!#lists.isEmpty(serviceList)}">
+
+        <!-- 全部服務 -->
+        <article class="member-service-summary-card">
+
+            <p class="member-service-summary-label">
+                全部服務
+            </p>
+
+            <p class="member-service-summary-value"
+               th:text="${#lists.size(serviceList)}">
+                0
+            </p>
+
+        </article>
+
+        <!-- 上架中 -->
+        <article class="member-service-summary-card
+                        member-service-summary-card--active">
+
+            <p class="member-service-summary-label">
+                上架中
+            </p>
+
+            <p class="member-service-summary-value"
+               th:text="${#lists.size(serviceList.?[status == 1])}">
+                0
+            </p>
+
+        </article>
+
+        <!-- 已下架 -->
+        <article class="member-service-summary-card
+                        member-service-summary-card--inactive">
+
+            <p class="member-service-summary-label">
+                已下架
+            </p>
+
+            <p class="member-service-summary-value"
+               th:text="${#lists.size(serviceList.?[status == 0])}">
+                0
+            </p>
+
+        </article>
+
+        <!-- 平台停用 -->
+        <article class="member-service-summary-card
+                        member-service-summary-card--disabled">
+
+            <p class="member-service-summary-label">
+                平台停用
+            </p>
+
+            <p class="member-service-summary-value"
+               th:text="${#lists.size(serviceList.?[status == 3])}">
+                0
+            </p>
+
+        </article>
+
+    </section>
+
+    <!-- ======================================================
+         空資料
+         ====================================================== -->
+    <section class="member-service-empty"
+             th:if="${#lists.isEmpty(serviceList)}">
+
+        <div class="member-service-empty-icon">
+            ＋
+        </div>
+
+        <h2>
+            你目前還沒有建立服務
+        </h2>
+
+        <p>
+            建立第一個服務後，就可以新增時段並接受其他會員預約。
+        </p>
+
+        <a class="btn member-service-add-button"
+           th:href="@{/member/services/add}">
+            新增第一個服務
+        </a>
+
+    </section>
+
+    <!-- ======================================================
+         服務列表
+         ====================================================== -->
+    <section th:if="${!#lists.isEmpty(serviceList)}">
+
+        <div class="member-service-result-heading">
+
+            <div>
+
+                <h2>
+                    服務列表
+                </h2>
+
+                <p>
+                    可修改服務內容、管理時段或調整上下架狀態。
+                </p>
+
+            </div>
+
+            <span class="member-service-count"
+                  th:text="|共 ${#lists.size(serviceList)} 筆|">
+                共 0 筆
+            </span>
+
+        </div>
+
+        <div class="member-service-grid">
+
+            <article class="member-service-card"
+                     th:each="service : ${serviceList}">
+
+                <!-- ==================================================
+                     服務圖片
+                     ================================================== -->
+                <a class="member-service-image-wrap"
+                   th:href="@{/front/services/{serviceId}(
+                                serviceId=${service.serviceId}
+                             )}">
+
+                    <img class="member-service-image"
+                         th:src="@{/front/services/image/{serviceId}(
+                                    serviceId=${service.serviceId}
+                                 )}"
+                         th:onerror="this.onerror=null;
+                                     this.src='/images/activity/default-activity.jpg';"
+                         alt="服務圖片">
+
+                    <!-- 服務類型 -->
+                    <span class="member-service-type-badge"
+                          th:text="${service.serviceType != null
+                                   ? service.serviceType.typeName
+                                   : '無服務類型'}">
+                        服務類型
+                    </span>
+
+                    <!-- 上架 -->
+                    <span class="member-service-status
+                                 member-service-status--active"
+                          th:if="${service.status == 1}">
+                        上架中
+                    </span>
+
+                    <!-- 下架 -->
+                    <span class="member-service-status
+                                 member-service-status--inactive"
+                          th:if="${service.status == 0}">
+                        已下架
+                    </span>
+
+                    <!-- 封存 -->
+                    <span class="member-service-status
+                                 member-service-status--deleted"
+                          th:if="${service.status == 2}">
+                        已封存
+                    </span>
+
+                    <!-- 平台停用 -->
+                    <span class="member-service-status
+                                 member-service-status--disabled"
+                          th:if="${service.status == 3}">
+                        平台停用
+                    </span>
+
                 </a>
-                
-                <a th:href="@{/member/services/{id}/slots(id=${service.serviceId})}">
- 			   管理時段
- 			   </a>
 
-                <!-- 上架中才顯示下架 -->
-                <form th:if="${service.status == 1}"
-                      th:action="@{/member/services/{id}/deactivate(id=${service.serviceId})}"
-                      method="post"
-                      style="display:inline;">
-                    <button type="submit"
-                            onclick="return confirm('確定要下架這個服務嗎？下架後前台將看不到，但你可以重新上架。')">
-                        下架
-                    </button>
-                </form>
+                <!-- ==================================================
+                     卡片內容
+                     ================================================== -->
+                <div class="member-service-card-body">
 
-                <!-- 已下架才顯示重新上架 -->
-                <form th:if="${service.status == 0}"
-                      th:action="@{/member/services/{id}/activate(id=${service.serviceId})}"
-                      method="post"
-                      style="display:inline;">
-                    <button type="submit"
-                            onclick="return confirm('確定要重新上架這個服務嗎？上架後前台使用者將可以看到。')">
-                        重新上架
-                    </button>
-                </form>
+                    <div class="member-service-card-title-row">
 
-                <!-- 刪除/封存 -->
-                <form th:action="@{/member/services/{id}/delete(id=${service.serviceId})}"
-                      method="post"
-                      style="display:inline;">
-                    <button type="submit"
-                            onclick="return confirm('確定要刪除此服務嗎？刪除後不可重新上架，只會保留歷史訂單紀錄。')">
-                        刪除
-                    </button>
-                </form>
-            </td>
-        </tr>
-    </tbody>
-</table>
+                        <h3 class="member-service-card-title"
+                            th:text="${service.serviceName}">
+                            河堤散步陪伴
+                        </h3>
 
-<hr>
+                        <span class="member-service-card-id"
+                              th:text="|#${service.serviceId}|">
+                            #1
+                        </span>
 
-<p>
-    <a th:href="@{/front/services}">回前台服務列表</a>
-</p>
+                    </div>
+
+                    <!-- 有地區欄位時保留這區 -->
+                    <p class="member-service-location"
+                       th:if="${service.serviceCity != null
+                                or service.serviceDistrict != null}">
+
+                        <span class="member-service-location-dot"></span>
+
+                        <span th:text="|${service.serviceCity ?: ''}
+                                       ${service.serviceDistrict ?: ''}|">
+                            桃園市 八德區
+                        </span>
+
+                    </p>
+
+                    <p class="member-service-place"
+                       th:if="${service.serviceLocation != null
+                                and !#strings.isEmpty(service.serviceLocation)}"
+                       th:text="${service.serviceLocation}">
+                        八德埤塘自然生態公園附近
+                    </p>
+
+                    <p class="member-service-description-text"
+                       th:text="${service.description}">
+                        服務說明
+                    </p>
+
+                    <!-- ==================================================
+                         基本資訊
+                         ================================================== -->
+                    <div class="member-service-info-grid">
+
+                        <div class="member-service-info-item">
+
+                            <p class="member-service-info-label">
+                                每小時費率
+                            </p>
+
+                            <p class="member-service-info-value
+                                      member-service-price">
+
+                                NT$
+
+                                <span th:text="${service.hourlyRate}">
+                                    500
+                                </span>
+
+                            </p>
+
+                        </div>
+
+                        <div class="member-service-info-item">
+
+                            <p class="member-service-info-label">
+                                建立時間
+                            </p>
+
+                            <p class="member-service-info-value"
+                               th:text="${service.createdAt != null
+                                        ? #temporals.format(
+                                            service.createdAt,
+                                            'yyyy-MM-dd'
+                                          )
+                                        : '-'}">
+                                2026-07-13
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <!-- 平台停用說明 -->
+                    <p class="member-service-disabled-message"
+                       th:if="${service.status == 3}">
+
+                        此服務目前已被平台停用，無法自行重新上架。
+                        請聯絡平台管理員確認原因。
+
+                    </p>
+
+                    <!-- ==================================================
+                         操作按鈕
+                         ================================================== -->
+                    <div class="member-service-actions">
+
+                        <!-- 公開詳情 -->
+                        <a class="btn member-service-action-button
+                                  member-service-detail-button"
+                           th:href="@{/front/services/{serviceId}(
+                                        serviceId=${service.serviceId}
+                                     )}">
+                            查看詳情
+                        </a>
+
+                        <!-- 修改 -->
+                        <a class="btn member-service-action-button
+                                  member-service-edit-button"
+                           th:if="${service.status != 2
+                                   and service.status != 3}"
+                           th:href="@{/member/services/{serviceId}/edit(
+                                        serviceId=${service.serviceId}
+                                     )}">
+                            修改服務
+                        </a>
+
+                        <!-- 管理時段 -->
+                        <a class="btn member-service-action-button
+                                  member-service-slot-button"
+                           th:if="${service.status != 2}"
+                           th:href="@{/member/services/{serviceId}/slots(
+                                        serviceId=${service.serviceId}
+                                     )}">
+                            管理時段
+                        </a>
+
+                        <!-- 下架 -->
+                        <form class="member-service-action-form"
+                              th:if="${service.status == 1}"
+                              th:action="@{/member/services/{serviceId}/deactivate(
+                                           serviceId=${service.serviceId}
+                                        )}"
+                              method="post">
+
+                            <button class="btn member-service-action-button
+                                           member-service-detail-button"
+                                    type="submit">
+
+                                下架服務
+
+                            </button>
+
+                        </form>
+
+                        <!-- 重新上架 -->
+                        <form class="member-service-action-form"
+                              th:if="${service.status == 0}"
+                              th:action="@{/member/services/{serviceId}/activate(
+                                           serviceId=${service.serviceId}
+                                        )}"
+                              method="post">
+
+                            <button class="btn member-service-action-button
+                                           member-service-slot-button"
+                                    type="submit">
+
+                                重新上架
+
+                            </button>
+
+                        </form>
+
+                        <!-- 刪除 -->
+                        <button class="btn member-service-action-button
+                                       member-service-delete-button
+                                       js-delete-service"
+                                type="button"
+                                th:if="${service.status != 2
+                                       and service.status != 3}"
+                                th:attr="data-service-id=${service.serviceId},
+                                         data-service-name=${service.serviceName}">
+
+                            刪除服務
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+</main>
+
+<!-- ==========================================================
+     刪除確認彈窗
+     ========================================================== -->
+<div class="member-service-modal"
+     id="deleteServiceModal"
+     hidden>
+
+    <div class="member-service-modal-content"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="deleteServiceModalTitle">
+
+        <h2 class="member-service-modal-title"
+            id="deleteServiceModalTitle">
+            確定刪除服務？
+        </h2>
+
+        <p class="member-service-modal-text">
+
+            你即將刪除
+
+            <strong id="deleteServiceName">
+                這項服務
+            </strong>
+
+            。沒有訂單時會直接刪除；已有訂單時會改為封存。
+
+        </p>
+
+        <form id="deleteServiceForm"
+              method="post">
+
+            <div class="member-service-modal-actions">
+
+                <button class="btn btn-secondary"
+                        id="cancelDeleteService"
+                        type="button">
+                    取消
+                </button>
+
+                <button class="btn btn-danger"
+                        type="submit">
+                    確定刪除
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- ==========================================================
+     刪除彈窗 JS
+     ========================================================== -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const modal =
+            document.getElementById('deleteServiceModal');
+
+        const deleteForm =
+            document.getElementById('deleteServiceForm');
+
+        const serviceNameElement =
+            document.getElementById('deleteServiceName');
+
+        const cancelButton =
+            document.getElementById('cancelDeleteService');
+
+        const deleteButtons =
+            document.querySelectorAll('.js-delete-service');
+
+        function closeDeleteModal() {
+
+            modal.setAttribute('hidden', '');
+
+            deleteForm.removeAttribute('action');
+
+            serviceNameElement.textContent =
+                '這項服務';
+        }
+
+        deleteButtons.forEach(function (button) {
+
+            button.addEventListener('click', function () {
+
+                const serviceId =
+                    button.dataset.serviceId;
+
+                const serviceName =
+                    button.dataset.serviceName;
+
+                serviceNameElement.textContent =
+                    serviceName || '這項服務';
+
+                deleteForm.action =
+                    '/member/services/' +
+                    serviceId +
+                    '/delete';
+
+                modal.removeAttribute('hidden');
+            });
+        });
+
+        cancelButton.addEventListener(
+            'click',
+            closeDeleteModal
+        );
+
+        modal.addEventListener('click', function (event) {
+
+            if (event.target === modal) {
+                closeDeleteModal();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+
+            if (event.key === 'Escape' &&
+                !modal.hasAttribute('hidden')) {
+
+                closeDeleteModal();
+            }
+        });
+    });
+</script>
+
+<!-- ==========================================================
+     通知未讀數更新
+     ========================================================== -->
+<script>
+    async function refreshUnreadBadge() {
+
+        try {
+
+            const response =
+                await fetch('/notification/unread-count');
+
+            if (!response.ok) {
+                return;
+            }
+
+            const count =
+                await response.json();
+
+            const notifyButton =
+                document.querySelector('.icon-btn--notify');
+
+            if (!notifyButton) {
+                return;
+            }
+
+            let badge =
+                notifyButton.querySelector(
+                    '.icon-badge--unread'
+                );
+
+            if (count > 0) {
+
+                if (!badge) {
+
+                    badge =
+                        document.createElement('span');
+
+                    badge.className =
+                        'icon-badge icon-badge--unread';
+
+                    notifyButton.appendChild(badge);
+                }
+
+                badge.textContent =
+                    count > 99 ? '99+' : count;
+
+            } else if (badge) {
+
+                badge.remove();
+            }
+
+        } catch (error) {
+
+            console.error(
+                '更新通知數量失敗：',
+                error
+            );
+        }
+    }
+
+    refreshUnreadBadge();
+
+    setInterval(
+        refreshUnreadBadge,
+        30000
+    );
+</script>
 
 </body>
 </html>

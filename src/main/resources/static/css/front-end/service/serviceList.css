@@ -1,0 +1,575 @@
+/* ==========================================================
+   一對一服務列表頁專屬樣式
+   搭配：
+   /CSS/front-end/service/common.css
+   ========================================================== */
+
+/* ==========================================================
+   頁面標題區
+   ========================================================== */
+
+.service-page-heading {
+    margin-bottom: 28px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.service-page-eyebrow {
+    margin-bottom: 4px;
+
+    color: var(--color-rental);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.service-page-description {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+    font-size: 14px;
+}
+
+.service-login-status {
+    flex-shrink: 0;
+
+    padding: 9px 15px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+
+    background: var(--color-surface);
+    color: var(--color-text-soft);
+
+    font-size: 13px;
+    white-space: nowrap;
+
+    box-shadow: var(--shadow-sm);
+}
+
+.service-login-status strong {
+    color: var(--color-primary-dark);
+}
+
+/* ==========================================================
+   主版面
+   左側分類 + 右側內容
+   ========================================================== */
+
+.service-layout {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 24px;
+}
+
+.service-content {
+    min-width: 0;
+}
+
+/* ==========================================================
+   左側服務分類
+   ========================================================== */
+
+.service-category-panel {
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+
+    align-self: start;
+}
+
+.service-category-title {
+    margin-bottom: 14px;
+
+    color: var(--color-text);
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.service-category-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.service-category-item {
+    padding: 10px 12px;
+
+    border-radius: var(--radius-sm);
+
+    color: var(--color-text-soft);
+    font-size: 14px;
+    font-weight: 700;
+
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.service-category-item:hover {
+    transform: translateX(3px);
+
+    background: var(--color-bg);
+    color: var(--color-primary-dark);
+}
+
+.service-category-item.active {
+    background:
+        linear-gradient(
+            135deg,
+            var(--color-rental),
+            #FFA486
+        );
+
+    color: #FFFFFF;
+
+    box-shadow:
+        0 8px 20px rgba(255, 122, 89, 0.18);
+}
+
+/* ==========================================================
+   搜尋區
+   ========================================================== */
+
+.service-search-panel {
+    margin-bottom: 24px;
+}
+
+.service-search-heading {
+    margin-bottom: 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.service-search-heading h2 {
+    font-size: 20px;
+}
+
+.service-search-heading p {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+    font-size: 13px;
+}
+
+.service-clear-link {
+    flex-shrink: 0;
+
+    color: var(--color-primary-dark);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.service-clear-link:hover {
+    text-decoration: underline;
+}
+
+.service-search-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+}
+
+.service-search-input {
+    width: 100%;
+}
+
+.service-search-button {
+    min-width: 96px;
+
+    border: none;
+
+    background: var(--color-rental);
+    color: #FFFFFF;
+}
+
+.service-search-button:hover {
+    box-shadow:
+        0 10px 24px rgba(255, 122, 89, 0.24);
+}
+
+/* ==========================================================
+   搜尋結果標題
+   ========================================================== */
+
+.service-result-heading {
+    margin-bottom: 16px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.service-result-heading h2 {
+    font-size: 22px;
+}
+
+.service-result-heading p {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+    font-size: 13px;
+}
+
+.service-result-heading strong {
+    color: var(--color-rental);
+}
+
+.service-result-count {
+    flex-shrink: 0;
+
+    padding: 5px 11px;
+
+    border-radius: var(--radius-full);
+
+    background: #FFF0EB;
+    color: var(--color-rental);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* ==========================================================
+   服務卡片列表
+   ========================================================== */
+
+.service-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fill, minmax(270px, 1fr));
+
+    gap: 20px;
+}
+
+.service-card {
+    overflow: hidden;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-6px);
+
+    border-color: transparent;
+    box-shadow: var(--shadow-hover);
+}
+
+.service-card-image-wrap {
+    position: relative;
+
+    display: block;
+    overflow: hidden;
+}
+
+.service-card-image {
+    width: 100%;
+    height: 180px;
+
+    display: block;
+    object-fit: cover;
+
+    background:
+        linear-gradient(
+            135deg,
+            #FFA486,
+            var(--color-bg)
+        );
+
+    transition: transform 0.25s ease;
+}
+
+.service-card:hover .service-card-image {
+    transform: scale(1.03);
+}
+
+/* 服務類型標籤 */
+
+.service-type-badge {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+
+    padding: 5px 10px;
+
+    border-radius: var(--radius-full);
+
+    background: rgba(43, 39, 64, 0.78);
+    color: #FFFFFF;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+/* ==========================================================
+   卡片內容
+   ========================================================== */
+
+.service-card-body {
+    padding: 16px;
+}
+
+.service-card-title-row {
+    margin-bottom: 9px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.service-card-title {
+    margin: 0;
+
+    color: var(--color-text);
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+.service-card-title a {
+    transition: color 0.15s ease;
+}
+
+.service-card-title a:hover {
+    color: var(--color-rental);
+}
+
+.service-card-id {
+    flex-shrink: 0;
+
+    color: var(--color-text-soft);
+    font-size: 11px;
+}
+
+/* ==========================================================
+   地區資訊
+   ========================================================== */
+
+.service-card-location {
+    margin-bottom: 2px;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    color: var(--color-primary-dark);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.service-location-icon {
+    width: 8px;
+    height: 8px;
+
+    display: inline-block;
+
+    border-radius: 50%;
+
+    background: var(--color-rental);
+}
+
+.service-card-place {
+    margin-bottom: 10px;
+
+    color: var(--color-text-soft);
+    font-size: 13px;
+}
+
+/* ==========================================================
+   描述與提供者資訊
+   ========================================================== */
+
+.service-card-description {
+    min-height: 45px;
+    margin-bottom: 12px;
+
+    display: -webkit-box;
+    overflow: hidden;
+
+    color: var(--color-text-soft);
+    font-size: 14px;
+
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.service-card-provider {
+    margin-bottom: 15px;
+
+    color: var(--color-text-soft);
+    font-size: 12px;
+}
+
+/* ==========================================================
+   卡片底部
+   ========================================================== */
+
+.service-card-footer {
+    padding-top: 13px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    border-top: 1px solid var(--color-border);
+}
+
+.service-price {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+
+    color: var(--color-text-soft);
+    font-size: 12px;
+}
+
+.service-price-currency {
+    color: var(--color-rental);
+    font-weight: 700;
+}
+
+.service-price strong {
+    color: var(--color-rental);
+    font-size: 21px;
+}
+
+.service-detail-button {
+    min-height: 38px;
+    padding: 8px 14px;
+
+    background: var(--color-rental);
+    color: #FFFFFF;
+}
+
+.service-detail-button:hover {
+    box-shadow:
+        0 10px 24px rgba(255, 122, 89, 0.24);
+}
+
+/* ==========================================================
+   空資料狀態
+   ========================================================== */
+
+.service-empty-state {
+    padding: 50px 20px;
+
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+
+    background: var(--color-surface);
+
+    text-align: center;
+}
+
+.service-empty-icon {
+    margin-bottom: 12px;
+
+    color: var(--color-primary-light);
+    font-size: 42px;
+}
+
+.service-empty-state h3 {
+    margin-bottom: 5px;
+
+    color: var(--color-text);
+    font-size: 20px;
+}
+
+.service-empty-state p {
+    margin-bottom: 18px;
+
+    color: var(--color-text-soft);
+    font-size: 14px;
+}
+
+/* ==========================================================
+   RWD
+   ========================================================== */
+
+@media (max-width: 900px) {
+
+    .service-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .service-category-panel {
+        position: static;
+    }
+
+    .service-category-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .service-category-item {
+        border: 1px solid var(--color-border);
+    }
+
+    .service-category-item:hover {
+        transform: translateY(-2px);
+    }
+}
+
+@media (max-width: 680px) {
+
+    .service-page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .service-login-status {
+        white-space: normal;
+    }
+
+    .service-search-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .service-search-form {
+        grid-template-columns: 1fr;
+    }
+
+    .service-search-button {
+        width: 100%;
+    }
+
+    .service-result-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .service-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 420px) {
+
+    .service-card-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .service-detail-button {
+        width: 100%;
+    }
+}

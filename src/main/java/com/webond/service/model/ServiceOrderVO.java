@@ -122,6 +122,15 @@ public class ServiceOrderVO {
 
     @Column(name = "SLOT_END_TIME_SNAPSHOT")
     private LocalDateTime slotEndTimeSnapshot;
+    
+    @Column(name = "SERVICE_CITY_SNAPSHOT")
+    private String serviceCitySnapshot;
+
+    @Column(name = "SERVICE_DISTRICT_SNAPSHOT")
+    private String serviceDistrictSnapshot;
+
+    @Column(name = "SERVICE_LOCATION_SNAPSHOT")
+    private String serviceLocationSnapshot;
 
     public Integer getServiceOrderId() {
         return serviceOrderId;
@@ -394,4 +403,30 @@ public class ServiceOrderVO {
     public void setSlotEndTimeSnapshot(LocalDateTime slotEndTimeSnapshot) {
         this.slotEndTimeSnapshot = slotEndTimeSnapshot;
     }
+
+	public String getServiceCitySnapshot() {
+		return serviceCitySnapshot;
+	}
+
+	public void setServiceCitySnapshot(String serviceCitySnapshot) {
+		this.serviceCitySnapshot = serviceCitySnapshot;
+	}
+
+	public String getServiceDistrictSnapshot() {
+		return serviceDistrictSnapshot;
+	}
+
+	public void setServiceDistrictSnapshot(String serviceDistrictSnapshot) {
+		this.serviceDistrictSnapshot = serviceDistrictSnapshot;
+	}
+
+	public String getServiceLocationSnapshot() {
+		return serviceLocationSnapshot;
+	}
+
+	public void setServiceLocationSnapshot(String serviceLocationSnapshot) {
+		this.serviceLocationSnapshot = serviceLocationSnapshot;
+	}
+    
+    
 }

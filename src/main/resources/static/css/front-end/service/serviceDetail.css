@@ -1,0 +1,662 @@
+/* ==========================================================
+   Webond 一對一服務詳情頁
+   搭配：
+   /CSS/front-end/service/common.css
+   ========================================================== */
+
+/* ==========================================================
+   頁面上方操作列
+   ========================================================== */
+
+.service-detail-topbar {
+    margin-bottom: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.service-detail-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    color: var(--color-primary-dark);
+
+    font-size: 14px;
+    font-weight: 700;
+
+    transition:
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.service-detail-back:hover {
+    color: var(--color-rental);
+    transform: translateX(-3px);
+}
+
+.service-detail-login-status {
+    padding: 8px 14px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+
+    background: var(--color-surface);
+    color: var(--color-text-soft);
+
+    box-shadow: var(--shadow-sm);
+
+    font-size: 13px;
+}
+
+.service-detail-login-status strong {
+    color: var(--color-primary-dark);
+}
+
+/* ==========================================================
+   左右主要版面
+   ========================================================== */
+
+.service-detail-layout {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1.35fr)
+        minmax(320px, 0.65fr);
+
+    align-items: start;
+    gap: 26px;
+}
+
+.service-detail-main {
+    min-width: 0;
+}
+
+/* ==========================================================
+   服務封面圖片
+   ========================================================== */
+
+.service-detail-image-wrap {
+    overflow: hidden;
+
+    margin-bottom: 22px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+
+    background: var(--color-surface);
+
+    box-shadow: var(--shadow-sm);
+}
+
+.service-detail-image {
+    width: 100%;
+    height: 420px;
+
+    display: block;
+    object-fit: cover;
+
+    background:
+        linear-gradient(
+            135deg,
+            #FFA486,
+            var(--color-bg)
+        );
+}
+
+/* ==========================================================
+   服務標題區
+   ========================================================== */
+
+.service-detail-header {
+    margin-bottom: 22px;
+}
+
+.service-detail-meta {
+    margin-bottom: 10px;
+
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.service-detail-type {
+    padding: 5px 11px;
+
+    border-radius: var(--radius-full);
+
+    background: #FFF0EB;
+    color: var(--color-rental);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.service-detail-id {
+    color: var(--color-text-soft);
+
+    font-size: 12px;
+}
+
+.service-detail-title {
+    margin-bottom: 12px;
+
+    color: var(--color-text);
+
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 800;
+    line-height: 1.35;
+}
+
+.service-detail-location {
+    margin-bottom: 4px;
+
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: var(--color-primary-dark);
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.service-detail-location-dot {
+    width: 9px;
+    height: 9px;
+
+    display: inline-block;
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: var(--color-rental);
+}
+
+.service-detail-place {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+
+    font-size: 14px;
+}
+
+/* ==========================================================
+   左側內容區塊
+   ========================================================== */
+
+.service-detail-section {
+    margin-bottom: 22px;
+}
+
+.service-detail-section:last-child {
+    margin-bottom: 0;
+}
+
+.service-detail-section-title {
+    margin-bottom: 14px;
+    padding-left: 12px;
+
+    border-left: 5px solid var(--color-rental);
+
+    color: var(--color-text);
+
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.service-detail-description {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+
+    font-size: 15px;
+    line-height: 1.9;
+
+    white-space: pre-line;
+}
+
+/* ==========================================================
+   基本資訊格
+   ========================================================== */
+
+.service-detail-info-list {
+    display: grid;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+}
+
+.service-detail-info-item {
+    padding: 14px 16px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    background: var(--color-bg);
+}
+
+.service-detail-info-label {
+    margin-bottom: 3px;
+
+    color: var(--color-text-soft);
+
+    font-size: 12px;
+}
+
+.service-detail-info-value {
+    margin-bottom: 0;
+
+    color: var(--color-text);
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+/* ==========================================================
+   提供者資訊
+   ========================================================== */
+
+.service-provider-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.service-provider-avatar {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--color-primary),
+            var(--color-primary-light)
+        );
+
+    color: #FFFFFF;
+
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.service-provider-info {
+    min-width: 0;
+}
+
+.service-provider-label {
+    margin-bottom: 2px;
+
+    color: var(--color-text-soft);
+
+    font-size: 12px;
+}
+
+.service-provider-value {
+    margin-bottom: 0;
+
+    color: var(--color-text);
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* ==========================================================
+   右側預約面板
+   ========================================================== */
+
+.service-booking-panel {
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+}
+
+.service-price-box {
+    margin-bottom: 20px;
+
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+}
+
+.service-price-currency {
+    color: var(--color-rental);
+
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.service-price-amount {
+    color: var(--color-rental);
+
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.service-price-unit {
+    color: var(--color-text-soft);
+
+    font-size: 13px;
+}
+
+.service-slot-title {
+    margin-bottom: 5px;
+
+    color: var(--color-text);
+
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.service-slot-subtitle {
+    margin-bottom: 14px;
+
+    color: var(--color-text-soft);
+
+    font-size: 12px;
+}
+
+/* ==========================================================
+   時段列表
+   ========================================================== */
+
+.service-slot-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.service-slot-item {
+    padding: 14px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+
+    background: var(--color-bg);
+
+    transition:
+        transform 0.15s ease,
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.service-slot-item--available {
+    border-color: rgba(32, 167, 121, 0.28);
+    background: #F8FFFC;
+}
+
+.service-slot-item--available:hover {
+    transform: translateY(-2px);
+
+    border-color: rgba(32, 167, 121, 0.5);
+
+    box-shadow:
+        0 8px 20px rgba(32, 167, 121, 0.08);
+}
+
+.service-slot-item--locked {
+    border-color: rgba(217, 131, 36, 0.28);
+    background: var(--color-warning-bg);
+}
+
+.service-slot-item--booked {
+    border-color: rgba(107, 101, 128, 0.18);
+    background: #F4F2F8;
+}
+
+.service-slot-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.service-slot-time {
+    min-width: 0;
+}
+
+.service-slot-date {
+    margin-bottom: 2px;
+
+    color: var(--color-text);
+
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.service-slot-hour {
+    color: var(--color-text-soft);
+
+    font-size: 13px;
+}
+
+.service-slot-separator {
+    margin: 0 4px;
+}
+
+/* ==========================================================
+   時段狀態
+   ========================================================== */
+
+.service-slot-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    padding: 4px 10px;
+
+    border-radius: var(--radius-full);
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.service-slot-status.available {
+    background: var(--color-success-bg);
+    color: var(--color-success);
+}
+
+.service-slot-status.locked {
+    background: #FFE8C2;
+    color: var(--color-warning);
+}
+
+.service-slot-status.booked {
+    background: #E8E5EF;
+    color: var(--color-text-soft);
+}
+
+/* ==========================================================
+   時段操作
+   ========================================================== */
+
+.service-slot-action {
+    margin-top: 12px;
+}
+
+.service-booking-toggle {
+    width: 100%;
+
+    border: none;
+
+    background: var(--color-rental);
+    color: #FFFFFF;
+}
+
+.service-booking-toggle:hover {
+    box-shadow:
+        0 10px 24px rgba(255, 122, 89, 0.24);
+}
+
+.service-booking-disabled {
+    width: 100%;
+
+    border: none;
+
+    background: #E8E5EF;
+    color: var(--color-text-soft);
+
+    cursor: not-allowed;
+}
+
+.service-booking-disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* ==========================================================
+   點擊後展開的預約表單
+   ========================================================== */
+
+.service-booking-form {
+    margin-top: 14px;
+    padding-top: 14px;
+
+    border-top: 1px solid var(--color-border);
+}
+
+.service-booking-form[hidden] {
+    display: none;
+}
+
+.service-booking-note {
+    min-height: 100px;
+}
+
+.service-booking-form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.service-booking-form-actions .btn {
+    flex: 1;
+}
+
+.service-booking-submit {
+    border: none;
+
+    background: var(--color-rental);
+    color: #FFFFFF;
+}
+
+.service-booking-submit:hover {
+    box-shadow:
+        0 10px 24px rgba(255, 122, 89, 0.24);
+}
+
+/* ==========================================================
+   不可預約說明
+   ========================================================== */
+
+.service-slot-message {
+    margin-top: 10px;
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.service-slot-lock-time {
+    margin-top: 5px;
+    margin-bottom: 0;
+
+    color: var(--color-warning);
+
+    font-size: 11px;
+}
+
+/* ==========================================================
+   空時段
+   ========================================================== */
+
+.service-slot-empty {
+    padding: 28px 15px;
+
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+
+    background: var(--color-bg);
+    color: var(--color-text-soft);
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+/* ==========================================================
+   RWD
+   ========================================================== */
+
+@media (max-width: 960px) {
+
+    .service-detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .service-booking-panel {
+        position: static;
+    }
+
+    .service-detail-image {
+        height: 360px;
+    }
+}
+
+@media (max-width: 680px) {
+
+    .service-detail-topbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .service-detail-login-status {
+        width: 100%;
+    }
+
+    .service-detail-image {
+        height: 270px;
+    }
+
+    .service-detail-info-list {
+        grid-template-columns: 1fr;
+    }
+
+    .service-detail-title {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .service-detail-image {
+        height: 220px;
+    }
+
+    .service-slot-summary {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .service-booking-form-actions {
+        flex-direction: column;
+    }
+
+    .service-price-amount {
+        font-size: 30px;
+    }
+}

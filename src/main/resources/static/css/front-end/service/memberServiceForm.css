@@ -1,0 +1,502 @@
+/* ==========================================================
+   Webond 會員－新增／修改服務
+   搭配 common.css
+   ========================================================== */
+
+/* 頁面標題 */
+
+.member-service-form-heading {
+    margin-bottom: 24px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.member-service-form-eyebrow {
+    margin-bottom: 4px;
+
+    color: var(--color-rental);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.member-service-form-description {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+    font-size: 14px;
+}
+
+.member-service-form-back {
+    flex-shrink: 0;
+}
+
+/* 主要版面 */
+
+.member-service-form-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+
+    align-items: start;
+    gap: 24px;
+}
+
+.member-service-form-main {
+    min-width: 0;
+}
+
+.member-service-form-sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+}
+
+/* 表單區塊 */
+
+.member-service-form-section {
+    margin-bottom: 22px;
+}
+
+.member-service-form-section:last-child {
+    margin-bottom: 0;
+}
+
+.member-service-form-section-title {
+    margin-bottom: 16px;
+    padding-left: 12px;
+
+    border-left: 5px solid var(--color-rental);
+
+    color: var(--color-text);
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.member-service-form-section-description {
+    margin-top: -8px;
+    margin-bottom: 18px;
+
+    color: var(--color-text-soft);
+    font-size: 13px;
+}
+
+/* 欄位排列 */
+
+.member-service-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.member-service-form-full {
+    grid-column: 1 / -1;
+}
+
+.member-service-location-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 14px;
+}
+
+.required-mark {
+    margin-left: 3px;
+
+    color: var(--color-danger);
+    font-weight: 800;
+}
+
+/* 費率欄位 */
+
+.member-service-rate-wrap {
+    position: relative;
+}
+
+.member-service-rate-prefix {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+
+    transform: translateY(-50%);
+
+    color: var(--color-rental);
+    font-weight: 700;
+
+    pointer-events: none;
+}
+
+.member-service-rate-input {
+    padding-right: 65px;
+    padding-left: 48px;
+}
+
+.member-service-rate-unit {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+
+    transform: translateY(-50%);
+
+    color: var(--color-text-soft);
+    font-size: 13px;
+
+    pointer-events: none;
+}
+
+/* 字數統計 */
+
+.member-service-character-row {
+    margin-top: 6px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.member-service-character-row .form-help {
+    margin-top: 0;
+}
+
+.member-service-character-count {
+    flex-shrink: 0;
+
+    margin: 0;
+
+    color: var(--color-text-soft);
+    font-size: 12px;
+}
+
+.member-service-character-count.is-limit {
+    color: var(--color-danger);
+    font-weight: 700;
+}
+
+/* 圖片上傳 */
+
+.member-service-image-upload {
+    position: relative;
+
+    overflow: hidden;
+
+    min-height: 280px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 2px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+
+    background: var(--color-bg);
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
+}
+
+.member-service-image-upload:hover {
+    border-color: var(--color-primary-light);
+    background: #FFFFFF;
+}
+
+.member-service-image-upload.has-image {
+    border-style: solid;
+}
+
+.member-service-image-input {
+    position: absolute;
+
+    width: 1px;
+    height: 1px;
+
+    overflow: hidden;
+
+    opacity: 0;
+    pointer-events: none;
+}
+
+.member-service-image-label {
+    width: 100%;
+    min-height: 280px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
+
+.member-service-image-placeholder {
+    padding: 24px;
+
+    text-align: center;
+}
+
+.member-service-image-icon {
+    width: 54px;
+    height: 54px;
+
+    margin: 0 auto 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--color-primary),
+            var(--color-primary-light)
+        );
+
+    color: #FFFFFF;
+    font-size: 30px;
+    font-weight: 500;
+}
+
+.member-service-image-title {
+    margin-bottom: 5px;
+
+    color: var(--color-text);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.member-service-image-hint {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+    font-size: 12px;
+}
+
+.member-service-image-preview {
+    width: 100%;
+    height: 280px;
+
+    display: none;
+    object-fit: cover;
+}
+
+.member-service-image-upload.has-image
+.member-service-image-preview {
+    display: block;
+}
+
+.member-service-image-upload.has-image
+.member-service-image-placeholder {
+    display: none;
+}
+
+.member-service-image-remove {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+
+    z-index: 2;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 34px;
+    padding: 6px 12px;
+
+    border: none;
+    border-radius: var(--radius-full);
+
+    background: rgba(43, 39, 64, 0.82);
+    color: #FFFFFF;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+.member-service-image-remove:hover {
+    background: var(--color-danger);
+}
+
+.member-service-image-upload.has-image
+.member-service-image-remove {
+    display: inline-flex;
+}
+
+/* 右側即時預覽 */
+
+.member-service-form-summary-title {
+    margin-bottom: 14px;
+
+    font-size: 19px;
+}
+
+.member-service-summary-image {
+    width: 100%;
+    height: 180px;
+
+    margin-bottom: 14px;
+
+    display: block;
+    object-fit: cover;
+
+    border-radius: var(--radius-md);
+
+    background:
+        linear-gradient(
+            135deg,
+            #FFA486,
+            var(--color-bg)
+        );
+}
+
+.member-service-summary-type {
+    display: inline-flex;
+
+    margin-bottom: 10px;
+    padding: 4px 10px;
+
+    border-radius: var(--radius-full);
+
+    background: #FFF0EB;
+    color: var(--color-rental);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.member-service-summary-name {
+    margin-bottom: 7px;
+
+    color: var(--color-text);
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.45;
+}
+
+.member-service-summary-location {
+    margin-bottom: 4px;
+
+    color: var(--color-primary-dark);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.member-service-summary-place {
+    margin-bottom: 10px;
+
+    color: var(--color-text-soft);
+    font-size: 12px;
+}
+
+.member-service-summary-description {
+    margin-bottom: 14px;
+
+    display: -webkit-box;
+    overflow: hidden;
+
+    color: var(--color-text-soft);
+    font-size: 13px;
+    line-height: 1.65;
+
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.member-service-summary-price {
+    padding-top: 12px;
+
+    border-top: 1px solid var(--color-border);
+
+    color: var(--color-text-soft);
+    font-size: 12px;
+}
+
+.member-service-summary-price strong {
+    color: var(--color-rental);
+    font-size: 24px;
+}
+
+/* 表單操作 */
+
+.member-service-form-actions {
+    margin-top: 24px;
+
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.member-service-form-submit {
+    min-width: 130px;
+
+    border: none;
+
+    background: var(--color-rental);
+    color: #FFFFFF;
+}
+
+.member-service-form-submit:hover {
+    box-shadow:
+        0 10px 24px rgba(255, 122, 89, 0.24);
+}
+
+.member-service-form-submit:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+}
+
+/* RWD */
+
+@media (max-width: 960px) {
+
+    .member-service-form-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .member-service-form-sidebar {
+        position: static;
+    }
+}
+
+@media (max-width: 680px) {
+
+    .member-service-form-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .member-service-form-grid,
+    .member-service-location-row {
+        grid-template-columns: 1fr;
+    }
+
+    .member-service-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .member-service-form-actions .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .member-service-character-row {
+        flex-direction: column;
+    }
+
+    .member-service-image-upload,
+    .member-service-image-label {
+        min-height: 220px;
+    }
+
+    .member-service-image-preview {
+        height: 220px;
+    }
+}

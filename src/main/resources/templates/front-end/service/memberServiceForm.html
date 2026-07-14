@@ -1,153 +1,736 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
-    <title th:text="${mode == 'add' ? '新增服務' : '修改服務'}">服務表單</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title th:text="${mode == 'add'
+                     ? '新增服務｜Webond'
+                     : '修改服務｜Webond'}">
+        服務表單｜Webond
+    </title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+          rel="stylesheet">
+
+    <!-- Service 前台共用 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/service/common.css}">
+
+    <!-- 表單頁專屬 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/service/memberServiceForm.css}">
 </head>
+
 <body>
 
-<h1 th:text="${mode == 'add' ? '新增服務' : '修改服務'}">服務表單</h1>
+<!-- ==========================================================
+     固定導覽列
+     ========================================================== -->
+<header class="site-header">
 
-<p>
-    <a th:href="@{/member/services}">回我的服務</a>
-</p>
+    <div class="header-inner">
 
-<hr>
+        <a class="logo"
+           th:href="@{/}">
 
-<!-- 錯誤訊息 -->
-<p th:if="${errorMsg != null}" th:text="${errorMsg}" style="color:red;"></p>
+            <span class="logo-mark">
 
-<!-- 表單 -->
-<form th:action="${mode == 'add'} 
-                    ? @{/member/services/add} 
-                    : @{/member/services/{id}/edit(id=${serviceId})}"
-      th:object="${serviceRequest}"
-      method="post"
-      enctype="multipart/form-data">
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
 
-    <!-- 服務類型 -->
-    <p>
-        <label>服務類型：</label>
-        <select th:field="*{serviceTypeId}">
-            <option value="">請選擇服務類型</option>
-            <option th:each="type : ${serviceTypeList}"
-                    th:value="${type.svcTypeID}"
-                    th:text="${type.typeName}">
-                類型名稱
-            </option>
-        </select>
-    </p>
+                    <path d="M3 11l9-7 9 7"></path>
 
-    <p th:if="${errors != null and errors['serviceTypeId'] != null}"
-       th:text="${errors['serviceTypeId']}"
-       style="color:red;"></p>
+                    <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path>
+                </svg>
 
-    <!-- 服務名稱 -->
-    <p>
-        <label>服務名稱：</label>
-        <input type="text" th:field="*{serviceName}">
-    </p>
+            </span>
 
-    <p th:if="${errors != null and errors['serviceName'] != null}"
-       th:text="${errors['serviceName']}"
-       style="color:red;"></p>
+            <span class="logo-text">
 
-    <!-- 服務描述 -->
-    <p>
-        <label>服務描述：</label><br>
-        <textarea th:field="*{description}" rows="5" cols="50"></textarea>
-    </p>
+                <span class="logo-title">
+                    Webond
+                </span>
 
-    <p th:if="${errors != null and errors['description'] != null}"
-       th:text="${errors['description']}"
-       style="color:red;"></p>
+                <span class="logo-sub">
+                    閒人出租
+                </span>
 
-    <!-- 每小時費率 -->
-    <p>
-        <label>每小時費率：</label>
-        <input type="number" th:field="*{hourlyRate}" min="100">
-    </p>
+            </span>
+        </a>
 
-    <p th:if="${errors != null and errors['hourlyRate'] != null}"
-       th:text="${errors['hourlyRate']}"
-       style="color:red;"></p>
+        <nav class="header-actions">
 
-    <!-- 服務封面圖片 -->
-    <p>
-        <label>服務封面圖片：</label>
-        <input type="file"
-               id="serviceImageFile"
-               name="serviceImageFile"
-               accept="image/*">
-    </p>
+            <!-- 聊天室 -->
+            <a class="icon-btn icon-btn--chat"
+               href="javascript:void(0);"
+               title="聊天室"
+               aria-disabled="true">
 
-    <p style="color: gray;">
-        可不選圖片；未上傳時會顯示預設圖片
-    </p>
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
 
-    <!-- 圖片預覽區 -->
-    <div>
-        <p>目前服務圖片：</p>
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8
+                             8.5 8.5 0 0 1-7.6 4.7
+                             8.38 8.38 0 0 1-3.8-.9
+                             L3 21l1.9-5.7
+                             a8.38 8.38 0 0 1-.9-3.8
+                             8.5 8.5 0 0 1 4.7-7.6
+                             8.38 8.38 0 0 1 3.8-.9
+                             h.5a8.48 8.48 0 0 1 8 8v.5z">
+                    </path>
+                </svg>
 
-        <img id="serviceImagePreview"
-             th:src="${mode == 'edit' and serviceId != null}
-                        ? @{/front/services/image/{serviceId}(serviceId=${serviceId})}
-                        : @{/images/activity/default-activity.jpg}"
-             alt="服務圖片預覽"
-             style="width: 300px; height: 200px; object-fit: cover; border: 1px solid #ccc;">
+                <span class="icon-badge"
+                      th:if="${session.memberVO != null}">
+                    0
+                </span>
+            </a>
+
+            <!-- 通知 -->
+            <a class="icon-btn icon-btn--notify"
+               th:href="@{/front/notification/listAllNotification}"
+               title="通知">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M18 8a6 6 0 0 0-12 0
+                             c0 7-3 9-3 9h18s-3-2-3-9">
+                    </path>
+
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0">
+                    </path>
+                </svg>
+
+                <span class="icon-badge icon-badge--unread"
+                      th:if="${unreadNotificationCount != null
+                               and unreadNotificationCount > 0}"
+                      th:text="${unreadNotificationCount > 99
+                               ? '99+'
+                               : unreadNotificationCount}">
+                </span>
+            </a>
+
+            <!-- 會員中心 -->
+            <a class="icon-btn icon-btn--member"
+               th:if="${session.memberVO != null}"
+               th:href="@{/front/memberPage/my(
+                            memberId=${session.memberVO.memberId}
+                        )}"
+               title="會員中心">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8
+                             a4 4 0 0 0-4 4v2">
+                    </path>
+
+                    <circle cx="12"
+                            cy="7"
+                            r="4">
+                    </circle>
+                </svg>
+            </a>
+
+        </nav>
+    </div>
+</header>
+
+<!-- ==========================================================
+     主要內容
+     ========================================================== -->
+<main class="site-main">
+
+    <!-- 頁面標題 -->
+    <section class="member-service-form-heading">
+
+        <div>
+
+            <p class="member-service-form-eyebrow"
+               th:text="${mode == 'add'
+                        ? '建立新服務'
+                        : '編輯服務內容'}">
+                建立新服務
+            </p>
+
+            <h1 class="page-title"
+                th:text="${mode == 'add'
+                         ? '新增服務'
+                         : '修改服務'}">
+                新增服務
+            </h1>
+
+            <p class="member-service-form-description"
+               th:text="${mode == 'add'
+                        ? '填寫服務內容與地點，建立可供其他會員預約的一對一服務。'
+                        : '更新服務資訊、地點、費率或封面圖片。'}">
+                填寫服務內容與地點。
+            </p>
+
+        </div>
+
+        <a class="btn btn-secondary member-service-form-back"
+           th:href="@{/member/services}">
+            ← 回我的服務
+        </a>
+
+    </section>
+
+    <!-- 錯誤訊息 -->
+    <div class="alert alert-error"
+         th:if="${errorMsg != null}"
+         th:text="${errorMsg}">
+        操作失敗
     </div>
 
-    <hr>
+    <!-- ======================================================
+         新增／修改表單
+         ====================================================== -->
+    <form id="memberServiceForm"
+          th:action="${mode == 'add'}
+                     ? @{/member/services/add}
+                     : @{/member/services/{serviceId}/edit(
+                            serviceId=${serviceId}
+                        )}"
+          th:object="${serviceRequest}"
+          method="post"
+          enctype="multipart/form-data"
+          th:attr="data-default-image-url=@{/images/activity/default-activity.jpg},
+                   data-original-image-url=${mode == 'edit'}
+                       ? @{/front/services/image/{serviceId}(
+                              serviceId=${serviceId}
+                          )}
+                       : ''">
 
-    <button type="submit" th:text="${mode == 'add' ? '新增服務' : '儲存修改'}">
-        送出
-    </button>
+        <!-- Spring Security CSRF -->
+        <input type="hidden"
+               th:if="${_csrf != null}"
+               th:name="${_csrf.parameterName}"
+               th:value="${_csrf.token}">
 
-    <a th:href="@{/member/services}">取消</a>
+        <div class="member-service-form-layout">
 
-</form>
+            <!-- ==================================================
+                 左側表單
+                 ================================================== -->
+            <section class="member-service-form-main">
 
-<script>
-    const fileInput = document.getElementById("serviceImageFile");
-    const previewImg = document.getElementById("serviceImagePreview");
+                <!-- 基本資訊 -->
+                <section class="panel member-service-form-section">
 
-    const originalPreviewSrc = previewImg.src;
+                    <h2 class="member-service-form-section-title">
+                        基本資訊
+                    </h2>
 
-    fileInput.addEventListener("change", function () {
-        const file = this.files[0];
+                    <p class="member-service-form-section-description">
+                        請填寫清楚的服務名稱、類型與合理費率。
+                    </p>
 
-        // 使用者取消選檔，恢復原圖
-        if (!file) {
-            previewImg.src = originalPreviewSrc;
-            return;
-        }
+                    <div class="member-service-form-grid">
 
-        // 檢查檔案格式
-        if (!file.type.startsWith("image/")) {
-            alert("請選擇圖片檔案");
-            this.value = "";
-            previewImg.src = originalPreviewSrc;
-            return;
-        }
+                        <!-- 服務類型 -->
+                        <div class="form-group">
 
-        // 前端先擋 5MB
-        if (file.size > 5 * 1024 * 1024) {
-            alert("圖片大小不可超過 5MB");
-            this.value = "";
-            previewImg.src = originalPreviewSrc;
-            return;
-        }
+                            <label class="form-label"
+                                   for="serviceTypeId">
 
-        // 預覽新圖片
-        const reader = new FileReader();
+                                服務類型
 
-        reader.onload = function (e) {
-            previewImg.src = e.target.result;
-        };
+                                <span class="required-mark">*</span>
 
-        reader.readAsDataURL(file);
-    });
-</script>
+                            </label>
+
+                            <select class="form-control"
+                                    id="serviceTypeId"
+                                    th:field="*{serviceTypeId}"
+                                    required>
+
+                                <option value="">
+                                    請選擇服務類型
+                                </option>
+
+                                <option th:each="type : ${serviceTypeList}"
+                                        th:value="${type.svcTypeID}"
+                                        th:text="${type.typeName}">
+                                    服務類型
+                                </option>
+
+                            </select>
+
+                            <p class="form-error"
+                               th:if="${#fields.hasErrors('serviceTypeId')}"
+                               th:errors="*{serviceTypeId}">
+                                服務類型錯誤
+                            </p>
+
+                        </div>
+
+                        <!-- 每小時費率 -->
+                        <div class="form-group">
+
+                            <label class="form-label"
+                                   for="hourlyRate">
+
+                                每小時費率
+
+                                <span class="required-mark">*</span>
+
+                            </label>
+
+                            <div class="member-service-rate-wrap">
+
+                                <span class="member-service-rate-prefix">
+                                    NT$
+                                </span>
+
+                                <input class="form-control member-service-rate-input"
+                                       id="hourlyRate"
+                                       type="number"
+                                       th:field="*{hourlyRate}"
+                                       min="100"
+                                       step="1"
+                                       placeholder="例如：500"
+                                       required>
+
+                                <span class="member-service-rate-unit">
+                                    / 小時
+                                </span>
+
+                            </div>
+
+                            <p class="form-help">
+                                每小時費率最低為 NT$100。
+                            </p>
+
+                            <p class="form-error"
+                               th:if="${#fields.hasErrors('hourlyRate')}"
+                               th:errors="*{hourlyRate}">
+                                費率錯誤
+                            </p>
+
+                        </div>
+
+                        <!-- 服務名稱 -->
+                        <div class="form-group member-service-form-full">
+
+                            <label class="form-label"
+                                   for="serviceName">
+
+                                服務名稱
+
+                                <span class="required-mark">*</span>
+
+                            </label>
+
+                            <input class="form-control"
+                                   id="serviceName"
+                                   type="text"
+                                   th:field="*{serviceName}"
+                                   maxlength="100"
+                                   placeholder="例如：河堤散步陪伴"
+                                   required>
+
+                            <div class="member-service-character-row">
+
+                                <p class="form-help">
+                                    建議使用簡短、容易理解的名稱。
+                                </p>
+
+                                <p class="member-service-character-count">
+
+                                    <span id="serviceNameCount">
+                                        0
+                                    </span>
+
+                                    / 100
+
+                                </p>
+
+                            </div>
+
+                            <p class="form-error"
+                               th:if="${#fields.hasErrors('serviceName')}"
+                               th:errors="*{serviceName}">
+                                服務名稱錯誤
+                            </p>
+
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- 服務地點 -->
+                <section class="panel member-service-form-section">
+
+                    <h2 class="member-service-form-section-title">
+                        服務地點
+                    </h2>
+
+                    <p class="member-service-form-section-description">
+                        選擇縣市後，行政區選單會自動更新。
+                    </p>
+
+                    <div class="member-service-location-row">
+
+                        <!-- 縣市 -->
+                        <div class="form-group">
+
+                            <label class="form-label"
+                                   for="serviceCity">
+
+                                縣市
+
+                                <span class="required-mark">*</span>
+
+                            </label>
+
+                            <select class="form-control"
+                                    id="serviceCity"
+                                    th:field="*{serviceCity}"
+                                    required>
+
+                                <option value="">
+                                    請選擇縣市
+                                </option>
+
+                                <option value="臺北市">臺北市</option>
+                                <option value="新北市">新北市</option>
+                                <option value="桃園市">桃園市</option>
+                                <option value="臺中市">臺中市</option>
+                                <option value="臺南市">臺南市</option>
+                                <option value="高雄市">高雄市</option>
+                                <option value="基隆市">基隆市</option>
+                                <option value="新竹市">新竹市</option>
+                                <option value="嘉義市">嘉義市</option>
+                                <option value="新竹縣">新竹縣</option>
+                                <option value="苗栗縣">苗栗縣</option>
+                                <option value="彰化縣">彰化縣</option>
+                                <option value="南投縣">南投縣</option>
+                                <option value="雲林縣">雲林縣</option>
+                                <option value="嘉義縣">嘉義縣</option>
+                                <option value="屏東縣">屏東縣</option>
+                                <option value="宜蘭縣">宜蘭縣</option>
+                                <option value="花蓮縣">花蓮縣</option>
+                                <option value="臺東縣">臺東縣</option>
+                                <option value="澎湖縣">澎湖縣</option>
+                                <option value="金門縣">金門縣</option>
+                                <option value="連江縣">連江縣</option>
+
+                            </select>
+
+                            <p class="form-error"
+                               th:if="${#fields.hasErrors('serviceCity')}"
+                               th:errors="*{serviceCity}">
+                                縣市錯誤
+                            </p>
+
+                        </div>
+
+                        <!-- 行政區 -->
+                        <div class="form-group">
+
+                            <label class="form-label"
+                                   for="serviceDistrict">
+
+                                行政區
+
+                                <span class="required-mark">*</span>
+
+                            </label>
+
+                            <select class="form-control"
+                                    id="serviceDistrict"
+                                    th:field="*{serviceDistrict}"
+                                    th:attr="data-selected-district=*{serviceDistrict}"
+                                    required
+                                    disabled>
+
+                                <option value="">
+                                    請先選擇縣市
+                                </option>
+
+                            </select>
+
+                            <p class="form-error"
+                               th:if="${#fields.hasErrors('serviceDistrict')}"
+                               th:errors="*{serviceDistrict}">
+                                行政區錯誤
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <!-- 詳細地點 -->
+                    <div class="form-group">
+
+                        <label class="form-label"
+                               for="serviceLocation">
+
+                            詳細地點或集合地點
+
+                            <span class="required-mark">*</span>
+
+                        </label>
+
+                        <input class="form-control"
+                               id="serviceLocation"
+                               type="text"
+                               th:field="*{serviceLocation}"
+                               maxlength="255"
+                               placeholder="例如：八德埤塘自然生態公園入口"
+                               required>
+
+                        <p class="form-help">
+                            建議填寫公共場所或容易辨識的集合地點，不要直接公開私人住址。
+                        </p>
+
+                        <p class="form-error"
+                           th:if="${#fields.hasErrors('serviceLocation')}"
+                           th:errors="*{serviceLocation}">
+                            地點錯誤
+                        </p>
+
+                    </div>
+
+                </section>
+
+                <!-- 服務內容 -->
+                <section class="panel member-service-form-section">
+
+                    <h2 class="member-service-form-section-title">
+                        服務內容
+                    </h2>
+
+                    <p class="member-service-form-section-description">
+                        說明服務方式、內容、限制與注意事項。
+                    </p>
+
+                    <div class="form-group">
+
+                        <label class="form-label"
+                               for="description">
+
+                            服務描述
+
+                            <span class="required-mark">*</span>
+
+                        </label>
+
+                        <textarea class="form-control"
+                                  id="description"
+                                  th:field="*{description}"
+                                  maxlength="1000"
+                                  rows="8"
+                                  placeholder="例如：一起在河堤散步聊天，步調可以依照你的體力調整。請穿著舒適鞋子，如遇下雨可協調改期。"
+                                  required></textarea>
+
+                        <div class="member-service-character-row">
+
+                            <p class="form-help">
+                                描述越清楚，越能減少預約後的溝通落差。
+                            </p>
+
+                            <p class="member-service-character-count">
+
+                                <span id="descriptionCount">
+                                    0
+                                </span>
+
+                                / 1000
+
+                            </p>
+
+                        </div>
+
+                        <p class="form-error"
+                           th:if="${#fields.hasErrors('description')}"
+                           th:errors="*{description}">
+                            服務描述錯誤
+                        </p>
+
+                    </div>
+
+                </section>
+
+                <!-- 封面圖片 -->
+                <section class="panel member-service-form-section">
+
+                    <h2 class="member-service-form-section-title">
+                        服務封面
+                    </h2>
+
+                    <p class="member-service-form-section-description">
+                        上傳一張能代表服務內容的橫向圖片。
+                    </p>
+
+                    <div class="member-service-image-upload"
+                         id="serviceImageUpload">
+
+                        <input class="member-service-image-input"
+                               id="serviceImageFile"
+                               type="file"
+                               name="serviceImageFile"
+                               accept="image/jpeg,image/png,image/webp">
+
+                        <label class="member-service-image-label"
+                               for="serviceImageFile">
+
+                            <div class="member-service-image-placeholder">
+
+                                <div class="member-service-image-icon">
+                                    ＋
+                                </div>
+
+                                <p class="member-service-image-title">
+                                    點擊選擇封面圖片
+                                </p>
+
+                                <p class="member-service-image-hint">
+                                    支援 JPG、PNG、WEBP，圖片不可超過 5MB
+                                </p>
+
+                            </div>
+
+                            <img class="member-service-image-preview"
+                                 id="serviceImagePreview"
+                                 alt="服務封面預覽">
+
+                        </label>
+
+                        <button class="member-service-image-remove"
+                                id="removeServiceImage"
+                                type="button"
+                                th:text="${mode == 'edit'
+                                         ? '取消新圖片'
+                                         : '移除預覽'}">
+                            移除預覽
+                        </button>
+
+                    </div>
+
+                    <p class="form-help"
+                       th:if="${mode == 'edit'}">
+                        修改時沒有選擇新圖片，就會保留原本封面。
+                    </p>
+
+                </section>
+
+                <!-- 操作按鈕 -->
+                <div class="member-service-form-actions">
+
+                    <a class="btn btn-secondary"
+                       th:href="@{/member/services}">
+                        取消
+                    </a>
+
+                    <button class="btn member-service-form-submit"
+                            type="submit"
+                            th:text="${mode == 'add'
+                                     ? '建立服務'
+                                     : '儲存修改'}">
+                        建立服務
+                    </button>
+
+                </div>
+
+            </section>
+
+            <!-- ==================================================
+                 右側卡片預覽
+                 ================================================== -->
+            <aside class="panel member-service-form-sidebar">
+
+                <h2 class="member-service-form-summary-title">
+                    服務卡片預覽
+                </h2>
+
+                <img class="member-service-summary-image"
+                     id="summaryImage"
+                     th:src="${mode == 'edit'}
+                             ? @{/front/services/image/{serviceId}(
+                                    serviceId=${serviceId}
+                                )}
+                             : @{/images/activity/default-activity.jpg}"
+                     alt="服務圖片預覽">
+
+                <span class="member-service-summary-type"
+                      id="summaryServiceType">
+                    服務類型
+                </span>
+
+                <h3 class="member-service-summary-name"
+                    id="summaryServiceName">
+                    服務名稱
+                </h3>
+
+                <p class="member-service-summary-location"
+                   id="summaryLocation">
+                    縣市 行政區
+                </p>
+
+                <p class="member-service-summary-place"
+                   id="summaryPlace">
+                    詳細地點會顯示在這裡
+                </p>
+
+                <p class="member-service-summary-description"
+                   id="summaryDescription">
+                    服務描述會顯示在這裡。
+                </p>
+
+                <div class="member-service-summary-price">
+
+                    NT$
+
+                    <strong id="summaryHourlyRate">
+                        0
+                    </strong>
+
+                    / 小時
+
+                </div>
+
+            </aside>
+
+        </div>
+
+    </form>
+
+</main>
+
+<!-- 表單互動 -->
+<script th:src="@{/js/front-end/service/memberServiceForm.js}"></script>
 
 </body>
 </html>

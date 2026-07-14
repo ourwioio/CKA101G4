@@ -1,491 +1,863 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
+
 <head>
-<meta charset="UTF-8">
-<title>管理服務時段</title>
+    <meta charset="UTF-8">
 
-<style>
-body {
-	margin: 0;
-	padding: 32px;
-	font-family: Arial, "Microsoft JhengHei", sans-serif;
-	background-color: #f5f6f8;
-	color: #222;
-}
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-.page {
-	max-width: 1050px;
-	margin: 0 auto;
-}
+    <title th:text="|${serviceVO.serviceName}－時段管理｜Webond|">
+        服務時段管理｜Webond
+    </title>
 
-.top-link {
-	margin-bottom: 16px;
-}
+    <!-- Google Fonts -->
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
 
-.top-link a {
-	color: #2563eb;
-	text-decoration: none;
-}
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
 
-.top-link a:hover {
-	text-decoration: underline;
-}
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+          rel="stylesheet">
 
-.card {
-	background-color: #fff;
-	border: 1px solid #ddd;
-	border-radius: 12px;
-	padding: 24px;
-	margin-bottom: 24px;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
+    <!-- Service 前台共用 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/service/common.css}">
 
-h1 {
-	margin-top: 0;
-	margin-bottom: 8px;
-	font-size: 32px;
-}
-
-h2 {
-	margin-top: 0;
-	margin-bottom: 20px;
-	font-size: 22px;
-}
-
-.service-info {
-	color: #555;
-	margin-bottom: 0;
-}
-
-.message-error {
-	color: #b91c1c;
-	background-color: #fee2e2;
-	border: 1px solid #fecaca;
-	padding: 10px 12px;
-	border-radius: 8px;
-	margin-bottom: 16px;
-}
-
-.message-success {
-	color: #166534;
-	background-color: #dcfce7;
-	border: 1px solid #bbf7d0;
-	padding: 10px 12px;
-	border-radius: 8px;
-	margin-bottom: 16px;
-}
-
-.form-grid {
-	display: grid;
-	grid-template-columns: 130px 1fr;
-	gap: 16px 18px;
-	align-items: center;
-	max-width: 650px;
-}
-
-.form-grid label {
-	font-weight: bold;
-	text-align: right;
-}
-
-.form-grid input, .form-grid select {
-	width: 300px;
-	padding: 8px 10px;
-	font-size: 16px;
-	border: 1px solid #bbb;
-	border-radius: 6px;
-	box-sizing: border-box;
-	background-color: #fff;
-}
-
-.hint {
-	grid-column: 2;
-	color: #666;
-	font-size: 13px;
-	margin-top: -8px;
-	line-height: 1.6;
-}
-
-.form-actions {
-	grid-column: 2;
-	margin-top: 8px;
-}
-
-button {
-	padding: 9px 16px;
-	font-size: 16px;
-	border: 1px solid #999;
-	border-radius: 6px;
-	background-color: #f8f8f8;
-	cursor: pointer;
-}
-
-button:hover {
-	background-color: #eeeeee;
-}
-
-.primary-btn {
-	background-color: #2563eb;
-	color: #fff;
-	border-color: #2563eb;
-}
-
-.primary-btn:hover {
-	background-color: #1d4ed8;
-}
-
-.danger-btn {
-	color: #b91c1c;
-	background-color: #fff;
-	border-color: #fca5a5;
-}
-
-.danger-btn:hover {
-	background-color: #fee2e2;
-}
-
-.empty-text {
-	color: #666;
-}
-
-table {
-	width: 100%;
-	border-collapse: collapse;
-	background-color: #fff;
-}
-
-th, td {
-	border: 1px solid #ddd;
-	padding: 10px;
-	text-align: center;
-}
-
-th {
-	background-color: #f1f5f9;
-	font-weight: bold;
-}
-
-.status-available {
-	color: #166534;
-	font-weight: bold;
-}
-
-.status-locked {
-	color: #b45309;
-	font-weight: bold;
-}
-
-.status-booked {
-	color: #991b1b;
-	font-weight: bold;
-}
-</style>
+    <!-- 時段管理專屬 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/service/memberServiceSlotList.css}">
 </head>
+
 <body>
 
-	<div class="page">
-
-		<div class="top-link">
-			<a th:href="@{/member/services}">← 回我的服務</a>
-		</div>
-
-		<div class="card">
-			<h1>管理服務時段</h1>
+<!-- ==========================================================
+     固定導覽列
+     ========================================================== -->
+<header class="site-header">
+
+    <div class="header-inner">
+
+        <!-- Logo -->
+        <a class="logo"
+           th:href="@{/}">
+
+            <span class="logo-mark">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M3 11l9-7 9 7"></path>
+
+                    <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path>
+                </svg>
+
+            </span>
+
+            <span class="logo-text">
+
+                <span class="logo-title">
+                    Webond
+                </span>
+
+                <span class="logo-sub">
+                    閒人出租
+                </span>
+
+            </span>
+        </a>
+
+        <!-- 右側功能 -->
+        <nav class="header-actions">
+
+            <!-- 聊天 -->
+            <a class="icon-btn icon-btn--chat"
+               href="javascript:void(0);"
+               title="聊天室"
+               aria-disabled="true">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8
+                             8.5 8.5 0 0 1-7.6 4.7
+                             8.38 8.38 0 0 1-3.8-.9
+                             L3 21l1.9-5.7
+                             a8.38 8.38 0 0 1-.9-3.8
+                             8.5 8.5 0 0 1 4.7-7.6
+                             8.38 8.38 0 0 1 3.8-.9
+                             h.5a8.48 8.48 0 0 1 8 8v.5z">
+                    </path>
+                </svg>
+
+                <span class="icon-badge"
+                      th:if="${session.memberVO != null}">
+                    0
+                </span>
+            </a>
+
+            <!-- 通知 -->
+            <a class="icon-btn icon-btn--notify"
+               th:href="@{/front/notification/listAllNotification}"
+               title="通知">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M18 8a6 6 0 0 0-12 0
+                             c0 7-3 9-3 9h18s-3-2-3-9">
+                    </path>
+
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0">
+                    </path>
+                </svg>
+
+                <span class="icon-badge icon-badge--unread"
+                      th:if="${unreadNotificationCount != null
+                               and unreadNotificationCount > 0}"
+                      th:text="${unreadNotificationCount > 99
+                               ? '99+'
+                               : unreadNotificationCount}">
+                </span>
+            </a>
+
+            <!-- 會員中心 -->
+            <a class="icon-btn icon-btn--member"
+               th:if="${session.memberVO != null}"
+               th:href="@{/front/memberPage/my(
+                            memberId=${session.memberVO.memberId}
+                        )}"
+               title="會員中心">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8
+                             a4 4 0 0 0-4 4v2">
+                    </path>
+
+                    <circle cx="12"
+                            cy="7"
+                            r="4">
+                    </circle>
+                </svg>
+            </a>
+
+        </nav>
+    </div>
+</header>
+
+<!-- ==========================================================
+     主要內容
+     ========================================================== -->
+<main class="site-main">
+
+    <!-- ======================================================
+         頁面標題
+         ====================================================== -->
+    <section class="member-slot-heading">
+
+        <div class="member-slot-heading-main">
+
+            <p class="member-slot-eyebrow">
+                服務管理中心
+            </p>
+
+            <h1 class="page-title">
+                時段管理
+            </h1>
+
+            <p class="member-slot-description">
+                新增可預約時段、查看目前狀態，並管理尚未被預約的時段。
+            </p>
+
+        </div>
+
+        <div class="member-slot-heading-actions">
+
+            <a class="btn btn-secondary"
+               th:href="@{/member/services}">
+                ← 回我的服務
+            </a>
+
+            <a class="btn btn-secondary"
+               th:href="@{/front/services/{serviceId}(
+                            serviceId=${serviceId}
+                        )}">
+                查看公開頁面
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- ======================================================
+         訊息
+         ====================================================== -->
+    <div class="alert alert-success"
+         th:if="${successMsg != null}"
+         th:text="${successMsg}">
+        操作成功
+    </div>
+
+    <div class="alert alert-error"
+         th:if="${errorMsg != null}"
+         th:text="${errorMsg}">
+        操作失敗
+    </div>
+
+    <!-- ======================================================
+         服務資訊摘要
+         ====================================================== -->
+    <section class="panel member-slot-service-panel">
+
+        <img class="member-slot-service-image"
+             th:src="@{/front/services/image/{serviceId}(
+                        serviceId=${serviceVO.serviceId}
+                     )}"
+             th:onerror="this.onerror=null;
+                         this.src='/images/activity/default-activity.jpg';"
+             alt="服務圖片">
+
+        <div class="member-slot-service-info">
+
+            <span class="member-slot-service-type"
+                  th:text="${serviceVO.serviceType != null
+                           ? serviceVO.serviceType.typeName
+                           : '無服務類型'}">
+                服務類型
+            </span>
+
+            <h2 class="member-slot-service-name"
+                th:text="${serviceVO.serviceName}">
+                河堤散步陪伴
+            </h2>
+
+            <p class="member-slot-service-location"
+               th:text="|${serviceVO.serviceCity ?: ''}
+                          ${serviceVO.serviceDistrict ?: ''}
+                          ${serviceVO.serviceLocation ?: ''}|">
+                桃園市 八德區 八德埤塘自然生態公園
+            </p>
+
+            <p class="member-slot-service-price">
+
+                NT$
+
+                <strong th:text="${serviceVO.hourlyRate}">
+                    500
+                </strong>
+
+                / 小時
+
+            </p>
+
+        </div>
+
+        <!-- 服務狀態 -->
+        <div class="member-slot-service-status">
+
+            <span class="status-badge status-active"
+                  th:if="${serviceVO.status == 1}">
+                上架中
+            </span>
+
+            <span class="status-badge status-inactive"
+                  th:if="${serviceVO.status == 0}">
+                已下架
+            </span>
+
+            <span class="status-badge status-disabled"
+                  th:if="${serviceVO.status == 2}">
+                已封存
+            </span>
+
+            <span class="status-badge status-disabled"
+                  th:if="${serviceVO.status == 3}">
+                平台停用
+            </span>
+
+        </div>
+
+    </section>
+
+    <!-- ======================================================
+         左側新增 + 右側列表
+         ====================================================== -->
+    <div class="member-slot-layout">
+
+        <!-- ==================================================
+             新增時段
+             ================================================== -->
+        <aside class="panel member-slot-form-panel">
+
+            <h2 class="member-slot-panel-title">
+                新增服務時段
+            </h2>
+
+            <p class="member-slot-panel-description">
+                可建立一整段時段，或自動切分成多筆可預約時段。
+            </p>
+
+            <form id="addSlotForm"
+                  th:action="@{/member/services/{serviceId}/slots(
+                               serviceId=${serviceId}
+                           )}"
+                  method="post"
+                  th:attr="data-max-booking-days=14">
+
+                <input type="hidden"
+                       th:if="${_csrf != null}"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <div class="member-slot-form-grid">
+
+                    <!-- 日期 -->
+                    <div class="form-group">
+
+                        <label class="form-label"
+                               for="slotDate">
+                            服務日期
+                        </label>
+
+                        <input class="form-control"
+                               id="slotDate"
+                               name="slotDate"
+                               type="date"
+                               required>
+
+                        <p class="form-help">
+                            最遠可新增今天起 14 天內的時段。
+                        </p>
+
+                    </div>
+
+                    <!-- 開始與結束時間 -->
+                    <div class="member-slot-input-row">
+
+                        <div class="form-group">
+
+                            <label class="form-label"
+                                   for="startTime">
+                                開始時間
+                            </label>
+
+                            <input class="form-control"
+                                   id="startTime"
+                                   name="startTime"
+                                   type="time"
+                                   step="1800"
+                                   required>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label class="form-label"
+                                   for="endTime">
+                                結束時間
+                            </label>
+
+                            <input class="form-control"
+                                   id="endTime"
+                                   name="endTime"
+                                   type="time"
+                                   step="1800"
+                                   required>
+
+                        </div>
 
-			<p class="service-info">
-				目前管理的服務編號： <strong th:text="${serviceId}"></strong>
-			</p>
-		</div>
-
-		<div class="card">
-
-			<p th:if="${errorMsg != null}" th:text="${errorMsg}"
-				class="message-error"></p>
-
-			<p th:if="${successMsg != null}" th:text="${successMsg}"
-				class="message-success"></p>
-
-			<h2>新增可預約時段</h2>
-
-			<form id="slotForm"
-				th:action="@{/member/services/{id}/slots(id=${serviceId})}"
-				method="post">
-
-				<div class="form-grid">
-
-					<label for="slotDate">日期</label> <input type="date" id="slotDate"
-						name="slotDate" required> <label for="startTime">開始時間</label>
-					<input type="time" id="startTime" name="startTime" step="60"
-						required> <label for="splitMinutes">切分方式</label> <select
-						id="splitMinutes" name="splitMinutes" required>
-						<option value="0">不切，整段上架</option>
-						<option value="30">每 30 分鐘切一段</option>
-						<option value="60">每 60 分鐘切一段</option>
-						<option value="120">每 120 分鐘切一段</option>
-						<option value="240">每 240 分鐘切一段</option>
-					</select> <label for="endTime">結束時間</label> <select id="endTime"
-						name="endTime" required>
-						<option value="">請先選擇開始時間</option>
-					</select>
-
-					<div class="hint">
-						日期只能選今天起 14 天內。<br> 結束時間會自動列出同日與隔日選項，一次最多新增 12 小時。<br>
-						選到「隔日」時，系統會自動送出跨日參數。
-					</div>
-
-					<!-- 0 = 同日，1 = 隔日 -->
-					<input type="hidden" id="endDayOffset" name="endDayOffset"
-						value="0">
-
-					<div class="form-actions">
-						<button type="submit" class="primary-btn">新增時段</button>
-					</div>
-
-				</div>
-
-			</form>
-		</div>
-
-		<div class="card">
-			<h2>目前時段列表</h2>
-			<div style="margin-bottom: 16px;"
-				th:if="${!#lists.isEmpty(slotList)}">
-
-				<form
-					th:action="@{/member/services/{serviceId}/slots/delete-available(serviceId=${serviceId})}"
-					method="post" style="display: inline;">
-
-					<button type="submit" class="danger-btn"
-						onclick="return confirm('確定要清空這個服務底下所有「可預約」時段嗎？已預約或暫時鎖定的時段不會被刪除。')">
-						清空全部可預約時段</button>
-
-				</form>
-
-			</div>
-
-			<p th:if="${#lists.isEmpty(slotList)}" class="empty-text">
-				這個服務目前還沒有任何時段。</p>
-
-			<table th:if="${!#lists.isEmpty(slotList)}">
-				<thead>
-					<tr>
-						<th>時段編號</th>
-						<th>開始時間</th>
-						<th>結束時間</th>
-						<th>時段長度</th>
-						<th>狀態</th>
-						<th>操作</th>
-					</tr>
-				</thead>
-
-				<tbody>
-					<tr th:each="slot : ${slotList}">
-
-						<td th:text="${slot.serviceSlotId}"></td>
-
-						<td
-							th:text="${#temporals.format(slot.startTime, 'yyyy-MM-dd HH:mm')}"></td>
-
-						<td
-							th:text="${#temporals.format(slot.endTime, 'yyyy-MM-dd HH:mm')}"></td>
-
-						<td><span
-							th:text="${T(java.time.Duration).between(slot.startTime, slot.endTime).toMinutes()}"></span>
-							分鐘</td>
-
-						<td><span th:if="${slot.slotStatus == 0}"
-							class="status-available">可預約</span> <span
-							th:if="${slot.slotStatus == 1}" class="status-locked">暫時鎖定</span>
-							<span th:if="${slot.slotStatus == 2}" class="status-booked">已預約</span>
-							<span
-							th:if="${slot.slotStatus != 0 and slot.slotStatus != 1 and slot.slotStatus != 2}">
-								未知狀態 </span></td>
-
-						<td>
-							<form th:if="${slot.slotStatus == 0}"
-								th:action="@{/member/services/{serviceId}/slots/{slotId}/delete(
-                                            serviceId=${serviceId},
-                                            slotId=${slot.serviceSlotId}
-                                          )}"
-								method="post" style="display: inline;">
-
-								<button type="submit" class="danger-btn"
-									onclick="return confirm('確定要刪除這個時段嗎？')">刪除</button>
-							</form> <span th:if="${slot.slotStatus != 0}"> 不可刪除 </span>
-						</td>
-
-					</tr>
-				</tbody>
-			</table>
-		</div>
-
-	</div>
-
-	<script>
-		const MAX_BOOKING_DAYS = 14;
-		const MAX_BLOCK_HOURS = 12;
-
-		const slotForm = document.getElementById("slotForm");
-		const slotDateInput = document.getElementById("slotDate");
-		const startTimeInput = document.getElementById("startTime");
-		const splitMinutesSelect = document.getElementById("splitMinutes");
-		const endTimeSelect = document.getElementById("endTime");
-		const endDayOffsetInput = document.getElementById("endDayOffset");
-
-		window.addEventListener("DOMContentLoaded", function() {
-			const today = new Date();
-
-			const maxDate = new Date();
-			maxDate.setDate(maxDate.getDate() + MAX_BOOKING_DAYS);
-
-			slotDateInput.min = formatDate(today);
-			slotDateInput.max = formatDate(maxDate);
-
-			generateEndTimeOptions();
-		});
-
-		slotDateInput.addEventListener("change", function() {
-			generateEndTimeOptions();
-		});
-
-		startTimeInput.addEventListener("change", function() {
-			generateEndTimeOptions();
-		});
-
-		splitMinutesSelect.addEventListener("change", function() {
-			generateEndTimeOptions();
-		});
-
-		endTimeSelect.addEventListener("change", function() {
-			updateEndDayOffset();
-		});
-
-		slotForm
-				.addEventListener(
-						"submit",
-						function(event) {
-							updateEndDayOffset();
-
-							if (!endTimeSelect.value) {
-								alert("請選擇結束時間");
-								event.preventDefault();
-								return;
-							}
-
-							const selectedOption = endTimeSelect.options[endTimeSelect.selectedIndex];
-
-							const confirmMessage = "確定要新增這批時段嗎？\n\n"
-									+ "日期："
-									+ slotDateInput.value
-									+ "\n"
-									+ "開始時間："
-									+ startTimeInput.value
-									+ "\n"
-									+ "結束時間："
-									+ selectedOption.textContent
-									+ "\n"
-									+ "切分方式："
-									+ splitMinutesSelect.options[splitMinutesSelect.selectedIndex].textContent;
-
-							if (!confirm(confirmMessage)) {
-								event.preventDefault();
-							}
-						});
-
-		function generateEndTimeOptions() {
-			const startTimeValue = startTimeInput.value;
-			const splitMinutes = Number(splitMinutesSelect.value);
-
-			endTimeSelect.innerHTML = "";
-			endDayOffsetInput.value = "0";
-
-			if (!startTimeValue) {
-				addOption("", "請先選擇開始時間", 0);
-				return;
-			}
-
-			const startMinutes = timeToMinutes(startTimeValue);
-			const maxDurationMinutes = MAX_BLOCK_HOURS * 60;
-
-			let stepMinutes = splitMinutes;
-
-			/*
-			 * splitMinutes = 0 代表後端不切資料。
-			 * 但前端結束時間選單仍用 30 分鐘產生選項。
-			 */
-			if (stepMinutes === 0) {
-				stepMinutes = 30;
-			}
-
-			let duration = stepMinutes;
-
-			while (duration <= maxDurationMinutes) {
-				const absoluteEndMinutes = startMinutes + duration;
-
-				const dayOffset = Math.floor(absoluteEndMinutes / (24 * 60));
-				const endMinutesInDay = absoluteEndMinutes % (24 * 60);
-
-				const endTimeText = minutesToTime(endMinutesInDay);
-
-				let label = endTimeText;
-
-				if (dayOffset === 1) {
-					label = "隔日 " + endTimeText;
-				} else if (dayOffset > 1) {
-					label = dayOffset + " 日後 " + endTimeText;
-				}
-
-				addOption(endTimeText, label, dayOffset);
-
-				duration += stepMinutes;
-			}
-
-			updateEndDayOffset();
-		}
-
-		function addOption(value, text, dayOffset) {
-			const option = document.createElement("option");
-			option.value = value;
-			option.textContent = text;
-			option.dataset.dayOffset = String(dayOffset);
-
-			endTimeSelect.appendChild(option);
-		}
-
-		function updateEndDayOffset() {
-			const selectedOption = endTimeSelect.options[endTimeSelect.selectedIndex];
-
-			if (selectedOption && selectedOption.dataset.dayOffset) {
-				endDayOffsetInput.value = selectedOption.dataset.dayOffset;
-			} else {
-				endDayOffsetInput.value = "0";
-			}
-		}
-
-		function timeToMinutes(timeText) {
-			const parts = timeText.split(":");
-			const hours = Number(parts[0]);
-			const minutes = Number(parts[1]);
-
-			return hours * 60 + minutes;
-		}
-
-		function minutesToTime(totalMinutes) {
-			const hours = Math.floor(totalMinutes / 60);
-			const minutes = totalMinutes % 60;
-
-			return String(hours).padStart(2, "0") + ":"
-					+ String(minutes).padStart(2, "0");
-		}
-
-		function formatDate(date) {
-			const year = date.getFullYear();
-			const month = String(date.getMonth() + 1).padStart(2, "0");
-			const day = String(date.getDate()).padStart(2, "0");
-
-			return year + "-" + month + "-" + day;
-		}
-	</script>
+                    </div>
+
+                    <!-- 結束日 -->
+                    <div class="form-group">
+
+                        <label class="form-label"
+                               for="endDayOffset">
+                            結束日期
+                        </label>
+
+                        <select class="form-control"
+                                id="endDayOffset"
+                                name="endDayOffset">
+
+                            <option value="0">
+                                同一天
+                            </option>
+
+                            <option value="1">
+                                隔天
+                            </option>
+
+                        </select>
+
+                        <p class="form-help">
+                            跨午夜的服務請選擇「隔天」。
+                        </p>
+
+                    </div>
+
+                    <!-- 切分方式 -->
+                    <div class="form-group">
+
+                        <label class="form-label"
+                               for="splitMinutes">
+                            時段切分方式
+                        </label>
+
+                        <select class="form-control"
+                                id="splitMinutes"
+                                name="splitMinutes"
+                                required>
+
+                            <option value="0">
+                                不切分，整段建立一筆
+                            </option>
+
+                            <option value="30">
+                                每 30 分鐘一筆
+                            </option>
+
+                            <option value="60">
+                                每 1 小時一筆
+                            </option>
+
+                            <option value="120">
+                                每 2 小時一筆
+                            </option>
+
+                            <option value="180">
+                                每 3 小時一筆
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="alert alert-error"
+                         id="slotFormError"
+                         hidden>
+                    </div>
+
+                    <button class="btn member-slot-submit"
+                            id="addSlotSubmit"
+                            type="submit">
+                        新增時段
+                    </button>
+
+                </div>
+
+            </form>
+
+            <p class="member-slot-form-notice">
+                新增時段不得與現有時段重疊，單次建立區間最長為 12 小時。
+                選擇切分時，總時間必須能被切分分鐘數整除。
+            </p>
+
+        </aside>
+
+        <!-- ==================================================
+             時段列表
+             ================================================== -->
+        <section class="member-slot-list-panel">
+
+            <div class="member-slot-list-heading">
+
+                <div>
+
+                    <h2>
+                        全部時段
+                    </h2>
+
+                    <p>
+                        可預約、暫時鎖定及已預約時段都會顯示。
+                    </p>
+
+                </div>
+
+                <span class="member-slot-count"
+                      th:text="|共 ${#lists.size(slotList)} 筆|">
+                    共 0 筆
+                </span>
+
+            </div>
+
+            <!-- 篩選 -->
+            <div class="member-slot-filter"
+                 th:if="${!#lists.isEmpty(slotList)}">
+
+                <button class="member-slot-filter-button active"
+                        type="button"
+                        data-filter="all">
+                    全部
+                </button>
+
+                <button class="member-slot-filter-button"
+                        type="button"
+                        data-filter="available">
+                    可預約
+                </button>
+
+                <button class="member-slot-filter-button"
+                        type="button"
+                        data-filter="locked">
+                    暫時鎖定
+                </button>
+
+                <button class="member-slot-filter-button"
+                        type="button"
+                        data-filter="booked">
+                    已預約
+                </button>
+
+                <button class="member-slot-filter-button"
+                        type="button"
+                        data-filter="expired">
+                    已過期
+                </button>
+
+                <button class="member-slot-filter-button"
+                        type="button"
+                        id="openClearAvailableModal">
+                    清空可預約時段
+                </button>
+
+            </div>
+
+            <!-- 無資料 -->
+            <div class="member-slot-empty"
+                 th:if="${#lists.isEmpty(slotList)}">
+
+                <div class="member-slot-empty-icon">
+                    ＋
+                </div>
+
+                <h3>
+                    目前還沒有服務時段
+                </h3>
+
+                <p>
+                    可使用左側表單建立第一批可預約時段。
+                </p>
+
+            </div>
+
+            <!-- 篩選後無資料 -->
+            <div class="member-slot-empty"
+                 id="filteredSlotEmpty"
+                 hidden>
+
+                <h3>
+                    沒有符合條件的時段
+                </h3>
+
+                <p>
+                    請切換其他狀態查看。
+                </p>
+
+            </div>
+
+            <!-- 時段列表 -->
+            <div class="member-slot-list"
+                 id="memberSlotList"
+                 th:if="${!#lists.isEmpty(slotList)}">
+
+                <article class="member-slot-card"
+                         th:each="slot : ${slotList}"
+                         th:with="expired=${slot.endTime.isBefore(
+                             T(java.time.LocalDateTime).now()
+                         )}"
+                         th:classappend="${expired
+                                          ? ' member-slot-card--expired'
+                                          : (slot.slotStatus == 0
+                                              ? ' member-slot-card--available'
+                                              : (slot.slotStatus == 1
+                                                  ? ' member-slot-card--locked'
+                                                  : ' member-slot-card--booked'))}"
+                         th:attr="data-status=${expired
+                                               ? 'expired'
+                                               : (slot.slotStatus == 0
+                                                   ? 'available'
+                                                   : (slot.slotStatus == 1
+                                                       ? 'locked'
+                                                       : 'booked'))}">
+
+                    <div class="member-slot-card-main">
+
+                        <div class="member-slot-card-top">
+
+                            <span class="member-slot-date"
+                                  th:text="${#temporals.format(
+                                      slot.startTime,
+                                      'yyyy-MM-dd'
+                                  )}">
+                                2026-07-20
+                            </span>
+
+                            <span class="member-slot-time">
+
+                                <span th:text="${#temporals.format(
+                                    slot.startTime,
+                                    'HH:mm'
+                                )}">
+                                    14:00
+                                </span>
+
+                                ～
+
+                                <span th:text="${#temporals.format(
+                                    slot.endTime,
+                                    'yyyy-MM-dd'.equals(
+                                        #temporals.format(
+                                            slot.startTime,
+                                            'yyyy-MM-dd'
+                                        )
+                                    )
+                                    ? 'HH:mm'
+                                    : 'MM-dd HH:mm'
+                                )}">
+                                    16:00
+                                </span>
+
+                            </span>
+
+                            <span class="member-slot-id"
+                                  th:text="|#${slot.serviceSlotId}|">
+                                #1
+                            </span>
+
+                            <!-- 已過期優先 -->
+                            <span class="member-slot-status
+                                         member-slot-status--expired"
+                                  th:if="${expired}">
+                                已過期
+                            </span>
+
+                            <span class="member-slot-status
+                                         member-slot-status--available"
+                                  th:if="${!expired and slot.slotStatus == 0}">
+                                可預約
+                            </span>
+
+                            <span class="member-slot-status
+                                         member-slot-status--locked"
+                                  th:if="${!expired and slot.slotStatus == 1}">
+                                暫時鎖定
+                            </span>
+
+                            <span class="member-slot-status
+                                         member-slot-status--booked"
+                                  th:if="${!expired and slot.slotStatus == 2}">
+                                已預約
+                            </span>
+
+                        </div>
+
+                        <div class="member-slot-card-meta">
+
+                            <span class="member-slot-meta-item"
+                                  th:text="|開始：${#temporals.format(
+                                      slot.startTime,
+                                      'yyyy-MM-dd HH:mm'
+                                  )}|">
+                                開始：2026-07-20 14:00
+                            </span>
+
+                            <span class="member-slot-meta-item"
+                                  th:text="|結束：${#temporals.format(
+                                      slot.endTime,
+                                      'yyyy-MM-dd HH:mm'
+                                  )}|">
+                                結束：2026-07-20 16:00
+                            </span>
+
+                            <span class="member-slot-lock-expire"
+                                  th:if="${slot.slotStatus == 1
+                                           and slot.lockExpiresAt != null}"
+                                  th:text="|鎖定期限：${#temporals.format(
+                                      slot.lockExpiresAt,
+                                      'yyyy-MM-dd HH:mm'
+                                  )}|">
+                                鎖定期限：2026-07-20 14:10
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="member-slot-card-actions">
+
+                        <!-- 只有可預約才能刪除 -->
+                        <button class="btn member-slot-delete-button
+                                       js-delete-slot"
+                                type="button"
+                                th:if="${slot.slotStatus == 0}"
+                                th:attr="data-slot-id=${slot.serviceSlotId},
+                                         data-slot-time=|${#temporals.format(
+                                             slot.startTime,
+                                             'yyyy-MM-dd HH:mm'
+                                         )} ～ ${#temporals.format(
+                                             slot.endTime,
+                                             'yyyy-MM-dd HH:mm'
+                                         )}|">
+                            刪除時段
+                        </button>
+
+                        <button class="btn member-slot-delete-button"
+                                type="button"
+                                disabled
+                                th:if="${slot.slotStatus != 0}">
+                            無法刪除
+                        </button>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+<!-- ==========================================================
+     單筆刪除確認彈窗
+     ========================================================== -->
+<div class="member-slot-modal"
+     id="deleteSlotModal"
+     hidden>
+
+    <div class="member-slot-modal-content"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="deleteSlotModalTitle">
+
+        <h2 class="member-slot-modal-title"
+            id="deleteSlotModalTitle">
+            確定刪除時段？
+        </h2>
+
+        <p class="member-slot-modal-text">
+
+            即將刪除：
+
+            <span class="member-slot-modal-time"
+                  id="deleteSlotTime">
+                服務時段
+            </span>
+
+            。已有訂單紀錄時，系統會改為封存。
+        </p>
+
+        <form id="deleteSlotForm"
+              method="post">
+
+            <input type="hidden"
+                   th:if="${_csrf != null}"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
+
+            <div class="member-slot-modal-actions">
+
+                <button class="btn btn-secondary"
+                        id="cancelDeleteSlot"
+                        type="button">
+                    取消
+                </button>
+
+                <button class="btn btn-danger"
+                        type="submit">
+                    確定刪除
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- ==========================================================
+     清空可預約時段彈窗
+     ========================================================== -->
+<div class="member-slot-modal"
+     id="clearAvailableModal"
+     hidden>
+
+    <div class="member-slot-modal-content"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="clearAvailableModalTitle">
+
+        <h2 class="member-slot-modal-title"
+            id="clearAvailableModalTitle">
+            清空全部可預約時段？
+        </h2>
+
+        <p class="member-slot-modal-text">
+            系統會刪除目前服務底下所有「可預約」時段。
+            暫時鎖定與已預約時段不會受到影響。
+        </p>
+
+        <form th:action="@{/member/services/{serviceId}/slots/delete-available(
+                           serviceId=${serviceId}
+                       )}"
+              method="post">
+
+            <input type="hidden"
+                   th:if="${_csrf != null}"
+                   th:name="${_csrf.parameterName}"
+                   th:value="${_csrf.token}">
+
+            <div class="member-slot-modal-actions">
+
+                <button class="btn btn-secondary"
+                        id="cancelClearAvailable"
+                        type="button">
+                    取消
+                </button>
+
+                <button class="btn btn-danger"
+                        type="submit">
+                    確定清空
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- JS 需要使用目前 serviceId -->
+<div id="slotPageData"
+     th:attr="data-service-id=${serviceId}"
+     hidden>
+</div>
+
+<script th:src="@{/js/front-end/service/memberServiceSlotList.js}"></script>
 
 </body>
 </html>
