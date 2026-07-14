@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Webond 會員系統 - 送出檢舉案</title>
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 <style>
 body {
@@ -174,6 +176,7 @@ body {
 }
 </style>
 </head>
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 <body>
 
 	<div class="report-container">

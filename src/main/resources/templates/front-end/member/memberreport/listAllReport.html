@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webond 後台管理 - 會員檢舉管理中心</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
     <style>
         :root {
             --slate-50: #f8fafc;
@@ -137,6 +139,7 @@
         }
     </script>
 </head>
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 <body>
 <div class="container">
     <div class="card-panel main-panel">

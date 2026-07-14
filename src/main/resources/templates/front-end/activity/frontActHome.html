@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>活動前台</title>
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
 <style>
 body {
@@ -215,6 +217,7 @@ body {
 
 </head>
 
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 <body>
 
 	<div class="header">

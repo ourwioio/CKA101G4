@@ -6,8 +6,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <link rel="stylesheet" th:href="@{/css/front-end/member/profileEdit.css}" />
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <title>編輯會員個人頁面</title>
 </head>
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 <body class="page-body">
     <form class="profile-form" th:action="@{/front/memberPage/update}" method="post" th:object="${profileUpdateDTO}" enctype="multipart/form-data">
         <input type="hidden" th:field="*{memberId}" />
