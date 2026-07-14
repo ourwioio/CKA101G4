@@ -1,607 +1,666 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
 
 <head>
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-<title th:text="|${serviceVO.serviceName}｜Webond|">一對一服務詳情</title>
+    <title th:text="|${serviceVO.serviceName}｜Webond|">
+        一對一服務詳情
+    </title>
 
-<!-- Google Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Google Fonts -->
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
 
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
 
-<link
-	href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-	rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+          rel="stylesheet">
 
-<!-- Service 前台共用 CSS -->
-<link rel="stylesheet" th:href="@{/CSS/front-end/service/common.css}">
+    <!-- Service 前台共用 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/service/common.css}">
 
-<!-- 服務詳情頁專屬 CSS -->
-<link rel="stylesheet"
-	th:href="@{/CSS/front-end/service/serviceDetail.css}">
+    <!-- 前台共用 Header CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/common/header.css}">
+
+    <!-- 服務詳情頁專屬 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/service/serviceDetail.css}">
 </head>
 
 <body>
 
-	<!-- ==========================================================
-     固定導覽列
+<!-- ==========================================================
+     共用前台導覽列
      ========================================================== -->
-	<header class="site-header">
+<header th:replace="~{front-end/fragments/header :: frontHeader}">
+</header>
 
-		<div class="header-inner">
-
-			<!-- Logo -->
-			<a class="logo" th:href="@{/}"> <span class="logo-mark"> <svg
-						viewBox="0 0 24 24" fill="none" stroke="currentColor"
-						stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                    <path d="M3 11l9-7 9 7"></path>
-
-                    <path
-							d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path>
-                </svg>
-
-			</span> <span class="logo-text"> <span class="logo-title">
-						Webond </span> <span class="logo-sub"> 閒人出租 </span>
-
-			</span>
-			</a>
-
-			<!-- Header 右側 -->
-			<nav class="header-actions">
-
-				<!-- 聊天室 -->
-				<a class="icon-btn icon-btn--chat" href="javascript:void(0);"
-					title="聊天室" aria-disabled="true"> <svg viewBox="0 0 24 24"
-						fill="none" stroke="currentColor" stroke-width="2"
-						stroke-linecap="round" stroke-linejoin="round">
-
-                    <path
-							d="M21 11.5a8.38 8.38 0 0 1-.9 3.8
-                             8.5 8.5 0 0 1-7.6 4.7
-                             8.38 8.38 0 0 1-3.8-.9
-                             L3 21l1.9-5.7
-                             a8.38 8.38 0 0 1-.9-3.8
-                             8.5 8.5 0 0 1 4.7-7.6
-                             8.38 8.38 0 0 1 3.8-.9
-                             h.5a8.48 8.48 0 0 1 8 8v.5z">
-                    </path>
-                </svg> <span class="icon-badge"
-					th:if="${session.memberVO != null}"> 0 </span>
-				</a>
-
-				<!-- 通知 -->
-				<a class="icon-btn icon-btn--notify"
-					th:href="@{/front/notification/listAllNotification}" title="通知">
-
-					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-						stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-
-                    <path
-							d="M18 8a6 6 0 0 0-12 0
-                             c0 7-3 9-3 9h18s-3-2-3-9">
-                    </path>
-
-                    <path d="M13.73 21a2 2 0 0 1-3.46 0">
-                    </path>
-                </svg> <span class="icon-badge icon-badge--unread"
-					th:if="${unreadNotificationCount != null
-                               and unreadNotificationCount > 0}"
-					th:text="${unreadNotificationCount > 99
-                               ? '99+'
-                               : unreadNotificationCount}">
-				</span>
-				</a>
-
-				<!-- 已登入 -->
-				<a th:if="${session.memberVO != null}"
-					class="icon-btn icon-btn--member"
-					th:href="@{/front/memberPage/my(memberId=${session.memberVO.memberId})}"
-					title="會員中心"> <svg viewBox="0 0 24 24" fill="none"
-						stroke="currentColor" stroke-width="2" stroke-linecap="round"
-						stroke-linejoin="round">
-
-                    <path
-							d="M20 21v-2a4 4 0 0 0-4-4H8
-                             a4 4 0 0 0-4 4v2">
-                    </path>
-
-                    <circle cx="12" cy="7" r="4">
-                    </circle>
-                </svg>
-				</a>
-
-				<!-- 未登入 -->
-				<a th:if="${session.memberVO == null}"
-					class="icon-btn icon-btn--member" th:href="@{/member/login}"
-					title="登入"> <svg viewBox="0 0 24 24" fill="none"
-						stroke="currentColor" stroke-width="2" stroke-linecap="round"
-						stroke-linejoin="round">
-
-                    <path
-							d="M20 21v-2a4 4 0 0 0-4-4H8
-                             a4 4 0 0 0-4 4v2">
-                    </path>
-
-                    <circle cx="12" cy="7" r="4">
-                    </circle>
-                </svg>
-				</a>
-
-			</nav>
-		</div>
-	</header>
-
-	<!-- ==========================================================
+<!-- ==========================================================
      主要內容
      ========================================================== -->
-	<main class="site-main">
+<main class="site-main">
 
-		<!-- 返回與登入狀態 -->
-		<div class="service-detail-topbar">
+    <!-- 返回與登入狀態 -->
+    <div class="service-detail-topbar">
 
-			<a class="service-detail-back" th:href="@{/front/services}"> ←
-				回服務列表 </a>
+        <a class="service-detail-back"
+           th:href="@{/front/services}">
+            ← 回服務列表
+        </a>
 
-			<div class="service-detail-login-status">
+        <div class="service-detail-login-status">
 
-				<span th:if="${session.memberVO != null}"> 目前會員： <strong
-					th:text="${session.memberVO.memberId}"> 1 </strong> ｜ <a
-					th:href="@{/member/services}"> 我的服務 </a>
+            <span th:if="${session.memberVO != null}">
 
-				</span> <span th:if="${session.memberVO == null}"> 尚未登入 ｜ <a
-					th:href="@{/member/services/fakelogin}"> 前往登入 </a>
+                目前會員：
 
-				</span>
+                <strong th:text="${session.memberVO.memberId}">
+                    1
+                </strong>
 
-			</div>
-		</div>
+                ｜
 
-		<!-- 成功訊息 -->
-		<div class="alert alert-success" th:if="${successMsg != null}"
-			th:text="${successMsg}">操作成功</div>
+                <a th:href="@{/member/services}">
+                    我的服務
+                </a>
 
-		<!-- 錯誤訊息 -->
-		<div class="alert alert-error" th:if="${errorMsg != null}"
-			th:text="${errorMsg}">操作失敗</div>
+            </span>
 
-		<!-- ======================================================
+            <span th:if="${session.memberVO == null}">
+
+                尚未登入 ｜
+
+                <a th:href="@{/member/services/fakelogin}">
+                    前往登入
+                </a>
+
+            </span>
+
+        </div>
+    </div>
+
+    <!-- 成功訊息 -->
+    <div class="alert alert-success"
+         th:if="${successMsg != null}"
+         th:text="${successMsg}">
+        操作成功
+    </div>
+
+    <!-- 錯誤訊息 -->
+    <div class="alert alert-error"
+         th:if="${errorMsg != null}"
+         th:text="${errorMsg}">
+        操作失敗
+    </div>
+
+    <!-- ======================================================
          左側內容 + 右側預約
          ====================================================== -->
-		<div class="service-detail-layout">
+    <div class="service-detail-layout">
 
-			<!-- ==================================================
+        <!-- ==================================================
              左側服務資訊
              ================================================== -->
-			<section class="service-detail-main">
+        <section class="service-detail-main">
 
-				<!-- 服務封面 -->
-				<div class="service-detail-image-wrap">
+            <!-- 服務封面 -->
+            <div class="service-detail-image-wrap">
 
-					<img class="service-detail-image"
-						th:src="@{/front/services/image/{serviceId}(
+                <img class="service-detail-image"
+                     th:src="@{/front/services/image/{serviceId}(
                                 serviceId=${serviceVO.serviceId}
                              )}"
-						th:onerror="this.onerror=null; this.src='/images/activity/default-activity.jpg';"
-						alt="服務圖片">
+                     th:onerror="this.onerror=null; this.src='/images/activity/default-activity.jpg';"
+                     alt="服務圖片">
 
-				</div>
+            </div>
 
-				<!-- ==================================================
-     服務主標題
-     ================================================== -->
-				<section class="panel service-detail-header">
+            <!-- ==================================================
+                 服務主標題
+                 ================================================== -->
+            <section class="panel service-detail-header">
 
-					<!-- 上方：服務類型、編號、檢舉按鈕 -->
-					<div class="service-detail-header-row">
+                <!-- 上方：服務類型、編號、檢舉按鈕 -->
+                <div class="service-detail-header-row">
 
-						<div class="service-detail-meta">
+                    <div class="service-detail-meta">
 
-							<span class="service-detail-type"
-								th:text="${serviceVO.serviceType != null
-                           ? serviceVO.serviceType.typeName
-                           : '無服務類型'}">
-								服務類型 </span> <span class="service-detail-id"
-								th:text="|服務編號 #${serviceVO.serviceId}|"> 服務編號 #1 </span>
+                        <span class="service-detail-type"
+                              th:text="${serviceVO.serviceType != null
+                                       ? serviceVO.serviceType.typeName
+                                       : '無服務類型'}">
+                            服務類型
+                        </span>
 
-						</div>
+                        <span class="service-detail-id"
+                              th:text="|服務編號 #${serviceVO.serviceId}|">
+                            服務編號 #1
+                        </span>
 
-						<!-- 已登入：直接進入服務檢舉表單 -->
-						<a class="service-report-button"
-							th:if="${session.memberVO != null}"
-							th:href="@{/front/serviceReport/add(
-                        serviceId=${serviceVO.serviceId}
-                    )}"
-							title="檢舉此服務"> <svg viewBox="0 0 24 24" fill="none"
-								stroke="currentColor" stroke-width="2" stroke-linecap="round"
-								stroke-linejoin="round" aria-hidden="true">
+                    </div>
 
-                <path d="M4 21V4"></path>
-                <path d="M4 5h12l-2 4 2 4H4"></path>
+                    <!-- 已登入：直接進入服務檢舉表單 -->
+                    <a class="service-report-button"
+                       th:if="${session.memberVO != null}"
+                       th:href="@{/front/serviceReport/add(
+                            serviceId=${serviceVO.serviceId}
+                       )}"
+                       title="檢舉此服務">
 
-            </svg> <span> 檢舉此服務 </span>
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             aria-hidden="true">
 
-						</a>
+                            <path d="M4 21V4"></path>
+                            <path d="M4 5h12l-2 4 2 4H4"></path>
 
-						<!-- 未登入：先前往登入 -->
-						<a class="service-report-button"
-							th:if="${session.memberVO == null}" th:href="@{/member/login}"
-							title="登入後才能檢舉服務"> <svg viewBox="0 0 24 24" fill="none"
-								stroke="currentColor" stroke-width="2" stroke-linecap="round"
-								stroke-linejoin="round" aria-hidden="true">
+                        </svg>
 
-                <path d="M4 21V4"></path>
-                <path d="M4 5h12l-2 4 2 4H4"></path>
+                        <span>
+                            檢舉此服務
+                        </span>
 
-            </svg> <span> 檢舉此服務 </span>
+                    </a>
 
-						</a>
+                    <!-- 未登入：先前往登入 -->
+                    <a class="service-report-button"
+                       th:if="${session.memberVO == null}"
+                       th:href="@{/member/login}"
+                       title="登入後才能檢舉服務">
 
-					</div>
+                        <svg viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             aria-hidden="true">
 
-					<!-- 服務名稱 -->
-					<h1 class="service-detail-title" th:text="${serviceVO.serviceName}">
-						河堤散步陪伴</h1>
+                            <path d="M4 21V4"></path>
+                            <path d="M4 5h12l-2 4 2 4H4"></path>
 
-					<!-- 縣市與行政區 -->
-					<p class="service-detail-location"
-						th:if="${serviceVO.serviceCity != null
-                or serviceVO.serviceDistrict != null}">
+                        </svg>
 
-						<span class="service-detail-location-dot"></span> <span
-							th:text="|${serviceVO.serviceCity ?: ''}
-                       ${serviceVO.serviceDistrict ?: ''}|">
-							桃園市 八德區 </span>
+                        <span>
+                            檢舉此服務
+                        </span>
 
-					</p>
+                    </a>
 
-					<!-- 地點說明 -->
-					<p class="service-detail-place"
-						th:if="${serviceVO.serviceLocation != null
-                and !#strings.isEmpty(serviceVO.serviceLocation)}"
-						th:text="${serviceVO.serviceLocation}">八德埤塘自然生態公園附近</p>
+                </div>
 
-				</section>
+                <!-- 服務名稱 -->
+                <h1 class="service-detail-title"
+                    th:text="${serviceVO.serviceName}">
+                    河堤散步陪伴
+                </h1>
 
-				<!-- 服務說明 -->
-				<section class="panel service-detail-section">
+                <!-- 縣市與行政區 -->
+                <p class="service-detail-location"
+                   th:if="${serviceVO.serviceCity != null
+                           or serviceVO.serviceDistrict != null}">
 
-					<h2 class="service-detail-section-title">服務內容</h2>
+                    <span class="service-detail-location-dot">
+                    </span>
 
-					<p class="service-detail-description"
-						th:text="${serviceVO.description}">服務內容說明</p>
+                    <span th:text="|${serviceVO.serviceCity ?: ''}
+                                   ${serviceVO.serviceDistrict ?: ''}|">
+                        桃園市 八德區
+                    </span>
 
-				</section>
+                </p>
 
-				<!-- 服務基本資訊 -->
-				<section class="panel service-detail-section">
+                <!-- 地點說明 -->
+                <p class="service-detail-place"
+                   th:if="${serviceVO.serviceLocation != null
+                           and !#strings.isEmpty(serviceVO.serviceLocation)}"
+                   th:text="${serviceVO.serviceLocation}">
+                    八德埤塘自然生態公園附近
+                </p>
 
-					<h2 class="service-detail-section-title">服務資訊</h2>
+            </section>
 
-					<div class="service-detail-info-list">
+            <!-- 服務說明 -->
+            <section class="panel service-detail-section">
 
-						<div class="service-detail-info-item">
+                <h2 class="service-detail-section-title">
+                    服務內容
+                </h2>
 
-							<p class="service-detail-info-label">服務類型</p>
+                <p class="service-detail-description"
+                   th:text="${serviceVO.description}">
+                    服務內容說明
+                </p>
 
-							<p class="service-detail-info-value"
-								th:text="${serviceVO.serviceType != null
+            </section>
+
+            <!-- 服務基本資訊 -->
+            <section class="panel service-detail-section">
+
+                <h2 class="service-detail-section-title">
+                    服務資訊
+                </h2>
+
+                <div class="service-detail-info-list">
+
+                    <div class="service-detail-info-item">
+
+                        <p class="service-detail-info-label">
+                            服務類型
+                        </p>
+
+                        <p class="service-detail-info-value"
+                           th:text="${serviceVO.serviceType != null
                                     ? serviceVO.serviceType.typeName
                                     : '無服務類型'}">
-								散步陪伴</p>
+                            散步陪伴
+                        </p>
 
-						</div>
+                    </div>
 
-						<div class="service-detail-info-item">
+                    <div class="service-detail-info-item">
 
-							<p class="service-detail-info-label">每小時費率</p>
+                        <p class="service-detail-info-label">
+                            每小時費率
+                        </p>
 
-							<p class="service-detail-info-value">
+                        <p class="service-detail-info-value">
 
-								NT$ <span th:text="${serviceVO.hourlyRate}"> 500 </span> / 小時
+                            NT$
 
-							</p>
+                            <span th:text="${serviceVO.hourlyRate}">
+                                500
+                            </span>
 
-						</div>
+                            / 小時
 
-						<div class="service-detail-info-item"
-							th:if="${serviceVO.serviceCity != null}">
+                        </p>
 
-							<p class="service-detail-info-label">服務縣市</p>
+                    </div>
 
-							<p class="service-detail-info-value"
-								th:text="${serviceVO.serviceCity}">桃園市</p>
+                    <div class="service-detail-info-item"
+                         th:if="${serviceVO.serviceCity != null}">
 
-						</div>
+                        <p class="service-detail-info-label">
+                            服務縣市
+                        </p>
 
-						<div class="service-detail-info-item"
-							th:if="${serviceVO.serviceDistrict != null}">
+                        <p class="service-detail-info-value"
+                           th:text="${serviceVO.serviceCity}">
+                            桃園市
+                        </p>
 
-							<p class="service-detail-info-label">服務行政區</p>
+                    </div>
 
-							<p class="service-detail-info-value"
-								th:text="${serviceVO.serviceDistrict}">八德區</p>
+                    <div class="service-detail-info-item"
+                         th:if="${serviceVO.serviceDistrict != null}">
 
-						</div>
+                        <p class="service-detail-info-label">
+                            服務行政區
+                        </p>
 
-						<div class="service-detail-info-item">
+                        <p class="service-detail-info-value"
+                           th:text="${serviceVO.serviceDistrict}">
+                            八德區
+                        </p>
 
-							<p class="service-detail-info-label">服務提供者</p>
+                    </div>
 
-							<p class="service-detail-info-value"
-								th:text="|會員 #${serviceVO.memberId}|">會員 #1</p>
+                    <div class="service-detail-info-item">
 
-						</div>
+                        <p class="service-detail-info-label">
+                            服務提供者
+                        </p>
 
-						<div class="service-detail-info-item">
+                        <p class="service-detail-info-value"
+                           th:text="|會員 #${serviceVO.memberId}|">
+                            會員 #1
+                        </p>
 
-							<p class="service-detail-info-label">建立時間</p>
+                    </div>
 
-							<p class="service-detail-info-value"
-								th:text="${serviceVO.createdAt != null
+                    <div class="service-detail-info-item">
+
+                        <p class="service-detail-info-label">
+                            建立時間
+                        </p>
+
+                        <p class="service-detail-info-value"
+                           th:text="${serviceVO.createdAt != null
                                     ? #temporals.format(
                                         serviceVO.createdAt,
                                         'yyyy-MM-dd HH:mm'
                                       )
                                     : '-'}">
-								2026-07-13 14:00</p>
+                            2026-07-13 14:00
+                        </p>
 
-						</div>
+                    </div>
 
-					</div>
-				</section>
+                </div>
+            </section>
 
-				<!-- 服務提供者 -->
-				<section class="panel service-detail-section">
+            <!-- 服務提供者 -->
+            <section class="panel service-detail-section">
 
-					<h2 class="service-detail-section-title">服務提供者</h2>
+                <h2 class="service-detail-section-title">
+                    服務提供者
+                </h2>
 
-					<div class="service-provider-box">
+                <div class="service-provider-box">
 
-						<div class="service-provider-avatar"
-							th:text="${serviceVO.memberId}">1</div>
+                    <div class="service-provider-avatar"
+                         th:text="${serviceVO.memberId}">
+                        1
+                    </div>
 
-						<div class="service-provider-info">
+                    <div class="service-provider-info">
 
-							<p class="service-provider-label">提供者會員編號</p>
+                        <p class="service-provider-label">
+                            提供者會員編號
+                        </p>
 
-							<p class="service-provider-value"
-								th:text="|會員 #${serviceVO.memberId}|">會員 #1</p>
+                        <p class="service-provider-value"
+                           th:text="|會員 #${serviceVO.memberId}|">
+                            會員 #1
+                        </p>
 
-						</div>
+                    </div>
 
-					</div>
+                </div>
 
-				</section>
+            </section>
 
-			</section>
+        </section>
 
-			<!-- ==================================================
+        <!-- ==================================================
              右側時段與預約
              ================================================== -->
-			<aside class="panel service-booking-panel">
+        <aside class="panel service-booking-panel">
 
-				<!-- 價格 -->
-				<div class="service-price-box">
+            <!-- 價格 -->
+            <div class="service-price-box">
 
-					<span class="service-price-currency"> NT$ </span> <strong
-						class="service-price-amount" th:text="${serviceVO.hourlyRate}">
-						500 </strong> <span class="service-price-unit"> / 小時 </span>
+                <span class="service-price-currency">
+                    NT$
+                </span>
 
-				</div>
+                <strong class="service-price-amount"
+                        th:text="${serviceVO.hourlyRate}">
+                    500
+                </strong>
 
-				<h2 class="service-slot-title">服務時段</h2>
+                <span class="service-price-unit">
+                    / 小時
+                </span>
 
-				<p class="service-slot-subtitle">所有時段都會顯示，只有「可預約」狀態能送出申請。</p>
+            </div>
 
-				<!-- 沒有任何時段 -->
-				<div class="service-slot-empty"
-					th:if="${#lists.isEmpty(serviceSlotList)}">目前尚未建立任何服務時段</div>
+            <h2 class="service-slot-title">
+                服務時段
+            </h2>
 
-				<!-- 全部時段 -->
-				<div class="service-slot-list"
-					th:if="${!#lists.isEmpty(serviceSlotList)}">
+            <p class="service-slot-subtitle">
+                所有時段都會顯示，只有「可預約」狀態能送出申請。
+            </p>
 
-					<article class="service-slot-item"
-						th:each="slot : ${serviceSlotList}"
-						th:id="|service-slot-${slot.serviceSlotId}|"
-						th:classappend="${slot.slotStatus == 0
+            <!-- 沒有任何時段 -->
+            <div class="service-slot-empty"
+                 th:if="${#lists.isEmpty(serviceSlotList)}">
+                目前尚未建立任何服務時段
+            </div>
+
+            <!-- 全部時段 -->
+            <div class="service-slot-list"
+                 th:if="${!#lists.isEmpty(serviceSlotList)}">
+
+                <article class="service-slot-item"
+                         th:each="slot : ${serviceSlotList}"
+                         th:id="|service-slot-${slot.serviceSlotId}|"
+                         th:classappend="${slot.slotStatus == 0
                                           ? ' service-slot-item--available'
                                           : (slot.slotStatus == 1
                                               ? ' service-slot-item--locked'
                                               : ' service-slot-item--booked')}"
-						th:attr="data-slot-id=${slot.serviceSlotId},
+                         th:attr="data-slot-id=${slot.serviceSlotId},
                                   data-slot-status=${slot.slotStatus}">
 
-						<!-- 時間與狀態 -->
-						<div class="service-slot-summary">
+                    <!-- 時間與狀態 -->
+                    <div class="service-slot-summary">
 
-							<div class="service-slot-time">
+                        <div class="service-slot-time">
 
-								<div class="service-slot-date"
-									th:text="${#temporals.format(
+                            <div class="service-slot-date"
+                                 th:text="${#temporals.format(
                                             slot.startTime,
                                             'yyyy-MM-dd'
                                           )}">
-									2026-08-01</div>
+                                2026-08-01
+                            </div>
 
-								<div class="service-slot-hour">
+                            <div class="service-slot-hour">
 
-									<span
-										th:text="${#temporals.format(
+                                <span th:text="${#temporals.format(
                                                    slot.startTime,
                                                    'HH:mm'
                                                  )}">
-										14:00 </span> <span class="service-slot-separator"> ～ </span> <span
-										th:text="${#temporals.format(
+                                    14:00
+                                </span>
+
+                                <span class="service-slot-separator">
+                                    ～
+                                </span>
+
+                                <span th:text="${#temporals.format(
                                                    slot.endTime,
                                                    'HH:mm'
                                                  )}">
-										16:00 </span>
+                                    16:00
+                                </span>
 
-								</div>
+                            </div>
 
-							</div>
+                        </div>
 
-							<!-- WebSocket 收到訊息後會直接更新這個狀態標籤 -->
-							<span class="service-slot-status js-slot-status"
-								th:classappend="${slot.slotStatus == 0
+                        <!-- WebSocket 收到訊息後更新狀態 -->
+                        <span class="service-slot-status js-slot-status"
+                              th:classappend="${slot.slotStatus == 0
                                                ? ' available'
                                                : (slot.slotStatus == 1
                                                    ? ' locked'
                                                    : ' booked')}"
-								th:text="${slot.slotStatus == 0
+                              th:text="${slot.slotStatus == 0
                                         ? '可預約'
                                         : (slot.slotStatus == 1
                                             ? '暫時鎖定'
                                             : (slot.slotStatus == 2
                                                 ? '已預約'
                                                 : '無法預約'))}">
-								可預約 </span>
+                            可預約
+                        </span>
 
-						</div>
+                    </div>
 
-						<!-- ==================================================
+                    <!-- ==================================================
                          可預約狀態
-                         這個區塊永遠會被 Thymeleaf 建立，讓 WebSocket
-                         可以在 SLOT_STATUS 回到 0 時重新顯示。
                          ================================================== -->
-						<div class="js-slot-state js-slot-available-content"
-							th:attr="hidden=${slot.slotStatus != 0 ? 'hidden' : null}">
+                    <div class="js-slot-state js-slot-available-content"
+                         th:attr="hidden=${slot.slotStatus != 0
+                                          ? 'hidden'
+                                          : null}">
 
-							<div class="service-slot-action">
+                        <div class="service-slot-action">
 
-								<!-- 已登入且不是自己的服務 -->
-								<button class="btn service-booking-toggle" type="button"
-									th:if="${session.memberVO != null
+                            <!-- 已登入且不是自己的服務 -->
+                            <button class="btn service-booking-toggle"
+                                    type="button"
+                                    th:if="${session.memberVO != null
                                            and session.memberVO.memberId
                                                != serviceVO.memberId}"
-									th:attr="data-target=|booking-form-${slot.serviceSlotId}|">
-									我要預約</button>
+                                    th:attr="data-target=|booking-form-${slot.serviceSlotId}|">
+                                我要預約
+                            </button>
 
-								<!-- 自己的服務 -->
-								<button class="btn service-booking-disabled" type="button"
-									disabled
-									th:if="${session.memberVO != null
+                            <!-- 自己的服務 -->
+                            <button class="btn service-booking-disabled"
+                                    type="button"
+                                    disabled
+                                    th:if="${session.memberVO != null
                                            and session.memberVO.memberId
                                                == serviceVO.memberId}">
-									這是你的服務</button>
+                                這是你的服務
+                            </button>
 
-								<!-- 未登入 -->
-								<a class="btn service-booking-toggle"
-									th:if="${session.memberVO == null}"
-									th:href="@{/member/services/fakelogin}"> 登入後預約 </a>
+                            <!-- 未登入 -->
+                            <a class="btn service-booking-toggle"
+                               th:if="${session.memberVO == null}"
+                               th:href="@{/member/services/fakelogin}">
+                                登入後預約
+                            </a>
 
-							</div>
+                        </div>
 
-							<!-- 點擊「我要預約」後展開 -->
-							<form class="service-booking-form"
-								th:id="|booking-form-${slot.serviceSlotId}|"
-								th:if="${session.memberVO != null
-                                       and session.memberVO.memberId
-                                           != serviceVO.memberId}"
-								th:action="@{/front/services/{serviceId}/slots/{serviceSlotId}/request(
+                        <!-- 點擊「我要預約」後展開 -->
+                        <form class="service-booking-form"
+                              th:id="|booking-form-${slot.serviceSlotId}|"
+                              th:if="${session.memberVO != null
+                                     and session.memberVO.memberId
+                                         != serviceVO.memberId}"
+                              th:action="@{/front/services/{serviceId}/slots/{serviceSlotId}/request(
                                           serviceId=${serviceVO.serviceId},
                                           serviceSlotId=${slot.serviceSlotId}
                                        )}"
-								method="post" hidden>
+                              method="post"
+                              hidden>
 
-								<input type="hidden" th:if="${_csrf != null}"
-									th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                            <input type="hidden"
+                                   th:if="${_csrf != null}"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}">
 
-								<div class="form-group">
+                            <div class="form-group">
 
-									<label class="form-label"
-										th:for="|buyerRequestNote-${slot.serviceSlotId}|">
-										預約需求 </label>
+                                <label class="form-label"
+                                       th:for="|buyerRequestNote-${slot.serviceSlotId}|">
+                                    預約需求
+                                </label>
 
-									<textarea class="form-control service-booking-note"
-										th:id="|buyerRequestNote-${slot.serviceSlotId}|"
-										name="buyerRequestNote" maxlength="500"
-										placeholder="可填寫需求、注意事項或希望的服務方式"></textarea>
+                                <textarea class="form-control service-booking-note"
+                                          th:id="|buyerRequestNote-${slot.serviceSlotId}|"
+                                          name="buyerRequestNote"
+                                          maxlength="500"
+                                          placeholder="可填寫需求、注意事項或希望的服務方式"></textarea>
 
-									<p class="form-help">最多 500 個字，也可以留空。</p>
+                                <p class="form-help">
+                                    最多 500 個字，也可以留空。
+                                </p>
 
-								</div>
+                            </div>
 
-								<div class="service-booking-form-actions">
+                            <div class="service-booking-form-actions">
 
-									<button class="btn service-booking-submit" type="submit">
-										送出預約申請</button>
+                                <button class="btn service-booking-submit"
+                                        type="submit">
+                                    送出預約申請
+                                </button>
 
-									<button class="btn btn-secondary service-booking-cancel"
-										type="button"
-										th:attr="data-target=|booking-form-${slot.serviceSlotId}|">
-										取消</button>
+                                <button class="btn btn-secondary service-booking-cancel"
+                                        type="button"
+                                        th:attr="data-target=|booking-form-${slot.serviceSlotId}|">
+                                    取消
+                                </button>
 
-								</div>
+                            </div>
 
-							</form>
+                        </form>
 
-						</div>
+                    </div>
 
-						<!-- 暫時鎖定狀態 -->
-						<div class="js-slot-state js-slot-locked-content"
-							th:attr="hidden=${slot.slotStatus != 1 ? 'hidden' : null}">
+                    <!-- 暫時鎖定狀態 -->
+                    <div class="js-slot-state js-slot-locked-content"
+                         th:attr="hidden=${slot.slotStatus != 1
+                                          ? 'hidden'
+                                          : null}">
 
-							<p class="service-slot-message">此時段目前正由其他會員進行預約，暫時無法操作。</p>
+                        <p class="service-slot-message">
+                            此時段目前正由其他會員進行預約，暫時無法操作。
+                        </p>
 
-							<p class="service-slot-lock-time js-slot-lock-time"
-								th:if="${slot.lockExpiresAt != null}"
-								th:text="|鎖定期限：${#temporals.format(
+                        <p class="service-slot-lock-time js-slot-lock-time"
+                           th:if="${slot.lockExpiresAt != null}"
+                           th:text="|鎖定期限：${#temporals.format(
                                        slot.lockExpiresAt,
                                        'yyyy-MM-dd HH:mm:ss'
                                    )}|">
-								鎖定期限：2026-08-01 14:00:30</p>
+                            鎖定期限：2026-08-01 14:00:30
+                        </p>
 
-						</div>
+                    </div>
 
-						<!-- 已預約／其他不可用狀態 -->
-						<div class="js-slot-state js-slot-booked-content"
-							th:attr="hidden=${slot.slotStatus == 0 or slot.slotStatus == 1 ? 'hidden' : null}">
+                    <!-- 已預約／其他不可用狀態 -->
+                    <div class="js-slot-state js-slot-booked-content"
+                         th:attr="hidden=${slot.slotStatus == 0
+                                          or slot.slotStatus == 1
+                                          ? 'hidden'
+                                          : null}">
 
-							<p class="service-slot-message js-slot-booked-message"
-								th:text="${slot.slotStatus == 2
+                        <p class="service-slot-message js-slot-booked-message"
+                           th:text="${slot.slotStatus == 2
                                     ? '此時段已經完成預約，無法再次選擇。'
                                     : '此時段目前無法預約。'}">
-								此時段已經完成預約，無法再次選擇。</p>
+                            此時段已經完成預約，無法再次選擇。
+                        </p>
 
-						</div>
+                    </div>
 
-					</article>
+                </article>
 
-				</div>
+            </div>
 
-			</aside>
+        </aside>
 
-		</div>
+    </div>
 
-	</main>
+</main>
 
-	<!-- ==========================================================
+<!-- ==========================================================
      WebSocket 頁面資料
-
-     data-websocket-url 必須和 WebSocketConfig 的
-     registry.addEndpoint("/ws") 相同。
      ========================================================== -->
-	<div id="serviceDetailPageData"
-		th:attr="data-service-id=${serviceVO.serviceId},
+<div id="serviceDetailPageData"
+     th:attr="data-service-id=${serviceVO.serviceId},
               data-websocket-url=@{/ws},
               data-topic=|/topic/services/${serviceVO.serviceId}/slots|"
-		hidden></div>
+     hidden>
+</div>
 
-	<!-- SockJS + STOMP -->
-	<script
-		src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
-	<script
-		src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<!-- SockJS -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js">
+</script>
 
-	<!-- 服務詳情頁 JS：表單、通知數量、時段 WebSocket -->
-	<script th:src="@{/js/front-end/service/serviceDetail.js}"></script>
+<!-- STOMP -->
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js">
+</script>
+
+<!-- 服務詳情頁 JS：預約表單、時段 WebSocket -->
+<script th:src="@{/js/front-end/service/serviceDetail.js}">
+</script>
+
+<!-- 共用通知 AJAX 輪詢 -->
+<script th:src="@{/JS/front-end/common/notificationPolling.js}">
+</script>
 
 </body>
 </html>

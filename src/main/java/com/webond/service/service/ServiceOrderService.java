@@ -2,11 +2,16 @@ package com.webond.service.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.webond.member.model.MemberVO;
+import com.webond.member.model.NotificationVO;
+import com.webond.member.repository.MemberRepository;
+import com.webond.member.service.NotificationService;
 import com.webond.service.model.ServiceOrderVO;
 import com.webond.service.model.ServiceSlotVO;
 import com.webond.service.model.ServiceVO;
@@ -93,31 +98,39 @@ public class ServiceOrderService {
 	// 期限設定
 	// =========================================================
 
-	// 賣家有 60 秒確認申請
+	// 測試用：賣家有 180 秒確認申請
 	private static final long SELLER_CONFIRM_SECONDS = 180;
 
-	// 買家有 30 秒付款
+	// 測試用：買家有 60 秒付款
 	private static final long BUYER_PAYMENT_SECONDS = 60;
 
 	private final ServiceOrderRepository orderRepo;
 	private final ServiceRepository serviceRepo;
 	private final ServiceSlotRepository slotRepo;
 	private final SlotStatusWebSocketService slotStatusWebSocketService;
+	private final MemberRepository memberRepo;
+	private final NotificationService notificationService;
 
-	public ServiceOrderService(ServiceOrderRepository orderRepo, ServiceRepository serviceRepo,
-			ServiceSlotRepository slotRepo, SlotStatusWebSocketService slotStatusWebSocketService) {
+	public ServiceOrderService(ServiceOrderRepository orderRepo,
+			ServiceRepository serviceRepo,
+			ServiceSlotRepository slotRepo,
+			SlotStatusWebSocketService slotStatusWebSocketService,
+			MemberRepository memberRepo,
+			NotificationService notificationService) {
 
 		this.orderRepo = orderRepo;
 		this.serviceRepo = serviceRepo;
 		this.slotRepo = slotRepo;
 		this.slotStatusWebSocketService = slotStatusWebSocketService;
+		this.memberRepo = memberRepo;
+		this.notificationService = notificationService;
 	}
 
 	// =========================================================
 	// 買家送出預約申請
 	//
 	// 此時不鎖定時段。
-	// 賣家必須在 60 秒內確認。
+	// 賣家必須在 180 秒內確認。
 	// =========================================================
 
 	public ServiceOrderVO createRequest(Integer slotId, Integer buyerId, String buyerRequestNote) {
@@ -210,7 +223,7 @@ public class ServiceOrderService {
 
 		order.setRefundAmount(0);
 
-		// 賣家確認期限為現在時間加 60 秒
+		// 賣家確認期限為現在時間加 180 秒
 		order.setSellerConfirmExpiresAt(now.plusSeconds(SELLER_CONFIRM_SECONDS));
 
 		order.setPaymentExpiresAt(null);
@@ -221,7 +234,19 @@ public class ServiceOrderService {
 		 * 同一時段仍可讓其他買家提出申請。 等賣家接受其中一筆時才鎖定。
 		 */
 
-		return orderRepo.save(order);
+		ServiceOrderVO savedOrder = orderRepo.save(order);
+
+		// 通知賣方：收到新的預約申請
+		sendNotification(
+				savedOrder.getSellerMemberId(),
+				"收到新的服務預約申請",
+				"您的服務「" + savedOrder.getServiceNameSnapshot()
+						+ "」收到新的預約申請，預約時段為 "
+						+ formatOrderSlot(savedOrder)
+						+ "，請前往收到的預約查看。"
+		);
+
+		return savedOrder;
 	}
 
 	// =========================================================
@@ -285,6 +310,15 @@ public class ServiceOrderService {
 	    slotRepo.save(slot);
 
 	    ServiceOrderVO savedOrder = orderRepo.save(order);
+
+	    // 通知買方：賣方已接受申請，請完成付款
+	    sendNotification(
+	            savedOrder.getBuyerMemberId(),
+	            "預約申請已通過",
+	            "賣方已同意您對「" + savedOrder.getServiceNameSnapshot()
+	                    + "」的預約申請，請於付款期限內完成付款。預約時段為 "
+	                    + formatOrderSlot(savedOrder)
+	    );
 
 	    /*
 	     * 注意：
@@ -452,6 +486,27 @@ public class ServiceOrderService {
 
 	    if (!otherOrders.isEmpty()) {
 	        orderRepo.saveAll(otherOrders);
+	    }
+
+	    // 通知賣方：買方已完成付款
+	    sendNotification(
+	            savedOrder.getSellerMemberId(),
+	            "買家已完成付款",
+	            "您的服務「" + savedOrder.getServiceNameSnapshot()
+	                    + "」已有買家完成付款，訂單已正式成立。預約時段為 "
+	                    + formatOrderSlot(savedOrder)
+	    );
+
+	    // 通知其他申請人：此時段已由其他買家完成付款
+	    for (ServiceOrderVO otherOrder : otherOrders) {
+
+	        sendNotification(
+	                otherOrder.getBuyerMemberId(),
+	                "預約時段已被其他會員預約",
+	                "您申請的服務「" + otherOrder.getServiceNameSnapshot()
+	                        + "」時段 " + formatOrderSlot(otherOrder)
+	                        + " 已由其他會員完成付款，因此您的預約申請已由系統取消。"
+	        );
 	    }
 
 	    // WebSocket：通知前端此時段已預約
@@ -923,7 +978,7 @@ public class ServiceOrderService {
 
 		order.setCancelledByRole(CANCEL_BY_SYSTEM);
 
-		order.setCancelReason("賣家未於 60 秒內確認訂單");
+		order.setCancelReason("賣家未於 180 秒內確認訂單");
 
 		order.setCancelledAt(now);
 
@@ -953,7 +1008,7 @@ public class ServiceOrderService {
 
 		order.setCancelledByRole(CANCEL_BY_SYSTEM);
 
-		order.setCancelReason("買家未於 30 秒內完成付款");
+		order.setCancelReason("買家未於 60 秒內完成付款");
 
 		order.setCancelledAt(now);
 
@@ -969,6 +1024,55 @@ public class ServiceOrderService {
 		order.setHandledAt(null);
 
 		releaseSlot(slot);
+	}
+
+	// =========================================================
+	// 建立會員通知
+	//
+	// NotificationService.addNotification() 會自動設定：
+	// CREATED_AT = LocalDate.now()
+	// IS_READ = 0
+	// =========================================================
+
+	private void sendNotification(Integer memberId, String title, String content) {
+
+		if (memberId == null) {
+			return;
+		}
+
+		MemberVO member = memberRepo.findById(memberId)
+				.orElseThrow(() -> new RuntimeException("找不到通知收件會員：" + memberId));
+
+		NotificationVO notification = new NotificationVO();
+
+		notification.setMember(member);
+		notification.setTitle(title);
+		notification.setContent(content);
+
+		// 0：一般會員通知
+		notification.setNotificationType((byte) 0);
+
+		notificationService.addNotification(notification);
+	}
+
+	// =========================================================
+	// 格式化通知中的訂單時段
+	// =========================================================
+
+	private String formatOrderSlot(ServiceOrderVO order) {
+
+		if (order == null
+				|| order.getSlotStartTimeSnapshot() == null
+				|| order.getSlotEndTimeSnapshot() == null) {
+
+			return "時間未設定";
+		}
+
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+		return order.getSlotStartTimeSnapshot().format(formatter)
+				+ " ～ "
+				+ order.getSlotEndTimeSnapshot().format(formatter);
 	}
 
 	// =========================================================
