@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>訂單評價</title>
+</head>
+<body>
+
+<div th:if="${errorMessage}" style="color:red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+
+<h2>訂單評價</h2>
+
+<table>
+    <tr>
+        <td>服務名稱</td>
+        <td th:text="${order.serviceNameSnapshot}"></td>
+    </tr>
+    <tr>
+        <td>服務類型</td>
+        <td th:text="${order.serviceTypeNameSnapshot}"></td>
+    </tr>
+    <tr>
+        <td>服務時段</td>
+        <td>
+            <span th:text="${#temporals.format(order.slotStartTimeSnapshot, 'yyyy-MM-dd HH:mm')}"></span>
+            ~
+            <span th:text="${#temporals.format(order.slotEndTimeSnapshot, 'HH:mm')}"></span>
+        </td>
+    </tr>
+    <tr>
+        <td>訂單編號</td>
+        <td th:text="${order.serviceOrderId}"></td>
+    </tr>
+</table>
+
+<hr>
+
+<!-- 買方視角：評賣家 -->
+<div th:if="${isbuyer}">
+
+    <div th:if="${order.buyerReviewedAt != null}">
+        <h3>你已完成評價</h3>
+        <p>評分：<span th:text="${order.buyerRateSeller}"></span> / 5</p>
+        <p>評論：<span th:text="${order.buyerReviewComment}"></span></p>
+        <p>評價時間：<span th:text="${#temporals.format(order.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+    </div>
+
+    <form th:if="${order.buyerReviewedAt == null}"
+          th:action="@{/orderReview/submit}"
+          th:object="${serviceReviewDTO}"
+          method="post">
+
+        <input type="hidden" th:field="*{orderId}" th:value="${order.serviceOrderId}" />
+
+        <label>給賣家的評分</label>
+        <select th:field="*{rate}">
+            <option value="">請選擇</option>
+            <option value="5">5 - 非常滿意</option>
+            <option value="4">4 - 滿意</option>
+            <option value="3">3 - 普通</option>
+            <option value="2">2 - 不滿意</option>
+            <option value="1">1 - 非常不滿意</option>
+        </select>
+
+        <div>
+            <label>評論內容</label>
+            <textarea th:field="*{comment}" maxlength="500" rows="4"></textarea>
+        </div>
+
+        <button type="submit">送出評價</button>
+    </form>
+</div>
+
+<!-- 賣方視角：評買家 -->
+<div th:unless="${isbuyer}">
+
+    <div th:if="${order.sellerReviewedAt != null}">
+        <h3>你已完成評價</h3>
+        <p>評分：<span th:text="${order.sellerRateBuyer}"></span> / 5</p>
+        <p>評論：<span th:text="${order.sellerReviewComment}"></span></p>
+        <p>評價時間：<span th:text="${#temporals.format(order.sellerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+    </div>
+
+    <form th:if="${order.sellerReviewedAt == null}"
+          th:action="@{/orderReview/submit}"
+          th:object="${serviceReviewDTO}"
+          method="post">
+
+        <input type="hidden" th:field="*{orderId}" />
+
+        <label>給買家的評分</label>
+        <select th:field="*{rate}">
+            <option value="">請選擇</option>
+            <option value="5">5 - 非常滿意</option>
+            <option value="4">4 - 滿意</option>
+            <option value="3">3 - 普通</option>
+            <option value="2">2 - 不滿意</option>
+            <option value="1">1 - 非常不滿意</option>
+        </select>
+
+        <div>
+            <label>評論內容</label>
+            <textarea th:field="*{comment}" maxlength="500" rows="4"></textarea>
+        </div>
+
+        <button type="submit">送出評價</button>
+        
+    </form>
+</div>
+
+
+</body>
+</html>
