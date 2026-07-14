@@ -24,6 +24,7 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 @Entity
@@ -69,6 +70,7 @@ public class MemberVO implements java.io.Serializable {
 	private byte[] memberPic;
 
 	@Column(name = "GENDER")
+	@NotNull(message = "請選擇性別")
 	private Byte gender;
 
 	@Column(name = "PHONE")
@@ -123,7 +125,7 @@ public class MemberVO implements java.io.Serializable {
 	@NotEmpty(message = "真實姓名請勿空白")
 	private String realName;
 
-	// 🎯【優化修正】拿掉 byte[] 的 @NotNull。圖片改由 Controller 的 MultipartFile 進行驗證與防禦，才不會在裝箱時直接崩潰。
+	// 💡 圖片改由 Controller / HTML 獨立校驗防禦，免去 @NotNull 導致的 Binding 錯誤
 	@Lob
 	@Column(name = "ID_IMAGE")
 	private byte[] idImage;
@@ -134,7 +136,7 @@ public class MemberVO implements java.io.Serializable {
 
 	@Column(name = "ID_NUMBER")
 	@NotEmpty(message = "身分證字號請勿空白")
-	@Pattern(regexp = "^[A-Z][12]\\d{8}$", message = "身分證字號格式不正確") // 💡 順手幫你加上最強的身分證格式檢查防護！
+	@Pattern(regexp = "^[A-Z][12]\\d{8}$", message = "身分證字號格式不正確")
 	private String idNumber;
 
 	@Column(name = "KYC_STATUS")
@@ -151,7 +153,7 @@ public class MemberVO implements java.io.Serializable {
 	private String bankCode;
 
 	@Column(name = "BANK_ACCOUNT")
-	@Pattern(regexp = "^\\d{10,14}$", message = "銀行帳號格式錯誤")
+	@Pattern(regexp = "^\\d{10,14}$", message = "銀行帳號格式錯誤（請輸入10至14位數字）")
 	private String bankAccount;
 
 	public MemberVO() {
@@ -180,6 +182,14 @@ public class MemberVO implements java.io.Serializable {
 
 	public void setNotifications(Set<NotificationVO> notifications) {
 		this.notifications = notifications;
+	}
+
+	public Set<ServiceReportVO> getServicereports() {
+		return servicereports;
+	}
+
+	public void setServicereports(Set<ServiceReportVO> servicereports) {
+		this.servicereports = servicereports;
 	}
 
 	public Integer getMemberId() {
@@ -421,38 +431,40 @@ public class MemberVO implements java.io.Serializable {
 	public void setBankAccount(String bankAccount) {
 		this.bankAccount = bankAccount;
 	}
-	
-	//評價平均
+
+	// =========================================================================
+	// ⭐️ 評價平均運算輔助方法 (加上 Null 防護)
+	// =========================================================================
+
 	public double getServiceAvgRate() {
-		if(serviceRateCount != null && serviceRateCount > 0) {
+		if (serviceRateSum != null && serviceRateCount != null && serviceRateCount > 0) {
 			double result = serviceRateSum.doubleValue() / serviceRateCount;
 			return Math.round(result * 10) / 10.0;
 		}
 		return 0.0;
 	}
-	
+
 	public double getServicerAvgRate() {
-		if(servicerRateCount != null && servicerRateCount > 0) {
+		if (servicerRateSum != null && servicerRateCount != null && servicerRateCount > 0) {
 			double result = servicerRateSum.doubleValue() / servicerRateCount;
 			return Math.round(result * 10) / 10.0;
 		}
 		return 0.0;
 	}
-	
+
 	public double getActAvgRate() {
-		if(actRateCount != null && actRateCount > 0) {
-			 double result = actRateSum.doubleValue() / actRateCount;
-			 return Math.round(result * 10) / 10.0;
+		if (actRateSum != null && actRateCount != null && actRateCount > 0) {
+			double result = actRateSum.doubleValue() / actRateCount;
+			return Math.round(result * 10) / 10.0;
 		}
 		return 0.0;
 	}
-	
+
 	public double getHoldactAvgRate() {
-		if(holdactRateCount != null && holdactRateCount > 0) {
+		if (holdactRateSum != null && holdactRateCount != null && holdactRateCount > 0) {
 			double result = holdactRateSum.doubleValue() / holdactRateCount;
 			return Math.round(result * 10) / 10.0;
 		}
 		return 0.0;
 	}
-	
 }

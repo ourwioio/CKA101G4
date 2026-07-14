@@ -5,8 +5,7 @@
 <title>Webond 會員註冊與實名認證</title>
 <style>
 body {
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif,
-		"Microsoft JhengHei";
+	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Microsoft JhengHei";
 	background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
 	min-height: 100vh;
 	margin: 0;
@@ -74,8 +73,7 @@ label {
 	font-size: 14px;
 }
 
-input[type="text"], input[type="email"], input[type="password"], select,
-	input[type="file"] {
+input[type="text"], input[type="email"], input[type="password"], select, input[type="file"] {
 	width: 100%;
 	padding: 10px;
 	box-sizing: border-box;
@@ -117,38 +115,16 @@ button[type="submit"]:hover {
 	background: #0284c7;
 }
 
-.error-msg {
-	color: #b91c1c;
-	background: #fef2f2;
-	padding: 10px;
-	border-radius: 8px;
-	margin-bottom: 20px;
-	font-size: 14px;
-	border: 1px solid #fca5a5;
-}
-
+/* 🎯 統一的欄位下方紅字錯誤訊息樣式 */
 .field-error {
 	color: #b91c1c;
 	font-size: 12px;
 	font-weight: 500;
-	margin-top: 5px;
+	margin-top: 6px;
 	display: block;
 }
 
-.login-link {
-	text-align: center;
-	margin-top: 20px;
-	font-size: 14px;
-	color: #64748b;
-}
-
-.login-link a {
-	color: #0ea5e9;
-	text-decoration: none;
-	font-weight: bold;
-}
-
-/* 📸 已上傳圖片預覽樣式 */
+/* 📸 預覽圖樣式 */
 .img-preview {
 	margin-top: 8px;
 	max-width: 100%;
@@ -161,10 +137,11 @@ button[type="submit"]:hover {
 .img-preview-container {
 	font-size: 12px;
 	color: #0284c7;
-	margin-top: 4px;
+	margin-top: 6px;
+	margin-bottom: 4px;
 }
 
-/* ✉️ Email 驗證按鈕與輸入框組合樣式 */
+/* ✉️ Email 驗證按鈕組合樣式 */
 .input-with-btn {
 	display: flex;
 	gap: 8px;
@@ -212,13 +189,6 @@ button[type="submit"]:hover {
 		<h2>加入 Webond 會員</h2>
 		<p class="subtitle">請填寫以下欄位，註冊同時完成 KYC 實名認證與金流綁定</p>
 
-		<div class="error-msg"
-			th:if="${errorMsgs != null and !errorMsgs.isEmpty()}">
-			<ul>
-				<li th:each="err : ${errorMsgs}" th:text="${err}">錯誤訊息</li>
-			</ul>
-		</div>
-
 		<form th:action="@{/member/doRegister}" method="post"
 			th:object="${memberVO}" enctype="multipart/form-data" onsubmit="return validateFormBeforeSubmit()">
 
@@ -228,7 +198,7 @@ button[type="submit"]:hover {
 				<div class="form-group full-width">
 					<label for="email">Email 帳號 (登入用) *</label>
 					<div class="input-with-btn">
-						<input type="email" id="email" th:field="*{email}" placeholder="example@email.com" required>
+						<input type="email" id="email" th:field="*{email}" placeholder="example@email.com">
 						<button type="button" class="btn-send-otp" id="sendOtpBtn" onclick="sendOtp()">取得驗證碼</button>
 					</div>
 					<span id="otpMsg" class="otp-msg"></span>
@@ -239,7 +209,7 @@ button[type="submit"]:hover {
 					<label for="otpCode">Email 驗證碼 *</label>
 					<div class="input-with-btn">
 						<input type="text" id="otpCode" name="otpCode" maxlength="6" 
-							   th:value="${inputOtpCode}" placeholder="請輸入 6 位數字驗證碼" required>
+							   th:value="${inputOtpCode}" placeholder="請輸入 6 位數字驗證碼">
 						<button type="button" class="btn-send-otp" id="verifyOtpBtn" style="background:#059669;" onclick="verifyOtp()">核對驗證碼</button>
 					</div>
 					<span id="verifyMsg" class="otp-msg"></span>
@@ -248,59 +218,47 @@ button[type="submit"]:hover {
 
 				<div class="form-group">
 					<label for="password">登入密碼 *</label>
-					<input type="password" id="password" name="password"
-						th:value="${rawPassword}" placeholder="請設定登入密碼" required> <span
-						class="field-error" th:if="${#fields.hasErrors('passwordHash')}"
-						th:errors="*{passwordHash}"></span>
+					<input type="password" id="password" name="password" th:value="${rawPassword}" placeholder="請設定登入密碼">
+					<span class="field-error" th:if="${#fields.hasErrors('passwordHash')}" th:errors="*{passwordHash}"></span>
 				</div>
 
 				<div class="form-group">
-					<label for="nickname">會員暱稱 *</label> <input type="text"
-						id="nickname" th:field="*{nickname}" placeholder="填寫社群暱稱" required>
-					<span class="field-error" th:if="${#fields.hasErrors('nickname')}"
-						th:errors="*{nickname}"></span>
+					<label for="nickname">會員暱稱 *</label>
+					<input type="text" id="nickname" th:field="*{nickname}" placeholder="填寫社群暱稱">
+					<span class="field-error" th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}"></span>
 				</div>
 
 				<div class="form-group">
-					<label for="phone">手機號碼 *</label> <input type="text" id="phone"
-						th:field="*{phone}" placeholder="0912345678" required> <span
-						class="field-error" th:if="${#fields.hasErrors('phone')}"
-						th:errors="*{phone}"></span>
+					<label for="phone">手機號碼 *</label>
+					<input type="text" id="phone" th:field="*{phone}" placeholder="0912345678">
+					<span class="field-error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
 				</div>
 
 				<div class="form-group">
 					<label>性別 *</label>
 					<div class="radio-group">
-						<label><input type="radio" th:field="*{gender}" value="1">
-							男</label> <label><input type="radio" th:field="*{gender}"
-							value="0"> 女</label> <label><input type="radio"
-							th:field="*{gender}" value="2"> 其他</label>
+						<label><input type="radio" th:field="*{gender}" value="1"> 男</label> 
+						<label><input type="radio" th:field="*{gender}" value="0"> 女</label> 
+						<label><input type="radio" th:field="*{gender}" value="2"> 其他</label>
 					</div>
-					<span class="field-error" th:if="${#fields.hasErrors('gender')}"
-						th:errors="*{gender}"></span>
+					<span class="field-error" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
 				</div>
 
 				<div class="form-group">
-					<label for="memberPicFile">個人大頭貼</label> <input type="file"
-						id="memberPicFile" name="memberPicFile" accept="image/*">
-					<input type="hidden" name="tempMemberPic"
-						th:value="${tempMemberPic}">
-					<div class="img-preview-container"
-						th:if="${tempMemberPic != null and !tempMemberPic.isEmpty()}">
-						<span>✓ 已暫存先前選擇的照片（如需修改可重新選擇）：</span><br> <img
-							class="img-preview"
-							th:src="'data:image/jpeg;base64,' + ${tempMemberPic}" alt="大頭貼預覽">
+					<label for="memberPicFile">個人大頭貼</label>
+					<input type="file" id="memberPicFile" name="memberPicFile" accept="image/*">
+					<input type="hidden" name="tempMemberPic" th:value="${tempMemberPic}">
+					<div class="img-preview-container" th:if="${tempMemberPic != null and !tempMemberPic.isEmpty()}">
+						<span>✓ 已暫存先前選擇的照片：</span><br>
+						<img class="img-preview" th:src="'data:image/jpeg;base64,' + ${tempMemberPic}" alt="大頭貼預覽">
 					</div>
-					<span class="field-error" th:if="${#fields.hasErrors('memberPic')}"
-						th:errors="*{memberPic}"></span>
+					<span class="field-error" th:if="${#fields.hasErrors('memberPic')}" th:errors="*{memberPic}"></span>
 				</div>
 
 				<div class="form-group full-width">
-					<label for="memberIntro">個人簡介</label> <input type="text"
-						id="memberIntro" th:field="*{memberIntro}"
-						placeholder="一兩句話介紹一下自己吧！"> <span class="field-error"
-						th:if="${#fields.hasErrors('memberIntro')}"
-						th:errors="*{memberIntro}"></span>
+					<label for="memberIntro">個人簡介</label>
+					<input type="text" id="memberIntro" th:field="*{memberIntro}" placeholder="一兩句話介紹一下自己吧！">
+					<span class="field-error" th:if="${#fields.hasErrors('memberIntro')}" th:errors="*{memberIntro}"></span>
 				</div>
 			</div>
 
@@ -308,56 +266,48 @@ button[type="submit"]:hover {
 			<div class="form-grid">
 
 				<div class="form-group">
-					<label for="realName">真實姓名 *</label> <input type="text"
-						id="realName" th:field="*{realName}" placeholder="需與身分證相同" required>
-					<span class="field-error" th:if="${#fields.hasErrors('realName')}"
-						th:errors="*{realName}"></span>
+					<label for="realName">真實姓名 *</label>
+					<input type="text" id="realName" th:field="*{realName}" placeholder="需與身分證相同">
+					<span class="field-error" th:if="${#fields.hasErrors('realName')}" th:errors="*{realName}"></span>
 				</div>
 
 				<div class="form-group">
-					<label for="idNumber">身分證字號 *</label> <input type="text"
-						id="idNumber" th:field="*{idNumber}" placeholder="A123456789" required>
-					<span class="field-error" th:if="${#fields.hasErrors('idNumber')}"
-						th:errors="*{idNumber}"></span>
+					<label for="idNumber">身分證字號 *</label>
+					<input type="text" id="idNumber" th:field="*{idNumber}" placeholder="A123456789">
+					<span class="field-error" th:if="${#fields.hasErrors('idNumber')}" th:errors="*{idNumber}"></span>
 				</div>
 
 				<div class="form-group">
-					<label for="idFrontImageFile">身分證正面照片 *</label> <input type="file"
-						id="idFrontImageFile" name="idFrontImageFile" accept="image/*"> 
+					<label for="idFrontImageFile">身分證正面照片 *</label>
+					<input type="file" id="idFrontImageFile" name="idFrontImageFile" accept="image/*"> 
 					<input type="hidden" id="tempIdFrontImage" name="tempIdFrontImage" th:value="${tempIdFrontImage}">
-					<div class="img-preview-container"
-						th:if="${tempIdFrontImage != null and !tempIdFrontImage.isEmpty()}">
-						<span>✓ 已暫存身分證正面照片：</span><br> <img class="img-preview"
-							th:src="'data:image/jpeg;base64,' + ${tempIdFrontImage}" alt="身分證正面預覽">
+					<div class="img-preview-container" th:if="${tempIdFrontImage != null and !tempIdFrontImage.isEmpty()}">
+						<span>✓ 已暫存身分證正面照片：</span><br>
+						<img class="img-preview" th:src="'data:image/jpeg;base64,' + ${tempIdFrontImage}" alt="身分證正面預覽">
 					</div>
-					<span class="field-error" th:if="${#fields.hasErrors('idImage')}"
-						th:errors="*{idImage}"></span>
+					<span class="field-error" th:if="${idFrontImageError != null}" th:text="${idFrontImageError}"></span>
 				</div>
 
 				<div class="form-group">
-					<label for="idBackImageFile">身分證反面照片 *</label> <input type="file"
-						id="idBackImageFile" name="idBackImageFile" accept="image/*"> 
+					<label for="idBackImageFile">身分證反面照片 *</label>
+					<input type="file" id="idBackImageFile" name="idBackImageFile" accept="image/*"> 
 					<input type="hidden" id="tempIdBackImage" name="tempIdBackImage" th:value="${tempIdBackImage}">
-					<div class="img-preview-container"
-						th:if="${tempIdBackImage != null and !tempIdBackImage.isEmpty()}">
-						<span>✓ 已暫存身分證反面照片：</span><br> <img class="img-preview"
-							th:src="'data:image/jpeg;base64,' + ${tempIdBackImage}" alt="身分證反面預覽">
+					<div class="img-preview-container" th:if="${tempIdBackImage != null and !tempIdBackImage.isEmpty()}">
+						<span>✓ 已暫存身分證反面照片：</span><br>
+						<img class="img-preview" th:src="'data:image/jpeg;base64,' + ${tempIdBackImage}" alt="身分證反面預覽">
 					</div>
 					<span class="field-error" th:if="${idBackImageError != null}" th:text="${idBackImageError}"></span>
 				</div>
 
 				<div class="form-group full-width">
-					<label for="faceImageFile">現場自拍人臉照片 *</label> <input type="file"
-						id="faceImageFile" name="faceImageFile" accept="image/*">
-					<input type="hidden" id="tempFaceImage" name="tempFaceImage"
-						th:value="${tempFaceImage}">
-					<div class="img-preview-container"
-						th:if="${tempFaceImage != null and !tempFaceImage.isEmpty()}">
-						<span>✓ 已暫存先前上傳的人臉照片：</span><br> <img class="img-preview"
-							th:src="'data:image/jpeg;base64,' + ${tempFaceImage}" alt="自拍照預覽">
+					<label for="faceImageFile">現場自拍人臉照片 *</label>
+					<input type="file" id="faceImageFile" name="faceImageFile" accept="image/*">
+					<input type="hidden" id="tempFaceImage" name="tempFaceImage" th:value="${tempFaceImage}">
+					<div class="img-preview-container" th:if="${tempFaceImage != null and !tempFaceImage.isEmpty()}">
+						<span>✓ 已暫存先前上傳的人臉照片：</span><br>
+						<img class="img-preview" th:src="'data:image/jpeg;base64,' + ${tempFaceImage}" alt="自拍照預覽">
 					</div>
-					<span class="field-error" th:if="${#fields.hasErrors('faceImage')}"
-						th:errors="*{faceImage}"></span>
+					<span class="field-error" th:if="${#fields.hasErrors('faceImage')}" th:errors="*{faceImage}"></span>
 				</div>
 			</div>
 
@@ -365,18 +315,15 @@ button[type="submit"]:hover {
 			<div class="form-grid">
 
 				<div class="form-group">
-					<label for="bankCode">銀行代碼 (3碼) *</label> <input type="text"
-						id="bankCode" th:field="*{bankCode}" placeholder="例如：822" required>
-					<span class="field-error" th:if="${#fields.hasErrors('bankCode')}"
-						th:errors="*{bankCode}"></span>
+					<label for="bankCode">銀行代碼 (3碼) *</label>
+					<input type="text" id="bankCode" th:field="*{bankCode}" placeholder="例如：822">
+					<span class="field-error" th:if="${#fields.hasErrors('bankCode')}" th:errors="*{bankCode}"></span>
 				</div>
 
 				<div class="form-group">
-					<label for="bankAccount">銀行帳號 *</label> <input type="text"
-						id="bankAccount" th:field="*{bankAccount}" placeholder="10-14位數字" required>
-					<span class="field-error"
-						th:if="${#fields.hasErrors('bankAccount')}"
-						th:errors="*{bankAccount}"></span>
+					<label for="bankAccount">銀行帳號 *</label>
+					<input type="text" id="bankAccount" th:field="*{bankAccount}" placeholder="10-14位數字">
+					<span class="field-error" th:if="${#fields.hasErrors('bankAccount')}" th:errors="*{bankAccount}"></span>
 				</div>
 			</div>
 
@@ -391,9 +338,8 @@ button[type="submit"]:hover {
 	<script>
 		let cooldownSeconds = 0;
 		let timer = null;
-		let isEmailVerified = false; // 追蹤是否點擊按鈕通過驗證
+		let isEmailVerified = false;
 
-		// 1. 點擊按鈕發送 OTP 驗證碼
 		function sendOtp() {
 			const emailInput = document.getElementById('email');
 			const email = emailInput.value.trim();
@@ -437,7 +383,6 @@ button[type="submit"]:hover {
 			});
 		}
 
-		// 2. 點擊「核對驗證碼」按鈕 (呼叫 /member/verify-otp)
 		function verifyOtp() {
 		    const emailInput = document.getElementById('email');
 		    const otpCodeInput = document.getElementById('otpCode');
@@ -467,7 +412,6 @@ button[type="submit"]:hover {
 		            verifyMsg.innerText = '🎉 ' + (res.body.message || 'Email 驗證成功！');
 		            isEmailVerified = true;
 		            
-		            // 🟢 只停用按鈕，不要鎖定 input，確保 form submit 時 email 欄位能順利帶入 post body
 		            document.getElementById('verifyOtpBtn').disabled = true;
 		            document.getElementById('sendOtpBtn').disabled = true;
 		        } else {
@@ -482,7 +426,6 @@ button[type="submit"]:hover {
 		    });
 		}
 
-		// 3. 60 秒冷卻倒數計時器
 		function startCooldown(seconds) {
 			cooldownSeconds = seconds;
 			const sendBtn = document.getElementById('sendOtpBtn');
@@ -500,29 +443,12 @@ button[type="submit"]:hover {
 			}, 1000);
 		}
 
-		// 4. 表單提交前的檢查
 		function validateFormBeforeSubmit() {
+			// 如果頁面上已經有 OTP 錯誤訊息或未驗證，防止表單送出
 			if (!isEmailVerified) {
 				alert('請先點擊「核對驗證碼」成功完成 Email 驗證後，再提交註冊表單！');
 				return false;
 			}
-
-			// 檢查身分證正面 (當前無選檔 且 無暫存檔)
-			const frontFile = document.getElementById('idFrontImageFile').files.length;
-			const tempFront = document.getElementById('tempIdFrontImage').value;
-			if (frontFile === 0 && !tempFront) {
-				alert('請選擇身分證【正面】照片！');
-				return false;
-			}
-
-			// 檢查身分證反面 (當前無選檔 且 無暫存檔)
-			const backFile = document.getElementById('idBackImageFile').files.length;
-			const tempBack = document.getElementById('tempIdBackImage').value;
-			if (backFile === 0 && !tempBack) {
-				alert('請選擇身分證【反面】照片！');
-				return false;
-			}
-
 			return true;
 		}
 	</script>
