@@ -1,6 +1,7 @@
 package com.webond.venue.controller;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
@@ -238,6 +239,10 @@ public class VenueFrontOrderController {
 
 		List<VenueOrderVO> list = venueOrderService.getVenuesByMember(loginMember.getMemberId());
 		model.addAttribute("venueOrderListData", list);
+		
+		LocalDate cutoff = LocalDate.now().plusDays(3);
+	    model.addAttribute("cancelCutoff", cutoff);
+		
 		return "front-end/venue/myVenueOrder";
 	}
 
@@ -291,12 +296,24 @@ public class VenueFrontOrderController {
 		return "front-end/venue/myVenuesCompleted";
 	}
 	
-	@GetMapping("cancelOrder")
-	public String cancelOrder(@RequestParam("venueOrderId") Integer venueOrderId, Model model) {
-		VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
-		venueOrderVO.setOrderStatus((byte) 4);
-		venueOrderService.updateVenueOrder(venueOrderVO);
-		return "redirect:/front/venueOrder/myVenueOrder";
+	@PostMapping("cancelOrder")
+	public String cancelOrder(@RequestParam("venueOrderId") Integer venueOrderId,
+	        @RequestParam("refundReason") String refundReason,
+	        HttpSession session) {
+
+	    MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+	    if (loginMember == null) {
+	        return "redirect:/member/login";
+	    }
+
+	    VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
+	    if (venueOrderVO != null) {
+	        venueOrderVO.setOrderStatus((byte) 4);
+	        venueOrderVO.setRefundStatus((byte) 0);
+	        venueOrderVO.setRefundReason(refundReason);
+	        venueOrderService.updateVenueOrder(venueOrderVO);
+	    }
+	    return "redirect:/front/venueOrder/myVenueOrder";
 	}
 	
 	@ModelAttribute("venueTypeData")

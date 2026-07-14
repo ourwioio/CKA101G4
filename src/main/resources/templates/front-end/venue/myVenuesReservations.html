@@ -29,7 +29,6 @@
 				<th>訂單編號</th>
 				<th>場地編號</th>
 				<th>場地名稱</th>
-				<th>撥款狀態</th>
 				<th>預約日期</th>
 				<th>預約時段</th>
 				<th>詳細資訊</th>
@@ -41,10 +40,6 @@
 					<td th:text="${venueOrderVO.venueOrderId}"></td>
 					<td th:text="${venueOrderVO.venueVO.venueId}"></td>
 			        <td th:text="${venueOrderVO.venueVO.venueName}"></td>
-			        <td th:switch="${venueOrderVO.payoutAmount}">
-			        	<span th:case="0">未撥款</span>
-			        	<span th:case="1">已撥款</span>
-			        </td>
 			        <td th:text="${venueOrderVO.bookDate}"></td>
 			        <td th:text="${venueOrderVO.startAt} + '~' + ${venueOrderVO.endAt}"></td>
 			        <td>

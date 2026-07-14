@@ -187,3 +187,13 @@ h1 { font-size: 24px; font-weight: 600; color: #333; margin-bottom: 1.5rem; }
     opacity: 0.4;
     cursor: not-allowed;
 }
+
+.btn-danger-submit { background: #dc3545; }
+.btn-danger-submit:hover { background: #bd2130; }
+
+.cancel-label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #555;
+}

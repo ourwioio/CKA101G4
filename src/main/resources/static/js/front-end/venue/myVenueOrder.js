@@ -138,4 +138,33 @@ function renderPaginationButtons(totalPages, page) {
     }
 }
 
+function openCancelModal(btn) {
+    var orderId = btn.getAttribute('data-order-id');
+    document.getElementById('cancelOrderId').value = orderId;
+    document.getElementById('cancelReason').value = '';
+    document.getElementById('cancelModalOverlay').style.display = 'flex';
+}
+
+function closeCancelModal() {
+    document.getElementById('cancelModalOverlay').style.display = 'none';
+}
+
+document.getElementById('cancelModalOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeCancelModal();
+});
+
+document.getElementById('cancelForm').addEventListener('submit', function (e) {
+    var reason = document.getElementById('cancelReason').value.trim();
+
+    if (!reason) {
+        e.preventDefault();
+        alert('請輸入取消原因');
+        return;
+    }
+
+    if (!confirm('確定要取消這筆訂單嗎？取消後將無法復原。')) {
+        e.preventDefault();
+    }
+});
+
 document.addEventListener('DOMContentLoaded', initPagination);

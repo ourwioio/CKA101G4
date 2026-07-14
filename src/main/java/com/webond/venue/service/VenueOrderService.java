@@ -72,6 +72,14 @@ public class VenueOrderService {
 	public List<VenueOrderVO> getMyAllCompletedBookings(Integer memberId){
 		return repository.findPaidOrdersByVenueOwner(memberId, (byte) 3);
 	}
+	
+	public List<VenueOrderVO> getAllRefundStatus(){
+		return repository.findByRefundStatus((byte) 0);
+	}
+	
+	public List<VenueOrderVO> getAllPayoutAmount(){
+		return repository.findByPayoutAmount((byte) 0); 
+	}
 
 	
 }
