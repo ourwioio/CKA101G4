@@ -1,0 +1,158 @@
+/* ==========================================================
+   navbar.css
+   建議路徑：src/main/resources/static/css/navbar.css
+   在頁面 <head> 引入：
+     <link rel="stylesheet" th:href="@{/css/navbar.css}">
+
+   下面的 :root 只列出 navbar 實際用到的 design tokens。
+   如果全站已有共用的 tokens 檔案（例如 tokens.css），
+   建議把這段 :root 搬過去合併，這裡就可以整段刪除，
+   避免多個檔案重複宣告同一組變數。
+   ========================================================== */
+:root{
+  --color-surface:       #FFFFFF;
+  --color-surface-soft:  #FFFDF8;
+  --color-ink:           #17140F;
+  --color-ink-soft:      #726A5F;
+  --color-border:        #ECE4D6;
+
+  --color-yellow:       #FFE59A;
+  --color-yellow-deep:  #FFC94D;
+  --color-pink:         #FFB5C1;
+
+  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+  --radius-full: 999px;
+
+  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+
+  --nav-height: 76px;
+}
+
+/* ==========================================================
+   浮動導覽列
+   ========================================================== */
+.navbar{
+  position: fixed;
+  top: 16px; left: 16px; right: 16px;
+  z-index: 100;
+}
+.navbar__inner{
+  max-width: 1200px;
+  margin: 0 auto;
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  padding: 8px 10px 8px 22px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+}
+
+.navbar__logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-shrink:0;
+  text-decoration:none;
+  color:inherit;
+}
+.navbar__logo-mark{ display:flex; gap:5px; }
+.navbar__logo-eye{
+  position:relative;
+  width:15px; height:15px;
+  background: var(--color-ink);
+  border-radius:50%;
+}
+.navbar__logo-eye::after{
+  content:'';
+  position:absolute;
+  width:4px; height:4px;
+  top:3px; left:3px;
+  background:#fff;
+  border-radius:50%;
+}
+.navbar__logo-text{ display:flex; flex-direction:column; line-height:1.1; font-family: var(--font-display); }
+.navbar__logo-text .t{ font-weight:800; font-size:17px; letter-spacing:0.5px; }
+.navbar__logo-text .s{ font-size:10px; color:var(--color-ink-soft); font-weight:500; letter-spacing:1px; }
+
+.navbar__links{
+  display:flex;
+  align-items:center;
+  gap:28px;
+  font-weight:700;
+  font-size:13.5px;
+  letter-spacing:0.5px;
+  list-style:none;
+  margin:0;
+  padding:0;
+  font-family: var(--font-body);
+}
+.navbar__links a{
+  position:relative;
+  padding:4px 0;
+  transition: color .15s ease;
+  text-decoration:none;
+  color:inherit;
+}
+.navbar__links a:hover{ color: var(--color-ink); }
+.navbar__links a::after{
+  content:'';
+  position:absolute; left:0; right:0; bottom:-2px;
+  height:2px; background: var(--color-yellow-deep);
+  transform: scaleX(0); transform-origin:left;
+  transition: transform .2s ease;
+}
+.navbar__links a:hover::after{ transform: scaleX(1); }
+
+.navbar__actions{ display:flex; align-items:center; gap:8px; }
+
+.icon-dot{
+  position:relative;
+  width:42px; height:42px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%;
+  background: var(--color-surface);
+  border:1.5px solid var(--color-border);
+  color: var(--color-ink);
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+  text-decoration:none;
+}
+.icon-dot svg{ width:18px; height:18px; }
+.icon-dot:hover{ transform: translateY(-2px); background: var(--color-ink); color:#fff; border-color:var(--color-ink); }
+.icon-dot[aria-disabled="true"]{ opacity:.85; }
+
+.icon-dot--fill{
+  background: var(--color-ink);
+  color:#fff;
+  border:none;
+}
+.icon-dot--fill:hover{ background: var(--color-yellow-deep); color: var(--color-ink); }
+
+.badge-dot{
+  position:absolute;
+  top:-3px; right:-3px;
+  min-width:18px; height:18px;
+  padding:0 4px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:800;
+  border-radius: var(--radius-full);
+  background: var(--color-pink);
+  color: var(--color-ink);
+  border:2px solid var(--color-surface);
+  animation: pop .25s ease;
+}
+@keyframes pop{ from{ transform:scale(0);} to{ transform:scale(1);} }
+
+/* RWD：手機隱藏文字導覽連結 */
+@media (max-width: 760px){
+  .navbar__links{ display:none; }
+}
+@media (max-width: 520px){
+  .navbar__logo-text .s{ display:none; }
+}

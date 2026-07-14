@@ -4,8 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>活動管理</title>
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 <body class="bg-gray-100 p-8">
 
 	<div class="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6">

@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>雙欄私訊聊天室</title>
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <style>
 .container {
 	display: flex;
@@ -53,6 +55,7 @@
 }
 </style>
 </head>
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 <body onload="connect();">
 
 	<h2>
