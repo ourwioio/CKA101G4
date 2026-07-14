@@ -194,5 +194,14 @@ public interface ServiceOrderRepository
            """)
     Long countPendingRefundOrders();
     
+
+    // =========================================================
+    // 評價查詢
+    // =========================================================
+
+    
+    List<ServiceOrderVO> findBySellerMemberIdAndBuyerReviewCommentIsNotNull(Integer sellerMemberId);
+
+    List<ServiceOrderVO> findByBuyerMemberIdAndSellerReviewCommentIsNotNull(Integer buyerMemberId);
     
 }

@@ -748,6 +748,7 @@
                 </div>
 
                 <div class="buyer-action-buttons">
+                  
 
                     <a class="btn btn-secondary"
                        th:href="@{/front/services/{serviceId}(
@@ -790,6 +791,10 @@
                 </div>
 
                 <div class="buyer-action-buttons">
+                	<a class="btn btn-secondary"
+                     	th:href="@{/orderReview/write/{orderId}(orderId=${order.serviceOrderId})}">
+                        評價
+                    </a>
 
                     <a class="btn btn-secondary"
                        th:href="@{/front/services/{serviceId}(

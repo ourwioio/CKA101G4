@@ -31,5 +31,10 @@ public interface ActivityOrderRepository extends JpaRepository<ActivityOrderVO, 
 	@Query("select coalesce(sum(o.bookingCount), 0) from ActivityOrderVO o where o.activityId = :activityId and o.orderStatus = :orderStatus")
 	Integer sumBookingCountByActivityIdAndOrderStatus(@Param("activityId") Integer activityId,
 			@Param("orderStatus") Byte orderStatus);
+	
+//	評價
+	@Query("SELECT o FROM ActivityOrderVO o JOIN ActivityVO a ON o.activityId = a.activityId " +
+		       "WHERE a.memberId = :hostMemberId AND o.buyerReviewComment IS NOT NULL")
+		List<ActivityOrderVO> findHostReviews(@Param("hostMemberId") Integer hostMemberId);
 
 }

@@ -108,14 +108,34 @@
 
     <!-- ========== 最近評論 ========== -->
     <div class="section">
-      <h2 class="section-title">最近評論</h2>
-      <div class="reviews-container">
-        <!-- 這裡需要從後端傳來評論列表 -->
-        <div class="no-reviews">
-          <p>📝 暫無評論</p>
-        </div>
-      </div>
-    </div>
+  <h2 class="section-title">最近評論</h2>
+
+  <!-- 切換鍵 -->
+  <div class="review-tabs" th:if="${!reviews.isEmpty()}">
+	    <button type="button" class="tab-btn active" data-filter="all" onclick="filterReviews('all', this)">全部</button>
+	    <button type="button" class="tab-btn" data-filter="AS_SELLER" onclick="filterReviews('AS_SELLER', this)">賣家評價</button>
+	    <button type="button" class="tab-btn" data-filter="AS_BUYER" onclick="filterReviews('AS_BUYER', this)">買家評價</button>
+	    <button data-filter="AS_ACTIVITY_HOST" onclick="filterReviews('AS_ACTIVITY_HOST', this)">活動主辦</button>
+		<button data-filter="AS_VENUE_OWNER" onclick="filterReviews('AS_VENUE_OWNER', this)">場地提供</button>
+	  </div>
+	
+	  <div class="reviews-container" th:if="${!reviews.isEmpty()}">
+	    <div class="review-item"
+	         th:each="review : ${reviews}"
+	         th:data-role="${review.role}">
+	      <p th:text="${review.comment}"></p>
+	      <span th:text="${review.rating} + ' 星'"></span>
+	      <span th:text="${#temporals.format(review.reviewedAt, 'yyyy-MM-dd')}"></span>
+	      <span th:text="${review.role == 'AS_SERVICE_SELLER'} ? '服務賣家' : 
+              (${review.role == 'AS_SERVICE_BUYER'} ? '服務買家' :
+              (${review.role == 'AS_ACTIVITY_HOST'} ? '活動主辦' : '場地提供'))"></span>
+	    </div>
+	  </div>
+	
+	  <div class="no-reviews" th:unless="${!reviews.isEmpty()}">
+	    <p>📝 暫無評論</p>
+	  </div>
+	</div>
 
     <!-- 服務區塊 -->
     <section class="section">
