@@ -39,12 +39,27 @@
             margin-bottom: 20px; 
             text-align: left;
         }
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
         label { 
-            display: block; 
-            margin-bottom: 6px; 
             font-weight: 600; 
             color: #0c4a6e; 
             font-size: 14px;
+        }
+        .forgot-link {
+            font-size: 13px;
+            color: #0284c7;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+        .forgot-link:hover {
+            color: #0369a1;
+            text-decoration: underline;
         }
         input[type="text"], input[type="email"], input[type="password"] { 
             width: 100%; 
@@ -79,7 +94,7 @@
             background: #0284c7; 
         }
         
-        /* 🎯 完美同步：老師範例中的高質感錯誤訊息提示框 */
+        /* 🎯 高質感錯誤訊息提示框 (紅色) */
         .error-message {
             padding: 0.75rem; 
             font-size: 0.875rem; 
@@ -98,7 +113,29 @@
             height: 1.25rem; 
             margin-right: 0.5rem; 
             fill: currentColor;
-            flex-shrink: 0; /* 防止圖標被文字擠壓變形 */
+            flex-shrink: 0;
+        }
+
+        /* 🟢 高質感成功訊息提示框 (綠色) */
+        .success-message {
+            padding: 0.75rem; 
+            font-size: 0.875rem; 
+            color: #15803d; 
+            background-color: #dcfce7; 
+            border: 1px solid #86efac; 
+            border-radius: 0.5rem; 
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .success-message svg {
+            width: 1.25rem; 
+            height: 1.25rem; 
+            margin-right: 0.5rem; 
+            fill: currentColor;
+            flex-shrink: 0;
         }
 
         .register-link {
@@ -120,6 +157,13 @@
     <h2>歡迎回來 Webond</h2>
     <p class="subtitle">請輸入您的帳號密碼進行登入</p>
     
+    <div class="success-message" th:if="${successMsg != null}">
+        <svg viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+        </svg>
+        <span th:text="${successMsg}">操作成功！</span>
+    </div>
+
     <div class="error-message" th:if="${errorMsgs != null}">
         <svg viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
@@ -135,7 +179,10 @@
         </div>
         
         <div class="form-group">
-            <label for="password">密碼 *</label>
+            <div class="label-row">
+                <label for="password">密碼 *</label>
+                <a th:href="@{/member/forgotPassword}" class="forgot-link">忘記密碼？</a>
+            </div>
             <input type="password" id="password" name="password" placeholder="請輸入密碼" required>
         </div>
 
@@ -143,7 +190,7 @@
     </form>
     
     <div class="register-link">
-        還項目沒有帳號嗎？ <a th:href="@{/member/register}">立即註冊</a>
+        還沒有帳號嗎？ <a th:href="@{/member/register}">立即註冊</a>
     </div>
 </div>
 

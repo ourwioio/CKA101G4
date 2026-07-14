@@ -3,7 +3,10 @@ package com.webond.member.controller;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -97,7 +100,7 @@ public class MemberControllerLoie {
 			session.setAttribute("account", memberVO.getEmail());
 
 			String location = (String) session.getAttribute("location");
-			return "redirect:" + (location != null ? location : "/member/memberSelect_page");
+			return "redirect:" + (location != null ? location : "/");
 
 		} else {
 			model.addAttribute("email", email);
@@ -107,7 +110,109 @@ public class MemberControllerLoie {
 	}
 
 	// =========================================================================
-	// 📝 API 2：註冊表單送出（已修正身分證正反面分開處理與暫存問題）
+	// 🔑 忘記密碼模組 (Redis 串接)
+	// =========================================================================
+
+	// 1. 前往忘記密碼頁面
+	@GetMapping("/forgotPassword")
+	public String forgotPasswordPage() {
+		return "front-end/member/forgotPassword";
+	}
+
+	// 2. AJAX 發送忘記密碼驗證碼至 Redis
+	@PostMapping("/send-forgot-otp")
+	@ResponseBody
+	public Map<String, Object> sendForgotOtp(@RequestParam String email) {
+		Map<String, Object> result = new HashMap<>();
+
+		if (email == null || email.trim().isEmpty()) {
+			result.put("success", false);
+			result.put("message", "請輸入 Email！");
+			return result;
+		}
+
+		// 檢查 60 秒冷卻
+		if (redisService.isCoolingDown(email)) {
+			result.put("success", false);
+			result.put("message", "請求過於頻繁，請稍後再試！");
+			return result;
+		}
+
+		// 檢查 Email 是否有註冊過
+		MemberVO memberVO = memberService.findByEmail(email.trim());
+		if (memberVO == null) {
+			result.put("success", false);
+			result.put("message", "該 Email 尚未註冊會員！");
+			return result;
+		}
+
+		// 產生 6 位數隨機數字驗證碼
+		String otpCode = String.format("%06d", new Random().nextInt(900000) + 100000);
+
+		// 存入 Redis (5 分鐘有效，60 秒冷卻)
+		redisService.saveForgotOtp(email, otpCode);
+
+		// TODO: 呼叫 MailService 寄出信件
+		System.out.println("【重設密碼測試】發送驗證碼至 " + email + " 驗證碼為：" + otpCode);
+
+		result.put("success", true);
+		result.put("message", "驗證碼已寄至您的信箱，請於 5 分鐘內輸入！");
+		return result;
+	}
+
+	// 3. 送出重設密碼表單
+	@PostMapping("/resetPassword")
+	public String resetPassword(
+			@RequestParam String email,
+			@RequestParam String otpCode,
+			@RequestParam String newPassword,
+			RedirectAttributes redirectAttributes,
+			Model model) {
+
+		boolean hasError = false;
+
+		// 1. 檢查 Email 是否存在
+		MemberVO memberVO = memberService.findByEmail(email);
+		if (memberVO == null) {
+			model.addAttribute("emailError", "找不到該 Email 對應的帳號！");
+			hasError = true;
+		}
+
+		// 2. 檢查 Redis 內的驗證碼
+		String realOtp = redisService.getForgotOtp(email);
+		if (realOtp == null) {
+			model.addAttribute("otpError", "驗證碼已過期或未發送，請重新取得！");
+			hasError = true;
+		} else if (!realOtp.equals(otpCode.trim())) {
+			model.addAttribute("otpError", "驗證碼不正確！");
+			hasError = true;
+		}
+
+		// 3. 檢查新密碼
+		if (newPassword == null || newPassword.trim().isEmpty()) {
+			model.addAttribute("passwordError", "新密碼請勿空白！");
+			hasError = true;
+		}
+
+		// 若驗證失敗，返回重設頁面並帶回原本輸入的 Email
+		if (hasError) {
+			model.addAttribute("email", email);
+			return "front-end/member/forgotPassword";
+		}
+
+		// 4. 更新 DB 密碼
+		memberVO.setPasswordHash(passwordEncoder.encode(newPassword));
+		memberService.updateMember(memberVO);
+
+		// 5. 密碼重設成功，清理 Redis 驗證碼
+		redisService.deleteForgotOtp(email);
+
+		redirectAttributes.addFlashAttribute("successMsg", "密碼重設成功，請使用新密碼登入！");
+		return "redirect:/member/login";
+	}
+
+	// =========================================================================
+	// 📝 API 2：註冊表單送出（對齊前端個別欄位下方顯示錯誤提示）
 	// =========================================================================
 	@PostMapping("/doRegister")
 	public String doRegister(@Valid MemberVO memberVO, BindingResult result,
@@ -122,19 +227,18 @@ public class MemberControllerLoie {
 			@RequestParam(name = "tempIdBackImage", required = false) String tempIdBackImage,           // 🟢 反面暫存
 			@RequestParam(name = "tempIdImage", required = false) String tempIdImage,                   // 🟢 相容舊隱藏欄位
 			@RequestParam(name = "tempFaceImage", required = false) String tempFaceImage, 
-			HttpSession session, Model model) { // 🟢 修正：補上 HttpSession session 參數
+			HttpSession session, Model model) {
 
-		// 1. 處理密碼
+		// 1. 處理密碼驗證（掛至 passwordHash 欄位下方）
 		if (rawPassword == null || rawPassword.trim().isEmpty()) {
 			result.rejectValue("passwordHash", "error.passwordHash", "密碼請勿空白");
 		} else {
 			memberVO.setPasswordHash(passwordEncoder.encode(rawPassword));
 		}
 
-		// 2. 驗證碼檢查
+		// 2. 驗證碼檢查（傳至 otpError Key 供獨立顯示）
 		if (inputOtpCode == null || inputOtpCode.trim().isEmpty()) {
 			model.addAttribute("otpError", "請輸入信箱驗證碼！");
-			result.reject("error.otpCode", "請輸入信箱驗證碼");
 		}
 
 		// 3. 處理圖片（頭像與人臉）
@@ -150,10 +254,9 @@ public class MemberControllerLoie {
 			idFrontBytes = processImageBytes(null, tempIdImage);
 		}
 
-		// 組合身分證 bytes (若正反都有，合存入 idImage 欄位；亦可只拿正面作為主要標示)
+		// 組合身分證 bytes 供 Entity 儲存
 		byte[] finalIdImageBytes = idFrontBytes;
 		if (idFrontBytes != null && idFrontBytes.length > 0 && idBackBytes != null && idBackBytes.length > 0) {
-			// 將正反兩張合存成 JSON / 字串格式存入資料庫 byte[]，或優先取正面
 			String combinedBase64 = "{\"front\":\"" + encodeToBase64(idFrontBytes) + "\",\"back\":\"" + encodeToBase64(idBackBytes) + "\"}";
 			finalIdImageBytes = combinedBase64.getBytes();
 		}
@@ -162,9 +265,15 @@ public class MemberControllerLoie {
 		memberVO.setIdImage(finalIdImageBytes);
 		memberVO.setFaceImage(faceImageBytes);
 
-		// 🟢 嚴格檢查：正面與反面都必須存在！
-		if (idFrontBytes == null || idFrontBytes.length == 0 || idBackBytes == null || idBackBytes.length == 0) {
-			result.rejectValue("idImage", "error.idImage", "請務必上傳身分證件照片（包含正面與反面）");
+		// 🟢 嚴格檢查：將身分證正反面與人臉照片錯誤精確分派給對應 Key/欄位
+		boolean hasImageError = false;
+		if (idFrontBytes == null || idFrontBytes.length == 0) {
+			model.addAttribute("idFrontImageError", "請務必上傳身分證【正面】照片！");
+			hasImageError = true;
+		}
+		if (idBackBytes == null || idBackBytes.length == 0) {
+			model.addAttribute("idBackImageError", "請務必上傳身分證【反面】照片！");
+			hasImageError = true;
 		}
 		if (faceImageBytes == null || faceImageBytes.length == 0) {
 			result.rejectValue("faceImage", "error.faceImage", "請務必上傳自拍人臉圖片");
@@ -176,8 +285,8 @@ public class MemberControllerLoie {
 		memberVO.setCreatedAt(java.time.LocalDate.now());
 		memberVO.setSubmittedAt(java.time.LocalDateTime.now());
 
-		// 🟢 4. 驗證失敗處理：將正面、反面、人臉及頭像暫存分別存入 Model 返回前端渲染！
-		if (result.hasErrors()) {
+		// 🟢 4. 驗證失敗處理：將正面、反面、人臉及頭像暫存分別存入 Model 返回前端渲染
+		if (result.hasErrors() || hasImageError || model.containsAttribute("otpError")) {
 			model.addAttribute("memberVO", memberVO);
 			model.addAttribute("rawPassword", rawPassword);
 			model.addAttribute("inputOtpCode", inputOtpCode);
@@ -193,14 +302,13 @@ public class MemberControllerLoie {
 		try {
 			memberService.registerMember(memberVO);
 
-			// 註冊成功，清理 Redis 驗證碼
-			redisService.deleteOtp(memberVO.getEmail());
+			// 註冊成功，清理 Redis 註冊驗證碼
+			redisService.deleteRegisterOtp(memberVO.getEmail());
 
 			// 🟢【登入與跳轉】自動將註冊帳號寫入 Session 保持登入狀態
 			session.setAttribute("memberVO", memberVO);
 			session.setAttribute("account", memberVO.getEmail());
 
-			// 🟢【重定向】跳轉回首頁 (若專案首頁路由是 /index，請自行調整為 return "redirect:/index";)
 			return "redirect:/"; 
 
 		} catch (Exception e) {

@@ -9,49 +9,83 @@ import org.springframework.stereotype.Service;
 @Service
 public class RedisService {
 
-    @Autowired
-    private StringRedisTemplate redisTemplate;
+	@Autowired
+	private StringRedisTemplate redisTemplate;
 
-    // 定義 Key 的前綴，方便在 Redis Insight 中分類管理
-    private static final String OTP_PREFIX = "auth:otp:";
-    private static final String COOL_DOWN_PREFIX = "auth:cooldown:";
+	// 💡 Key 前綴設計：依業務類別區分
+	private static final String REGISTER_OTP_PREFIX = "auth:register:otp:";
+	private static final String FORGOT_OTP_PREFIX = "auth:forgot:otp:";
+	private static final String COOL_DOWN_PREFIX = "auth:cooldown:";
 
-    /**
-     * 1. 檢查是否處於 60 秒冷卻期 (防刷機制)
-     */
-    public boolean isCoolingDown(String email) {
-        String key = COOL_DOWN_PREFIX + email.trim();
-        return Boolean.TRUE.equals(redisTemplate.hasKey(key));
-    }
+	// =========================================================================
+	// 1. 防刷冷卻機制 (60 秒)
+	// =========================================================================
 
-    /**
-     * 2. 存入驗證碼 (有效期限 5 分鐘) 並設定 60 秒冷卻時間
-     */
-    public void saveOtp(String email, String otpCode) {
-        String cleanEmail = email.trim();
-        String otpKey = OTP_PREFIX + cleanEmail;
-        String coolDownKey = COOL_DOWN_PREFIX + cleanEmail;
+	/**
+	 * 檢查是否處於 60 秒發送冷卻期
+	 */
+	public boolean isCoolingDown(String email) {
+		String key = COOL_DOWN_PREFIX + email.trim();
+		return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+	}
 
-        // 寫入驗證碼，TTL 設定 10 分鐘
-        redisTemplate.opsForValue().set(otpKey, otpCode, 10, TimeUnit.MINUTES);
+	/**
+	 * 設定 60 秒發送冷卻 Key
+	 */
+	private void setCoolDown(String email) {
+		String key = COOL_DOWN_PREFIX + email.trim();
+		redisTemplate.opsForValue().set(key, "1", 60, TimeUnit.SECONDS);
+	}
 
-        // 寫入冷卻 Key，TTL 設定 60 秒 (值隨便設即可)
-        redisTemplate.opsForValue().set(coolDownKey, "1", 60, TimeUnit.SECONDS);
-    }
+	// =========================================================================
+	// 2. 註冊 OTP 邏輯 (有效時間 10 分鐘)
+	// =========================================================================
 
-    /**
-     * 3. 從 Redis 讀取驗證碼
-     */
-    public String getOtp(String email) {
-        String key = OTP_PREFIX + email.trim();
-        return redisTemplate.opsForValue().get(key);
-    }
+	public void saveRegisterOtp(String email, String otpCode) {
+		String key = REGISTER_OTP_PREFIX + email.trim();
+		redisTemplate.opsForValue().set(key, otpCode, 10, TimeUnit.MINUTES);
+		setCoolDown(email);
+	}
 
-    /**
-     * 4. 驗證成功後刪除 Redis 中的驗證碼 (避免重複被使用)
-     */
-    public void deleteOtp(String email) {
-        String key = OTP_PREFIX + email.trim();
-        redisTemplate.delete(key);
-    }
+	public String getRegisterOtp(String email) {
+		return redisTemplate.opsForValue().get(REGISTER_OTP_PREFIX + email.trim());
+	}
+
+	public void deleteRegisterOtp(String email) {
+		redisTemplate.delete(REGISTER_OTP_PREFIX + email.trim());
+	}
+
+	// =========================================================================
+	// 3. 忘記密碼 OTP 邏輯 (有效時間 5 分鐘)
+	// =========================================================================
+
+	public void saveForgotOtp(String email, String otpCode) {
+		String key = FORGOT_OTP_PREFIX + email.trim();
+		redisTemplate.opsForValue().set(key, otpCode, 5, TimeUnit.MINUTES);
+		setCoolDown(email);
+	}
+
+	public String getForgotOtp(String email) {
+		return redisTemplate.opsForValue().get(FORGOT_OTP_PREFIX + email.trim());
+	}
+
+	public void deleteForgotOtp(String email) {
+		redisTemplate.delete(FORGOT_OTP_PREFIX + email.trim());
+	}
+
+	// =========================================================================
+	// 4. 相容舊方法 (預設對應註冊模組，避免修改 Controller 時編譯錯誤)
+	// =========================================================================
+
+	public void saveOtp(String email, String otpCode) {
+		saveRegisterOtp(email, otpCode);
+	}
+
+	public String getOtp(String email) {
+		return getRegisterOtp(email);
+	}
+
+	public void deleteOtp(String email) {
+		deleteRegisterOtp(email);
+	}
 }
