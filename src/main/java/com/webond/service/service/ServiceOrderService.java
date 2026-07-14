@@ -94,10 +94,10 @@ public class ServiceOrderService {
 	// =========================================================
 
 	// 賣家有 60 秒確認申請
-	private static final long SELLER_CONFIRM_SECONDS = 60;
+	private static final long SELLER_CONFIRM_SECONDS = 180;
 
 	// 買家有 30 秒付款
-	private static final long BUYER_PAYMENT_SECONDS = 30;
+	private static final long BUYER_PAYMENT_SECONDS = 60;
 
 	private final ServiceOrderRepository orderRepo;
 	private final ServiceRepository serviceRepo;
@@ -228,103 +228,81 @@ public class ServiceOrderService {
 	// 賣家接受其中一筆申請
 	//
 	// 1. 選中的訂單進入待付款
-	// 2. 時段鎖定 30 秒
-	// 3. WebSocket 推播時段已鎖定
-	// 4. 其他相同時段的待確認申請由系統取消
+	// 2. 時段暫時鎖定
+	// 3. 其他相同時段的申請先保留
+	// 4. 等買家付款成功後，才取消其他申請
 	// =========================================================
 
-	public ServiceOrderVO acceptRequest(Integer orderId, String sellerRequirementNote) {
+	public ServiceOrderVO acceptRequest(Integer orderId,
+	                                    String sellerRequirementNote) {
 
-		ServiceOrderVO order = getOrderOrThrow(orderId);
+	    ServiceOrderVO order = getOrderOrThrow(orderId);
 
-		if (!Byte.valueOf(ORDER_PENDING_SELLER_CONFIRM).equals(order.getOrderStatus())) {
+	    if (!Byte.valueOf(ORDER_PENDING_SELLER_CONFIRM)
+	            .equals(order.getOrderStatus())) {
 
-			throw new RuntimeException("此訂單不是待賣家確認狀態");
-		}
+	        throw new RuntimeException("此訂單不是待賣家確認狀態");
+	    }
 
-		LocalDateTime now = LocalDateTime.now();
+	    LocalDateTime now = LocalDateTime.now();
 
-		LocalDateTime sellerExpiresAt = order.getSellerConfirmExpiresAt();
+	    LocalDateTime sellerExpiresAt = order.getSellerConfirmExpiresAt();
 
-		if (sellerExpiresAt != null && !now.isBefore(sellerExpiresAt)) {
+	    if (sellerExpiresAt != null
+	            && !now.isBefore(sellerExpiresAt)) {
 
-			throw new RuntimeException("賣家確認期限已過");
-		}
+	        throw new RuntimeException("賣家確認期限已過");
+	    }
 
-		ServiceSlotVO slot = getSlotOrThrow(order.getServiceSlotId());
+	    ServiceSlotVO slot = getSlotOrThrow(order.getServiceSlotId());
 
-		if (!Byte.valueOf(SLOT_AVAILABLE).equals(slot.getSlotStatus())) {
+	    if (!Byte.valueOf(SLOT_AVAILABLE)
+	            .equals(slot.getSlotStatus())) {
 
-			throw new RuntimeException("此時段已被其他訂單鎖定或預約");
-		}
+	        throw new RuntimeException("此時段已有其他買家正在付款或已完成預約");
+	    }
 
-		LocalDateTime paymentExpiresAt = now.plusSeconds(BUYER_PAYMENT_SECONDS);
+	    LocalDateTime paymentExpiresAt =
+	            now.plusSeconds(BUYER_PAYMENT_SECONDS);
 
-		// -----------------------------------------------------
-		// 選中的訂單進入待付款
-		// -----------------------------------------------------
+	    // 選中的訂單進入待付款
+	    order.setOrderStatus(ORDER_PENDING_PAYMENT);
 
-		order.setOrderStatus(ORDER_PENDING_PAYMENT);
+	    order.setSellerRequirementNote(
+	            normalizeNullableText(sellerRequirementNote)
+	    );
 
-		order.setSellerRequirementNote(normalizeNullableText(sellerRequirementNote));
+	    // 賣家已完成確認
+	    order.setSellerConfirmExpiresAt(null);
 
-		// 賣家已完成確認
-		order.setSellerConfirmExpiresAt(null);
+	    // 設定付款期限
+	    order.setPaymentExpiresAt(paymentExpiresAt);
 
-		// 買家有 30 秒付款
-		order.setPaymentExpiresAt(paymentExpiresAt);
+	    // 時段暫時鎖定
+	    slot.setSlotStatus(SLOT_LOCKED);
+	    slot.setLockExpiresAt(paymentExpiresAt);
 
-		// -----------------------------------------------------
-		// 時段鎖定 30 秒
-		// -----------------------------------------------------
+	    slotRepo.save(slot);
 
-		slot.setSlotStatus(SLOT_LOCKED);
+	    ServiceOrderVO savedOrder = orderRepo.save(order);
 
-		slot.setLockExpiresAt(paymentExpiresAt);
+	    /*
+	     * 注意：
+	     * 這裡不再取消其他相同時段的申請。
+	     *
+	     * 其他申請維持：
+	     * ORDER_STATUS = 0 待賣家確認
+	     *
+	     * 如果目前買家付款逾期，
+	     * 時段釋放後，賣家還可以接受其他申請。
+	     */
 
-		slotRepo.save(slot);
+	    // WebSocket：通知前端此時段暫時鎖定
+	    publishSlotStatus(savedOrder, SLOT_LOCKED);
 
-		ServiceOrderVO savedOrder = orderRepo.save(order);
-
-		// -----------------------------------------------------
-		// 取消其他相同時段的待確認申請
-		// -----------------------------------------------------
-
-		List<ServiceOrderVO> otherOrders = orderRepo.findByServiceSlotIdAndOrderStatusAndServiceOrderIdNot(
-				order.getServiceSlotId(), ORDER_PENDING_SELLER_CONFIRM, order.getServiceOrderId());
-
-		for (ServiceOrderVO otherOrder : otherOrders) {
-
-			otherOrder.setOrderStatus(ORDER_CANCELLED);
-
-			otherOrder.setCancelledByRole(CANCEL_BY_SYSTEM);
-
-			otherOrder.setCancelReason("此時段已有其他申請獲得賣家接受");
-
-			otherOrder.setCancelledAt(now);
-
-			otherOrder.setSellerConfirmExpiresAt(null);
-			otherOrder.setPaymentExpiresAt(null);
-
-			// 尚未付款，不需要退款
-			otherOrder.setRefundStatus(REFUND_NONE);
-
-			otherOrder.setRefundAmount(0);
-
-			otherOrder.setPayoutStatus(PAYOUT_UNPAID);
-
-			otherOrder.setHandledAt(null);
-		}
-
-		if (!otherOrders.isEmpty()) {
-			orderRepo.saveAll(otherOrders);
-		}
-
-		// WebSocket：通知所有前端此時段已暫時鎖定
-		publishSlotStatus(savedOrder, SLOT_LOCKED);
-
-		return savedOrder;
+	    return savedOrder;
 	}
+
 
 	// =========================================================
 	// 賣家拒絕申請
@@ -370,60 +348,116 @@ public class ServiceOrderService {
 	// =========================================================
 	// 買家付款成功
 	//
-	// 訂單變成已成立。
-	// 時段變成已預約並透過 WebSocket 推播。
+	// 1. 付款訂單變成已成立
+	// 2. 時段變成已預約
+	// 3. 取消其他相同時段仍在待確認的申請
+	// 4. WebSocket 推播時段已預約
 	// =========================================================
 
-	public ServiceOrderVO paySuccess(Integer orderId, Byte paymentMethod) {
+	public ServiceOrderVO paySuccess(Integer orderId,
+	                                 Byte paymentMethod) {
 
-		ServiceOrderVO order = getOrderOrThrow(orderId);
+	    ServiceOrderVO order = getOrderOrThrow(orderId);
 
-		if (!Byte.valueOf(ORDER_PENDING_PAYMENT).equals(order.getOrderStatus())) {
+	    if (!Byte.valueOf(ORDER_PENDING_PAYMENT)
+	            .equals(order.getOrderStatus())) {
 
-			throw new RuntimeException("此訂單不是待付款狀態");
-		}
+	        throw new RuntimeException("此訂單不是待付款狀態");
+	    }
 
-		validatePaymentMethod(paymentMethod);
+	    validatePaymentMethod(paymentMethod);
 
-		LocalDateTime now = LocalDateTime.now();
+	    LocalDateTime now = LocalDateTime.now();
 
-		LocalDateTime paymentExpiresAt = order.getPaymentExpiresAt();
+	    LocalDateTime paymentExpiresAt =
+	            order.getPaymentExpiresAt();
 
-		if (paymentExpiresAt != null && !now.isBefore(paymentExpiresAt)) {
+	    if (paymentExpiresAt != null
+	            && !now.isBefore(paymentExpiresAt)) {
 
-			throw new RuntimeException("付款期限已過");
-		}
+	        throw new RuntimeException("付款期限已過");
+	    }
 
-		ServiceSlotVO slot = getSlotOrThrow(order.getServiceSlotId());
+	    ServiceSlotVO slot =
+	            getSlotOrThrow(order.getServiceSlotId());
 
-		if (!Byte.valueOf(SLOT_LOCKED).equals(slot.getSlotStatus())) {
+	    if (!Byte.valueOf(SLOT_LOCKED)
+	            .equals(slot.getSlotStatus())) {
 
-			throw new RuntimeException("此時段目前不是待付款鎖定狀態");
-		}
+	        throw new RuntimeException("此時段目前不是待付款鎖定狀態");
+	    }
 
-		if (slot.getLockExpiresAt() != null && !now.isBefore(slot.getLockExpiresAt())) {
+	    if (slot.getLockExpiresAt() != null
+	            && !now.isBefore(slot.getLockExpiresAt())) {
 
-			throw new RuntimeException("時段鎖定期限已過");
-		}
+	        throw new RuntimeException("時段鎖定期限已過");
+	    }
 
-		order.setOrderStatus(ORDER_CONFIRMED);
+	    // -----------------------------------------------------
+	    // 付款訂單正式成立
+	    // -----------------------------------------------------
 
-		order.setServicePaymentMethod(paymentMethod);
+	    order.setOrderStatus(ORDER_CONFIRMED);
 
-		order.setPaymentExpiresAt(null);
+	    order.setServicePaymentMethod(paymentMethod);
 
-		slot.setSlotStatus(SLOT_BOOKED);
+	    order.setPaymentExpiresAt(null);
 
-		slot.setLockExpiresAt(null);
+	    // -----------------------------------------------------
+	    // 時段正式變成已預約
+	    // -----------------------------------------------------
 
-		slotRepo.save(slot);
+	    slot.setSlotStatus(SLOT_BOOKED);
 
-		ServiceOrderVO savedOrder = orderRepo.save(order);
+	    slot.setLockExpiresAt(null);
 
-		// WebSocket：通知所有前端此時段已預約
-		publishSlotStatus(savedOrder, SLOT_BOOKED);
+	    slotRepo.save(slot);
 
-		return savedOrder;
+	    ServiceOrderVO savedOrder = orderRepo.save(order);
+
+	    // -----------------------------------------------------
+	    // 付款成功後，才取消其他相同時段的待確認申請
+	    // -----------------------------------------------------
+
+	    List<ServiceOrderVO> otherOrders =
+	            orderRepo.findByServiceSlotIdAndOrderStatusAndServiceOrderIdNot(
+	                    order.getServiceSlotId(),
+	                    ORDER_PENDING_SELLER_CONFIRM,
+	                    order.getServiceOrderId()
+	            );
+
+	    for (ServiceOrderVO otherOrder : otherOrders) {
+
+	        otherOrder.setOrderStatus(ORDER_CANCELLED);
+
+	        otherOrder.setCancelledByRole(CANCEL_BY_SYSTEM);
+
+	        otherOrder.setCancelReason(
+	                "此時段已有其他買家完成付款，預約名額已被取得"
+	        );
+
+	        otherOrder.setCancelledAt(now);
+
+	        otherOrder.setSellerConfirmExpiresAt(null);
+	        otherOrder.setPaymentExpiresAt(null);
+
+	        // 尚未付款，不需要退款
+	        otherOrder.setRefundStatus(REFUND_NONE);
+	        otherOrder.setRefundAmount(0);
+
+	        otherOrder.setPayoutStatus(PAYOUT_UNPAID);
+
+	        otherOrder.setHandledAt(null);
+	    }
+
+	    if (!otherOrders.isEmpty()) {
+	        orderRepo.saveAll(otherOrders);
+	    }
+
+	    // WebSocket：通知前端此時段已預約
+	    publishSlotStatus(savedOrder, SLOT_BOOKED);
+
+	    return savedOrder;
 	}
 
 	// =========================================================
