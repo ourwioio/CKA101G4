@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ public class ActivityOrderService {
 	private ActivityOrderRepository orderRepo;
 
 	public List<ActivityOrderVO> getAll() {
-		return orderRepo.findAll();
+		return orderRepo.findAll(Sort.by(Sort.Direction.DESC, "activityOrderId"));
 	}
 
 	public ActivityOrderVO getOneOrder(Integer activityOrderId) {
