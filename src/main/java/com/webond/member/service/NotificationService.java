@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,79 +12,114 @@ import com.webond.member.repository.NotificationRepository;
 
 @Service
 public class NotificationService {
-	
-	@Autowired
-	NotificationRepository repository;
-	
-	@Autowired
-	private SessionFactory sessionFactory;
-	
-	
-	
-	public void addNotification(NotificationVO notificationVO) {
-		//自動帶入時間
-		notificationVO.setCreatedAt(LocalDate.now());
-		notificationVO.setIsRead((byte) 0);
-		if (notificationVO.getReport() != null) {
-		    notificationVO.setNotificationType((byte) 2);
-		}
-		repository.save(notificationVO);
-	}
-	
-	public void updateNotification(NotificationVO notificationVO) {
-		//更新的時間不能修改
-		NotificationVO original = repository.findById(notificationVO.getNotificationId()).orElse(null);
-		if(original != null) {
-			notificationVO.setCreatedAt(original.getCreatedAt());
-		}
-		notificationVO.setIsRead((byte)0);
-		repository.save(notificationVO);
-	}
-	
-	public NotificationVO getOneForUpdate(Integer notificationId) {
-		
-	    return repository.findById(notificationId).orElse(null);
-	    
-	}
-	
-	public void deleteNotification(Integer notificationId) {
-		if(repository.existsById(notificationId)) {
-			repository.deleteById(notificationId);
-		}
-	}
-	
-	public NotificationVO getOneNotification(Integer notificationId) {
-		Optional<NotificationVO> optional = repository.findById(notificationId);
-		NotificationVO notificationVO = optional.orElse(null);
-		if(notificationVO != null) {
-			notificationVO.setIsRead((byte) 1);
-			repository.save(notificationVO);
-		}
-		return notificationVO;
-	}
 
+    @Autowired
+    private NotificationRepository repository;
 
-	public List<NotificationVO> getNotificationByMemberId(Integer memberId){
-		return repository.findByMember_MemberId(memberId);
-	}
+    public void addNotification(
+            NotificationVO notificationVO) {
 
-	public List<NotificationVO> getNotificationByEmployeeId(Integer employeeId){
-		return repository.findByEmployee_EmployeeId(employeeId);
-	}
-	
-	public List<NotificationVO> getAll(){
-		return repository.findAll();
-	}
-	
-	public void markNotificationAsRead(Integer notificationId) {
-	    repository.markAsRead(notificationId);
-	}
-	
-	public int countUnread(Integer memberId) {
-        return repository.countByMember_MemberIdAndIsRead(memberId, 0);
+        notificationVO.setCreatedAt(LocalDate.now());
+        notificationVO.setIsRead((byte) 0);
+
+        if (notificationVO.getReport() != null) {
+            notificationVO.setNotificationType((byte) 2);
+        }
+
+        repository.save(notificationVO);
     }
-	
-	
-	
 
+    public void updateNotification(
+            NotificationVO notificationVO) {
+
+        NotificationVO original =
+                repository
+                    .findById(
+                        notificationVO.getNotificationId()
+                    )
+                    .orElse(null);
+
+        if (original != null) {
+            notificationVO.setCreatedAt(
+                original.getCreatedAt()
+            );
+        }
+
+        notificationVO.setIsRead((byte) 0);
+
+        repository.save(notificationVO);
+    }
+
+    public NotificationVO getOneForUpdate(
+            Integer notificationId) {
+
+        return repository
+                .findById(notificationId)
+                .orElse(null);
+    }
+
+    public void deleteNotification(
+            Integer notificationId) {
+
+        if (repository.existsById(notificationId)) {
+            repository.deleteById(notificationId);
+        }
+    }
+
+    public NotificationVO getOneNotification(
+            Integer notificationId) {
+
+        Optional<NotificationVO> optional =
+                repository.findById(notificationId);
+
+        NotificationVO notificationVO =
+                optional.orElse(null);
+
+        if (notificationVO != null) {
+
+            notificationVO.setIsRead((byte) 1);
+
+            repository.save(notificationVO);
+        }
+
+        return notificationVO;
+    }
+
+    public List<NotificationVO> getNotificationByMemberId(
+            Integer memberId) {
+
+        return repository
+                .findByMember_MemberId(memberId);
+    }
+
+    public List<NotificationVO> getNotificationByEmployeeId(
+            Integer employeeId) {
+
+        return repository
+                .findByEmployee_EmployeeId(employeeId);
+    }
+
+    public List<NotificationVO> getAll() {
+        return repository.findAll();
+    }
+
+    public void markNotificationAsRead(
+            Integer notificationId) {
+
+        repository.markAsRead(notificationId);
+    }
+
+    public int countUnread(
+            Integer memberId) {
+
+        if (memberId == null) {
+            return 0;
+        }
+
+        return repository
+                .countByMember_MemberIdAndIsRead(
+                    memberId,
+                    0
+                );
+    }
 }
