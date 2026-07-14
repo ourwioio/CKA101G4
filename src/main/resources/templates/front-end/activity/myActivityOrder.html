@@ -141,6 +141,10 @@ td {
 	background: #d97706;
 }
 
+.btn-rating {
+	background: #7c3aed;
+}
+
 .payment-select {
 	color: #0f172a;
 	background: #e2e8f0;
@@ -254,6 +258,12 @@ td {
 							<span th:if="${order.orderStatus == 2}" class="status pending">&#24453;&#23529;&#26680;</span>
 							<span th:if="${order.orderStatus == 3}" class="status pending">&#24453;&#20184;&#27454;</span>
 							<span th:if="${order.orderStatus == 4}" class="status active">&#24050;&#23436;&#25104;</span>
+							<div th:if="${order.refundStatus == 1}" style="margin-top: 6px;">
+								<span class="status refund">&#24453;&#36864;&#27454;</span>
+							</div>
+							<div th:if="${order.refundStatus == 2}" style="margin-top: 6px;">
+								<span class="status active">&#24050;&#36864;&#27454;</span>
+							</div>
 						</td>
 
 						<td>
@@ -269,11 +279,6 @@ td {
 									<button type="submit" class="btn-small btn-cancel">&#21462;&#28040;&#22577;&#21517;</button>
 								</form>
 
-								<form th:action="@{/activity/front/order/refund}" method="post">
-									<input type="hidden" name="activityOrderId"
-										th:value="${order.activityOrderId}">
-									<button type="submit" class="btn-small btn-refund">&#36865;&#20986;&#36864;&#27454;&#23529;&#26680;</button>
-								</form>
 							</div>
 
 							<div class="actions" th:if="${order.orderStatus == 2}">
@@ -304,7 +309,12 @@ td {
 								</form>
 							</div>
 
-							<span th:unless="${order.orderStatus == 0 or order.orderStatus == 2 or order.orderStatus == 3}">-</span>
+							<div class="actions" th:if="${order.orderStatus == 4 and order.buyerRateSeller == null}">
+								<button type="button" class="btn-small btn-rating">&#35413;&#20729;</button>
+							</div>
+
+							<span th:if="${order.orderStatus == 4 and order.buyerRateSeller != null}" class="status active">&#24050;&#35413;&#20729;</span>
+							<span th:unless="${order.orderStatus == 0 or order.orderStatus == 2 or order.orderStatus == 3 or order.orderStatus == 4}">-</span>
 						</td>
 					</tr>
 				</tbody>

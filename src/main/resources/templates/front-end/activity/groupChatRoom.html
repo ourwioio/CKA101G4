@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>活動聊天室</title>
+<title>&#27963;&#21205;&#32842;&#22825;&#23460;</title>
 <style>
 body {
 	margin: 0;
@@ -133,23 +133,23 @@ body {
 	<div class="chat-page">
 		<div class="chat-header">
 			<div>
-				<h1 th:text="${activityVO.activityTitle}">活動聊天室</h1>
+				<h1 th:text="${activityVO.activityTitle}">&#27963;&#21205;&#32842;&#22825;&#23460;</h1>
 				<p>
-					目前會員：<span th:text="${loginMemberName}">會員1</span>
+					&#30446;&#21069;&#26371;&#21729;&#65306;<span th:text="${loginMemberName}">&#26371;&#21729;1</span>
 				</p>
 			</div>
-			<a class="btn-back" th:href="@{/activity/front/home}">返回活動前台</a>
+			<a class="btn-back" th:href="@{/activity/front/home}">&#22238;&#21040;&#27963;&#21205;&#21069;&#21488;</a>
 		</div>
 
 		<div class="message-list">
 			<div class="empty" th:if="${#lists.isEmpty(messageListData)}">
-				目前還沒有訊息
+				&#30446;&#21069;&#23578;&#28961;&#32842;&#22825;&#35338;&#24687;
 			</div>
 
 			<div class="message" th:each="message : ${messageListData}"
 				th:classappend="${message.senderMemberId == loginMemberId} ? ' mine'">
-				<div class="sender" th:text="|會員${message.senderMemberId}|">會員1</div>
-				<div class="content" th:text="${message.content}">訊息內容</div>
+				<div class="sender" th:text="|&#26371;&#21729;${message.senderMemberId}|">&#26371;&#21729;1</div>
+				<div class="content" th:text="${message.content}">&#35338;&#24687;&#20839;&#23481;</div>
 				<div class="time"
 					th:text="${message.sentAt == null ? '' : #temporals.format(message.sentAt, 'yyyy-MM-dd HH:mm')}">
 				</div>
@@ -158,8 +158,8 @@ body {
 
 		<form class="chat-form" th:action="@{/activity/front/chat/send}" method="post">
 			<input type="hidden" name="activityId" th:value="${activityVO.activityId}">
-			<textarea name="content" maxlength="500" placeholder="輸入訊息..." required></textarea>
-			<button type="submit">送出</button>
+			<textarea name="content" maxlength="500" placeholder="&#36664;&#20837;&#35338;&#24687;..." required></textarea>
+			<button type="submit">&#36865;&#20986;</button>
 		</form>
 	</div>
 </body>

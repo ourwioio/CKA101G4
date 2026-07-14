@@ -72,6 +72,12 @@ body {
 	border: 1px solid #bbf7d0;
 }
 
+.error {
+	background: #fee2e2;
+	color: #991b1b;
+	border: 1px solid #fecaca;
+}
+
 .section {
 	border-top: 1px solid #e2e8f0;
 	padding-top: 22px;
@@ -133,6 +139,7 @@ body {
 		</div>
 
 		<div th:if="${param.refundSuccess}" class="notice success">&#24050;&#30906;&#35469;&#36864;&#27454;&#23436;&#25104;</div>
+		<div th:if="${param.refundFailed}" class="notice error">&#27492;&#35330;&#21934;&#30446;&#21069;&#19981;&#31526;&#21512;&#30906;&#35469;&#36864;&#27454;&#26781;&#20214;&#12290;</div>
 		<div th:if="${param.payoutSuccess}" class="notice success">&#24050;&#30906;&#35469;&#25765;&#27454;&#23436;&#25104;</div>
 
 		<div class="section">
@@ -224,9 +231,9 @@ body {
 				<div class="item">
 					<div class="label">&#36864;&#27454;&#29376;&#24907;</div>
 					<div class="value">
-						<span th:if="${orderVO.refundStatus == null or orderVO.refundStatus == 0}">&#28961;&#36864;&#27454;</span>
-						<span th:if="${orderVO.refundStatus == 1}">&#24453;&#36864;&#27454;</span>
 						<span th:if="${orderVO.refundStatus == 2}">&#24050;&#36864;&#27454;</span>
+						<span th:if="${orderVO.refundStatus == 1}">&#24453;&#36864;&#27454;</span>
+						<span th:if="${orderVO.refundStatus == null or orderVO.refundStatus == 0}">&#28961;&#36864;&#27454;</span>
 					</div>
 				</div>
 
@@ -239,7 +246,9 @@ body {
 					<div class="label">&#25765;&#27454;&#29376;&#24907;</div>
 					<div class="value">
 						<span th:if="${orderVO.payoutAmount}">&#24050;&#25765;&#27454;</span>
-						<span th:unless="${orderVO.payoutAmount}">&#24453;&#25765;&#27454;</span>
+						<span th:if="${!orderVO.payoutAmount and (orderVO.orderStatus == 0 or orderVO.orderStatus == 4) and orderVO.refundStatus != 2}">&#24453;&#25765;&#27454;</span>
+						<span th:if="${!orderVO.payoutAmount and (orderVO.orderStatus == 1 or orderVO.refundStatus == 2)}">-</span>
+						<span th:if="${!orderVO.payoutAmount and orderVO.orderStatus != 0 and orderVO.orderStatus != 1 and orderVO.orderStatus != 4 and orderVO.refundStatus != 2}">-</span>
 					</div>
 				</div>
 

@@ -127,6 +127,20 @@ h1 {
 .btn-order:hover {
 	background: #1d4ed8;
 }
+
+.btn-report {
+	background: #dc2626;
+	color: white;
+	border: 0;
+	padding: 12px 24px;
+	border-radius: 8px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.btn-report:hover {
+	background: #b91c1c;
+}
 </style>
 </head>
 
@@ -218,6 +232,7 @@ h1 {
 			活動描述</div>
 
 		<div class="actions">
+			<button type="button" class="btn-report">&#27298;&#33289;&#27963;&#21205;</button>
 			<a th:href="${backUrl}" class="btn-back" th:text="${backText}">返回列表</a> <a
 				th:if="${showOrderButton}"
 				th:href="@{/activity/front/order(activityId=${activityVO.activityId})}"
