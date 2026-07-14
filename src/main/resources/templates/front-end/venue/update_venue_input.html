@@ -123,6 +123,15 @@
 				</div>
 			</div>
 			
+			<!-- 場地簡介 -->
+			<div class="form-group">
+			    <label>場地介紹</label>
+			    <textarea th:field="*{venueDescription}" 
+			              placeholder="請輸入場地介紹、特色說明等" 
+			              rows="5"></textarea>
+			    <div class="error" th:if="${#fields.hasErrors('venueDescription')}" th:errors="*{venueDescription}"></div>
+			</div>
+
 			<div class="section-title">場地封面</div>
 			<div class="form-group">
 			    <label>點選照片設為封面</label>

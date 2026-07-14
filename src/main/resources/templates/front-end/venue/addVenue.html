@@ -93,6 +93,14 @@
                 </div>
                 <div class="error" th:if="${hourError}" th:text="${hourError}"></div>
             </div>
+            <!-- 場地簡介 -->
+			<div class="form-group">
+			    <label>場地介紹</label>
+			    <textarea th:field="*{venueDescription}" 
+			              placeholder="請輸入場地介紹、特色說明等" 
+			              rows="5"></textarea>
+			    <div class="error" th:if="${#fields.hasErrors('venueDescription')}" th:errors="*{venueDescription}"></div>
+			</div>
 
             <div class="form-group">
                 <label>場地照片</label>

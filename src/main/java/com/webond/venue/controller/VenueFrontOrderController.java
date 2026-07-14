@@ -248,23 +248,22 @@ public class VenueFrontOrderController {
 
 	@PostMapping("updateReview")
 	public String updateReview(@RequestParam("venueOrderId") Integer venueOrderId,
-			@RequestParam("venueRating") Integer venueRating, @RequestParam("venueComment") String venueComment,
-			HttpSession session) {
+	        @RequestParam("venueRating") Integer venueRating, @RequestParam("venueComment") String venueComment,
+	        HttpSession session) {
 
-		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
-		if (loginMember == null) {
-			return "redirect:/member/login";
-		}
+	    MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+	    if (loginMember == null) {
+	        return "redirect:/member/login";
+	    }
 
-		VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
+	    try {
+	        venueOrderService.submitReview(venueOrderId, loginMember.getMemberId(), venueRating, venueComment);
+	    } catch (RuntimeException e) {
+	        // 之後可以視需要用 RedirectAttributes 帶錯誤訊息回頁面顯示
+	        // 目前先讓它靜默失敗、不讓整個 request 500
+	    }
 
-		if (venueOrderVO != null) {
-			venueOrderVO.setVenueRating(venueRating);
-			venueOrderVO.setVenueComment(venueComment);
-			venueOrderService.updateVenueOrder(venueOrderVO);
-		}
-
-		return "redirect:/front/venueOrder/myVenueOrder";
+	    return "redirect:/front/venueOrder/myVenueOrder";
 	}
 
 	@GetMapping("myVenuesReservations")

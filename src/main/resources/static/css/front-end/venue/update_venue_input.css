@@ -39,3 +39,17 @@ input:focus, select:focus { border-color: #0f6e56; box-shadow: 0 0 0 3px rgba(15
 .btn-secondary:hover { background: #f8fafc; }
 .btn-primary { background: #0f6e56; color: #ffffff; border: none; }
 .btn-primary:hover { background: #0b5240; }
+textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    font-family: inherit;
+    resize: vertical;
+}
+
+textarea:focus {
+    border-color: #1d9e75;
+}
