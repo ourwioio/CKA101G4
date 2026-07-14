@@ -1,8 +1,8 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>報名紀錄</title>
+<title>?勗?蝝??/title>
 
 <style>
 body {
@@ -126,9 +126,19 @@ td {
 	color: #92400e;
 }
 
-.expired {
-	background: #e5e7eb;
-	color: #374151;
+.completed {
+	background: #ede9fe;
+	color: #5b21b6;
+}
+
+.btn-detail {
+	background: #2563eb;
+	color: white;
+	text-decoration: none;
+	padding: 8px 14px;
+	border-radius: 8px;
+	font-weight: bold;
+	display: inline-block;
 }
 
 </style>
@@ -138,30 +148,30 @@ td {
 
 	<div class="page-card">
 		<div class="header">
-			<h2>報名紀錄</h2>
-			<a th:href="@{/activity/admin/home}" class="btn-back">回後台首頁</a>
+			<h2>?勗?蝝??/h2>
+			<a th:href="@{/activity/admin/home}" class="btn-back">???圈???/a>
 		</div>
 
 		<div class="employee">
-			目前員工：<span th:text="${loginEmployeeName}"></span>
-			（員工編號 <span th:text="${loginEmployeeId}"></span>）
-		</div>
+			?桀??∪極嚗?span th:text="${loginEmployeeName}"></span>
+			嚗撌亦楊??<span th:text="${loginEmployeeId}"></span>嚗?		</div>
 
-		<div th:if="${param.hostReviewOnly}" class="notice error">報名申請由活動主辦會員審核，後台僅提供查看。</div>
+		<div th:if="${param.hostReviewOnly}" class="notice error">?勗??唾??望暑?蜓颲行??∪祟?賂?敺??靘??/div>
 
 		<div class="table-card">
 			<table>
 				<thead>
 					<tr>
-						<th>訂單編號</th>
-						<th>活動名稱</th>
-						<th>會員ID</th>
-						<th>狀態</th>
-						<th>報名人數</th>
-						<th>總金額</th>
-						<th>申請備註</th>
-						<th>付款方式</th>
-						<th>備註</th>
+						<th>閮蝺刻?</th>
+						<th>瘣餃??迂</th>
+						<th>?ID</th>
+						<th>???/th>
+						<th>?勗?鈭箸</th>
+						<th>蝮賡?憿?/th>
+						<th>?唾??酉</th>
+						<th>隞狡?孵?</th>
+						<th>?甈??交狡</th>
+						<th>??</th>
 					</tr>
 				</thead>
 
@@ -179,12 +189,11 @@ td {
 						<td th:text="${order.buyerMemberId}"></td>
 
 						<td>
-							<span th:if="${order.orderStatus == 3}" class="status pending">待審核</span>
-							<span th:if="${order.orderStatus == 4}" class="status pending">待付款</span>
-							<span th:if="${order.orderStatus == 0}" class="status active">已付款</span>
-							<span th:if="${order.orderStatus == 1}" class="status cancel">已取消/退回</span>
-							<span th:if="${order.orderStatus == 2}" class="status refund">退款申請中</span>
-							<span th:if="${order.orderStatus == 5}" class="status expired">付款逾期</span>
+							<span th:if="${order.orderStatus == 2}" class="status pending">&#24453;&#23529;&#26680;</span>
+							<span th:if="${order.orderStatus == 3}" class="status pending">&#24453;&#20184;&#27454;</span>
+							<span th:if="${order.orderStatus == 0}" class="status active">&#24050;&#20184;&#27454;</span>
+							<span th:if="${order.orderStatus == 1}" class="status cancel">&#24050;&#21462;&#28040;</span>
+							<span th:if="${order.orderStatus == 4}" class="status completed">&#24050;&#23436;&#25104;</span>
 						</td>
 
 						<td th:text="${order.bookingCount}"></td>
@@ -192,12 +201,27 @@ td {
 						<td class="note" th:text="${order.orderNote ?: '-'}"></td>
 
 						<td>
-							<span th:if="${order.activityPaymentMethod == 0}">信用卡</span>
-							<span th:if="${order.activityPaymentMethod == 1}">ATM轉帳</span>
-							<span th:if="${order.activityPaymentMethod == null}">未付款</span>
+							<span th:if="${order.activityPaymentMethod == 0}">靽∠??/span>
+							<span th:if="${order.activityPaymentMethod == 1}">ATM頧董</span>
+							<span th:if="${order.activityPaymentMethod == null}">?芯?甈?/span>
 						</td>
 
-						<td>報名審核由主辦會員處理</td>
+						<td>
+							<div th:if="${order.refundStatus == null or order.refundStatus == 0}">&#28961;&#36864;&#27454;</div>
+							<div th:if="${order.refundStatus == 1}">&#24453;&#36864;&#27454;</div>
+							<div th:if="${order.refundStatus == 2}">&#24050;&#36864;&#27454;</div>
+							<div th:if="${order.orderStatus == 4}">
+								<span th:if="${order.payoutAmount}">撌脫甈?/span>
+								<span th:unless="${order.payoutAmount}">敺甈?/span>
+							</div>
+						</td>
+
+						<td>
+							<a class="btn-detail"
+								th:href="@{/activityOrder/detail(activityOrderId=${order.activityOrderId})}">
+								?亦??敦
+							</a>
+						</td>
 					</tr>
 				</tbody>
 			</table>

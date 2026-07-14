@@ -3,7 +3,7 @@
 
 <head>
 <meta charset="UTF-8">
-<title>新增活動訂單</title>
+<title>????????殉?謘?/title>
 
 <style>
 body {
@@ -151,10 +151,10 @@ textarea {
 
 	<div class="header-container">
 
-		<div class="header-title">➕ 新增活動訂單</div>
+		<div class="header-title">??????????殉?謘?/div>
 
 		<a th:href="@{/activityOrder/listAllActivityOrder}"
-			class="btn-secondary"> 🔙 返回列表 </a>
+			class="btn-secondary"> ?? 擗???謅?</a>
 
 	</div>
 
@@ -165,16 +165,16 @@ textarea {
 
 			<div class="form-grid">
 
-				<!-- 活動 -->
+				<!-- ???? -->
 
 				<div class="form-group">
 
-					<label> 活動 <span class="required">*</span>
+					<label> ???? <span class="required">*</span>
 
 					</label> <select th:field="*{activityId}" class="form-control"
 						th:classappend="${#fields.hasErrors('activityId')} ? ' input-error'">
 
-						<option value="">請選擇活動</option>
+						<option value="">?ｇ蹓??芣???/option>
 
 						<option th:each="activity:${activityListData}"
 							th:value="${activity.activityId}"
@@ -187,14 +187,14 @@ textarea {
 
 				</div>
 
-				<!-- 買家會員 -->
+				<!-- ?????蛔 -->
 
 				<div class="form-group">
 
-					<label> 買家會員ID <span class="required">*</span>
+					<label> ?????蛔ID <span class="required">*</span>
 
 					</label> <input type="number" th:field="*{buyerMemberId}"
-						class="form-control" placeholder="請輸入會員ID"
+						class="form-control" placeholder="?ｇ???鈭??嚗"
 						th:classappend="${#fields.hasErrors('buyerMemberId')} ? ' input-error'">
 
 					<div class="error" th:if="${#fields.hasErrors('buyerMemberId')}"
@@ -202,37 +202,35 @@ textarea {
 
 				</div>
 
-				<!-- 員工 -->
+				<!-- ??芣扔 -->
 
 				<div class="form-group">
 
-					<label> 員工ID </label> <input type="number" th:field="*{employeeId}"
-						class="form-control" placeholder="可不填">
+					<label> ??芣扔ID </label> <input type="number" th:field="*{employeeId}"
+						class="form-control" placeholder="?????>
 
 				</div>
 
-				<!-- 訂單狀態 -->
+				<!-- ?殉?謘????-->
 
 				<div class="form-group">
 
-					<label> 訂單狀態 </label> <select th:field="*{orderStatus}"
-						class="form-control">
-
-						<option value="0">已完成</option>
-
-						<option value="1">已取消</option>
-
-						<option value="2">已退款</option>
-
+					<label> ?殉?謘????</label>
+					<select th:field="*{orderStatus}" class="form-control">
+						<option value="0">&#24050;&#20184;&#27454;</option>
+						<option value="1">&#24050;&#21462;&#28040;</option>
+						<option value="2">&#24453;&#23529;&#26680;</option>
+						<option value="3">&#24453;&#20184;&#27454;</option>
+						<option value="4">&#24050;&#23436;&#25104;</option>
 					</select>
 
 				</div>
 
-				<!-- 報名人數 -->
+				<!-- ????剔捂??-->
 
 				<div class="form-group">
 
-					<label> 報名人數 <span class="required">*</span>
+					<label> ????剔捂??<span class="required">*</span>
 
 					</label> <input type="number" th:field="*{bookingCount}"
 						class="form-control">
@@ -242,11 +240,11 @@ textarea {
 
 				</div>
 
-				<!-- 活動價格 -->
+				<!-- ?????撖僱 -->
 
 				<div class="form-group">
 
-					<label> 活動價格 <span class="required">*</span>
+					<label> ?????撖僱 <span class="required">*</span>
 
 					</label> <input type="number" th:field="*{activityPrice}"
 						class="form-control">
@@ -255,11 +253,11 @@ textarea {
 						th:errors="*{activityPrice}"></div>
 
 				</div>
-				<!-- 訂單總金額 -->
+				<!-- ?殉?謘鞈???-->
 
 				<div class="form-group">
 
-					<label> 訂單總金額 <span class="required">*</span>
+					<label> ?殉?謘鞈???<span class="required">*</span>
 
 					</label> <input type="number" th:field="*{totalAmount}"
 						class="form-control">
@@ -269,29 +267,29 @@ textarea {
 
 				</div>
 
-				<!-- 付款方式 -->
+				<!-- ?朵??摮? -->
 
 				<div class="form-group">
 
-					<label> 付款方式 </label> <select th:field="*{activityPaymentMethod}"
+					<label> ?朵??摮? </label> <select th:field="*{activityPaymentMethod}"
 						class="form-control">
 
-						<option value="0">信用卡</option>
+						<option value="0">?賤????/option>
 
-						<option value="1">ATM轉帳</option>
+						<option value="1">ATM?改??/option>
 
 					</select>
 
 				</div>
 
-				<!-- 訂單備註 -->
+				<!-- ?殉?謘?謕? -->
 
 				<div class="form-group col-span-2">
 
-					<label> 訂單備註 </label>
+					<label> ?殉?謘?謕? </label>
 
 					<textarea th:field="*{orderNote}" class="form-control"
-						placeholder="請輸入備註...">
+						placeholder="?ｇ???鈭???..">
     </textarea>
 
 				</div>
@@ -301,9 +299,9 @@ textarea {
 			<div class="form-actions">
 
 				<a th:href="@{/activityOrder/listAllActivityOrder}"
-					class="btn-cancel"> 取消 </a>
+					class="btn-cancel"> ?謘? </a>
 
-				<button type="submit" class="btn-submit">💾 儲存訂單</button>
+				<button type="submit" class="btn-submit">???????殉?謘?/button>
 
 			</div>
 

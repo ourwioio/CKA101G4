@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>報名名單</title>
+<title>&#22577;&#21517;&#23529;&#26680;</title>
 
 <style>
 body{
@@ -103,11 +103,6 @@ tr:hover{
     color:#3730a3;
 }
 
-.expired{
-    background:#e5e7eb;
-    color:#374151;
-}
-
 .action{
     display:flex;
     justify-content:center;
@@ -115,8 +110,8 @@ tr:hover{
     flex-wrap:wrap;
 }
 
-.btn-approve,
-.btn-reject{
+                                <button class="btn-approve" type="submit">&#21516;&#24847;</button>
+                                <button class="btn-reject" type="submit">&#25298;&#32085;</button>
     color:white;
     border:none;
     padding:8px 15px;
@@ -125,11 +120,11 @@ tr:hover{
     font-weight:bold;
 }
 
-.btn-approve{
+                                <button class="btn-approve" type="submit">&#21516;&#24847;</button>
     background:#16a34a;
 }
 
-.btn-reject{
+                                <button class="btn-reject" type="submit">&#25298;&#32085;</button>
     background:#dc2626;
 }
 
@@ -193,34 +188,34 @@ tr:hover{
 
     <div class="header">
         <div>
-            <h1>👥 報名名單</h1>
+            <h1>&#22577;&#21517;&#23529;&#26680;</h1>
             <div class="sub">
-                活動：
+                &#27963;&#21205;&#65306;
                 <span th:text="${activityVO.activityTitle}"></span>
             </div>
         </div>
 
         <a th:href="@{/activity/front/myHostActivity}" class="btn-back">
-            🔙 返回我舉辦的活動
+            &#36820;&#22238;&#25105;&#33289;&#36774;&#30340;&#27963;&#21205;
         </a>
     </div>
 
-    <div th:if="${param.approveSuccess}" class="notice success">已通過申請，等待會員付款。</div>
-    <div th:if="${param.rejectSuccess}" class="notice success">已退回報名申請。</div>
-    <div th:if="${param.approveFailed}" class="notice error">通過失敗：活動可能已額滿、下架或不開放報名。</div>
+    <div th:if="${param.approveSuccess}" class="notice success">&#24050;&#21516;&#24847;&#22577;&#21517;&#65292;&#35330;&#21934;&#24050;&#25913;&#28858;&#24453;&#20184;&#27454;&#12290;</div>
+    <div th:if="${param.rejectSuccess}" class="notice success">&#24050;&#25298;&#32085;&#22577;&#21517;&#30003;&#35531;&#12290;</div>
+    <div th:if="${param.approveFailed}" class="notice error">&#21516;&#24847;&#22833;&#25943;&#65292;&#21517;&#38989;&#24050;&#28385;&#12290;</div>
 
     <div class="group-status">
-        目前已付款人數：
+        &#30446;&#21069;&#24050;&#20184;&#27454;&#20154;&#25976;&#65306;
         <strong th:text="${activityVO.attendeesCount ?: 0}">0</strong>
         /
         <strong th:text="${activityVO.maxParticipants}">0</strong>
-        <span th:if="${hasReachedMinimum}" class="group-ok">已達成團人數</span>
+        <span th:if="${hasReachedMinimum}" class="group-ok">&#24050;&#36948;&#25104;&#25104;&#22296;&#20154;&#25976;</span>
         <span th:unless="${hasReachedMinimum}" class="group-wait">
-            尚未成團，最低需要
+            &#23578;&#26410;&#25104;&#22296;&#65292;&#33267;&#23569;&#38656;&#35201;
             <strong th:text="${activityVO.minParticipants}">1</strong>
-            人
+            &#20154;
         </span>
-        <span th:if="${isFull}" class="group-full">，活動已額滿，剩餘待審核申請會自動退回</span>
+        <span th:if="${isFull}" class="group-full">&#21517;&#38989;&#24050;&#28385;&#65292;&#24453;&#20184;&#27454;&#35330;&#21934;&#23559;&#28961;&#27861;&#20184;&#27454;&#12290;</span>
     </div>
 
     <div class="table-card">
@@ -228,14 +223,14 @@ tr:hover{
         <table>
             <thead>
                 <tr>
-                    <th>訂單編號</th>
-                    <th>會員ID</th>
-                    <th>報名人數</th>
-                    <th>總金額</th>
-                    <th>付款方式</th>
-                    <th>訂單狀態</th>
-                    <th>申請備註</th>
-                    <th>審核操作</th>
+                    <th>&#35330;&#21934;&#32232;&#34399;</th>
+                    <th>&#26371;&#21729;ID</th>
+                    <th>&#22577;&#21517;&#20154;&#25976;</th>
+                    <th>&#32317;&#37329;&#38989;</th>
+                    <th>&#20184;&#27454;&#26041;&#24335;</th>
+                    <th>&#35330;&#21934;&#29376;&#24907;</th>
+                    <th>&#22577;&#21517;&#20633;&#35387;</th>
+                    <th>&#23529;&#26680;&#25805;&#20316;</th>
                 </tr>
             </thead>
 
@@ -243,7 +238,7 @@ tr:hover{
 
                 <tr th:if="${#lists.isEmpty(orderListData)}">
                     <td colspan="8" class="empty">
-                        目前尚無會員報名此活動
+                        &#30446;&#21069;&#27794;&#26377;&#26371;&#21729;&#22577;&#21517;&#36039;&#26009;
                     </td>
                 </tr>
 
@@ -257,51 +252,33 @@ tr:hover{
                     </td>
 
                     <td>
-                        <span th:if="${order.activityPaymentMethod == 0}">信用卡</span>
-                        <span th:if="${order.activityPaymentMethod == 1}">ATM轉帳</span>
+                        <span th:if="${order.activityPaymentMethod == 0}">&#20449;&#29992;&#21345;</span>
+                        <span th:if="${order.activityPaymentMethod == 1}">ATM&#36681;&#24115;</span>
                     </td>
 
                     <td>
-                        <span th:if="${order.orderStatus == 0}" class="status finish">
-                            已完成
-                        </span>
-
-                        <span th:if="${order.orderStatus == 1}" class="status cancel">
-                            已取消
-                        </span>
-
-                        <span th:if="${order.orderStatus == 2}" class="status refund">
-                            退款申請中
-                        </span>
-
-                        <span th:if="${order.orderStatus == 3}" class="status pending">
-                            待主辦審核
-                        </span>
-
-                        <span th:if="${order.orderStatus == 4}" class="status paying">
-                            待付款
-                        </span>
-
-                        <span th:if="${order.orderStatus == 5}" class="status expired">
-                            付款逾期
-                        </span>
+                        <span th:if="${order.orderStatus == 0}" class="status finish">&#24050;&#20184;&#27454;</span>
+                        <span th:if="${order.orderStatus == 1}" class="status cancel">&#24050;&#21462;&#28040;</span>
+                        <span th:if="${order.orderStatus == 2}" class="status pending">&#24453;&#20027;&#36774;&#23529;&#26680;</span>
+                        <span th:if="${order.orderStatus == 3}" class="status paying">&#24453;&#20184;&#27454;</span>
+                        <span th:if="${order.orderStatus == 4}" class="status finish">&#24050;&#23436;&#25104;</span>
                     </td>
                     <td th:text="${order.orderNote ?: '-'}"></td>
                     <td>
-                        <div class="action" th:if="${order.orderStatus == 3}">
+                        <div class="action" th:if="${order.orderStatus == 2}">
                             <form th:action="@{/activity/front/memberList/approve}" method="post">
                                 <input type="hidden" name="activityOrderId"
                                     th:value="${order.activityOrderId}">
-                                <button class="btn-approve" type="submit">通過</button>
+                                <button class="btn-approve" type="submit">&#21516;&#24847;</button>
                             </form>
 
                             <form th:action="@{/activity/front/memberList/reject}" method="post">
                                 <input type="hidden" name="activityOrderId"
                                     th:value="${order.activityOrderId}">
-                                <button class="btn-reject" type="submit">退回</button>
+                                <button class="btn-reject" type="submit">&#25298;&#32085;</button>
                             </form>
                         </div>
-                        <span th:unless="${order.orderStatus == 3}">-</span>
+                        <span th:unless="${order.orderStatus == 2}">-</span>
                     </td>
                 </tr>
 
@@ -315,7 +292,7 @@ tr:hover{
 <script th:if="${shouldAutoRefreshOrder}">
     setTimeout(function() {
         window.location.reload();
-    }, 5000);
+    }, 1000);
 </script>
 
 </body>

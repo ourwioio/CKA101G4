@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>活動報名申請</title>
+<title>&#27963;&#21205;&#22577;&#21517;&#30003;&#35531;</title>
 
 <style>
 body {
@@ -82,7 +82,7 @@ label {
 <body>
 
 	<div class="card">
-		<h2>活動報名申請</h2>
+		<h2>&#27963;&#21205;&#22577;&#21517;&#30003;&#35531;</h2>
 
 		<form th:action="@{/activity/front/order/save}"
 			th:object="${activityOrderVO}" method="post">
@@ -95,33 +95,33 @@ label {
 			<input type="hidden" th:field="*{activityPaymentMethod}">
 
 			<div class="form-group">
-				<label>活動名稱</label>
+				<label>&#27963;&#21205;&#21517;&#31281;</label>
 				<input class="form-control readonly" th:value="${activityVO.activityTitle}" readonly>
 			</div>
 
 			<div class="form-group">
-				<label>申請會員</label>
+				<label>&#22577;&#21517;&#26371;&#21729;</label>
 				<input class="form-control readonly" th:value="${loginMemberName}" readonly>
 			</div>
 
 			<div class="form-group">
-				<label>活動價格</label>
+				<label>&#27963;&#21205;&#20729;&#26684;</label>
 				<input class="form-control readonly" th:value="${activityVO.activityPrice}" readonly>
 			</div>
 
 			<div class="form-group">
-				<label>報名人數</label>
+				<label>&#22577;&#21517;&#20154;&#25976;</label>
 				<input type="number" min="1" th:field="*{bookingCount}" class="form-control">
 			</div>
 
 			<div class="form-group">
-				<label>備註</label>
+				<label>&#20633;&#35387;</label>
 				<textarea class="form-control" rows="4" th:field="*{orderNote}"></textarea>
 			</div>
 
 			<div class="btn-area">
-				<a th:href="@{/activity/front/list}" class="btn-back">返回</a>
-				<button type="submit" class="btn-submit">送出申請</button>
+				<a th:href="@{/activity/front/list}" class="btn-back">&#36820;&#22238;&#21015;&#34920;</a>
+				<button type="submit" class="btn-submit">&#36865;&#20986;&#30003;&#35531;</button>
 			</div>
 		</form>
 	</div>

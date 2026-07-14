@@ -4,7 +4,16 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.webond.activity.model.ActivityOrderService;
 import com.webond.activity.model.ActivityOrderVO;
@@ -17,38 +26,33 @@ public class ActivityOrderController {
 	@Autowired
 	private ActivityOrderService orderSvc;
 
-	// 查詢全部
 	@GetMapping
 	public ResponseEntity<List<ActivityOrderVO>> getAll() {
 		return ResponseEntity.ok(orderSvc.getAll());
 	}
 
-	// 查詢單筆
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getOne(@PathVariable Integer id) {
 		ActivityOrderVO orderVO = orderSvc.getOneOrder(id);
 
 		if (orderVO == null) {
-			return ResponseEntity.badRequest().body("查無此訂單");
+			return ResponseEntity.badRequest().body("\u67e5\u7121\u8a02\u55ae\u8cc7\u6599");
 		}
 
 		return ResponseEntity.ok(orderVO);
 	}
 
-	// 新增訂單
 	@PostMapping
 	public ResponseEntity<ActivityOrderVO> createOrder(@RequestBody ActivityOrderVO orderVO) {
 		return ResponseEntity.ok(orderSvc.addOrder(orderVO));
 	}
 
-	// 修改整筆訂單
 	@PutMapping("/{id}")
 	public ResponseEntity<?> updateOrder(@PathVariable Integer id, @RequestBody ActivityOrderVO formVO) {
-
 		ActivityOrderVO orderVO = orderSvc.getOneOrder(id);
 
 		if (orderVO == null) {
-			return ResponseEntity.badRequest().body("查無此訂單");
+			return ResponseEntity.badRequest().body("\u67e5\u7121\u8a02\u55ae\u8cc7\u6599");
 		}
 
 		orderVO.setActivityId(formVO.getActivityId());
@@ -75,7 +79,6 @@ public class ActivityOrderController {
 		return ResponseEntity.ok(orderSvc.updateOrder(orderVO));
 	}
 
-	// 修改訂單狀態
 	@PutMapping("/{id}/status")
 	public ResponseEntity<?> updateStatus(@PathVariable Integer id, @RequestParam Byte status) {
 		try {
@@ -85,10 +88,9 @@ public class ActivityOrderController {
 		}
 	}
 
-	// 刪除
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteOrder(@PathVariable Integer id) {
 		orderSvc.deleteOrder(id);
-		return ResponseEntity.ok("訂單已刪除");
+		return ResponseEntity.ok("\u8a02\u55ae\u5df2\u522a\u9664");
 	}
 }

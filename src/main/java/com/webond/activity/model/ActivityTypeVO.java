@@ -1,9 +1,14 @@
 package com.webond.activity.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "ACTIVITY_TYPE") // 確保對應到你 MySQL 中的實際表格名稱
+@Table(name = "ACTIVITY_TYPE")
 public class ActivityTypeVO {
 
 	@Id
@@ -14,7 +19,9 @@ public class ActivityTypeVO {
 	@Column(name = "TYPE_NAME", nullable = false, length = 50)
 	private String activityTypeName;
 
-	// Getters and Setters
+	@Column(name = "TYPE_MODE")
+	private Byte typeMode = 1;
+
 	public Integer getActivityTypeId() {
 		return activityTypeId;
 	}
@@ -29,5 +36,13 @@ public class ActivityTypeVO {
 
 	public void setActivityTypeName(String activityTypeName) {
 		this.activityTypeName = activityTypeName;
+	}
+
+	public Byte getTypeMode() {
+		return typeMode;
+	}
+
+	public void setTypeMode(Byte typeMode) {
+		this.typeMode = typeMode;
 	}
 }
