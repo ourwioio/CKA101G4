@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>場地檢舉詳細資訊</title>
+
+<style>
+* {
+	box-sizing: border-box;
+}
+
+body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		Arial, sans-serif;
+	background-color: #f4f6f9;
+	color: #333;
+	margin: 0;
+	padding: 2rem 1rem;
+}
+
+.container {
+	max-width: 900px;
+	margin: 0 auto;
+}
+
+.page-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1.5rem;
+}
+
+.page-title {
+	font-size: 24px;
+	font-weight: 600;
+	color: #2c3e50;
+}
+
+.card {
+	background: #ffffff;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+	padding: 2.5rem;
+}
+
+.section-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: #0f6e56;
+	border-left: 4px solid #0f6e56;
+	padding-left: 8px;
+	margin: 1.5rem 0 1rem 0;
+}
+
+.info-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1.5rem;
+	margin-bottom: 1rem;
+}
+
+.info-group {
+	border-bottom: 1px solid #f1f5f9;
+	padding-bottom: 10px;
+}
+
+.info-group.full-width {
+	grid-column: span 2;
+}
+
+.info-label {
+	font-size: 13px;
+	font-weight: 500;
+	color: #64748b;
+	margin-bottom: 4px;
+}
+
+.info-value {
+	font-size: 15px;
+	font-weight: 600;
+	color: #1e293b;
+}
+
+.status-badge {
+	display: inline-block;
+	padding: 4px 12px;
+	border-radius: 50px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.status-reviewing {
+	background-color: #fef3c7;
+	color: #b45309;
+}
+
+.status-approved {
+	background-color: #dcfce7;
+	color: #15803d;
+}
+
+.status-rejected {
+	background-color: #fee2e2;
+	color: #b91c1c;
+}
+
+.action-form {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	padding: 1.5rem;
+	margin-top: 1rem;
+}
+
+.action-bar {
+	margin-top: 2.5rem;
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+	border-top: 1px solid #e2e8f0;
+	padding-top: 1.5rem;
+}
+
+.btn {
+	padding: 10px 24px;
+	font-size: 14px;
+	font-weight: 500;
+	border-radius: 6px;
+	cursor: pointer;
+	text-decoration: none;
+	transition: all 0.2s;
+	border: none;
+}
+
+.btn-secondary {
+	background: #ffffff;
+	border: 1px solid #cbd5e1;
+	color: #475569;
+}
+
+.btn-secondary:hover {
+	background: #f8fafc;
+}
+
+.btn-approve {
+	background: #0f6e56;
+	color: #ffffff;
+}
+
+.btn-approve:hover {
+	background: #0b5240;
+}
+
+.btn-reject {
+	background: #dc2626;
+	color: #ffffff;
+}
+
+.btn-reject:hover {
+	background: #b91c1c;
+}
+</style>
+</head>
+<body>
+
+	<div class="container">
+
+		<div class="page-header">
+			<h1 class="page-title">場地檢舉詳細資訊</h1>
+			<a th:href="@{/venueReport/listAllVenueReport}"
+				class="btn btn-secondary">返回列表</a>
+		</div>
+
+		<div class="card" th:object="${existingVenueReport}">
+
+			<div class="section-title">檢舉基本資訊</div>
+			<div class="info-grid">
+				<div class="info-group">
+					<div class="info-label">檢舉編號</div>
+					<div class="info-value" th:text="*{venueReportId}"></div>
+				</div>
+				<div class="info-group">
+					<div class="info-label">場地訂單編號</div>
+					<div class="info-value" th:text="*{venueOrderId}"></div>
+				</div>
+				<div class="info-group">
+					<div class="info-label">檢舉者會員編號</div>
+					<div class="info-value" th:text="*{memberId}"></div>
+				</div>
+				<div class="info-group">
+					<div class="info-label">處理狀態</div>
+					<div>
+						<span class="status-badge status-reviewing"
+							th:if="*{reportStatus == 0}">審核中</span> <span
+							class="status-badge status-approved" th:if="*{reportStatus == 1}">通過（下架場地）</span>
+						<span class="status-badge status-rejected"
+							th:if="*{reportStatus == 2}">未通過</span>
+					</div>
+				</div>
+				<div class="info-group full-width">
+					<div class="info-label">檢舉內容</div>
+					<div class="info-value"
+						th:text="*{serReportCom != null ? serReportCom : '無'}"></div>
+				</div>
+				<div class="info-group">
+					<div class="info-label">檢舉時間</div>
+					<div class="info-value"
+						th:text="*{serReportTime != null ? #temporals.format(serReportTime, 'yyyy-MM-dd HH:mm') : '-'}"></div>
+				</div>
+				<div class="info-group">
+					<div class="info-label">處理員工</div>
+					<div class="info-value"
+						th:text="${existingVenueReport.employeeId != null ? existingVenueReport.employeeId + ' - ' + employeeNameMap.get(existingVenueReport.employeeId) : '尚未處理'}"></div>
+				</div>
+				<div class="info-group full-width">
+					<div class="info-label">處理完成時間</div>
+					<div class="info-value"
+						th:text="*{handledAt != null ? #temporals.format(handledAt, 'yyyy-MM-dd HH:mm') : '尚未處理'}"></div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 處理操作區：只有「審核中」狀態才顯示，已處理過的紀錄不再顯示操作按鈕 -->
+		<div th:if="${existingVenueReport.reportStatus == 0}">
+			<div class="section-title">檢舉處理</div>
+
+			<div class="action-form">
+				<p style="color: #64748b; font-size: 14px; margin-top: 0;">
+					通過表示檢舉成立，系統將自動把該場地下架；未通過表示檢舉不成立，場地狀態不受影響。</p>
+
+				<!-- 實際送出的表單：approve -->
+				<form th:action="@{/venueReport/approve}" method="post"
+					id="approveForm">
+					<input type="hidden" name="venueReportId"
+						th:value="${existingVenueReport.venueReportId}" />
+				</form>
+
+				<!-- 實際送出的表單：reject -->
+				<form th:action="@{/venueReport/reject}" method="post"
+					id="rejectForm">
+					<input type="hidden" name="venueReportId"
+						th:value="${existingVenueReport.venueReportId}" />
+				</form>
+
+				<div class="action-bar"
+					style="border-top: none; padding-top: 0; margin-top: 0.5rem;">
+					<button type="button" class="btn btn-approve"
+						onclick="submitReport('approve')">審核通過（下架場地）</button>
+					<button type="button" class="btn btn-reject"
+						onclick="submitReport('reject')">審核未通過</button>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+	<script>
+		function submitReport(action) {
+			const confirmMsg = action === 'approve' ? '確定要通過此檢舉並將場地下架嗎？'
+					: '確定要標記此檢舉未通過嗎？';
+			if (!confirm(confirmMsg)) {
+				return;
+			}
+			if (action === 'approve') {
+				document.getElementById('approveForm').submit();
+			} else {
+				document.getElementById('rejectForm').submit();
+			}
+		}
+	</script>
+
+</body>
+</html>
