@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>退款明細管理</title>
+<link rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+	<div class="container mt-4">
+
+		<h3 class="mb-4">退款所有明細</h3>
+
+		<!-- 篩選條件 -->
+		<form th:action="@{/refundPayout/refundList}" method="get"
+			class="row g-3 mb-4">
+
+			<div class="col-auto">
+				<label class="form-label">時間區間</label> <select name="quickRange"
+					class="form-select" onchange="this.form.submit()">
+					<option value="thisMonth"
+						th:selected="${selectedRange == 'thisMonth'}">本月</option>
+					<option value="thisQuarter"
+						th:selected="${selectedRange == 'thisQuarter'}">本季</option>
+					<option value="thisYear"
+						th:selected="${selectedRange == 'thisYear'}">今年</option>
+					<option value="all" th:selected="${selectedRange == 'all'}">全部</option>
+					<option value="custom" th:selected="${selectedRange == 'custom'}">自訂區間</option>
+				</select>
+			</div>
+
+			<div class="col-auto" th:if="${selectedRange == 'custom'}">
+				<label class="form-label">開始日期</label> <input type="date"
+					name="startDate" class="form-control">
+			</div>
+
+			<div class="col-auto" th:if="${selectedRange == 'custom'}">
+				<label class="form-label">結束日期</label> <input type="date"
+					name="endDate" class="form-control">
+			</div>
+
+			<div class="col-auto">
+				<label class="form-label">訂單類型</label> <select name="sourceType"
+					class="form-select" onchange="this.form.submit()">
+					<option value=""
+						th:selected="${selectedSourceType == null or selectedSourceType == ''}">全部</option>
+					<option value="ONE_ON_ONE"
+						th:selected="${selectedSourceType == 'ONE_ON_ONE'}">一對一服務</option>
+					<option value="GROUP"
+						th:selected="${selectedSourceType == 'GROUP'}">揪團活動</option>
+					<option value="VENUE"
+						th:selected="${selectedSourceType == 'VENUE'}">場地租借</option>
+				</select>
+			</div>
+
+			<div class="col-auto align-self-end">
+				<button type="submit" class="btn btn-primary">查詢</button>
+				<a th:href="@{/refundPayout/refundList}"
+					class="btn btn-outline-secondary">清除條件</a>
+			</div>
+		</form>
+
+		<!-- 明細表格 -->
+		<table class="table table-bordered table-hover align-middle">
+			<thead class="table-light">
+				<tr>
+					<th>訂單類型</th>
+					<th>退款狀態</th>
+					<th>訂單編號</th>
+					<th>會員編號</th>
+					<th>訂單金額</th>
+					<th>退款金額</th>
+					<th>負責員工</th>
+					<th>處理時間</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:if="${#lists.isEmpty(records)}">
+					<td colspan="8" class="text-center text-muted">查無退款明細</td>
+				</tr>
+				<tr th:each="r : ${records}">
+					<td th:text="${r.orderTypeName}"></td>
+					<td><span th:if="${r.refundStatus == 0}"
+						class="badge bg-warning text-dark">進行中</span> <span
+						th:if="${r.refundStatus == 1}" class="badge bg-success">已完成</span>
+						<span th:if="${r.refundStatus == 2}" class="badge bg-secondary">未申請</span>
+					</td>
+					<td th:text="${r.orderId}"></td>
+					<td th:text="${r.memberId}"></td>
+					<td th:text="${r.totalAmount}"></td>
+					<td th:text="${r.refundAmount}"></td>
+					<td
+						th:text="${r.employeeId} != null ? (${r.employeeId} + ' - ' + ${r.employeeName}) : '-'"></td>
+					<td
+						th:text="${r.handledAt} != null ? ${#temporals.format(r.handledAt, 'yyyy-MM-dd HH:mm')} : '-'"></td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+</body>
+</html>
