@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>活動後台</title>
+<title>&#27963;&#21205;&#24460;&#21488;</title>
 
 <style>
 body {
@@ -11,6 +11,22 @@ body {
 	background: #f8fafc;
 	font-family: "Microsoft JhengHei", sans-serif;
 	color: #1e293b;
+}
+
+.top-actions {
+	max-width: 1100px;
+	margin: 0 auto 20px;
+	display: flex;
+	justify-content: flex-end;
+}
+
+.btn-home {
+	background: #64748b;
+	color: white;
+	text-decoration: none;
+	padding: 10px 18px;
+	border-radius: 8px;
+	font-weight: bold;
 }
 
 .header {
@@ -29,22 +45,6 @@ body {
 .header p {
 	color: #64748b;
 	font-size: 1.05rem;
-}
-
-.top-actions {
-	max-width: 1100px;
-	margin: 0 auto 20px;
-	display: flex;
-	justify-content: flex-end;
-}
-
-.btn-home {
-	background: #64748b;
-	color: white;
-	text-decoration: none;
-	padding: 10px 18px;
-	border-radius: 8px;
-	font-weight: bold;
 }
 
 .login-panel {
@@ -153,65 +153,63 @@ body {
 </head>
 
 <body>
-
 	<div class="top-actions">
-		<a th:href="@{/activity/home}" class="btn-home">回活動首頁</a>
+		<a th:href="@{/activity/home}" class="btn-home">&#22238;&#21069;&#24460;&#21488;&#36984;&#21934;</a>
 	</div>
 
 	<div class="header">
-		<h1>活動後台</h1>
+		<h1>&#27963;&#21205;&#24460;&#21488;</h1>
 		<p>
-			目前狀態：<span th:text="${loginEmployeeName}">未登入</span>
-			<span th:if="${isLoginEmployee}">（員工編號 <span th:text="${loginEmployeeId}">1</span>）</span>
+			&#30446;&#21069;&#21729;&#24037;&#65306;<span th:text="${loginEmployeeName}">&#26410;&#30331;&#20837;</span>
+			<span th:if="${isLoginEmployee}">&#65288;&#21729;&#24037;&#32232;&#34399; <span th:text="${loginEmployeeId}">1</span>&#65289;</span>
 		</p>
 	</div>
 
 	<div th:if="${param.loginRequired}" class="warning">
-		請先登入後台員工，才能進入活動管理功能。
+		&#35531;&#20808;&#30331;&#20837;&#24460;&#21488;&#21729;&#24037;&#65292;&#25165;&#33021;&#26597;&#30475;&#27963;&#21205;&#24460;&#21488;&#36039;&#26009;&#12290;
 	</div>
 
 	<div class="login-panel">
 		<div>
-			<strong>測試後台員工</strong>
-			<div>預設未登入；登入後台員工後，才可查看活動資料與下架活動。</div>
+			<strong>&#28204;&#35430;&#24460;&#21488;&#21729;&#24037;</strong>
+			<div>&#36984;&#25799;&#24460;&#21488;&#21729;&#24037;&#24460;&#65292;&#25165;&#33021;&#26597;&#30475;&#27963;&#21205;&#36039;&#26009;&#12289;&#35330;&#21934;&#32000;&#37636;&#33287;&#19979;&#26550;&#27963;&#21205;&#12290;</div>
 		</div>
 
 		<form class="login-form" th:action="@{/activity/admin/fakeLogin}" method="post">
 			<select name="employeeId">
-				<option value="" th:selected="${!isLoginEmployee}">未登入</option>
+				<option value="" th:selected="${!isLoginEmployee}">&#26410;&#30331;&#20837;</option>
 				<option th:each="employee : ${employeeListData}"
 					th:value="${employee.employeeId}"
 					th:selected="${employee.employeeId == loginEmployeeId}"
-					th:text="|員工${employee.employeeId} - ${employee.empName ?: '未命名'}|">
+					th:text="${'Employee ' + employee.employeeId + ' - ' + (employee.empName ?: 'No name')}">
 				</option>
 			</select>
-			<button type="submit">切換</button>
+			<button type="submit">&#20999;&#25563;</button>
 		</form>
 	</div>
 
 	<div th:unless="${isLoginEmployee}" class="warning">
-		目前尚未登入後台員工，管理功能已鎖定。
+		&#30446;&#21069;&#23578;&#26410;&#30331;&#20837;&#24460;&#21488;&#21729;&#24037;&#65292;&#19979;&#26041;&#21151;&#33021;&#21345;&#29255;&#26371;&#26283;&#26178;&#38577;&#34255;&#12290;
 	</div>
 
 	<div class="card-container" th:if="${isLoginEmployee}">
 		<div class="card">
-			<h2>活動管理</h2>
-			<p>後台只可查看活動與下架活動，不提供新增或修改活動。</p>
-			<a class="btn activity" th:href="@{/activity/listAllActivity}">進入活動管理</a>
+			<h2>&#27963;&#21205;&#31649;&#29702;</h2>
+			<p>&#24460;&#21488;&#21482;&#21487;&#26597;&#30475;&#27963;&#21205;&#33287;&#19979;&#26550;&#27963;&#21205;&#65292;&#19981;&#25552;&#20379;&#26032;&#22686;&#25110;&#20462;&#25913;&#27963;&#21205;&#12290;</p>
+			<a class="btn activity" th:href="@{/activity/listAllActivity}">&#36914;&#20837;&#27963;&#21205;&#31649;&#29702;</a>
 		</div>
 
 		<div class="card">
-			<h2>活動類別管理</h2>
-			<p>管理活動分類資料。</p>
-			<a class="btn type" th:href="@{/activityType/listAllActivityType}">進入類別管理</a>
+			<h2>&#27963;&#21205;&#39006;&#21029;&#31649;&#29702;</h2>
+			<p>&#31649;&#29702;&#27963;&#21205;&#20998;&#39006;&#36039;&#26009;&#12290;</p>
+			<a class="btn type" th:href="@{/activityType/listAllActivityType}">&#36914;&#20837;&#39006;&#21029;&#31649;&#29702;</a>
 		</div>
 
 		<div class="card">
-			<h2>訂單紀錄</h2>
-			<p>查看活動報名與付款狀態，提供退款與檢舉流程查詢來源；報名審核仍由主辦會員處理。</p>
-			<a class="btn order" th:href="@{/activityOrder/listAllActivityOrder}">查看訂單紀錄</a>
+			<h2>&#35330;&#21934;&#32000;&#37636;</h2>
+			<p>&#26597;&#30475;&#27963;&#21205;&#22577;&#21517;&#33287;&#20184;&#27454;&#29376;&#24907;&#65292;&#25552;&#20379;&#36864;&#27454;&#33287;&#25765;&#27454;&#27969;&#31243;&#26597;&#35426;&#20358;&#28304;&#65307;&#22577;&#21517;&#23529;&#26680;&#30001;&#20027;&#36774;&#26371;&#21729;&#34389;&#29702;&#12290;</p>
+			<a class="btn order" th:href="@{/activityOrder/listAllActivityOrder}">&#26597;&#30475;&#35330;&#21934;&#32000;&#37636;</a>
 		</div>
 	</div>
-
 </body>
 </html>

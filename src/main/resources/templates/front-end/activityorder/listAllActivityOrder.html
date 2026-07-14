@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>?勗?蝝??/title>
+<title>&#24460;&#21488;&#35330;&#21934;&#32000;&#37636;</title>
 
 <style>
 body {
@@ -26,6 +26,7 @@ body {
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 18px;
+	gap: 16px;
 }
 
 .header h2 {
@@ -46,12 +47,6 @@ body {
 	font-weight: bold;
 }
 
-.success {
-	background: #dcfce7;
-	color: #166534;
-	border: 1px solid #bbf7d0;
-}
-
 .error {
 	background: #fee2e2;
 	color: #991b1b;
@@ -65,6 +60,7 @@ body {
 	padding: 10px 18px;
 	border-radius: 8px;
 	font-weight: bold;
+	white-space: nowrap;
 }
 
 .table-card {
@@ -139,39 +135,41 @@ td {
 	border-radius: 8px;
 	font-weight: bold;
 	display: inline-block;
+	white-space: nowrap;
 }
-
 </style>
 </head>
 
 <body>
-
 	<div class="page-card">
 		<div class="header">
-			<h2>?勗?蝝??/h2>
-			<a th:href="@{/activity/admin/home}" class="btn-back">???圈???/a>
+			<h2>&#24460;&#21488;&#35330;&#21934;&#32000;&#37636;</h2>
+			<a th:href="@{/activity/admin/home}" class="btn-back">&#22238;&#24460;&#21488;&#39318;&#38913;</a>
 		</div>
 
 		<div class="employee">
-			?桀??∪極嚗?span th:text="${loginEmployeeName}"></span>
-			嚗撌亦楊??<span th:text="${loginEmployeeId}"></span>嚗?		</div>
+			&#30446;&#21069;&#21729;&#24037;&#65306;<span th:text="${loginEmployeeName}"></span>
+			&#65288;&#21729;&#24037;&#32232;&#34399; <span th:text="${loginEmployeeId}"></span>&#65289;
+		</div>
 
-		<div th:if="${param.hostReviewOnly}" class="notice error">?勗??唾??望暑?蜓颲行??∪祟?賂?敺??靘??/div>
+		<div th:if="${param.hostReviewOnly}" class="notice error">
+			&#22577;&#21517;&#23529;&#26680;&#30001;&#27963;&#21205;&#20027;&#36774;&#20154;&#34389;&#29702;&#65292;&#24460;&#21488;&#21482;&#26597;&#30475;&#35330;&#21934;&#12289;&#36864;&#27454;&#33287;&#25765;&#27454;&#36039;&#35338;&#12290;
+		</div>
 
 		<div class="table-card">
 			<table>
 				<thead>
 					<tr>
-						<th>閮蝺刻?</th>
-						<th>瘣餃??迂</th>
-						<th>?ID</th>
-						<th>???/th>
-						<th>?勗?鈭箸</th>
-						<th>蝮賡?憿?/th>
-						<th>?唾??酉</th>
-						<th>隞狡?孵?</th>
-						<th>?甈??交狡</th>
-						<th>??</th>
+						<th>&#35330;&#21934;&#32232;&#34399;</th>
+						<th>&#27963;&#21205;&#21517;&#31281;</th>
+						<th>&#26371;&#21729;&#32232;&#34399;</th>
+						<th>&#35330;&#21934;&#29376;&#24907;</th>
+						<th>&#22577;&#21517;&#20154;&#25976;</th>
+						<th>&#35330;&#21934;&#37329;&#38989;</th>
+						<th>&#22577;&#21517;&#20633;&#35387;</th>
+						<th>&#20184;&#27454;&#26041;&#24335;</th>
+						<th>&#36864;&#27454; / &#25765;&#27454;</th>
+						<th>&#25805;&#20316;</th>
 					</tr>
 				</thead>
 
@@ -201,32 +199,36 @@ td {
 						<td class="note" th:text="${order.orderNote ?: '-'}"></td>
 
 						<td>
-							<span th:if="${order.activityPaymentMethod == 0}">靽∠??/span>
-							<span th:if="${order.activityPaymentMethod == 1}">ATM頧董</span>
-							<span th:if="${order.activityPaymentMethod == null}">?芯?甈?/span>
+							<span th:if="${order.activityPaymentMethod == 0}">&#20449;&#29992;&#21345;</span>
+							<span th:if="${order.activityPaymentMethod == 1}">ATM&#36681;&#24115;</span>
+							<span th:if="${order.activityPaymentMethod == null}">&#26410;&#20184;&#27454;</span>
 						</td>
 
 						<td>
-							<div th:if="${order.refundStatus == null or order.refundStatus == 0}">&#28961;&#36864;&#27454;</div>
-							<div th:if="${order.refundStatus == 1}">&#24453;&#36864;&#27454;</div>
-							<div th:if="${order.refundStatus == 2}">&#24050;&#36864;&#27454;</div>
-							<div th:if="${order.orderStatus == 4}">
-								<span th:if="${order.payoutAmount}">撌脫甈?/span>
-								<span th:unless="${order.payoutAmount}">敺甈?/span>
+							<div>
+								<span th:if="${order.refundStatus == null or order.refundStatus == 0}" class="status active">&#28961;&#36864;&#27454;</span>
+								<span th:if="${order.refundStatus == 1}" class="status refund">&#24453;&#36864;&#27454;</span>
+								<span th:if="${order.refundStatus == 2}" class="status completed">&#24050;&#36864;&#27454;</span>
+							</div>
+							<div th:if="${order.orderStatus == 0 or order.orderStatus == 4}" style="margin-top: 6px;">
+								<span th:if="${order.payoutAmount}" class="status completed">&#24050;&#25765;&#27454;</span>
+								<span th:unless="${order.payoutAmount}" class="status refund">&#24453;&#25765;&#27454;</span>
 							</div>
 						</td>
 
 						<td>
 							<a class="btn-detail"
 								th:href="@{/activityOrder/detail(activityOrderId=${order.activityOrderId})}">
-								?亦??敦
+								&#26597;&#30475;&#26126;&#32048;
 							</a>
 						</td>
+					</tr>
+					<tr th:if="${#lists.isEmpty(orderListData)}">
+						<td colspan="10">&#30446;&#21069;&#27794;&#26377;&#35330;&#21934;&#36039;&#26009;</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 	</div>
-
 </body>
 </html>

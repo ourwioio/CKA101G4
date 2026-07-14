@@ -1,8 +1,8 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>瘣餃?閮?敦</title>
+<title>&#24460;&#21488;&#35330;&#21934;&#26126;&#32048;</title>
 
 <style>
 body {
@@ -108,6 +108,7 @@ body {
 	color: #0f172a;
 	font-weight: bold;
 	line-height: 1.6;
+	white-space: pre-wrap;
 }
 
 .actions {
@@ -125,26 +126,25 @@ body {
 </head>
 
 <body>
-
 	<div class="page-card">
 		<div class="header">
-			<h1>瘣餃?閮?敦</h1>
-			<a th:href="@{/activityOrder/listAllActivityOrder}" class="btn-back">餈?閮蝝??/a>
+			<h1>&#24460;&#21488;&#35330;&#21934;&#26126;&#32048;</h1>
+			<a th:href="@{/activityOrder/listAllActivityOrder}" class="btn-back">&#22238;&#35330;&#21934;&#32000;&#37636;</a>
 		</div>
 
-		<div th:if="${param.refundSuccess}" class="notice success">撌脩Ⅱ隤甈曉???/div>
-		<div th:if="${param.payoutSuccess}" class="notice success">撌脩Ⅱ隤甈曉???/div>
+		<div th:if="${param.refundSuccess}" class="notice success">&#24050;&#30906;&#35469;&#36864;&#27454;&#23436;&#25104;</div>
+		<div th:if="${param.payoutSuccess}" class="notice success">&#24050;&#30906;&#35469;&#25765;&#27454;&#23436;&#25104;</div>
 
 		<div class="section">
-			<h2>閮鞈?</h2>
+			<h2>&#35330;&#21934;&#36039;&#35338;</h2>
 			<div class="grid">
 				<div class="item">
-					<div class="label">閮蝺刻?</div>
+					<div class="label">&#35330;&#21934;&#32232;&#34399;</div>
 					<div class="value" th:text="${orderVO.activityOrderId}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">閮???/div>
+					<div class="label">&#35330;&#21934;&#29376;&#24907;</div>
 					<div class="value">
 						<span th:if="${orderVO.orderStatus == 0}">&#24050;&#20184;&#27454;</span>
 						<span th:if="${orderVO.orderStatus == 1}">&#24050;&#21462;&#28040;</span>
@@ -155,48 +155,48 @@ body {
 				</div>
 
 				<div class="item">
-					<div class="label">?勗??蝺刻?</div>
+					<div class="label">&#22577;&#21517;&#26371;&#21729;&#32232;&#34399;</div>
 					<div class="value" th:text="${orderVO.buyerMemberId}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">?勗?鈭箸</div>
+					<div class="label">&#22577;&#21517;&#20154;&#25976;</div>
 					<div class="value" th:text="${orderVO.bookingCount}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">蝮賡?憿?/div>
+					<div class="label">&#35330;&#21934;&#37329;&#38989;</div>
 					<div class="value">NT$ <span th:text="${orderVO.totalAmount}"></span></div>
 				</div>
 
 				<div class="item">
-					<div class="label">?唾??酉</div>
+					<div class="label">&#22577;&#21517;&#20633;&#35387;</div>
 					<div class="value" th:text="${orderVO.orderNote ?: '-'}"></div>
 				</div>
 			</div>
 		</div>
 
 		<div class="section">
-			<h2>瘣餃?鞈?</h2>
+			<h2>&#27963;&#21205;&#36039;&#35338;</h2>
 			<div class="grid">
 				<div class="item">
-					<div class="label">瘣餃??迂</div>
+					<div class="label">&#27963;&#21205;&#21517;&#31281;</div>
 					<div class="value" th:text="${activityVO != null ? activityVO.activityTitle : '-'}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">銝餉齒?蝺刻?</div>
+					<div class="label">&#20027;&#36774;&#26371;&#21729;&#32232;&#34399;</div>
 					<div class="value" th:text="${activityVO != null ? activityVO.memberId : '-'}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">瘣餃?????</div>
+					<div class="label">&#27963;&#21205;&#38283;&#22987;&#26178;&#38291;</div>
 					<div class="value"
 						th:text="${activityVO != null && activityVO.startTime != null ? #temporals.format(activityVO.startTime, 'yyyy-MM-dd HH:mm') : '-'}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">瘣餃?蝯???</div>
+					<div class="label">&#27963;&#21205;&#32080;&#26463;&#26178;&#38291;</div>
 					<div class="value"
 						th:text="${activityVO != null && activityVO.endTime != null ? #temporals.format(activityVO.endTime, 'yyyy-MM-dd HH:mm') : '-'}"></div>
 				</div>
@@ -204,25 +204,25 @@ body {
 		</div>
 
 		<div class="section">
-			<h2>隞狡 / ?甈?/ ?交狡</h2>
+			<h2>&#20184;&#27454; / &#36864;&#27454; / &#25765;&#27454;</h2>
 			<div class="grid">
 				<div class="item">
-					<div class="label">隞狡?孵?</div>
+					<div class="label">&#20184;&#27454;&#26041;&#24335;</div>
 					<div class="value">
-						<span th:if="${orderVO.activityPaymentMethod == 0}">靽∠??/span>
-						<span th:if="${orderVO.activityPaymentMethod == 1}">ATM頧董</span>
-						<span th:if="${orderVO.activityPaymentMethod == null}">?芯?甈?/span>
+						<span th:if="${orderVO.activityPaymentMethod == 0}">&#20449;&#29992;&#21345;</span>
+						<span th:if="${orderVO.activityPaymentMethod == 1}">ATM&#36681;&#24115;</span>
+						<span th:if="${orderVO.activityPaymentMethod == null}">&#26410;&#20184;&#27454;</span>
 					</div>
 				</div>
 
 				<div class="item">
-					<div class="label">隞狡??</div>
+					<div class="label">&#20184;&#27454;&#26178;&#38291;</div>
 					<div class="value"
 						th:text="${orderVO.paidAt != null ? #temporals.format(orderVO.paidAt, 'yyyy-MM-dd HH:mm:ss') : '-'}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">?甈曄???/div>
+					<div class="label">&#36864;&#27454;&#29376;&#24907;</div>
 					<div class="value">
 						<span th:if="${orderVO.refundStatus == null or orderVO.refundStatus == 0}">&#28961;&#36864;&#27454;</span>
 						<span th:if="${orderVO.refundStatus == 1}">&#24453;&#36864;&#27454;</span>
@@ -231,20 +231,20 @@ body {
 				</div>
 
 				<div class="item">
-					<div class="label">?甈曉???/div>
+					<div class="label">&#36864;&#27454;&#21407;&#22240;</div>
 					<div class="value" th:text="${orderVO.refundReason ?: '-'}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">?交狡???/div>
+					<div class="label">&#25765;&#27454;&#29376;&#24907;</div>
 					<div class="value">
-						<span th:if="${orderVO.payoutAmount}">撌脫甈?/span>
-						<span th:unless="${orderVO.payoutAmount}">敺甈?/span>
+						<span th:if="${orderVO.payoutAmount}">&#24050;&#25765;&#27454;</span>
+						<span th:unless="${orderVO.payoutAmount}">&#24453;&#25765;&#27454;</span>
 					</div>
 				</div>
 
 				<div class="item">
-					<div class="label">摰???</div>
+					<div class="label">&#23436;&#25104;&#26178;&#38291;</div>
 					<div class="value"
 						th:text="${orderVO.activityCompletedAt != null ? #temporals.format(orderVO.activityCompletedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}"></div>
 				</div>
@@ -253,24 +253,24 @@ body {
 			<div class="actions">
 				<form th:if="${orderVO.refundStatus == 1}"
 					th:action="@{/activityOrder/confirmRefund}" method="post"
-					onsubmit="return confirm('蝣箄???閮撌脣憿甈曉?嚗?);">
+					onsubmit="return confirm('&#30906;&#35469;&#27492;&#35330;&#21934;&#24050;&#23436;&#25104;&#36864;&#27454;&#65311;');">
 					<input type="hidden" name="activityOrderId" th:value="${orderVO.activityOrderId}">
-					<button type="submit" class="btn-action btn-refund">蝣箄??甈?/button>
+					<button type="submit" class="btn-action btn-refund">&#30906;&#35469;&#36864;&#27454;</button>
 				</form>
 
 				<form th:if="${(orderVO.orderStatus == 0 or orderVO.orderStatus == 4) and !orderVO.payoutAmount and (orderVO.refundStatus == null or orderVO.refundStatus == 0)}"
 					th:action="@{/activityOrder/confirmPayout}" method="post"
-					onsubmit="return confirm('蝣箄???閮撌脫甈曄策銝餉齒???');">
+					onsubmit="return confirm('&#30906;&#35469;&#27492;&#35330;&#21934;&#24050;&#25765;&#27454;&#32102;&#27963;&#21205;&#20027;&#36774;&#20154;&#65311;');">
 					<input type="hidden" name="activityOrderId" th:value="${orderVO.activityOrderId}">
-					<button type="submit" class="btn-action btn-payout">蝣箄??交狡</button>
+					<button type="submit" class="btn-action btn-payout">&#30906;&#35469;&#25765;&#27454;</button>
 				</form>
 
 				<div class="empty-action"
 					th:unless="${orderVO.refundStatus == 1 or ((orderVO.orderStatus == 0 or orderVO.orderStatus == 4) and !orderVO.payoutAmount and (orderVO.refundStatus == null or orderVO.refundStatus == 0))}">
-					?桀?瘝??臬銵??甈暹??交狡????				</div>
+					&#30446;&#21069;&#27794;&#26377;&#21487;&#34389;&#29702;&#30340;&#36864;&#27454;&#25110;&#25765;&#27454;&#25805;&#20316;
+				</div>
 			</div>
 		</div>
 	</div>
-
 </body>
 </html>
