@@ -1,512 +1,910 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
-    <title>一對一服務詳情</title>
 
-    <style>
-        body {
-            font-family: Arial, "Microsoft JhengHei", sans-serif;
-            margin: 30px;
-            background-color: #f7f7f7;
-            color: #222;
-        }
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-        h1, h2 {
-            margin-bottom: 12px;
-        }
+    <title th:text="|${serviceVO.serviceName}｜Webond|">
+        一對一服務詳情
+    </title>
 
-        a {
-            color: #0066cc;
-            text-decoration: none;
-        }
+    <!-- Google Fonts -->
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
 
-        a:hover {
-            text-decoration: underline;
-        }
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
 
-        .container {
-            max-width: 1100px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 24px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+          rel="stylesheet">
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #fff;
-            margin-top: 10px;
-        }
+    <!-- Service 前台共用 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/service/common.css}">
 
-        th {
-            background-color: #f0f0f0;
-            text-align: left;
-            width: 180px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            vertical-align: top;
-        }
-
-        .message-success {
-            padding: 10px;
-            margin-bottom: 15px;
-            background-color: #e8f7e8;
-            border: 1px solid #8bc48b;
-            color: #227722;
-            border-radius: 4px;
-        }
-
-        .message-error {
-            padding: 10px;
-            margin-bottom: 15px;
-            background-color: #fdeaea;
-            border: 1px solid #dd8888;
-            color: #aa2222;
-            border-radius: 4px;
-        }
-
-        .status-available {
-            color: green;
-            font-weight: bold;
-        }
-
-        .status-locked {
-            color: #cc8500;
-            font-weight: bold;
-        }
-
-        .status-booked {
-            color: #b00020;
-            font-weight: bold;
-        }
-
-        .status-unknown {
-            color: gray;
-            font-weight: bold;
-        }
-
-        .btn {
-            padding: 6px 12px;
-            border: 1px solid #888;
-            background-color: #fff;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .btn-primary {
-            background-color: #1976d2;
-            border-color: #1976d2;
-            color: #fff;
-        }
-
-        .btn-secondary {
-            background-color: #eee;
-            color: #222;
-        }
-
-        .btn:disabled {
-            cursor: not-allowed;
-            color: #aaa;
-            background-color: #eee;
-        }
-
-        .request-box {
-            display: none;
-            margin-top: 10px;
-            padding: 12px;
-            background-color: #fafafa;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-        }
-
-        .request-box textarea {
-            width: 100%;
-            box-sizing: border-box;
-            resize: vertical;
-            padding: 8px;
-            font-family: Arial, "Microsoft JhengHei", sans-serif;
-        }
-
-        .hint {
-            color: #666;
-            font-size: 14px;
-        }
-
-        .websocket-status {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-
-        .action-text {
-            color: #666;
-        }
-    </style>
-
-    <!-- WebSocket / STOMP 前端套件 -->
-    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <!-- 服務詳情頁專屬 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/service/serviceDetail.css}">
 </head>
 
 <body>
 
-<div class="container">
+<!-- ==========================================================
+     固定導覽列
+     ========================================================== -->
+<header class="site-header">
 
-    <h1>一對一服務詳情</h1>
+    <div class="header-inner">
 
-    <p>
-        <a th:href="@{/front/services}">回服務列表</a>
-    </p>
+        <!-- Logo -->
+        <a class="logo"
+           th:href="@{/}">
 
-    <!-- 成功 / 錯誤訊息 -->
-    <div th:if="${successMsg}" class="message-success" th:text="${successMsg}">
-        成功訊息
+            <span class="logo-mark">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M3 11l9-7 9 7"></path>
+
+                    <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path>
+                </svg>
+
+            </span>
+
+            <span class="logo-text">
+
+                <span class="logo-title">
+                    Webond
+                </span>
+
+                <span class="logo-sub">
+                    閒人出租
+                </span>
+
+            </span>
+        </a>
+
+        <!-- Header 右側 -->
+        <nav class="header-actions">
+
+            <!-- 聊天室 -->
+            <a class="icon-btn icon-btn--chat"
+               href="javascript:void(0);"
+               title="聊天室"
+               aria-disabled="true">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8
+                             8.5 8.5 0 0 1-7.6 4.7
+                             8.38 8.38 0 0 1-3.8-.9
+                             L3 21l1.9-5.7
+                             a8.38 8.38 0 0 1-.9-3.8
+                             8.5 8.5 0 0 1 4.7-7.6
+                             8.38 8.38 0 0 1 3.8-.9
+                             h.5a8.48 8.48 0 0 1 8 8v.5z">
+                    </path>
+                </svg>
+
+                <span class="icon-badge"
+                      th:if="${session.memberVO != null}">
+                    0
+                </span>
+            </a>
+
+            <!-- 通知 -->
+            <a class="icon-btn icon-btn--notify"
+               th:href="@{/front/notification/listAllNotification}"
+               title="通知">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M18 8a6 6 0 0 0-12 0
+                             c0 7-3 9-3 9h18s-3-2-3-9">
+                    </path>
+
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0">
+                    </path>
+                </svg>
+
+                <span class="icon-badge icon-badge--unread"
+                      th:if="${unreadNotificationCount != null
+                               and unreadNotificationCount > 0}"
+                      th:text="${unreadNotificationCount > 99
+                               ? '99+'
+                               : unreadNotificationCount}">
+                </span>
+            </a>
+
+            <!-- 已登入 -->
+            <a th:if="${session.memberVO != null}"
+               class="icon-btn icon-btn--member"
+               th:href="@{/front/memberPage/my(memberId=${session.memberVO.memberId})}"
+               title="會員中心">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8
+                             a4 4 0 0 0-4 4v2">
+                    </path>
+
+                    <circle cx="12"
+                            cy="7"
+                            r="4">
+                    </circle>
+                </svg>
+            </a>
+
+            <!-- 未登入 -->
+            <a th:if="${session.memberVO == null}"
+               class="icon-btn icon-btn--member"
+               th:href="@{/member/login}"
+               title="登入">
+
+                <svg viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8
+                             a4 4 0 0 0-4 4v2">
+                    </path>
+
+                    <circle cx="12"
+                            cy="7"
+                            r="4">
+                    </circle>
+                </svg>
+            </a>
+
+        </nav>
+    </div>
+</header>
+
+<!-- ==========================================================
+     主要內容
+     ========================================================== -->
+<main class="site-main">
+
+    <!-- 返回與登入狀態 -->
+    <div class="service-detail-topbar">
+
+        <a class="service-detail-back"
+           th:href="@{/front/services}">
+            ← 回服務列表
+        </a>
+
+        <div class="service-detail-login-status">
+
+            <span th:if="${session.memberVO != null}">
+
+                目前會員：
+
+                <strong th:text="${session.memberVO.memberId}">
+                    1
+                </strong>
+
+                ｜
+
+                <a th:href="@{/member/services}">
+                    我的服務
+                </a>
+
+            </span>
+
+            <span th:if="${session.memberVO == null}">
+
+                尚未登入 ｜
+
+                <a th:href="@{/member/services/fakelogin}">
+                    前往登入
+                </a>
+
+            </span>
+
+        </div>
     </div>
 
-    <div th:if="${errorMsg}" class="message-error" th:text="${errorMsg}">
-        錯誤訊息
+    <!-- 成功訊息 -->
+    <div class="alert alert-success"
+         th:if="${successMsg != null}"
+         th:text="${successMsg}">
+        操作成功
     </div>
 
-    <p id="websocketStatus" class="websocket-status">
-        即時時段狀態連線中...
-    </p>
+    <!-- 錯誤訊息 -->
+    <div class="alert alert-error"
+         th:if="${errorMsg != null}"
+         th:text="${errorMsg}">
+        操作失敗
+    </div>
 
-    <hr>
+    <!-- ======================================================
+         左側內容 + 右側預約
+         ====================================================== -->
+    <div class="service-detail-layout">
 
-    <!-- 服務基本資料 -->
-    <h2>服務基本資料</h2>
+        <!-- ==================================================
+             左側服務資訊
+             ================================================== -->
+        <section class="service-detail-main">
 
-    <table>
-        <tr>
-            <th>服務編號</th>
-            <td th:text="${serviceVO.serviceId}">1</td>
-        </tr>
+            <!-- 服務封面 -->
+            <div class="service-detail-image-wrap">
 
-        <tr>
-            <th>服務類型</th>
-            <td th:text="${serviceVO.serviceType != null ? serviceVO.serviceType.typeName : '無類型'}">
-                服務類型
-            </td>
-        </tr>
+                <img class="service-detail-image"
+                     th:src="@{/front/services/image/{serviceId}(
+                                serviceId=${serviceVO.serviceId}
+                             )}"
+                     th:onerror="this.onerror=null; this.src='/images/activity/default-activity.jpg';"
+                     alt="服務圖片">
 
-        <tr>
-            <th>服務名稱</th>
-            <td th:text="${serviceVO.serviceName}">
-                服務名稱
-            </td>
-        </tr>
+            </div>
 
-        <tr>
-            <th>服務描述</th>
-            <td th:text="${serviceVO.description}">
-                服務描述
-            </td>
-        </tr>
+            <!-- 服務主標題 -->
+            <section class="panel service-detail-header">
 
-        <tr>
-            <th>提供者會員編號</th>
-            <td th:text="${serviceVO.memberId}">
-                1
-            </td>
-        </tr>
+                <div class="service-detail-meta">
 
-        <tr>
-            <th>每小時費率</th>
-            <td>
-                NT$
-                <span th:text="${serviceVO.hourlyRate}">500</span>
-                / 小時
-            </td>
-        </tr>
+                    <span class="service-detail-type"
+                          th:text="${serviceVO.serviceType != null
+                                   ? serviceVO.serviceType.typeName
+                                   : '無服務類型'}">
+                        服務類型
+                    </span>
 
-        <tr>
-            <th>建立時間</th>
-            <td th:text="${#temporals.format(serviceVO.createdAt, 'yyyy-MM-dd HH:mm')}">
-                2026-01-01 10:00
-            </td>
-        </tr>
-    </table>
+                    <span class="service-detail-id"
+                          th:text="|服務編號 #${serviceVO.serviceId}|">
+                        服務編號 #1
+                    </span>
 
-    <hr>
+                </div>
 
-    <!-- 服務時段 -->
-    <h2>服務時段</h2>
+                <h1 class="service-detail-title"
+                    th:text="${serviceVO.serviceName}">
+                    河堤散步陪伴
+                </h1>
 
-    <p class="hint">
-        選擇可預約時段後，可以填寫需求備註並送出預約申請。送出後需等待賣家確認。
-    </p>
+                <!-- 有地區欄位時顯示 -->
+                <p class="service-detail-location"
+                   th:if="${serviceVO.serviceCity != null
+                            or serviceVO.serviceDistrict != null}">
 
-    <p th:if="${#lists.isEmpty(serviceSlotList)}">
-        目前沒有可顯示的服務時段。
-    </p>
+                    <span class="service-detail-location-dot"></span>
 
-    <table id="slotTable" th:if="${!#lists.isEmpty(serviceSlotList)}">
-        <thead>
-        <tr>
-            <th style="width: 90px;">時段編號</th>
-            <th>開始時間</th>
-            <th>結束時間</th>
-            <th style="width: 120px;">狀態</th>
-            <th style="width: 360px;">操作</th>
-        </tr>
-        </thead>
+                    <span th:text="|${serviceVO.serviceCity ?: ''}
+                                   ${serviceVO.serviceDistrict ?: ''}|">
+                        桃園市 八德區
+                    </span>
 
-        <tbody>
-        <tr th:each="slot : ${serviceSlotList}"
-            th:id="'slot-row-' + ${slot.serviceSlotId}"
-            th:attr="data-slot-id=${slot.serviceSlotId}">
+                </p>
 
-            <td th:text="${slot.serviceSlotId}">
-                1
-            </td>
+                <p class="service-detail-place"
+                   th:if="${serviceVO.serviceLocation != null
+                            and !#strings.isEmpty(serviceVO.serviceLocation)}"
+                   th:text="${serviceVO.serviceLocation}">
+                    八德埤塘自然生態公園附近
+                </p>
 
-            <td th:text="${#temporals.format(slot.startTime, 'yyyy-MM-dd HH:mm')}">
-                2026-01-01 10:00
-            </td>
+            </section>
 
-            <td th:text="${#temporals.format(slot.endTime, 'yyyy-MM-dd HH:mm')}">
-                2026-01-01 11:00
-            </td>
+            <!-- 服務說明 -->
+            <section class="panel service-detail-section">
 
-            <td th:id="'slot-status-' + ${slot.serviceSlotId}">
-                <span th:if="${slot.slotStatus == 0}" class="status-available">
-                    可預約
-                </span>
+                <h2 class="service-detail-section-title">
+                    服務內容
+                </h2>
 
-                <span th:if="${slot.slotStatus == 1}" class="status-locked">
-                    暫時鎖定
-                </span>
+                <p class="service-detail-description"
+                   th:text="${serviceVO.description}">
+                    服務內容說明
+                </p>
 
-                <span th:if="${slot.slotStatus == 2}" class="status-booked">
-                    已預約
-                </span>
+            </section>
 
-                <span th:if="${slot.slotStatus != 0 and slot.slotStatus != 1 and slot.slotStatus != 2}"
-                      class="status-unknown">
-                    未知狀態
-                </span>
-            </td>
+            <!-- 服務基本資訊 -->
+            <section class="panel service-detail-section">
 
-            <td th:id="'slot-action-' + ${slot.serviceSlotId}">
+                <h2 class="service-detail-section-title">
+                    服務資訊
+                </h2>
 
-                <!-- 可預約狀態 -->
-                <div th:if="${slot.slotStatus == 0}">
+                <div class="service-detail-info-list">
 
-                    <!-- 未登入 -->
-                    <div th:if="${session.memberVO == null}">
-                        <span class="action-text">請先登入後再預約</span>
-                        <br>
-                        <a th:href="@{/member/services/fakelogin}">前往登入</a>
+                    <div class="service-detail-info-item">
+
+                        <p class="service-detail-info-label">
+                            服務類型
+                        </p>
+
+                        <p class="service-detail-info-value"
+                           th:text="${serviceVO.serviceType != null
+                                    ? serviceVO.serviceType.typeName
+                                    : '無服務類型'}">
+                            散步陪伴
+                        </p>
+
                     </div>
 
-                    <!-- 已登入，但是自己的服務 -->
-                    <div th:if="${session.memberVO != null and session.memberVO.memberId == serviceVO.memberId}">
-                        <span class="action-text">這是你自己的服務，不能預約</span>
+                    <div class="service-detail-info-item">
+
+                        <p class="service-detail-info-label">
+                            每小時費率
+                        </p>
+
+                        <p class="service-detail-info-value">
+
+                            NT$
+
+                            <span th:text="${serviceVO.hourlyRate}">
+                                500
+                            </span>
+
+                            / 小時
+
+                        </p>
+
                     </div>
 
-                    <!-- 已登入，而且不是自己的服務 -->
-                    <div th:if="${session.memberVO != null and session.memberVO.memberId != serviceVO.memberId}">
+                    <div class="service-detail-info-item"
+                         th:if="${serviceVO.serviceCity != null}">
 
-                        <button type="button"
-                                class="btn btn-primary"
-                                th:onclick="'toggleRequestBox(' + ${slot.serviceSlotId} + ')'">
-                            申請預約
+                        <p class="service-detail-info-label">
+                            服務縣市
+                        </p>
+
+                        <p class="service-detail-info-value"
+                           th:text="${serviceVO.serviceCity}">
+                            桃園市
+                        </p>
+
+                    </div>
+
+                    <div class="service-detail-info-item"
+                         th:if="${serviceVO.serviceDistrict != null}">
+
+                        <p class="service-detail-info-label">
+                            服務行政區
+                        </p>
+
+                        <p class="service-detail-info-value"
+                           th:text="${serviceVO.serviceDistrict}">
+                            八德區
+                        </p>
+
+                    </div>
+
+                    <div class="service-detail-info-item">
+
+                        <p class="service-detail-info-label">
+                            服務提供者
+                        </p>
+
+                        <p class="service-detail-info-value"
+                           th:text="|會員 #${serviceVO.memberId}|">
+                            會員 #1
+                        </p>
+
+                    </div>
+
+                    <div class="service-detail-info-item">
+
+                        <p class="service-detail-info-label">
+                            建立時間
+                        </p>
+
+                        <p class="service-detail-info-value"
+                           th:text="${serviceVO.createdAt != null
+                                    ? #temporals.format(
+                                        serviceVO.createdAt,
+                                        'yyyy-MM-dd HH:mm'
+                                      )
+                                    : '-'}">
+                            2026-07-13 14:00
+                        </p>
+
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- 服務提供者 -->
+            <section class="panel service-detail-section">
+
+                <h2 class="service-detail-section-title">
+                    服務提供者
+                </h2>
+
+                <div class="service-provider-box">
+
+                    <div class="service-provider-avatar"
+                         th:text="${serviceVO.memberId}">
+                        1
+                    </div>
+
+                    <div class="service-provider-info">
+
+                        <p class="service-provider-label">
+                            提供者會員編號
+                        </p>
+
+                        <p class="service-provider-value"
+                           th:text="|會員 #${serviceVO.memberId}|">
+                            會員 #1
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </section>
+
+        <!-- ==================================================
+             右側時段與預約
+             ================================================== -->
+        <aside class="panel service-booking-panel">
+
+            <!-- 價格 -->
+            <div class="service-price-box">
+
+                <span class="service-price-currency">
+                    NT$
+                </span>
+
+                <strong class="service-price-amount"
+                        th:text="${serviceVO.hourlyRate}">
+                    500
+                </strong>
+
+                <span class="service-price-unit">
+                    / 小時
+                </span>
+
+            </div>
+
+            <h2 class="service-slot-title">
+                服務時段
+            </h2>
+
+            <p class="service-slot-subtitle">
+                所有時段都會顯示，只有「可預約」狀態能送出申請。
+            </p>
+
+            <!-- 沒有任何時段 -->
+            <div class="service-slot-empty"
+                 th:if="${#lists.isEmpty(serviceSlotList)}">
+
+                目前尚未建立任何服務時段
+
+            </div>
+
+            <!-- 全部時段 -->
+            <div class="service-slot-list"
+                 th:if="${!#lists.isEmpty(serviceSlotList)}">
+
+                <article class="service-slot-item"
+                         th:each="slot : ${serviceSlotList}"
+                         th:classappend="${slot.slotStatus == 0
+                                          ? ' service-slot-item--available'
+                                          : (slot.slotStatus == 1
+                                              ? ' service-slot-item--locked'
+                                              : ' service-slot-item--booked')}">
+
+                    <!-- 時間與狀態 -->
+                    <div class="service-slot-summary">
+
+                        <div class="service-slot-time">
+
+                            <div class="service-slot-date"
+                                 th:text="${#temporals.format(
+                                            slot.startTime,
+                                            'yyyy-MM-dd'
+                                          )}">
+                                2026-08-01
+                            </div>
+
+                            <div class="service-slot-hour">
+
+                                <span th:text="${#temporals.format(
+                                                   slot.startTime,
+                                                   'HH:mm'
+                                                 )}">
+                                    14:00
+                                </span>
+
+                                <span class="service-slot-separator">
+                                    ～
+                                </span>
+
+                                <span th:text="${#temporals.format(
+                                                   slot.endTime,
+                                                   'HH:mm'
+                                                 )}">
+                                    16:00
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <!-- 狀態 0 -->
+                        <span class="service-slot-status available"
+                              th:if="${slot.slotStatus == 0}">
+                            可預約
+                        </span>
+
+                        <!-- 狀態 1 -->
+                        <span class="service-slot-status locked"
+                              th:if="${slot.slotStatus == 1}">
+                            暫時鎖定
+                        </span>
+
+                        <!-- 狀態 2 -->
+                        <span class="service-slot-status booked"
+                              th:if="${slot.slotStatus == 2}">
+                            已預約
+                        </span>
+
+                        <!-- 未知狀態 -->
+                        <span class="service-slot-status booked"
+                              th:if="${slot.slotStatus != 0
+                                       and slot.slotStatus != 1
+                                       and slot.slotStatus != 2}">
+                            無法預約
+                        </span>
+
+                    </div>
+
+                    <!-- ==================================================
+                         可預約時段操作
+                         ================================================== -->
+                    <div class="service-slot-action"
+                         th:if="${slot.slotStatus == 0}">
+
+                        <!-- 已登入且不是自己的服務 -->
+                        <button class="btn service-booking-toggle"
+                                type="button"
+                                th:if="${session.memberVO != null
+                                       and session.memberVO.memberId
+                                           != serviceVO.memberId}"
+                                th:attr="data-target=|booking-form-${slot.serviceSlotId}|">
+
+                            我要預約
+
                         </button>
 
-                        <div class="request-box"
-                             th:id="'request-box-' + ${slot.serviceSlotId}">
+                        <!-- 自己的服務 -->
+                        <button class="btn service-booking-disabled"
+                                type="button"
+                                disabled
+                                th:if="${session.memberVO != null
+                                       and session.memberVO.memberId
+                                           == serviceVO.memberId}">
 
-                            <form th:action="@{/front/services/{serviceId}/slots/{serviceSlotId}/request(
-                                        serviceId=${serviceVO.serviceId},
-                                        serviceSlotId=${slot.serviceSlotId}
-                                    )}"
-                                  method="post">
+                            這是你的服務
 
-                                <p>
-                                    <strong>預約時段：</strong>
-                                    <span th:text="${#temporals.format(slot.startTime, 'yyyy-MM-dd HH:mm')}">
-                                        2026-01-01 10:00
-                                    </span>
-                                    ～
-                                    <span th:text="${#temporals.format(slot.endTime, 'yyyy-MM-dd HH:mm')}">
-                                        2026-01-01 11:00
-                                    </span>
-                                </p>
+                        </button>
 
-                                <p>
-                                    <strong>買方備註：</strong>
-                                </p>
+                        <!-- 未登入 -->
+                        <a class="btn service-booking-toggle"
+                           th:if="${session.memberVO == null}"
+                           th:href="@{/member/services/fakelogin}">
 
-                                <textarea name="buyerRequestNote"
-                                          rows="4"
-                                          maxlength="500"
-                                          placeholder="可以簡單說明你的需求，例如：想聊什麼、希望怎麼進行、地點偏好、注意事項等。"></textarea>
+                            登入後預約
 
-                                <p class="hint">
-                                    備註為選填，最多 500 字。送出後會等待賣家確認。
-                                </p>
+                        </a>
 
-                                <button type="submit" class="btn btn-primary">
-                                    送出預約申請
-                                </button>
-
-                                <button type="button"
-                                        class="btn btn-secondary"
-                                        th:onclick="'toggleRequestBox(' + ${slot.serviceSlotId} + ')'">
-                                    取消
-                                </button>
-                            </form>
-                        </div>
                     </div>
-                </div>
 
-                <!-- 暫時鎖定 -->
-                <div th:if="${slot.slotStatus == 1}">
-                    <span class="action-text">此時段暫時鎖定中</span>
-                </div>
+                    <!-- ==================================================
+                         點擊我要預約後才展開
+                         ================================================== -->
+                    <form class="service-booking-form"
+                          th:id="|booking-form-${slot.serviceSlotId}|"
+                          th:if="${slot.slotStatus == 0
+                                   and session.memberVO != null
+                                   and session.memberVO.memberId
+                                       != serviceVO.memberId}"
+                          th:action="@{/front/services/{serviceId}/slots/{serviceSlotId}/request(
+                                      serviceId=${serviceVO.serviceId},
+                                      serviceSlotId=${slot.serviceSlotId}
+                                   )}"
+                          method="post"
+                          hidden>
 
-                <!-- 已預約 -->
-                <div th:if="${slot.slotStatus == 2}">
-                    <span class="action-text">此時段已被預約</span>
-                </div>
+                        <div class="form-group">
 
-                <!-- 其他狀態 -->
-                <div th:if="${slot.slotStatus != 0 and slot.slotStatus != 1 and slot.slotStatus != 2}">
-                    <span class="action-text">目前不可預約</span>
-                </div>
+                            <label class="form-label"
+                                   th:for="|buyerRequestNote-${slot.serviceSlotId}|">
 
-            </td>
-        </tr>
-        </tbody>
-    </table>
+                                預約需求
 
-    <hr>
+                            </label>
 
-    <p>
-        <a th:href="@{/front/services}">回服務列表</a>
-    </p>
+                            <textarea class="form-control service-booking-note"
+                                      th:id="|buyerRequestNote-${slot.serviceSlotId}|"
+                                      name="buyerRequestNote"
+                                      maxlength="500"
+                                      placeholder="可填寫需求、注意事項或希望的服務方式"></textarea>
 
-</div>
+                            <p class="form-help">
+                                最多 500 個字，也可以留空。
+                            </p>
 
-<script th:inline="javascript">
-    const serviceId = /*[[${serviceVO.serviceId}]]*/ 0;
-    const websocketUrl = /*[[@{/ws}]]*/ "/ws";
-    const topicUrl = "/topic/services/" + serviceId + "/slots";
+                        </div>
 
-    let stompClient = null;
+                        <div class="service-booking-form-actions">
 
-    connectWebSocket();
+                            <button class="btn service-booking-submit"
+                                    type="submit">
 
-    function toggleRequestBox(serviceSlotId) {
-        const box = document.getElementById("request-box-" + serviceSlotId);
+                                送出預約申請
 
-        if (box == null) {
-            return;
+                            </button>
+
+                            <button class="btn btn-secondary service-booking-cancel"
+                                    type="button"
+                                    th:attr="data-target=|booking-form-${slot.serviceSlotId}|">
+
+                                取消
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                    <!-- 暫時鎖定 -->
+                    <div th:if="${slot.slotStatus == 1}">
+
+                        <p class="service-slot-message">
+                            此時段目前正由其他會員進行預約，暫時無法操作。
+                        </p>
+
+                        <p class="service-slot-lock-time"
+                           th:if="${slot.lockExpiresAt != null}"
+                           th:text="|鎖定期限：${#temporals.format(
+                                       slot.lockExpiresAt,
+                                       'yyyy-MM-dd HH:mm'
+                                   )}|">
+                            鎖定期限：2026-08-01 14:00
+                        </p>
+
+                    </div>
+
+                    <!-- 已預約 -->
+                    <p class="service-slot-message"
+                       th:if="${slot.slotStatus == 2}">
+
+                        此時段已經完成預約，無法再次選擇。
+
+                    </p>
+
+                </article>
+
+            </div>
+
+        </aside>
+
+    </div>
+
+</main>
+
+<!-- ==========================================================
+     預約表單展開與收合
+     ========================================================== -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        const toggleButtons =
+            document.querySelectorAll(
+                '.service-booking-toggle[data-target]'
+            );
+
+        const cancelButtons =
+            document.querySelectorAll(
+                '.service-booking-cancel[data-target]'
+            );
+
+        function closeAllBookingForms(exceptForm) {
+
+            const openedForms =
+                document.querySelectorAll(
+                    '.service-booking-form:not([hidden])'
+                );
+
+            openedForms.forEach(function (form) {
+
+                if (form !== exceptForm) {
+                    form.setAttribute('hidden', '');
+                }
+            });
+
+            toggleButtons.forEach(function (button) {
+
+                const targetId =
+                    button.dataset.target;
+
+                const targetForm =
+                    document.getElementById(targetId);
+
+                if (targetForm !== exceptForm) {
+                    button.textContent = '我要預約';
+                }
+            });
         }
 
-        if (box.style.display === "block") {
-            box.style.display = "none";
-        } else {
-            box.style.display = "block";
-        }
-    }
+        toggleButtons.forEach(function (button) {
 
-    function connectWebSocket() {
-        if (typeof SockJS === "undefined" || typeof Stomp === "undefined") {
-            document.getElementById("websocketStatus").textContent =
-                "即時狀態套件載入失敗，但仍可正常送出預約申請。";
-            return;
-        }
+            button.addEventListener('click', function () {
 
-        const socket = new SockJS(websocketUrl);
+                const targetId =
+                    button.dataset.target;
 
-        stompClient = Stomp.over(socket);
+                const targetForm =
+                    document.getElementById(targetId);
 
-        stompClient.debug = null;
+                if (!targetForm) {
+                    return;
+                }
 
-        stompClient.connect(
-            {},
-            function () {
-                document.getElementById("websocketStatus").textContent =
-                    "即時時段狀態已連線";
+                const isHidden =
+                    targetForm.hasAttribute('hidden');
 
-                stompClient.subscribe(topicUrl, function (message) {
-                    const slotMessage = JSON.parse(message.body);
+                closeAllBookingForms(targetForm);
 
-                    updateSlotStatus(slotMessage);
-                });
-            },
-            function () {
-                document.getElementById("websocketStatus").textContent =
-                    "即時時段狀態連線中斷，正在重新連線...";
+                if (isHidden) {
 
-                setTimeout(connectWebSocket, 3000);
+                    targetForm.removeAttribute('hidden');
+
+                    button.textContent =
+                        '收起預約需求';
+
+                    const textarea =
+                        targetForm.querySelector('textarea');
+
+                    if (textarea) {
+                        textarea.focus();
+                    }
+
+                } else {
+
+                    targetForm.setAttribute('hidden', '');
+
+                    button.textContent =
+                        '我要預約';
+                }
+            });
+        });
+
+        cancelButtons.forEach(function (button) {
+
+            button.addEventListener('click', function () {
+
+                const targetId =
+                    button.dataset.target;
+
+                const targetForm =
+                    document.getElementById(targetId);
+
+                if (!targetForm) {
+                    return;
+                }
+
+                targetForm.setAttribute('hidden', '');
+
+                const toggleButton =
+                    document.querySelector(
+                        '.service-booking-toggle[data-target="' +
+                        targetId +
+                        '"]'
+                    );
+
+                if (toggleButton) {
+                    toggleButton.textContent = '我要預約';
+                }
+            });
+        });
+    });
+</script>
+
+<!-- ==========================================================
+     通知數量更新
+     ========================================================== -->
+<script>
+    async function refreshUnreadBadge() {
+
+        try {
+
+            const response =
+                await fetch('/notification/unread-count');
+
+            if (!response.ok) {
+                return;
             }
-        );
+
+            const count =
+                await response.json();
+
+            const notifyButton =
+                document.querySelector(
+                    '.icon-btn--notify'
+                );
+
+            if (!notifyButton) {
+                return;
+            }
+
+            let badge =
+                notifyButton.querySelector(
+                    '.icon-badge--unread'
+                );
+
+            if (count > 0) {
+
+                if (!badge) {
+
+                    badge =
+                        document.createElement('span');
+
+                    badge.className =
+                        'icon-badge icon-badge--unread';
+
+                    notifyButton.appendChild(badge);
+                }
+
+                badge.textContent =
+                    count > 99 ? '99+' : count;
+
+            } else if (badge) {
+
+                badge.remove();
+            }
+
+        } catch (error) {
+
+            console.error(
+                '更新通知數量失敗：',
+                error
+            );
+        }
     }
 
-    function updateSlotStatus(slotMessage) {
-        const serviceSlotId = slotMessage.serviceSlotId;
-        const slotStatus = Number(slotMessage.slotStatus);
+    refreshUnreadBadge();
 
-        const row = document.getElementById("slot-row-" + serviceSlotId);
-        const statusCell = document.getElementById("slot-status-" + serviceSlotId);
-        const actionCell = document.getElementById("slot-action-" + serviceSlotId);
-
-        if (row == null || statusCell == null || actionCell == null) {
-            return;
-        }
-
-        /*
-         * slotStatus = 3 代表已封存
-         * 前台買家頁面不顯示封存時段
-         */
-        if (slotStatus === 3) {
-            row.style.display = "none";
-            return;
-        }
-
-        statusCell.innerHTML = buildStatusHtml(slotStatus);
-        actionCell.innerHTML = buildActionHtml(slotStatus);
-    }
-
-    function buildStatusHtml(slotStatus) {
-        if (slotStatus === 0) {
-            return '<span class="status-available">可預約</span>';
-        }
-
-        if (slotStatus === 1) {
-            return '<span class="status-locked">暫時鎖定</span>';
-        }
-
-        if (slotStatus === 2) {
-            return '<span class="status-booked">已預約</span>';
-        }
-
-        return '<span class="status-unknown">未知狀態</span>';
-    }
-
-    function buildActionHtml(slotStatus) {
-        if (slotStatus === 0) {
-            return '<span class="action-text">此時段已恢復可預約，請重新整理頁面後申請。</span>';
-        }
-
-        if (slotStatus === 1) {
-            return '<span class="action-text">此時段暫時鎖定中</span>';
-        }
-
-        if (slotStatus === 2) {
-            return '<span class="action-text">此時段已被預約</span>';
-        }
-
-        return '<span class="action-text">目前不可預約</span>';
-    }
+    setInterval(
+        refreshUnreadBadge,
+        30000
+    );
 </script>
 
 </body>

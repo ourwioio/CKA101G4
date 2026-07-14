@@ -93,14 +93,15 @@ public class MemberServiceController {
 	        }
 
 	        serviceSvc.addBySeller(
-	                loginMemberId,
-	                request.getServiceTypeId(),
-	                request.getServiceName(),
-	                request.getDescription(),
-	                request.getHourlyRate(),
-	                serviceImage,
-	                serviceImageType
-	        );
+	        	    loginMemberId,
+	        	    request.getServiceTypeId(),
+	        	    request.getServiceName(),
+	        	    request.getDescription(),
+	        	    request.getHourlyRate(),
+	        	    request.getServiceCity(),
+	        	    request.getServiceDistrict(),
+	        	    request.getServiceLocation()
+	        	);
 
 	        redirectAttributes.addFlashAttribute("successMsg", "新增服務成功");
 
@@ -160,32 +161,52 @@ public class MemberServiceController {
 	// 會員修改服務
 	// URL: POST /member/services/{serviceId}/edit
 	@PostMapping("/{serviceId}/edit")
-	public String updateService(@PathVariable Integer serviceId, @ModelAttribute ServiceRequest request,
-			HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+	public String updateService(
+	        @PathVariable Integer serviceId,
+	        @ModelAttribute ServiceRequest request,
+	        HttpSession session,
+	        Model model,
+	        RedirectAttributes redirectAttributes) {
 
-		Integer loginMemberId = getLoginMemberId(session);
+	    Integer loginMemberId = getLoginMemberId(session);
 
-		if (loginMemberId == null) {
-			return "redirect:/member/services/fakelogin";
-		}
+	    if (loginMemberId == null) {
+	        return "redirect:/member/services/fakelogin";
+	    }
 
-		try {
-			serviceSvc.updateBySeller(serviceId, loginMemberId, request.getServiceTypeId(), request.getServiceName(),
-					request.getDescription(), request.getHourlyRate());
+	    try {
+	        serviceSvc.updateBySeller(
+	                serviceId,
+	                loginMemberId,
+	                request.getServiceTypeId(),
+	                request.getServiceName(),
+	                request.getDescription(),
+	                request.getHourlyRate(),
+	                request.getServiceCity(),
+	                request.getServiceDistrict(),
+	                request.getServiceLocation()
+	        );
 
-			redirectAttributes.addFlashAttribute("successMsg", "修改服務成功");
+	        redirectAttributes.addFlashAttribute(
+	                "successMsg",
+	                "修改服務成功"
+	        );
 
-			return "redirect:/member/services";
+	        return "redirect:/member/services";
 
-		} catch (IllegalArgumentException e) {
-			model.addAttribute("errorMsg", e.getMessage());
-			model.addAttribute("serviceId", serviceId);
-			model.addAttribute("serviceRequest", request);
-			model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
-			model.addAttribute("mode", "edit");
+	    } catch (IllegalArgumentException e) {
 
-			return "front-end/service/memberServiceForm";
-		}
+	        model.addAttribute("errorMsg", e.getMessage());
+	        model.addAttribute("serviceId", serviceId);
+	        model.addAttribute("serviceRequest", request);
+	        model.addAttribute(
+	                "serviceTypeList",
+	                serviceTypeSvc.getAll()
+	        );
+	        model.addAttribute("mode", "edit");
+
+	        return "front-end/service/memberServiceForm";
+	    }
 	}
 
 	// 會員中心：我的服務列表
@@ -288,18 +309,32 @@ public class MemberServiceController {
 		if (loginMemberId == null) {
 			return "redirect:/member/services/fakelogin";
 		}
-
 		try {
-			List<ServiceSlotVO> slotList = serviceSlotSvc.getSlotsBySeller(serviceId, loginMemberId);
+		    ServiceVO serviceVO =
+		            serviceSvc.getOwnServiceForEdit(
+		                    serviceId,
+		                    loginMemberId
+		            );
 
-			model.addAttribute("serviceId", serviceId);
-			model.addAttribute("slotList", slotList);
+		    List<ServiceSlotVO> slotList =
+		            serviceSlotSvc.getSlotsBySeller(
+		                    serviceId,
+		                    loginMemberId
+		            );
 
-			return "front-end/service/memberServiceSlotList";
+		    model.addAttribute("serviceId", serviceId);
+		    model.addAttribute("serviceVO", serviceVO);
+		    model.addAttribute("slotList", slotList);
+
+		    return "front-end/service/memberServiceSlotList";
 
 		} catch (IllegalArgumentException e) {
-			redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
-			return "redirect:/member/services";
+		    redirectAttributes.addFlashAttribute(
+		            "errorMsg",
+		            e.getMessage()
+		    );
+
+		    return "redirect:/member/services";
 		}
 	}
 

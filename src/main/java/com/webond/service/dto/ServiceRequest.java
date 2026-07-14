@@ -21,7 +21,16 @@ public class ServiceRequest {
     @NotNull(message = "每小時費率必須是整數")
     @Min(value = 0, message = "每小時費率不可小於 0")
     private Integer hourlyRate;
+    
+    @NotBlank(message = "請選擇服務縣市")
+    private String serviceCity;
 
+    @NotBlank(message = "請選擇服務行政區")
+    private String serviceDistrict;
+
+    @Size(max = 255, message = "服務地點說明不可超過 255 個字")
+    private String serviceLocation;
+    
     public Integer getServiceTypeId() {
 		return serviceTypeId;
 	}
@@ -53,4 +62,30 @@ public class ServiceRequest {
 	public void setHourlyRate(Integer hourlyRate) {
 		this.hourlyRate = hourlyRate;
 	}
+
+	public String getServiceCity() {
+		return serviceCity;
+	}
+
+	public void setServiceCity(String serviceCity) {
+		this.serviceCity = serviceCity;
+	}
+
+	public String getServiceDistrict() {
+		return serviceDistrict;
+	}
+
+	public void setServiceDistrict(String serviceDistrict) {
+		this.serviceDistrict = serviceDistrict;
+	}
+
+	public String getServiceLocation() {
+		return serviceLocation;
+	}
+
+	public void setServiceLocation(String serviceLocation) {
+		this.serviceLocation = serviceLocation;
+	}
+	
+	
 }
