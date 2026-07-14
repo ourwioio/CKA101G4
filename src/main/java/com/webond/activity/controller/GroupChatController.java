@@ -11,6 +11,7 @@ import com.webond.activity.model.ActivityOrderService;
 import com.webond.activity.model.ActivityService;
 import com.webond.activity.model.ActivityVO;
 import com.webond.activity.model.GroupChatMessageService;
+import com.webond.member.model.MemberVO;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -39,7 +40,7 @@ public class GroupChatController {
 
 		model.addAttribute("activityVO", activityVO);
 		model.addAttribute("loginMemberId", loginMemberId);
-		model.addAttribute("loginMemberName", "會員" + loginMemberId);
+		model.addAttribute("loginMemberName", resolveLoginMemberName(session, loginMemberId));
 		model.addAttribute("messageListData", groupChatMessageSvc.getMessagesByActivityId(activityId));
 		return "front-end/activity/groupChatRoom";
 	}
@@ -69,11 +70,28 @@ public class GroupChatController {
 	}
 
 	private Integer getLoginMemberId(HttpSession session) {
+		Object member = session.getAttribute("memberVO");
+		if (member instanceof MemberVO) {
+			return ((MemberVO) member).getMemberId();
+		}
+
 		Object memberId = session.getAttribute(ACTIVITY_LOGIN_MEMBER_ID);
 		if (memberId instanceof Integer) {
 			return (Integer) memberId;
 		}
 
 		return null;
+	}
+
+	private String resolveLoginMemberName(HttpSession session, Integer loginMemberId) {
+		Object member = session.getAttribute("memberVO");
+		if (member instanceof MemberVO) {
+			MemberVO memberVO = (MemberVO) member;
+			if (memberVO.getNickname() != null && !memberVO.getNickname().trim().isEmpty()) {
+				return memberVO.getNickname();
+			}
+		}
+
+		return "\u6703\u54e1" + loginMemberId;
 	}
 }

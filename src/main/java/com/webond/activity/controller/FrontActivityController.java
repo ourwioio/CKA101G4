@@ -23,9 +23,11 @@ import java.util.Map;
 
 import com.webond.activity.model.ActivityOrderService;
 import com.webond.activity.model.ActivityOrderVO;
+import com.webond.activity.model.ActivityNotificationService;
 import com.webond.activity.model.ActivityService;
 import com.webond.activity.model.ActivityTypeService;
 import com.webond.activity.model.ActivityVO;
+import com.webond.member.model.MemberVO;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -45,6 +47,9 @@ public class FrontActivityController {
 
 	@Autowired
 	private ActivityTypeService activityTypeSvc;
+
+	@Autowired
+	private ActivityNotificationService activityNotificationSvc;
 
 	@GetMapping("/activity/front/home")
 	public String frontActHome(Model model, HttpSession session) {
@@ -251,7 +256,8 @@ public class FrontActivityController {
 			return "redirect:/activity/front/detail?id=" + orderVO.getActivityId() + "&full=true";
 		}
 
-		activityOrderSvc.addOrder(orderVO);
+		ActivityOrderVO savedOrder = activityOrderSvc.addOrder(orderVO);
+		activityNotificationSvc.notifyHostNewOrder(activityVO, savedOrder);
 
 		return "redirect:/activity/front/myOrder";
 	}
@@ -272,6 +278,8 @@ public class FrontActivityController {
 
 		if (orderVO != null) {
 			activitySvc.syncAttendeesFromOrders(orderVO.getActivityId());
+			activityNotificationSvc.notifyHostOrderCancelled(activitySvc.getOneActivity(orderVO.getActivityId()),
+					orderVO, existingOrder == null ? null : existingOrder.getOrderStatus());
 		}
 
 		return "redirect:/activity/front/myOrder";
@@ -318,6 +326,9 @@ public class FrontActivityController {
 			}
 			if (paidOrder.getOrderStatus() != null && paidOrder.getOrderStatus() == 1) {
 				return "redirect:/activity/front/myOrder?paymentCancelled=true";
+			}
+			if (paidOrder.getOrderStatus() != null && paidOrder.getOrderStatus() == 0) {
+				activityNotificationSvc.notifyHostPaymentCompleted(activityVO, paidOrder);
 			}
 		}
 
@@ -510,8 +521,9 @@ public class FrontActivityController {
 			return "redirect:/activity/front/myHostActivity?noPermission=true";
 		}
 
-		activityOrderSvc.approveOrderByHost(activityOrderId);
+		ActivityOrderVO approvedOrder = activityOrderSvc.approveOrderByHost(activityOrderId);
 		activitySvc.syncAttendeesFromOrders(orderVO.getActivityId());
+		activityNotificationSvc.notifyBuyerApproved(activitySvc.getOneActivity(orderVO.getActivityId()), approvedOrder);
 		return "redirect:/activity/front/memberList?activityId=" + orderVO.getActivityId() + "&approveSuccess=true";
 	}
 
@@ -531,8 +543,9 @@ public class FrontActivityController {
 			return "redirect:/activity/front/myHostActivity?noPermission=true";
 		}
 
-		activityOrderSvc.rejectOrderByHost(activityOrderId);
+		ActivityOrderVO rejectedOrder = activityOrderSvc.rejectOrderByHost(activityOrderId);
 		activitySvc.syncAttendeesFromOrders(orderVO.getActivityId());
+		activityNotificationSvc.notifyBuyerRejected(activitySvc.getOneActivity(orderVO.getActivityId()), rejectedOrder);
 		return "redirect:/activity/front/memberList?activityId=" + orderVO.getActivityId() + "&rejectSuccess=true";
 	}
 
@@ -612,9 +625,10 @@ public class FrontActivityController {
 
 	private void addFakeLoginMember(Model model, HttpSession session) {
 		Integer loginMemberId = getLoginMemberId(session);
+		MemberVO loginMember = getSessionMember(session);
 
 		model.addAttribute("loginMemberId", loginMemberId);
-		model.addAttribute("loginMemberName", loginMemberId == null ? "未登入" : "會員" + loginMemberId);
+		model.addAttribute("loginMemberName", resolveLoginMemberName(loginMember, loginMemberId));
 		model.addAttribute("isLoginMember", loginMemberId != null);
 		model.addAttribute("memberListData", TEST_MEMBER_IDS);
 	}
@@ -704,12 +718,38 @@ public class FrontActivityController {
 	}
 
 	private Integer getLoginMemberId(HttpSession session) {
+		MemberVO loginMember = getSessionMember(session);
+		if (loginMember != null && loginMember.getMemberId() != null) {
+			return loginMember.getMemberId();
+		}
+
 		Object memberId = session.getAttribute(ACTIVITY_LOGIN_MEMBER_ID);
 		if (memberId instanceof Integer && TEST_MEMBER_IDS.contains((Integer) memberId)) {
 			return (Integer) memberId;
 		}
 
 		return null;
+	}
+
+	private MemberVO getSessionMember(HttpSession session) {
+		Object member = session.getAttribute("memberVO");
+		if (member instanceof MemberVO) {
+			return (MemberVO) member;
+		}
+
+		return null;
+	}
+
+	private String resolveLoginMemberName(MemberVO loginMember, Integer loginMemberId) {
+		if (loginMemberId == null) {
+			return "未登入";
+		}
+
+		if (loginMember != null && loginMember.getNickname() != null && !loginMember.getNickname().trim().isEmpty()) {
+			return loginMember.getNickname();
+		}
+
+		return "會員" + loginMemberId;
 	}
 
 	private boolean isLoginMember(HttpSession session) {

@@ -23,7 +23,7 @@ public class ActivityOrderService {
 	private static final Byte REFUND_STATUS_NONE = 0;
 	private static final Byte REFUND_STATUS_REQUESTED = 1;
 	private static final Byte REFUND_STATUS_DONE = 2;
-	private static final int PAYMENT_TIMEOUT_SECONDS = 10;
+	private static final int PAYMENT_TIMEOUT_SECONDS = 60;
 
 	@Autowired
 	private ActivityOrderRepository orderRepo;
@@ -200,6 +200,8 @@ public class ActivityOrderService {
 
 		for (ActivityOrderVO orderVO : pendingOrders) {
 			orderVO.setOrderStatus(ORDER_STATUS_CANCELLED);
+			orderVO.setRefundStatus(REFUND_STATUS_NONE);
+			orderVO.setRefundReason("\u540d\u984d\u5df2\u6eff\uff0c\u7cfb\u7d71\u81ea\u52d5\u53d6\u6d88\uff0c\u672a\u4ed8\u6b3e\u7121\u9700\u9000\u6b3e");
 			orderRepo.save(orderVO);
 		}
 	}
@@ -218,11 +220,15 @@ public class ActivityOrderService {
 
 		if (isPaymentExpired(orderVO)) {
 			orderVO.setOrderStatus(ORDER_STATUS_CANCELLED);
+			orderVO.setRefundStatus(REFUND_STATUS_NONE);
+			orderVO.setRefundReason("\u4ed8\u6b3e\u903e\u6642\uff0c\u7cfb\u7d71\u81ea\u52d5\u53d6\u6d88\uff0c\u672a\u4ed8\u6b3e\u7121\u9700\u9000\u6b3e");
 			return orderRepo.save(orderVO);
 		}
 
 		if (!hasCapacity) {
 			orderVO.setOrderStatus(ORDER_STATUS_CANCELLED);
+			orderVO.setRefundStatus(REFUND_STATUS_NONE);
+			orderVO.setRefundReason("\u540d\u984d\u5df2\u6eff\uff0c\u7cfb\u7d71\u81ea\u52d5\u53d6\u6d88\uff0c\u672a\u4ed8\u6b3e\u7121\u9700\u9000\u6b3e");
 			return orderRepo.save(orderVO);
 		}
 
@@ -238,6 +244,8 @@ public class ActivityOrderService {
 
 		for (ActivityOrderVO orderVO : pendingPaymentOrders) {
 			orderVO.setOrderStatus(ORDER_STATUS_CANCELLED);
+			orderVO.setRefundStatus(REFUND_STATUS_NONE);
+			orderVO.setRefundReason("\u540d\u984d\u5df2\u6eff\uff0c\u7cfb\u7d71\u81ea\u52d5\u53d6\u6d88\uff0c\u672a\u4ed8\u6b3e\u7121\u9700\u9000\u6b3e");
 			orderRepo.save(orderVO);
 		}
 	}
@@ -256,6 +264,8 @@ public class ActivityOrderService {
 
 		for (ActivityOrderVO orderVO : overdueOrders) {
 			orderVO.setOrderStatus(ORDER_STATUS_CANCELLED);
+			orderVO.setRefundStatus(REFUND_STATUS_NONE);
+			orderVO.setRefundReason("\u4ed8\u6b3e\u903e\u6642\uff0c\u7cfb\u7d71\u81ea\u52d5\u53d6\u6d88\uff0c\u672a\u4ed8\u6b3e\u7121\u9700\u9000\u6b3e");
 			orderRepo.save(orderVO);
 		}
 
@@ -265,12 +275,21 @@ public class ActivityOrderService {
 	public ActivityOrderVO confirmRefund(Integer activityOrderId, Integer employeeId) {
 		ActivityOrderVO orderVO = getOneOrder(activityOrderId);
 
-		if (orderVO == null || !REFUND_STATUS_REQUESTED.equals(orderVO.getRefundStatus())) {
+		if (orderVO == null) {
+			return null;
+		}
+
+		if (REFUND_STATUS_DONE.equals(orderVO.getRefundStatus())) {
 			return orderVO;
 		}
 
-		orderVO.setOrderStatus(ORDER_STATUS_CANCELLED);
+		if (!REFUND_STATUS_REQUESTED.equals(orderVO.getRefundStatus())) {
+			return orderVO;
+		}
+
+		orderVO.setOrderStatus(ORDER_STATUS_COMPLETED);
 		orderVO.setRefundStatus(REFUND_STATUS_DONE);
+		orderVO.setActivityCompletedAt(LocalDateTime.now());
 		orderVO.setEmployeeId(employeeId);
 		return orderRepo.save(orderVO);
 	}

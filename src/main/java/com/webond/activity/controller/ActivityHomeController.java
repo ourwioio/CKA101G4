@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.webond.employee.model.EmployeeVO;
+import com.webond.activity.config.ActivityEmployeeSession;
 import com.webond.employee.repository.EmployeeRepository;
 
 import jakarta.servlet.http.HttpSession;
@@ -18,10 +18,11 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/activity")
 public class ActivityHomeController {
 
-	private static final String ACTIVITY_ADMIN_EMPLOYEE_ID = "activityAdminEmployeeId";
-
 	@Autowired
 	private EmployeeRepository employeeRepo;
+
+	@Autowired
+	private ActivityEmployeeSession employeeSession;
 
 	@GetMapping("/home")
 	public String portal() {
@@ -37,33 +38,17 @@ public class ActivityHomeController {
 	@PostMapping("/admin/fakeLogin")
 	public String switchFakeEmployee(@RequestParam(value = "employeeId", required = false) Integer employeeId,
 			HttpSession session) {
-		if (employeeId != null && employeeRepo.existsById(employeeId)) {
-			session.setAttribute(ACTIVITY_ADMIN_EMPLOYEE_ID, employeeId);
-		} else {
-			session.removeAttribute(ACTIVITY_ADMIN_EMPLOYEE_ID);
-		}
+		employeeSession.switchActivityTestEmployee(session, employeeId);
 		return "redirect:/activity/admin/home";
 	}
 
 	private void addFakeEmployee(Model model, HttpSession session) {
-		Integer employeeId = getLoginEmployeeId(session);
-		EmployeeVO employeeVO = employeeId == null ? null : employeeRepo.findById(employeeId).orElse(null);
-		String employeeName = employeeVO != null && employeeVO.getEmpName() != null
-				&& !employeeVO.getEmpName().trim().isEmpty() ? employeeVO.getEmpName()
-						: employeeId == null ? "No employee" : "Employee " + employeeId;
+		Integer employeeId = employeeSession.getLoginEmployeeId(session);
+		String employeeName = employeeSession.getLoginEmployeeName(session);
 
 		model.addAttribute("loginEmployeeId", employeeId);
 		model.addAttribute("loginEmployeeName", employeeName);
 		model.addAttribute("isLoginEmployee", employeeId != null);
 		model.addAttribute("employeeListData", employeeRepo.findAll(Sort.by(Sort.Direction.ASC, "employeeId")));
-	}
-
-	private Integer getLoginEmployeeId(HttpSession session) {
-		Object employeeId = session.getAttribute(ACTIVITY_ADMIN_EMPLOYEE_ID);
-		if (employeeId instanceof Integer && employeeRepo.existsById((Integer) employeeId)) {
-			return (Integer) employeeId;
-		}
-
-		return null;
 	}
 }

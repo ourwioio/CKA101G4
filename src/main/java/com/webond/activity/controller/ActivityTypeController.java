@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.webond.activity.config.ActivityEmployeeSession;
 import com.webond.activity.model.ActivityTypeService;
 import com.webond.activity.model.ActivityTypeVO; 
 
@@ -18,10 +19,11 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/activityType")
 public class ActivityTypeController {
 
-    private static final String ACTIVITY_ADMIN_EMPLOYEE_ID = "activityAdminEmployeeId";
-
     @Autowired
     private ActivityTypeService activityTypeSvc;
+
+    @Autowired
+    private ActivityEmployeeSession employeeSession;
 
     //查詢全部活動類型
     @GetMapping("/listAllActivityType")
@@ -90,6 +92,6 @@ public class ActivityTypeController {
     }
 
     private boolean isLoginEmployee(HttpSession session) {
-        return session.getAttribute(ACTIVITY_ADMIN_EMPLOYEE_ID) instanceof Integer;
+        return employeeSession.isLoginEmployee(session);
     }
 }
