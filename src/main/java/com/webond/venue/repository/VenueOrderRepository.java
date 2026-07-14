@@ -27,4 +27,8 @@ public interface VenueOrderRepository
 			@Param("orderStatus") Byte orderStatus);
 	
 	 List<VenueOrderVO> findByOrderStatus(Byte orderStatus);
+	 
+	 List<VenueOrderVO> findByRefundStatus(Byte refundStatus);
+	 
+	 List<VenueOrderVO> findByPayoutAmount(Byte payoutAmount);
 }

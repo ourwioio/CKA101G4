@@ -103,9 +103,11 @@
                            th:href="@{/front/venueOrder/mockPayment(venueOrderId=${order.venueOrderId})}"
                            class="btn-pay">前往付款</a>
 
- 						<th:block th:if="${order.orderStatus == 1}">
-                            <a th:href="@{/front/venueOrder/cancelOrder(venueOrderId=${order.venueOrderId})}" class="btn-pay">取消訂單</a>
-                        </th:block>
+						<th:block th:if="${order.orderStatus == 1 and order.bookDate.isAfter(cancelCutoff)}">
+						    <button type="button" class="btn-pay"
+						            th:attr="data-order-id=${order.venueOrderId}"
+						            onclick="openCancelModal(this)">取消訂單</button>
+						</th:block>
 
                         <!-- 🌟 已付款或已完成：可評價、可檢舉 -->
                         <th:block th:if="${order.orderStatus == 3}">
@@ -149,6 +151,24 @@
             <div class="modal-actions">
                 <button type="button" class="btn-cancel" onclick="closeReviewModal()">取消</button>
                 <button type="submit" class="btn-submit">送出評價</button>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- 取消訂單 Modal -->
+<div class="modal-overlay" id="cancelModalOverlay">
+    <div class="modal-box">
+        <h3>取消訂單</h3>
+        <form th:action="@{/front/venueOrder/cancelOrder}" method="post" id="cancelForm">
+            <input type="hidden" name="venueOrderId" id="cancelOrderId" />
+
+            <label for="cancelReason" class="cancel-label">請告訴我們取消的原因：</label>
+            <textarea name="refundReason" id="cancelReason"
+                      placeholder="請輸入取消原因..." required></textarea>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeCancelModal()">返回</button>
+                <button type="submit" class="btn-submit btn-danger-submit">確認取消訂單</button>
             </div>
         </form>
     </div>
