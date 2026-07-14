@@ -10,6 +10,7 @@
 <body>
 <div class="container">
     <h2>服務檢舉列表</h2>
+    <a class="icon-dot" href="javascript:void(0);" title="返回員工首頁" aria-disabled="true">✖</a>
     <table class="report-table">
         <thead>
             <tr>
@@ -27,7 +28,7 @@
         <tbody>
             <tr th:each="report : ${serviceReportListData}">
                 <td th:text="${report.serviceReportId}">1</td>
-                <td th:text="${report.serviceOrder != null ? report.serviceOrder.serviceOrderId : '-'}">1</td>
+                <td th:text="${report.service != null ? report.service.serviceId : '-'}">1</td>
                 <td th:text="${report.reporterMember != null ? report.reporterMember.memberId : '-'}">1</td>
                 <td th:text="${report.employee != null ? report.employee.employeeId : '未指派'}">-</td>
                 <td class="content-cell" th:text="${report.serviceReportCom}" th:title="${report.serviceReportCom}">檢舉內容...</td>

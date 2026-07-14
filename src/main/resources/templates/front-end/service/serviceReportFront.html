@@ -149,12 +149,12 @@
 <body>
 <div class="report-card">
     <h3>檢舉訂單</h3>
-
+	<a th:href="@{/front/services}">✖</a>
     <form class="report-form" th:action="@{/front/serviceReport/insert}" th:object="${serviceReportVO}" method="post">
-        <input type="hidden" name="orderId" th:value="${serviceOrderVO.serviceOrderId}" />
+        <input type="hidden" name="serviceId" th:value="${serviceId}" />
         <div class="form-group">
             <label>檢舉內容</label>
-            <textarea th:field="*{serviceReportCom}" maxlength="500" rows="5"></textarea>
+            <textarea th:field="*{serviceReportCom}" maxlength="500" rows="5" placeholder="請輸入檢舉內容..."></textarea>
             <span class="error-text" th:if="${#fields.hasErrors('serviceReportCom')}"
                   th:errors="*{serviceReportCom}"></span>
         </div>
@@ -163,19 +163,6 @@
     </form>
 </div>
 
-<!-- 檢舉成功彈窗 -->
-<div class="success-modal-mask" th:classappend="${reportSuccess} ? ' show' : ''" id="successModalMask">
-    <div class="success-modal">
-        <div class="icon">✓</div>
-        <p>檢舉已成功送出</p>
-        <button type="button" onclick="closeSuccessModal()">確定</button>
-    </div>
-</div>
 
-<script>
-    function closeSuccessModal() {
-        document.getElementById('successModalMask').classList.remove('show');
-    }
-</script>
 </body>
 </html>
