@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>場地檢舉管理</title>
+<th:block th:insert="~{back-end/venue/index}"></th:block>
+<link rel="stylesheet" th:href="@{/css/back-end/venue/listAllVenue.css}"
+	href="venue-admin-list.css">
+</head>
+<body>
+	<div class="wrap">
+		<div class="header">
+			<span class="title">場地檢舉清單</span>
+		</div>
+
+		<!-- 搜尋區：依處理狀態 -->
+		<form th:action="@{/venueReport/listByStatus}" method="get"
+			style="margin-bottom: 1.5rem; display: flex; gap: 12px; flex-wrap: wrap;">
+			<select name="reportStatus">
+				<option value="">-- 全部狀態 --</option>
+				<option value="0"
+					th:selected="${searchReportStatus != null && searchReportStatus == 0}">審核中</option>
+				<option value="1"
+					th:selected="${searchReportStatus != null && searchReportStatus == 1}">通過（下架場地）</option>
+				<option value="2"
+					th:selected="${searchReportStatus != null && searchReportStatus == 2}">未通過</option>
+			</select>
+
+			<button type="submit" class="btn-edit">搜尋</button>
+		</form>
+
+		<div class="table-wrap">
+			<table>
+				<thead>
+					<tr>
+						<th>檢舉編號</th>
+						<th>場地訂單編號</th>
+						<th>檢舉內容</th>
+						<th>檢舉時間</th>
+						<th>處理狀態</th>
+						<th>處理員工</th>
+						<th>處理完成時間</th>
+						<th>查看詳情</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="venueReport : ${venueReportListData}">
+						<td th:text="${venueReport.venueReportId}"></td>
+						<td th:text="${venueReport.venueOrderId}"></td>
+						<td th:text="${venueReport.serReportCom}"></td>
+						<td
+							th:text="${venueReport.serReportTime != null ? #temporals.format(venueReport.serReportTime, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+						<td><span th:switch="${venueReport.reportStatus}"> <span
+								th:case="0" class="btn-toggle btn-toggle-down"
+								style="pointer-events: none;">審核中</span> <span th:case="1"
+								class="btn-toggle btn-toggle-up" style="pointer-events: none;">通過（下架場地）</span>
+								<span th:case="2" class="btn-toggle btn-toggle-down"
+								style="pointer-events: none;">未通過</span>
+						</span></td>
+						<td
+							th:text="${venueReport.employeeId != null ? venueReport.employeeId + ' - ' + employeeNameMap.get(venueReport.employeeId) : '尚未處理'}"></td>
+						<td
+							th:text="${venueReport.handledAt != null ? #temporals.format(venueReport.handledAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+						<td>
+							<form th:action="@{/venueReport/viewOne}" method="get"
+								class="inline-form">
+								<input type="hidden" name="venueReportId"
+									th:value="${venueReport.venueReportId}" />
+								<button type="submit" class="btn-edit">查看詳情</button>
+							</form>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</body>
+</html>
