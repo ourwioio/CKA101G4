@@ -1,0 +1,865 @@
+/* =========================================================
+   買方訂單頁
+   ========================================================= */
+
+:root {
+    --buyer-text: #31302f;
+    --buyer-muted: #77716d;
+    --buyer-border: #eadfd8;
+    --buyer-surface: #ffffff;
+    --buyer-primary: #e77758;
+    --buyer-primary-dark: #cf5f42;
+    --buyer-success: #36856a;
+    --buyer-warning: #b77b22;
+    --buyer-danger: #c95454;
+    --buyer-blue: #497ca8;
+    --buyer-shadow: 0 16px 40px rgba(91, 67, 54, 0.09);
+}
+
+body {
+    background: #fbf8f5;
+    color: var(--buyer-text);
+}
+
+[hidden] {
+    display: none !important;
+}
+
+.buyer-order-page {
+    width: min(1180px, calc(100% - 40px));
+    margin: 0 auto;
+    padding-top: 36px;
+    padding-bottom: 70px;
+}
+
+/* Header */
+
+.buyer-header-link {
+    color: #6f6965;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.buyer-header-link:hover,
+.buyer-header-link.active {
+    color: var(--buyer-primary);
+}
+
+/* Heading */
+
+.buyer-order-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 28px;
+    margin-bottom: 26px;
+}
+
+.buyer-order-eyebrow,
+.buyer-modal-eyebrow {
+    margin: 0 0 7px;
+    color: var(--buyer-primary);
+    font-family: "M PLUS Rounded 1c", sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+}
+
+.buyer-order-heading .page-title {
+    margin: 0;
+    font-family: "M PLUS Rounded 1c", "Noto Sans TC", sans-serif;
+    font-size: clamp(30px, 4vw, 44px);
+    line-height: 1.15;
+}
+
+.buyer-order-description {
+    max-width: 650px;
+    margin: 12px 0 0;
+    color: var(--buyer-muted);
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+.buyer-order-heading-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.buyer-primary-link,
+.buyer-pay-button {
+    border-color: var(--buyer-primary);
+    background: var(--buyer-primary);
+    color: #ffffff;
+}
+
+.buyer-primary-link:hover,
+.buyer-pay-button:hover {
+    border-color: var(--buyer-primary-dark);
+    background: var(--buyer-primary-dark);
+}
+
+/* Summary */
+
+.buyer-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.buyer-summary-card {
+    min-height: 116px;
+    padding: 20px;
+    border: 1px solid var(--buyer-border);
+    border-radius: 18px;
+    background: var(--buyer-surface);
+    box-shadow: 0 8px 24px rgba(91, 67, 54, 0.05);
+}
+
+.buyer-summary-card span {
+    display: block;
+    color: var(--buyer-muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.buyer-summary-card strong {
+    display: block;
+    margin-top: 13px;
+    font-family: "M PLUS Rounded 1c", sans-serif;
+    font-size: 30px;
+    line-height: 1;
+}
+
+.buyer-summary-card--waiting {
+    background: #fff7ed;
+}
+
+.buyer-summary-card--payment {
+    background: #f4f8fc;
+}
+
+.buyer-summary-card--confirmed {
+    background: #effaf6;
+}
+
+.buyer-summary-card--completed {
+    background: #f5f2fb;
+}
+
+/* Toolbar */
+
+.buyer-order-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    border: 1px solid var(--buyer-border);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.82);
+}
+
+.buyer-filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.buyer-filter-button {
+    min-height: 38px;
+    padding: 8px 14px;
+    border: 1px solid #e6d8cf;
+    border-radius: 999px;
+    background: #ffffff;
+    color: #736c68;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.buyer-filter-button:hover,
+.buyer-filter-button.active {
+    border-color: var(--buyer-primary);
+    background: #fff2ec;
+    color: var(--buyer-primary-dark);
+}
+
+.buyer-order-sync-note {
+    margin: 0;
+    color: #8a827d;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+/* Empty */
+
+.buyer-empty-state {
+    padding: 64px 24px;
+    border: 1px dashed #dfcec2;
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.78);
+    text-align: center;
+}
+
+.buyer-empty-icon {
+    font-size: 44px;
+    color: var(--buyer-primary);
+}
+
+.buyer-empty-state h2 {
+    margin: 10px 0 8px;
+}
+
+.buyer-empty-state p {
+    margin: 0 0 20px;
+    color: var(--buyer-muted);
+}
+
+/* Cards */
+
+.buyer-order-list {
+    display: grid;
+    gap: 20px;
+}
+
+.buyer-order-card {
+    overflow: hidden;
+    border: 1px solid var(--buyer-border);
+    border-radius: 22px;
+    background: var(--buyer-surface);
+    box-shadow: var(--buyer-shadow);
+}
+
+.buyer-order-card.is-expired {
+    opacity: 0.82;
+}
+
+.buyer-order-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 22px;
+    padding: 24px 26px 20px;
+}
+
+.buyer-service-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.buyer-service-type,
+.buyer-order-number {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.buyer-service-type {
+    background: #fff0e8;
+    color: #cc674b;
+}
+
+.buyer-order-number {
+    background: #f5f3f1;
+    color: #7b746f;
+}
+
+.buyer-service-identity h2 {
+    margin: 12px 0 7px;
+    font-family: "M PLUS Rounded 1c", "Noto Sans TC", sans-serif;
+    font-size: 24px;
+    line-height: 1.3;
+}
+
+.buyer-service-identity p {
+    margin: 0;
+    color: var(--buyer-muted);
+    font-size: 14px;
+}
+
+.buyer-status-area {
+    display: flex;
+    align-items: flex-end;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.buyer-status-badge,
+.buyer-sub-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.buyer-status-badge--pending-confirm {
+    background: #fff1de;
+    color: #a66516;
+}
+
+.buyer-status-badge--pending-payment {
+    background: #eaf3fb;
+    color: #3f759e;
+}
+
+.buyer-status-badge--confirmed {
+    background: #e9f8f2;
+    color: #2d7b61;
+}
+
+.buyer-status-badge--completed {
+    background: #eee9f7;
+    color: #655184;
+}
+
+.buyer-status-badge--cancelled,
+.buyer-status-badge--refunded,
+.buyer-status-badge--expired {
+    background: #f6eaea;
+    color: #a64e4e;
+}
+
+.buyer-sub-status {
+    min-height: 26px;
+    padding: 4px 9px;
+    font-size: 12px;
+}
+
+.buyer-sub-status--refund-pending {
+    background: #fff4d9;
+    color: #9a6b18;
+}
+
+.buyer-sub-status--refund-completed {
+    background: #e8f5ef;
+    color: #2d765d;
+}
+
+.buyer-sub-status--refund-partial {
+    background: #f3edf9;
+    color: #6e518e;
+}
+
+/* Card summary */
+
+.buyer-order-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 1px solid #f0e7e1;
+    border-bottom: 1px solid #f0e7e1;
+    background: #fffdfa;
+}
+
+.buyer-summary-item {
+    min-width: 0;
+    padding: 18px 22px;
+    border-right: 1px solid #f0e7e1;
+}
+
+.buyer-summary-item:last-child {
+    border-right: 0;
+}
+
+.buyer-summary-label {
+    display: block;
+    margin-bottom: 7px;
+    color: #8b837e;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.buyer-summary-item strong {
+    display: block;
+    overflow-wrap: anywhere;
+    font-size: 15px;
+}
+
+.buyer-amount-item strong {
+    color: #ce684b;
+    font-size: 18px;
+}
+
+/* Action panels */
+
+.buyer-action-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    padding: 22px 26px;
+}
+
+.buyer-action-panel--pending-confirm {
+    background: #fffaf3;
+}
+
+.buyer-action-panel--pending-payment {
+    align-items: flex-start;
+    background: #f7fbff;
+}
+
+.buyer-action-panel--confirmed {
+    background: #f5fcf9;
+}
+
+.buyer-action-panel--completed {
+    background: #faf8fd;
+}
+
+.buyer-action-panel--cancelled,
+.buyer-action-panel--expired {
+    background: #fffafa;
+}
+
+.buyer-action-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.buyer-action-copy h3 {
+    margin: 0 0 7px;
+    font-size: 17px;
+}
+
+.buyer-action-copy p {
+    margin: 4px 0;
+    color: #6f6965;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.buyer-note-box {
+    margin-top: 12px !important;
+    padding: 11px 13px;
+    border-left: 3px solid #eda66f;
+    border-radius: 7px;
+    background: #ffffff;
+}
+
+.buyer-countdown-box {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-width: 170px;
+    min-height: 54px;
+    padding: 10px 14px;
+    border: 1px solid #efd3b7;
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.buyer-countdown-box--payment {
+    border-color: #cbdfee;
+}
+
+.buyer-countdown-box span {
+    color: #7b746f;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.buyer-countdown {
+    font-family: "M PLUS Rounded 1c", monospace;
+    font-size: 21px;
+    color: #c86644;
+}
+
+.buyer-countdown-box.is-urgent {
+    animation: buyerPulse 1s ease-in-out infinite;
+    border-color: #d56858;
+    background: #fff3f1;
+}
+
+@keyframes buyerPulse {
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(213, 104, 88, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 0 5px rgba(213, 104, 88, 0.12);
+    }
+}
+
+.buyer-payment-control {
+    flex: 0 1 410px;
+    display: grid;
+    gap: 12px;
+}
+
+.buyer-payment-form {
+    display: grid;
+    grid-template-columns: minmax(150px, 1fr) auto;
+    align-items: end;
+    gap: 10px;
+}
+
+.buyer-payment-form .buyer-field-label {
+    grid-column: 1 / -1;
+    margin-bottom: -3px;
+}
+
+.buyer-field-label {
+    display: block;
+    margin-bottom: 7px;
+    color: #5f5955;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.buyer-form-control {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 13px;
+    border: 1px solid #decfc5;
+    border-radius: 12px;
+    background: #ffffff;
+    color: var(--buyer-text);
+    font: inherit;
+    line-height: 1.6;
+}
+
+textarea.buyer-form-control {
+    resize: vertical;
+}
+
+.buyer-form-control:focus {
+    border-color: var(--buyer-primary);
+    outline: 3px solid rgba(231, 119, 88, 0.13);
+}
+
+.buyer-action-buttons {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.buyer-cancel-button,
+.buyer-cancel-confirm {
+    border-color: #d4655c;
+    background: #ffffff;
+    color: #bc4c45;
+}
+
+.buyer-cancel-button:hover,
+.buyer-cancel-confirm:hover {
+    background: #bc4c45;
+    color: #ffffff;
+}
+
+.buyer-refund-state {
+    display: grid;
+    gap: 5px;
+    color: #6d6763;
+    font-size: 14px;
+    text-align: right;
+}
+
+.buyer-refund-waiting {
+    color: #9a6b18;
+    font-weight: 800;
+}
+
+.buyer-refund-done {
+    color: #2d765d;
+    font-weight: 800;
+}
+
+.buyer-refund-partial {
+    color: #6e518e;
+    font-weight: 800;
+}
+
+/* Detail */
+
+.buyer-order-detail-toggle-row {
+    border-top: 1px solid #f0e7e1;
+}
+
+.buyer-detail-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 52px;
+    padding: 12px 26px;
+    border: 0;
+    background: #ffffff;
+    color: #625c58;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.buyer-detail-toggle:hover {
+    background: #fffaf7;
+}
+
+.buyer-detail-toggle-icon {
+    font-size: 20px;
+    transition: transform 0.2s ease;
+}
+
+.buyer-detail-toggle[aria-expanded="true"]
+.buyer-detail-toggle-icon {
+    transform: rotate(45deg);
+}
+
+.buyer-order-details {
+    padding: 22px 26px 26px;
+    border-top: 1px solid #f0e7e1;
+    background: #fcfaf8;
+}
+
+.buyer-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.buyer-detail-item {
+    padding: 15px 16px;
+    border: 1px solid #ece2dc;
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.buyer-detail-item > span {
+    display: block;
+    margin-bottom: 7px;
+    color: #8a827d;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.buyer-detail-item p {
+    margin: 0;
+    color: #55504d;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+/* Modal */
+
+body.buyer-modal-open {
+    overflow: hidden;
+}
+
+.buyer-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    background: rgba(44, 38, 34, 0.46);
+}
+
+.buyer-modal-dialog {
+    position: relative;
+    width: min(520px, 100%);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding: 28px;
+    border-radius: 22px;
+    background: #ffffff;
+    box-shadow: 0 26px 70px rgba(52, 37, 29, 0.24);
+}
+
+.buyer-modal-dialog h2 {
+    margin: 0 0 9px;
+    font-family: "M PLUS Rounded 1c", "Noto Sans TC", sans-serif;
+}
+
+.buyer-modal-dialog > p:not(.buyer-modal-eyebrow) {
+    margin: 0 0 20px;
+    color: #77706c;
+    line-height: 1.7;
+}
+
+.buyer-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: #f6f1ee;
+    color: #6e6762;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.buyer-cancel-warning {
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border: 1px solid #f0c3b9;
+    border-radius: 12px;
+    background: #fff4f1;
+    color: #a84d42;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.7;
+}
+
+.buyer-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+/* Responsive */
+
+@media (max-width: 980px) {
+
+    .buyer-summary-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .buyer-order-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .buyer-summary-item:nth-child(2) {
+        border-right: 0;
+    }
+
+    .buyer-summary-item:nth-child(-n + 2) {
+        border-bottom: 1px solid #f0e7e1;
+    }
+
+    .buyer-action-panel {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .buyer-payment-control {
+        flex-basis: auto;
+    }
+
+    .buyer-action-buttons {
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 760px) {
+
+    .buyer-order-page {
+        width: min(100% - 24px, 1180px);
+        padding-top: 24px;
+    }
+
+    .buyer-order-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .buyer-order-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .buyer-order-sync-note {
+        white-space: normal;
+    }
+
+    .buyer-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .buyer-order-card-top {
+        flex-direction: column;
+    }
+
+    .buyer-status-area {
+        align-items: flex-start;
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .buyer-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .buyer-header-link {
+        display: none;
+    }
+}
+
+@media (max-width: 560px) {
+
+    .buyer-summary-grid,
+    .buyer-order-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .buyer-summary-item {
+        border-right: 0;
+        border-bottom: 1px solid #f0e7e1;
+    }
+
+    .buyer-summary-item:last-child {
+        border-bottom: 0;
+    }
+
+    .buyer-order-card-top,
+    .buyer-action-panel,
+    .buyer-order-details {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .buyer-detail-toggle {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .buyer-payment-form {
+        grid-template-columns: 1fr;
+    }
+
+    .buyer-payment-form .buyer-field-label {
+        grid-column: auto;
+    }
+
+    .buyer-action-buttons,
+    .buyer-modal-actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .buyer-action-buttons .btn,
+    .buyer-modal-actions .btn,
+    .buyer-pay-button {
+        width: 100%;
+    }
+
+    .buyer-countdown-box {
+        width: 100%;
+    }
+}

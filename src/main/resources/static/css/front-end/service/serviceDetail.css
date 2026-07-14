@@ -660,3 +660,98 @@
         font-size: 30px;
     }
 }
+
+/* =========================================================
+   服務標題上方
+   ========================================================= */
+
+.service-detail-header-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.service-detail-header-row .service-detail-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+/* =========================================================
+   檢舉服務按鈕
+   ========================================================= */
+
+.service-report-button {
+    flex-shrink: 0;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 42px;
+    padding: 10px 17px;
+
+    border: 1px solid #df775b;
+    border-radius: 999px;
+
+    background: #fff8f5;
+    color: #d76246;
+
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.service-report-button svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.service-report-button:hover {
+    color: #ffffff;
+    background: #df775b;
+    border-color: #df775b;
+
+    box-shadow: 0 8px 20px rgba(215, 98, 70, 0.2);
+
+    transform: translateY(-1px);
+}
+
+.service-report-button:active {
+    transform: translateY(0);
+}
+
+.service-report-button:focus-visible {
+    outline: 3px solid rgba(223, 119, 91, 0.25);
+    outline-offset: 3px;
+}
+
+/* =========================================================
+   手機版
+   ========================================================= */
+
+@media (max-width: 640px) {
+
+    .service-detail-header-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .service-report-button {
+        align-self: flex-start;
+    }
+}

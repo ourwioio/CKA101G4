@@ -42,19 +42,23 @@ public interface ServiceRepository extends JpaRepository<ServiceVO, Integer> {
            """)
     ServiceVO findActiveServiceById(Integer serviceId);
 
-    // 前台公開查詢：依服務名稱或描述關鍵字查已上架服務
+ // 前台公開查詢：依名稱、描述、類型或地區搜尋已上架服務
     @Query("""
-           select s from ServiceVO s
-           left join fetch s.serviceType
+           select distinct s
+           from ServiceVO s
+           left join fetch s.serviceType st
            where s.status = 1
            and (
                 s.serviceName like concat('%', :keyword, '%')
                 or s.description like concat('%', :keyword, '%')
+                or st.typeName like concat('%', :keyword, '%')
+                or s.serviceCity like concat('%', :keyword, '%')
+                or s.serviceDistrict like concat('%', :keyword, '%')
+                or s.serviceLocation like concat('%', :keyword, '%')
            )
            order by s.serviceId
            """)
     List<ServiceVO> searchActiveServices(String keyword);
-
     // =========================
     // 會員中心查詢
     // =========================

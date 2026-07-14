@@ -18,37 +18,44 @@ public class ServiceOrderVO {
     @Column(name = "SERVICE_ORDER_ID")
     private Integer serviceOrderId;
 
-    @Column(name = "SERVICE_SLOT_ID")
+    @Column(name = "SERVICE_SLOT_ID", nullable = false)
     private Integer serviceSlotId;
 
-    @Column(name = "SERVICE_ID")
+    @Column(name = "SERVICE_ID", nullable = false)
     private Integer serviceId;
 
-    @Column(name = "BUYER_MEMBER_ID")
+    @Column(name = "BUYER_MEMBER_ID", nullable = false)
     private Integer buyerMemberId;
 
     @Column(name = "EMPLOYEE_ID")
     private Integer employeeId;
 
-    @Column(name = "ORDER_HOURLY_RATE")
+    @Column(name = "ORDER_HOURLY_RATE", nullable = false)
     private Integer orderHourlyRate;
 
-    @Column(name = "TOTAL_AMOUNT")
+    @Column(name = "TOTAL_AMOUNT", nullable = false)
     private Integer totalAmount;
 
-    @Column(name = "ORDER_STATUS")
-    private Byte orderStatus;
+    // 0：待賣家確認
+    // 1：待買家付款
+    // 2：已成立
+    // 3：已完成
+    // 4：已取消
+    @Column(name = "ORDER_STATUS", nullable = false)
+    private Byte orderStatus = 0;
 
-    @Column(name = "BUYER_REQUEST_NOTE")
+    @Column(name = "BUYER_REQUEST_NOTE", length = 500)
     private String buyerRequestNote;
 
-    @Column(name = "SELLER_REQUIREMENT_NOTE")
+    @Column(name = "SELLER_REQUIREMENT_NOTE", length = 500)
     private String sellerRequirementNote;
 
+    // 0：信用卡
+    // 1：ATM轉帳
     @Column(name = "SERVICE_PAYMENT_METHOD")
     private Byte servicePaymentMethod;
 
-    @Column(name = "CREATED_AT")
+    @Column(name = "CREATED_AT", nullable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "SERVICE_COMPLETED_AT")
@@ -57,7 +64,7 @@ public class ServiceOrderVO {
     @Column(name = "BUYER_RATE_SELLER")
     private Byte buyerRateSeller;
 
-    @Column(name = "BUYER_REVIEW_COMMENT")
+    @Column(name = "BUYER_REVIEW_COMMENT", length = 500)
     private String buyerReviewComment;
 
     @Column(name = "BUYER_REVIEWED_AT")
@@ -66,32 +73,41 @@ public class ServiceOrderVO {
     @Column(name = "SELLER_RATE_BUYER")
     private Byte sellerRateBuyer;
 
-    @Column(name = "SELLER_REVIEW_COMMENT")
+    @Column(name = "SELLER_REVIEW_COMMENT", length = 500)
     private String sellerReviewComment;
 
     @Column(name = "SELLER_REVIEWED_AT")
     private LocalDateTime sellerReviewedAt;
 
-    @Column(name = "PAYOUT_STATUS")
-    private Byte payoutStatus;
+    // 0：未撥款
+    // 1：已撥款
+    @Column(name = "PAYOUT_STATUS", nullable = false)
+    private Byte payoutStatus = 0;
 
-    @Column(name = "REFUND_STATUS")
-    private Byte refundStatus;
+    // 0：無退款
+    // 1：待退款
+    // 2：已退款
+    @Column(name = "REFUND_STATUS", nullable = false)
+    private Byte refundStatus = 0;
 
     @Column(name = "HANDLED_AT")
     private LocalDateTime handledAt;
 
+    // 0：買方取消
+    // 1：賣方取消
+    // 2：後台取消
+    // 3：系統逾時取消
     @Column(name = "CANCELLED_BY_ROLE")
     private Byte cancelledByRole;
 
-    @Column(name = "CANCEL_REASON")
+    @Column(name = "CANCEL_REASON", length = 500)
     private String cancelReason;
 
     @Column(name = "CANCELLED_AT")
     private LocalDateTime cancelledAt;
 
     @Column(name = "REFUND_AMOUNT")
-    private Integer refundAmount;
+    private Integer refundAmount = 0;
 
     @Column(name = "SELLER_CONFIRM_EXPIRES_AT")
     private LocalDateTime sellerConfirmExpiresAt;
@@ -99,38 +115,42 @@ public class ServiceOrderVO {
     @Column(name = "PAYMENT_EXPIRES_AT")
     private LocalDateTime paymentExpiresAt;
 
-    // =====================
+    // =========================================================
     // 訂單快照欄位
-    // 建立訂單當下，把服務與時段資料寫死
-    // 避免服務後續修改影響歷史訂單
-    // =====================
+    // 建立訂單當下寫入，避免服務後續修改影響歷史訂單
+    // =========================================================
 
-    @Column(name = "SELLER_MEMBER_ID")
+    @Column(name = "SELLER_MEMBER_ID", nullable = false)
     private Integer sellerMemberId;
 
-    @Column(name = "SERVICE_NAME_SNAPSHOT")
+    @Column(name = "SERVICE_NAME_SNAPSHOT", nullable = false, length = 100)
     private String serviceNameSnapshot;
 
-    @Column(name = "SERVICE_TYPE_NAME_SNAPSHOT")
+    @Column(name = "SERVICE_TYPE_NAME_SNAPSHOT", nullable = false, length = 500)
     private String serviceTypeNameSnapshot;
 
-    @Column(name = "SERVICE_DESCRIPTION_SNAPSHOT")
+    // 資料庫已改為可空
+    @Column(name = "SERVICE_DESCRIPTION_SNAPSHOT", length = 500)
     private String serviceDescriptionSnapshot;
 
-    @Column(name = "SLOT_START_TIME_SNAPSHOT")
+    @Column(name = "SLOT_START_TIME_SNAPSHOT", nullable = false)
     private LocalDateTime slotStartTimeSnapshot;
 
-    @Column(name = "SLOT_END_TIME_SNAPSHOT")
+    @Column(name = "SLOT_END_TIME_SNAPSHOT", nullable = false)
     private LocalDateTime slotEndTimeSnapshot;
-    
-    @Column(name = "SERVICE_CITY_SNAPSHOT")
+
+    @Column(name = "SERVICE_CITY_SNAPSHOT", nullable = false, length = 20)
     private String serviceCitySnapshot;
 
-    @Column(name = "SERVICE_DISTRICT_SNAPSHOT")
+    @Column(name = "SERVICE_DISTRICT_SNAPSHOT", nullable = false, length = 20)
     private String serviceDistrictSnapshot;
 
-    @Column(name = "SERVICE_LOCATION_SNAPSHOT")
+    @Column(name = "SERVICE_LOCATION_SNAPSHOT", nullable = false, length = 255)
     private String serviceLocationSnapshot;
+
+    // =========================================================
+    // Getter / Setter
+    // =========================================================
 
     public Integer getServiceOrderId() {
         return serviceOrderId;
@@ -404,29 +424,27 @@ public class ServiceOrderVO {
         this.slotEndTimeSnapshot = slotEndTimeSnapshot;
     }
 
-	public String getServiceCitySnapshot() {
-		return serviceCitySnapshot;
-	}
+    public String getServiceCitySnapshot() {
+        return serviceCitySnapshot;
+    }
 
-	public void setServiceCitySnapshot(String serviceCitySnapshot) {
-		this.serviceCitySnapshot = serviceCitySnapshot;
-	}
+    public void setServiceCitySnapshot(String serviceCitySnapshot) {
+        this.serviceCitySnapshot = serviceCitySnapshot;
+    }
 
-	public String getServiceDistrictSnapshot() {
-		return serviceDistrictSnapshot;
-	}
+    public String getServiceDistrictSnapshot() {
+        return serviceDistrictSnapshot;
+    }
 
-	public void setServiceDistrictSnapshot(String serviceDistrictSnapshot) {
-		this.serviceDistrictSnapshot = serviceDistrictSnapshot;
-	}
+    public void setServiceDistrictSnapshot(String serviceDistrictSnapshot) {
+        this.serviceDistrictSnapshot = serviceDistrictSnapshot;
+    }
 
-	public String getServiceLocationSnapshot() {
-		return serviceLocationSnapshot;
-	}
+    public String getServiceLocationSnapshot() {
+        return serviceLocationSnapshot;
+    }
 
-	public void setServiceLocationSnapshot(String serviceLocationSnapshot) {
-		this.serviceLocationSnapshot = serviceLocationSnapshot;
-	}
-    
-    
+    public void setServiceLocationSnapshot(String serviceLocationSnapshot) {
+        this.serviceLocationSnapshot = serviceLocationSnapshot;
+    }
 }
