@@ -33,6 +33,8 @@ import com.webond.member.dto.ChangePasswordDTO;
 import com.webond.member.dto.ProfileUpdateDTO;
 import com.webond.member.model.MemberVO;
 import com.webond.member.service.MemberService;
+import com.webond.member.service.MyReviewService;
+import com.webond.service.dto.MemberReviewDTO;
 import com.webond.service.model.ServiceVO;
 import com.webond.service.service.ServiceService;
 import com.webond.venue.model.VenueVO;
@@ -55,6 +57,9 @@ public class MemberFrontControllerAyaka {
 	
 	@Autowired
 	VenueService venueService;
+	
+	@Autowired
+	MyReviewService myReviewService;
 	
 	@Autowired
     private BCryptPasswordEncoder passwordEncoder;
@@ -113,6 +118,8 @@ public class MemberFrontControllerAyaka {
 	    ServiceVO serviceList = serviceService.getOneService(memberId);
 	    ActivityVO activityList = activityService.getOneActivity(memberId);
 	    List<VenueVO> venueList = venueService.getVenuesByMember(memberId);
+	    List<MemberReviewDTO> reviews = myReviewService.getReviewsByMemberId(memberId);
+	    model.addAttribute("reviews", reviews);
 	    
 	    model.addAttribute("memberVO", memberVO);
 	    model.addAttribute("serviceListData", serviceList);

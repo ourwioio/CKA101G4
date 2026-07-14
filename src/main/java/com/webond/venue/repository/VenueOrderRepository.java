@@ -33,4 +33,11 @@ public interface VenueOrderRepository
 	 List<VenueOrderVO> findByPayoutAmount(Byte payoutAmount);
 	 
 	 List<VenueOrderVO> findByVenueVO_VenueIdAndVenueRatingIsNotNullOrderByHandledAtDesc(Integer venueId);
+	 
+	 @Query("""
+	 		SELECT o 
+	 		FROM VenueOrderVO o 
+	 		WHERE o.venueVO.member.memberId = :ownerMemberId AND o.venueComment IS NOT NULL
+	 		""")
+	 List<VenueOrderVO> findVenueOwnerReviews(@Param("ownerMemberId") Integer ownerMemberId);
 }

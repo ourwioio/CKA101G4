@@ -56,6 +56,10 @@ public class ServiceReviewService {
         if (order.getOrderStatus() != 3) {
             throw new IllegalArgumentException("訂單未完成，無法評價");
         }
+        
+        if (dto.getRate() == null) {
+        	throw new IllegalArgumentException("請填寫評價");
+        }
 
         LocalDateTime now = LocalDateTime.now();
 

@@ -45,3 +45,18 @@ document.addEventListener("DOMContentLoaded", function () {
   renderFns.activity = setupPagination("activity");
   renderFns.venue = setupPagination("venue");
 });
+
+function filterReviews(role, btn) {
+  // 切換按鈕的 active 樣式
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const items = document.querySelectorAll('.review-item');
+  items.forEach(item => {
+    if (role === 'all' || item.dataset.role === role) {
+      item.style.display = '';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
