@@ -1,11 +1,8 @@
 package com.webond.service.controller;
 
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -15,10 +12,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.member.model.MemberVO;
-import com.webond.service.dto.ServiceReportDTO;
 import com.webond.service.model.ServiceOrderVO;
+import com.webond.service.model.ServiceReportVO;
 import com.webond.service.repository.ServiceOrderRepository;
 import com.webond.service.service.ServiceReportService;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("front/serviceReport")
@@ -29,83 +29,88 @@ public class ServiceReportFrontController {
 
     @Autowired
     private ServiceOrderRepository serviceOrderRepository;
+    
 
-    // 訂單完成頁的「檢舉」按鈕會轉跳到這裡，只帶 orderId
-    @GetMapping("/create")
-    public String showCreateForm(@RequestParam Integer orderId,
-                                  HttpSession session,
-                                  Model model,
-                                  RedirectAttributes redirectAttributes) {
+    @GetMapping("/add")
+    public String addServiceReport(@RequestParam("orderId") Integer orderId,
+                                  ModelMap model,HttpSession session) {
+		
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if(loginMember == null) {
+			return "redirect:/member/login";
+		}
 
-        Integer loginMemberId = getLoginMemberId(session);
-        if (loginMemberId == null) {
-            return "redirect:/member/services/fakelogin";
+	    ServiceOrderVO serviceOrderVO = serviceOrderRepository.findById(orderId).orElse(null);
+	    if (serviceOrderVO == null) {
+	        model.addAttribute("orderError", "訂單不存在");
+	        return "redirect:/member/service-orders/buyer";
+	    }
+
+	    if (!serviceOrderVO.getBuyerMemberId().equals(loginMember.getMemberId())) {
+	        return "redirect:/member/login";
+	    }
+	    
+	    ServiceReportVO serviceReportVO = new ServiceReportVO();
+	    serviceReportVO.setServiceOrder(serviceOrderVO);
+
+	    try {
+	        serviceReportService.checkCanReport(serviceReportVO);
+	    } catch (IllegalArgumentException | IllegalStateException e) {
+	        model.addAttribute("orderError", e.getMessage());
+	        return "redirect:/member/service-orders/buyer";
+	    }
+
+	    model.addAttribute("serviceOrderVO", serviceOrderVO);
+	    model.addAttribute("serviceReportVO", serviceReportVO);
+	    return "front-end/service/serviceReportFront";
+    }
+    @PostMapping("/insert")
+    public String submit(@RequestParam("orderId") Integer orderId,
+                         @Valid @ModelAttribute("serviceReportVO") ServiceReportVO serviceReportVO,
+                         BindingResult result,
+                         HttpSession session,
+                         ModelMap model,
+                         RedirectAttributes redirectAttributes) {   // ← 新增這個參數
+
+        MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+        if (loginMember == null) {
+            return "redirect:/member/login";
+        }
+
+        ServiceOrderVO serviceOrderVO = serviceOrderRepository.findById(orderId).orElse(null);
+        if (serviceOrderVO == null) {
+            model.addAttribute("orderError", "訂單不存在");
+            return "front-end/service/serviceReportFront";
+        }
+
+        if (!serviceOrderVO.getBuyerMemberId().equals(loginMember.getMemberId())) {
+            return "redirect:/member/login";
+        }
+
+        serviceReportVO.setServiceOrder(serviceOrderVO);
+        serviceReportVO.setReporterMember(loginMember);
+
+        if (result.hasErrors()) {
+            model.addAttribute("serviceOrderVO", serviceOrderVO);
+            return "front-end/service/serviceReportFront";
         }
 
         try {
-            serviceReportService.checkCanReport(orderId, loginMemberId);
+            serviceReportService.checkCanReport(serviceReportVO);
         } catch (IllegalArgumentException | IllegalStateException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return backToOrderList(orderId, loginMemberId);
+            model.addAttribute("serviceError", e.getMessage());
+            model.addAttribute("serviceOrderVO", serviceOrderVO);
+            return "front-end/service/serviceReportFront";
         }
 
-        ServiceOrderVO order = serviceOrderRepository.findById(orderId).orElseThrow();
+        serviceReportService.submitReport(serviceReportVO);
 
-        model.addAttribute("order", order);
-        model.addAttribute("serviceReportDTO", new ServiceReportDTO());
-        return "front-end/service/serviceReportCreate";
+        return "redirect:/front/serviceReport/success";
+    } 
+    
+    @GetMapping("/success")
+    public String reportSuccess() {
+        return "front-end/service/serviceReportSuccess";
     }
 
-    @PostMapping("/submit")
-    public String submit(@RequestParam Integer orderId,
-                          @Valid @ModelAttribute("serviceReportDTO") ServiceReportDTO serviceReportDTO,
-                          BindingResult bindingResult,
-                          HttpSession session,
-                          Model model,
-                          RedirectAttributes redirectAttributes) {
-
-        Integer loginMemberId = getLoginMemberId(session);
-        if (loginMemberId == null) {
-            return "redirect:/member/services/fakelogin";
-        }
-
-        if (bindingResult.hasErrors()) {
-            ServiceOrderVO order = serviceOrderRepository.findById(orderId).orElseThrow();
-            model.addAttribute("order", order);
-            return "front-end/service/serviceReportCreate";
-        }
-
-        try {
-            serviceReportService.submitReport(orderId, loginMemberId, serviceReportDTO);
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return backToOrderList(orderId, loginMemberId);
-        }
-
-        redirectAttributes.addFlashAttribute("successMessage", "檢舉已送出，等待後台審核");
-        return backToOrderList(orderId, loginMemberId);
-    }
-
-    // =====================
-    // 共用：從 Session 取登入會員 ID（沿用訂單模組的 key 名稱 "memberVO"）
-    // =====================
-    private Integer getLoginMemberId(HttpSession session) {
-        MemberVO memberVO = (MemberVO) session.getAttribute("memberVO");
-        if (memberVO == null) {
-            return null;
-        }
-        return memberVO.getMemberId();
-    }
-
-    // =====================
-    // 共用：依登入者是買家還是賣家，導回對應的訂單列表頁
-    // =====================
-    private String backToOrderList(Integer orderId, Integer loginMemberId) {
-        ServiceOrderVO order = serviceOrderRepository.findById(orderId).orElse(null);
-
-        if (order != null && loginMemberId.equals(order.getBuyerMemberId())) {
-            return "redirect:/member/service-orders/buyer";
-        }
-        return "redirect:/member/service-orders/seller";
-    }
 }

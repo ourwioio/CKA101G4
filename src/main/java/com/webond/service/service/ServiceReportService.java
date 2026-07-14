@@ -1,6 +1,6 @@
 package com.webond.service.service;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.webond.member.model.MemberVO;
 import com.webond.member.repository.MemberRepository;
-import com.webond.service.dto.ServiceReportDTO;
 import com.webond.service.model.ServiceOrderVO;
 import com.webond.service.model.ServiceReportVO;
 import com.webond.service.repository.ServiceOrderRepository;
@@ -52,42 +51,45 @@ public class ServiceReportService {
 		
 		// 只覆蓋這頁允許編輯的欄位，其餘（serviceOrder、reporterMember、serviceReportTime）維持原值
 		existing.setServiceReportStatus(newStatus);
-		existing.setServiceReportHandleTime(new Timestamp(System.currentTimeMillis())); // 伺服器當下時間，不接受前端傳入
+		existing.setServiceReportHandleTime(LocalDateTime.now()); // 伺服器當下時間，不接受前端傳入
 		existing.setEmployee(serviceReportVO.getEmployee());
 		repository.save(existing);
 	}
 	
 	//前台
-	public void checkCanReport(Integer orderId, Integer loginMemberId) {
-       ServiceOrderVO order = serviceOrderRepository.findById(orderId)
-               .orElseThrow(() -> new IllegalArgumentException("查無此訂單"));
+	public void checkCanReport(ServiceReportVO serviceReportVO) {
+       Optional<ServiceOrderVO> optional = serviceOrderRepository.findById(serviceReportVO.getServiceOrder().getServiceOrderId());
+       ServiceOrderVO serviceOrderVO = optional.orElse(null);
 
-       if (order.getOrderStatus() != 3) {
+       if(serviceOrderVO == null) {
+           throw new IllegalArgumentException("訂單或會員不存在，無法送出檢舉");    	   
+       }
+       
+       if (serviceOrderVO.getOrderStatus() != 3) {
            throw new IllegalStateException("此訂單尚未完成，無法檢舉");
        }
 
-       if (repository.existsByServiceOrder_ServiceOrderId(orderId)) {
+
+       if (repository.existsByServiceOrder_ServiceOrderId(serviceOrderVO.getServiceOrderId())) {
            throw new IllegalStateException("此訂單已被檢舉過，無法重複檢舉");
        }
+
     }
 
    @Transactional
-   public void submitReport(Integer orderId, Integer reporterMemberId, ServiceReportDTO dto) {
-       // 送出當下再檢查一次，避免重複點擊或併發問題
-       checkCanReport(orderId, reporterMemberId);
+   public void submitReport(ServiceReportVO serviceReportVO) {
 
-       ServiceOrderVO order = serviceOrderRepository.findById(orderId)
-               .orElseThrow(() -> new IllegalArgumentException("查無此訂單"));
-       MemberVO reporter = memberRepository.findById(reporterMemberId)
-               .orElseThrow(() -> new IllegalArgumentException("查無此會員"));
+       ServiceOrderVO order = serviceOrderRepository.findById(serviceReportVO.getServiceOrder().getServiceOrderId()).orElse(null);
+       MemberVO reporter = memberRepository.findById(serviceReportVO.getReporterMember().getMemberId()).orElse(null);
+       
+       if(order == null || reporter == null) {
+           throw new IllegalArgumentException("訂單或會員不存在，無法送出檢舉");    	   
+       }
 
-       ServiceReportVO report = new ServiceReportVO();
-       report.setServiceOrder(order);
-       report.setReporterMember(reporter);
-       report.setServiceReportCom(dto.getServiceReportCom());
-       // serviceReportTime、serviceReportStatus 交給 @PrePersist 處理
+       serviceReportVO.setServiceOrder(order);
 
-       repository.save(report);
+       serviceReportVO.setServiceOrder(order);
+       repository.save(serviceReportVO);
    }
 
 }

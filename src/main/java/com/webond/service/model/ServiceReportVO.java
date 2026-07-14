@@ -2,6 +2,7 @@ package com.webond.service.model;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import com.webond.employee.model.EmployeeVO;
 import com.webond.member.model.MemberVO;
@@ -47,7 +48,7 @@ public class ServiceReportVO implements java.io.Serializable {
 	private LocalDateTime serviceReportTime;
 
 	@Column(name = "SERVICE_REPORT_HANDLE_TIME")
-	private Timestamp serviceReportHandleTime;
+	private LocalDateTime serviceReportHandleTime;
 
 	@Column(name = "SERVICE_REPORT_STATUS", columnDefinition = "byte default 0")
 	private Byte serviceReportStatus;
@@ -113,12 +114,12 @@ public class ServiceReportVO implements java.io.Serializable {
 		this.employee = employee;
 	}
 
-	public Timestamp getServiceReportHandleTime() {
+	public LocalDateTime getServiceReportHandleTime() {
 		return serviceReportHandleTime;
 	}
 
-	public void setServiceReportHandleTime(Timestamp serviceReportHandleTime) {
-		this.serviceReportHandleTime = serviceReportHandleTime;
+	public void setServiceReportHandleTime(LocalDateTime localDateTime) {
+		this.serviceReportHandleTime = localDateTime;
 	}
 
 	public Byte getServiceReportStatus() {

@@ -30,7 +30,7 @@
         </div>
         <div class="info-row">
             <span class="label">檢舉時間</span>
-            <span th:text="${#dates.format(serviceReportVO.serviceReportTime, 'yyyy-MM-dd HH:mm')}">2026-01-01</span>
+            <span th:text="${#temporals.format(serviceReportVO.serviceReportTime, 'yyyy-MM-dd HH:mm')}">2026-01-01</span>
         </div>
         <div class="info-row" th:if="${serviceReportVO.serviceReportHandleTime != null}">
             <span class="label">上次處理時間</span>

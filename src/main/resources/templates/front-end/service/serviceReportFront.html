@@ -3,21 +3,155 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<style>
+    .report-card {
+        max-width: 480px;
+        margin: 60px auto;
+        padding: 32px 36px;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(75, 0, 130, 0.08);
+        border: 1px solid #ece9f7;
+        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+    }
+
+    .report-card h3 {
+        margin: 0 0 24px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #3f2b7a;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #6c4fd3;
+        display: inline-block;
+    }
+
+    .report-form .form-group {
+        margin-bottom: 20px;
+    }
+
+    .report-form label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #4b3b8a;
+    }
+
+    .report-form textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 12px 14px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #333;
+        border: 1px solid #d8d3f0;
+        border-radius: 10px;
+        resize: vertical;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        font-family: inherit;
+    }
+
+    .report-form textarea:focus {
+        outline: none;
+        border-color: #6c4fd3;
+        box-shadow: 0 0 0 3px rgba(108, 79, 211, 0.15);
+    }
+
+    .error-text {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+        color: #e53935;
+    }
+
+    .report-submit-btn {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(135deg, #7c5cf0, #5a3fc0);
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: opacity 0.2s ease, transform 0.1s ease;
+    }
+
+    .report-submit-btn:hover {
+        opacity: 0.92;
+    }
+
+    .report-submit-btn:active {
+        transform: scale(0.98);
+    }
+
+    /* 成功彈窗 */
+    .success-modal-mask {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(20, 10, 50, 0.35);
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+    }
+
+    .success-modal-mask.show {
+        display: flex;
+    }
+
+    .success-modal {
+        background: #fff;
+        border-radius: 14px;
+        padding: 32px 28px;
+        width: 300px;
+        text-align: center;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+        animation: popIn 0.25s ease;
+    }
+
+    @keyframes popIn {
+        from { transform: scale(0.85); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+
+    .success-modal .icon {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 16px;
+        border-radius: 50%;
+        background: #6c4fd3;
+        color: #fff;
+        font-size: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .success-modal p {
+        margin: 0 0 20px;
+        font-size: 15px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .success-modal button {
+        padding: 8px 24px;
+        border: none;
+        border-radius: 8px;
+        background: #6c4fd3;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+    }
+</style>
 </head>
 <body>
 <div class="report-card">
     <h3>檢舉訂單</h3>
 
-    <p>
-        訂單編號：
-        <a th:href="@{/admin/order/detail(orderId=${order.serviceOrderId})}" target="_blank">
-            <span th:text="${order.serviceOrderId}"></span>
-        </a>
-    </p>
-
-    <form th:action="@{front/reportService/submit}" th:object="${serviceReportDTO}" method="post">
-        <input type="hidden" name="orderId" th:value="${order.serviceOrderId}" />
-
+    <form class="report-form" th:action="@{/front/serviceReport/insert}" th:object="${serviceReportVO}" method="post">
+        <input type="hidden" name="orderId" th:value="${serviceOrderVO.serviceOrderId}" />
         <div class="form-group">
             <label>檢舉內容</label>
             <textarea th:field="*{serviceReportCom}" maxlength="500" rows="5"></textarea>
@@ -25,8 +159,23 @@
                   th:errors="*{serviceReportCom}"></span>
         </div>
 
-        <button type="submit">送出檢舉</button>
+        <button type="submit" class="report-submit-btn">送出檢舉</button>
     </form>
 </div>
+
+<!-- 檢舉成功彈窗 -->
+<div class="success-modal-mask" th:classappend="${reportSuccess} ? ' show' : ''" id="successModalMask">
+    <div class="success-modal">
+        <div class="icon">✓</div>
+        <p>檢舉已成功送出</p>
+        <button type="button" onclick="closeSuccessModal()">確定</button>
+    </div>
+</div>
+
+<script>
+    function closeSuccessModal() {
+        document.getElementById('successModalMask').classList.remove('show');
+    }
+</script>
 </body>
 </html>
