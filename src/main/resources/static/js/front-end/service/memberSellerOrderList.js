@@ -248,7 +248,7 @@
 
                         const confirmed =
                             window.confirm(
-                                "確定接受這筆申請嗎？接受後時段會鎖定 30 秒，其他相同時段申請會由系統取消。"
+                                "確定接受這筆申請嗎？接受後時段會暫時鎖定 60 秒並等待買家付款；其他相同時段的申請會先保留，等買家付款成功後才由系統取消。"
                             );
 
                         if (!confirmed) {
@@ -312,9 +312,8 @@
 
                         if (serviceName) {
                             serviceName.textContent =
-                                `你即將拒絕「${
-                                    button.dataset.serviceName
-                                    || "這筆服務"
+                                `你即將拒絕「${button.dataset.serviceName
+                                || "這筆服務"
                                 }」的預約申請。`;
                         }
 
@@ -408,9 +407,8 @@
 
                         if (serviceName) {
                             serviceName.textContent =
-                                `你即將取消「${
-                                    button.dataset.serviceName
-                                    || "這筆服務"
+                                `你即將取消「${button.dataset.serviceName
+                                || "這筆服務"
                                 }」的訂單。`;
                         }
 
@@ -632,11 +630,9 @@
         const seconds =
             totalSeconds % 60;
 
-        return `${
-            String(minutes).padStart(2, "0")
-        }:${
-            String(seconds).padStart(2, "0")
-        }`;
+        return `${String(minutes).padStart(2, "0")
+            }:${String(seconds).padStart(2, "0")
+            }`;
     }
 
     function markCardExpired(countdownElement) {

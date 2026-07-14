@@ -25,6 +25,10 @@
     <link rel="stylesheet"
           th:href="@{/CSS/front-end/service/common.css}">
 
+    <!-- 前台共用 Header CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/common/header.css}">
+
     <!-- 賣方訂單頁專屬 CSS -->
     <link rel="stylesheet"
           th:href="@{/CSS/front-end/service/memberSellerOrderList.css}">
@@ -33,94 +37,9 @@
 <body>
 
 <!-- ==========================================================
-     固定導覽列
+     共用固定導覽列
      ========================================================== -->
-<header class="site-header">
-
-    <div class="header-inner">
-
-        <a class="logo"
-           th:href="@{/}">
-
-            <span class="logo-mark">
-
-                <svg viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2"
-                     stroke-linecap="round"
-                     stroke-linejoin="round">
-
-                    <path d="M3 11l9-7 9 7"></path>
-
-                    <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path>
-                </svg>
-
-            </span>
-
-            <span class="logo-text">
-
-                <span class="logo-title">
-                    Webond
-                </span>
-
-                <span class="logo-sub">
-                    閒人出租
-                </span>
-
-            </span>
-        </a>
-
-        <nav class="header-actions">
-
-            <a class="seller-header-link"
-               th:href="@{/front/services}">
-                探索服務
-            </a>
-
-            <a class="seller-header-link"
-               th:href="@{/member/service-orders/buyer}">
-                我的預約
-            </a>
-
-            <a class="seller-header-link active"
-               th:href="@{/member/service-orders/seller}">
-                收到的預約
-            </a>
-
-            <a class="seller-header-link"
-               th:href="@{/member/services}">
-                我的服務
-            </a>
-
-            <a class="icon-btn icon-btn--member"
-               th:if="${session.memberVO != null}"
-               th:href="@{/front/memberPage/my(
-                            memberId=${session.memberVO.memberId}
-                        )}"
-               title="會員中心">
-
-                <svg viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2"
-                     stroke-linecap="round"
-                     stroke-linejoin="round">
-
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8
-                             a4 4 0 0 0-4 4v2">
-                    </path>
-
-                    <circle cx="12"
-                            cy="7"
-                            r="4">
-                    </circle>
-                </svg>
-            </a>
-
-        </nav>
-
-    </div>
+<header th:replace="~{front-end/fragments/header :: frontHeader}">
 </header>
 
 <!-- ==========================================================
@@ -144,7 +63,7 @@
             </h1>
 
             <p class="seller-order-description">
-                在 60 秒內處理新的預約申請，並查看付款、成立、退款與撥款狀態。
+                在 3 分鐘內處理新的預約申請，並查看付款、成立、退款與撥款狀態。
             </p>
 
         </div>
@@ -198,7 +117,8 @@
 
         </article>
 
-        <article class="seller-summary-card seller-summary-card--attention">
+        <article class="seller-summary-card
+                        seller-summary-card--attention">
 
             <span>
                 待我確認
@@ -210,7 +130,8 @@
 
         </article>
 
-        <article class="seller-summary-card seller-summary-card--payment">
+        <article class="seller-summary-card
+                        seller-summary-card--payment">
 
             <span>
                 等待買家付款
@@ -222,7 +143,8 @@
 
         </article>
 
-        <article class="seller-summary-card seller-summary-card--confirmed">
+        <article class="seller-summary-card
+                        seller-summary-card--confirmed">
 
             <span>
                 已成立
@@ -234,7 +156,8 @@
 
         </article>
 
-        <article class="seller-summary-card seller-summary-card--completed">
+        <article class="seller-summary-card
+                        seller-summary-card--completed">
 
             <span>
                 已完成
@@ -304,7 +227,8 @@
          完全沒有訂單
          ====================================================== -->
     <section class="seller-empty-state"
-             th:if="${orderList == null or #lists.isEmpty(orderList)}">
+             th:if="${orderList == null
+                      or #lists.isEmpty(orderList)}">
 
         <div class="seller-empty-icon">
             ⌁
@@ -345,7 +269,8 @@
          ====================================================== -->
     <section class="seller-order-list"
              id="sellerOrderList"
-             th:if="${orderList != null and !#lists.isEmpty(orderList)}">
+             th:if="${orderList != null
+                      and !#lists.isEmpty(orderList)}">
 
         <article class="seller-order-card"
                  th:each="order : ${orderList}"
@@ -397,6 +322,7 @@
 
                     <p>
                         買家會員：
+
                         <strong th:text="|#${order.buyerMemberId}|">
                             #2
                         </strong>
@@ -592,7 +518,9 @@
                     </h3>
 
                     <p>
-                        接受後，時段會鎖定 30 秒，並等待買家完成付款。
+                        接受後，時段會暫時鎖定 60 秒並等待買家完成付款；
+                        其他相同時段的申請會先保留，
+                        買家付款成功後才會由系統取消。
                     </p>
 
                     <p class="seller-buyer-note"
@@ -627,7 +555,7 @@
                                         'yyyy-MM-dd''T''HH:mm:ss'
                                       )
                                     : ''}">
-                            01:00
+                            03:00
                         </strong>
 
                     </div>
@@ -694,7 +622,8 @@
                     </h3>
 
                     <p>
-                        此時段目前暫時鎖定。若買家未在期限內付款，系統會自動取消並釋放時段。
+                        此時段目前暫時鎖定。
+                        若買家未在期限內付款，系統會自動取消並釋放時段。
                     </p>
 
                     <p th:if="${order.sellerRequirementNote != null
@@ -728,7 +657,7 @@
                                         'yyyy-MM-dd''T''HH:mm:ss'
                                       )
                                     : ''}">
-                            00:30
+                            01:00
                         </strong>
 
                     </div>
@@ -879,7 +808,8 @@
 
                 <div class="seller-cancelled-refund">
 
-                    <span th:if="${order.refundStatus == 0}">
+                    <span th:if="${order.refundStatus == null
+                                  or order.refundStatus == 0}">
                         無退款
                     </span>
 
@@ -1190,8 +1120,13 @@
 
 </div>
 
-<!-- JS -->
-<script th:src="@{/js/front-end/service/memberSellerOrderList.js}"></script>
+<!-- 賣方訂單頁功能 -->
+<script th:src="@{/js/front-end/service/memberSellerOrderList.js}">
+</script>
+
+<!-- 共用通知 AJAX 輪巡 -->
+<script th:src="@{/JS/front-end/common/notificationPolling.js}">
+</script>
 
 </body>
 </html>

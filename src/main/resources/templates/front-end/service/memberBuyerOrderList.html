@@ -25,6 +25,10 @@
     <link rel="stylesheet"
           th:href="@{/CSS/front-end/service/common.css}">
 
+    <!-- 前台共用 Header CSS -->
+    <link rel="stylesheet"
+          th:href="@{/CSS/front-end/common/header.css}">
+
     <!-- 買方訂單頁專屬 CSS -->
     <link rel="stylesheet"
           th:href="@{/CSS/front-end/service/memberBuyerOrderList.css}">
@@ -35,92 +39,7 @@
 <!-- ==========================================================
      固定導覽列
      ========================================================== -->
-<header class="site-header">
-
-    <div class="header-inner">
-
-        <a class="logo"
-           th:href="@{/}">
-
-            <span class="logo-mark">
-
-                <svg viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2"
-                     stroke-linecap="round"
-                     stroke-linejoin="round">
-
-                    <path d="M3 11l9-7 9 7"></path>
-
-                    <path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path>
-                </svg>
-
-            </span>
-
-            <span class="logo-text">
-
-                <span class="logo-title">
-                    Webond
-                </span>
-
-                <span class="logo-sub">
-                    閒人出租
-                </span>
-
-            </span>
-        </a>
-
-        <nav class="header-actions">
-
-            <a class="buyer-header-link"
-               th:href="@{/front/services}">
-                探索服務
-            </a>
-
-            <a class="buyer-header-link active"
-               th:href="@{/member/service-orders/buyer}">
-                我的預約
-            </a>
-
-            <a class="buyer-header-link"
-               th:href="@{/member/service-orders/seller}">
-                收到的預約
-            </a>
-
-            <a class="buyer-header-link"
-               th:href="@{/member/services}">
-                我的服務
-            </a>
-
-            <a class="icon-btn icon-btn--member"
-               th:if="${session.memberVO != null}"
-               th:href="@{/front/memberPage/my(
-                            memberId=${session.memberVO.memberId}
-                        )}"
-               title="會員中心">
-
-                <svg viewBox="0 0 24 24"
-                     fill="none"
-                     stroke="currentColor"
-                     stroke-width="2"
-                     stroke-linecap="round"
-                     stroke-linejoin="round">
-
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8
-                             a4 4 0 0 0-4 4v2">
-                    </path>
-
-                    <circle cx="12"
-                            cy="7"
-                            r="4">
-                    </circle>
-                </svg>
-            </a>
-
-        </nav>
-
-    </div>
+<header th:replace="~{front-end/fragments/header :: frontHeader}">
 </header>
 
 <!-- ==========================================================
@@ -427,7 +346,7 @@
                         已取消
                     </span>
 
-                    <!-- 相容目前舊版 ServiceOrderService 狀態 -->
+                    <!-- 相容舊版狀態 -->
                     <span class="buyer-status-badge
                                  buyer-status-badge--refunded"
                           th:if="${order.orderStatus == 5}">
@@ -461,7 +380,6 @@
                         已退款
                     </span>
 
-                    <!-- 相容舊版部分退款狀態 -->
                     <span class="buyer-sub-status
                                  buyer-sub-status--refund-partial"
                           th:if="${order.refundStatus == 3}">
@@ -580,7 +498,9 @@
                     </h3>
 
                     <p>
-                        賣家確認前，時段仍可能接受其他會員的申請。賣家接受其中一筆後，其他申請會由系統取消。
+                        賣家確認前，時段仍可能接受其他會員的申請。
+                        賣家接受申請後，其他申請會先保留；
+                        當其中一位買家完成付款後，其他相同時段的申請才會由系統取消。
                     </p>
 
                     <p class="buyer-note-box"
@@ -608,7 +528,7 @@
                     <strong class="buyer-countdown"
                             data-countdown-type="seller"
                             th:attr="data-expire-at=${order.sellerConfirmExpiresAt}">
-                        01:00
+                        03:00
                     </strong>
 
                 </div>
@@ -660,7 +580,7 @@
                         <strong class="buyer-countdown"
                                 data-countdown-type="payment"
                                 th:attr="data-expire-at=${order.paymentExpiresAt}">
-                            00:30
+                            01:00
                         </strong>
 
                     </div>
@@ -808,7 +728,7 @@
             </section>
 
             <!-- ==================================================
-                 狀態操作：新版已取消
+                 狀態操作：已取消
                  ================================================== -->
             <section class="buyer-action-panel
                             buyer-action-panel--cancelled"
@@ -1215,8 +1135,13 @@
 
 </div>
 
-<!-- JS -->
-<script th:src="@{/js/front-end/service/memberBuyerOrderList.js}"></script>
+<!-- 買方訂單頁功能 -->
+<script th:src="@{/js/front-end/service/memberBuyerOrderList.js}">
+</script>
+
+<!-- 共用通知 AJAX 輪詢 -->
+<script th:src="@{/JS/front-end/common/notificationPolling.js}">
+</script>
 
 </body>
 </html>
