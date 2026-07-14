@@ -12,9 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.member.model.MemberVO;
-import com.webond.service.model.ServiceOrderVO;
 import com.webond.service.model.ServiceReportVO;
-import com.webond.service.repository.ServiceOrderRepository;
+import com.webond.service.repository.ServiceRepository;
 import com.webond.service.service.ServiceReportService;
 
 import jakarta.servlet.http.HttpSession;
@@ -26,84 +25,48 @@ public class ServiceReportFrontController {
 
     @Autowired
     private ServiceReportService serviceReportService;
-
-    @Autowired
-    private ServiceOrderRepository serviceOrderRepository;
     
 
     @GetMapping("/add")
-    public String addServiceReport(@RequestParam("orderId") Integer orderId,
+    public String addServiceReport(@RequestParam("serviceId") Integer serviceId,
                                   ModelMap model,HttpSession session) {
 		
 		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 		if(loginMember == null) {
 			return "redirect:/member/login";
 		}
-
-	    ServiceOrderVO serviceOrderVO = serviceOrderRepository.findById(orderId).orElse(null);
-	    if (serviceOrderVO == null) {
-	        model.addAttribute("orderError", "訂單不存在");
-	        return "redirect:/member/service-orders/buyer";
-	    }
-
-	    if (!serviceOrderVO.getBuyerMemberId().equals(loginMember.getMemberId())) {
-	        return "redirect:/member/login";
-	    }
 	    
 	    ServiceReportVO serviceReportVO = new ServiceReportVO();
-	    serviceReportVO.setServiceOrder(serviceOrderVO);
 
-	    try {
-	        serviceReportService.checkCanReport(serviceReportVO);
-	    } catch (IllegalArgumentException | IllegalStateException e) {
-	        model.addAttribute("orderError", e.getMessage());
-	        return "redirect:/member/service-orders/buyer";
-	    }
-
-	    model.addAttribute("serviceOrderVO", serviceOrderVO);
 	    model.addAttribute("serviceReportVO", serviceReportVO);
+	    model.addAttribute("serviceId", serviceId);
 	    return "front-end/service/serviceReportFront";
     }
+    
+    
     @PostMapping("/insert")
-    public String submit(@RequestParam("orderId") Integer orderId,
+    public String submit(@RequestParam("serviceId") Integer serviceId,
                          @Valid @ModelAttribute("serviceReportVO") ServiceReportVO serviceReportVO,
                          BindingResult result,
                          HttpSession session,
-                         ModelMap model,
-                         RedirectAttributes redirectAttributes) {   // ← 新增這個參數
+                         ModelMap model) {   
 
         MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
         if (loginMember == null) {
             return "redirect:/member/login";
         }
-
-        ServiceOrderVO serviceOrderVO = serviceOrderRepository.findById(orderId).orElse(null);
-        if (serviceOrderVO == null) {
-            model.addAttribute("orderError", "訂單不存在");
-            return "front-end/service/serviceReportFront";
-        }
-
-        if (!serviceOrderVO.getBuyerMemberId().equals(loginMember.getMemberId())) {
-            return "redirect:/member/login";
-        }
-
-        serviceReportVO.setServiceOrder(serviceOrderVO);
         serviceReportVO.setReporterMember(loginMember);
 
-        if (result.hasErrors()) {
-            model.addAttribute("serviceOrderVO", serviceOrderVO);
-            return "front-end/service/serviceReportFront";
-        }
-
         try {
-            serviceReportService.checkCanReport(serviceReportVO);
+            serviceReportService.checkCanReport(serviceId);
         } catch (IllegalArgumentException | IllegalStateException e) {
             model.addAttribute("serviceError", e.getMessage());
-            model.addAttribute("serviceOrderVO", serviceOrderVO);
-            return "front-end/service/serviceReportFront";
+            model.addAttribute("serviceId", serviceId); 
+            return "front-end/service/serviceList";
         }
 
-        serviceReportService.submitReport(serviceReportVO);
+        serviceReportService.submitReport(serviceReportVO, serviceId);
+        model.addAttribute("success", "finish");
 
         return "redirect:/front/serviceReport/success";
     } 

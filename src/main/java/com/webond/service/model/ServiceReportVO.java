@@ -30,8 +30,8 @@ public class ServiceReportVO implements java.io.Serializable {
 	private Integer serviceReportId;
 
     @ManyToOne
-    @JoinColumn(name = "SERVICE_ORDER_ID", nullable = false)
-    private ServiceOrderVO serviceOrder;
+    @JoinColumn(name = "SERVICE_ID", nullable = false)
+    private ServiceVO service;
 
     @ManyToOne
     @JoinColumn(name = "REPORTER_MEMBER_ID", nullable = false)
@@ -74,12 +74,12 @@ public class ServiceReportVO implements java.io.Serializable {
 		this.serviceReportId = serviceReportId;
 	}
 
-	public ServiceOrderVO getServiceOrder() {
-		return serviceOrder;
+	public ServiceVO getService() {
+		return service;
 	}
 
-	public void setServiceOrder(ServiceOrderVO serviceOrder) {
-		this.serviceOrder = serviceOrder;
+	public void setService(ServiceVO service) {
+		this.service = service;
 	}
 
 	public MemberVO getReporterMember() {

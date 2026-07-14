@@ -65,22 +65,19 @@ public class ServiceReportController {
 		if (employeeId == null) {
 			return "redirect:/serviceReport/fakeLogin";
 		}
-		
-		if(result.hasErrors()) {
-			return "back-end/service/serviceReportUpdate";
-		}
+
 
 	    EmployeeVO employee = new EmployeeVO();
 	    employee.setEmployeeId(employeeId);
 	    serviceReportVO.setEmployee(employee);
-
+	  
 		try {
 			serviceReportService.updateServiceReport(serviceReportVO);
 		} catch (IllegalStateException e) {
 			model.addAttribute("errorMessage", e.getMessage());
 			ServiceReportVO current = serviceReportService.getOneServiceReport(serviceReportVO.getServiceReportId());
 			model.addAttribute("serviceReportVO", current);
-			return "back-end/service/updateServiceReport";
+			return "back-end/service/serviceReportUpdate";
 		}
 		
 		model.addAttribute("success", "finish");
