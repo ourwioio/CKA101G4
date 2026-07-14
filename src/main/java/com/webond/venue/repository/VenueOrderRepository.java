@@ -31,4 +31,6 @@ public interface VenueOrderRepository
 	 List<VenueOrderVO> findByRefundStatus(Byte refundStatus);
 	 
 	 List<VenueOrderVO> findByPayoutAmount(Byte payoutAmount);
+	 
+	 List<VenueOrderVO> findByVenueVO_VenueIdAndVenueRatingIsNotNullOrderByHandledAtDesc(Integer venueId);
 }
