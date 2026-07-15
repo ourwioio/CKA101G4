@@ -10,7 +10,14 @@
 	<table border="1" cellpadding="10" cellspacing="0"
 		style="width: 100%; max-width: 1500px; table-layout: fixed; margin: 0 auto;">
 		<tr>
-			<td th:replace="~{back-end/employee/adminPage :: sidebar}"></td>
+			<td style="width: 270px; padding: 0; vertical-align: top;">
+
+				<div
+					th:replace="~{back-end/fragments/adminSidebar
+                       :: adminSidebar}">
+				</div>
+
+			</td>
 
 			<td
 				style="vertical-align: top; text-align: left; width: calc(100% - 200px);">
@@ -26,7 +33,7 @@
 						style="margin-bottom: 20px; text-align: left; background: #f8f9fa; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
 						<span style="font-weight: bold; margin-right: 15px;">狀態篩選：</span>
 						<a th:href="@{/admin/actRptList}"
-						th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == null} ? 'background-color: #0d6efd ; color: white; font-weight: bold;' : 'background-color: white; color: #333;')"
+							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == null} ? 'background-color: #0d6efd ; color: white; font-weight: bold;' : 'background-color: white; color: #333;')"
 							th:class="'tab-btn tab-all ' + (${currentStatus == null} ? 'active' : '')">
 							查看全部 </a> <a th:href="@{/admin/actRptList(status=0)}"
 							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 0} ? 'background-color: orange; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
