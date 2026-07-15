@@ -5,90 +5,154 @@
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>場地列表</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/front-end/venue/listAllVenue.css}" href="style.css">
+<link rel="stylesheet" th:href="@{/css/front-end/venue/loginModal.css}">
 </head>
 <body>
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
+
+<main class="venue-page">
+
 	<div class="header-bar">
 		<h1>場地列表</h1>
-		<a th:href="@{/}" class="btn-primary">回首頁</a>
-	<div class="user-info">
-	    <span th:if="${session.memberVO != null}">
-	        當前登入會員：<strong th:text="${session.memberVO.nickname}"></strong>
-	    </span>
-	    <span th:if="${session.memberVO == null}">
-	        目前狀態：<strong>未登入 (訪客)</strong>
-	    </span>
-	</div>
-
-		<!-- 未登入才顯示「登入」按鈕，導去真正的登入頁 -->
-		<a th:if="${session.memberVO == null}" th:href="@{/member/login}"
-			class="btn-primary">
-			登入 </a>
-			
-		<a th:if="${session.memberVO != null}" th:href="@{/member/logout}"
-			class="btn-primary">
-			登出 </a>
-
-		<a th:href="@{/front/venue/myVenue}" class="btn-primary"> 我的場地 </a>
-		<a th:href="@{/front/venue/addVenue}"
-			class="btn-primary">
-			新增場地 </a>
-	</div>
-	<form th:action="@{/front/venue/listVenues_ByCompositeQuery}" method="post"
-	      class="search-form">
-	    場地名稱: <input type="text" name="venueName" th:value="${param.venueName}"><br>
-	    地址關鍵字: <input type="text" name="address" th:value="${param.address}"><br>
-	
-	    容納人數：
-	    最少 <input type="number" name="capacityMin" th:value="${param.capacityMin}" style="width:80px">
-	    ～
-	    最多 <input type="number" name="capacityMax" th:value="${param.capacityMax}" style="width:80px"><br>
-	
-	    每小時費用：
-	    最低 <input type="number" name="hourlyRateMin" th:value="${param.hourlyRateMin}" style="width:80px">
-	    ～
-	    最高 <input type="number" name="hourlyRateMax" th:value="${param.hourlyRateMax}" style="width:80px"><br>
-	
-	    場地類型:
-	    <select name="venueTypeId">
-	        <option value="">--不限--</option>
-	        <option th:each="type : ${venueTypeData}"
-	                th:value="${type.venueTypeId}"
-	                th:selected="${param.venueTypeId != null and param.venueTypeId[0] == type.venueTypeId.toString()}"
-	                th:text="${type.typeName}"></option>
-	    </select><br>
-	
-	    <input type="submit" value="查詢">
-	    <a th:href="@{/front/venue/listAllVenue}"
-	       class="btn-clear">
-	       清除條件
-	    </a>
-	</form>
-	<div class="venue-grid">
-		<div th:each="venue : ${venueListData}" class="venue-card">
-			<img
-				th:if="${venue.coverImage != null}"
-				th:src="@{/front/venue/getImage(imagesId=${venue.coverImage.imagesId})}"
-				class="card-img" />
-			<div class="card-body">
-				<h3 th:text="${venue.venueName}"></h3>
-				<p th:text="${venue.address}"></p>
-				<p>
-					容納人數：<span th:text="${venue.capacity}"></span> 人
-				</p>
-				<p>
-					每小時：<span th:text="${venue.hourlyRate}"></span> 元
-				</p>
-				<p>
-				    評論：
-				    <span th:if="${venue.ratingCount == null or venue.ratingCount == 0}">尚未評分</span>
-				    <span th:unless="${venue.ratingCount == null or venue.ratingCount == 0}"
-				          th:text="${#numbers.formatDecimal(venue.averageRating, 1, 1)} + '/5 星（' + ${venue.ratingCount} + ' 則）'">
-				    </span>
-				</p>
-				<a th:href="@{/front/venue/getOneVenue(venueId=${venue.venueId})}">查看詳情</a>
-			</div>
+		<div class="header-bar__actions">
+			<a th:href="@{/front/venue/myVenue}" class="btn-primary btn-primary--ghost"
+			   th:attr="data-require-login=${session.memberVO == null} ? 'true' : null">我的場地</a>
+			<a th:href="@{/front/venue/addVenue}" class="btn-primary"
+			   th:attr="data-require-login=${session.memberVO == null} ? 'true' : null">新增場地</a>
 		</div>
 	</div>
+
+	<section class="filter-panel">
+		<button type="button" class="filter-toggle" id="filterToggle" aria-expanded="false">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+			<span>篩選條件</span>
+			<svg class="filter-toggle__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+		</button>
+
+		<form th:action="@{/front/venue/listVenues_ByCompositeQuery}" method="post"
+		      class="search-form" id="searchForm">
+
+			<div class="search-form__grid">
+
+				<label class="field">
+					<span class="field__label">場地名稱</span>
+					<input type="text" name="venueName" th:value="${param.venueName}" placeholder="輸入場地名稱">
+				</label>
+
+				<label class="field">
+					<span class="field__label">地址關鍵字</span>
+					<input type="text" name="address" th:value="${param.address}" placeholder="輸入地址關鍵字">
+				</label>
+
+				<label class="field">
+					<span class="field__label">場地類型</span>
+					<select name="venueTypeId">
+						<option value="">不限</option>
+						<option th:each="type : ${venueTypeData}"
+						        th:value="${type.venueTypeId}"
+						        th:selected="${param.venueTypeId != null and param.venueTypeId[0] == type.venueTypeId.toString()}"
+						        th:text="${type.typeName}"></option>
+					</select>
+				</label>
+
+				<div class="field field--range">
+					<span class="field__label">容納人數</span>
+					<div class="field__range">
+						<input type="number" name="capacityMin" th:value="${param.capacityMin}" placeholder="最少">
+						<span class="field__range-sep">～</span>
+						<input type="number" name="capacityMax" th:value="${param.capacityMax}" placeholder="最多">
+					</div>
+				</div>
+
+				<div class="field field--range">
+					<span class="field__label">每小時費用</span>
+					<div class="field__range">
+						<input type="number" name="hourlyRateMin" th:value="${param.hourlyRateMin}" placeholder="最低">
+						<span class="field__range-sep">～</span>
+						<input type="number" name="hourlyRateMax" th:value="${param.hourlyRateMax}" placeholder="最高">
+					</div>
+				</div>
+
+			</div>
+
+			<div class="search-form__actions">
+				<a th:href="@{/front/venue/listAllVenue}" class="btn-clear">清除條件</a>
+				<input type="submit" value="查詢" class="btn-primary">
+			</div>
+
+		</form>
+	</section>
+
+	<section class="card-grid" th:if="${not #lists.isEmpty(venueListData)}">
+		<div class="item-card" th:each="venue : ${venueListData}">
+			<a th:href="@{/front/venue/getOneVenue(venueId=${venue.venueId})}" class="item-card__link">
+
+				<div class="item-card__thumb-wrap">
+					<img th:if="${venue.coverImage != null}"
+					     th:src="@{/front/venue/getImage(imagesId=${venue.coverImage.imagesId})}"
+					     alt="場地圖片" onerror="this.src='/images/default-venue.jpeg'">
+					<img th:if="${venue.coverImage == null}"
+					     src="/images/default-venue.jpeg" alt="暫無圖片">
+				</div>
+
+				<div class="item-card__body">
+					<h3 class="item-card__title" th:text="${venue.venueName}">場地名稱</h3>
+					<p class="item-card__addr" th:text="${venue.address}">地點</p>
+
+					<div class="item-card__meta">
+						<span>容納 <span th:text="${venue.capacity}"></span> 人</span>
+					</div>
+					<div class="item-card__meta">
+						<span>NT$ <span th:text="${venue.hourlyRate}"></span> / 小時</span>
+					</div>
+					<p class="item-card__rating">
+						<span class="stars-readonly"
+						      th:with="hasRating=${venue.ratingCount != null and venue.ratingCount > 0}, r=${hasRating ? T(java.lang.Math).round(venue.averageRating * 2) / 2.0 : 0}">
+							<span th:each="i : ${#numbers.sequence(1,5)}"
+							      th:text="'★'"
+							      th:classappend="${r >= i} ? 'filled' : (${r >= i - 0.5} ? 'half' : '')"></span>
+							<span class="rating-count" th:text="${hasRating} ? '（' + ${venue.ratingCount} + ' 則）' : '（' + ${venue.ratingCount} + ' 則）'"></span>
+						</span>
+					</p>
+
+					<span class="item-card__detail">查看詳情</span>
+				</div>
+
+			</a>
+		</div>
+	</section>
+
+	<div class="empty-state" th:if="${#lists.isEmpty(venueListData)}">
+		<span class="blob"></span>
+		目前尚無符合條件的場地
+	</div>
+
+</main>
+
+<!-- 登入提示視窗（僅訪客渲染） -->
+<div class="login-modal" id="loginModal" hidden th:if="${session.memberVO == null}">
+	<div class="login-modal__backdrop" data-login-modal-close></div>
+	<div class="login-modal__card" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+		<span class="login-modal__blob" aria-hidden="true"></span>
+		<h3 class="login-modal__title" id="loginModalTitle">需要登入會員</h3>
+		<p class="login-modal__desc">此功能需要登入後才能使用，<br>您也可以先以訪客身份繼續瀏覽。</p>
+		<div class="login-modal__actions">
+			<a class="login-modal__btn" th:href="@{/member/login}">前往登入</a>
+			<button type="button" class="login-modal__btn login-modal__btn--ghost" data-login-modal-close>以訪客身份繼續瀏覽</button>
+		</div>
+	</div>
+</div>
+
+<script th:src="@{/js/front-end/venue/listAllVenue.js}"></script>
+<script th:src="@{/js/front-end/venue/loginModal.js}"></script>
+<script th:src="@{/js/front-end/venue/addressShorten.js}"></script>
 </body>
 </html>

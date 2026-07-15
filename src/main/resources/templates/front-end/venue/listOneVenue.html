@@ -2,91 +2,130 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>場地詳情</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title th:text="${venueVO.venueName} + ' - 場地詳情'">場地詳情</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/front-end/venue/listOneVenue.css}" href="venue-detail.css">
+<link rel="stylesheet" th:href="@{/css/front-end/venue/loginModal.css}">
 </head>
 <body>
-	<a class="back-link" th:href="@{/front/venue/listAllVenue}">← 回場地列表</a>
-	<div class="card">
-		<img class="main-img"
-			th:if="${venueVO.coverImage != null}"
-			th:src="@{/front/venue/getImage(imagesId=${venueVO.coverImage.imagesId})}" />
-		<div class="body">
-			<div class="venue-name" th:text="${venueVO.venueName}"></div>
-			<div class="venue-addr" th:text="${venueVO.address}"></div>
-			<div class="info-row">
-				<div class="info-item">
-					<div class="info-label">容納人數</div>
-					<div class="info-value">
-						<span th:text="${venueVO.capacity}"></span> 人
-					</div>
-				</div>
-				<div class="info-item">
-					<div class="info-label">每小時費用</div>
-					<div class="info-value">
-						<span th:text="${venueVO.hourlyRate}"></span> 元
-					</div>
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
+
+<main class="venue-detail-page">
+
+	<a class="back-link" th:href="@{/front/venue/listAllVenue}">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+		回場地列表
+	</a>
+
+	<div class="detail-card">
+
+		<div class="detail-card__gallery">
+			<img class="detail-card__main-img"
+				th:if="${venueVO.coverImage != null}"
+				th:src="@{/front/venue/getImage(imagesId=${venueVO.coverImage.imagesId})}"
+				alt="場地圖片" onerror="this.src='/images/default-venue.jpeg'" />
+			<img class="detail-card__main-img"
+				th:if="${venueVO.coverImage == null}"
+				src="/images/default-venue.jpeg" alt="暫無圖片" />
+		</div>
+
+		<div class="detail-card__body">
+			<h1 class="detail-card__title" th:text="${venueVO.venueName}"></h1>
+			<p class="detail-card__addr" th:text="${venueVO.address}"></p>
+
+			<div class="detail-card__tags">
+				<span class="tag">容納 <span th:text="${venueVO.capacity}"></span> 人</span>
+				<span class="tag">NT$ <span th:text="${venueVO.hourlyRate}"></span> / 小時</span>
+			</div>
+
+			<div class="detail-card__desc"
+				th:if="${venueVO.venueDescription != null and !venueVO.venueDescription.isEmpty()}"
+				th:text="${venueVO.venueDescription}"></div>
+
+			<div class="detail-card__photos" th:if="${not #lists.isEmpty(venueVO.venueImages)}">
+				<div class="section-label">場地照片</div>
+				<div class="photo-grid">
+					<img th:each="img : ${venueVO.venueImages}"
+						th:src="@{/front/venue/getImage(imagesId=${img.imagesId})}" alt="場地照片" />
 				</div>
 			</div>
-			<div class="section-title">場地介紹：</div>
-			<div class="venue-desc" th:if="${venueVO.venueDescription != null and !venueVO.venueDescription.isEmpty()}" 
-     th:text="${venueVO.venueDescription}"></div>
-			<hr />
-			<div class="section-title">場地照片</div>
-			<div class="img-grid">
-				<img th:each="img : ${venueVO.venueImages}"
-					th:src="@{/front/venue/getImage(imagesId=${img.imagesId})}" />
-			</div>
-			<div class="book-row">
-				<div class="price-note">
-					每小時 <span th:text="${venueVO.hourlyRate}"></span> 元
-				</div>
+
+			<div class="detail-card__book-row">
+				<div class="price-note">每小時 <strong th:text="${venueVO.hourlyRate}"></strong> 元</div>
 				<a class="btn-book"
-					th:href="@{/front/venueOrder/addVenueOrder(venueId=${venueVO.venueId})}">預約此場地</a>
+					th:href="@{/front/venueOrder/addVenueOrder(venueId=${venueVO.venueId})}"
+					th:attr="data-require-login=${session.memberVO == null} ? 'true' : null">預約此場地</a>
 			</div>
 		</div>
+
 	</div>
 
-		<hr />
-		
-		<div class="section-title">場地評價</div>
-		
-		<!-- 平均分數摘要 -->
+	<section class="review-section">
+		<h2 class="section-title">場地評價</h2>
+
 		<div class="rating-summary">
-<!-- 		    <span th:if="${venueVO.ratingCount == null or venueVO.ratingCount == 0}">尚未有人評分</span> -->
-		    <span th:unless="${venueVO.ratingCount == null or venueVO.ratingCount == 0}"
-		          th:text="${#numbers.formatDecimal(venueVO.averageRating, 1, 1)} + '/5 星（共 ' + ${venueVO.ratingCount} + ' 則評價）'">
-		    </span>
-		</div>
-		
-		<!-- 逐筆評價卡片 -->
-		<div class="review-grid" th:if="${!#lists.isEmpty(reviewList)}">
-		    <div class="review-card" th:each="review : ${reviewList}">
-		        <div class="review-header">
-		            <span class="reviewer-name" th:text="${review.member.nickname}"></span>
-		            <span class="review-date"
-		                  th:text="${#temporals.format(review.handledAt, 'yyyy-MM-dd')}"></span>
-		        </div>
-		
-		        <div class="stars-readonly">
-		            <span th:each="i : ${#numbers.sequence(1,5)}"
-		                  th:text="'★'"
-		                  th:class="${i <= review.venueRating} ? 'filled' : ''"></span>
-		        </div>
-		
-		        <p class="review-comment"
-		           th:if="${review.venueComment != null and !review.venueComment.isEmpty()}"
-		           th:text="${review.venueComment}"></p>
-		        <p class="review-comment review-empty"
-		           th:if="${review.venueComment == null or review.venueComment.isEmpty()}">
-		            （這位使用者沒有留下文字評論）
-		        </p>
-		    </div>
-		</div>
-		
-		<div class="no-reviews" th:if="${#lists.isEmpty(reviewList)}">
-		    目前還沒有評價
+			<span class="stars-readonly"
+			      th:with="hasRating=${venueVO.ratingCount != null and venueVO.ratingCount > 0}, r=${hasRating ? T(java.lang.Math).round(venueVO.averageRating * 2) / 2.0 : 0}">
+				<span th:each="i : ${#numbers.sequence(1,5)}"
+				      th:text="'★'"
+				      th:classappend="${r >= i} ? 'filled' : (${r >= i - 0.5} ? 'half' : '')"></span>
+				<span class="rating-count" th:text="${hasRating} ? '（共 ' + ${venueVO.ratingCount} + ' 則評價）' : '（共 ' + ${venueVO.ratingCount} + ' 則評價）'"></span>
+			</span>
 		</div>
 
+		<div class="review-grid" th:if="${!#lists.isEmpty(reviewList)}">
+			<div class="review-card" th:each="review : ${reviewList}">
+				<div class="review-header">
+					<span class="reviewer-name" th:text="${review.member.nickname}"></span>
+					<span class="review-date"
+					      th:text="${#temporals.format(review.handledAt, 'yyyy-MM-dd')}"></span>
+				</div>
+
+				<div class="stars-readonly">
+					<span th:each="i : ${#numbers.sequence(1,5)}"
+					      th:text="'★'"
+					      th:class="${i <= review.venueRating} ? 'filled' : ''"></span>
+				</div>
+
+				<p class="review-comment"
+				   th:if="${review.venueComment != null and !review.venueComment.isEmpty()}"
+				   th:text="${review.venueComment}"></p>
+				<p class="review-comment review-empty"
+				   th:if="${review.venueComment == null or review.venueComment.isEmpty()}">
+					（這位使用者沒有留下文字評論）
+				</p>
+			</div>
+		</div>
+
+		<div class="empty-state" th:if="${#lists.isEmpty(reviewList)}">
+			<span class="blob"></span>
+			目前還沒有評價
+		</div>
+	</section>
+
+</main>
+
+<!-- 登入提示視窗（僅訪客渲染） -->
+<div class="login-modal" id="loginModal" hidden th:if="${session.memberVO == null}">
+	<div class="login-modal__backdrop" data-login-modal-close></div>
+	<div class="login-modal__card" role="dialog" aria-modal="true" aria-labelledby="loginModalTitle">
+		<span class="login-modal__blob" aria-hidden="true"></span>
+		<h3 class="login-modal__title" id="loginModalTitle">需要登入會員</h3>
+		<p class="login-modal__desc">此功能需要登入後才能使用，<br>您也可以先以訪客身份繼續瀏覽。</p>
+		<div class="login-modal__actions">
+			<a class="login-modal__btn" th:href="@{/member/login}">前往登入</a>
+			<button type="button" class="login-modal__btn login-modal__btn--ghost" data-login-modal-close>以訪客身份繼續瀏覽</button>
+		</div>
+	</div>
+</div>
+
+<script th:src="@{/js/front-end/venue/loginModal.js}"></script>
 </body>
 </html>
