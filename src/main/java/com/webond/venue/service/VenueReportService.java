@@ -1,13 +1,18 @@
 package com.webond.venue.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.webond.member.model.MemberVO;
+import com.webond.member.repository.MemberRepository;
 import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueReportVO;
 import com.webond.venue.model.VenueVO;
@@ -15,116 +20,157 @@ import com.webond.venue.repository.VenueOrderRepository;
 import com.webond.venue.repository.VenueReportRepository;
 import com.webond.venue.repository.VenueRepository;
 
-@Service
+@Service("venueReportService")
 public class VenueReportService {
 
-	@Autowired
-	VenueReportRepository repository;
-
-	@Autowired
-	VenueRepository venueRepository; // 連動更新場地狀態
-
-	@Autowired
-	VenueOrderRepository venueOrderRepository; // 透過訂單找場地
-
-	// 狀態常數，避免 magic number 散落各處
+	// ===== 檢舉處理狀態 =====
 	public static final byte STATUS_REVIEWING = 0; // 審核中
-	public static final byte STATUS_APPROVED = 1; // 通過（下架場地）
-	public static final byte STATUS_REJECTED = 2; // 未通過
+	public static final byte STATUS_APPROVED = 1; // 審核通過（檢舉成立）
+	public static final byte STATUS_REJECTED = 2; // 審核未通過
 
-	// 場地狀態常數（對照 VENUE 表的 venueStatus）
-	private static final byte VENUE_STATUS_INACTIVE = 0; // 下架
-	private static final byte VENUE_STATUS_ACTIVE = 1; // 上架
+	// ===== 場地狀態 =====
+	public static final byte VENUE_STATUS_INACTIVE = 0; // 下架
+	public static final byte VENUE_STATUS_ACTIVE = 1; // 上架
+	public static final byte VENUE_STATUS_PENDING = 2; // 待審核
 
-	// ===== 新增 =====
+	public static final Map<Byte, String> STATUS_LABEL_MAP = new LinkedHashMap<>();
+	static {
+		STATUS_LABEL_MAP.put(STATUS_REVIEWING, "審核中");
+		STATUS_LABEL_MAP.put(STATUS_APPROVED, "審核通過");
+		STATUS_LABEL_MAP.put(STATUS_REJECTED, "審核未通過");
+	}
+
+	@Autowired
+	private VenueReportRepository venueReportRepository;
+
+	@Autowired
+	private VenueOrderRepository venueOrderRepository;
+
+	@Autowired
+	private VenueRepository venueRepository;
+
+	@Autowired
+	private MemberRepository memberRepository;
+
+	@Autowired
+	private VenueReviewService venueReviewService;
+
+	// ===== 前台：會員送出檢舉 =====
 	public void addVenueReport(VenueReportVO venueReportVO) {
 		venueReportVO.setVenueReportId(null); // 確保走 INSERT
-		venueReportVO.setReportStatus(STATUS_REVIEWING); // 新增一律預設審核中
-		repository.save(venueReportVO);
+		venueReportVO.setSerReportTime(LocalDateTime.now());
+		venueReportVO.setReportStatus(STATUS_REVIEWING);
+		venueReportVO.setEmployeeId(null);
+		venueReportVO.setHandledAt(null);
+		venueReportRepository.save(venueReportVO);
 	}
 
-	// ===== 修改 =====
+	// ===== 防重複檢舉：同一筆訂單是否已有審核中的檢舉 =====
+	public boolean hasReviewingReport(Integer venueOrderId) {
+		return venueReportRepository.findByVenueOrderId(venueOrderId).stream()
+				.anyMatch(report -> report.getReportStatus() != null && report.getReportStatus() == STATUS_REVIEWING);
+	}
+
 	/**
-	 * 修改檢舉紀錄：若該筆已經處理完成（通過或未通過），鎖定處理狀態與處理相關欄位，
-	 * 不允許透過修改表單改回審核中或變更處理結果（即使前端被繞過送出也一樣擋下）。
-	 */
-	@Transactional
-	public void updateVenueReport(VenueReportVO venueReportVO) {
-		VenueReportVO existingVenueReport = getOneVenueReport(venueReportVO.getVenueReportId());
-		if (existingVenueReport != null && existingVenueReport.getReportStatus() != STATUS_REVIEWING) {
-			venueReportVO.setReportStatus(existingVenueReport.getReportStatus());
-			venueReportVO.setEmployeeId(existingVenueReport.getEmployeeId());
-			venueReportVO.setHandledAt(existingVenueReport.getHandledAt());
-		}
-		repository.save(venueReportVO);
-	}
-
-	// ===== 刪除 =====
-	public void deleteVenueReport(Integer venueReportId) {
-		if (repository.existsById(venueReportId))
-			repository.deleteById(venueReportId);
-	}
-
-	// ===== 查詢 =====
-	public VenueReportVO getOneVenueReport(Integer venueReportId) {
-		Optional<VenueReportVO> optional = repository.findById(venueReportId);
-		return optional.orElse(null);
-	}
-
-	public List<VenueReportVO> getAll() {
-		return repository.findAll();
-	}
-
-	public List<VenueReportVO> getByStatus(Byte reportStatus) {
-		return repository.findByReportStatus(reportStatus);
-	}
-
-	public List<VenueReportVO> getByVenueOrderId(Integer venueOrderId) {
-		return repository.findByVenueOrderId(venueOrderId);
-	}
-
-	public List<VenueReportVO> getByMemberId(Integer memberId) {
-		return repository.findByMemberId(memberId);
-	}
-
-	public List<VenueReportVO> getByEmployeeId(Integer employeeId) {
-		return repository.findByEmployeeId(employeeId);
-	}
-
-	// ===== 業務邏輯：審核通過（下架場地） =====
-	/**
-	 * 檢舉通過：更新檢舉紀錄狀態，並將對應場地訂單所屬的場地 venueStatus 切換為下架。
+	 * 後台：檢舉成立 ① 檢舉狀態 → 1（審核通過） ② 場地提供者違規點數 +1（停權判斷由會員模組負責） ③
+	 * VENUE_REVIEW.reviewStatus → 0（審核中），清空審核人／備註／審核時間 ④ VENUE.venueStatus →
+	 * 2（待審核），待提供者修改資料後重新審核
 	 */
 	@Transactional
 	public void approve(Integer venueReportId, Integer employeeId) {
-		VenueReportVO venueReport = getOneVenueReport(venueReportId);
-		if (venueReport == null)
+		VenueReportVO venueReport = venueReportRepository.findById(venueReportId).orElse(null);
+		if (venueReport == null) {
 			return;
+		}
+		if (venueReport.getReportStatus() != null && venueReport.getReportStatus() != STATUS_REVIEWING) {
+			return; // 已處理過則鎖定，不可重複審核
+		}
+
+		// ① 更新檢舉紀錄
 		venueReport.setReportStatus(STATUS_APPROVED);
 		venueReport.setEmployeeId(employeeId);
 		venueReport.setHandledAt(LocalDateTime.now());
-		repository.save(venueReport);
+		venueReportRepository.save(venueReport);
 
 		VenueOrderVO venueOrder = venueOrderRepository.findById(venueReport.getVenueOrderId()).orElse(null);
-		if (venueOrder != null && venueOrder.getVenueVO() != null) {
-			VenueVO venue = venueOrder.getVenueVO();
-			venue.setVenueStatus(VENUE_STATUS_INACTIVE);
-			venueRepository.save(venue);
+		if (venueOrder == null || venueOrder.getVenueVO() == null) {
+			return;
 		}
+		VenueVO venueVO = venueOrder.getVenueVO();
+
+		// ② 場地提供者違規點數 +1
+		MemberVO provider = venueVO.getMember();
+		if (provider != null) {
+			int currentPoints = provider.getReportPoints() != null ? provider.getReportPoints() : 0;
+			provider.setReportPoints(currentPoints + 1);
+			memberRepository.save(provider);
+		}
+
+		// ③ 場地審核紀錄退回審核中
+		venueReviewService.resetToReviewing(venueVO.getVenueId());
+
+		// ④ 場地狀態改為待審核
+		venueVO.setVenueStatus(VENUE_STATUS_PENDING);
+		venueRepository.save(venueVO);
 	}
 
-	// ===== 業務邏輯：審核未通過 =====
-	/**
-	 * 檢舉未通過：只更新檢舉紀錄狀態，場地狀態不受影響。
-	 */
+	// ===== 後台：檢舉不成立，場地與會員皆不受影響 =====
 	@Transactional
 	public void reject(Integer venueReportId, Integer employeeId) {
-		VenueReportVO venueReport = getOneVenueReport(venueReportId);
-		if (venueReport == null)
+		VenueReportVO venueReport = venueReportRepository.findById(venueReportId).orElse(null);
+		if (venueReport == null) {
 			return;
+		}
+		if (venueReport.getReportStatus() != null && venueReport.getReportStatus() != STATUS_REVIEWING) {
+			return;
+		}
+
 		venueReport.setReportStatus(STATUS_REJECTED);
 		venueReport.setEmployeeId(employeeId);
 		venueReport.setHandledAt(LocalDateTime.now());
-		repository.save(venueReport);
+		venueReportRepository.save(venueReport);
+	}
+
+	// ===== 查詢 =====
+	public List<VenueReportVO> getAll() {
+		return venueReportRepository.findAllByOrderBySerReportTimeDesc();
+	}
+
+	public List<VenueReportVO> getByStatus(Byte reportStatus) {
+		return venueReportRepository.findByReportStatus(reportStatus);
+	}
+
+	public VenueReportVO getOneVenueReport(Integer venueReportId) {
+		return venueReportRepository.findById(venueReportId).orElse(null);
+	}
+
+	public VenueOrderVO getVenueOrder(Integer venueOrderId) {
+		return venueOrderRepository.findById(venueOrderId).orElse(null);
+	}
+
+	// ===== 複合查詢：處理狀態 + 檢舉內容關鍵字 + 檢舉時間區間，任意組合 =====
+	public List<VenueReportVO> search(Byte reportStatus, String keyword, LocalDate startDate, LocalDate endDate) {
+
+		List<VenueReportVO> list;
+
+		// 有完整日期區間先由 DB 撈基礎清單，否則撈全部
+		if (startDate != null && endDate != null) {
+			list = venueReportRepository.findBySerReportTimeBetween(startDate.atStartOfDay(),
+					endDate.atTime(LocalTime.MAX));
+		} else {
+			list = venueReportRepository.findAllByOrderBySerReportTimeDesc();
+		}
+
+		if (reportStatus != null) {
+			list = list.stream().filter(report -> reportStatus.equals(report.getReportStatus())).toList();
+		}
+
+		if (keyword != null && !keyword.trim().isEmpty()) {
+			String lowerKeyword = keyword.trim().toLowerCase();
+			list = list.stream().filter(report -> report.getSerReportCom() != null
+					&& report.getSerReportCom().toLowerCase().contains(lowerKeyword)).toList();
+		}
+
+		return list;
 	}
 }

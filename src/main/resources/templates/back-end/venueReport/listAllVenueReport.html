@@ -15,20 +15,26 @@
 			<span class="title">場地檢舉清單</span>
 		</div>
 
-		<!-- 搜尋區：依處理狀態 -->
-		<form th:action="@{/venueReport/listByStatus}" method="get"
+		<!-- 搜尋區：處理狀態 + 檢舉時間區間 + 內容關鍵字 -->
+		<form th:action="@{/venueReport/search}" method="get"
 			style="margin-bottom: 1.5rem; display: flex; gap: 12px; flex-wrap: wrap;">
+
 			<select name="reportStatus">
 				<option value="">-- 全部狀態 --</option>
 				<option value="0"
-					th:selected="${searchReportStatus != null && searchReportStatus == 0}">審核中</option>
+					th:selected="${searchStatus != null and searchStatus == 0}">審核中</option>
 				<option value="1"
-					th:selected="${searchReportStatus != null && searchReportStatus == 1}">通過（下架場地）</option>
+					th:selected="${searchStatus != null and searchStatus == 1}">審核通過</option>
 				<option value="2"
-					th:selected="${searchReportStatus != null && searchReportStatus == 2}">未通過</option>
-			</select>
+					th:selected="${searchStatus != null and searchStatus == 2}">審核未通過</option>
+			</select> <input type="date" name="startDate" th:value="${searchStartDate}" />
+			<span>~</span> <input type="date" name="endDate"
+				th:value="${searchEndDate}" /> <input type="text" name="keyword"
+				placeholder="檢舉內容關鍵字" th:value="${searchKeyword}" />
 
 			<button type="submit" class="btn-edit">搜尋</button>
+			<a th:href="@{/venueReport/listAllVenueReport}" class="btn-edit"
+				style="text-decoration: none;">清除條件</a>
 		</form>
 
 		<div class="table-wrap">
@@ -37,31 +43,36 @@
 					<tr>
 						<th>檢舉編號</th>
 						<th>場地訂單編號</th>
-						<th>檢舉內容</th>
-						<th>檢舉時間</th>
 						<th>處理狀態</th>
+						<th>檢舉時間</th>
+						<th>檢舉內容</th>
 						<th>處理員工</th>
 						<th>處理完成時間</th>
 						<th>查看詳情</th>
 					</tr>
 				</thead>
 				<tbody>
+					<tr th:if="${#lists.isEmpty(venueReportListData)}">
+						<td colspan="8"
+							style="text-align: center; padding: 2rem; color: #64748b;">
+							目前沒有符合條件的檢舉紀錄</td>
+					</tr>
 					<tr th:each="venueReport : ${venueReportListData}">
 						<td th:text="${venueReport.venueReportId}"></td>
 						<td th:text="${venueReport.venueOrderId}"></td>
-						<td th:text="${venueReport.serReportCom}"></td>
-						<td
-							th:text="${venueReport.serReportTime != null ? #temporals.format(venueReport.serReportTime, 'yyyy-MM-dd HH:mm') : '-'}"></td>
 						<td><span th:switch="${venueReport.reportStatus}"> <span
 								th:case="0" class="btn-toggle btn-toggle-down"
 								style="pointer-events: none;">審核中</span> <span th:case="1"
-								class="btn-toggle btn-toggle-up" style="pointer-events: none;">通過（下架場地）</span>
+								class="btn-toggle btn-toggle-up" style="pointer-events: none;">審核通過</span>
 								<span th:case="2" class="btn-toggle btn-toggle-down"
-								style="pointer-events: none;">未通過</span>
+								style="pointer-events: none;">審核未通過</span>
 						</span></td>
+						<td style="white-space: nowrap;"
+							th:text="${venueReport.serReportTime != null ? #temporals.format(venueReport.serReportTime, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+						<td th:text="${venueReport.serReportCom}"></td>
 						<td
 							th:text="${venueReport.employeeId != null ? venueReport.employeeId + ' - ' + employeeNameMap.get(venueReport.employeeId) : '尚未處理'}"></td>
-						<td
+						<td style="white-space: nowrap;"
 							th:text="${venueReport.handledAt != null ? #temporals.format(venueReport.handledAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
 						<td>
 							<form th:action="@{/venueReport/viewOne}" method="get"

@@ -28,10 +28,6 @@ public interface VenueReportRepository extends JpaRepository<VenueReportVO, Inte
     @Query("FROM VenueReportVO WHERE venueOrderId = ?1 ORDER BY serReportTime DESC")
     List<VenueReportVO> findByVenueOrderId(Integer venueOrderId);
 
-    // 依檢舉者會員編號查詢
-    @Query("FROM VenueReportVO WHERE memberId = ?1 ORDER BY serReportTime DESC")
-    List<VenueReportVO> findByMemberId(Integer memberId);
-
     // 依處理員工編號查詢
     @Query("FROM VenueReportVO WHERE employeeId = ?1 ORDER BY serReportTime DESC")
     List<VenueReportVO> findByEmployeeId(Integer employeeId);

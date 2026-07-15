@@ -106,6 +106,18 @@ body {
 	color: #b91c1c;
 }
 
+.form-select {
+	width: 100%;
+	max-width: 320px;
+	padding: 8px 12px;
+	font-size: 14px;
+	border: 1px solid #cbd5e1;
+	border-radius: 6px;
+	margin-top: 4px;
+	background: #ffffff;
+	color: #1e293b;
+}
+
 .action-form {
 	background: #f8fafc;
 	border: 1px solid #e2e8f0;
@@ -173,7 +185,7 @@ body {
 				class="btn btn-secondary">返回列表</a>
 		</div>
 
-		<div class="card" th:object="${existingVenueReport}">
+		<div class="card" th:object="${venueReportVO}">
 
 			<div class="section-title">檢舉基本資訊</div>
 			<div class="info-grid">
@@ -186,17 +198,19 @@ body {
 					<div class="info-value" th:text="*{venueOrderId}"></div>
 				</div>
 				<div class="info-group">
-					<div class="info-label">檢舉者會員編號</div>
-					<div class="info-value" th:text="*{memberId}"></div>
+					<div class="info-label">檢舉者會員</div>
+					<div class="info-value"
+						th:text="${venueOrderVO != null and venueOrderVO.member != null}
+                          ? ${venueOrderVO.member.memberId} + ' - ' + ${venueOrderVO.member.nickname} : '-'"></div>
 				</div>
 				<div class="info-group">
 					<div class="info-label">處理狀態</div>
 					<div>
 						<span class="status-badge status-reviewing"
 							th:if="*{reportStatus == 0}">審核中</span> <span
-							class="status-badge status-approved" th:if="*{reportStatus == 1}">通過（下架場地）</span>
+							class="status-badge status-approved" th:if="*{reportStatus == 1}">審核通過</span>
 						<span class="status-badge status-rejected"
-							th:if="*{reportStatus == 2}">未通過</span>
+							th:if="*{reportStatus == 2}">審核未通過</span>
 					</div>
 				</div>
 				<div class="info-group full-width">
@@ -212,7 +226,9 @@ body {
 				<div class="info-group">
 					<div class="info-label">處理員工</div>
 					<div class="info-value"
-						th:text="${existingVenueReport.employeeId != null ? existingVenueReport.employeeId + ' - ' + employeeNameMap.get(existingVenueReport.employeeId) : '尚未處理'}"></div>
+						th:text="${venueReportVO.employeeId != null
+                           ? venueReportVO.employeeId + ' - ' + employeeNameMap.get(venueReportVO.employeeId)
+                           : '尚未處理'}"></div>
 				</div>
 				<div class="info-group full-width">
 					<div class="info-label">處理完成時間</div>
@@ -220,34 +236,91 @@ body {
 						th:text="*{handledAt != null ? #temporals.format(handledAt, 'yyyy-MM-dd HH:mm') : '尚未處理'}"></div>
 				</div>
 			</div>
+
+
+			<div class="section-title" th:if="${venueVO != null}">被檢舉場地資訊</div>
+			<div class="info-grid" th:if="${venueVO != null}">
+				<div class="info-group">
+					<div class="info-label">場地編號</div>
+					<div class="info-value" th:text="${venueVO.venueId}"></div>
+				</div>
+				<div class="info-group">
+					<div class="info-label">場地名稱</div>
+					<div class="info-value" th:text="${venueVO.venueName}"></div>
+				</div>
+				<div class="info-group full-width">
+					<div class="info-label">場地地址</div>
+					<div class="info-value" th:text="${venueVO.address}"></div>
+				</div>
+				<div class="info-group">
+					<div class="info-label">場地提供者</div>
+					<div class="info-value"
+						th:text="${venueVO.member != null}
+                          ? ${venueVO.member.memberId} + ' - ' + ${venueVO.member.nickname} : '-'"></div>
+				</div>
+				<div class="info-group">
+					<div class="info-label">提供者累計違規點數</div>
+					<div class="info-value"
+						th:text="${venueVO.member != null and venueVO.member.reportPoints != null}
+                          ? ${venueVO.member.reportPoints} : 0"></div>
+				</div>
+				<div class="info-group full-width">
+					<div class="info-label">場地目前狀態</div>
+					<div>
+						<span class="status-badge status-approved"
+							th:if="${venueVO.venueStatus == 1}">上架</span> <span
+							class="status-badge status-reviewing"
+							th:if="${venueVO.venueStatus == 2}">待審核</span> <span
+							class="status-badge status-rejected"
+							th:if="${venueVO.venueStatus == 0}">下架</span>
+					</div>
+				</div>
+			</div>
+
 		</div>
 
-		<!-- 處理操作區：只有「審核中」狀態才顯示，已處理過的紀錄不再顯示操作按鈕 -->
-		<div th:if="${existingVenueReport.reportStatus == 0}">
+
+		<!-- 處理操作區：只有「審核中」狀態才顯示 -->
+		<div th:if="${venueReportVO.reportStatus == 0}">
 			<div class="section-title">檢舉處理</div>
 
 			<div class="action-form">
-				<p style="color: #64748b; font-size: 14px; margin-top: 0;">
-					通過表示檢舉成立，系統將自動把該場地下架；未通過表示檢舉不成立，場地狀態不受影響。</p>
+				<div class="info-group"
+					style="border-bottom: none; padding-bottom: 0; margin-bottom: 16px;">
+					<div class="info-label">
+						審核員工 <span style="color: #dc2626;">*</span>
+					</div>
+					<select id="employeeSelect" class="form-select">
+						<option value="">請選擇負責員工</option>
+						<option th:each="emp : ${employeeListData}"
+							th:value="${emp.employeeId}"
+							th:text="${emp.employeeId} + ' - ' + ${emp.empName}"></option>
+					</select>
+				</div>
 
-				<!-- 實際送出的表單：approve -->
+				<p style="color: #64748b; font-size: 14px; margin-top: 0;">
+					審核通過表示檢舉成立，場地提供者將累計 1 點違規點數，<br>
+					該場地會退回「待審核」狀態，待提供者修改資料後重新走場地審核流程；<br>
+					審核未通過表示檢舉不成立，場地狀態不受影響。</p>
+
 				<form th:action="@{/venueReport/approve}" method="post"
 					id="approveForm">
 					<input type="hidden" name="venueReportId"
-						th:value="${existingVenueReport.venueReportId}" />
+						th:value="${venueReportVO.venueReportId}" /> <input type="hidden"
+						name="employeeId" id="approveEmployeeId" />
 				</form>
 
-				<!-- 實際送出的表單：reject -->
 				<form th:action="@{/venueReport/reject}" method="post"
 					id="rejectForm">
 					<input type="hidden" name="venueReportId"
-						th:value="${existingVenueReport.venueReportId}" />
+						th:value="${venueReportVO.venueReportId}" /> <input type="hidden"
+						name="employeeId" id="rejectEmployeeId" />
 				</form>
 
 				<div class="action-bar"
 					style="border-top: none; padding-top: 0; margin-top: 0.5rem;">
 					<button type="button" class="btn btn-approve"
-						onclick="submitReport('approve')">審核通過（下架場地）</button>
+						onclick="submitReport('approve')">審核通過</button>
 					<button type="button" class="btn btn-reject"
 						onclick="submitReport('reject')">審核未通過</button>
 				</div>
@@ -258,14 +331,23 @@ body {
 
 	<script>
 		function submitReport(action) {
-			const confirmMsg = action === 'approve' ? '確定要通過此檢舉並將場地下架嗎？'
-					: '確定要標記此檢舉未通過嗎？';
+			const employeeId = document.getElementById('employeeSelect').value;
+			if (!employeeId) {
+				alert('請先選擇負責員工！');
+				return;
+			}
+
+			const confirmMsg = action === 'approve' ? '確定檢舉成立？提供者將累計違規點數，場地會退回待審核狀態。'
+					: '確定檢舉不成立？場地狀態將維持不變。';
 			if (!confirm(confirmMsg)) {
 				return;
 			}
+
 			if (action === 'approve') {
+				document.getElementById('approveEmployeeId').value = employeeId;
 				document.getElementById('approveForm').submit();
 			} else {
+				document.getElementById('rejectEmployeeId').value = employeeId;
 				document.getElementById('rejectForm').submit();
 			}
 		}
