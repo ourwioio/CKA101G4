@@ -2,6 +2,8 @@ package com.webond.venue.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,35 +20,66 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/venueReports")
 public class VenueReportFrontController {
 
-	// TODO 改成貴組前台場地訂單列表的實際路徑
-	private static final String ORDER_LIST_PATH = "/front/venueOrder/list";
+	private static final String ORDER_LIST_PATH = "/front/venueOrder/myVenueOrder";
 	private static final String ORDER_LIST_URL = "redirect:" + ORDER_LIST_PATH;
 
 	@Autowired
 	private VenueReportService venueReportSvc;
 
-	@PostMapping("insert")
-	public String insert(@RequestParam("venueOrderId") Integer venueOrderId,
-			@RequestParam("serReportCom") String serReportCom, HttpSession session, RedirectAttributes redirectAttrs) {
+	// ===== 檢舉表單頁：從訂單列表的「檢舉」按鈕帶 venueOrderId 進來 =====
+	@GetMapping("addVenueReport")
+	public String addVenueReport(@RequestParam("venueOrderId") Integer venueOrderId, HttpSession session,
+			ModelMap model, RedirectAttributes redirectAttrs) {
 
 		// 1. 登入檢查（session key "memberVO"，存整個 MemberVO）
 		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 		if (loginMember == null) {
-			session.setAttribute("location", ORDER_LIST_PATH); // 配合 LoginFilter 登入後跳回
+			session.setAttribute("location", "/venueReports/addVenueReport?venueOrderId=" + venueOrderId);
+			return "redirect:/member/login";
+		}
+
+		// 2. 驗證訂單存在且屬於該會員（防止竄改網址的 venueOrderId）
+		VenueOrderVO venueOrderVO = venueReportSvc.getVenueOrder(venueOrderId);
+		if (venueOrderVO == null || venueOrderVO.getMember() == null
+				|| !venueOrderVO.getMember().getMemberId().equals(loginMember.getMemberId())) {
+			redirectAttrs.addFlashAttribute("errorMsg", "查無此訂單");
+			return ORDER_LIST_URL;
+		}
+
+		// 3. 防重複檢舉
+		if (venueReportSvc.hasReviewingReport(venueOrderId)) {
+			redirectAttrs.addFlashAttribute("errorMsg", "此訂單已有檢舉正在審核中，請等待處理結果");
+			return ORDER_LIST_URL;
+		}
+
+		model.addAttribute("venueOrderVO", venueOrderVO);
+		model.addAttribute("venueVO", venueOrderVO.getVenueVO());
+		model.addAttribute("loginMember", loginMember);
+		return "front-end/venueReport/addVenueReport";
+	}
+
+	// ===== 送出檢舉 =====
+	@PostMapping("insert")
+	public String insert(@RequestParam("venueOrderId") Integer venueOrderId,
+			@RequestParam("serReportCom") String serReportCom, HttpSession session, RedirectAttributes redirectAttrs) {
+
+		// 1. 登入檢查
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
 			return "redirect:/member/login";
 		}
 
 		// 2. 內容驗證
 		if (serReportCom == null || serReportCom.trim().isEmpty()) {
 			redirectAttrs.addFlashAttribute("errorMsg", "檢舉內容不可空白");
-			return ORDER_LIST_URL;
+			return "redirect:/venueReports/addVenueReport?venueOrderId=" + venueOrderId;
 		}
 		if (serReportCom.trim().length() > 500) {
 			redirectAttrs.addFlashAttribute("errorMsg", "檢舉內容不可超過 500 字");
-			return ORDER_LIST_URL;
+			return "redirect:/venueReports/addVenueReport?venueOrderId=" + venueOrderId;
 		}
 
-		// 3. 驗證訂單存在且屬於該會員（防止竄改 venueOrderId）
+		// 3. 驗證訂單存在且屬於該會員
 		VenueOrderVO venueOrderVO = venueReportSvc.getVenueOrder(venueOrderId);
 		if (venueOrderVO == null || venueOrderVO.getMember() == null
 				|| !venueOrderVO.getMember().getMemberId().equals(loginMember.getMemberId())) {
