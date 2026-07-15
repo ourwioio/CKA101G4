@@ -103,6 +103,17 @@ td {
 	color: #1d4ed8;
 }
 
+.countdown {
+	margin-top: 8px;
+	color: #475569;
+	font-size: 13px;
+	font-weight: bold;
+}
+
+.countdown.expired {
+	color: #b91c1c;
+}
+
 .actions {
 	display: grid;
 	gap: 10px;
@@ -236,7 +247,8 @@ td {
 						<td colspan="7" class="empty">&#30446;&#21069;&#27794;&#26377;&#22577;&#21517;&#27963;&#21205;</td>
 					</tr>
 
-					<tr th:each="order : ${orderListData}">
+					<tr th:each="order : ${orderListData}"
+						th:attr="data-order-id=${order.activityOrderId},data-order-status=${order.orderStatus}">
 						<td th:text="${order.activityOrderId}"></td>
 
 						<td>
@@ -261,6 +273,18 @@ td {
 							<span th:if="${order.orderStatus == 2}" class="status pending">&#24453;&#23529;&#26680;</span>
 							<span th:if="${order.orderStatus == 3}" class="status pending">&#24453;&#20184;&#27454;</span>
 							<span th:if="${order.orderStatus == 4}" class="status active">&#24050;&#23436;&#25104;</span>
+							<th:block th:if="${order.orderStatus == 2}" th:each="activity : ${activityListData}">
+								<div class="countdown"
+									th:if="${activity.activityId == order.activityId}"
+									th:attr="data-deadline=${#temporals.format(activity.registrationDeadline, 'yyyy-MM-dd''T''HH:mm:ss')}">
+									&#24453;&#20027;&#36774;&#23529;&#26680;&#21097;&#39192;&#65306;<span>&#35336;&#31639;&#20013;</span>
+								</div>
+							</th:block>
+							<div class="countdown"
+								th:if="${order.orderStatus == 3 and order.approvedAt != null}"
+								th:attr="data-start=${#temporals.format(order.approvedAt, 'yyyy-MM-dd''T''HH:mm:ss')},data-seconds=60">
+								&#20184;&#27454;&#21097;&#39192;&#65306;<span>&#35336;&#31639;&#20013;</span>
+							</div>
 							<div th:if="${order.totalAmount == null or order.totalAmount <= 0}" style="margin-top: 6px;">
 								<span class="status active">&#28961;&#36864;&#27454;</span>
 							</div>
@@ -328,10 +352,85 @@ td {
 		</div>
 	</div>
 
-	<script th:if="${shouldAutoRefreshOrder}">
-		setTimeout(function() {
-			window.location.reload();
-		}, 1000);
+	<script th:inline="javascript">
+		function formatRemaining(milliseconds) {
+			if (milliseconds <= 0) {
+				return '\u5df2\u903e\u6642';
+			}
+			const totalSeconds = Math.floor(milliseconds / 1000);
+			const days = Math.floor(totalSeconds / 86400);
+			const hours = Math.floor((totalSeconds % 86400) / 3600);
+			const minutes = Math.floor((totalSeconds % 3600) / 60);
+			const seconds = totalSeconds % 60;
+			if (days > 0) {
+				return days + '\u5929 ' + hours + '\u5c0f\u6642 ' + minutes + '\u5206';
+			}
+			if (hours > 0) {
+				return hours + '\u5c0f\u6642 ' + minutes + '\u5206 ' + seconds + '\u79d2';
+			}
+			return minutes + '\u5206 ' + seconds + '\u79d2';
+		}
+
+		function updateCountdowns() {
+			document.querySelectorAll('.countdown').forEach(function(item) {
+				let deadline = null;
+				if (item.dataset.deadline) {
+					deadline = new Date(item.dataset.deadline).getTime();
+				} else if (item.dataset.start && item.dataset.seconds) {
+					deadline = new Date(item.dataset.start).getTime() + Number(item.dataset.seconds) * 1000;
+				}
+				if (!deadline || Number.isNaN(deadline)) {
+					return;
+				}
+				const remaining = deadline - Date.now();
+				const text = item.querySelector('span');
+				if (text) {
+					text.textContent = formatRemaining(remaining);
+				}
+				item.classList.toggle('expired', remaining <= 0);
+			});
+		}
+
+		updateCountdowns();
+		setInterval(updateCountdowns, 1000);
+
+		const orderStatusUrl = /*[[@{/activity/front/order/status}]]*/ '/activity/front/order/status';
+		let isPollingOrderStatus = false;
+
+		function pollOrderStatuses() {
+			const rows = Array.from(document.querySelectorAll('[data-order-id][data-order-status]'));
+			if (rows.length === 0 || isPollingOrderStatus) {
+				return;
+			}
+			isPollingOrderStatus = true;
+			const orderIds = rows.map(function(row) {
+				return row.dataset.orderId;
+			}).join(',');
+
+			fetch(orderStatusUrl + '?orderIds=' + encodeURIComponent(orderIds) + '&_=' + Date.now(), {
+				cache: 'no-store',
+				headers: { 'Accept': 'application/json' }
+			})
+				.then(function(response) {
+					return response.ok ? response.json() : {};
+				})
+				.then(function(data) {
+					const hasChanged = rows.some(function(row) {
+						const current = data[row.dataset.orderId];
+						return current && String(current.orderStatus) !== String(row.dataset.orderStatus);
+					});
+					if (hasChanged) {
+						window.location.reload();
+					}
+				})
+				.catch(function() {})
+				.finally(function() {
+					isPollingOrderStatus = false;
+				});
+		}
+
+		pollOrderStatuses();
+		setInterval(pollOrderStatuses, 1000);
 	</script>
 
 </body>

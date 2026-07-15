@@ -105,6 +105,21 @@ tr:hover{
     color:#3730a3;
 }
 
+.countdown{
+    margin-top:8px;
+    color:#475569;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.countdown.expired{
+    color:#b91c1c;
+}
+
+.row-updating{
+    opacity:.65;
+}
+
 .action{
     display:flex;
     justify-content:center;
@@ -127,6 +142,24 @@ tr:hover{
 }
 
                                 <button class="btn-reject" type="submit">&#25298;&#32085;</button>
+    background:#dc2626;
+}
+
+.btn-approve,
+.btn-reject{
+    color:white;
+    border:none;
+    padding:8px 15px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-approve{
+    background:#16a34a;
+}
+
+.btn-reject{
     background:#dc2626;
 }
 
@@ -187,7 +220,8 @@ tr:hover{
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
 <body>
 
-<div class="container">
+<div class="container"
+    th:attr="data-activity-id=${activityVO.activityId},data-order-count=${orderCount},data-latest-order-id=${latestOrderId}">
 
     <div class="header">
         <div>
@@ -245,7 +279,8 @@ tr:hover{
                     </td>
                 </tr>
 
-                <tr th:each="order : ${orderListData}">
+                <tr th:each="order : ${orderListData}"
+                    th:attr="data-order-id=${order.activityOrderId},data-order-status=${order.orderStatus}">
                     <td th:text="${order.activityOrderId}"></td>
                     <td th:text="${order.buyerMemberId}"></td>
                     <td th:text="${order.bookingCount}"></td>
@@ -265,6 +300,16 @@ tr:hover{
                         <span th:if="${order.orderStatus == 2}" class="status pending">&#24453;&#20027;&#36774;&#23529;&#26680;</span>
                         <span th:if="${order.orderStatus == 3}" class="status paying">&#24453;&#20184;&#27454;</span>
                         <span th:if="${order.orderStatus == 4}" class="status finish">&#24050;&#23436;&#25104;</span>
+                        <div class="countdown"
+                            th:if="${order.orderStatus == 2}"
+                            th:attr="data-deadline=${#temporals.format(activityVO.registrationDeadline, 'yyyy-MM-dd''T''HH:mm:ss')}">
+                            &#23529;&#26680;&#21097;&#39192;&#65306;<span>&#35336;&#31639;&#20013;</span>
+                        </div>
+                        <div class="countdown"
+                            th:if="${order.orderStatus == 3 and order.approvedAt != null}"
+                            th:attr="data-start=${#temporals.format(order.approvedAt, 'yyyy-MM-dd''T''HH:mm:ss')},data-seconds=60">
+                            &#20184;&#27454;&#21097;&#39192;&#65306;<span>&#35336;&#31639;&#20013;</span>
+                        </div>
                     </td>
                     <td th:text="${order.orderNote ?: '-'}"></td>
                     <td>
@@ -292,10 +337,156 @@ tr:hover{
 
 </div>
 
-<script th:if="${shouldAutoRefreshOrder}">
-    setTimeout(function() {
-        window.location.reload();
-    }, 1000);
+<script th:inline="javascript">
+    function formatRemaining(milliseconds) {
+        if (milliseconds <= 0) {
+            return '\u5df2\u903e\u6642';
+        }
+        const totalSeconds = Math.floor(milliseconds / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        if (days > 0) {
+            return days + '\u5929 ' + hours + '\u5c0f\u6642 ' + minutes + '\u5206';
+        }
+        if (hours > 0) {
+            return hours + '\u5c0f\u6642 ' + minutes + '\u5206 ' + seconds + '\u79d2';
+        }
+        return minutes + '\u5206 ' + seconds + '\u79d2';
+    }
+
+    function updateCountdowns() {
+        document.querySelectorAll('.countdown').forEach(function(item) {
+            let deadline = null;
+            if (item.dataset.deadline) {
+                deadline = new Date(item.dataset.deadline).getTime();
+            } else if (item.dataset.start && item.dataset.seconds) {
+                deadline = new Date(item.dataset.start).getTime() + Number(item.dataset.seconds) * 1000;
+            }
+            if (!deadline || Number.isNaN(deadline)) {
+                return;
+            }
+            const remaining = deadline - Date.now();
+            const text = item.querySelector('span');
+            if (text) {
+                text.textContent = formatRemaining(remaining);
+            }
+            item.classList.toggle('expired', remaining <= 0);
+        });
+    }
+
+    updateCountdowns();
+    setInterval(updateCountdowns, 1000);
+
+    const orderStatusUrl = /*[[@{/activity/front/order/status}]]*/ '/activity/front/order/status';
+    const activitySummaryUrl = /*[[@{/activity/front/memberList/summary}]]*/ '/activity/front/memberList/summary';
+    const approveAjaxUrl = /*[[@{/activity/front/memberList/approve/ajax}]]*/ '/activity/front/memberList/approve/ajax';
+    const rejectAjaxUrl = /*[[@{/activity/front/memberList/reject/ajax}]]*/ '/activity/front/memberList/reject/ajax';
+    let isPollingOrderStatus = false;
+
+    function bindReviewForms() {
+        document.querySelectorAll('.action form').forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const row = form.closest('[data-order-id]');
+                const buttons = form.closest('.action').querySelectorAll('button');
+                buttons.forEach(function(button) {
+                    button.disabled = true;
+                });
+                if (row) {
+                    row.classList.add('row-updating');
+                }
+
+                const ajaxUrl = form.action.indexOf('/approve') !== -1 ? approveAjaxUrl : rejectAjaxUrl;
+                fetch(ajaxUrl, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: new FormData(form)
+                })
+                    .then(function(response) {
+                        return response.ok ? response.json() : { success: false };
+                    })
+                    .then(function(result) {
+                        if (!result.success) {
+                            window.location.reload();
+                            return;
+                        }
+                        window.location.reload();
+                    })
+                    .catch(function() {
+                        window.location.reload();
+                    });
+            });
+        });
+    }
+
+    function pollOrderStatuses() {
+        const rows = Array.from(document.querySelectorAll('[data-order-id][data-order-status]'));
+        if (rows.length === 0 || isPollingOrderStatus) {
+            return;
+        }
+        isPollingOrderStatus = true;
+        const orderIds = rows.map(function(row) {
+            return row.dataset.orderId;
+        }).join(',');
+
+        fetch(orderStatusUrl + '?orderIds=' + encodeURIComponent(orderIds) + '&_=' + Date.now(), {
+            cache: 'no-store',
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(function(response) {
+                return response.ok ? response.json() : {};
+            })
+            .then(function(data) {
+                const hasChanged = rows.some(function(row) {
+                    const current = data[row.dataset.orderId];
+                    return current && String(current.orderStatus) !== String(row.dataset.orderStatus);
+                });
+                if (hasChanged) {
+                    window.location.reload();
+                }
+            })
+            .catch(function() {})
+            .finally(function() {
+                isPollingOrderStatus = false;
+            });
+    }
+
+    function pollActivitySummary() {
+        const container = document.querySelector('[data-activity-id][data-order-count][data-latest-order-id]');
+        if (!container) {
+            return;
+        }
+
+        fetch(activitySummaryUrl + '?activityId=' + encodeURIComponent(container.dataset.activityId) + '&_=' + Date.now(), {
+            cache: 'no-store',
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(function(response) {
+                return response.ok ? response.json() : {};
+            })
+            .then(function(summary) {
+                if (!summary.success) {
+                    return;
+                }
+                const countChanged = String(summary.orderCount) !== String(container.dataset.orderCount);
+                const latestChanged = String(summary.latestOrderId) !== String(container.dataset.latestOrderId);
+                if (countChanged || latestChanged) {
+                    window.location.reload();
+                }
+            })
+            .catch(function() {});
+    }
+
+    pollOrderStatuses();
+    pollActivitySummary();
+    setInterval(pollOrderStatuses, 1000);
+    setInterval(pollActivitySummary, 1000);
+    bindReviewForms();
 </script>
 
 </body>

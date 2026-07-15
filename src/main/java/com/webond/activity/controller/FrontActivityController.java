@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
@@ -352,6 +353,36 @@ public class FrontActivityController {
 		return "front-end/activity/myActivityOrder";
 	}
 
+	@GetMapping("/activity/front/order/status")
+	@ResponseBody
+	public Map<Integer, Map<String, Object>> activityOrderStatus(
+			@RequestParam("orderIds") String orderIds, HttpSession session) {
+		Map<Integer, Map<String, Object>> statusMap = new HashMap<>();
+		Integer loginMemberId = getLoginMemberId(session);
+
+		if (loginMemberId == null || orderIds == null || orderIds.trim().isEmpty()) {
+			return statusMap;
+		}
+
+		for (String rawOrderId : orderIds.split(",")) {
+			Integer orderId = parseInteger(rawOrderId);
+			if (orderId == null) {
+				continue;
+			}
+			ActivityOrderVO orderVO = activityOrderSvc.getOneOrder(orderId);
+			if (orderVO == null || !canViewActivityOrderStatus(orderVO, loginMemberId)) {
+				continue;
+			}
+
+			Map<String, Object> status = new HashMap<>();
+			status.put("orderStatus", orderVO.getOrderStatus());
+			status.put("refundStatus", orderVO.getRefundStatus());
+			statusMap.put(orderId, status);
+		}
+
+		return statusMap;
+	}
+
 	@GetMapping("/activity/front/addHostActivity")
 	public String addHostActivity(Model model, HttpSession session) {
 		Integer loginMemberId = getLoginMemberId(session);
@@ -497,12 +528,34 @@ public class FrontActivityController {
 		model.addAttribute("activityVO", activityVO);
 		List<ActivityOrderVO> orderList = activityOrderSvc.getOrdersByActivityId(activityId);
 		model.addAttribute("orderListData", orderList);
+		model.addAttribute("orderCount", orderList.size());
+		model.addAttribute("latestOrderId", getLatestOrderId(orderList));
 		model.addAttribute("shouldAutoRefreshOrder", hasOrderStatus(orderList, (byte) 2)
 				|| hasOrderStatus(orderList, (byte) 3));
 		model.addAttribute("hasReachedMinimum", activitySvc.hasReachedMinimum(activityVO));
 		model.addAttribute("isFull", activitySvc.isFull(activityVO));
 
 		return "front-end/activity/frontActivityMemberList";
+	}
+
+	@GetMapping("/activity/front/memberList/summary")
+	@ResponseBody
+	public Map<String, Object> memberListSummary(@RequestParam("activityId") Integer activityId, HttpSession session) {
+		Map<String, Object> summary = new HashMap<>();
+		Integer loginMemberId = getLoginMemberId(session);
+		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
+
+		if (loginMemberId == null || activityVO == null || !loginMemberId.equals(activityVO.getMemberId())) {
+			summary.put("success", false);
+			return summary;
+		}
+
+		List<ActivityOrderVO> orderList = activityOrderSvc.getOrdersByActivityId(activityId);
+		summary.put("success", true);
+		summary.put("orderCount", orderList.size());
+		summary.put("latestOrderId", getLatestOrderId(orderList));
+		summary.put("pendingReviewCount", activityOrderSvc.getPendingReviewCount(activityId));
+		return summary;
 	}
 
 	@PostMapping("/activity/front/memberList/approve")
@@ -527,6 +580,13 @@ public class FrontActivityController {
 		return "redirect:/activity/front/memberList?activityId=" + orderVO.getActivityId() + "&approveSuccess=true";
 	}
 
+	@PostMapping("/activity/front/memberList/approve/ajax")
+	@ResponseBody
+	public Map<String, Object> approveMemberOrderAjax(@RequestParam("activityOrderId") Integer activityOrderId,
+			HttpSession session) {
+		return handleMemberOrderReviewAjax(activityOrderId, true, session);
+	}
+
 	@PostMapping("/activity/front/memberList/reject")
 	public String rejectMemberOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
 		if (!isLoginMember(session)) {
@@ -547,6 +607,13 @@ public class FrontActivityController {
 		activitySvc.syncAttendeesFromOrders(orderVO.getActivityId());
 		activityNotificationSvc.notifyBuyerRejected(activitySvc.getOneActivity(orderVO.getActivityId()), rejectedOrder);
 		return "redirect:/activity/front/memberList?activityId=" + orderVO.getActivityId() + "&rejectSuccess=true";
+	}
+
+	@PostMapping("/activity/front/memberList/reject/ajax")
+	@ResponseBody
+	public Map<String, Object> rejectMemberOrderAjax(@RequestParam("activityOrderId") Integer activityOrderId,
+			HttpSession session) {
+		return handleMemberOrderReviewAjax(activityOrderId, false, session);
 	}
 
 	@GetMapping("/activity/front/updateHostActivity")
@@ -681,6 +748,82 @@ public class FrontActivityController {
 		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
 		Integer loginMemberId = getLoginMemberId(session);
 		return activityVO != null && activityVO.getMemberId().equals(loginMemberId);
+	}
+
+	private boolean canViewActivityOrderStatus(ActivityOrderVO orderVO, Integer loginMemberId) {
+		if (orderVO == null || loginMemberId == null) {
+			return false;
+		}
+		if (loginMemberId.equals(orderVO.getBuyerMemberId())) {
+			return true;
+		}
+		ActivityVO activityVO = activitySvc.getOneActivity(orderVO.getActivityId());
+		return activityVO != null && loginMemberId.equals(activityVO.getMemberId());
+	}
+
+	private Map<String, Object> activityOrderActionResult(boolean success, String message, ActivityOrderVO orderVO) {
+		Map<String, Object> result = new HashMap<>();
+		result.put("success", success);
+		result.put("message", message);
+		if (orderVO != null) {
+			result.put("activityOrderId", orderVO.getActivityOrderId());
+			result.put("orderStatus", orderVO.getOrderStatus());
+			result.put("refundStatus", orderVO.getRefundStatus());
+		}
+		return result;
+	}
+
+	private Map<String, Object> handleMemberOrderReviewAjax(Integer activityOrderId, boolean approve,
+			HttpSession session) {
+		if (!isLoginMember(session)) {
+			return activityOrderActionResult(false, "loginRequired", null);
+		}
+
+		ActivityOrderVO orderVO = activityOrderSvc.getOneOrder(activityOrderId);
+		if (orderVO == null) {
+			return activityOrderActionResult(false, "notFound", null);
+		}
+
+		if (!isLoginMemberActivityHost(orderVO.getActivityId(), session)) {
+			return activityOrderActionResult(false, "noPermission", orderVO);
+		}
+
+		ActivityOrderVO reviewedOrder;
+		ActivityVO activityVO = activitySvc.getOneActivity(orderVO.getActivityId());
+		if (approve) {
+			reviewedOrder = activityOrderSvc.approveOrderByHost(activityOrderId);
+			activityNotificationSvc.notifyBuyerApproved(activityVO, reviewedOrder);
+		} else {
+			reviewedOrder = activityOrderSvc.rejectOrderByHost(activityOrderId);
+			activityNotificationSvc.notifyBuyerRejected(activityVO, reviewedOrder);
+		}
+		activitySvc.syncAttendeesFromOrders(orderVO.getActivityId());
+		return activityOrderActionResult(true, approve ? "approved" : "rejected", reviewedOrder);
+	}
+
+	private Integer parseInteger(String value) {
+		if (value == null || value.trim().isEmpty()) {
+			return null;
+		}
+		try {
+			return Integer.valueOf(value.trim());
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
+	private Integer getLatestOrderId(List<ActivityOrderVO> orderList) {
+		Integer latestOrderId = 0;
+		if (orderList == null) {
+			return latestOrderId;
+		}
+		for (ActivityOrderVO orderVO : orderList) {
+			if (orderVO != null && orderVO.getActivityOrderId() != null
+					&& orderVO.getActivityOrderId() > latestOrderId) {
+				latestOrderId = orderVO.getActivityOrderId();
+			}
+		}
+		return latestOrderId;
 	}
 
 	private Map<Integer, String> buildRegistrationStatusMap(List<ActivityVO> activityList) {
