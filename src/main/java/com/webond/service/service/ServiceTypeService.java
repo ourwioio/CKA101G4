@@ -47,6 +47,23 @@ public class ServiceTypeService {
 
         return serviceTypeRepository.findAll();
     }
+    
+    @Transactional(readOnly = true)
+    public List<ServiceTypeVO> search(String keyword) {
+
+        String normalizedKeyword =
+                normalizeNullableText(keyword);
+
+        if (normalizedKeyword == null) {
+            return serviceTypeRepository.findAll();
+        }
+
+        return serviceTypeRepository
+                .findByTypeNameContainingIgnoreCaseOrDescripContainingIgnoreCase(
+                        normalizedKeyword,
+                        normalizedKeyword
+                );
+    }
 
     // =========================================================
     // 新增服務類型
@@ -204,15 +221,13 @@ public class ServiceTypeService {
     // 共用：空白字串轉成 null
     // =========================================================
 
-    private String normalizeNullableText(
-            String text) {
+    private String normalizeNullableText(String text) {
 
         if (text == null) {
             return null;
         }
 
-        String normalized =
-                text.trim();
+        String normalized = text.trim();
 
         return normalized.isEmpty()
                 ? null

@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>後台服務類型管理</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: #2d3436;
+            background: #f5f6fa;
+            font-family:
+                    "Noto Sans TC",
+                    Arial,
+                    sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input,
+        textarea {
+            font: inherit;
+        }
+
+        .page {
+            width: min(1200px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 28px 0 60px;
+        }
+
+        /* =========================
+           頁面標題
+           ========================= */
+
+        .page-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 22px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .page-subtitle {
+            margin: 7px 0 0;
+            color: #69727b;
+            font-size: 14px;
+        }
+
+        .header-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+        }
+
+        /* =========================
+           員工資訊
+           ========================= */
+
+        .employee-panel {
+            min-width: 280px;
+            padding: 16px 18px;
+            background: #ffffff;
+            border: 1px solid #e1e5ea;
+            border-radius: 14px;
+            box-shadow:
+                    0 4px 16px
+                    rgba(0, 0, 0, 0.05);
+        }
+
+        .employee-label {
+            margin-bottom: 6px;
+            color: #7b838b;
+            font-size: 13px;
+        }
+
+        .employee-id {
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .employee-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .employee-switch-form {
+            display: flex;
+            gap: 8px;
+        }
+
+        .employee-switch-form input {
+            width: 105px;
+            height: 38px;
+            padding: 0 10px;
+            border: 1px solid #d9dee5;
+            border-radius: 8px;
+        }
+
+        /* =========================
+           按鈕
+           ========================= */
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            padding: 8px 13px;
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+            transition:
+                    transform 0.15s ease,
+                    background 0.15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn--home {
+            color: #ffffff;
+            background: #2d3436;
+        }
+
+        .btn--home:hover {
+            background: #171b1d;
+        }
+
+        .btn--service {
+            color: #5a4acb;
+            background: #efedff;
+        }
+
+        .btn--service:hover {
+            background: #e1ddff;
+        }
+
+        .btn--orders {
+            color: #075985;
+            background: #e0f2fe;
+        }
+
+        .btn--orders:hover {
+            background: #bae6fd;
+        }
+
+        .btn--primary {
+            color: #ffffff;
+            background: #6c5ce7;
+        }
+
+        .btn--primary:hover {
+            background: #5748c8;
+        }
+
+        .btn--update {
+            color: #ffffff;
+            background: #0984e3;
+        }
+
+        .btn--update:hover {
+            background: #0873c4;
+        }
+
+        .btn--secondary {
+            color: #4f5964;
+            background: #edf0f3;
+        }
+
+        .btn--secondary:hover {
+            background: #dfe4e8;
+        }
+
+        /* =========================
+           成功失敗訊息
+           ========================= */
+
+        .message {
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .message--success {
+            color: #176b45;
+            background: #e8f8ef;
+            border: 1px solid #b7e4ca;
+        }
+
+        .message--error {
+            color: #a12622;
+            background: #fff0ef;
+            border: 1px solid #f3c0bd;
+        }
+
+        /* =========================
+           共用面板
+           ========================= */
+
+        .panel {
+            margin-bottom: 22px;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #e1e5ea;
+            border-radius: 14px;
+            box-shadow:
+                    0 4px 15px
+                    rgba(0, 0, 0, 0.04);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 17px 20px;
+            border-bottom: 1px solid #e7eaee;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .panel-description {
+            color: #69727b;
+            font-size: 13px;
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+        /* =========================
+           查詢服務類型
+           ========================= */
+
+        .search-form {
+            display: grid;
+            grid-template-columns:
+                    minmax(260px, 1fr)
+                    auto
+                    auto;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-result {
+            margin-top: 12px;
+            color: #69727b;
+            font-size: 13px;
+        }
+
+        .search-result strong {
+            color: #5a4acb;
+        }
+
+        /* =========================
+           新增服務類型
+           ========================= */
+
+        .add-form {
+            display: grid;
+            grid-template-columns:
+                    minmax(180px, 1fr)
+                    minmax(280px, 2fr)
+                    auto;
+            align-items: end;
+            gap: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            color: #4f5964;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .form-control {
+            width: 100%;
+            min-height: 42px;
+            padding: 9px 11px;
+            color: #2d3436;
+            background: #ffffff;
+            border: 1px solid #d9dee5;
+            border-radius: 8px;
+        }
+
+        textarea.form-control {
+            min-height: 42px;
+            max-height: 140px;
+            resize: vertical;
+        }
+
+        .form-control:focus {
+            border-color: #6c5ce7;
+            outline: 2px solid rgba(108, 92, 231, 0.15);
+        }
+
+        /* =========================
+           服務類型卡片
+           ========================= */
+
+        .type-grid {
+            display: grid;
+            grid-template-columns:
+                    repeat(auto-fill, minmax(300px, 1fr));
+            gap: 14px;
+        }
+
+        .type-card {
+            padding: 17px;
+            background: #f8f9fb;
+            border: 1px solid #e3e6ea;
+            border-radius: 11px;
+        }
+
+        .type-edit-form {
+            display: grid;
+            gap: 13px;
+        }
+
+        .type-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .type-card-title {
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .type-id {
+            color: #7f8790;
+            font-size: 12px;
+        }
+
+        .type-edit-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: #59626c;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .type-edit-input {
+            width: 100%;
+            min-height: 40px;
+            padding: 8px 10px;
+            color: #2d3436;
+            background: #ffffff;
+            border: 1px solid #d9dee5;
+            border-radius: 8px;
+        }
+
+        textarea.type-edit-input {
+            min-height: 90px;
+            max-height: 180px;
+            resize: vertical;
+        }
+
+        .type-edit-input:focus {
+            border-color: #0984e3;
+            outline: 2px solid rgba(9, 132, 227, 0.15);
+        }
+
+        .type-edit-actions {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .empty-state {
+            padding: 48px 20px;
+            color: #69727b;
+            text-align: center;
+        }
+
+        .empty-state strong {
+            color: #5a4acb;
+        }
+
+        /* =========================
+           RWD
+           ========================= */
+
+        @media (max-width: 900px) {
+
+            .page-header {
+                flex-direction: column;
+            }
+
+            .employee-panel {
+                width: 100%;
+            }
+
+            .add-form {
+                grid-template-columns:
+                        repeat(2, minmax(0, 1fr));
+            }
+
+            .add-form .btn {
+                width: fit-content;
+            }
+        }
+
+        @media (max-width: 620px) {
+
+            .page {
+                width: calc(100% - 20px);
+                padding-top: 16px;
+            }
+
+            .header-links {
+                flex-direction: column;
+            }
+
+            .header-links .btn {
+                width: 100%;
+            }
+
+            .search-form {
+                grid-template-columns: 1fr;
+            }
+
+            .search-form .btn {
+                width: 100%;
+            }
+
+            .add-form {
+                grid-template-columns: 1fr;
+            }
+
+            .add-form .btn {
+                width: 100%;
+            }
+
+            .employee-switch-form {
+                width: 100%;
+            }
+
+            .employee-switch-form input {
+                flex: 1;
+                width: auto;
+            }
+
+            .type-edit-actions .btn {
+                width: 100%;
+            }
+
+            .panel-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="page">
+
+    <!-- =========================
+         頁面標題
+         ========================= -->
+
+    <header class="page-header">
+
+        <div>
+
+            <h1 class="page-title">
+                後台服務類型管理
+            </h1>
+
+            <p class="page-subtitle">
+                查詢、新增及修改會員上架服務時可選擇的服務類型
+            </p>
+
+            <div class="header-links">
+
+                <!-- 返回員工首頁 -->
+                <a class="btn btn--home"
+                   th:href="@{/admin/adminPage}">
+                    ← 返回員工首頁
+                </a>
+
+                <!-- 前往服務管理 -->
+                <a class="btn btn--service"
+                   th:href="@{/admin/services}">
+                    前往服務管理
+                </a>
+
+                <!-- 前往服務訂單管理 -->
+                <a class="btn btn--orders"
+                   th:href="@{/admin/services/orders}">
+                    前往服務訂單管理
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- =========================
+             員工 Session
+             ========================= -->
+
+        <div class="employee-panel">
+
+            <div class="employee-label">
+                目前登入員工
+            </div>
+
+            <div class="employee-id">
+                員工 #
+
+                <span th:text="${loginEmployeeId != null
+                        ? loginEmployeeId
+                        : '未登入'}">
+                    1001
+                </span>
+            </div>
+
+            <div class="employee-actions">
+
+                <form class="employee-switch-form"
+                      th:action="@{/admin/service/types/fake-login}"
+                      method="get">
+
+                    <input type="number"
+                           name="employeeId"
+                           min="1"
+                           placeholder="員工 ID"
+                           required>
+
+                    <button class="btn btn--secondary"
+                            type="submit">
+                        切換員工
+                    </button>
+
+                </form>
+
+                <a class="btn btn--secondary"
+                   th:href="@{/admin/service/types/fake-logout}">
+                    重設 Session
+                </a>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <!-- =========================
+         成功失敗訊息
+         ========================= -->
+
+    <div class="message message--success"
+         th:if="${successMsg != null}"
+         th:text="${successMsg}">
+        操作成功
+    </div>
+
+    <div class="message message--error"
+         th:if="${errorMsg != null}"
+         th:text="${errorMsg}">
+        操作失敗
+    </div>
+
+    <!-- =========================
+         查詢服務類型
+         ========================= -->
+
+    <section class="panel">
+
+        <div class="panel-header">
+
+            <h2 class="panel-title">
+                查詢服務類型
+            </h2>
+
+            <span class="panel-description">
+                可依照類型名稱或類型說明搜尋
+            </span>
+
+        </div>
+
+        <div class="panel-body">
+
+            <form class="search-form"
+                  th:action="@{/admin/service/types}"
+                  method="get">
+
+                <input class="form-control"
+                       type="text"
+                       name="keyword"
+                       th:value="${keyword != null ? keyword : ''}"
+                       maxlength="50"
+                       placeholder="輸入類型名稱或類型說明"
+                       autocomplete="off">
+
+                <button class="btn btn--primary"
+                        type="submit">
+                    查詢
+                </button>
+
+                <a class="btn btn--secondary"
+                   th:if="${keyword != null
+                            and !#strings.isEmpty(keyword)}"
+                   th:href="@{/admin/service/types}">
+                    清除查詢
+                </a>
+
+            </form>
+
+            <div class="search-result"
+                 th:if="${keyword != null
+                          and !#strings.isEmpty(keyword)}">
+
+                關鍵字：
+
+                <strong th:text="${keyword}">
+                    陪伴
+                </strong>
+
+                ，共找到
+
+                <strong th:text="${serviceTypeList != null
+                        ? #lists.size(serviceTypeList)
+                        : 0}">
+                    0
+                </strong>
+
+                筆結果
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- =========================
+         新增服務類型
+         ========================= -->
+
+    <section class="panel">
+
+        <div class="panel-header">
+
+            <h2 class="panel-title">
+                新增服務類型
+            </h2>
+
+            <span class="panel-description">
+                新增後可供會員上架服務時選擇
+            </span>
+
+        </div>
+
+        <div class="panel-body">
+
+            <form class="add-form"
+                  th:action="@{/admin/service/types/add}"
+                  method="post">
+
+                <!-- CSRF -->
+                <input type="hidden"
+                       th:if="${_csrf != null}"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <!-- 類型名稱 -->
+                <div class="form-group">
+
+                    <label for="newTypeName">
+                        類型名稱
+                    </label>
+
+                    <input id="newTypeName"
+                           class="form-control"
+                           type="text"
+                           name="typeName"
+                           maxlength="50"
+                           placeholder="例如：運動陪伴"
+                           autocomplete="off"
+                           required>
+
+                </div>
+
+                <!-- 類型說明 -->
+                <div class="form-group">
+
+                    <label for="newDescription">
+                        類型說明
+                    </label>
+
+                    <textarea id="newDescription"
+                              class="form-control"
+                              name="description"
+                              maxlength="255"
+                              placeholder="簡單說明這個服務類型"></textarea>
+
+                </div>
+
+                <button class="btn btn--primary"
+                        type="submit">
+                    新增類型
+                </button>
+
+            </form>
+
+        </div>
+
+    </section>
+
+    <!-- =========================
+         現有服務類型
+         ========================= -->
+
+    <section class="panel">
+
+        <div class="panel-header">
+
+            <h2 class="panel-title">
+
+                <span th:if="${keyword != null
+                              and !#strings.isEmpty(keyword)}">
+                    查詢結果
+                </span>
+
+                <span th:if="${keyword == null
+                              or #strings.isEmpty(keyword)}">
+                    現有服務類型
+                </span>
+
+            </h2>
+
+            <span class="panel-description">
+
+                <span th:if="${keyword != null
+                              and !#strings.isEmpty(keyword)}">
+
+                    「<strong th:text="${keyword}">
+                        陪伴
+                    </strong>」共找到
+
+                </span>
+
+                <span th:if="${keyword == null
+                              or #strings.isEmpty(keyword)}">
+                    目前共有
+                </span>
+
+                <strong th:text="${serviceTypeList != null
+                        ? #lists.size(serviceTypeList)
+                        : 0}">
+                    0
+                </strong>
+
+                種，可直接修改名稱及說明
+
+            </span>
+
+        </div>
+
+        <!-- 有服務類型 -->
+        <div class="panel-body"
+             th:if="${serviceTypeList != null
+                      and !#lists.isEmpty(serviceTypeList)}">
+
+            <div class="type-grid">
+
+                <article class="type-card"
+                         th:each="type : ${serviceTypeList}">
+
+                    <form class="type-edit-form"
+                          th:action="@{/admin/service/types/{serviceTypeId}/update(
+                                  serviceTypeId=${type.svcTypeID}
+                          )}"
+                          method="post"
+                          onsubmit="return confirm('確定要儲存這個服務類型的修改嗎？');">
+
+                        <!-- CSRF -->
+                        <input type="hidden"
+                               th:if="${_csrf != null}"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
+
+                        <div class="type-card-header">
+
+                            <span class="type-card-title">
+                                修改服務類型
+                            </span>
+
+                            <span class="type-id">
+                                類型編號 #
+
+                                <span th:text="${type.svcTypeID}">
+                                    1
+                                </span>
+                            </span>
+
+                        </div>
+
+                        <!-- 類型名稱 -->
+                        <div class="type-edit-group">
+
+                            <label th:for="|typeName-${type.svcTypeID}|">
+                                類型名稱
+                            </label>
+
+                            <input class="type-edit-input"
+                                   type="text"
+                                   name="typeName"
+                                   th:id="|typeName-${type.svcTypeID}|"
+                                   th:value="${type.typeName}"
+                                   maxlength="50"
+                                   required>
+
+                        </div>
+
+                        <!-- 類型說明 -->
+                        <div class="type-edit-group">
+
+                            <label th:for="|description-${type.svcTypeID}|">
+                                類型說明
+                            </label>
+
+                            <textarea class="type-edit-input"
+                                      name="description"
+                                      th:id="|description-${type.svcTypeID}|"
+                                      th:text="${type.descrip}"
+                                      maxlength="255"
+                                      placeholder="尚未填寫類型說明"></textarea>
+
+                        </div>
+
+                        <div class="type-edit-actions">
+
+                            <button class="btn btn--update"
+                                    type="submit">
+                                儲存修改
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </article>
+
+            </div>
+
+        </div>
+
+        <!-- 沒有服務類型 -->
+        <div class="empty-state"
+             th:if="${serviceTypeList == null
+                      or #lists.isEmpty(serviceTypeList)}">
+
+            <div th:if="${keyword != null
+                         and !#strings.isEmpty(keyword)}">
+
+                查無符合「
+
+                <strong th:text="${keyword}">
+                    關鍵字
+                </strong>
+
+                」的服務類型
+
+                <div style="margin-top: 16px;">
+
+                    <a class="btn btn--secondary"
+                       th:href="@{/admin/service/types}">
+                        顯示全部服務類型
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div th:if="${keyword == null
+                         or #strings.isEmpty(keyword)}">
+                目前尚未建立服務類型
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+</html>

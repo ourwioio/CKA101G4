@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.employee.model.EmployeeVO;
-import com.webond.service.model.ServiceTypeVO;
 import com.webond.service.model.ServiceVO;
 import com.webond.service.service.ServiceService;
-import com.webond.service.service.ServiceTypeService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -23,23 +21,33 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/admin/services")
 public class AdminServiceController {
 
-    // Session 裡存放 EmployeeVO 的 key
+    // =========================================================
+    // 路徑設定
+    // =========================================================
+
+    public static final String BASE_PATH =
+            "/admin/services";
+
+    // =========================================================
+    // Session 設定
+    // =========================================================
+
     private static final String EMPLOYEE_SESSION_KEY =
             "employeeVO";
 
-    // 沒有員工 Session 時使用的測試員工
     private static final int DEFAULT_FAKE_EMPLOYEE_ID =
             1001;
 
+    // =========================================================
+    // Service
+    // =========================================================
+
     private final ServiceService serviceSvc;
-    private final ServiceTypeService serviceTypeSvc;
 
     public AdminServiceController(
-            ServiceService serviceSvc,
-            ServiceTypeService serviceTypeSvc) {
+            ServiceService serviceSvc) {
 
         this.serviceSvc = serviceSvc;
-        this.serviceTypeSvc = serviceTypeSvc;
     }
 
     // =========================================================
@@ -47,7 +55,11 @@ public class AdminServiceController {
     //
     // GET /admin/services
     // =========================================================
+    @GetMapping("/home")
+    public String showServiceAdminHome() {
 
+        return "back-end/service/adminServiceHome";
+    }
     @GetMapping
     public String listAllServices(
             HttpSession session,
@@ -56,25 +68,19 @@ public class AdminServiceController {
         Integer loginEmployeeId =
                 getLoginEmployeeId(session);
 
-        // 沒有員工 Session，自動執行假登入
+        // 測試階段：沒有員工 Session 時，自動導向假登入
         if (loginEmployeeId == null) {
-            return "redirect:/admin/services/fake-login";
+            return "redirect:"
+                    + BASE_PATH
+                    + "/fake-login";
         }
 
         List<ServiceVO> serviceList =
                 serviceSvc.getAll();
 
-        List<ServiceTypeVO> serviceTypeList =
-                serviceTypeSvc.getAll();
-
         model.addAttribute(
                 "serviceList",
                 serviceList
-        );
-
-        model.addAttribute(
-                "serviceTypeList",
-                serviceTypeList
         );
 
         model.addAttribute(
@@ -94,9 +100,12 @@ public class AdminServiceController {
     // 後台查看單一服務詳情
     //
     // GET /admin/services/{serviceId}
+    //
+    // 使用 \d+ 限制 serviceId 必須是數字，
+    // 避免與 /orders、/fake-login 等固定路徑衝突。
     // =========================================================
 
-    @GetMapping("/{serviceId}")
+    @GetMapping("/{serviceId:\\d+}")
     public String getServiceDetail(
             @PathVariable Integer serviceId,
             HttpSession session,
@@ -107,7 +116,9 @@ public class AdminServiceController {
                 getLoginEmployeeId(session);
 
         if (loginEmployeeId == null) {
-            return "redirect:/admin/services/fake-login";
+            return "redirect:"
+                    + BASE_PATH
+                    + "/fake-login";
         }
 
         ServiceVO serviceVO =
@@ -120,7 +131,7 @@ public class AdminServiceController {
                     "查無此服務"
             );
 
-            return "redirect:/admin/services";
+            return "redirect:" + BASE_PATH;
         }
 
         model.addAttribute(
@@ -142,71 +153,18 @@ public class AdminServiceController {
     }
 
     // =========================================================
-    // 後台新增服務類型
-    //
-    // POST /admin/services/types/add
-    //
-    // TYPE_MODE：
-    // 0：動態服務
-    // 1：靜態服務
-    // =========================================================
-
-    @PostMapping("/types/add")
-    public String addServiceType(
-            @RequestParam String typeName,
-            @RequestParam(required = false)
-            String description,
-            @RequestParam(defaultValue = "0")
-            Integer typeMode,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
-
-        Integer loginEmployeeId =
-                getLoginEmployeeId(session);
-
-        if (loginEmployeeId == null) {
-            return "redirect:/admin/services/fake-login";
-        }
-
-        try {
-
-            ServiceTypeVO serviceTypeVO =
-                    serviceTypeSvc.add(
-                            typeName,
-                            normalizeNullableText(description)
-                    );
-
-            redirectAttributes.addFlashAttribute(
-                    "successMsg",
-                    "服務類型「"
-                            + serviceTypeVO.getTypeName()
-                            + "」新增成功"
-            );
-
-        } catch (IllegalArgumentException e) {
-
-            redirectAttributes.addFlashAttribute(
-                    "errorMsg",
-                    e.getMessage()
-            );
-        }
-
-        return "redirect:/admin/services";
-    }
-
-    // =========================================================
     // 後台平台停用服務
     //
     // POST /admin/services/{serviceId}/disable
     //
-    // STATUS：
+    // 服務狀態：
     // 0：會員下架
-    // 1：上架
-    // 2：封存
+    // 1：上架中
+    // 2：已封存
     // 3：平台停用
     // =========================================================
 
-    @PostMapping("/{serviceId}/disable")
+    @PostMapping("/{serviceId:\\d+}/disable")
     public String disableService(
             @PathVariable Integer serviceId,
             HttpSession session,
@@ -216,7 +174,9 @@ public class AdminServiceController {
                 getLoginEmployeeId(session);
 
         if (loginEmployeeId == null) {
-            return "redirect:/admin/services/fake-login";
+            return "redirect:"
+                    + BASE_PATH
+                    + "/fake-login";
         }
 
         try {
@@ -225,7 +185,8 @@ public class AdminServiceController {
 
             redirectAttributes.addFlashAttribute(
                     "successMsg",
-                    "服務 #" + serviceId
+                    "服務 #"
+                            + serviceId
                             + " 已由平台停用"
             );
 
@@ -237,7 +198,7 @@ public class AdminServiceController {
             );
         }
 
-        return "redirect:/admin/services";
+        return "redirect:" + BASE_PATH;
     }
 
     // =========================================================
@@ -245,11 +206,11 @@ public class AdminServiceController {
     //
     // POST /admin/services/{serviceId}/restore
     //
-    // STATUS：
-    // 3 平台停用 → 1 上架
+    // 狀態變更：
+    // 3 平台停用 → 1 上架中
     // =========================================================
 
-    @PostMapping("/{serviceId}/restore")
+    @PostMapping("/{serviceId:\\d+}/restore")
     public String restoreService(
             @PathVariable Integer serviceId,
             HttpSession session,
@@ -259,7 +220,9 @@ public class AdminServiceController {
                 getLoginEmployeeId(session);
 
         if (loginEmployeeId == null) {
-            return "redirect:/admin/services/fake-login";
+            return "redirect:"
+                    + BASE_PATH
+                    + "/fake-login";
         }
 
         try {
@@ -268,7 +231,8 @@ public class AdminServiceController {
 
             redirectAttributes.addFlashAttribute(
                     "successMsg",
-                    "服務 #" + serviceId
+                    "服務 #"
+                            + serviceId
                             + " 已恢復上架"
             );
 
@@ -280,7 +244,7 @@ public class AdminServiceController {
             );
         }
 
-        return "redirect:/admin/services";
+        return "redirect:" + BASE_PATH;
     }
 
     // =========================================================
@@ -297,7 +261,6 @@ public class AdminServiceController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        // 未指定員工編號時，預設使用 1001
         if (employeeId == null) {
             employeeId = DEFAULT_FAKE_EMPLOYEE_ID;
         }
@@ -309,13 +272,9 @@ public class AdminServiceController {
                     "員工編號不正確"
             );
 
-            return "redirect:/admin/services";
+            return "redirect:" + BASE_PATH;
         }
 
-        /*
-         * 假登入也存 EmployeeVO，
-         * 使用方式與真正員工登入一致。
-         */
         EmployeeVO employeeVO =
                 new EmployeeVO();
 
@@ -333,7 +292,7 @@ public class AdminServiceController {
                 "已假登入員工 #" + employeeId
         );
 
-        return "redirect:/admin/services";
+        return "redirect:" + BASE_PATH;
     }
 
     // =========================================================
@@ -357,10 +316,10 @@ public class AdminServiceController {
         );
 
         /*
-         * 回到服務管理頁後，
-         * 因為沒有 EmployeeVO，會再次執行假登入。
+         * 回到服務列表後，因為 Session 已清除，
+         * listAllServices() 會再次導向假登入。
          */
-        return "redirect:/admin/services";
+        return "redirect:" + BASE_PATH;
     }
 
     // =========================================================
@@ -383,7 +342,7 @@ public class AdminServiceController {
     }
 
     // =========================================================
-    // 共用：從 EmployeeVO 取得員工 ID
+    // 共用：取得登入員工編號
     // =========================================================
 
     private Integer getLoginEmployeeId(
@@ -397,24 +356,5 @@ public class AdminServiceController {
         }
 
         return employeeVO.getEmployeeId();
-    }
-
-    // =========================================================
-    // 共用：空白文字轉成 null
-    // =========================================================
-
-    private String normalizeNullableText(
-            String text) {
-
-        if (text == null) {
-            return null;
-        }
-
-        String normalized =
-                text.trim();
-
-        return normalized.isEmpty()
-                ? null
-                : normalized;
     }
 }

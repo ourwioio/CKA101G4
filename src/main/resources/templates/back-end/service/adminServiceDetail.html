@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>服務詳情</title>
+    <title>後台服務詳情</title>
 
     <style>
         * {
@@ -41,32 +41,82 @@
         }
 
         /* =========================
-           頂部
+           頂部導覽
            ========================= */
 
         .top-bar {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
-            gap: 16px;
+            gap: 18px;
             margin-bottom: 20px;
         }
 
-        .back-link {
+        .navigation-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+
+        .nav-link {
             display: inline-flex;
             align-items: center;
+            justify-content: center;
             min-height: 40px;
             padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+            transition:
+                    transform 0.15s ease,
+                    background 0.15s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-1px);
+        }
+
+        .nav-link--home {
+            color: #ffffff;
+            background: #2d3436;
+        }
+
+        .nav-link--home:hover {
+            background: #171b1d;
+        }
+
+        .nav-link--services {
             color: #5a4acb;
             background: #efedff;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 800;
+        }
+
+        .nav-link--services:hover {
+            background: #e1ddff;
+        }
+
+        .nav-link--orders {
+            color: #075985;
+            background: #e0f2fe;
+        }
+
+        .nav-link--orders:hover {
+            background: #bae6fd;
         }
 
         .employee-info {
+            min-width: 170px;
+            padding: 12px 15px;
             color: #69727b;
+            background: #ffffff;
+            border: 1px solid #e1e5ea;
+            border-radius: 10px;
             font-size: 13px;
+            text-align: right;
+        }
+
+        .employee-info strong {
+            color: #2d3436;
         }
 
         /* =========================
@@ -127,6 +177,7 @@
             margin: 0;
             font-size: 29px;
             font-weight: 800;
+            word-break: break-word;
         }
 
         .service-type {
@@ -140,7 +191,7 @@
         }
 
         /* =========================
-           狀態及金額
+           摘要卡片
            ========================= */
 
         .summary-grid {
@@ -168,7 +219,12 @@
         .summary-value {
             font-size: 18px;
             font-weight: 800;
+            word-break: break-word;
         }
+
+        /* =========================
+           狀態標籤
+           ========================= */
 
         .badge {
             display: inline-flex;
@@ -256,6 +312,7 @@
             border: 1px solid #e5e8ec;
             border-radius: 11px;
             white-space: pre-wrap;
+            word-break: break-word;
         }
 
         /* =========================
@@ -273,8 +330,11 @@
         }
 
         .action-description {
+            flex: 1;
+            min-width: 240px;
             color: #69727b;
             font-size: 13px;
+            line-height: 1.6;
         }
 
         .action-group {
@@ -332,6 +392,34 @@
         }
 
         /* =========================
+           無資料
+           ========================= */
+
+        .empty-card {
+            padding: 50px 24px;
+            color: #69727b;
+            background: #ffffff;
+            border: 1px solid #e1e5ea;
+            border-radius: 16px;
+            box-shadow:
+                    0 5px 20px
+                    rgba(0, 0, 0, 0.05);
+            text-align: center;
+        }
+
+        .empty-card__title {
+            margin-bottom: 8px;
+            color: #2d3436;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .empty-card__description {
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        /* =========================
            RWD
            ========================= */
 
@@ -355,6 +443,19 @@
                 flex-direction: column;
             }
 
+            .navigation-group {
+                flex-direction: column;
+            }
+
+            .navigation-group .nav-link {
+                width: 100%;
+            }
+
+            .employee-info {
+                width: 100%;
+                text-align: left;
+            }
+
             .action-group,
             .action-form,
             .btn {
@@ -369,19 +470,39 @@
 <div class="page">
 
     <!-- =========================
-         頂部
+         頂部導覽
          ========================= -->
 
     <div class="top-bar">
 
-        <a class="back-link"
-           th:href="@{/admin/services}">
-            ← 返回服務列表
-        </a>
+        <div class="navigation-group">
+
+            <!-- 返回員工後台首頁 -->
+            <a class="nav-link nav-link--home"
+               th:href="@{/admin/adminPage}">
+                ← 返回員工首頁
+            </a>
+
+            <!-- 返回服務管理 -->
+            <a class="nav-link nav-link--services"
+               th:href="@{/admin/services}">
+                返回服務管理
+            </a>
+
+            <!-- 前往服務訂單 -->
+            <a class="nav-link nav-link--orders"
+               th:href="@{/admin/services/orders}">
+                前往服務訂單管理
+            </a>
+
+        </div>
 
         <div class="employee-info">
-            處理員工 #
-            <strong th:text="${loginEmployeeId}">
+            目前處理員工 #
+
+            <strong th:text="${loginEmployeeId != null
+                    ? loginEmployeeId
+                    : '未登入'}">
                 1001
             </strong>
         </div>
@@ -389,7 +510,7 @@
     </div>
 
     <!-- =========================
-         訊息
+         成功與錯誤訊息
          ========================= -->
 
     <div class="message message--success"
@@ -415,6 +536,7 @@
 
             <div class="service-number">
                 服務編號 #
+
                 <span th:text="${serviceVO.serviceId}">
                     1
                 </span>
@@ -422,6 +544,7 @@
 
             <h1 class="service-title"
                 th:text="${serviceVO.serviceName != null
+                         and !#strings.isEmpty(serviceVO.serviceName)
                          ? serviceVO.serviceName
                          : '未命名服務'}">
                 咖啡聊天
@@ -447,11 +570,12 @@
         <div class="detail-body">
 
             <!-- =====================
-                 摘要
+                 摘要資訊
                  ===================== -->
 
             <section class="summary-grid">
 
+                <!-- 每小時費率 -->
                 <div class="summary-card">
 
                     <div class="summary-label">
@@ -460,6 +584,7 @@
 
                     <div class="summary-value">
                         NT$
+
                         <span th:text="${#numbers.formatInteger(
                                 serviceVO.hourlyRate != null
                                     ? serviceVO.hourlyRate
@@ -469,10 +594,13 @@
                         )}">
                             500
                         </span>
+
+                        / 時
                     </div>
 
                 </div>
 
+                <!-- 賣家會員 -->
                 <div class="summary-card">
 
                     <div class="summary-label">
@@ -481,13 +609,17 @@
 
                     <div class="summary-value">
                         會員 #
-                        <span th:text="${serviceVO.memberId}">
+
+                        <span th:text="${serviceVO.memberId != null
+                                ? serviceVO.memberId
+                                : '未設定'}">
                             1
                         </span>
                     </div>
 
                 </div>
 
+                <!-- 服務狀態 -->
                 <div class="summary-card">
 
                     <div class="summary-label">
@@ -537,6 +669,7 @@
 
             <section class="detail-grid">
 
+                <!-- 服務編號 -->
                 <div class="detail-item">
 
                     <div class="detail-label">
@@ -550,6 +683,7 @@
 
                 </div>
 
+                <!-- 服務類型編號 -->
                 <div class="detail-item">
 
                     <div class="detail-label">
@@ -565,6 +699,29 @@
 
                 </div>
 
+                <!-- 服務類型名稱 -->
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        服務類型名稱
+                    </div>
+
+                    <div class="detail-value">
+
+                        <span th:if="${serviceVO.serviceType != null}"
+                              th:text="${serviceVO.serviceType.typeName}">
+                            陪伴聊天
+                        </span>
+
+                        <span th:if="${serviceVO.serviceType == null}">
+                            未分類
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <!-- 賣家會員編號 -->
                 <div class="detail-item">
 
                     <div class="detail-label">
@@ -573,13 +730,17 @@
 
                     <div class="detail-value">
                         會員 #
-                        <span th:text="${serviceVO.memberId}">
+
+                        <span th:text="${serviceVO.memberId != null
+                                ? serviceVO.memberId
+                                : '未設定'}">
                             1
                         </span>
                     </div>
 
                 </div>
 
+                <!-- 建立時間 -->
                 <div class="detail-item">
 
                     <div class="detail-label">
@@ -600,6 +761,22 @@
                             未紀錄
                         </span>
 
+                    </div>
+
+                </div>
+
+                <!-- 目前狀態代碼 -->
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        狀態代碼
+                    </div>
+
+                    <div class="detail-value"
+                         th:text="${serviceVO.status != null
+                                  ? serviceVO.status
+                                  : '未設定'}">
+                        1
                     </div>
 
                 </div>
@@ -632,22 +809,33 @@
 
                     <span th:if="${serviceVO.status == 0
                                   or serviceVO.status == 1}">
-                        平台停用後，會員將無法重新上架此服務。
+                        平台停用後，該服務將變成平台停用狀態，
+                        會員無法自行重新上架。
                     </span>
 
                     <span th:if="${serviceVO.status == 3}">
-                        此服務目前已被平台停用，可由後台恢復上架。
+                        此服務目前已由平台停用，
+                        後台可將服務恢復為上架狀態。
                     </span>
 
                     <span th:if="${serviceVO.status == 2}">
-                        已封存服務不可再執行停用或恢復操作。
+                        此服務已封存，無法再執行停用或恢復操作。
+                    </span>
+
+                    <span th:if="${serviceVO.status == null}">
+                        此服務尚未設定狀態，無法執行後台操作。
                     </span>
 
                 </div>
 
                 <div class="action-group">
 
-                    <!-- 平台停用 -->
+                    <!--
+                        平台停用：
+
+                        status = 0 會員下架
+                        status = 1 上架中
+                    -->
                     <form class="action-form"
                           th:if="${serviceVO.status == 0
                                    or serviceVO.status == 1}"
@@ -669,7 +857,11 @@
 
                     </form>
 
-                    <!-- 恢復服務 -->
+                    <!--
+                        恢復上架：
+
+                        status = 3 平台停用
+                    -->
                     <form class="action-form"
                           th:if="${serviceVO.status == 3}"
                           th:action="@{/admin/services/{serviceId}/restore(
@@ -690,9 +882,16 @@
 
                     </form>
 
+                    <!-- 已封存 -->
                     <span class="archived-message"
                           th:if="${serviceVO.status == 2}">
                         此服務已封存，無法操作
+                    </span>
+
+                    <!-- 未設定狀態 -->
+                    <span class="archived-message"
+                          th:if="${serviceVO.status == null}">
+                        服務狀態未設定，無法操作
                     </span>
 
                 </div>
@@ -702,6 +901,28 @@
         </div>
 
     </article>
+
+    <!-- =========================
+         查無服務
+         ========================= -->
+
+    <section class="empty-card"
+             th:if="${serviceVO == null}">
+
+        <div class="empty-card__title">
+            查無服務資料
+        </div>
+
+        <div class="empty-card__description">
+            此服務可能不存在，或已經無法讀取。
+        </div>
+
+        <a class="nav-link nav-link--services"
+           th:href="@{/admin/services}">
+            返回服務管理
+        </a>
+
+    </section>
 
 </div>
 

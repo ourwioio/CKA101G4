@@ -36,7 +36,7 @@
         }
 
         .page {
-            width: min(1380px, calc(100% - 32px));
+            width: min(1420px, calc(100% - 32px));
             margin: 0 auto;
             padding: 28px 0 60px;
         }
@@ -177,6 +177,15 @@
 
         .btn--service:hover {
             background: #e1ddff;
+        }
+
+        .btn--home {
+            color: #ffffff;
+            background: #2d3436;
+        }
+
+        .btn--home:hover {
+            background: #171b1d;
         }
 
         /* =========================
@@ -332,7 +341,7 @@
 
         .order-table {
             width: 100%;
-            min-width: 1180px;
+            min-width: 1320px;
             table-layout: fixed;
             border-collapse: collapse;
         }
@@ -380,6 +389,10 @@
 
         .col-amount {
             width: 105px;
+        }
+
+        .col-payment {
+            width: 115px;
         }
 
         .col-status {
@@ -520,6 +533,28 @@
             background: #fee2e2;
         }
 
+        /* 付款方式 */
+
+        .status--credit-card {
+            color: #075985;
+            background: #e0f2fe;
+        }
+
+        .status--atm {
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .status--not-selected {
+            color: #475569;
+            background: #e2e8f0;
+        }
+
+        .status--unknown {
+            color: #991b1b;
+            background: #fee2e2;
+        }
+
         /* =========================
            取消資訊
            ========================= */
@@ -601,6 +636,14 @@
                 flex: 1;
                 width: auto;
             }
+
+            .header-links {
+                flex-direction: column;
+            }
+
+            .header-links .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -610,7 +653,7 @@
 <div class="page">
 
     <!-- =========================
-         標題及員工 Session
+         標題及功能按鈕
          ========================= -->
 
     <header class="page-header">
@@ -627,6 +670,13 @@
 
             <div class="header-links">
 
+                <!-- 返回員工後台首頁 -->
+                <a class="btn btn--home"
+                   th:href="@{/admin/adminPage}">
+                    ← 返回員工首頁
+                </a>
+
+                <!-- 前往服務管理 -->
                 <a class="btn btn--service"
                    th:href="@{/admin/services}">
                     前往服務管理
@@ -636,6 +686,10 @@
 
         </div>
 
+        <!-- =========================
+             員工 Session
+             ========================= -->
+
         <div class="employee-panel">
 
             <div class="employee-label">
@@ -644,6 +698,7 @@
 
             <div class="employee-id">
                 員工 #
+
                 <span th:text="${loginEmployeeId}">
                     1001
                 </span>
@@ -696,7 +751,7 @@
     </div>
 
     <!-- =========================
-         三項統計
+         統計資訊
          ========================= -->
 
     <section class="stats-grid">
@@ -937,6 +992,10 @@
                         金額
                     </th>
 
+                    <th class="col-payment">
+                        付款方式
+                    </th>
+
                     <th class="col-status">
                         訂單狀態
                     </th>
@@ -965,10 +1024,13 @@
                         1
                     </td>
 
-                    <!-- 服務資訊 -->
+                    <!-- =====================
+                         服務資訊
+                         ===================== -->
+
                     <td>
 
-                        <!-- 有 serviceId，可點擊查看詳情 -->
+                        <!-- 有 serviceId，可以點擊服務名稱 -->
                         <a class="service-link"
                            th:if="${order.serviceId != null}"
                            th:href="@{/admin/services/{serviceId}(
@@ -983,7 +1045,7 @@
                             咖啡聊天
                         </a>
 
-                        <!-- serviceId 為 null，只顯示文字 -->
+                        <!-- 沒有 serviceId，只顯示文字 -->
                         <div class="primary-text"
                              th:if="${order.serviceId == null}"
                              th:text="${order.serviceNameSnapshot != null
@@ -995,6 +1057,7 @@
                             咖啡聊天
                         </div>
 
+                        <!-- 服務類型快照 -->
                         <div class="secondary-text"
                              th:text="${order.serviceTypeNameSnapshot != null
                                       and !#strings.isEmpty(
@@ -1005,6 +1068,7 @@
                             陪伴聊天
                         </div>
 
+                        <!-- 服務編號 -->
                         <div class="secondary-text"
                              th:if="${order.serviceId != null}">
                             服務編號 #
@@ -1016,7 +1080,10 @@
 
                     </td>
 
-                    <!-- 交易雙方 -->
+                    <!-- =====================
+                         交易雙方
+                         ===================== -->
+
                     <td>
 
                         <div class="member-line">
@@ -1041,7 +1108,10 @@
 
                     </td>
 
-                    <!-- 預約時段 -->
+                    <!-- =====================
+                         預約時段
+                         ===================== -->
+
                     <td>
 
                         <div th:if="${order.slotStartTimeSnapshot != null
@@ -1083,7 +1153,10 @@
 
                     </td>
 
-                    <!-- 金額 -->
+                    <!-- =====================
+                         訂單金額
+                         ===================== -->
+
                     <td>
 
                         <div class="amount-text">
@@ -1118,7 +1191,43 @@
 
                     </td>
 
-                    <!-- 訂單狀態 -->
+                    <!-- =====================
+                         付款方式
+
+                         0：信用卡
+                         1：ATM 轉帳
+                         ===================== -->
+
+                    <td>
+
+                        <span class="status status--credit-card"
+                              th:if="${order.servicePaymentMethod == 0}">
+                            信用卡
+                        </span>
+
+                        <span class="status status--atm"
+                              th:if="${order.servicePaymentMethod == 1}">
+                            ATM 轉帳
+                        </span>
+
+                        <span class="status status--not-selected"
+                              th:if="${order.servicePaymentMethod == null}">
+                            尚未付款
+                        </span>
+
+                        <span class="status status--unknown"
+                              th:if="${order.servicePaymentMethod != null
+                                       and order.servicePaymentMethod != 0
+                                       and order.servicePaymentMethod != 1}">
+                            未知方式
+                        </span>
+
+                    </td>
+
+                    <!-- =====================
+                         訂單狀態
+                         ===================== -->
+
                     <td>
 
                         <span class="status status--pending"
@@ -1146,15 +1255,20 @@
                             已取消
                         </span>
 
-                        <span th:if="${order.orderStatus == null}">
+                        <span class="status status--not-selected"
+                              th:if="${order.orderStatus == null}">
                             未設定
                         </span>
 
                     </td>
 
-                    <!-- 款項狀態 -->
+                    <!-- =====================
+                         撥款及退款狀態
+                         ===================== -->
+
                     <td>
 
+                        <!-- 撥款狀態 -->
                         <div class="finance-status">
 
                             <span class="status status--unpaid"
@@ -1167,12 +1281,14 @@
                                 已撥款
                             </span>
 
-                            <span th:if="${order.payoutStatus == null}">
+                            <span class="status status--not-selected"
+                                  th:if="${order.payoutStatus == null}">
                                 撥款未設定
                             </span>
 
                         </div>
 
+                        <!-- 退款狀態 -->
                         <div class="finance-status">
 
                             <span class="status status--refund-none"
@@ -1195,7 +1311,8 @@
                                 退款未通過
                             </span>
 
-                            <span th:if="${order.refundStatus == null}">
+                            <span class="status status--not-selected"
+                                  th:if="${order.refundStatus == null}">
                                 退款未設定
                             </span>
 
@@ -1203,7 +1320,10 @@
 
                     </td>
 
-                    <!-- 處理資訊 -->
+                    <!-- =====================
+                         處理資訊
+                         ===================== -->
+
                     <td>
 
                         <div th:if="${order.employeeId != null}">
@@ -1227,6 +1347,7 @@
                             2026-07-15 15:26
                         </div>
 
+                        <!-- 取消訂單資訊 -->
                         <details class="cancel-detail"
                                  th:if="${order.orderStatus == 4}">
 
@@ -1290,10 +1411,19 @@
 
                     </td>
 
-                    <!-- 操作 -->
+                    <!-- =====================
+                         後台操作
+                         ===================== -->
+
                     <td>
 
-                        <!-- 已完成、未撥款、不需退款 -->
+                        <!--
+                            完成撥款條件：
+
+                            ORDER_STATUS = 3
+                            PAYOUT_STATUS = 0
+                            REFUND_STATUS = 0
+                        -->
                         <form class="action-form"
                               th:if="${order.orderStatus == 3
                                        and order.payoutStatus == 0
@@ -1320,7 +1450,13 @@
 
                         </form>
 
-                        <!-- 已取消、未撥款、等待退款 -->
+                        <!--
+                            完成退款條件：
+
+                            ORDER_STATUS = 4
+                            PAYOUT_STATUS = 0
+                            REFUND_STATUS = 1
+                        -->
                         <form class="action-form"
                               th:if="${order.orderStatus == 4
                                        and order.payoutStatus == 0
@@ -1347,6 +1483,7 @@
 
                         </form>
 
+                        <!-- 沒有可執行的操作 -->
                         <span class="no-action"
                               th:if="${!(
                                           order.orderStatus == 3
@@ -1371,6 +1508,7 @@
 
         </div>
 
+        <!-- 沒有符合條件的訂單 -->
         <div class="empty-state"
              th:if="${orderList == null
                       or #lists.isEmpty(orderList)}">
