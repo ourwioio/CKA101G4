@@ -27,6 +27,10 @@
             text-decoration: none;
         }
 
+        button {
+            font-family: inherit;
+        }
+
         /*
          * adminSidebar.html 裡已經有：
          *
@@ -42,10 +46,25 @@
             margin: 0 auto;
         }
 
+        /* =========================================
+           頁面標頭
+           ========================================= */
+
         .service-home-header {
             margin-bottom: 28px;
             padding-bottom: 18px;
             border-bottom: 1px solid #dfe4e8;
+        }
+
+        .service-home-header-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .service-home-header-content {
+            min-width: 0;
         }
 
         .service-home-title {
@@ -70,6 +89,78 @@
             border-radius: 6px;
             font-size: 13px;
         }
+
+        /* =========================================
+           匯入服務圖片按鈕
+           ========================================= */
+
+        .service-image-import-form {
+            flex-shrink: 0;
+            margin: 0;
+        }
+
+        .service-image-import-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 10px 18px;
+            color: #ffffff;
+            background: #0984e3;
+            border: 0;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow:
+                    0 3px 10px
+                    rgba(9, 132, 227, 0.18);
+            transition:
+                    background 0.15s ease,
+                    transform 0.15s ease,
+                    box-shadow 0.15s ease;
+        }
+
+        .service-image-import-button:hover {
+            background: #0769b5;
+            transform: translateY(-1px);
+            box-shadow:
+                    0 5px 14px
+                    rgba(9, 132, 227, 0.24);
+        }
+
+        .service-image-import-button:active {
+            transform: translateY(0);
+        }
+
+        /* =========================================
+           成功／錯誤訊息
+           ========================================= */
+
+        .service-alert {
+            margin-bottom: 22px;
+            padding: 13px 16px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .service-alert--success {
+            color: #146c43;
+            background: #d1e7dd;
+            border-color: #badbcc;
+        }
+
+        .service-alert--error {
+            color: #842029;
+            background: #f8d7da;
+            border-color: #f5c2c7;
+        }
+
+        /* =========================================
+           功能卡片
+           ========================================= */
 
         .service-menu {
             display: grid;
@@ -134,10 +225,30 @@
             background: #962d22;
         }
 
+        /* =========================================
+           RWD
+           ========================================= */
+
         @media (max-width: 850px) {
 
             .service-menu {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 680px) {
+
+            .service-home-header-top {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .service-image-import-form {
+                width: 100%;
+            }
+
+            .service-image-import-button {
+                width: 100%;
             }
         }
 
@@ -175,39 +286,91 @@
 
         <div class="service-home">
 
+            <!-- =====================================
+                 頁面標頭
+                 ===================================== -->
+
             <header class="service-home-header">
 
-                <h1 class="service-home-title">
-                    服務管理首頁
-                </h1>
+                <div class="service-home-header-top">
 
-                <p class="service-home-description">
-                    請選擇需要管理的服務功能。
-                </p>
+                    <!-- 左側標題內容 -->
+                    <div class="service-home-header-content">
 
-                <div class="employee-info">
+                        <h1 class="service-home-title">
+                            服務管理首頁
+                        </h1>
 
-                    目前登入員工：
+                        <p class="service-home-description">
+                            請選擇需要管理的服務功能。
+                        </p>
 
-                    <span th:if="${loginEmployeeId != null}"
-                          th:text="${loginEmployeeId}">
-                        1001
-                    </span>
+                        <div class="employee-info">
 
-                    <span th:if="${loginEmployeeId == null
-                                  and session.employeeVO != null}"
-                          th:text="${session.employeeVO.employeeId}">
-                        1001
-                    </span>
+                            目前登入員工：
 
-                    <span th:if="${loginEmployeeId == null
-                                  and session.employeeVO == null}">
-                        未取得
-                    </span>
+                            <span th:if="${loginEmployeeId != null}"
+                                  th:text="${loginEmployeeId}">
+                                1001
+                            </span>
+
+                            <span th:if="${loginEmployeeId == null
+                                          and session.employeeVO != null}"
+                                  th:text="${session.employeeVO.employeeId}">
+                                1001
+                            </span>
+
+                            <span th:if="${loginEmployeeId == null
+                                          and session.employeeVO == null}">
+                                未取得
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <!-- 右側匯入圖片按鈕 -->
+                    <form class="service-image-import-form"
+                          th:action="@{/admin/services/import-images}"
+                          method="post"
+                          onsubmit="return confirm('確定要將 1.png～10.png 匯入服務編號 1～10 嗎？原本的服務圖片會被覆蓋。');">
+
+                        <!-- 開啟 Spring Security CSRF 時需要 -->
+                        <input type="hidden"
+                               th:if="${_csrf != null}"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
+
+                        <button type="submit"
+                                class="service-image-import-button">
+                            匯入服務封面圖片
+                        </button>
+
+                    </form>
 
                 </div>
 
             </header>
+
+            <!-- =====================================
+                 操作結果訊息
+                 ===================================== -->
+
+            <div class="service-alert service-alert--success"
+                 th:if="${successMsg != null}"
+                 th:text="${successMsg}">
+                圖片匯入成功
+            </div>
+
+            <div class="service-alert service-alert--error"
+                 th:if="${errorMsg != null}"
+                 th:text="${errorMsg}">
+                圖片匯入失敗
+            </div>
+
+            <!-- =====================================
+                 服務管理功能選單
+                 ===================================== -->
 
             <section class="service-menu">
 
