@@ -3,9 +3,12 @@ package com.webond.member.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,15 +39,9 @@ public class NotificationFrontController {
             return "redirect:/member/login";
         }
 
-        List<NotificationVO> notificationList =
-                notificationService.getNotificationByMemberId(
-                        loginMember.getMemberId()
-                );
+        List<NotificationVO> notificationList = notificationService.getNotificationByMemberId( loginMember.getMemberId());
 
-        model.addAttribute(
-                "notificationVO",
-                notificationList
-        );
+        model.addAttribute("notificationVO", notificationList);
 
         return "front-end/member/listAllNotification";
     }
@@ -57,28 +54,33 @@ public class NotificationFrontController {
             HttpSession session,
             ModelMap model) {
 
-        MemberVO loginMember =
-                (MemberVO) session.getAttribute("memberVO");
+        MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 
         if (loginMember == null) {
             return "redirect:/member/login";
         }
 
-        NotificationVO notificationVO =
-                notificationService.getOneNotification(
-                        notificationId
-                );
+        NotificationVO notificationVO =notificationService.getOneNotification(notificationId);
 
-        notificationService.markNotificationAsRead(
-                notificationId
-        );
+        notificationService.markNotificationAsRead(notificationId);
 
-        model.addAttribute(
-                "notificationVO",
-                notificationVO
-        );
+        model.addAttribute("notificationVO",notificationVO);
 
         return "front-end/member/listOneNotification";
+    }
+    
+    @PostMapping("/markAllRead")
+    @ResponseBody
+    public ResponseEntity<String> markAllRead(HttpSession session){
+
+        MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+        
+        if (loginMember == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        notificationService.markAllNotificationAsRead(loginMember.getMemberId());
+        return ResponseEntity.ok("success");   
+        
     }
 
 
