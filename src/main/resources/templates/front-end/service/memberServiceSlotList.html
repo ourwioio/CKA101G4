@@ -27,9 +27,8 @@
     <link rel="stylesheet"
           th:href="@{/CSS/front-end/service/common.css}">
 
-    <!-- 前台共用 Header CSS -->
-    <link rel="stylesheet"
-          th:href="@{/CSS/front-end/common/header.css}">
+<!-- 前台共用 Navbar CSS -->
+<link rel="stylesheet" th:href="@{/CSS/front-end/common/navbar.css}">
 
     <!-- 時段管理專屬 CSS -->
     <link rel="stylesheet"
@@ -41,8 +40,8 @@
 <!-- ==========================================================
      固定導覽列
      ========================================================== -->
-<header th:replace="~{front-end/fragments/header :: frontHeader}">
-</header>
+	<header th:replace="~{front-end/common/navbar :: navbar}">
+	</header>
 
 <!-- ==========================================================
      主要內容

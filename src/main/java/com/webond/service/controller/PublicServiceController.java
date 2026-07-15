@@ -73,7 +73,10 @@ public class PublicServiceController {
 			return "front-end/service/serviceList";
 		}
 
-		List<ServiceSlotVO> serviceSlotList = serviceSlotSvc.getByServiceId(serviceId);
+		List<ServiceSlotVO> serviceSlotList =
+		        serviceSlotSvc.getPublicFutureSlotsByServiceId(
+		                serviceId
+		        );
 
 		model.addAttribute("serviceVO", serviceVO);
 		model.addAttribute("serviceSlotList", serviceSlotList);
