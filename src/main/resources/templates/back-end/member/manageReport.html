@@ -463,11 +463,13 @@ textarea.input-control {
 </head>
 <body>
 
+<div class="wb-admin-layout">
+
+	<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
+
+	<main class="wb-admin-content">
+
 	<div class="container">
-		<div
-			th:replace="~{back-end/fragments/adminSidebar
-                        :: adminSidebar}">
-		
 		<div class="card-panel main-panel">
 			<div class="header-area">
 				<h2>⚖️ 會員檢舉案審核中心 (權限五專用)</h2>
@@ -639,6 +641,10 @@ textarea.input-control {
 			</div>
 		</div>
 	</div>
+
+	</main>
+
+</div>
 
 	<div id="imgModal" class="image-modal" onclick="closeEvidenceZoom()">
 		<button type="button" class="modal-nav prev" id="modalPrevBtn"
