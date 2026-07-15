@@ -25,8 +25,10 @@
 					<div
 						style="margin-bottom: 20px; text-align: left; background: #f8f9fa; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
 						<span style="font-weight: bold; margin-right: 15px;">狀態篩選：</span>
-
-						<a th:href="@{/admin/actRptList(status=0)}"
+						<a th:href="@{/admin/actRptList}"
+						th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == null} ? 'background-color: #0d6efd ; color: white; font-weight: bold;' : 'background-color: white; color: #333;')"
+							th:class="'tab-btn tab-all ' + (${currentStatus == null} ? 'active' : '')">
+							查看全部 </a> <a th:href="@{/admin/actRptList(status=0)}"
 							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 0} ? 'background-color: orange; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
 							待處理 </a> <a th:href="@{/admin/actRptList(status=3)}"
 							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 3} ? 'background-color: red; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
@@ -35,7 +37,7 @@
 							檢舉成立 </a> <a th:href="@{/admin/actRptList(status=2)}"
 							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 2} ? 'background-color: gray; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
 							檢舉駁回 </a> <a th:href="@{/admin/actRptList(status=4)}"
-							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 4} ? 'background-color: blue; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
+							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 4} ? 'background-color: #0dcaf0; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
 							申訴成功 </a> <a th:href="@{/admin/actRptList(status=5)}"
 							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 5} ? 'background-color: #6c757d; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
 							申訴駁回 </a>

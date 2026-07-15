@@ -12,11 +12,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.webond.activity.repository.ActRptRepository;
+import com.webond.member.model.MemberVO;
+import com.webond.member.service.MemberService;
 
 @Service
 public class ActRptService {
+	
 	@Autowired
     private ActRptRepository actRptRepo;
+	
+	@Autowired
+	private MemberService memSvc;
+	
 
     @Transactional
     public ActRptVO createReport(ActRptVO actRptVO) {
@@ -40,6 +47,7 @@ public class ActRptService {
     	return actRptRepo.findById(id).orElse(null);
     }
     
+    // 更新審核結果
     @Transactional
     public void reviewRpt(ActRptVO reviewData) {
     	ActRptVO existing = actRptRepo.findById(reviewData.getActRptId()).orElse(null);
@@ -51,6 +59,20 @@ public class ActRptService {
             existing.setRemark(reviewData.getRemark()); 
             existing.setUpdated(new Timestamp(System.currentTimeMillis())); 
             
+            if (Integer.valueOf(1).equals(reviewData.getActRptStatus())) {
+                
+            	MemberVO memVO = memSvc.getOneMember(existing.getActId().getMemberId());
+                
+                if (memVO != null) {
+                    int currentPoints = memVO.getReportPoints() != null ? memVO.getReportPoints() : 0;
+                    int penalty = reviewData.getPenaltyValue() != null ? reviewData.getPenaltyValue() : 0;
+                    
+                    memVO.setReportPoints(currentPoints + penalty);
+                    
+                    memSvc.updateMember(memVO); 
+                }
+            }
+            
             actRptRepo.save(existing);
     	}
     }
@@ -58,6 +80,11 @@ public class ActRptService {
     public ActRptVO getOneActRpt(Integer actRptId) {
     	Optional<ActRptVO> vo = actRptRepo.findById(actRptId);
     	return vo.orElse(null);
+    }
+    
+    public Page<ActRptVO> getAllRpts(int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("actRptId").ascending());
+        return actRptRepo.findAll(pageable); 
     }
     
     

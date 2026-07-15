@@ -129,7 +129,7 @@ public class ActRptController {
 	    
 	    @GetMapping("/admin/actRptList")
 	    public String actRptList(
-	            @RequestParam(value = "status", defaultValue = "0") Integer status, // 預設看 0:待處理
+	            @RequestParam(value = "status", required = false) Integer status, // 預設看 0:待處理
 	            @RequestParam(value = "page", defaultValue = "0") int page,
 	    		Model model, 
 	    		HttpSession session) {
@@ -140,8 +140,14 @@ public class ActRptController {
 	        }
 	        
 	        int pageSize = 10; 
-	        Page<ActRptVO> reportPage = actRptSvc.getRptsByStatusWithPage(status, page, pageSize);
+	        Page<ActRptVO> reportPage;
 
+	        if (status == null) {
+	        	reportPage = actRptSvc.getAllRpts(page, pageSize);
+	        } else {
+	            reportPage = actRptSvc.getRptsByStatusWithPage(status, page, pageSize);
+	        }
+	        
 	        model.addAttribute("actRptListData", reportPage.getContent());
 	        model.addAttribute("currentStatus", status);
 	        model.addAttribute("currentPage", page);
@@ -149,6 +155,7 @@ public class ActRptController {
 	    	
 	        return "back-end/activity/listAllActRpt";
 	    }
+	    
 	    
 	    @GetMapping("/admin/actRpt/img/{id}")
 	    @ResponseBody
@@ -169,8 +176,8 @@ public class ActRptController {
 	    public ResponseEntity<byte[]> getAppealImg(@PathVariable("id") Integer id) {
 	    	ActRptVO vo = actRptSvc.getOneActRpt(id); 
 	        
-	        if (vo != null && vo.getActRptImg() != null) {
-	            byte[] imgBytes = vo.getActRptImg();
+	        if (vo != null && vo.getAppealImg() != null) {
+	            byte[] imgBytes = vo.getAppealImg();
 	            return ResponseEntity.ok()
 	                    .contentType(MediaType.IMAGE_JPEG)
 	                    .body(imgBytes);
@@ -209,8 +216,8 @@ public class ActRptController {
 	        	NotificationVO notificationVO = new NotificationVO();
 	        	notificationVO.setMember(memVO);
 	        	notificationVO.setTitle("您的「" + actVO.getActivityTitle() + "」已被檢舉");
-	        	notificationVO.setContent("活動已違反：" + originalRpt.getRptType() + "\n" +
-	        							  "懲處：會員記點" + originalRpt.getPenaltyValue() + "\n" +
+	        	notificationVO.setContent("活動已違反：" + originalRpt.getRptType() + "<br>" +
+	        							  "懲處：會員記點 " + originalRpt.getPenaltyValue() + "<br>" +
 	        							  "申訴管道(請在三天內完成)：<a href='" + appealPath + "' class='alert-link'>點此填寫申訴單</a>");
 	        	notificationVO.setNotificationType((byte) 2);
 	        	

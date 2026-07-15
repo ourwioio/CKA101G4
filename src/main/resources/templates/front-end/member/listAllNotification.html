@@ -35,7 +35,7 @@
         <tbody>
             <tr th:each="n:${notificationVO}">
                 <td th:text="${n.title}"></td>
-                <td th:text="${n.content}"></td>
+                <td th:utext="${n.content}"></td>
                 <td th:text="${n.notificationType}"></td>
                 <td th:text="${n.isRead != null and n.isRead == 1 ? '已讀' : '未讀'}"></td>
                 <td th:text="${n.createdAt}"></td>
