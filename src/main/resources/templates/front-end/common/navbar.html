@@ -39,13 +39,58 @@
       </a>
 
       <!-- 通知 -->
-      <a class="icon-dot" th:href="@{/front/notification/listAllNotification}" title="通知" aria-disabled="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        <span class="badge-dot"
-            th:if="${unreadNotificationCount != null and unreadNotificationCount > 0}"
-            th:text="${unreadNotificationCount > 99} ? '99+' : ${unreadNotificationCount}">
-        </span>
-      </a>
+<!--       <a class="icon-dot" th:href="@{/front/notification/listAllNotification}" title="通知" aria-disabled="true"> -->
+<!--         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> -->
+<!--         <span class="badge-dot" -->
+<!--             th:if="${unreadNotificationCount != null and unreadNotificationCount > 0}" -->
+<!--             th:text="${unreadNotificationCount > 99} ? '99+' : ${unreadNotificationCount}"> -->
+<!--         </span> -->
+<!--       </a> -->
+
+		<!-- ==================================================
+     通知新版
+     同時加入通知輪詢所需的識別 class 與網址
+     ================================================== -->
+<a class="icon-dot icon-btn icon-btn--notify"
+   th:if="${session.memberVO != null}"
+   th:href="@{/front/notification/listAllNotification}"
+   th:attr="data-unread-url=@{/front/notification/unread-count}"
+   title="通知">
+
+    <svg viewBox="0 0 24 24"
+         fill="none"
+         stroke="currentColor"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         aria-hidden="true">
+
+        <path d="M18 8
+                 a6 6 0 0 0-12 0
+                 c0 7-3 9-3 9
+                 h18
+                 s-3-2-3-9">
+        </path>
+
+        <path d="M13.73 21
+                 a2 2 0 0 1-3.46 0">
+        </path>
+
+    </svg>
+
+    <!--
+        badge-dot：新版 Navbar CSS
+        icon-badge--unread：舊版通知輪詢 JS
+    -->
+    <span class="badge-dot icon-badge icon-badge--unread"
+          th:if="${unreadNotificationCount != null
+                   and unreadNotificationCount > 0}"
+          th:text="${unreadNotificationCount > 99
+                   ? '99+'
+                   : unreadNotificationCount}">
+    </span>
+
+</a>
 
       <!-- 會員個人頁面 -->
       <a th:if="${session.memberVO != null}"

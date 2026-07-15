@@ -1,477 +1,329 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      lang="zh-TW">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title th:text="|${serviceVO.serviceName}－時段管理｜Webond|">
-        服務時段管理｜Webond
-    </title>
+<title th:text="|${serviceVO.serviceName}－時段管理｜Webond|">
+	服務時段管理｜Webond</title>
 
-    <!-- Google Fonts -->
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
 
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-          rel="stylesheet">
+<link
+	href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+	rel="stylesheet">
 
-    <!-- Service 前台共用 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/CSS/front-end/service/common.css}">
+<!-- Service 前台共用 CSS -->
+<link rel="stylesheet" th:href="@{/CSS/front-end/service/common.css}">
 
 <!-- 前台共用 Navbar CSS -->
 <link rel="stylesheet" th:href="@{/CSS/front-end/common/navbar.css}">
 
-    <!-- 時段管理專屬 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/CSS/front-end/service/memberServiceSlotList.css}">
+<!-- 時段管理專屬 CSS -->
+<link rel="stylesheet"
+	th:href="@{/CSS/front-end/service/memberServiceSlotList.css}">
 </head>
 
 <body>
 
-<!-- ==========================================================
+	<!-- ==========================================================
      固定導覽列
      ========================================================== -->
-	<header th:replace="~{front-end/common/navbar :: navbar}">
-	</header>
+	<header th:replace="~{front-end/common/navbar :: navbar}"> </header>
 
-<!-- ==========================================================
+	<!-- ==========================================================
      主要內容
      ========================================================== -->
-<main class="site-main">
+	<main class="site-main">
 
-    <!-- ======================================================
+		<!-- ======================================================
          頁面標題
          ====================================================== -->
-    <section class="member-slot-heading">
+		<section class="member-slot-heading">
 
-        <div class="member-slot-heading-main">
+			<div class="member-slot-heading-main">
 
-            <p class="member-slot-eyebrow">
-                服務管理中心
-            </p>
+				<p class="member-slot-eyebrow">服務管理中心</p>
 
-            <h1 class="page-title">
-                時段管理
-            </h1>
+				<h1 class="page-title">時段管理</h1>
 
-            <p class="member-slot-description">
-                新增可預約時段、查看目前狀態，並管理尚未被預約的時段。
-            </p>
+				<p class="member-slot-description">新增可預約時段、查看目前狀態，並管理尚未被預約的時段。</p>
 
-        </div>
+			</div>
 
-        <div class="member-slot-heading-actions">
+			<div class="member-slot-heading-actions">
 
-            <a class="btn btn-secondary"
-               th:href="@{/member/services}">
-                ← 回我的服務
-            </a>
-
-            <a class="btn btn-secondary"
-               th:href="@{/front/services/{serviceId}(
+				<a class="btn btn-secondary" th:href="@{/member/services}"> ←
+					回我的服務 </a> <a class="btn btn-secondary"
+					th:href="@{/front/services/{serviceId}(
                             serviceId=${serviceId}
                         )}">
-                查看公開頁面
-            </a>
+					查看公開頁面 </a>
 
-        </div>
+			</div>
 
-    </section>
+		</section>
 
-    <!-- ======================================================
+		<!-- ======================================================
          訊息
          ====================================================== -->
-    <div class="alert alert-success"
-         th:if="${successMsg != null}"
-         th:text="${successMsg}">
-        操作成功
-    </div>
+		<div class="alert alert-success" th:if="${successMsg != null}"
+			th:text="${successMsg}">操作成功</div>
 
-    <div class="alert alert-error"
-         th:if="${errorMsg != null}"
-         th:text="${errorMsg}">
-        操作失敗
-    </div>
+		<div class="alert alert-error" th:if="${errorMsg != null}"
+			th:text="${errorMsg}">操作失敗</div>
 
-    <!-- ======================================================
+		<!-- ======================================================
          服務資訊摘要
          ====================================================== -->
-    <section class="panel member-slot-service-panel">
+		<section class="panel member-slot-service-panel">
 
-        <img class="member-slot-service-image"
-             th:src="@{/front/services/image/{serviceId}(
+			<img class="member-slot-service-image"
+				th:src="@{/front/services/image/{serviceId}(
                         serviceId=${serviceVO.serviceId}
                      )}"
-             th:onerror="this.onerror=null;
+				th:onerror="this.onerror=null;
                          this.src='/images/activity/default-activity.jpg';"
-             alt="服務圖片">
+				alt="服務圖片">
 
-        <div class="member-slot-service-info">
+			<div class="member-slot-service-info">
 
-            <span class="member-slot-service-type"
-                  th:text="${serviceVO.serviceType != null
+				<span class="member-slot-service-type"
+					th:text="${serviceVO.serviceType != null
                            ? serviceVO.serviceType.typeName
                            : '無服務類型'}">
-                服務類型
-            </span>
+					服務類型 </span>
 
-            <h2 class="member-slot-service-name"
-                th:text="${serviceVO.serviceName}">
-                河堤散步陪伴
-            </h2>
+				<h2 class="member-slot-service-name"
+					th:text="${serviceVO.serviceName}">河堤散步陪伴</h2>
 
-            <p class="member-slot-service-location"
-               th:text="|${serviceVO.serviceCity ?: ''}
+				<p class="member-slot-service-location"
+					th:text="|${serviceVO.serviceCity ?: ''}
                           ${serviceVO.serviceDistrict ?: ''}
                           ${serviceVO.serviceLocation ?: ''}|">
-                桃園市 八德區 八德埤塘自然生態公園
-            </p>
+					桃園市 八德區 八德埤塘自然生態公園</p>
 
-            <p class="member-slot-service-price">
+				<p class="member-slot-service-price">
 
-                NT$
+					NT$ <strong th:text="${serviceVO.hourlyRate}"> 500 </strong> / 小時
 
-                <strong th:text="${serviceVO.hourlyRate}">
-                    500
-                </strong>
+				</p>
 
-                / 小時
+			</div>
 
-            </p>
+			<!-- 服務狀態 -->
+			<div class="member-slot-service-status">
 
-        </div>
+				<span class="status-badge status-active"
+					th:if="${serviceVO.status == 1}"> 上架中 </span> <span
+					class="status-badge status-inactive"
+					th:if="${serviceVO.status == 0}"> 已下架 </span> <span
+					class="status-badge status-disabled"
+					th:if="${serviceVO.status == 2}"> 已封存 </span> <span
+					class="status-badge status-disabled"
+					th:if="${serviceVO.status == 3}"> 平台停用 </span>
 
-        <!-- 服務狀態 -->
-        <div class="member-slot-service-status">
+			</div>
 
-            <span class="status-badge status-active"
-                  th:if="${serviceVO.status == 1}">
-                上架中
-            </span>
+		</section>
 
-            <span class="status-badge status-inactive"
-                  th:if="${serviceVO.status == 0}">
-                已下架
-            </span>
-
-            <span class="status-badge status-disabled"
-                  th:if="${serviceVO.status == 2}">
-                已封存
-            </span>
-
-            <span class="status-badge status-disabled"
-                  th:if="${serviceVO.status == 3}">
-                平台停用
-            </span>
-
-        </div>
-
-    </section>
-
-    <!-- ======================================================
+		<!-- ======================================================
          左側新增 + 右側列表
          ====================================================== -->
-    <div class="member-slot-layout">
+		<div class="member-slot-layout">
 
-        <!-- ==================================================
+			<!-- ==================================================
              新增時段
              ================================================== -->
-        <aside class="panel member-slot-form-panel">
+			<aside class="panel member-slot-form-panel">
 
-            <h2 class="member-slot-panel-title">
-                新增服務時段
-            </h2>
+				<h2 class="member-slot-panel-title">新增服務時段</h2>
 
-            <p class="member-slot-panel-description">
-                可建立一整段時段，或自動切分成多筆可預約時段。
-            </p>
+				<p class="member-slot-panel-description">
+					可建立一整段時段，或自動切分成多筆可預約時段。</p>
 
-            <form id="addSlotForm"
-                  th:action="@{/member/services/{serviceId}/slots(
+				<form id="addSlotForm"
+					th:action="@{/member/services/{serviceId}/slots(
                                serviceId=${serviceId}
                            )}"
-                  method="post"
-                  th:attr="data-max-booking-days=14">
+					method="post" th:attr="data-max-booking-days=14">
 
-                <input type="hidden"
-                       th:if="${_csrf != null}"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}">
+					<input type="hidden" th:if="${_csrf != null}"
+						th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-                <div class="member-slot-form-grid">
+					<div class="member-slot-form-grid">
 
-                    <!-- 日期 -->
-                    <div class="form-group">
+						<!-- 日期 -->
+						<div class="form-group">
 
-                        <label class="form-label"
-                               for="slotDate">
-                            服務日期
-                        </label>
+							<label class="form-label" for="slotDate"> 服務日期 </label> <input
+								class="form-control" id="slotDate" name="slotDate" type="date"
+								required>
 
-                        <input class="form-control"
-                               id="slotDate"
-                               name="slotDate"
-                               type="date"
-                               required>
+							<p class="form-help">最遠可新增今天起 14 天內的時段。</p>
 
-                        <p class="form-help">
-                            最遠可新增今天起 14 天內的時段。
-                        </p>
+						</div>
 
-                    </div>
+						<!-- 開始與結束時間 -->
+						<div class="member-slot-input-row">
 
-                    <!-- 開始與結束時間 -->
-                    <div class="member-slot-input-row">
+							<div class="form-group">
 
-                        <div class="form-group">
+								<label class="form-label" for="startTime"> 開始時間 </label> <input
+									class="form-control" id="startTime" name="startTime"
+									type="time" step="60" required>
 
-                            <label class="form-label"
-                                   for="startTime">
-                                開始時間
-                            </label>
+								<p class="form-help">第一個時間可選擇任意分鐘。</p>
 
-                            <input class="form-control"
-                                   id="startTime"
-                                   name="startTime"
-                                   type="time"
-                                   step="1800"
-                                   required>
+							</div>
 
-                        </div>
+							<div class="form-group">
 
-                        <div class="form-group">
+								<label class="form-label" for="endTime"> 結束時間 </label> <input
+									class="form-control" id="endTime" name="endTime" type="time"
+									step="60" required>
 
-                            <label class="form-label"
-                                   for="endTime">
-                                結束時間
-                            </label>
+								<p class="form-help">與另一個時間須相差 30 分鐘的倍數。</p>
 
-                            <input class="form-control"
-                                   id="endTime"
-                                   name="endTime"
-                                   type="time"
-                                   step="1800"
-                                   required>
+							</div>
 
-                        </div>
+						</div>
 
-                    </div>
+						<!-- 結束日 -->
+						<div class="form-group">
 
-                    <!-- 結束日 -->
-                    <div class="form-group">
+							<label class="form-label" for="endDayOffset"> 結束日期 </label> <select
+								class="form-control" id="endDayOffset" name="endDayOffset">
 
-                        <label class="form-label"
-                               for="endDayOffset">
-                            結束日期
-                        </label>
+								<option value="0">同一天</option>
 
-                        <select class="form-control"
-                                id="endDayOffset"
-                                name="endDayOffset">
+								<option value="1">隔天</option>
 
-                            <option value="0">
-                                同一天
-                            </option>
+							</select>
 
-                            <option value="1">
-                                隔天
-                            </option>
+							<p class="form-help">跨午夜的服務請選擇「隔天」。</p>
 
-                        </select>
+						</div>
 
-                        <p class="form-help">
-                            跨午夜的服務請選擇「隔天」。
-                        </p>
+						<!-- 切分方式 -->
+						<div class="form-group">
 
-                    </div>
+							<label class="form-label" for="splitMinutes"> 時段切分方式 </label> <select
+								class="form-control" id="splitMinutes" name="splitMinutes"
+								required>
 
-                    <!-- 切分方式 -->
-                    <div class="form-group">
+								<option value="0">不切分，整段建立一筆</option>
 
-                        <label class="form-label"
-                               for="splitMinutes">
-                            時段切分方式
-                        </label>
+								<option value="30">每 30 分鐘一筆</option>
 
-                        <select class="form-control"
-                                id="splitMinutes"
-                                name="splitMinutes"
-                                required>
+								<option value="60">每 1 小時一筆</option>
 
-                            <option value="0">
-                                不切分，整段建立一筆
-                            </option>
+								<option value="120">每 2 小時一筆</option>
 
-                            <option value="30">
-                                每 30 分鐘一筆
-                            </option>
+								<option value="180">每 3 小時一筆</option>
 
-                            <option value="60">
-                                每 1 小時一筆
-                            </option>
+							</select>
 
-                            <option value="120">
-                                每 2 小時一筆
-                            </option>
+						</div>
 
-                            <option value="180">
-                                每 3 小時一筆
-                            </option>
+						<div class="alert alert-error" id="slotFormError" hidden></div>
 
-                        </select>
+						<button class="btn member-slot-submit" id="addSlotSubmit"
+							type="submit">新增時段</button>
 
-                    </div>
+					</div>
 
-                    <div class="alert alert-error"
-                         id="slotFormError"
-                         hidden>
-                    </div>
+				</form>
 
-                    <button class="btn member-slot-submit"
-                            id="addSlotSubmit"
-                            type="submit">
-                        新增時段
-                    </button>
+				<p class="member-slot-form-notice">新增時段不得與現有時段重疊，單次建立區間最長為 12
+					小時。 選擇切分時，總時間必須能被切分分鐘數整除。</p>
 
-                </div>
+			</aside>
 
-            </form>
-
-            <p class="member-slot-form-notice">
-                新增時段不得與現有時段重疊，單次建立區間最長為 12 小時。
-                選擇切分時，總時間必須能被切分分鐘數整除。
-            </p>
-
-        </aside>
-
-        <!-- ==================================================
+			<!-- ==================================================
              時段列表
              ================================================== -->
-        <section class="member-slot-list-panel">
+			<section class="member-slot-list-panel">
 
-            <div class="member-slot-list-heading">
+				<div class="member-slot-list-heading">
 
-                <div>
+					<div>
 
-                    <h2>
-                        全部時段
-                    </h2>
+						<h2>全部時段</h2>
 
-                    <p>
-                        可預約、暫時鎖定及已預約時段都會顯示。
-                    </p>
+						<p>可預約、暫時鎖定及已預約時段都會顯示。</p>
 
-                </div>
+					</div>
 
-                <span class="member-slot-count"
-                      th:text="|共 ${#lists.size(slotList)} 筆|">
-                    共 0 筆
-                </span>
+					<span class="member-slot-count"
+						th:text="|共 ${#lists.size(slotList)} 筆|"> 共 0 筆 </span>
 
-            </div>
+				</div>
 
-            <!-- 篩選 -->
-            <div class="member-slot-filter"
-                 th:if="${!#lists.isEmpty(slotList)}">
+				<!-- 篩選 -->
+				<div class="member-slot-filter" th:if="${!#lists.isEmpty(slotList)}">
 
-                <button class="member-slot-filter-button active"
-                        type="button"
-                        data-filter="all">
-                    全部
-                </button>
+					<button class="member-slot-filter-button active" type="button"
+						data-filter="all">全部</button>
 
-                <button class="member-slot-filter-button"
-                        type="button"
-                        data-filter="available">
-                    可預約
-                </button>
+					<button class="member-slot-filter-button" type="button"
+						data-filter="available">可預約</button>
 
-                <button class="member-slot-filter-button"
-                        type="button"
-                        data-filter="locked">
-                    暫時鎖定
-                </button>
+					<button class="member-slot-filter-button" type="button"
+						data-filter="locked">暫時鎖定</button>
 
-                <button class="member-slot-filter-button"
-                        type="button"
-                        data-filter="booked">
-                    已預約
-                </button>
+					<button class="member-slot-filter-button" type="button"
+						data-filter="booked">已預約</button>
 
-                <button class="member-slot-filter-button"
-                        type="button"
-                        data-filter="expired">
-                    已過期
-                </button>
+					<button class="member-slot-filter-button" type="button"
+						data-filter="expired">已過期</button>
 
-                <button class="member-slot-filter-button"
-                        type="button"
-                        id="openClearAvailableModal">
-                    清空可預約時段
-                </button>
+					<button class="member-slot-filter-button" type="button"
+						id="openClearAvailableModal">清空可預約時段</button>
 
-            </div>
+				</div>
 
-            <!-- 無資料 -->
-            <div class="member-slot-empty"
-                 th:if="${#lists.isEmpty(slotList)}">
+				<!-- 無資料 -->
+				<div class="member-slot-empty" th:if="${#lists.isEmpty(slotList)}">
 
-                <div class="member-slot-empty-icon">
-                    ＋
-                </div>
+					<div class="member-slot-empty-icon">＋</div>
 
-                <h3>
-                    目前還沒有服務時段
-                </h3>
+					<h3>目前還沒有服務時段</h3>
 
-                <p>
-                    可使用左側表單建立第一批可預約時段。
-                </p>
+					<p>可使用左側表單建立第一批可預約時段。</p>
 
-            </div>
+				</div>
 
-            <!-- 篩選後無資料 -->
-            <div class="member-slot-empty"
-                 id="filteredSlotEmpty"
-                 hidden>
+				<!-- 篩選後無資料 -->
+				<div class="member-slot-empty" id="filteredSlotEmpty" hidden>
 
-                <h3>
-                    沒有符合條件的時段
-                </h3>
+					<h3>沒有符合條件的時段</h3>
 
-                <p>
-                    請切換其他狀態查看。
-                </p>
+					<p>請切換其他狀態查看。</p>
 
-            </div>
+				</div>
 
-            <!-- 時段列表 -->
-            <div class="member-slot-list"
-                 id="memberSlotList"
-                 th:if="${!#lists.isEmpty(slotList)}">
+				<!-- 時段列表 -->
+				<div class="member-slot-list" id="memberSlotList"
+					th:if="${!#lists.isEmpty(slotList)}">
 
-                <article class="member-slot-card"
-                         th:each="slot : ${slotList}"
-                         th:with="expired=${slot.endTime.isBefore(
+					<article class="member-slot-card" th:each="slot : ${slotList}"
+						th:with="expired=${slot.endTime.isBefore(
                              T(java.time.LocalDateTime).now()
                          )}"
-                         th:classappend="${expired
+						th:classappend="${expired
                                           ? ' member-slot-card--expired'
                                           : (slot.slotStatus == 0
                                               ? ' member-slot-card--available'
                                               : (slot.slotStatus == 1
                                                   ? ' member-slot-card--locked'
                                                   : ' member-slot-card--booked'))}"
-                         th:attr="data-status=${expired
+						th:attr="data-status=${expired
                                                ? 'expired'
                                                : (slot.slotStatus == 0
                                                    ? 'available'
@@ -479,30 +331,22 @@
                                                        ? 'locked'
                                                        : 'booked'))}">
 
-                    <div class="member-slot-card-main">
+						<div class="member-slot-card-main">
 
-                        <div class="member-slot-card-top">
+							<div class="member-slot-card-top">
 
-                            <span class="member-slot-date"
-                                  th:text="${#temporals.format(
+								<span class="member-slot-date"
+									th:text="${#temporals.format(
                                       slot.startTime,
                                       'yyyy-MM-dd'
                                   )}">
-                                2026-07-20
-                            </span>
-
-                            <span class="member-slot-time">
-
-                                <span th:text="${#temporals.format(
+									2026-07-20 </span> <span class="member-slot-time"> <span
+									th:text="${#temporals.format(
                                     slot.startTime,
                                     'HH:mm'
                                 )}">
-                                    14:00
-                                </span>
-
-                                ～
-
-                                <span th:text="${#temporals.format(
+										14:00 </span> ～ <span
+									th:text="${#temporals.format(
                                     slot.endTime,
                                     'yyyy-MM-dd'.equals(
                                         #temporals.format(
@@ -513,83 +357,61 @@
                                     ? 'HH:mm'
                                     : 'MM-dd HH:mm'
                                 )}">
-                                    16:00
-                                </span>
+										16:00 </span>
 
-                            </span>
+								</span> <span class="member-slot-id" th:text="|#${slot.serviceSlotId}|">
+									#1 </span>
 
-                            <span class="member-slot-id"
-                                  th:text="|#${slot.serviceSlotId}|">
-                                #1
-                            </span>
-
-                            <!-- 已過期優先 -->
-                            <span class="member-slot-status
+								<!-- 已過期優先 -->
+								<span
+									class="member-slot-status
                                          member-slot-status--expired"
-                                  th:if="${expired}">
-                                已過期
-                            </span>
-
-                            <span class="member-slot-status
+									th:if="${expired}"> 已過期 </span> <span
+									class="member-slot-status
                                          member-slot-status--available"
-                                  th:if="${!expired and slot.slotStatus == 0}">
-                                可預約
-                            </span>
-
-                            <span class="member-slot-status
+									th:if="${!expired and slot.slotStatus == 0}"> 可預約 </span> <span
+									class="member-slot-status
                                          member-slot-status--locked"
-                                  th:if="${!expired and slot.slotStatus == 1}">
-                                暫時鎖定
-                            </span>
-
-                            <span class="member-slot-status
+									th:if="${!expired and slot.slotStatus == 1}"> 暫時鎖定 </span> <span
+									class="member-slot-status
                                          member-slot-status--booked"
-                                  th:if="${!expired and slot.slotStatus == 2}">
-                                已預約
-                            </span>
+									th:if="${!expired and slot.slotStatus == 2}"> 已預約 </span>
 
-                        </div>
+							</div>
 
-                        <div class="member-slot-card-meta">
+							<div class="member-slot-card-meta">
 
-                            <span class="member-slot-meta-item"
-                                  th:text="|開始：${#temporals.format(
+								<span class="member-slot-meta-item"
+									th:text="|開始：${#temporals.format(
                                       slot.startTime,
                                       'yyyy-MM-dd HH:mm'
                                   )}|">
-                                開始：2026-07-20 14:00
-                            </span>
-
-                            <span class="member-slot-meta-item"
-                                  th:text="|結束：${#temporals.format(
+									開始：2026-07-20 14:00 </span> <span class="member-slot-meta-item"
+									th:text="|結束：${#temporals.format(
                                       slot.endTime,
                                       'yyyy-MM-dd HH:mm'
                                   )}|">
-                                結束：2026-07-20 16:00
-                            </span>
-
-                            <span class="member-slot-lock-expire"
-                                  th:if="${slot.slotStatus == 1
+									結束：2026-07-20 16:00 </span> <span class="member-slot-lock-expire"
+									th:if="${slot.slotStatus == 1
                                            and slot.lockExpiresAt != null}"
-                                  th:text="|鎖定期限：${#temporals.format(
+									th:text="|鎖定期限：${#temporals.format(
                                       slot.lockExpiresAt,
                                       'yyyy-MM-dd HH:mm'
                                   )}|">
-                                鎖定期限：2026-07-20 14:10
-                            </span>
+									鎖定期限：2026-07-20 14:10 </span>
 
-                        </div>
+							</div>
 
-                    </div>
+						</div>
 
-                    <div class="member-slot-card-actions">
+						<div class="member-slot-card-actions">
 
-                        <!-- 只有可預約才能刪除 -->
-                        <button class="btn member-slot-delete-button
+							<!-- 只有可預約才能刪除 -->
+							<button
+								class="btn member-slot-delete-button
                                        js-delete-slot"
-                                type="button"
-                                th:if="${slot.slotStatus == 0}"
-                                th:attr="data-slot-id=${slot.serviceSlotId},
+								type="button" th:if="${slot.slotStatus == 0}"
+								th:attr="data-slot-id=${slot.serviceSlotId},
                                          data-slot-time=|${#temporals.format(
                                              slot.startTime,
                                              'yyyy-MM-dd HH:mm'
@@ -597,150 +419,107 @@
                                              slot.endTime,
                                              'yyyy-MM-dd HH:mm'
                                          )}|">
-                            刪除時段
-                        </button>
+								刪除時段</button>
 
-                        <button class="btn member-slot-delete-button"
-                                type="button"
-                                disabled
-                                th:if="${slot.slotStatus != 0}">
-                            無法刪除
-                        </button>
+							<button class="btn member-slot-delete-button" type="button"
+								disabled th:if="${slot.slotStatus != 0}">無法刪除</button>
 
-                    </div>
+						</div>
 
-                </article>
+					</article>
 
-            </div>
+				</div>
 
-        </section>
+			</section>
 
-    </div>
+		</div>
 
-</main>
+	</main>
 
-<!-- ==========================================================
+	<!-- ==========================================================
      單筆刪除確認彈窗
      ========================================================== -->
-<div class="member-slot-modal"
-     id="deleteSlotModal"
-     hidden>
+	<div class="member-slot-modal" id="deleteSlotModal" hidden>
 
-    <div class="member-slot-modal-content"
-         role="dialog"
-         aria-modal="true"
-         aria-labelledby="deleteSlotModalTitle">
+		<div class="member-slot-modal-content" role="dialog" aria-modal="true"
+			aria-labelledby="deleteSlotModalTitle">
 
-        <h2 class="member-slot-modal-title"
-            id="deleteSlotModalTitle">
-            確定刪除時段？
-        </h2>
+			<h2 class="member-slot-modal-title" id="deleteSlotModalTitle">
+				確定刪除時段？</h2>
 
-        <p class="member-slot-modal-text">
+			<p class="member-slot-modal-text">
 
-            即將刪除：
+				即將刪除： <span class="member-slot-modal-time" id="deleteSlotTime">
+					服務時段 </span> 。已有訂單紀錄時，系統會改為封存。
+			</p>
 
-            <span class="member-slot-modal-time"
-                  id="deleteSlotTime">
-                服務時段
-            </span>
+			<form id="deleteSlotForm" method="post">
 
-            。已有訂單紀錄時，系統會改為封存。
-        </p>
+				<input type="hidden" th:if="${_csrf != null}"
+					th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-        <form id="deleteSlotForm"
-              method="post">
+				<div class="member-slot-modal-actions">
 
-            <input type="hidden"
-                   th:if="${_csrf != null}"
-                   th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}">
+					<button class="btn btn-secondary" id="cancelDeleteSlot"
+						type="button">取消</button>
 
-            <div class="member-slot-modal-actions">
+					<button class="btn btn-danger" type="submit">確定刪除</button>
 
-                <button class="btn btn-secondary"
-                        id="cancelDeleteSlot"
-                        type="button">
-                    取消
-                </button>
+				</div>
 
-                <button class="btn btn-danger"
-                        type="submit">
-                    確定刪除
-                </button>
+			</form>
 
-            </div>
+		</div>
 
-        </form>
+	</div>
 
-    </div>
-
-</div>
-
-<!-- ==========================================================
+	<!-- ==========================================================
      清空可預約時段彈窗
      ========================================================== -->
-<div class="member-slot-modal"
-     id="clearAvailableModal"
-     hidden>
+	<div class="member-slot-modal" id="clearAvailableModal" hidden>
 
-    <div class="member-slot-modal-content"
-         role="dialog"
-         aria-modal="true"
-         aria-labelledby="clearAvailableModalTitle">
+		<div class="member-slot-modal-content" role="dialog" aria-modal="true"
+			aria-labelledby="clearAvailableModalTitle">
 
-        <h2 class="member-slot-modal-title"
-            id="clearAvailableModalTitle">
-            清空全部可預約時段？
-        </h2>
+			<h2 class="member-slot-modal-title" id="clearAvailableModalTitle">
+				清空全部可預約時段？</h2>
 
-        <p class="member-slot-modal-text">
-            系統會刪除目前服務底下所有「可預約」時段。
-            暫時鎖定與已預約時段不會受到影響。
-        </p>
+			<p class="member-slot-modal-text">系統會刪除目前服務底下所有「可預約」時段。
+				暫時鎖定與已預約時段不會受到影響。</p>
 
-        <form th:action="@{/member/services/{serviceId}/slots/delete-available(
+			<form
+				th:action="@{/member/services/{serviceId}/slots/delete-available(
                            serviceId=${serviceId}
                        )}"
-              method="post">
+				method="post">
 
-            <input type="hidden"
-                   th:if="${_csrf != null}"
-                   th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}">
+				<input type="hidden" th:if="${_csrf != null}"
+					th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-            <div class="member-slot-modal-actions">
+				<div class="member-slot-modal-actions">
 
-                <button class="btn btn-secondary"
-                        id="cancelClearAvailable"
-                        type="button">
-                    取消
-                </button>
+					<button class="btn btn-secondary" id="cancelClearAvailable"
+						type="button">取消</button>
 
-                <button class="btn btn-danger"
-                        type="submit">
-                    確定清空
-                </button>
+					<button class="btn btn-danger" type="submit">確定清空</button>
 
-            </div>
+				</div>
 
-        </form>
+			</form>
 
-    </div>
+		</div>
 
-</div>
+	</div>
 
-<!-- JS 需要使用目前 serviceId -->
-<div id="slotPageData"
-     th:attr="data-service-id=${serviceId}"
-     hidden>
-</div>
+	<!-- JS 需要使用目前 serviceId -->
+	<div id="slotPageData" th:attr="data-service-id=${serviceId}" hidden>
+	</div>
 
-<!-- 時段管理頁功能 -->
-<script th:src="@{/js/front-end/service/memberServiceSlotList.js}"></script>
+	<!-- 時段管理頁功能 -->
+	<script th:src="@{/js/front-end/service/memberServiceSlotList.js}"></script>
 
-<!-- 共用通知 AJAX 輪巡 -->
-<script th:src="@{/JS/front-end/common/notificationPolling.js}"></script>
+	<!-- 共用通知 AJAX 輪巡 -->
+	<script th:src="@{/JS/front-end/common/notificationPolling.js}"></script>
 
 </body>
 </html>

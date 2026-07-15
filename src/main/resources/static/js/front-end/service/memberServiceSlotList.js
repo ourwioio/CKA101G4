@@ -583,4 +583,481 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             );
         });
+		
+		document.addEventListener("DOMContentLoaded", function () {
+
+		    const startTimeInput =
+		        document.getElementById("startTime");
+
+		    const endTimeInput =
+		        document.getElementById("endTime");
+
+		    const endDayOffsetSelect =
+		        document.getElementById("endDayOffset");
+
+		    const addSlotForm =
+		        document.getElementById("addSlotForm");
+
+		    const errorBox =
+		        document.getElementById("slotFormError");
+
+		    if (!startTimeInput
+		            || !endTimeInput
+		            || !endDayOffsetSelect
+		            || !addSlotForm) {
+
+		        return;
+		    }
+
+		    const MINUTES_PER_DAY = 24 * 60;
+		    const TIME_STEP_MINUTES = 30;
+		    const MAX_DURATION_MINUTES = 12 * 60;
+
+
+		    // =========================================================
+		    // HH:mm 轉成當天分鐘數
+		    // 例如：
+		    // 12:32 -> 752
+		    // =========================================================
+
+		    function timeToMinutes(timeValue) {
+
+		        if (!timeValue) {
+		            return null;
+		        }
+
+		        const parts =
+		            timeValue.split(":");
+
+		        const hour =
+		            Number(parts[0]);
+
+		        const minute =
+		            Number(parts[1]);
+
+		        return hour * 60 + minute;
+		    }
+
+
+		    // =========================================================
+		    // 分鐘數轉回 HH:mm
+		    // =========================================================
+
+		    function minutesToTime(totalMinutes) {
+
+		        let normalizedMinutes =
+		            totalMinutes % MINUTES_PER_DAY;
+
+		        if (normalizedMinutes < 0) {
+		            normalizedMinutes += MINUTES_PER_DAY;
+		        }
+
+		        const hour =
+		            Math.floor(normalizedMinutes / 60);
+
+		        const minute =
+		            normalizedMinutes % 60;
+
+		        return String(hour).padStart(2, "0")
+		                + ":"
+		                + String(minute).padStart(2, "0");
+		    }
+
+
+		    // =========================================================
+		    // 將時間往上對齊到指定的 30 分鐘序列
+		    //
+		    // 例如基準是 12:32：
+		    // 有效時間就是 13:02、13:32、14:02……
+		    // =========================================================
+
+		    function alignUp(value, base, step) {
+
+		        const remainder =
+		            ((value - base) % step + step) % step;
+
+		        if (remainder === 0) {
+		            return value;
+		        }
+
+		        return value + step - remainder;
+		    }
+
+
+		    // =========================================================
+		    // 重設成任意分鐘
+		    // =========================================================
+
+		    function resetTimeConstraints(input) {
+
+		        input.step = "60";
+
+		        input.removeAttribute("min");
+		        input.removeAttribute("max");
+
+		        input.setCustomValidity("");
+		    }
+
+
+		    // =========================================================
+		    // 檢查目前已選值是否仍符合新的 min/max/step
+		    // 不符合就清空，要求重新選擇
+		    // =========================================================
+
+		    function clearInvalidValue(input) {
+
+		        if (!input.value) {
+		            return;
+		        }
+
+		        if (input.validity.rangeUnderflow
+		                || input.validity.rangeOverflow
+		                || input.validity.stepMismatch) {
+
+		            input.value = "";
+		        }
+		    }
+
+
+		    // =========================================================
+		    // 已選開始時間：
+		    // 限制結束時間只能是開始時間 + 30 分鐘的倍數
+		    // =========================================================
+
+		    function updateEndTimeConstraints() {
+
+		        if (!startTimeInput.value) {
+
+		            resetTimeConstraints(
+		                endTimeInput
+		            );
+
+		            return;
+		        }
+
+		        const startMinutes =
+		            timeToMinutes(
+		                startTimeInput.value
+		            );
+
+		        const endDayOffset =
+		            Number(
+		                endDayOffsetSelect.value
+		            ) || 0;
+
+		        const targetDayStart =
+		            endDayOffset * MINUTES_PER_DAY;
+
+		        const targetDayEnd =
+		            targetDayStart
+		            + MINUTES_PER_DAY
+		            - 1;
+
+		        // 最早結束：開始時間後 30 分鐘
+		        const firstPossibleEnd =
+		            startMinutes
+		            + TIME_STEP_MINUTES;
+
+		        // 最晚結束：開始時間後 12 小時
+		        const latestPossibleEnd =
+		            startMinutes
+		            + MAX_DURATION_MINUTES;
+
+		        // 對齊目前選擇的結束日期
+		        const firstEndOnTargetDay =
+		            alignUp(
+		                targetDayStart,
+		                firstPossibleEnd,
+		                TIME_STEP_MINUTES
+		            );
+
+		        const minimumEnd =
+		            Math.max(
+		                firstPossibleEnd,
+		                firstEndOnTargetDay
+		            );
+
+		        const maximumEnd =
+		            Math.min(
+		                latestPossibleEnd,
+		                targetDayEnd
+		            );
+
+		        // 目前日期設定下沒有合法結束時間
+		        if (minimumEnd > maximumEnd) {
+
+		            endTimeInput.value = "";
+
+		            endTimeInput.setCustomValidity(
+		                "目前的開始時間與結束日期，無法建立 12 小時內的時段"
+		            );
+
+		            return;
+		        }
+
+		        endTimeInput.setCustomValidity("");
+
+		        /*
+		         * step 的單位是秒。
+		         * 1800 秒 = 30 分鐘。
+		         *
+		         * step 會以 min 作為計算基準，
+		         * 所以開始 12:32 時：
+		         *
+		         * min = 13:02
+		         * 後續有效時間：
+		         * 13:02、13:32、14:02……
+		         */
+		        endTimeInput.step = "1800";
+
+		        endTimeInput.min =
+		            minutesToTime(minimumEnd);
+
+		        endTimeInput.max =
+		            minutesToTime(maximumEnd);
+
+		        clearInvalidValue(
+		            endTimeInput
+		        );
+		    }
+
+
+		    // =========================================================
+		    // 已選結束時間：
+		    // 限制開始時間只能是結束時間 - 30 分鐘的倍數
+		    // =========================================================
+
+		    function updateStartTimeConstraints() {
+
+		        if (!endTimeInput.value) {
+
+		            resetTimeConstraints(
+		                startTimeInput
+		            );
+
+		            return;
+		        }
+
+		        const endDayOffset =
+		            Number(
+		                endDayOffsetSelect.value
+		            ) || 0;
+
+		        const endMinutes =
+		            timeToMinutes(
+		                endTimeInput.value
+		            )
+		            + endDayOffset * MINUTES_PER_DAY;
+
+		        // 最早開始：結束前最多 12 小時
+		        const earliestStart =
+		            Math.max(
+		                0,
+		                endMinutes
+		                - MAX_DURATION_MINUTES
+		            );
+
+		        // 最晚開始：結束前至少 30 分鐘
+		        const latestStart =
+		            Math.min(
+		                MINUTES_PER_DAY - 1,
+		                endMinutes
+		                - TIME_STEP_MINUTES
+		            );
+
+		        /*
+		         * 開始時間必須和結束時間具有相同的
+		         * 30 分鐘餘數。
+		         *
+		         * 例如結束 14:32：
+		         * 開始可以是：
+		         * 14:02、13:32、13:02……
+		         */
+		        const firstValidStart =
+		            alignUp(
+		                earliestStart,
+		                endMinutes,
+		                TIME_STEP_MINUTES
+		            );
+
+		        if (firstValidStart > latestStart) {
+
+		            startTimeInput.value = "";
+
+		            startTimeInput.setCustomValidity(
+		                "目前的結束時間與結束日期，無法建立有效時段"
+		            );
+
+		            return;
+		        }
+
+		        startTimeInput.setCustomValidity("");
+
+		        startTimeInput.step = "1800";
+
+		        startTimeInput.min =
+		            minutesToTime(
+		                firstValidStart
+		            );
+
+		        startTimeInput.max =
+		            minutesToTime(
+		                latestStart
+		            );
+
+		        clearInvalidValue(
+		            startTimeInput
+		        );
+		    }
+
+
+		    // =========================================================
+		    // 顯示錯誤訊息
+		    // =========================================================
+
+		    function showTimeError(message) {
+
+		        if (!errorBox) {
+		            return;
+		        }
+
+		        errorBox.textContent =
+		            message;
+
+		        errorBox.hidden =
+		            false;
+		    }
+
+
+		    function clearTimeError() {
+
+		        if (!errorBox) {
+		            return;
+		        }
+
+		        errorBox.textContent = "";
+
+		        errorBox.hidden = true;
+		    }
+
+
+		    // =========================================================
+		    // 開始時間改變
+		    // =========================================================
+
+		    startTimeInput.addEventListener(
+		        "change",
+		        function () {
+
+		            clearTimeError();
+
+		            updateEndTimeConstraints();
+		        }
+		    );
+
+
+		    // =========================================================
+		    // 結束時間改變
+		    // =========================================================
+
+		    endTimeInput.addEventListener(
+		        "change",
+		        function () {
+
+		            clearTimeError();
+
+		            updateStartTimeConstraints();
+		        }
+		    );
+
+
+		    // =========================================================
+		    // 同一天／隔天改變
+		    // =========================================================
+
+		    endDayOffsetSelect.addEventListener(
+		        "change",
+		        function () {
+
+		            clearTimeError();
+
+		            if (startTimeInput.value) {
+		                updateEndTimeConstraints();
+		            }
+
+		            if (endTimeInput.value) {
+		                updateStartTimeConstraints();
+		            }
+		        }
+		    );
+
+
+		    // =========================================================
+		    // 送出前再次檢查
+		    // =========================================================
+
+		    addSlotForm.addEventListener(
+		        "submit",
+		        function (event) {
+
+		            clearTimeError();
+
+		            if (!startTimeInput.value
+		                    || !endTimeInput.value) {
+
+		                return;
+		            }
+
+		            const startMinutes =
+		                timeToMinutes(
+		                    startTimeInput.value
+		                );
+
+		            const endMinutes =
+		                timeToMinutes(
+		                    endTimeInput.value
+		                )
+		                + Number(
+		                    endDayOffsetSelect.value
+		                ) * MINUTES_PER_DAY;
+
+		            const durationMinutes =
+		                endMinutes
+		                - startMinutes;
+
+		            if (durationMinutes <= 0) {
+
+		                event.preventDefault();
+
+		                showTimeError(
+		                    "結束時間必須晚於開始時間"
+		                );
+
+		                return;
+		            }
+
+		            if (durationMinutes
+		                    % TIME_STEP_MINUTES !== 0) {
+
+		                event.preventDefault();
+
+		                showTimeError(
+		                    "開始時間與結束時間必須相差 30 分鐘的倍數"
+		                );
+
+		                return;
+		            }
+
+		            if (durationMinutes
+		                    > MAX_DURATION_MINUTES) {
+
+		                event.preventDefault();
+
+		                showTimeError(
+		                    "單次建立的時段最長為 12 小時"
+		                );
+		            }
+		        }
+		    );
+		});
 });

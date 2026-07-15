@@ -488,12 +488,29 @@ public class ServiceOrderService {
 				PAYOUT_UNPAID
 		);
 
+		order.setHandledAt(null);
+
 		/*
 		 * 買家申請時沒有鎖定時段，
 		 * 所以拒絕時不用修改 SERVICE_SLOT。
 		 */
 
-		return orderRepo.save(order);
+		ServiceOrderVO savedOrder =
+				orderRepo.save(order);
+
+		// 通知買家：賣家拒絕預約申請
+		sendNotification(
+				savedOrder.getBuyerMemberId(),
+				"預約申請未通過",
+				"賣家未接受您對服務「"
+						+ savedOrder.getServiceNameSnapshot()
+						+ "」的預約申請。預約時段為 "
+						+ formatOrderSlot(savedOrder)
+						+ "。原因："
+						+ savedOrder.getCancelReason()
+		);
+
+		return savedOrder;
 	}
 
 	// =========================================================
@@ -735,6 +752,9 @@ public class ServiceOrderService {
 
 		order.setCancelledAt(now);
 
+		order.setSellerConfirmExpiresAt(null);
+		order.setPaymentExpiresAt(null);
+
 		order.setPayoutStatus(
 				PAYOUT_UNPAID
 		);
@@ -772,6 +792,22 @@ public class ServiceOrderService {
 
 		ServiceOrderVO savedOrder =
 				orderRepo.save(order);
+
+		// 通知賣家：買家取消訂單
+		String notificationContent =
+				"買家已取消您提供的服務「"
+				+ savedOrder.getServiceNameSnapshot()
+				+ "」，預約時段為 "
+				+ formatOrderSlot(savedOrder)
+				+ "。取消原因："
+				+ savedOrder.getCancelReason()
+				+ "。時段已重新開放。";
+
+		sendNotification(
+				savedOrder.getSellerMemberId(),
+				"買家已取消服務訂單",
+				notificationContent
+		);
 
 		publishSlotStatus(
 				savedOrder,
@@ -875,15 +911,17 @@ public class ServiceOrderService {
 			order.setRefundAmount(0);
 		}
 
-		// 尚未由後台完成退款
 		order.setHandledAt(null);
+
+		boolean slotReleased =
+				pendingPayment || confirmed;
 
 		/*
 		 * 待付款時段為暫時鎖定。
 		 * 已成立時段為已預約。
 		 * 兩者取消後都必須釋放。
 		 */
-		if (pendingPayment || confirmed) {
+		if (slotReleased) {
 
 			ServiceSlotVO slot =
 					getSlotOrThrow(
@@ -893,14 +931,51 @@ public class ServiceOrderService {
 			releaseSlot(slot);
 
 			slotRepo.save(slot);
+		}
 
+		ServiceOrderVO savedOrder =
+				orderRepo.save(order);
+
+		if (slotReleased) {
 			publishSlotStatus(
-					order,
+					savedOrder,
 					SLOT_AVAILABLE
 			);
 		}
 
-		return orderRepo.save(order);
+		// 通知買家：賣家取消訂單
+		String notificationContent =
+				"賣家已取消服務「"
+				+ savedOrder.getServiceNameSnapshot()
+				+ "」的訂單，預約時段為 "
+				+ formatOrderSlot(savedOrder)
+				+ "。取消原因："
+				+ savedOrder.getCancelReason()
+				+ "。";
+
+		if (confirmed) {
+
+			notificationContent +=
+					"此訂單已付款，將等待後台處理全額退款。";
+
+		} else if (pendingPayment) {
+
+			notificationContent +=
+					"您尚未完成付款，因此不會產生退款。";
+
+		} else {
+
+			notificationContent +=
+					"您的預約申請已取消。";
+		}
+
+		sendNotification(
+				savedOrder.getBuyerMemberId(),
+				"賣家已取消服務訂單",
+				notificationContent
+		);
+
+		return savedOrder;
 	}
 
 	// =========================================================
@@ -956,6 +1031,9 @@ public class ServiceOrderService {
 
 		order.setCancelledAt(now);
 
+		order.setSellerConfirmExpiresAt(null);
+		order.setPaymentExpiresAt(null);
+
 		order.setRefundStatus(
 				REFUND_PENDING
 		);
@@ -988,6 +1066,29 @@ public class ServiceOrderService {
 		publishSlotStatus(
 				savedOrder,
 				SLOT_AVAILABLE
+		);
+
+		String notificationContent =
+				"平台已取消服務「"
+				+ savedOrder.getServiceNameSnapshot()
+				+ "」的訂單，預約時段為 "
+				+ formatOrderSlot(savedOrder)
+				+ "。取消原因："
+				+ savedOrder.getCancelReason()
+				+ "。此訂單將等待後台處理全額退款。";
+
+		// 通知買家
+		sendNotification(
+				savedOrder.getBuyerMemberId(),
+				"平台已取消服務訂單",
+				notificationContent
+		);
+
+		// 通知賣家
+		sendNotification(
+				savedOrder.getSellerMemberId(),
+				"平台已取消服務訂單",
+				notificationContent
 		);
 
 		return savedOrder;
@@ -1067,7 +1168,23 @@ public class ServiceOrderService {
 		 * PAYOUT_STATUS 維持 0 未撥款。
 		 */
 
-		return orderRepo.save(order);
+		ServiceOrderVO savedOrder =
+				orderRepo.save(order);
+
+		// 通知買家：退款完成
+		sendNotification(
+				savedOrder.getBuyerMemberId(),
+				"服務訂單退款完成",
+				"服務「"
+						+ savedOrder.getServiceNameSnapshot()
+						+ "」的退款已完成，退款金額為 NT$ "
+						+ savedOrder.getRefundAmount()
+						+ "，原預約時段為 "
+						+ formatOrderSlot(savedOrder)
+						+ "。"
+		);
+
+		return savedOrder;
 	}
 
 	// =========================================================
@@ -1381,6 +1498,16 @@ public class ServiceOrderService {
 		 * 買家送出申請時沒有鎖定時段，
 		 * 因此不需要釋放 SERVICE_SLOT。
 		 */
+
+		sendNotification(
+				order.getBuyerMemberId(),
+				"預約申請已逾期",
+				"賣家未在期限內確認您對服務「"
+						+ order.getServiceNameSnapshot()
+						+ "」的預約申請，系統已自動取消。預約時段為 "
+						+ formatOrderSlot(order)
+						+ "。"
+		);
 	}
 
 	// =========================================================
@@ -1422,6 +1549,26 @@ public class ServiceOrderService {
 		order.setHandledAt(null);
 
 		releaseSlot(slot);
+
+		sendNotification(
+				order.getBuyerMemberId(),
+				"付款期限已過",
+				"您未在期限內完成服務「"
+						+ order.getServiceNameSnapshot()
+						+ "」的付款，系統已自動取消訂單。預約時段為 "
+						+ formatOrderSlot(order)
+						+ "。"
+		);
+
+		sendNotification(
+				order.getSellerMemberId(),
+				"買家付款逾期",
+				"服務「"
+						+ order.getServiceNameSnapshot()
+						+ "」的買家未在期限內完成付款，系統已自動取消訂單並重新開放時段。預約時段為 "
+						+ formatOrderSlot(order)
+						+ "。"
+		);
 	}
 
 	// =========================================================
