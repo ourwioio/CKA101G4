@@ -133,7 +133,10 @@ public class ServiceOrderService {
 	// 賣家必須在 180 秒內確認。
 	// =========================================================
 
-	public ServiceOrderVO createRequest(Integer slotId, Integer buyerId, String buyerRequestNote) {
+	public ServiceOrderVO createRequest(
+			Integer slotId,
+			Integer buyerId,
+			String buyerRequestNote) {
 
 		if (buyerId == null) {
 			throw new RuntimeException("請先登入");
@@ -141,12 +144,17 @@ public class ServiceOrderService {
 
 		ServiceSlotVO slot = getSlotOrThrow(slotId);
 
-		if (!Byte.valueOf(SLOT_AVAILABLE).equals(slot.getSlotStatus())) {
+		if (!Byte.valueOf(SLOT_AVAILABLE)
+				.equals(slot.getSlotStatus())) {
 
 			throw new RuntimeException("此時段目前不可申請");
 		}
 
-		ServiceVO service = serviceRepo.findById(slot.getServiceId()).orElseThrow(() -> new RuntimeException("找不到服務"));
+		ServiceVO service = serviceRepo
+				.findById(slot.getServiceId())
+				.orElseThrow(
+						() -> new RuntimeException("找不到服務")
+				);
 
 		if (service.getMemberId() == null) {
 			throw new RuntimeException("服務缺少賣家資料");
@@ -164,83 +172,127 @@ public class ServiceOrderService {
 		// 原始關聯資料
 		// -----------------------------------------------------
 
-		order.setServiceSlotId(slot.getServiceSlotId());
+		order.setServiceSlotId(
+				slot.getServiceSlotId()
+		);
 
-		order.setServiceId(service.getServiceId());
+		order.setServiceId(
+				service.getServiceId()
+		);
 
-		order.setBuyerMemberId(buyerId);
+		order.setBuyerMemberId(
+				buyerId
+		);
 
 		// -----------------------------------------------------
 		// 訂單快照
 		// -----------------------------------------------------
 
-		order.setSellerMemberId(service.getMemberId());
+		order.setSellerMemberId(
+				service.getMemberId()
+		);
 
-		order.setServiceNameSnapshot(service.getServiceName());
+		order.setServiceNameSnapshot(
+				service.getServiceName()
+		);
 
-		order.setServiceDescriptionSnapshot(service.getDescription());
+		order.setServiceDescriptionSnapshot(
+				service.getDescription()
+		);
 
-		if (service.getServiceType() != null && service.getServiceType().getTypeName() != null) {
+		if (service.getServiceType() != null
+				&& service.getServiceType().getTypeName() != null) {
 
-			order.setServiceTypeNameSnapshot(service.getServiceType().getTypeName());
+			order.setServiceTypeNameSnapshot(
+					service.getServiceType().getTypeName()
+			);
 
 		} else {
 
-			order.setServiceTypeNameSnapshot("未分類");
+			order.setServiceTypeNameSnapshot(
+					"未分類"
+			);
 		}
 
-		order.setSlotStartTimeSnapshot(slot.getStartTime());
+		order.setSlotStartTimeSnapshot(
+				slot.getStartTime()
+		);
 
-		order.setSlotEndTimeSnapshot(slot.getEndTime());
+		order.setSlotEndTimeSnapshot(
+				slot.getEndTime()
+		);
 
-		order.setServiceCitySnapshot(service.getServiceCity());
+		order.setServiceCitySnapshot(
+				service.getServiceCity()
+		);
 
-		order.setServiceDistrictSnapshot(service.getServiceDistrict());
+		order.setServiceDistrictSnapshot(
+				service.getServiceDistrict()
+		);
 
-		order.setServiceLocationSnapshot(service.getServiceLocation());
+		order.setServiceLocationSnapshot(
+				service.getServiceLocation()
+		);
 
 		// -----------------------------------------------------
 		// 金額快照
 		// -----------------------------------------------------
 
-		order.setOrderHourlyRate(service.getHourlyRate());
+		order.setOrderHourlyRate(
+				service.getHourlyRate()
+		);
 
-		order.setTotalAmount(calculateTotalAmount(service, slot));
+		order.setTotalAmount(
+				calculateTotalAmount(service, slot)
+		);
 
 		// -----------------------------------------------------
 		// 初始狀態
 		// -----------------------------------------------------
 
-		order.setOrderStatus(ORDER_PENDING_SELLER_CONFIRM);
+		order.setOrderStatus(
+				ORDER_PENDING_SELLER_CONFIRM
+		);
 
-		order.setBuyerRequestNote(normalizeNullableText(buyerRequestNote));
+		order.setBuyerRequestNote(
+				normalizeNullableText(buyerRequestNote)
+		);
 
 		order.setCreatedAt(now);
 
-		order.setPayoutStatus(PAYOUT_UNPAID);
+		order.setPayoutStatus(
+				PAYOUT_UNPAID
+		);
 
-		order.setRefundStatus(REFUND_NONE);
+		order.setRefundStatus(
+				REFUND_NONE
+		);
 
 		order.setRefundAmount(0);
 
 		// 賣家確認期限為現在時間加 180 秒
-		order.setSellerConfirmExpiresAt(now.plusSeconds(SELLER_CONFIRM_SECONDS));
+		order.setSellerConfirmExpiresAt(
+				now.plusSeconds(SELLER_CONFIRM_SECONDS)
+		);
 
 		order.setPaymentExpiresAt(null);
 
 		/*
 		 * 此時不改 SERVICE_SLOT。
 		 *
-		 * 同一時段仍可讓其他買家提出申請。 等賣家接受其中一筆時才鎖定。
+		 * 同一時段仍可讓其他買家提出申請。
+		 * 等賣家接受其中一筆時才鎖定。
 		 */
 
-		ServiceOrderVO savedOrder = orderRepo.save(order);
+		ServiceOrderVO savedOrder =
+				orderRepo.save(order);
 
 		// 通知賣方：收到新的預約申請
 		sendNotification(
 				savedOrder.getSellerMemberId(),
 				"收到新的服務預約申請",
-				"您的服務「" + savedOrder.getServiceNameSnapshot()
+				"您的服務「"
+						+ savedOrder.getServiceNameSnapshot()
 						+ "」收到新的預約申請，預約時段為 "
 						+ formatOrderSlot(savedOrder)
 						+ "，請前往收到的預約查看。"
@@ -258,85 +310,115 @@ public class ServiceOrderService {
 	// 4. 等買家付款成功後，才取消其他申請
 	// =========================================================
 
-	public ServiceOrderVO acceptRequest(Integer orderId,
-	                                    String sellerRequirementNote) {
+	public ServiceOrderVO acceptRequest(
+			Integer orderId,
+			String sellerRequirementNote) {
 
-	    ServiceOrderVO order = getOrderOrThrow(orderId);
+		ServiceOrderVO order =
+				getOrderOrThrow(orderId);
 
-	    if (!Byte.valueOf(ORDER_PENDING_SELLER_CONFIRM)
-	            .equals(order.getOrderStatus())) {
+		if (!Byte.valueOf(ORDER_PENDING_SELLER_CONFIRM)
+				.equals(order.getOrderStatus())) {
 
-	        throw new RuntimeException("此訂單不是待賣家確認狀態");
-	    }
+			throw new RuntimeException(
+					"此訂單不是待賣家確認狀態"
+			);
+		}
 
-	    LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now =
+				LocalDateTime.now();
 
-	    LocalDateTime sellerExpiresAt = order.getSellerConfirmExpiresAt();
+		LocalDateTime sellerExpiresAt =
+				order.getSellerConfirmExpiresAt();
 
-	    if (sellerExpiresAt != null
-	            && !now.isBefore(sellerExpiresAt)) {
+		if (sellerExpiresAt != null
+				&& !now.isBefore(sellerExpiresAt)) {
 
-	        throw new RuntimeException("賣家確認期限已過");
-	    }
+			throw new RuntimeException(
+					"賣家確認期限已過"
+			);
+		}
 
-	    ServiceSlotVO slot = getSlotOrThrow(order.getServiceSlotId());
+		ServiceSlotVO slot =
+				getSlotOrThrow(
+						order.getServiceSlotId()
+				);
 
-	    if (!Byte.valueOf(SLOT_AVAILABLE)
-	            .equals(slot.getSlotStatus())) {
+		if (!Byte.valueOf(SLOT_AVAILABLE)
+				.equals(slot.getSlotStatus())) {
 
-	        throw new RuntimeException("此時段已有其他買家正在付款或已完成預約");
-	    }
+			throw new RuntimeException(
+					"此時段已有其他買家正在付款或已完成預約"
+			);
+		}
 
-	    LocalDateTime paymentExpiresAt =
-	            now.plusSeconds(BUYER_PAYMENT_SECONDS);
+		LocalDateTime paymentExpiresAt =
+				now.plusSeconds(
+						BUYER_PAYMENT_SECONDS
+				);
 
-	    // 選中的訂單進入待付款
-	    order.setOrderStatus(ORDER_PENDING_PAYMENT);
+		// 選中的訂單進入待付款
+		order.setOrderStatus(
+				ORDER_PENDING_PAYMENT
+		);
 
-	    order.setSellerRequirementNote(
-	            normalizeNullableText(sellerRequirementNote)
-	    );
+		order.setSellerRequirementNote(
+				normalizeNullableText(
+						sellerRequirementNote
+				)
+		);
 
-	    // 賣家已完成確認
-	    order.setSellerConfirmExpiresAt(null);
+		// 賣家已完成確認
+		order.setSellerConfirmExpiresAt(null);
 
-	    // 設定付款期限
-	    order.setPaymentExpiresAt(paymentExpiresAt);
+		// 設定付款期限
+		order.setPaymentExpiresAt(
+				paymentExpiresAt
+		);
 
-	    // 時段暫時鎖定
-	    slot.setSlotStatus(SLOT_LOCKED);
-	    slot.setLockExpiresAt(paymentExpiresAt);
+		// 時段暫時鎖定
+		slot.setSlotStatus(
+				SLOT_LOCKED
+		);
 
-	    slotRepo.save(slot);
+		slot.setLockExpiresAt(
+				paymentExpiresAt
+		);
 
-	    ServiceOrderVO savedOrder = orderRepo.save(order);
+		slotRepo.save(slot);
 
-	    // 通知買方：賣方已接受申請，請完成付款
-	    sendNotification(
-	            savedOrder.getBuyerMemberId(),
-	            "預約申請已通過",
-	            "賣方已同意您對「" + savedOrder.getServiceNameSnapshot()
-	                    + "」的預約申請，請於付款期限內完成付款。預約時段為 "
-	                    + formatOrderSlot(savedOrder)
-	    );
+		ServiceOrderVO savedOrder =
+				orderRepo.save(order);
 
-	    /*
-	     * 注意：
-	     * 這裡不再取消其他相同時段的申請。
-	     *
-	     * 其他申請維持：
-	     * ORDER_STATUS = 0 待賣家確認
-	     *
-	     * 如果目前買家付款逾期，
-	     * 時段釋放後，賣家還可以接受其他申請。
-	     */
+		// 通知買方：賣方已接受申請，請完成付款
+		sendNotification(
+				savedOrder.getBuyerMemberId(),
+				"預約申請已通過",
+				"賣方已同意您對「"
+						+ savedOrder.getServiceNameSnapshot()
+						+ "」的預約申請，請於付款期限內完成付款。預約時段為 "
+						+ formatOrderSlot(savedOrder)
+		);
 
-	    // WebSocket：通知前端此時段暫時鎖定
-	    publishSlotStatus(savedOrder, SLOT_LOCKED);
+		/*
+		 * 注意：
+		 * 這裡不再取消其他相同時段的申請。
+		 *
+		 * 其他申請維持：
+		 * ORDER_STATUS = 0 待賣家確認
+		 *
+		 * 如果目前買家付款逾期，
+		 * 時段釋放後，賣家還可以接受其他申請。
+		 */
 
-	    return savedOrder;
+		// WebSocket：通知前端此時段暫時鎖定
+		publishSlotStatus(
+				savedOrder,
+				SLOT_LOCKED
+		);
+
+		return savedOrder;
 	}
-
 
 	// =========================================================
 	// 賣家拒絕申請
@@ -344,36 +426,57 @@ public class ServiceOrderService {
 	// 買家尚未付款，因此不需要退款。
 	// =========================================================
 
-	public ServiceOrderVO rejectRequest(Integer orderId, String reason) {
+	public ServiceOrderVO rejectRequest(
+			Integer orderId,
+			String reason) {
 
-		ServiceOrderVO order = getOrderOrThrow(orderId);
+		ServiceOrderVO order =
+				getOrderOrThrow(orderId);
 
-		if (!Byte.valueOf(ORDER_PENDING_SELLER_CONFIRM).equals(order.getOrderStatus())) {
+		if (!Byte.valueOf(ORDER_PENDING_SELLER_CONFIRM)
+				.equals(order.getOrderStatus())) {
 
-			throw new RuntimeException("只有待賣家確認的申請可以拒絕");
+			throw new RuntimeException(
+					"只有待賣家確認的申請可以拒絕"
+			);
 		}
 
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now =
+				LocalDateTime.now();
 
-		order.setOrderStatus(ORDER_CANCELLED);
+		order.setOrderStatus(
+				ORDER_CANCELLED
+		);
 
-		order.setCancelledByRole(CANCEL_BY_SELLER);
+		order.setCancelledByRole(
+				CANCEL_BY_SELLER
+		);
 
-		order.setCancelReason(normalizeCancelReason(reason, "賣家拒絕預約申請"));
+		order.setCancelReason(
+				normalizeCancelReason(
+						reason,
+						"賣家拒絕預約申請"
+				)
+		);
 
 		order.setCancelledAt(now);
 
 		order.setSellerConfirmExpiresAt(null);
 		order.setPaymentExpiresAt(null);
 
-		order.setRefundStatus(REFUND_NONE);
+		order.setRefundStatus(
+				REFUND_NONE
+		);
 
 		order.setRefundAmount(0);
 
-		order.setPayoutStatus(PAYOUT_UNPAID);
+		order.setPayoutStatus(
+				PAYOUT_UNPAID
+		);
 
 		/*
-		 * 買家申請時沒有鎖定時段， 所以拒絕時不用修改 SERVICE_SLOT。
+		 * 買家申請時沒有鎖定時段，
+		 * 所以拒絕時不用修改 SERVICE_SLOT。
 		 */
 
 		return orderRepo.save(order);
@@ -388,131 +491,169 @@ public class ServiceOrderService {
 	// 4. WebSocket 推播時段已預約
 	// =========================================================
 
-	public ServiceOrderVO paySuccess(Integer orderId,
-	                                 Byte paymentMethod) {
+	public ServiceOrderVO paySuccess(
+			Integer orderId,
+			Byte paymentMethod) {
 
-	    ServiceOrderVO order = getOrderOrThrow(orderId);
+		ServiceOrderVO order =
+				getOrderOrThrow(orderId);
 
-	    if (!Byte.valueOf(ORDER_PENDING_PAYMENT)
-	            .equals(order.getOrderStatus())) {
+		if (!Byte.valueOf(ORDER_PENDING_PAYMENT)
+				.equals(order.getOrderStatus())) {
 
-	        throw new RuntimeException("此訂單不是待付款狀態");
-	    }
+			throw new RuntimeException(
+					"此訂單不是待付款狀態"
+			);
+		}
 
-	    validatePaymentMethod(paymentMethod);
+		validatePaymentMethod(paymentMethod);
 
-	    LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now =
+				LocalDateTime.now();
 
-	    LocalDateTime paymentExpiresAt =
-	            order.getPaymentExpiresAt();
+		LocalDateTime paymentExpiresAt =
+				order.getPaymentExpiresAt();
 
-	    if (paymentExpiresAt != null
-	            && !now.isBefore(paymentExpiresAt)) {
+		if (paymentExpiresAt != null
+				&& !now.isBefore(paymentExpiresAt)) {
 
-	        throw new RuntimeException("付款期限已過");
-	    }
+			throw new RuntimeException(
+					"付款期限已過"
+			);
+		}
 
-	    ServiceSlotVO slot =
-	            getSlotOrThrow(order.getServiceSlotId());
+		ServiceSlotVO slot =
+				getSlotOrThrow(
+						order.getServiceSlotId()
+				);
 
-	    if (!Byte.valueOf(SLOT_LOCKED)
-	            .equals(slot.getSlotStatus())) {
+		if (!Byte.valueOf(SLOT_LOCKED)
+				.equals(slot.getSlotStatus())) {
 
-	        throw new RuntimeException("此時段目前不是待付款鎖定狀態");
-	    }
+			throw new RuntimeException(
+					"此時段目前不是待付款鎖定狀態"
+			);
+		}
 
-	    if (slot.getLockExpiresAt() != null
-	            && !now.isBefore(slot.getLockExpiresAt())) {
+		if (slot.getLockExpiresAt() != null
+				&& !now.isBefore(
+						slot.getLockExpiresAt()
+				)) {
 
-	        throw new RuntimeException("時段鎖定期限已過");
-	    }
+			throw new RuntimeException(
+					"時段鎖定期限已過"
+			);
+		}
 
-	    // -----------------------------------------------------
-	    // 付款訂單正式成立
-	    // -----------------------------------------------------
+		// -----------------------------------------------------
+		// 付款訂單正式成立
+		// -----------------------------------------------------
 
-	    order.setOrderStatus(ORDER_CONFIRMED);
+		order.setOrderStatus(
+				ORDER_CONFIRMED
+		);
 
-	    order.setServicePaymentMethod(paymentMethod);
+		order.setServicePaymentMethod(
+				paymentMethod
+		);
 
-	    order.setPaymentExpiresAt(null);
+		order.setPaymentExpiresAt(null);
 
-	    // -----------------------------------------------------
-	    // 時段正式變成已預約
-	    // -----------------------------------------------------
+		// -----------------------------------------------------
+		// 時段正式變成已預約
+		// -----------------------------------------------------
 
-	    slot.setSlotStatus(SLOT_BOOKED);
+		slot.setSlotStatus(
+				SLOT_BOOKED
+		);
 
-	    slot.setLockExpiresAt(null);
+		slot.setLockExpiresAt(null);
 
-	    slotRepo.save(slot);
+		slotRepo.save(slot);
 
-	    ServiceOrderVO savedOrder = orderRepo.save(order);
+		ServiceOrderVO savedOrder =
+				orderRepo.save(order);
 
-	    // -----------------------------------------------------
-	    // 付款成功後，才取消其他相同時段的待確認申請
-	    // -----------------------------------------------------
+		// -----------------------------------------------------
+		// 付款成功後，才取消其他相同時段的待確認申請
+		// -----------------------------------------------------
 
-	    List<ServiceOrderVO> otherOrders =
-	            orderRepo.findByServiceSlotIdAndOrderStatusAndServiceOrderIdNot(
-	                    order.getServiceSlotId(),
-	                    ORDER_PENDING_SELLER_CONFIRM,
-	                    order.getServiceOrderId()
-	            );
+		List<ServiceOrderVO> otherOrders =
+				orderRepo
+					.findByServiceSlotIdAndOrderStatusAndServiceOrderIdNot(
+							order.getServiceSlotId(),
+							ORDER_PENDING_SELLER_CONFIRM,
+							order.getServiceOrderId()
+					);
 
-	    for (ServiceOrderVO otherOrder : otherOrders) {
+		for (ServiceOrderVO otherOrder : otherOrders) {
 
-	        otherOrder.setOrderStatus(ORDER_CANCELLED);
+			otherOrder.setOrderStatus(
+					ORDER_CANCELLED
+			);
 
-	        otherOrder.setCancelledByRole(CANCEL_BY_SYSTEM);
+			otherOrder.setCancelledByRole(
+					CANCEL_BY_SYSTEM
+			);
 
-	        otherOrder.setCancelReason(
-	                "此時段已有其他買家完成付款，預約名額已被取得"
-	        );
+			otherOrder.setCancelReason(
+					"此時段已有其他買家完成付款，預約名額已被取得"
+			);
 
-	        otherOrder.setCancelledAt(now);
+			otherOrder.setCancelledAt(now);
 
-	        otherOrder.setSellerConfirmExpiresAt(null);
-	        otherOrder.setPaymentExpiresAt(null);
+			otherOrder.setSellerConfirmExpiresAt(null);
+			otherOrder.setPaymentExpiresAt(null);
 
-	        // 尚未付款，不需要退款
-	        otherOrder.setRefundStatus(REFUND_NONE);
-	        otherOrder.setRefundAmount(0);
+			// 尚未付款，不需要退款
+			otherOrder.setRefundStatus(
+					REFUND_NONE
+			);
 
-	        otherOrder.setPayoutStatus(PAYOUT_UNPAID);
+			otherOrder.setRefundAmount(0);
 
-	        otherOrder.setHandledAt(null);
-	    }
+			otherOrder.setPayoutStatus(
+					PAYOUT_UNPAID
+			);
 
-	    if (!otherOrders.isEmpty()) {
-	        orderRepo.saveAll(otherOrders);
-	    }
+			otherOrder.setHandledAt(null);
+		}
 
-	    // 通知賣方：買方已完成付款
-	    sendNotification(
-	            savedOrder.getSellerMemberId(),
-	            "買家已完成付款",
-	            "您的服務「" + savedOrder.getServiceNameSnapshot()
-	                    + "」已有買家完成付款，訂單已正式成立。預約時段為 "
-	                    + formatOrderSlot(savedOrder)
-	    );
+		if (!otherOrders.isEmpty()) {
+			orderRepo.saveAll(otherOrders);
+		}
 
-	    // 通知其他申請人：此時段已由其他買家完成付款
-	    for (ServiceOrderVO otherOrder : otherOrders) {
+		// 通知賣方：買方已完成付款
+		sendNotification(
+				savedOrder.getSellerMemberId(),
+				"買家已完成付款",
+				"您的服務「"
+						+ savedOrder.getServiceNameSnapshot()
+						+ "」已有買家完成付款，訂單已正式成立。預約時段為 "
+						+ formatOrderSlot(savedOrder)
+		);
 
-	        sendNotification(
-	                otherOrder.getBuyerMemberId(),
-	                "預約時段已被其他會員預約",
-	                "您申請的服務「" + otherOrder.getServiceNameSnapshot()
-	                        + "」時段 " + formatOrderSlot(otherOrder)
-	                        + " 已由其他會員完成付款，因此您的預約申請已由系統取消。"
-	        );
-	    }
+		// 通知其他申請人：此時段已由其他買家完成付款
+		for (ServiceOrderVO otherOrder : otherOrders) {
 
-	    // WebSocket：通知前端此時段已預約
-	    publishSlotStatus(savedOrder, SLOT_BOOKED);
+			sendNotification(
+					otherOrder.getBuyerMemberId(),
+					"預約時段已被其他會員預約",
+					"您申請的服務「"
+							+ otherOrder.getServiceNameSnapshot()
+							+ "」時段 "
+							+ formatOrderSlot(otherOrder)
+							+ " 已由其他會員完成付款，因此您的預約申請已由系統取消。"
+			);
+		}
 
-	    return savedOrder;
+		// WebSocket：通知前端此時段已預約
+		publishSlotStatus(
+				savedOrder,
+				SLOT_BOOKED
+		);
+
+		return savedOrder;
 	}
 
 	// =========================================================
@@ -525,51 +666,86 @@ public class ServiceOrderService {
 	// 可以取消，但不退款。
 	// =========================================================
 
-	public ServiceOrderVO cancelByBuyer(Integer orderId, String reason) {
+	public ServiceOrderVO cancelByBuyer(
+			Integer orderId,
+			String reason) {
 
-		ServiceOrderVO order = getOrderOrThrow(orderId);
+		ServiceOrderVO order =
+				getOrderOrThrow(orderId);
 
-		if (!Byte.valueOf(ORDER_CONFIRMED).equals(order.getOrderStatus())) {
+		if (!Byte.valueOf(ORDER_CONFIRMED)
+				.equals(order.getOrderStatus())) {
 
-			throw new RuntimeException("只有已成立訂單可以由買家取消");
+			throw new RuntimeException(
+					"只有已成立訂單可以由買家取消"
+			);
 		}
 
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now =
+				LocalDateTime.now();
 
-		LocalDateTime serviceStartTime = order.getSlotStartTimeSnapshot();
+		LocalDateTime serviceStartTime =
+				order.getSlotStartTimeSnapshot();
 
 		if (serviceStartTime == null) {
-			throw new RuntimeException("訂單缺少服務開始時間");
+			throw new RuntimeException(
+					"訂單缺少服務開始時間"
+			);
 		}
 
 		if (!serviceStartTime.isAfter(now)) {
-			throw new RuntimeException("服務已開始或已結束，無法取消");
+			throw new RuntimeException(
+					"服務已開始或已結束，無法取消"
+			);
 		}
 
-		ServiceSlotVO slot = getSlotOrThrow(order.getServiceSlotId());
+		ServiceSlotVO slot =
+				getSlotOrThrow(
+						order.getServiceSlotId()
+				);
 
-		order.setOrderStatus(ORDER_CANCELLED);
+		order.setOrderStatus(
+				ORDER_CANCELLED
+		);
 
-		order.setCancelledByRole(CANCEL_BY_BUYER);
+		order.setCancelledByRole(
+				CANCEL_BY_BUYER
+		);
 
-		order.setCancelReason(normalizeCancelReason(reason, "買家取消訂單"));
+		order.setCancelReason(
+				normalizeCancelReason(
+						reason,
+						"買家取消訂單"
+				)
+		);
 
 		order.setCancelledAt(now);
 
-		order.setPayoutStatus(PAYOUT_UNPAID);
+		order.setPayoutStatus(
+				PAYOUT_UNPAID
+		);
 
 		// 嚴格超過 3 天才全額退款
-		boolean refundable = serviceStartTime.isAfter(now.plusDays(3));
+		boolean refundable =
+				serviceStartTime.isAfter(
+						now.plusDays(3)
+				);
 
 		if (refundable) {
 
-			order.setRefundStatus(REFUND_PENDING);
+			order.setRefundStatus(
+					REFUND_PENDING
+			);
 
-			order.setRefundAmount(order.getTotalAmount());
+			order.setRefundAmount(
+					order.getTotalAmount()
+			);
 
 		} else {
 
-			order.setRefundStatus(REFUND_NONE);
+			order.setRefundStatus(
+					REFUND_NONE
+			);
 
 			order.setRefundAmount(0);
 		}
@@ -580,9 +756,13 @@ public class ServiceOrderService {
 
 		slotRepo.save(slot);
 
-		ServiceOrderVO savedOrder = orderRepo.save(order);
+		ServiceOrderVO savedOrder =
+				orderRepo.save(order);
 
-		publishSlotStatus(savedOrder, SLOT_AVAILABLE);
+		publishSlotStatus(
+				savedOrder,
+				SLOT_AVAILABLE
+		);
 
 		return savedOrder;
 	}
@@ -602,49 +782,81 @@ public class ServiceOrderService {
 	// 已取消＋無退款。
 	// =========================================================
 
-	public ServiceOrderVO cancelBySeller(Integer orderId, String reason) {
+	public ServiceOrderVO cancelBySeller(
+			Integer orderId,
+			String reason) {
 
-		ServiceOrderVO order = getOrderOrThrow(orderId);
+		ServiceOrderVO order =
+				getOrderOrThrow(orderId);
 
-		Byte currentStatus = order.getOrderStatus();
+		Byte currentStatus =
+				order.getOrderStatus();
 
-		boolean pendingSellerConfirm = Byte.valueOf(ORDER_PENDING_SELLER_CONFIRM).equals(currentStatus);
+		boolean pendingSellerConfirm =
+				Byte.valueOf(ORDER_PENDING_SELLER_CONFIRM)
+					.equals(currentStatus);
 
-		boolean pendingPayment = Byte.valueOf(ORDER_PENDING_PAYMENT).equals(currentStatus);
+		boolean pendingPayment =
+				Byte.valueOf(ORDER_PENDING_PAYMENT)
+					.equals(currentStatus);
 
-		boolean confirmed = Byte.valueOf(ORDER_CONFIRMED).equals(currentStatus);
+		boolean confirmed =
+				Byte.valueOf(ORDER_CONFIRMED)
+					.equals(currentStatus);
 
-		if (!pendingSellerConfirm && !pendingPayment && !confirmed) {
+		if (!pendingSellerConfirm
+				&& !pendingPayment
+				&& !confirmed) {
 
-			throw new RuntimeException("此訂單目前不能由賣家取消");
+			throw new RuntimeException(
+					"此訂單目前不能由賣家取消"
+			);
 		}
 
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now =
+				LocalDateTime.now();
 
-		order.setOrderStatus(ORDER_CANCELLED);
+		order.setOrderStatus(
+				ORDER_CANCELLED
+		);
 
-		order.setCancelledByRole(CANCEL_BY_SELLER);
+		order.setCancelledByRole(
+				CANCEL_BY_SELLER
+		);
 
-		order.setCancelReason(normalizeCancelReason(reason, "賣家取消訂單"));
+		order.setCancelReason(
+				normalizeCancelReason(
+						reason,
+						"賣家取消訂單"
+				)
+		);
 
 		order.setCancelledAt(now);
 
 		order.setSellerConfirmExpiresAt(null);
 		order.setPaymentExpiresAt(null);
 
-		order.setPayoutStatus(PAYOUT_UNPAID);
+		order.setPayoutStatus(
+				PAYOUT_UNPAID
+		);
 
 		if (confirmed) {
 
 			// 已付款，取消後等待後台退款
-			order.setRefundStatus(REFUND_PENDING);
+			order.setRefundStatus(
+					REFUND_PENDING
+			);
 
-			order.setRefundAmount(order.getTotalAmount());
+			order.setRefundAmount(
+					order.getTotalAmount()
+			);
 
 		} else {
 
 			// 尚未付款，不需要退款
-			order.setRefundStatus(REFUND_NONE);
+			order.setRefundStatus(
+					REFUND_NONE
+			);
 
 			order.setRefundAmount(0);
 		}
@@ -653,17 +865,25 @@ public class ServiceOrderService {
 		order.setHandledAt(null);
 
 		/*
-		 * 待付款時段為暫時鎖定。 已成立時段為已預約。 兩者取消後都必須釋放。
+		 * 待付款時段為暫時鎖定。
+		 * 已成立時段為已預約。
+		 * 兩者取消後都必須釋放。
 		 */
 		if (pendingPayment || confirmed) {
 
-			ServiceSlotVO slot = getSlotOrThrow(order.getServiceSlotId());
+			ServiceSlotVO slot =
+					getSlotOrThrow(
+							order.getServiceSlotId()
+					);
 
 			releaseSlot(slot);
 
 			slotRepo.save(slot);
 
-			publishSlotStatus(order, SLOT_AVAILABLE);
+			publishSlotStatus(
+					order,
+					SLOT_AVAILABLE
+			);
 		}
 
 		return orderRepo.save(order);
@@ -675,41 +895,72 @@ public class ServiceOrderService {
 	// 取消後進入待退款。
 	// =========================================================
 
-	public ServiceOrderVO cancelByAdmin(Integer orderId, Integer employeeId, String reason) {
+	public ServiceOrderVO cancelByAdmin(
+			Integer orderId,
+			Integer employeeId,
+			String reason) {
 
 		if (employeeId == null) {
-			throw new RuntimeException("缺少處理員工資料");
+			throw new RuntimeException(
+					"缺少處理員工資料"
+			);
 		}
 
-		ServiceOrderVO order = getOrderOrThrow(orderId);
+		ServiceOrderVO order =
+				getOrderOrThrow(orderId);
 
-		if (!Byte.valueOf(ORDER_CONFIRMED).equals(order.getOrderStatus())) {
+		if (!Byte.valueOf(ORDER_CONFIRMED)
+				.equals(order.getOrderStatus())) {
 
-			throw new RuntimeException("只有已成立訂單可以由後台取消");
+			throw new RuntimeException(
+					"只有已成立訂單可以由後台取消"
+			);
 		}
 
-		ServiceSlotVO slot = getSlotOrThrow(order.getServiceSlotId());
+		ServiceSlotVO slot =
+				getSlotOrThrow(
+						order.getServiceSlotId()
+				);
 
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now =
+				LocalDateTime.now();
 
-		order.setOrderStatus(ORDER_CANCELLED);
+		order.setOrderStatus(
+				ORDER_CANCELLED
+		);
 
-		order.setCancelledByRole(CANCEL_BY_ADMIN);
+		order.setCancelledByRole(
+				CANCEL_BY_ADMIN
+		);
 
-		order.setCancelReason(normalizeCancelReason(reason, "後台取消訂單"));
+		order.setCancelReason(
+				normalizeCancelReason(
+						reason,
+						"後台取消訂單"
+				)
+		);
 
 		order.setCancelledAt(now);
 
-		order.setRefundStatus(REFUND_PENDING);
+		order.setRefundStatus(
+				REFUND_PENDING
+		);
 
-		order.setRefundAmount(order.getTotalAmount());
+		order.setRefundAmount(
+				order.getTotalAmount()
+		);
 
-		order.setPayoutStatus(PAYOUT_UNPAID);
+		order.setPayoutStatus(
+				PAYOUT_UNPAID
+		);
 
-		order.setEmployeeId(employeeId);
+		order.setEmployeeId(
+				employeeId
+		);
 
 		/*
-		 * 現在只是取消， 還沒有實際完成退款。
+		 * 現在只是取消，
+		 * 還沒有實際完成退款。
 		 */
 		order.setHandledAt(null);
 
@@ -717,9 +968,13 @@ public class ServiceOrderService {
 
 		slotRepo.save(slot);
 
-		ServiceOrderVO savedOrder = orderRepo.save(order);
+		ServiceOrderVO savedOrder =
+				orderRepo.save(order);
 
-		publishSlotStatus(savedOrder, SLOT_AVAILABLE);
+		publishSlotStatus(
+				savedOrder,
+				SLOT_AVAILABLE
+		);
 
 		return savedOrder;
 	}
@@ -736,42 +991,66 @@ public class ServiceOrderService {
 	// REFUND_STATUS = 2
 	// =========================================================
 
-	public ServiceOrderVO completeRefund(Integer orderId, Integer employeeId) {
+	public ServiceOrderVO completeRefund(
+			Integer orderId,
+			Integer employeeId) {
 
 		if (employeeId == null) {
-			throw new RuntimeException("缺少處理員工資料");
+			throw new RuntimeException(
+					"缺少處理員工資料"
+			);
 		}
 
-		ServiceOrderVO order = getOrderOrThrow(orderId);
+		ServiceOrderVO order =
+				getOrderOrThrow(orderId);
 
-		if (!Byte.valueOf(ORDER_CANCELLED).equals(order.getOrderStatus())) {
+		if (!Byte.valueOf(ORDER_CANCELLED)
+				.equals(order.getOrderStatus())) {
 
-			throw new RuntimeException("只有已取消訂單可以退款");
+			throw new RuntimeException(
+					"只有已取消訂單可以退款"
+			);
 		}
 
-		if (!Byte.valueOf(REFUND_PENDING).equals(order.getRefundStatus())) {
+		if (!Byte.valueOf(REFUND_PENDING)
+				.equals(order.getRefundStatus())) {
 
-			throw new RuntimeException("此訂單不是待退款狀態");
+			throw new RuntimeException(
+					"此訂單不是待退款狀態"
+			);
 		}
 
-		if (Byte.valueOf(PAYOUT_PAID).equals(order.getPayoutStatus())) {
+		if (Byte.valueOf(PAYOUT_PAID)
+				.equals(order.getPayoutStatus())) {
 
-			throw new RuntimeException("此訂單已撥款，不能直接退款");
+			throw new RuntimeException(
+					"此訂單已撥款，不能直接退款"
+			);
 		}
 
-		if (order.getRefundAmount() == null || order.getRefundAmount() <= 0) {
+		if (order.getRefundAmount() == null
+				|| order.getRefundAmount() <= 0) {
 
-			throw new RuntimeException("退款金額不正確");
+			throw new RuntimeException(
+					"退款金額不正確"
+			);
 		}
 
-		order.setRefundStatus(REFUND_COMPLETED);
+		order.setRefundStatus(
+				REFUND_COMPLETED
+		);
 
-		order.setEmployeeId(employeeId);
+		order.setEmployeeId(
+				employeeId
+		);
 
-		order.setHandledAt(LocalDateTime.now());
+		order.setHandledAt(
+				LocalDateTime.now()
+		);
 
 		/*
-		 * ORDER_STATUS 維持 4 已取消。 PAYOUT_STATUS 維持 0 未撥款。
+		 * ORDER_STATUS 維持 4 已取消。
+		 * PAYOUT_STATUS 維持 0 未撥款。
 		 */
 
 		return orderRepo.save(order);
@@ -781,21 +1060,31 @@ public class ServiceOrderService {
 	// 服務完成
 	// =========================================================
 
-	public ServiceOrderVO completeOrder(Integer orderId) {
+	public ServiceOrderVO completeOrder(
+			Integer orderId) {
 
-		ServiceOrderVO order = getOrderOrThrow(orderId);
+		ServiceOrderVO order =
+				getOrderOrThrow(orderId);
 
-		if (!Byte.valueOf(ORDER_CONFIRMED).equals(order.getOrderStatus())) {
+		if (!Byte.valueOf(ORDER_CONFIRMED)
+				.equals(order.getOrderStatus())) {
 
-			throw new RuntimeException("只有已成立訂單可以完成");
+			throw new RuntimeException(
+					"只有已成立訂單可以完成"
+			);
 		}
 
-		order.setOrderStatus(ORDER_COMPLETED);
+		order.setOrderStatus(
+				ORDER_COMPLETED
+		);
 
-		order.setServiceCompletedAt(LocalDateTime.now());
+		order.setServiceCompletedAt(
+				LocalDateTime.now()
+		);
 
 		/*
-		 * 已使用過的時段不重新開放。 SERVICE_SLOT 維持 2 已預約。
+		 * 已使用過的時段不重新開放。
+		 * SERVICE_SLOT 維持 2 已預約。
 		 */
 
 		return orderRepo.save(order);
@@ -807,34 +1096,54 @@ public class ServiceOrderService {
 	// 只有已完成且尚未撥款的訂單可以撥款。
 	// =========================================================
 
-	public ServiceOrderVO payout(Integer orderId, Integer employeeId) {
+	public ServiceOrderVO payout(
+			Integer orderId,
+			Integer employeeId) {
 
 		if (employeeId == null) {
-			throw new RuntimeException("缺少處理員工資料");
+			throw new RuntimeException(
+					"缺少處理員工資料"
+			);
 		}
 
-		ServiceOrderVO order = getOrderOrThrow(orderId);
+		ServiceOrderVO order =
+				getOrderOrThrow(orderId);
 
-		if (!Byte.valueOf(ORDER_COMPLETED).equals(order.getOrderStatus())) {
+		if (!Byte.valueOf(ORDER_COMPLETED)
+				.equals(order.getOrderStatus())) {
 
-			throw new RuntimeException("只有已完成訂單可以撥款");
+			throw new RuntimeException(
+					"只有已完成訂單可以撥款"
+			);
 		}
 
-		if (Byte.valueOf(PAYOUT_PAID).equals(order.getPayoutStatus())) {
+		if (Byte.valueOf(PAYOUT_PAID)
+				.equals(order.getPayoutStatus())) {
 
-			throw new RuntimeException("此訂單已撥款");
+			throw new RuntimeException(
+					"此訂單已撥款"
+			);
 		}
 
-		if (!Byte.valueOf(REFUND_NONE).equals(order.getRefundStatus())) {
+		if (!Byte.valueOf(REFUND_NONE)
+				.equals(order.getRefundStatus())) {
 
-			throw new RuntimeException("有退款狀態的訂單不能撥款");
+			throw new RuntimeException(
+					"有退款狀態的訂單不能撥款"
+			);
 		}
 
-		order.setPayoutStatus(PAYOUT_PAID);
+		order.setPayoutStatus(
+				PAYOUT_PAID
+		);
 
-		order.setEmployeeId(employeeId);
+		order.setEmployeeId(
+				employeeId
+		);
 
-		order.setHandledAt(LocalDateTime.now());
+		order.setHandledAt(
+				LocalDateTime.now()
+		);
 
 		return orderRepo.save(order);
 	}
@@ -845,16 +1154,24 @@ public class ServiceOrderService {
 	// 尚未付款，因此無退款。
 	// =========================================================
 
-	public ServiceOrderVO expireSellerConfirm(Integer orderId) {
+	public ServiceOrderVO expireSellerConfirm(
+			Integer orderId) {
 
-		ServiceOrderVO order = getOrderOrThrow(orderId);
+		ServiceOrderVO order =
+				getOrderOrThrow(orderId);
 
-		if (!Byte.valueOf(ORDER_PENDING_SELLER_CONFIRM).equals(order.getOrderStatus())) {
+		if (!Byte.valueOf(ORDER_PENDING_SELLER_CONFIRM)
+				.equals(order.getOrderStatus())) {
 
-			throw new RuntimeException("此訂單不是待賣家確認狀態");
+			throw new RuntimeException(
+					"此訂單不是待賣家確認狀態"
+			);
 		}
 
-		markSellerConfirmExpired(order, LocalDateTime.now());
+		markSellerConfirmExpired(
+				order,
+				LocalDateTime.now()
+		);
 
 		return orderRepo.save(order);
 	}
@@ -865,24 +1182,40 @@ public class ServiceOrderService {
 	// 取消訂單、釋放時段並透過 WebSocket 推播。
 	// =========================================================
 
-	public ServiceOrderVO expirePayment(Integer orderId) {
+	public ServiceOrderVO expirePayment(
+			Integer orderId) {
 
-		ServiceOrderVO order = getOrderOrThrow(orderId);
+		ServiceOrderVO order =
+				getOrderOrThrow(orderId);
 
-		if (!Byte.valueOf(ORDER_PENDING_PAYMENT).equals(order.getOrderStatus())) {
+		if (!Byte.valueOf(ORDER_PENDING_PAYMENT)
+				.equals(order.getOrderStatus())) {
 
-			throw new RuntimeException("此訂單不是待付款狀態");
+			throw new RuntimeException(
+					"此訂單不是待付款狀態"
+			);
 		}
 
-		ServiceSlotVO slot = getSlotOrThrow(order.getServiceSlotId());
+		ServiceSlotVO slot =
+				getSlotOrThrow(
+						order.getServiceSlotId()
+				);
 
-		markPaymentExpired(order, slot, LocalDateTime.now());
+		markPaymentExpired(
+				order,
+				slot,
+				LocalDateTime.now()
+		);
 
 		slotRepo.save(slot);
 
-		ServiceOrderVO savedOrder = orderRepo.save(order);
+		ServiceOrderVO savedOrder =
+				orderRepo.save(order);
 
-		publishSlotStatus(savedOrder, SLOT_AVAILABLE);
+		publishSlotStatus(
+				savedOrder,
+				SLOT_AVAILABLE
+		);
 
 		return savedOrder;
 	}
@@ -897,10 +1230,15 @@ public class ServiceOrderService {
 
 	public int expireOverdueSellerConfirmOrders() {
 
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now =
+				LocalDateTime.now();
 
-		List<ServiceOrderVO> expiredOrders = orderRepo
-				.findByOrderStatusAndSellerConfirmExpiresAtLessThanEqual(ORDER_PENDING_SELLER_CONFIRM, now);
+		List<ServiceOrderVO> expiredOrders =
+				orderRepo
+					.findByOrderStatusAndSellerConfirmExpiresAtLessThanEqual(
+							ORDER_PENDING_SELLER_CONFIRM,
+							now
+					);
 
 		int count = 0;
 
@@ -909,12 +1247,16 @@ public class ServiceOrderService {
 			/*
 			 * 防止查詢後、實際處理前狀態已被改變。
 			 */
-			if (!Byte.valueOf(ORDER_PENDING_SELLER_CONFIRM).equals(order.getOrderStatus())) {
+			if (!Byte.valueOf(ORDER_PENDING_SELLER_CONFIRM)
+					.equals(order.getOrderStatus())) {
 
 				continue;
 			}
 
-			markSellerConfirmExpired(order, now);
+			markSellerConfirmExpired(
+					order,
+					now
+			);
 
 			count++;
 		}
@@ -936,27 +1278,43 @@ public class ServiceOrderService {
 
 	public int expireOverduePaymentOrders() {
 
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now =
+				LocalDateTime.now();
 
-		List<ServiceOrderVO> expiredOrders = orderRepo
-				.findByOrderStatusAndPaymentExpiresAtLessThanEqual(ORDER_PENDING_PAYMENT, now);
+		List<ServiceOrderVO> expiredOrders =
+				orderRepo
+					.findByOrderStatusAndPaymentExpiresAtLessThanEqual(
+							ORDER_PENDING_PAYMENT,
+							now
+					);
 
 		int count = 0;
 
 		for (ServiceOrderVO order : expiredOrders) {
 
-			if (!Byte.valueOf(ORDER_PENDING_PAYMENT).equals(order.getOrderStatus())) {
+			if (!Byte.valueOf(ORDER_PENDING_PAYMENT)
+					.equals(order.getOrderStatus())) {
 
 				continue;
 			}
 
-			ServiceSlotVO slot = getSlotOrThrow(order.getServiceSlotId());
+			ServiceSlotVO slot =
+					getSlotOrThrow(
+							order.getServiceSlotId()
+					);
 
-			markPaymentExpired(order, slot, now);
+			markPaymentExpired(
+					order,
+					slot,
+					now
+			);
 
 			slotRepo.save(slot);
 
-			publishSlotStatus(order, SLOT_AVAILABLE);
+			publishSlotStatus(
+					order,
+					SLOT_AVAILABLE
+			);
 
 			count++;
 		}
@@ -972,29 +1330,42 @@ public class ServiceOrderService {
 	// 賣家確認逾期共用處理
 	// =========================================================
 
-	private void markSellerConfirmExpired(ServiceOrderVO order, LocalDateTime now) {
+	private void markSellerConfirmExpired(
+			ServiceOrderVO order,
+			LocalDateTime now) {
 
-		order.setOrderStatus(ORDER_CANCELLED);
+		order.setOrderStatus(
+				ORDER_CANCELLED
+		);
 
-		order.setCancelledByRole(CANCEL_BY_SYSTEM);
+		order.setCancelledByRole(
+				CANCEL_BY_SYSTEM
+		);
 
-		order.setCancelReason("賣家未於 180 秒內確認訂單");
+		order.setCancelReason(
+				"賣家未於 180 秒內確認訂單"
+		);
 
 		order.setCancelledAt(now);
 
 		order.setSellerConfirmExpiresAt(null);
 		order.setPaymentExpiresAt(null);
 
-		order.setRefundStatus(REFUND_NONE);
+		order.setRefundStatus(
+				REFUND_NONE
+		);
 
 		order.setRefundAmount(0);
 
-		order.setPayoutStatus(PAYOUT_UNPAID);
+		order.setPayoutStatus(
+				PAYOUT_UNPAID
+		);
 
 		order.setHandledAt(null);
 
 		/*
-		 * 買家送出申請時沒有鎖定時段， 因此不需要釋放 SERVICE_SLOT。
+		 * 買家送出申請時沒有鎖定時段，
+		 * 因此不需要釋放 SERVICE_SLOT。
 		 */
 	}
 
@@ -1002,24 +1373,37 @@ public class ServiceOrderService {
 	// 買家付款逾期共用處理
 	// =========================================================
 
-	private void markPaymentExpired(ServiceOrderVO order, ServiceSlotVO slot, LocalDateTime now) {
+	private void markPaymentExpired(
+			ServiceOrderVO order,
+			ServiceSlotVO slot,
+			LocalDateTime now) {
 
-		order.setOrderStatus(ORDER_CANCELLED);
+		order.setOrderStatus(
+				ORDER_CANCELLED
+		);
 
-		order.setCancelledByRole(CANCEL_BY_SYSTEM);
+		order.setCancelledByRole(
+				CANCEL_BY_SYSTEM
+		);
 
-		order.setCancelReason("買家未於 60 秒內完成付款");
+		order.setCancelReason(
+				"買家未於 60 秒內完成付款"
+		);
 
 		order.setCancelledAt(now);
 
 		order.setSellerConfirmExpiresAt(null);
 		order.setPaymentExpiresAt(null);
 
-		order.setRefundStatus(REFUND_NONE);
+		order.setRefundStatus(
+				REFUND_NONE
+		);
 
 		order.setRefundAmount(0);
 
-		order.setPayoutStatus(PAYOUT_UNPAID);
+		order.setPayoutStatus(
+				PAYOUT_UNPAID
+		);
 
 		order.setHandledAt(null);
 
@@ -1034,32 +1418,48 @@ public class ServiceOrderService {
 	// IS_READ = 0
 	// =========================================================
 
-	private void sendNotification(Integer memberId, String title, String content) {
+	private void sendNotification(
+			Integer memberId,
+			String title,
+			String content) {
 
 		if (memberId == null) {
 			return;
 		}
 
-		MemberVO member = memberRepo.findById(memberId)
-				.orElseThrow(() -> new RuntimeException("找不到通知收件會員：" + memberId));
+		MemberVO member = memberRepo
+				.findById(memberId)
+				.orElseThrow(
+						() -> new RuntimeException(
+								"找不到通知收件會員：" + memberId
+						)
+				);
 
-		NotificationVO notification = new NotificationVO();
+		NotificationVO notification =
+				new NotificationVO();
 
 		notification.setMember(member);
+
 		notification.setTitle(title);
+
 		notification.setContent(content);
 
 		// 0：一般會員通知
-		notification.setNotificationType((byte) 0);
+		notification.setNotificationType(
+				(byte) 0
+		);
 
-		notificationService.addNotification(notification);
+		notificationService.addNotification(
+				notification
+		);
 	}
 
 	// =========================================================
 	// 格式化通知中的訂單時段
 	// =========================================================
 
-	private String formatOrderSlot(ServiceOrderVO order) {
+	private String formatOrderSlot(
+			ServiceOrderVO order) {
 
 		if (order == null
 				|| order.getSlotStartTimeSnapshot() == null
@@ -1068,39 +1468,68 @@ public class ServiceOrderService {
 			return "時間未設定";
 		}
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+		DateTimeFormatter formatter =
+				DateTimeFormatter.ofPattern(
+						"yyyy-MM-dd HH:mm"
+				);
 
-		return order.getSlotStartTimeSnapshot().format(formatter)
+		return order
+					.getSlotStartTimeSnapshot()
+					.format(formatter)
 				+ " ～ "
-				+ order.getSlotEndTimeSnapshot().format(formatter);
+				+ order
+					.getSlotEndTimeSnapshot()
+					.format(formatter);
 	}
 
 	// =========================================================
 	// 計算訂單總金額
 	// =========================================================
 
-	private int calculateTotalAmount(ServiceVO service, ServiceSlotVO slot) {
+	private int calculateTotalAmount(
+			ServiceVO service,
+			ServiceSlotVO slot) {
 
-		if (service == null || service.getHourlyRate() == null) {
+		if (service == null
+				|| service.getHourlyRate() == null) {
 
-			throw new RuntimeException("服務費率不正確");
+			throw new RuntimeException(
+					"服務費率不正確"
+			);
 		}
 
-		if (slot.getStartTime() == null || slot.getEndTime() == null) {
+		if (slot.getStartTime() == null
+				|| slot.getEndTime() == null) {
 
-			throw new RuntimeException("服務時段時間不完整");
+			throw new RuntimeException(
+					"服務時段時間不完整"
+			);
 		}
 
-		long minutes = Duration.between(slot.getStartTime(), slot.getEndTime()).toMinutes();
+		long minutes =
+				Duration
+					.between(
+							slot.getStartTime(),
+							slot.getEndTime()
+					)
+					.toMinutes();
 
 		if (minutes <= 0) {
-			throw new RuntimeException("服務時段時間不正確");
+			throw new RuntimeException(
+					"服務時段時間不正確"
+			);
 		}
 
 		/*
-		 * 例如： 每小時 300 元 90 分鐘 300 × 90 ÷ 60 = 450 元
+		 * 例如：
+		 * 每小時 300 元
+		 * 90 分鐘
+		 * 300 × 90 ÷ 60 = 450 元
 		 */
-		long totalAmount = minutes * service.getHourlyRate() / 60;
+		long totalAmount =
+				minutes
+				* service.getHourlyRate()
+				/ 60;
 
 		return Math.toIntExact(totalAmount);
 	}
@@ -1109,9 +1538,12 @@ public class ServiceOrderService {
 	// 釋放時段
 	// =========================================================
 
-	private void releaseSlot(ServiceSlotVO slot) {
+	private void releaseSlot(
+			ServiceSlotVO slot) {
 
-		slot.setSlotStatus(SLOT_AVAILABLE);
+		slot.setSlotStatus(
+				SLOT_AVAILABLE
+		);
 
 		slot.setLockExpiresAt(null);
 	}
@@ -1120,46 +1552,77 @@ public class ServiceOrderService {
 	// WebSocket 推播時段狀態
 	// =========================================================
 
-	private void publishSlotStatus(ServiceOrderVO order, Byte slotStatus) {
+	private void publishSlotStatus(
+			ServiceOrderVO order,
+			Byte slotStatus) {
 
-		slotStatusWebSocketService.publishSlotStatus(order.getServiceId(), order.getServiceSlotId(), slotStatus);
+		slotStatusWebSocketService
+				.publishSlotStatus(
+						order.getServiceId(),
+						order.getServiceSlotId(),
+						slotStatus
+				);
 	}
 
 	// =========================================================
 	// 共用查詢
 	// =========================================================
 
-	private ServiceOrderVO getOrderOrThrow(Integer orderId) {
+	private ServiceOrderVO getOrderOrThrow(
+			Integer orderId) {
 
 		if (orderId == null) {
-			throw new RuntimeException("訂單編號不可為空");
+			throw new RuntimeException(
+					"訂單編號不可為空"
+			);
 		}
 
-		return orderRepo.findById(orderId).orElseThrow(() -> new RuntimeException("找不到訂單"));
+		return orderRepo
+				.findById(orderId)
+				.orElseThrow(
+						() -> new RuntimeException(
+								"找不到訂單"
+						)
+				);
 	}
 
-	private ServiceSlotVO getSlotOrThrow(Integer slotId) {
+	private ServiceSlotVO getSlotOrThrow(
+			Integer slotId) {
 
 		if (slotId == null) {
-			throw new RuntimeException("服務時段編號不可為空");
+			throw new RuntimeException(
+					"服務時段編號不可為空"
+			);
 		}
 
-		return slotRepo.findById(slotId).orElseThrow(() -> new RuntimeException("找不到服務時段"));
+		return slotRepo
+				.findById(slotId)
+				.orElseThrow(
+						() -> new RuntimeException(
+								"找不到服務時段"
+						)
+				);
 	}
 
 	// =========================================================
 	// 付款方式驗證
 	// =========================================================
 
-	private void validatePaymentMethod(Byte paymentMethod) {
+	private void validatePaymentMethod(
+			Byte paymentMethod) {
 
 		if (paymentMethod == null) {
-			throw new RuntimeException("請選擇付款方式");
+			throw new RuntimeException(
+					"請選擇付款方式"
+			);
 		}
 
-		if (paymentMethod.byteValue() != 0 && paymentMethod.byteValue() != 1) {
+		if (paymentMethod.byteValue() != 0
+				&& paymentMethod.byteValue() != 1) {
 
-			throw new RuntimeException("付款方式不正確");
+			throw new RuntimeException(
+					"付款方式不正確"
+			);
 		}
 	}
 
@@ -1167,22 +1630,31 @@ public class ServiceOrderService {
 	// 文字處理
 	// =========================================================
 
-	private String normalizeNullableText(String text) {
+	private String normalizeNullableText(
+			String text) {
 
 		if (text == null) {
 			return null;
 		}
 
-		String normalized = text.trim();
+		String normalized =
+				text.trim();
 
-		return normalized.isEmpty() ? null : normalized;
+		return normalized.isEmpty()
+				? null
+				: normalized;
 	}
 
-	private String normalizeCancelReason(String reason, String defaultReason) {
+	private String normalizeCancelReason(
+			String reason,
+			String defaultReason) {
 
-		String normalized = normalizeNullableText(reason);
+		String normalized =
+				normalizeNullableText(reason);
 
-		return normalized != null ? normalized : defaultReason;
+		return normalized != null
+				? normalized
+				: defaultReason;
 	}
 
 	// =========================================================
@@ -1190,9 +1662,12 @@ public class ServiceOrderService {
 	// =========================================================
 
 	@Transactional(readOnly = true)
-	public ServiceOrderVO getOne(Integer orderId) {
+	public ServiceOrderVO getOne(
+			Integer orderId) {
 
-		return orderRepo.findById(orderId).orElse(null);
+		return orderRepo
+				.findById(orderId)
+				.orElse(null);
 	}
 
 	@Transactional(readOnly = true)
@@ -1202,60 +1677,88 @@ public class ServiceOrderService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<ServiceOrderVO> getByBuyerMemberId(Integer buyerMemberId) {
+	public List<ServiceOrderVO> getByBuyerMemberId(
+			Integer buyerMemberId) {
 
-		return orderRepo.findByBuyerMemberId(buyerMemberId);
+		return orderRepo.findByBuyerMemberId(
+				buyerMemberId
+		);
 	}
 
 	@Transactional(readOnly = true)
-	public List<ServiceOrderVO> getBySellerMemberId(Integer sellerMemberId) {
+	public List<ServiceOrderVO> getBySellerMemberId(
+			Integer sellerMemberId) {
 
-		return orderRepo.findBySellerMemberId(sellerMemberId);
+		return orderRepo.findBySellerMemberId(
+				sellerMemberId
+		);
 	}
 
 	@Transactional(readOnly = true)
-	public List<ServiceOrderVO> getByServiceId(Integer serviceId) {
+	public List<ServiceOrderVO> getByServiceId(
+			Integer serviceId) {
 
-		return orderRepo.findByServiceId(serviceId);
+		return orderRepo.findByServiceId(
+				serviceId
+		);
 	}
 
 	/*
-	 * 同一時段可能有多筆申請， 因此現在回傳 List。
+	 * 同一時段可能有多筆申請，
+	 * 因此現在回傳 List。
 	 */
 	@Transactional(readOnly = true)
-	public List<ServiceOrderVO> getByServiceSlotId(Integer serviceSlotId) {
+	public List<ServiceOrderVO> getByServiceSlotId(
+			Integer serviceSlotId) {
 
-		return orderRepo.findAllByServiceSlotId(serviceSlotId);
+		return orderRepo.findAllByServiceSlotId(
+				serviceSlotId
+		);
 	}
 
 	@Transactional(readOnly = true)
-	public List<ServiceOrderVO> getByOrderStatus(Byte orderStatus) {
+	public List<ServiceOrderVO> getByOrderStatus(
+			Byte orderStatus) {
 
-		return orderRepo.findByOrderStatus(orderStatus);
+		return orderRepo.findByOrderStatus(
+				orderStatus
+		);
 	}
 
 	@Transactional(readOnly = true)
-	public List<ServiceOrderVO> getByPaymentMethod(Byte paymentMethod) {
+	public List<ServiceOrderVO> getByPaymentMethod(
+			Byte paymentMethod) {
 
-		return orderRepo.findByServicePaymentMethod(paymentMethod);
+		return orderRepo.findByServicePaymentMethod(
+				paymentMethod
+		);
 	}
 
 	@Transactional(readOnly = true)
-	public List<ServiceOrderVO> getByRefundStatus(Byte refundStatus) {
+	public List<ServiceOrderVO> getByRefundStatus(
+			Byte refundStatus) {
 
-		return orderRepo.findByRefundStatus(refundStatus);
+		return orderRepo.findByRefundStatus(
+				refundStatus
+		);
 	}
 
 	@Transactional(readOnly = true)
-	public List<ServiceOrderVO> getByPayoutStatus(Byte payoutStatus) {
+	public List<ServiceOrderVO> getByPayoutStatus(
+			Byte payoutStatus) {
 
-		return orderRepo.findByPayoutStatus(payoutStatus);
+		return orderRepo.findByPayoutStatus(
+				payoutStatus
+		);
 	}
 
 	@Transactional(readOnly = true)
-	public boolean existsByServiceId(Integer serviceId) {
+	public boolean existsByServiceId(
+			Integer serviceId) {
 
-		return orderRepo.existsByServiceId(serviceId);
+		return orderRepo.existsByServiceId(
+				serviceId
+		);
 	}
 
 	// =========================================================
@@ -1263,25 +1766,98 @@ public class ServiceOrderService {
 	// =========================================================
 
 	/*
-	 * 已取消、待退款。
+	 * 已完成、尚未撥款。
 	 *
-	 * ORDER_STATUS = 4 REFUND_STATUS = 1
+	 * ORDER_STATUS = 3
+	 * PAYOUT_STATUS = 0
+	 */
+	@Transactional(readOnly = true)
+	public List<ServiceOrderVO> getCompletedUnpaidOrders() {
+
+		return orderRepo.findByOrderStatusAndPayoutStatus(
+				ORDER_COMPLETED,
+				PAYOUT_UNPAID
+		);
+	}
+
+	/*
+	 * 已完成、已經撥款。
+	 *
+	 * ORDER_STATUS = 3
+	 * PAYOUT_STATUS = 1
+	 */
+	@Transactional(readOnly = true)
+	public List<ServiceOrderVO> getCompletedPaidOrders() {
+
+		return orderRepo.findByOrderStatusAndPayoutStatus(
+				ORDER_COMPLETED,
+				PAYOUT_PAID
+		);
+	}
+
+	/*
+	 * 已取消、不需要退款。
+	 *
+	 * ORDER_STATUS = 4
+	 * REFUND_STATUS = 0
+	 */
+	@Transactional(readOnly = true)
+	public List<ServiceOrderVO> getCancelledNoRefundOrders() {
+
+		return orderRepo.findByOrderStatusAndRefundStatus(
+				ORDER_CANCELLED,
+				REFUND_NONE
+		);
+	}
+
+	/*
+	 * 已取消、等待後台退款。
+	 *
+	 * ORDER_STATUS = 4
+	 * REFUND_STATUS = 1
+	 */
+	@Transactional(readOnly = true)
+	public List<ServiceOrderVO> getCancelledPendingRefundOrders() {
+
+		return orderRepo.findByOrderStatusAndRefundStatus(
+				ORDER_CANCELLED,
+				REFUND_PENDING
+		);
+	}
+
+	/*
+	 * 已取消、已完成退款。
+	 *
+	 * ORDER_STATUS = 4
+	 * REFUND_STATUS = 2
+	 */
+	@Transactional(readOnly = true)
+	public List<ServiceOrderVO> getCancelledRefundedOrders() {
+
+		return orderRepo.findByOrderStatusAndRefundStatus(
+				ORDER_CANCELLED,
+				REFUND_COMPLETED
+		);
+	}
+
+	/*
+	 * 保留原本方法名稱，
+	 * 避免其他 Controller 已經有呼叫。
 	 */
 	@Transactional(readOnly = true)
 	public List<ServiceOrderVO> getPendingRefundOrders() {
 
-		return orderRepo.findByOrderStatusAndRefundStatus(ORDER_CANCELLED, REFUND_PENDING);
+		return getCancelledPendingRefundOrders();
 	}
 
 	/*
-	 * 已完成、尚未撥款。
-	 *
-	 * ORDER_STATUS = 3 PAYOUT_STATUS = 0
+	 * 保留原本方法名稱，
+	 * 避免其他 Controller 已經有呼叫。
 	 */
 	@Transactional(readOnly = true)
 	public List<ServiceOrderVO> getPendingPayoutOrders() {
 
-		return orderRepo.findByOrderStatusAndPayoutStatus(ORDER_COMPLETED, PAYOUT_UNPAID);
+		return getCompletedUnpaidOrders();
 	}
 
 	// =========================================================
@@ -1291,30 +1867,41 @@ public class ServiceOrderService {
 	@Transactional(readOnly = true)
 	public Long getCompletedOrderTotalAmount() {
 
-		return orderRepo.sumCompletedOrderTotalAmount();
+		return orderRepo
+				.sumCompletedOrderTotalAmount();
 	}
 
 	@Transactional(readOnly = true)
 	public Long getCompletedUnpaidTotalAmount() {
 
-		return orderRepo.sumCompletedUnpaidTotalAmount();
+		return orderRepo
+				.sumCompletedUnpaidTotalAmount();
 	}
 
 	@Transactional(readOnly = true)
 	public Long getCompletedUnpaidOrderCount() {
 
-		return orderRepo.countCompletedUnpaidOrders();
+		return orderRepo
+				.countCompletedUnpaidOrders();
 	}
 
 	@Transactional(readOnly = true)
 	public Long getPendingRefundAmount() {
 
-		return orderRepo.sumPendingRefundAmount();
+		return orderRepo
+				.sumPendingRefundAmount();
 	}
 
 	@Transactional(readOnly = true)
 	public Long getPendingRefundOrderCount() {
 
-		return orderRepo.countPendingRefundOrders();
+		return orderRepo
+				.countPendingRefundOrders();
+	}
+	
+	@Transactional(readOnly = true)
+	public Long getCompletedOrderCount() {
+
+	    return orderRepo.countCompletedOrders();
 	}
 }

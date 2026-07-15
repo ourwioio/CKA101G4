@@ -12,121 +12,225 @@ import com.webond.service.repository.ServiceTypeRepository;
 @Transactional
 public class ServiceTypeService {
 
-    // Spring Data JPA Repository
-    // 取代原本的 ServiceTypeDAO_interface dao
     private final ServiceTypeRepository serviceTypeRepository;
 
-    // 建構子注入
-    // Spring 會自動把 ServiceTypeRepository 塞進來
-    public ServiceTypeService(ServiceTypeRepository serviceTypeRepository) {
-        this.serviceTypeRepository = serviceTypeRepository;
+    public ServiceTypeService(
+            ServiceTypeRepository serviceTypeRepository) {
+
+        this.serviceTypeRepository =
+                serviceTypeRepository;
     }
 
+    // =========================================================
     // 查單一服務類型
+    // =========================================================
+
     @Transactional(readOnly = true)
-    public ServiceTypeVO findByPK(Integer PK) {
-        /*
-         * 原本：
-         * dao.findByPK(PK)
-         *
-         * Spring Data JPA：
-         * findById(PK).orElse(null)
-         */
-        return serviceTypeRepository.findById(PK).orElse(null);
-    }
+    public ServiceTypeVO findByPK(
+            Integer serviceTypeId) {
 
-    // 查全部服務類型
-    @Transactional(readOnly = true)
-    public List<ServiceTypeVO> getAll() {
-        /*
-         * 原本：
-         * dao.getAll()
-         *
-         * Spring Data JPA：
-         * findAll()
-         */
-        return serviceTypeRepository.findAll();
-    }
-
-    // 刪除服務類型
-    public void delete(Integer PK) {
-        /*
-         * 先確認資料存在再刪，避免直接 deleteById 找不到資料時拋例外
-         *
-         * 注意：
-         * 如果 SERVICE 表還有資料參照這個 SERVICE_TYPE_ID，
-         * 資料庫可能會因為外鍵限制而不允許刪除。
-         */
-        if (serviceTypeRepository.existsById(PK)) {
-            serviceTypeRepository.deleteById(PK);
-        }
-    }
-
-    // 新增服務類型
-    public ServiceTypeVO add(String name, String descrip, Integer mode, String URL) {
-
-        // 可以保留基本驗證，避免髒資料進資料庫
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("服務類型名稱不可為空");
-        }
-
-        if (mode == null || (mode != 0 && mode != 1)) {
-            throw new IllegalArgumentException("服務類型模式不合法");
-        }
-
-        ServiceTypeVO svcTVO = new ServiceTypeVO();
-
-        svcTVO.setTypeName(name.trim());
-        svcTVO.setDescrip(descrip);
-        svcTVO.setTypeMode(mode);
-        svcTVO.setImgURL(URL);
-
-        /*
-         * 原本：
-         * dao.insert(svcTVO)
-         *
-         * Spring Data JPA：
-         * save(svcTVO)
-         *
-         * 沒有 PK 時，save() 會做新增。
-         */
-        return serviceTypeRepository.save(svcTVO);
-    }
-
-    // 修改服務類型
-    public ServiceTypeVO update(Integer PK, String name, String descrip, Integer mode, String URL) {
-
-        /*
-         * Spring Data JPA 比較建議：
-         * 先查出原本資料
-         * 再修改欄位
-         * 最後 save()
-         *
-         * 不建議直接 new 一個 ServiceTypeVO 再 save，
-         * 因為可能會覆蓋掉沒有帶進來的欄位。
-         */
-        ServiceTypeVO svcTVO = serviceTypeRepository.findById(PK).orElse(null);
-
-        if (svcTVO == null) {
+        if (serviceTypeId == null) {
             return null;
         }
 
-        if (name == null || name.trim().isEmpty()) {
-            throw new IllegalArgumentException("服務類型名稱不可為空");
+        return serviceTypeRepository
+                .findById(serviceTypeId)
+                .orElse(null);
+    }
+
+    // =========================================================
+    // 查全部服務類型
+    // =========================================================
+
+    @Transactional(readOnly = true)
+    public List<ServiceTypeVO> getAll() {
+
+        return serviceTypeRepository.findAll();
+    }
+    
+    @Transactional(readOnly = true)
+    public List<ServiceTypeVO> search(String keyword) {
+
+        String normalizedKeyword =
+                normalizeNullableText(keyword);
+
+        if (normalizedKeyword == null) {
+            return serviceTypeRepository.findAll();
         }
 
-        if (mode == null || (mode != 0 && mode != 1)) {
-            throw new IllegalArgumentException("服務類型模式不合法");
-        }
+        return serviceTypeRepository
+                .findByTypeNameContainingIgnoreCaseOrDescripContainingIgnoreCase(
+                        normalizedKeyword,
+                        normalizedKeyword
+                );
+    }
 
-        svcTVO.setTypeName(name.trim());
-        svcTVO.setDescrip(descrip);
-        svcTVO.setTypeMode(mode);
-        svcTVO.setImgURL(URL);
+    // =========================================================
+    // 新增服務類型
+    //
+    // TYPE_MODE、DEFAULT_IMAGE_URL 暫時不使用
+    // =========================================================
+
+    public ServiceTypeVO add(
+            String name,
+            String description) {
+
+        validateServiceType(
+                name,
+                description
+        );
+
+        ServiceTypeVO serviceTypeVO =
+                new ServiceTypeVO();
+
+        serviceTypeVO.setTypeName(
+                name.trim()
+        );
+
+        serviceTypeVO.setDescrip(
+                normalizeNullableText(description)
+        );
 
         /*
-         * 有 PK 且資料已存在時，save() 會做更新。
+         * 目前沒有使用這兩個欄位，
+         * 新增時暫時存 null。
          */
-        return serviceTypeRepository.save(svcTVO);
+        serviceTypeVO.setTypeMode(null);
+        serviceTypeVO.setImgURL(null);
+
+        return serviceTypeRepository.save(
+                serviceTypeVO
+        );
+    }
+
+    // =========================================================
+    // 修改服務類型
+    //
+    // 只修改名稱、描述
+    // 不處理 TYPE_MODE、DEFAULT_IMAGE_URL
+    // =========================================================
+
+    public ServiceTypeVO update(
+            Integer serviceTypeId,
+            String name,
+            String description) {
+
+        if (serviceTypeId == null) {
+            throw new IllegalArgumentException(
+                    "服務類型編號不可為空"
+            );
+        }
+
+        validateServiceType(
+                name,
+                description
+        );
+
+        ServiceTypeVO serviceTypeVO =
+                serviceTypeRepository
+                        .findById(serviceTypeId)
+                        .orElseThrow(
+                                () -> new IllegalArgumentException(
+                                        "查無此服務類型"
+                                )
+                        );
+
+        serviceTypeVO.setTypeName(
+                name.trim()
+        );
+
+        serviceTypeVO.setDescrip(
+                normalizeNullableText(description)
+        );
+
+        /*
+         * 修改時不設定 typeMode、imgURL，
+         * 避免覆蓋舊資料。
+         */
+
+        return serviceTypeRepository.save(
+                serviceTypeVO
+        );
+    }
+
+    // =========================================================
+    // 刪除服務類型
+    //
+    // 若 SERVICE 還有參照這個類型，
+    // 資料庫外鍵可能會阻止刪除。
+    // =========================================================
+
+    public void delete(
+            Integer serviceTypeId) {
+
+        if (serviceTypeId == null) {
+            throw new IllegalArgumentException(
+                    "服務類型編號不可為空"
+            );
+        }
+
+        if (!serviceTypeRepository
+                .existsById(serviceTypeId)) {
+
+            throw new IllegalArgumentException(
+                    "查無此服務類型"
+            );
+        }
+
+        serviceTypeRepository.deleteById(
+                serviceTypeId
+        );
+    }
+
+    // =========================================================
+    // 共用驗證
+    // =========================================================
+
+    private void validateServiceType(
+            String name,
+            String description) {
+
+        if (name == null
+                || name.trim().isEmpty()) {
+
+            throw new IllegalArgumentException(
+                    "服務類型名稱不可為空"
+            );
+        }
+
+        if (name.trim().length() > 50) {
+
+            throw new IllegalArgumentException(
+                    "服務類型名稱不可超過 50 個字"
+            );
+        }
+
+        String normalizedDescription =
+                normalizeNullableText(description);
+
+        if (normalizedDescription != null
+                && normalizedDescription.length() > 255) {
+
+            throw new IllegalArgumentException(
+                    "服務類型描述不可超過 255 個字"
+            );
+        }
+    }
+
+    // =========================================================
+    // 共用：空白字串轉成 null
+    // =========================================================
+
+    private String normalizeNullableText(String text) {
+
+        if (text == null) {
+            return null;
+        }
+
+        String normalized = text.trim();
+
+        return normalized.isEmpty()
+                ? null
+                : normalized;
     }
 }

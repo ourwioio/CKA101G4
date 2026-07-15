@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>後台服務管理</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: #2d3436;
+            background: #f5f6fa;
+            font-family: Arial, "Noto Sans TC", sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /*
+         * adminSidebar.html 裡已經有：
+         *
+         * .wb-admin-layout
+         * .wb-admin-content
+         *
+         * 這裡只處理右側服務首頁內容。
+         */
+
+        .service-home {
+            width: 100%;
+            max-width: 1150px;
+            margin: 0 auto;
+        }
+
+        .service-home-header {
+            margin-bottom: 28px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #dfe4e8;
+        }
+
+        .service-home-title {
+            margin: 0 0 10px;
+            font-size: 30px;
+        }
+
+        .service-home-description {
+            margin: 0;
+            color: #636e72;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .employee-info {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 7px 13px;
+            color: #555555;
+            background: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .service-menu {
+            display: grid;
+            grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .service-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 230px;
+            padding: 26px;
+            background: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 10px;
+            box-shadow:
+                    0 3px 12px
+                    rgba(0, 0, 0, 0.05);
+        }
+
+        .service-card-title {
+            margin: 0 0 12px;
+            font-size: 21px;
+        }
+
+        .service-card-description {
+            flex: 1;
+            margin: 0 0 24px;
+            color: #636e72;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .service-card-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            align-self: flex-start;
+            min-height: 40px;
+            padding: 9px 17px;
+            color: #ffffff;
+            background: #343a40;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            transition:
+                    background 0.15s ease,
+                    transform 0.15s ease;
+        }
+
+        .service-card-link:hover {
+            background: #111111;
+            transform: translateY(-1px);
+        }
+
+        .service-card-link--report {
+            background: #c0392b;
+        }
+
+        .service-card-link--report:hover {
+            background: #962d22;
+        }
+
+        @media (max-width: 850px) {
+
+            .service-menu {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 580px) {
+
+            .service-home-title {
+                font-size: 25px;
+            }
+
+            .service-card {
+                min-height: auto;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="wb-admin-layout">
+
+    <!-- =========================================
+         左側共用後台 Sidebar
+         ========================================= -->
+
+    <div th:replace="~{back-end/fragments/adminSidebar
+                       :: adminSidebar}">
+    </div>
+
+    <!-- =========================================
+         右側服務管理內容
+         ========================================= -->
+
+    <main class="wb-admin-content">
+
+        <div class="service-home">
+
+            <header class="service-home-header">
+
+                <h1 class="service-home-title">
+                    服務管理首頁
+                </h1>
+
+                <p class="service-home-description">
+                    請選擇需要管理的服務功能。
+                </p>
+
+                <div class="employee-info">
+
+                    目前登入員工：
+
+                    <span th:if="${loginEmployeeId != null}"
+                          th:text="${loginEmployeeId}">
+                        1001
+                    </span>
+
+                    <span th:if="${loginEmployeeId == null
+                                  and session.employeeVO != null}"
+                          th:text="${session.employeeVO.employeeId}">
+                        1001
+                    </span>
+
+                    <span th:if="${loginEmployeeId == null
+                                  and session.employeeVO == null}">
+                        未取得
+                    </span>
+
+                </div>
+
+            </header>
+
+            <section class="service-menu">
+
+                <!-- =============================
+                     服務管理
+                     ============================= -->
+
+                <article class="service-card">
+
+                    <h2 class="service-card-title">
+                        服務管理
+                    </h2>
+
+                    <p class="service-card-description">
+                        查看平台上的所有服務與服務詳細資料，
+                        並處理違規服務的停用及恢復。
+                    </p>
+
+                    <a class="service-card-link"
+                       th:href="@{/admin/services}">
+                        進入服務管理
+                    </a>
+
+                </article>
+
+                <!-- =============================
+                     服務類型管理
+                     ============================= -->
+
+                <article class="service-card">
+
+                    <h2 class="service-card-title">
+                        服務類型管理
+                    </h2>
+
+                    <p class="service-card-description">
+                        查詢、新增及修改平台服務類型，
+                        提供會員刊登服務時選擇。
+                    </p>
+
+                    <a class="service-card-link"
+                       th:href="@{/admin/service/types}">
+                        進入服務類型管理
+                    </a>
+
+                </article>
+
+                <!-- =============================
+                     服務訂單與撥款
+                     ============================= -->
+
+                <article class="service-card">
+
+                    <h2 class="service-card-title">
+                        訂單與撥款管理
+                    </h2>
+
+                    <p class="service-card-description">
+                        查看服務訂單、退款處理狀態，
+                        並處理已完成訂單的後台撥款。
+                    </p>
+
+                    <a class="service-card-link"
+                       th:href="@{/admin/services/orders}">
+                        進入訂單與撥款管理
+                    </a>
+
+                </article>
+
+                <!-- =============================
+                     一對一服務檢舉
+                     ============================= -->
+
+                <article class="service-card">
+
+                    <h2 class="service-card-title">
+                        一對一服務檢舉
+                    </h2>
+
+                    <p class="service-card-description">
+                        查看會員提出的一對一服務檢舉，
+                        並進行檢舉內容審核及後續處理。
+                    </p>
+
+                    <a class="service-card-link
+                              service-card-link--report"
+                       th:href="@{/serviceReport/listAllServiceReport}">
+                        進入服務檢舉管理
+                    </a>
+
+                </article>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

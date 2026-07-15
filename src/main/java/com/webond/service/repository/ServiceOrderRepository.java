@@ -79,6 +79,10 @@ public interface ServiceOrderRepository
      * 例如：
      * ORDER_STATUS = 3 已完成
      * PAYOUT_STATUS = 0 未撥款
+     *
+     * 或：
+     * ORDER_STATUS = 3 已完成
+     * PAYOUT_STATUS = 1 已撥款
      */
     List<ServiceOrderVO> findByOrderStatusAndPayoutStatus(
             Byte orderStatus,
@@ -92,7 +96,13 @@ public interface ServiceOrderRepository
     /*
      * 例如：
      * ORDER_STATUS = 4 已取消
+     * REFUND_STATUS = 0 不需要退款
+     *
+     * ORDER_STATUS = 4 已取消
      * REFUND_STATUS = 1 待退款
+     *
+     * ORDER_STATUS = 4 已取消
+     * REFUND_STATUS = 2 已退款
      */
     List<ServiceOrderVO> findByOrderStatusAndRefundStatus(
             Byte orderStatus,
@@ -100,16 +110,17 @@ public interface ServiceOrderRepository
     );
 
     // =========================================================
-    // 賣家接受其中一筆後，查詢其他相同時段申請
+    // 買家付款成功後，查詢其他相同時段申請
     // =========================================================
 
     /*
      * 查詢：
      * 1. 相同 SERVICE_SLOT_ID
      * 2. 訂單狀態仍是待賣家確認
-     * 3. 排除賣家剛接受的那一筆訂單
+     * 3. 排除已經付款成功的那一筆訂單
      *
-     * 查出的其他訂單會由系統取消。
+     * 查出的其他訂單會在買家付款成功後，
+     * 由系統取消並發送通知。
      */
     List<ServiceOrderVO>
             findByServiceSlotIdAndOrderStatusAndServiceOrderIdNot(
@@ -193,15 +204,26 @@ public interface ServiceOrderRepository
              and o.refundStatus = 1
            """)
     Long countPendingRefundOrders();
-    
 
     // =========================================================
     // 評價查詢
     // =========================================================
 
-    
-    List<ServiceOrderVO> findBySellerMemberIdAndBuyerReviewCommentIsNotNull(Integer sellerMemberId);
+    List<ServiceOrderVO>
+            findBySellerMemberIdAndBuyerReviewCommentIsNotNull(
+                    Integer sellerMemberId
+            );
 
-    List<ServiceOrderVO> findByBuyerMemberIdAndSellerReviewCommentIsNotNull(Integer buyerMemberId);
+    List<ServiceOrderVO>
+            findByBuyerMemberIdAndSellerReviewCommentIsNotNull(
+                    Integer buyerMemberId
+            );
     
+ // 已完成訂單筆數
+    @Query("""
+           select count(o)
+           from ServiceOrderVO o
+           where o.orderStatus = 3
+           """)
+    Long countCompletedOrders();
 }
