@@ -36,9 +36,9 @@
         }
 
         .page {
-            width: min(1380px, calc(100% - 32px));
+            width: 100%;
+            max-width: 1380px;
             margin: 0 auto;
-            padding: 28px 0 60px;
         }
 
         /* =========================
@@ -198,15 +198,6 @@
 
         .btn:hover {
             transform: translateY(-1px);
-        }
-
-        .btn--home {
-            color: #ffffff;
-            background: #2d3436;
-        }
-
-        .btn--home:hover {
-            background: #171b1d;
         }
 
         .btn--types {
@@ -447,11 +438,6 @@
 
         @media (max-width: 620px) {
 
-            .page {
-                width: calc(100% - 20px);
-                padding-top: 16px;
-            }
-
             .header-links {
                 flex-direction: column;
             }
@@ -479,395 +465,426 @@
 
 <body>
 
-<div class="page">
+<div class="wb-admin-layout">
 
     <!-- =========================
-         頁面標題
+         左側共用 Sidebar
          ========================= -->
 
-    <header class="page-header">
-
-        <div>
-
-            <h1 class="page-title">
-                後台服務管理
-            </h1>
-
-            <p class="page-subtitle">
-                查看平台服務、服務詳情及停用違規服務
-            </p>
-
-            <div class="header-links">
-
-                <!-- 返回員工首頁 -->
-                <a class="btn btn--home"
-                   th:href="@{/admin/adminPage}">
-                    ← 返回員工首頁
-                </a>
-
-                <!-- 前往服務類型管理 -->
-                <a class="btn btn--types"
-                   th:href="@{/admin/service/types}">
-                    前往服務類型管理
-                </a>
-
-                <!-- 前往服務訂單管理 -->
-                <a class="btn btn--orders"
-                   th:href="@{/admin/services/orders}">
-                    前往服務訂單管理
-                </a>
-
-            </div>
-
-        </div>
-
-        <!-- =========================
-             員工 Session
-             ========================= -->
-
-        <div class="employee-panel">
-
-            <div class="employee-label">
-                目前登入員工
-            </div>
-
-            <div class="employee-id">
-                員工 #
-
-                <span th:text="${loginEmployeeId != null
-                        ? loginEmployeeId
-                        : '未登入'}">
-                    1001
-                </span>
-            </div>
-
-            <div class="employee-actions">
-
-                <form class="employee-switch-form"
-                      th:action="@{/admin/services/fake-login}"
-                      method="get">
-
-                    <input type="number"
-                           name="employeeId"
-                           min="1"
-                           placeholder="員工 ID"
-                           required>
-
-                    <button class="btn btn--secondary"
-                            type="submit">
-                        切換員工
-                    </button>
-
-                </form>
-
-                <a class="btn btn--secondary"
-                   th:href="@{/admin/services/fake-logout}">
-                    重設 Session
-                </a>
-
-            </div>
-
-        </div>
-
-    </header>
-
-    <!-- =========================
-         成功與錯誤訊息
-         ========================= -->
-
-    <div class="message message--success"
-         th:if="${successMsg != null}"
-         th:text="${successMsg}">
-        操作成功
-    </div>
-
-    <div class="message message--error"
-         th:if="${errorMsg != null}"
-         th:text="${errorMsg}">
-        操作失敗
+    <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}">
     </div>
 
     <!-- =========================
-         全部服務
+         右側服務管理內容
          ========================= -->
 
-    <section class="panel">
+    <main class="wb-admin-content">
 
-        <div class="panel-header">
+        <div class="page">
 
-            <h2 class="panel-title">
-                全部服務
-            </h2>
+            <!-- =========================
+                 頁面標題
+                 ========================= -->
 
-            <span class="panel-description">
-                共
+            <header class="page-header">
 
-                <strong th:text="${serviceList != null
-                        ? #lists.size(serviceList)
-                        : 0}">
-                    0
-                </strong>
+                <div>
 
-                筆
-            </span>
+                    <h1 class="page-title">
+                        後台服務管理
+                    </h1>
 
-        </div>
+                    <p class="page-subtitle">
+                        查看平台服務、服務詳情及停用違規服務
+                    </p>
 
-        <!-- 有服務資料 -->
-        <div class="table-scroll"
-             th:if="${serviceList != null
-                      and !#lists.isEmpty(serviceList)}">
+                    <div class="header-links">
 
-            <table class="service-table">
-
-                <thead>
-
-                <tr>
-                    <th class="col-id">
-                        編號
-                    </th>
-
-                    <th class="col-service">
-                        服務資訊
-                    </th>
-
-                    <th class="col-type">
-                        服務類型
-                    </th>
-
-                    <th class="col-member">
-                        賣家
-                    </th>
-
-                    <th class="col-price">
-                        每小時費率
-                    </th>
-
-                    <th class="col-status">
-                        狀態
-                    </th>
-
-                    <th class="col-created">
-                        建立時間
-                    </th>
-
-                    <th class="col-action">
-                        操作
-                    </th>
-                </tr>
-
-                </thead>
-
-                <tbody>
-
-                <tr th:each="service : ${serviceList}">
-
-                    <!-- 服務編號 -->
-                    <td th:text="${service.serviceId}">
-                        1
-                    </td>
-
-                    <!-- 服務資訊 -->
-                    <td>
-
-                        <a class="service-name-link"
-                           th:href="@{/admin/services/{serviceId}(
-                                   serviceId=${service.serviceId}
-                           )}"
-                           th:text="${service.serviceName != null
-                                    and !#strings.isEmpty(service.serviceName)
-                                    ? service.serviceName
-                                    : '未命名服務'}">
-                            咖啡聊天
+                        <a class="btn btn--types"
+                           th:href="@{/admin/service/types}">
+                            前往服務類型管理
                         </a>
 
-                        <div class="service-description"
-                             th:text="${service.description != null
-                                      and !#strings.isEmpty(service.description)
-                                      ? service.description
-                                      : '尚未填寫服務說明'}">
-                            服務說明
-                        </div>
+                        <a class="btn btn--orders"
+                           th:href="@{/admin/services/orders}">
+                            前往服務訂單管理
+                        </a>
 
-                    </td>
+                    </div>
 
-                    <!-- 服務類型 -->
-                    <td>
+                </div>
 
-                        <span th:if="${service.serviceType != null}"
-                              th:text="${service.serviceType.typeName}">
-                            陪伴聊天
+                <!-- =========================
+                     員工 Session
+                     ========================= -->
+
+                <div class="employee-panel">
+
+                    <div class="employee-label">
+                        目前登入員工
+                    </div>
+
+                    <div class="employee-id">
+
+                        員工 #
+
+                        <span th:if="${loginEmployeeId != null}"
+                              th:text="${loginEmployeeId}">
+                            1001
                         </span>
 
-                        <span th:if="${service.serviceType == null}">
-                            未分類
+                        <span th:if="${loginEmployeeId == null
+                                      and session.employeeVO != null}"
+                              th:text="${session.employeeVO.employeeId}">
+                            1001
                         </span>
 
-                    </td>
+                        <span th:if="${loginEmployeeId == null
+                                      and session.employeeVO == null}">
+                            未登入
+                        </span>
 
-                    <!-- 賣家會員 -->
-                    <td>
-                        會員 #
+                    </div>
 
-                        <strong th:text="${service.memberId != null
-                                ? service.memberId
-                                : '未設定'}">
-                            1
+                    <div class="employee-actions">
+
+                        <form class="employee-switch-form"
+                              th:action="@{/admin/services/fake-login}"
+                              method="get">
+
+                            <input type="number"
+                                   name="employeeId"
+                                   min="1"
+                                   placeholder="員工 ID"
+                                   required>
+
+                            <button class="btn btn--secondary"
+                                    type="submit">
+                                切換員工
+                            </button>
+
+                        </form>
+
+                        <a class="btn btn--secondary"
+                           th:href="@{/admin/services/fake-logout}">
+                            重設 Session
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- =========================
+                 成功與錯誤訊息
+                 ========================= -->
+
+            <div class="message message--success"
+                 th:if="${successMsg != null}"
+                 th:text="${successMsg}">
+                操作成功
+            </div>
+
+            <div class="message message--error"
+                 th:if="${errorMsg != null}"
+                 th:text="${errorMsg}">
+                操作失敗
+            </div>
+
+            <!-- =========================
+                 全部服務
+                 ========================= -->
+
+            <section class="panel">
+
+                <div class="panel-header">
+
+                    <h2 class="panel-title">
+                        全部服務
+                    </h2>
+
+                    <span class="panel-description">
+
+                        共
+
+                        <strong th:text="${serviceList != null
+                                ? #lists.size(serviceList)
+                                : 0}">
+                            0
                         </strong>
-                    </td>
 
-                    <!-- 每小時費率 -->
-                    <td class="price">
-                        NT$
+                        筆
 
-                        <span th:text="${#numbers.formatInteger(
-                                service.hourlyRate != null
-                                    ? service.hourlyRate
-                                    : 0,
-                                1,
-                                'COMMA'
-                        )}">
-                            500
-                        </span>
+                    </span>
 
-                        / 時
-                    </td>
+                </div>
 
-                    <!-- 服務狀態 -->
-                    <td>
+                <!-- 有服務資料 -->
+                <div class="table-scroll"
+                     th:if="${serviceList != null
+                              and !#lists.isEmpty(serviceList)}">
 
-                        <span class="badge badge--inactive"
-                              th:if="${service.status == 0}">
-                            會員下架
-                        </span>
+                    <table class="service-table">
 
-                        <span class="badge badge--active"
-                              th:if="${service.status == 1}">
-                            上架中
-                        </span>
+                        <thead>
 
-                        <span class="badge badge--archived"
-                              th:if="${service.status == 2}">
-                            已封存
-                        </span>
+                        <tr>
 
-                        <span class="badge badge--disabled"
-                              th:if="${service.status == 3}">
-                            平台停用
-                        </span>
+                            <th class="col-id">
+                                編號
+                            </th>
 
-                        <span class="badge badge--archived"
-                              th:if="${service.status == null}">
-                            未設定
-                        </span>
+                            <th class="col-service">
+                                服務資訊
+                            </th>
 
-                    </td>
+                            <th class="col-type">
+                                服務類型
+                            </th>
 
-                    <!-- 建立時間 -->
-                    <td>
+                            <th class="col-member">
+                                賣家
+                            </th>
 
-                        <span th:if="${service.createdAt != null}"
-                              th:text="${#temporals.format(
-                                      service.createdAt,
-                                      'yyyy-MM-dd HH:mm'
-                              )}">
-                            2026-07-15 14:30
-                        </span>
+                            <th class="col-price">
+                                每小時費率
+                            </th>
 
-                        <span th:if="${service.createdAt == null}">
-                            未紀錄
-                        </span>
+                            <th class="col-status">
+                                狀態
+                            </th>
 
-                    </td>
+                            <th class="col-created">
+                                建立時間
+                            </th>
 
-                    <!-- 後台操作 -->
-                    <td>
+                            <th class="col-action">
+                                操作
+                            </th>
 
-                        <div class="action-group">
+                        </tr>
 
-                            <!-- 查看服務詳情 -->
-                            <a class="btn btn--detail"
-                               th:href="@{/admin/services/{serviceId}(
-                                       serviceId=${service.serviceId}
-                               )}">
-                                查看詳情
-                            </a>
+                        </thead>
 
-                            <!-- 平台停用 -->
-                            <form class="action-form"
-                                  th:if="${service.status == 0
-                                           or service.status == 1}"
-                                  th:action="@{/admin/services/{serviceId}/disable(
-                                          serviceId=${service.serviceId}
-                                  )}"
-                                  method="post"
-                                  onsubmit="return confirm('確定要由平台停用這筆服務嗎？');">
+                        <tbody>
 
-                                <input type="hidden"
-                                       th:if="${_csrf != null}"
-                                       th:name="${_csrf.parameterName}"
-                                       th:value="${_csrf.token}">
+                        <tr th:each="service : ${serviceList}">
 
-                                <button class="btn btn--danger"
-                                        type="submit">
+                            <!-- 服務編號 -->
+                            <td th:text="${service.serviceId}">
+                                1
+                            </td>
+
+                            <!-- 服務資訊 -->
+                            <td>
+
+                                <a class="service-name-link"
+                                   th:href="@{/admin/services/{serviceId}(
+                                           serviceId=${service.serviceId}
+                                   )}"
+                                   th:text="${service.serviceName != null
+                                            and !#strings.isEmpty(service.serviceName)
+                                            ? service.serviceName
+                                            : '未命名服務'}">
+                                    咖啡聊天
+                                </a>
+
+                                <div class="service-description"
+                                     th:text="${service.description != null
+                                              and !#strings.isEmpty(service.description)
+                                              ? service.description
+                                              : '尚未填寫服務說明'}">
+                                    服務說明
+                                </div>
+
+                            </td>
+
+                            <!-- 服務類型 -->
+                            <td>
+
+                                <span th:if="${service.serviceType != null}"
+                                      th:text="${service.serviceType.typeName}">
+                                    陪伴聊天
+                                </span>
+
+                                <span th:if="${service.serviceType == null}">
+                                    未分類
+                                </span>
+
+                            </td>
+
+                            <!-- 賣家會員 -->
+                            <td>
+
+                                會員 #
+
+                                <strong th:text="${service.memberId != null
+                                        ? service.memberId
+                                        : '未設定'}">
+                                    1
+                                </strong>
+
+                            </td>
+
+                            <!-- 每小時費率 -->
+                            <td class="price">
+
+                                NT$
+
+                                <span th:text="${#numbers.formatInteger(
+                                        service.hourlyRate != null
+                                            ? service.hourlyRate
+                                            : 0,
+                                        1,
+                                        'COMMA'
+                                )}">
+                                    500
+                                </span>
+
+                                / 時
+
+                            </td>
+
+                            <!-- 服務狀態 -->
+                            <td>
+
+                                <span class="badge badge--inactive"
+                                      th:if="${service.status == 0}">
+                                    會員下架
+                                </span>
+
+                                <span class="badge badge--active"
+                                      th:if="${service.status == 1}">
+                                    上架中
+                                </span>
+
+                                <span class="badge badge--archived"
+                                      th:if="${service.status == 2}">
+                                    已封存
+                                </span>
+
+                                <span class="badge badge--disabled"
+                                      th:if="${service.status == 3}">
                                     平台停用
-                                </button>
+                                </span>
 
-                            </form>
+                                <span class="badge badge--archived"
+                                      th:if="${service.status == null}">
+                                    未設定
+                                </span>
 
-                            <!-- 恢復上架 -->
-                            <form class="action-form"
-                                  th:if="${service.status == 3}"
-                                  th:action="@{/admin/services/{serviceId}/restore(
-                                          serviceId=${service.serviceId}
-                                  )}"
-                                  method="post"
-                                  onsubmit="return confirm('確定要恢復這筆服務上架嗎？');">
+                            </td>
 
-                                <input type="hidden"
-                                       th:if="${_csrf != null}"
-                                       th:name="${_csrf.parameterName}"
-                                       th:value="${_csrf.token}">
+                            <!-- 建立時間 -->
+                            <td>
 
-                                <button class="btn btn--success"
-                                        type="submit">
-                                    恢復上架
-                                </button>
+                                <span th:if="${service.createdAt != null}"
+                                      th:text="${#temporals.format(
+                                              service.createdAt,
+                                              'yyyy-MM-dd HH:mm'
+                                      )}">
+                                    2026-07-15 14:30
+                                </span>
 
-                            </form>
+                                <span th:if="${service.createdAt == null}">
+                                    未紀錄
+                                </span>
 
-                            <!-- 已封存 -->
-                            <span class="no-action"
-                                  th:if="${service.status == 2}">
-                                已封存，不可操作
-                            </span>
+                            </td>
 
-                            <!-- 未設定狀態 -->
-                            <span class="no-action"
-                                  th:if="${service.status == null}">
-                                狀態未設定
-                            </span>
+                            <!-- 後台操作 -->
+                            <td>
 
-                        </div>
+                                <div class="action-group">
 
-                    </td>
+                                    <!-- 查看服務詳情 -->
+                                    <a class="btn btn--detail"
+                                       th:href="@{/admin/services/{serviceId}(
+                                               serviceId=${service.serviceId}
+                                       )}">
+                                        查看詳情
+                                    </a>
 
-                </tr>
+                                    <!-- 平台停用 -->
+                                    <form class="action-form"
+                                          th:if="${service.status == 0
+                                                   or service.status == 1}"
+                                          th:action="@{/admin/services/{serviceId}/disable(
+                                                  serviceId=${service.serviceId}
+                                          )}"
+                                          method="post"
+                                          onsubmit="return confirm('確定要由平台停用這筆服務嗎？');">
 
-                </tbody>
+                                        <input type="hidden"
+                                               th:if="${_csrf != null}"
+                                               th:name="${_csrf.parameterName}"
+                                               th:value="${_csrf.token}">
 
-            </table>
+                                        <button class="btn btn--danger"
+                                                type="submit">
+                                            平台停用
+                                        </button>
+
+                                    </form>
+
+                                    <!-- 恢復上架 -->
+                                    <form class="action-form"
+                                          th:if="${service.status == 3}"
+                                          th:action="@{/admin/services/{serviceId}/restore(
+                                                  serviceId=${service.serviceId}
+                                          )}"
+                                          method="post"
+                                          onsubmit="return confirm('確定要恢復這筆服務上架嗎？');">
+
+                                        <input type="hidden"
+                                               th:if="${_csrf != null}"
+                                               th:name="${_csrf.parameterName}"
+                                               th:value="${_csrf.token}">
+
+                                        <button class="btn btn--success"
+                                                type="submit">
+                                            恢復上架
+                                        </button>
+
+                                    </form>
+
+                                    <!-- 已封存 -->
+                                    <span class="no-action"
+                                          th:if="${service.status == 2}">
+                                        已封存，不可操作
+                                    </span>
+
+                                    <!-- 未設定狀態 -->
+                                    <span class="no-action"
+                                          th:if="${service.status == null}">
+                                        狀態未設定
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <!-- 無服務資料 -->
+                <div class="empty-state"
+                     th:if="${serviceList == null
+                              or #lists.isEmpty(serviceList)}">
+                    目前沒有任何服務
+                </div>
+
+            </section>
 
         </div>
 
-        <!-- 無服務資料 -->
-        <div class="empty-state"
-             th:if="${serviceList == null
-                      or #lists.isEmpty(serviceList)}">
-            目前沒有任何服務
-        </div>
-
-    </section>
+    </main>
 
 </div>
 

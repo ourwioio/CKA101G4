@@ -37,9 +37,10 @@
         }
 
         .page {
-            width: min(1200px, calc(100% - 32px));
+            width: 100%;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 28px 0 60px;
+            padding-bottom: 60px;
         }
 
         /* =========================
@@ -142,15 +143,6 @@
 
         .btn:hover {
             transform: translateY(-1px);
-        }
-
-        .btn--home {
-            color: #ffffff;
-            background: #2d3436;
-        }
-
-        .btn--home:hover {
-            background: #171b1d;
         }
 
         .btn--service {
@@ -436,11 +428,6 @@
 
         @media (max-width: 620px) {
 
-            .page {
-                width: calc(100% - 20px);
-                padding-top: 16px;
-            }
-
             .header-links {
                 flex-direction: column;
             }
@@ -488,434 +475,453 @@
 
 <body>
 
-<div class="page">
+<div class="wb-admin-layout">
 
     <!-- =========================
-         頁面標題
+         左側共用 Sidebar
          ========================= -->
 
-    <header class="page-header">
-
-        <div>
-
-            <h1 class="page-title">
-                後台服務類型管理
-            </h1>
-
-            <p class="page-subtitle">
-                查詢、新增及修改會員上架服務時可選擇的服務類型
-            </p>
-
-            <div class="header-links">
-
-                <!-- 返回員工首頁 -->
-                <a class="btn btn--home"
-                   th:href="@{/admin/adminPage}">
-                    ← 返回員工首頁
-                </a>
-
-                <!-- 前往服務管理 -->
-                <a class="btn btn--service"
-                   th:href="@{/admin/services}">
-                    前往服務管理
-                </a>
-
-                <!-- 前往服務訂單管理 -->
-                <a class="btn btn--orders"
-                   th:href="@{/admin/services/orders}">
-                    前往服務訂單管理
-                </a>
-
-            </div>
-
-        </div>
-
-        <!-- =========================
-             員工 Session
-             ========================= -->
-
-        <div class="employee-panel">
-
-            <div class="employee-label">
-                目前登入員工
-            </div>
-
-            <div class="employee-id">
-                員工 #
-
-                <span th:text="${loginEmployeeId != null
-                        ? loginEmployeeId
-                        : '未登入'}">
-                    1001
-                </span>
-            </div>
-
-            <div class="employee-actions">
-
-                <form class="employee-switch-form"
-                      th:action="@{/admin/service/types/fake-login}"
-                      method="get">
-
-                    <input type="number"
-                           name="employeeId"
-                           min="1"
-                           placeholder="員工 ID"
-                           required>
-
-                    <button class="btn btn--secondary"
-                            type="submit">
-                        切換員工
-                    </button>
-
-                </form>
-
-                <a class="btn btn--secondary"
-                   th:href="@{/admin/service/types/fake-logout}">
-                    重設 Session
-                </a>
-
-            </div>
-
-        </div>
-
-    </header>
-
-    <!-- =========================
-         成功失敗訊息
-         ========================= -->
-
-    <div class="message message--success"
-         th:if="${successMsg != null}"
-         th:text="${successMsg}">
-        操作成功
-    </div>
-
-    <div class="message message--error"
-         th:if="${errorMsg != null}"
-         th:text="${errorMsg}">
-        操作失敗
+    <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}">
     </div>
 
     <!-- =========================
-         查詢服務類型
+         右側服務類型管理
          ========================= -->
 
-    <section class="panel">
+    <main class="wb-admin-content">
 
-        <div class="panel-header">
+        <div class="page">
 
-            <h2 class="panel-title">
-                查詢服務類型
-            </h2>
+            <!-- =========================
+                 頁面標題
+                 ========================= -->
 
-            <span class="panel-description">
-                可依照類型名稱或類型說明搜尋
-            </span>
+            <header class="page-header">
 
-        </div>
+                <div>
 
-        <div class="panel-body">
+                    <h1 class="page-title">
+                        後台服務類型管理
+                    </h1>
 
-            <form class="search-form"
-                  th:action="@{/admin/service/types}"
-                  method="get">
+                    <p class="page-subtitle">
+                        查詢、新增及修改會員上架服務時可選擇的服務類型
+                    </p>
 
-                <input class="form-control"
-                       type="text"
-                       name="keyword"
-                       th:value="${keyword != null ? keyword : ''}"
-                       maxlength="50"
-                       placeholder="輸入類型名稱或類型說明"
-                       autocomplete="off">
+                    <div class="header-links">
 
-                <button class="btn btn--primary"
-                        type="submit">
-                    查詢
-                </button>
+                        <a class="btn btn--service"
+                           th:href="@{/admin/services}">
+                            前往服務管理
+                        </a>
 
-                <a class="btn btn--secondary"
-                   th:if="${keyword != null
-                            and !#strings.isEmpty(keyword)}"
-                   th:href="@{/admin/service/types}">
-                    清除查詢
-                </a>
+                        <a class="btn btn--orders"
+                           th:href="@{/admin/services/orders}">
+                            前往服務訂單管理
+                        </a>
 
-            </form>
+                    </div>
 
-            <div class="search-result"
-                 th:if="${keyword != null
-                          and !#strings.isEmpty(keyword)}">
+                </div>
 
-                關鍵字：
+                <!-- =========================
+                     員工 Session
+                     ========================= -->
 
-                <strong th:text="${keyword}">
-                    陪伴
-                </strong>
+                <div class="employee-panel">
 
-                ，共找到
+                    <div class="employee-label">
+                        目前登入員工
+                    </div>
 
-                <strong th:text="${serviceTypeList != null
-                        ? #lists.size(serviceTypeList)
-                        : 0}">
-                    0
-                </strong>
+                    <div class="employee-id">
 
-                筆結果
+                        員工 #
 
+                        <span th:if="${loginEmployeeId != null}"
+                              th:text="${loginEmployeeId}">
+                            1001
+                        </span>
+
+                        <span th:if="${loginEmployeeId == null
+                                      and session.employeeVO != null}"
+                              th:text="${session.employeeVO.employeeId}">
+                            1001
+                        </span>
+
+                        <span th:if="${loginEmployeeId == null
+                                      and session.employeeVO == null}">
+                            未登入
+                        </span>
+
+                    </div>
+
+                    <div class="employee-actions">
+
+                        <form class="employee-switch-form"
+                              th:action="@{/admin/service/types/fake-login}"
+                              method="get">
+
+                            <input type="number"
+                                   name="employeeId"
+                                   min="1"
+                                   placeholder="員工 ID"
+                                   required>
+
+                            <button class="btn btn--secondary"
+                                    type="submit">
+                                切換員工
+                            </button>
+
+                        </form>
+
+                        <a class="btn btn--secondary"
+                           th:href="@{/admin/service/types/fake-logout}">
+                            重設 Session
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- =========================
+                 成功失敗訊息
+                 ========================= -->
+
+            <div class="message message--success"
+                 th:if="${successMsg != null}"
+                 th:text="${successMsg}">
+                操作成功
             </div>
 
-        </div>
+            <div class="message message--error"
+                 th:if="${errorMsg != null}"
+                 th:text="${errorMsg}">
+                操作失敗
+            </div>
 
-    </section>
+            <!-- =========================
+                 查詢服務類型
+                 ========================= -->
 
-    <!-- =========================
-         新增服務類型
-         ========================= -->
+            <section class="panel">
 
-    <section class="panel">
+                <div class="panel-header">
 
-        <div class="panel-header">
+                    <h2 class="panel-title">
+                        查詢服務類型
+                    </h2>
 
-            <h2 class="panel-title">
-                新增服務類型
-            </h2>
-
-            <span class="panel-description">
-                新增後可供會員上架服務時選擇
-            </span>
-
-        </div>
-
-        <div class="panel-body">
-
-            <form class="add-form"
-                  th:action="@{/admin/service/types/add}"
-                  method="post">
-
-                <!-- CSRF -->
-                <input type="hidden"
-                       th:if="${_csrf != null}"
-                       th:name="${_csrf.parameterName}"
-                       th:value="${_csrf.token}">
-
-                <!-- 類型名稱 -->
-                <div class="form-group">
-
-                    <label for="newTypeName">
-                        類型名稱
-                    </label>
-
-                    <input id="newTypeName"
-                           class="form-control"
-                           type="text"
-                           name="typeName"
-                           maxlength="50"
-                           placeholder="例如：運動陪伴"
-                           autocomplete="off"
-                           required>
+                    <span class="panel-description">
+                        可依照類型名稱或類型說明搜尋
+                    </span>
 
                 </div>
 
-                <!-- 類型說明 -->
-                <div class="form-group">
+                <div class="panel-body">
 
-                    <label for="newDescription">
-                        類型說明
-                    </label>
+                    <form class="search-form"
+                          th:action="@{/admin/service/types}"
+                          method="get">
 
-                    <textarea id="newDescription"
-                              class="form-control"
-                              name="description"
-                              maxlength="255"
-                              placeholder="簡單說明這個服務類型"></textarea>
+                        <input class="form-control"
+                               type="text"
+                               name="keyword"
+                               th:value="${keyword != null ? keyword : ''}"
+                               maxlength="50"
+                               placeholder="輸入類型名稱或類型說明"
+                               autocomplete="off">
+
+                        <button class="btn btn--primary"
+                                type="submit">
+                            查詢
+                        </button>
+
+                        <a class="btn btn--secondary"
+                           th:if="${keyword != null
+                                    and !#strings.isEmpty(keyword)}"
+                           th:href="@{/admin/service/types}">
+                            清除查詢
+                        </a>
+
+                    </form>
+
+                    <div class="search-result"
+                         th:if="${keyword != null
+                                  and !#strings.isEmpty(keyword)}">
+
+                        關鍵字：
+
+                        <strong th:text="${keyword}">
+                            陪伴
+                        </strong>
+
+                        ，共找到
+
+                        <strong th:text="${serviceTypeList != null
+                                ? #lists.size(serviceTypeList)
+                                : 0}">
+                            0
+                        </strong>
+
+                        筆結果
+
+                    </div>
 
                 </div>
 
-                <button class="btn btn--primary"
-                        type="submit">
-                    新增類型
-                </button>
+            </section>
 
-            </form>
+            <!-- =========================
+                 新增服務類型
+                 ========================= -->
 
-        </div>
+            <section class="panel">
 
-    </section>
+                <div class="panel-header">
 
-    <!-- =========================
-         現有服務類型
-         ========================= -->
+                    <h2 class="panel-title">
+                        新增服務類型
+                    </h2>
 
-    <section class="panel">
+                    <span class="panel-description">
+                        新增後可供會員上架服務時選擇
+                    </span>
 
-        <div class="panel-header">
+                </div>
 
-            <h2 class="panel-title">
+                <div class="panel-body">
 
-                <span th:if="${keyword != null
-                              and !#strings.isEmpty(keyword)}">
-                    查詢結果
-                </span>
+                    <form class="add-form"
+                          th:action="@{/admin/service/types/add}"
+                          method="post">
 
-                <span th:if="${keyword == null
-                              or #strings.isEmpty(keyword)}">
-                    現有服務類型
-                </span>
-
-            </h2>
-
-            <span class="panel-description">
-
-                <span th:if="${keyword != null
-                              and !#strings.isEmpty(keyword)}">
-
-                    「<strong th:text="${keyword}">
-                        陪伴
-                    </strong>」共找到
-
-                </span>
-
-                <span th:if="${keyword == null
-                              or #strings.isEmpty(keyword)}">
-                    目前共有
-                </span>
-
-                <strong th:text="${serviceTypeList != null
-                        ? #lists.size(serviceTypeList)
-                        : 0}">
-                    0
-                </strong>
-
-                種，可直接修改名稱及說明
-
-            </span>
-
-        </div>
-
-        <!-- 有服務類型 -->
-        <div class="panel-body"
-             th:if="${serviceTypeList != null
-                      and !#lists.isEmpty(serviceTypeList)}">
-
-            <div class="type-grid">
-
-                <article class="type-card"
-                         th:each="type : ${serviceTypeList}">
-
-                    <form class="type-edit-form"
-                          th:action="@{/admin/service/types/{serviceTypeId}/update(
-                                  serviceTypeId=${type.svcTypeID}
-                          )}"
-                          method="post"
-                          onsubmit="return confirm('確定要儲存這個服務類型的修改嗎？');">
-
-                        <!-- CSRF -->
                         <input type="hidden"
                                th:if="${_csrf != null}"
                                th:name="${_csrf.parameterName}"
                                th:value="${_csrf.token}">
 
-                        <div class="type-card-header">
+                        <div class="form-group">
 
-                            <span class="type-card-title">
-                                修改服務類型
-                            </span>
-
-                            <span class="type-id">
-                                類型編號 #
-
-                                <span th:text="${type.svcTypeID}">
-                                    1
-                                </span>
-                            </span>
-
-                        </div>
-
-                        <!-- 類型名稱 -->
-                        <div class="type-edit-group">
-
-                            <label th:for="|typeName-${type.svcTypeID}|">
+                            <label for="newTypeName">
                                 類型名稱
                             </label>
 
-                            <input class="type-edit-input"
+                            <input id="newTypeName"
+                                   class="form-control"
                                    type="text"
                                    name="typeName"
-                                   th:id="|typeName-${type.svcTypeID}|"
-                                   th:value="${type.typeName}"
                                    maxlength="50"
+                                   placeholder="例如：運動陪伴"
+                                   autocomplete="off"
                                    required>
 
                         </div>
 
-                        <!-- 類型說明 -->
-                        <div class="type-edit-group">
+                        <div class="form-group">
 
-                            <label th:for="|description-${type.svcTypeID}|">
+                            <label for="newDescription">
                                 類型說明
                             </label>
 
-                            <textarea class="type-edit-input"
+                            <textarea id="newDescription"
+                                      class="form-control"
                                       name="description"
-                                      th:id="|description-${type.svcTypeID}|"
-                                      th:text="${type.descrip}"
                                       maxlength="255"
-                                      placeholder="尚未填寫類型說明"></textarea>
+                                      placeholder="簡單說明這個服務類型"></textarea>
 
                         </div>
 
-                        <div class="type-edit-actions">
-
-                            <button class="btn btn--update"
-                                    type="submit">
-                                儲存修改
-                            </button>
-
-                        </div>
+                        <button class="btn btn--primary"
+                                type="submit">
+                            新增類型
+                        </button>
 
                     </form>
 
-                </article>
+                </div>
 
-            </div>
+            </section>
 
-        </div>
+            <!-- =========================
+                 現有服務類型
+                 ========================= -->
 
-        <!-- 沒有服務類型 -->
-        <div class="empty-state"
-             th:if="${serviceTypeList == null
-                      or #lists.isEmpty(serviceTypeList)}">
+            <section class="panel">
 
-            <div th:if="${keyword != null
-                         and !#strings.isEmpty(keyword)}">
+                <div class="panel-header">
 
-                查無符合「
+                    <h2 class="panel-title">
 
-                <strong th:text="${keyword}">
-                    關鍵字
-                </strong>
+                        <span th:if="${keyword != null
+                                      and !#strings.isEmpty(keyword)}">
+                            查詢結果
+                        </span>
 
-                」的服務類型
+                        <span th:if="${keyword == null
+                                      or #strings.isEmpty(keyword)}">
+                            現有服務類型
+                        </span>
 
-                <div style="margin-top: 16px;">
+                    </h2>
 
-                    <a class="btn btn--secondary"
-                       th:href="@{/admin/service/types}">
-                        顯示全部服務類型
-                    </a>
+                    <span class="panel-description">
+
+                        <span th:if="${keyword != null
+                                      and !#strings.isEmpty(keyword)}">
+
+                            「<strong th:text="${keyword}">
+                                陪伴
+                            </strong>」共找到
+
+                        </span>
+
+                        <span th:if="${keyword == null
+                                      or #strings.isEmpty(keyword)}">
+                            目前共有
+                        </span>
+
+                        <strong th:text="${serviceTypeList != null
+                                ? #lists.size(serviceTypeList)
+                                : 0}">
+                            0
+                        </strong>
+
+                        種，可直接修改名稱及說明
+
+                    </span>
 
                 </div>
 
-            </div>
+                <!-- 有服務類型 -->
+                <div class="panel-body"
+                     th:if="${serviceTypeList != null
+                              and !#lists.isEmpty(serviceTypeList)}">
 
-            <div th:if="${keyword == null
-                         or #strings.isEmpty(keyword)}">
-                目前尚未建立服務類型
-            </div>
+                    <div class="type-grid">
+
+                        <article class="type-card"
+                                 th:each="type : ${serviceTypeList}">
+
+                            <form class="type-edit-form"
+                                  th:action="@{/admin/service/types/{serviceTypeId}/update(
+                                          serviceTypeId=${type.svcTypeID}
+                                  )}"
+                                  method="post"
+                                  onsubmit="return confirm('確定要儲存這個服務類型的修改嗎？');">
+
+                                <input type="hidden"
+                                       th:if="${_csrf != null}"
+                                       th:name="${_csrf.parameterName}"
+                                       th:value="${_csrf.token}">
+
+                                <div class="type-card-header">
+
+                                    <span class="type-card-title">
+                                        修改服務類型
+                                    </span>
+
+                                    <span class="type-id">
+
+                                        類型編號 #
+
+                                        <span th:text="${type.svcTypeID}">
+                                            1
+                                        </span>
+
+                                    </span>
+
+                                </div>
+
+                                <div class="type-edit-group">
+
+                                    <label th:for="|typeName-${type.svcTypeID}|">
+                                        類型名稱
+                                    </label>
+
+                                    <input class="type-edit-input"
+                                           type="text"
+                                           name="typeName"
+                                           th:id="|typeName-${type.svcTypeID}|"
+                                           th:value="${type.typeName}"
+                                           maxlength="50"
+                                           required>
+
+                                </div>
+
+                                <div class="type-edit-group">
+
+                                    <label th:for="|description-${type.svcTypeID}|">
+                                        類型說明
+                                    </label>
+
+                                    <textarea class="type-edit-input"
+                                              name="description"
+                                              th:id="|description-${type.svcTypeID}|"
+                                              th:text="${type.descrip}"
+                                              maxlength="255"
+                                              placeholder="尚未填寫類型說明"></textarea>
+
+                                </div>
+
+                                <div class="type-edit-actions">
+
+                                    <button class="btn btn--update"
+                                            type="submit">
+                                        儲存修改
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </article>
+
+                    </div>
+
+                </div>
+
+                <!-- 沒有服務類型 -->
+                <div class="empty-state"
+                     th:if="${serviceTypeList == null
+                              or #lists.isEmpty(serviceTypeList)}">
+
+                    <div th:if="${keyword != null
+                                 and !#strings.isEmpty(keyword)}">
+
+                        查無符合「
+
+                        <strong th:text="${keyword}">
+                            關鍵字
+                        </strong>
+
+                        」的服務類型
+
+                        <div style="margin-top: 16px;">
+
+                            <a class="btn btn--secondary"
+                               th:href="@{/admin/service/types}">
+                                顯示全部服務類型
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    <div th:if="${keyword == null
+                                 or #strings.isEmpty(keyword)}">
+                        目前尚未建立服務類型
+                    </div>
+
+                </div>
+
+            </section>
 
         </div>
 
-    </section>
+    </main>
 
 </div>
 

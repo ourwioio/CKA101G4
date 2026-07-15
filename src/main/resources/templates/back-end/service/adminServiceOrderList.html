@@ -36,9 +36,10 @@
         }
 
         .page {
-            width: min(1420px, calc(100% - 32px));
+            width: 100%;
+            max-width: 1420px;
             margin: 0 auto;
-            padding: 28px 0 60px;
+            padding-bottom: 60px;
         }
 
         /* =========================
@@ -177,15 +178,6 @@
 
         .btn--service:hover {
             background: #e1ddff;
-        }
-
-        .btn--home {
-            color: #ffffff;
-            background: #2d3436;
-        }
-
-        .btn--home:hover {
-            background: #171b1d;
         }
 
         /* =========================
@@ -533,8 +525,6 @@
             background: #fee2e2;
         }
 
-        /* 付款方式 */
-
         .status--credit-card {
             color: #075985;
             background: #e0f2fe;
@@ -619,11 +609,6 @@
 
         @media (max-width: 600px) {
 
-            .page {
-                width: calc(100% - 20px);
-                padding-top: 16px;
-            }
-
             .filter-link {
                 flex: 1 1 150px;
             }
@@ -650,872 +635,880 @@
 
 <body>
 
-<div class="page">
+<div class="wb-admin-layout">
 
     <!-- =========================
-         標題及功能按鈕
+         左側共用 Sidebar
          ========================= -->
 
-    <header class="page-header">
-
-        <div>
-
-            <h1 class="page-title">
-                服務訂單管理
-            </h1>
-
-            <p class="page-subtitle">
-                管理已完成訂單撥款與已取消訂單退款
-            </p>
-
-            <div class="header-links">
-
-                <!-- 返回員工後台首頁 -->
-                <a class="btn btn--home"
-                   th:href="@{/admin/adminPage}">
-                    ← 返回員工首頁
-                </a>
-
-                <!-- 前往服務管理 -->
-                <a class="btn btn--service"
-                   th:href="@{/admin/services}">
-                    前往服務管理
-                </a>
-
-            </div>
-
-        </div>
-
-        <!-- =========================
-             員工 Session
-             ========================= -->
-
-        <div class="employee-panel">
-
-            <div class="employee-label">
-                目前處理員工
-            </div>
-
-            <div class="employee-id">
-                員工 #
-
-                <span th:text="${loginEmployeeId}">
-                    1001
-                </span>
-            </div>
-
-            <div class="employee-actions">
-
-                <form class="employee-switch-form"
-                      th:action="@{/admin/services/orders/fake-login}"
-                      method="get">
-
-                    <input type="number"
-                           name="employeeId"
-                           min="1"
-                           placeholder="員工 ID"
-                           required>
-
-                    <button class="btn btn--secondary"
-                            type="submit">
-                        切換員工
-                    </button>
-
-                </form>
-
-                <a class="btn btn--secondary"
-                   th:href="@{/admin/services/orders/fake-logout}">
-                    重設 Session
-                </a>
-
-            </div>
-
-        </div>
-
-    </header>
-
-    <!-- =========================
-         成功或錯誤訊息
-         ========================= -->
-
-    <div class="message message--success"
-         th:if="${successMsg != null}"
-         th:text="${successMsg}">
-        操作成功
-    </div>
-
-    <div class="message message--error"
-         th:if="${errorMsg != null}"
-         th:text="${errorMsg}">
-        操作失敗
+    <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}">
     </div>
 
     <!-- =========================
-         統計資訊
+         右側服務訂單內容
          ========================= -->
 
-    <section class="stats-grid">
+    <main class="wb-admin-content">
 
-        <!-- 已完成訂單 -->
-        <article class="stat-card">
+        <div class="page">
 
-            <div class="stat-card__label">
-                已完成訂單
-            </div>
+            <!-- =========================
+                 標題及功能按鈕
+                 ========================= -->
 
-            <div class="stat-card__value">
-                NT$
+            <header class="page-header">
 
-                <span th:text="${#numbers.formatInteger(
-                        completedTotalAmount != null
-                            ? completedTotalAmount
-                            : 0,
-                        1,
-                        'COMMA'
-                )}">
-                    0
-                </span>
-            </div>
+                <div>
 
-            <div class="stat-card__note">
-                共
+                    <h1 class="page-title">
+                        服務訂單管理
+                    </h1>
 
-                <strong th:text="${completedOrderCount != null
-                        ? completedOrderCount
-                        : 0}">
-                    0
-                </strong>
+                    <p class="page-subtitle">
+                        管理已完成訂單撥款與已取消訂單退款
+                    </p>
 
-                筆
-            </div>
+                    <div class="header-links">
 
-        </article>
-
-        <!-- 尚未撥款 -->
-        <article class="stat-card">
-
-            <div class="stat-card__label">
-                尚未撥款
-            </div>
-
-            <div class="stat-card__value">
-                NT$
-
-                <span th:text="${#numbers.formatInteger(
-                        completedUnpaidTotalAmount != null
-                            ? completedUnpaidTotalAmount
-                            : 0,
-                        1,
-                        'COMMA'
-                )}">
-                    0
-                </span>
-            </div>
-
-            <div class="stat-card__note">
-                共
-
-                <strong th:text="${completedUnpaidOrderCount != null
-                        ? completedUnpaidOrderCount
-                        : 0}">
-                    0
-                </strong>
-
-                筆
-            </div>
-
-        </article>
-
-        <!-- 等待退款 -->
-        <article class="stat-card">
-
-            <div class="stat-card__label">
-                等待退款
-            </div>
-
-            <div class="stat-card__value">
-                NT$
-
-                <span th:text="${#numbers.formatInteger(
-                        pendingRefundAmount != null
-                            ? pendingRefundAmount
-                            : 0,
-                        1,
-                        'COMMA'
-                )}">
-                    0
-                </span>
-            </div>
-
-            <div class="stat-card__note">
-                共
-
-                <strong th:text="${pendingRefundOrderCount != null
-                        ? pendingRefundOrderCount
-                        : 0}">
-                    0
-                </strong>
-
-                筆
-            </div>
-
-        </article>
-
-    </section>
-
-    <!-- =========================
-         訂單分類
-         ========================= -->
-
-    <section class="filter-panel">
-
-        <h2 class="filter-title">
-            訂單分類
-        </h2>
-
-        <div class="filter-group">
-
-            <a class="filter-link"
-               th:classappend="${selectedView == 'all'}
-                       ? 'active'
-                       : ''"
-               th:href="@{/admin/services/orders(view='all')}">
-                全部訂單
-            </a>
-
-            <a class="filter-link"
-               th:classappend="${selectedView == 'completed-unpaid'}
-                       ? 'active'
-                       : ''"
-               th:href="@{/admin/services/orders(
-                       view='completed-unpaid'
-               )}">
-                已完成／未撥款
-            </a>
-
-            <a class="filter-link"
-               th:classappend="${selectedView == 'completed-paid'}
-                       ? 'active'
-                       : ''"
-               th:href="@{/admin/services/orders(
-                       view='completed-paid'
-               )}">
-                已完成／已撥款
-            </a>
-
-            <a class="filter-link"
-               th:classappend="${selectedView == 'cancelled-no-refund'}
-                       ? 'active'
-                       : ''"
-               th:href="@{/admin/services/orders(
-                       view='cancelled-no-refund'
-               )}">
-                已取消／不需退款
-            </a>
-
-            <a class="filter-link"
-               th:classappend="${selectedView == 'cancelled-pending-refund'}
-                       ? 'active'
-                       : ''"
-               th:href="@{/admin/services/orders(
-                       view='cancelled-pending-refund'
-               )}">
-                已取消／待退款
-            </a>
-
-            <a class="filter-link"
-               th:classappend="${selectedView == 'cancelled-refunded'}
-                       ? 'active'
-                       : ''"
-               th:href="@{/admin/services/orders(
-                       view='cancelled-refunded'
-               )}">
-                已取消／已退款
-            </a>
-
-        </div>
-
-    </section>
-
-    <!-- =========================
-         訂單列表
-         ========================= -->
-
-    <section class="table-panel">
-
-        <div class="table-header">
-
-            <h2 class="table-title">
-                訂單列表
-            </h2>
-
-            <div class="table-count">
-                共
-
-                <span th:text="${orderList != null
-                        ? #lists.size(orderList)
-                        : 0}">
-                    0
-                </span>
-
-                筆
-            </div>
-
-        </div>
-
-        <div class="table-scroll"
-             th:if="${orderList != null
-                      and !#lists.isEmpty(orderList)}">
-
-            <table class="order-table">
-
-                <thead>
-
-                <tr>
-                    <th class="col-id">
-                        訂單編號
-                    </th>
-
-                    <th class="col-service">
-                        服務資訊
-                    </th>
-
-                    <th class="col-member">
-                        交易雙方
-                    </th>
-
-                    <th class="col-time">
-                        預約時段
-                    </th>
-
-                    <th class="col-amount">
-                        金額
-                    </th>
-
-                    <th class="col-payment">
-                        付款方式
-                    </th>
-
-                    <th class="col-status">
-                        訂單狀態
-                    </th>
-
-                    <th class="col-finance">
-                        款項狀態
-                    </th>
-
-                    <th class="col-handler">
-                        處理資訊
-                    </th>
-
-                    <th class="col-action">
-                        操作
-                    </th>
-                </tr>
-
-                </thead>
-
-                <tbody>
-
-                <tr th:each="order : ${orderList}">
-
-                    <!-- 訂單編號 -->
-                    <td th:text="${order.serviceOrderId}">
-                        1
-                    </td>
-
-                    <!-- =====================
-                         服務資訊
-                         ===================== -->
-
-                    <td>
-
-                        <!-- 有 serviceId，可以點擊服務名稱 -->
-                        <a class="service-link"
-                           th:if="${order.serviceId != null}"
-                           th:href="@{/admin/services/{serviceId}(
-                                   serviceId=${order.serviceId}
-                           )}"
-                           th:text="${order.serviceNameSnapshot != null
-                                    and !#strings.isEmpty(
-                                        order.serviceNameSnapshot
-                                    )
-                                    ? order.serviceNameSnapshot
-                                    : '未命名服務'}">
-                            咖啡聊天
+                        <a class="btn btn--service"
+                           th:href="@{/admin/services}">
+                            前往服務管理
                         </a>
 
-                        <!-- 沒有 serviceId，只顯示文字 -->
-                        <div class="primary-text"
-                             th:if="${order.serviceId == null}"
-                             th:text="${order.serviceNameSnapshot != null
-                                      and !#strings.isEmpty(
-                                          order.serviceNameSnapshot
-                                      )
-                                      ? order.serviceNameSnapshot
-                                      : '未命名服務'}">
-                            咖啡聊天
-                        </div>
+                    </div>
 
-                        <!-- 服務類型快照 -->
-                        <div class="secondary-text"
-                             th:text="${order.serviceTypeNameSnapshot != null
-                                      and !#strings.isEmpty(
-                                          order.serviceTypeNameSnapshot
-                                      )
-                                      ? order.serviceTypeNameSnapshot
-                                      : '未分類'}">
-                            陪伴聊天
-                        </div>
+                </div>
 
-                        <!-- 服務編號 -->
-                        <div class="secondary-text"
-                             th:if="${order.serviceId != null}">
-                            服務編號 #
+                <!-- =========================
+                     員工 Session
+                     ========================= -->
 
-                            <span th:text="${order.serviceId}">
+                <div class="employee-panel">
+
+                    <div class="employee-label">
+                        目前處理員工
+                    </div>
+
+                    <div class="employee-id">
+
+                        員工 #
+
+                        <span th:if="${loginEmployeeId != null}"
+                              th:text="${loginEmployeeId}">
+                            1001
+                        </span>
+
+                        <span th:if="${loginEmployeeId == null
+                                      and session.employeeVO != null}"
+                              th:text="${session.employeeVO.employeeId}">
+                            1001
+                        </span>
+
+                        <span th:if="${loginEmployeeId == null
+                                      and session.employeeVO == null}">
+                            未登入
+                        </span>
+
+                    </div>
+
+                    <div class="employee-actions">
+
+                        <form class="employee-switch-form"
+                              th:action="@{/admin/services/orders/fake-login}"
+                              method="get">
+
+                            <input type="number"
+                                   name="employeeId"
+                                   min="1"
+                                   placeholder="員工 ID"
+                                   required>
+
+                            <button class="btn btn--secondary"
+                                    type="submit">
+                                切換員工
+                            </button>
+
+                        </form>
+
+                        <a class="btn btn--secondary"
+                           th:href="@{/admin/services/orders/fake-logout}">
+                            重設 Session
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- =========================
+                 成功或錯誤訊息
+                 ========================= -->
+
+            <div class="message message--success"
+                 th:if="${successMsg != null}"
+                 th:text="${successMsg}">
+                操作成功
+            </div>
+
+            <div class="message message--error"
+                 th:if="${errorMsg != null}"
+                 th:text="${errorMsg}">
+                操作失敗
+            </div>
+
+            <!-- =========================
+                 統計資訊
+                 ========================= -->
+
+            <section class="stats-grid">
+
+                <!-- 已完成訂單 -->
+                <article class="stat-card">
+
+                    <div class="stat-card__label">
+                        已完成訂單
+                    </div>
+
+                    <div class="stat-card__value">
+
+                        NT$
+
+                        <span th:text="${#numbers.formatInteger(
+                                completedTotalAmount != null
+                                    ? completedTotalAmount
+                                    : 0,
+                                1,
+                                'COMMA'
+                        )}">
+                            0
+                        </span>
+
+                    </div>
+
+                    <div class="stat-card__note">
+
+                        共
+
+                        <strong th:text="${completedOrderCount != null
+                                ? completedOrderCount
+                                : 0}">
+                            0
+                        </strong>
+
+                        筆
+
+                    </div>
+
+                </article>
+
+                <!-- 尚未撥款 -->
+                <article class="stat-card">
+
+                    <div class="stat-card__label">
+                        尚未撥款
+                    </div>
+
+                    <div class="stat-card__value">
+
+                        NT$
+
+                        <span th:text="${#numbers.formatInteger(
+                                completedUnpaidTotalAmount != null
+                                    ? completedUnpaidTotalAmount
+                                    : 0,
+                                1,
+                                'COMMA'
+                        )}">
+                            0
+                        </span>
+
+                    </div>
+
+                    <div class="stat-card__note">
+
+                        共
+
+                        <strong th:text="${completedUnpaidOrderCount != null
+                                ? completedUnpaidOrderCount
+                                : 0}">
+                            0
+                        </strong>
+
+                        筆
+
+                    </div>
+
+                </article>
+
+                <!-- 等待退款 -->
+                <article class="stat-card">
+
+                    <div class="stat-card__label">
+                        等待退款
+                    </div>
+
+                    <div class="stat-card__value">
+
+                        NT$
+
+                        <span th:text="${#numbers.formatInteger(
+                                pendingRefundAmount != null
+                                    ? pendingRefundAmount
+                                    : 0,
+                                1,
+                                'COMMA'
+                        )}">
+                            0
+                        </span>
+
+                    </div>
+
+                    <div class="stat-card__note">
+
+                        共
+
+                        <strong th:text="${pendingRefundOrderCount != null
+                                ? pendingRefundOrderCount
+                                : 0}">
+                            0
+                        </strong>
+
+                        筆
+
+                    </div>
+
+                </article>
+
+            </section>
+
+            <!-- =========================
+                 訂單分類
+                 ========================= -->
+
+            <section class="filter-panel">
+
+                <h2 class="filter-title">
+                    訂單分類
+                </h2>
+
+                <div class="filter-group">
+
+                    <a class="filter-link"
+                       th:classappend="${selectedView == 'all'}
+                               ? 'active'
+                               : ''"
+                       th:href="@{/admin/services/orders(view='all')}">
+                        全部訂單
+                    </a>
+
+                    <a class="filter-link"
+                       th:classappend="${selectedView == 'completed-unpaid'}
+                               ? 'active'
+                               : ''"
+                       th:href="@{/admin/services/orders(
+                               view='completed-unpaid'
+                       )}">
+                        已完成／未撥款
+                    </a>
+
+                    <a class="filter-link"
+                       th:classappend="${selectedView == 'completed-paid'}
+                               ? 'active'
+                               : ''"
+                       th:href="@{/admin/services/orders(
+                               view='completed-paid'
+                       )}">
+                        已完成／已撥款
+                    </a>
+
+                    <a class="filter-link"
+                       th:classappend="${selectedView == 'cancelled-no-refund'}
+                               ? 'active'
+                               : ''"
+                       th:href="@{/admin/services/orders(
+                               view='cancelled-no-refund'
+                       )}">
+                        已取消／不需退款
+                    </a>
+
+                    <a class="filter-link"
+                       th:classappend="${selectedView == 'cancelled-pending-refund'}
+                               ? 'active'
+                               : ''"
+                       th:href="@{/admin/services/orders(
+                               view='cancelled-pending-refund'
+                       )}">
+                        已取消／待退款
+                    </a>
+
+                    <a class="filter-link"
+                       th:classappend="${selectedView == 'cancelled-refunded'}
+                               ? 'active'
+                               : ''"
+                       th:href="@{/admin/services/orders(
+                               view='cancelled-refunded'
+                       )}">
+                        已取消／已退款
+                    </a>
+
+                </div>
+
+            </section>
+
+            <!-- =========================
+                 訂單列表
+                 ========================= -->
+
+            <section class="table-panel">
+
+                <div class="table-header">
+
+                    <h2 class="table-title">
+                        訂單列表
+                    </h2>
+
+                    <div class="table-count">
+
+                        共
+
+                        <span th:text="${orderList != null
+                                ? #lists.size(orderList)
+                                : 0}">
+                            0
+                        </span>
+
+                        筆
+
+                    </div>
+
+                </div>
+
+                <div class="table-scroll"
+                     th:if="${orderList != null
+                              and !#lists.isEmpty(orderList)}">
+
+                    <table class="order-table">
+
+                        <thead>
+
+                        <tr>
+
+                            <th class="col-id">
+                                訂單編號
+                            </th>
+
+                            <th class="col-service">
+                                服務資訊
+                            </th>
+
+                            <th class="col-member">
+                                交易雙方
+                            </th>
+
+                            <th class="col-time">
+                                預約時段
+                            </th>
+
+                            <th class="col-amount">
+                                金額
+                            </th>
+
+                            <th class="col-payment">
+                                付款方式
+                            </th>
+
+                            <th class="col-status">
+                                訂單狀態
+                            </th>
+
+                            <th class="col-finance">
+                                款項狀態
+                            </th>
+
+                            <th class="col-handler">
+                                處理資訊
+                            </th>
+
+                            <th class="col-action">
+                                操作
+                            </th>
+
+                        </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                        <tr th:each="order : ${orderList}">
+
+                            <!-- 訂單編號 -->
+                            <td th:text="${order.serviceOrderId}">
                                 1
-                            </span>
-                        </div>
-
-                    </td>
-
-                    <!-- =====================
-                         交易雙方
-                         ===================== -->
-
-                    <td>
-
-                        <div class="member-line">
-                            買家：
-
-                            <strong th:text="${order.buyerMemberId != null
-                                    ? order.buyerMemberId
-                                    : '未設定'}">
-                                3
-                            </strong>
-                        </div>
-
-                        <div class="member-line">
-                            賣家：
-
-                            <strong th:text="${order.sellerMemberId != null
-                                    ? order.sellerMemberId
-                                    : '未設定'}">
-                                1
-                            </strong>
-                        </div>
-
-                    </td>
-
-                    <!-- =====================
-                         預約時段
-                         ===================== -->
-
-                    <td>
-
-                        <div th:if="${order.slotStartTimeSnapshot != null
-                                     and order.slotEndTimeSnapshot != null}">
-
-                            <div th:text="${#temporals.format(
-                                    order.slotStartTimeSnapshot,
-                                    'yyyy-MM-dd'
-                            )}">
-                                2026-07-20
-                            </div>
-
-                            <div class="secondary-text">
-
-                                <span th:text="${#temporals.format(
-                                        order.slotStartTimeSnapshot,
-                                        'HH:mm'
-                                )}">
-                                    10:00
-                                </span>
-
-                                ～
-
-                                <span th:text="${#temporals.format(
-                                        order.slotEndTimeSnapshot,
-                                        'HH:mm'
-                                )}">
-                                    11:00
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                        <span th:if="${order.slotStartTimeSnapshot == null
-                                      or order.slotEndTimeSnapshot == null}">
-                            未設定
-                        </span>
-
-                    </td>
-
-                    <!-- =====================
-                         訂單金額
-                         ===================== -->
-
-                    <td>
-
-                        <div class="amount-text">
-                            NT$
-
-                            <span th:text="${#numbers.formatInteger(
-                                    order.totalAmount != null
-                                        ? order.totalAmount
-                                        : 0,
-                                    1,
-                                    'COMMA'
-                            )}">
-                                400
-                            </span>
-                        </div>
-
-                        <div class="secondary-text"
-                             th:if="${order.refundAmount != null
-                                      and order.refundAmount > 0}">
-
-                            退款 NT$
-
-                            <span th:text="${#numbers.formatInteger(
-                                    order.refundAmount,
-                                    1,
-                                    'COMMA'
-                            )}">
-                                400
-                            </span>
-
-                        </div>
-
-                    </td>
-
-                    <!-- =====================
-                         付款方式
-
-                         0：信用卡
-                         1：ATM 轉帳
-                         ===================== -->
-
-                    <td>
-
-                        <span class="status status--credit-card"
-                              th:if="${order.servicePaymentMethod == 0}">
-                            信用卡
-                        </span>
-
-                        <span class="status status--atm"
-                              th:if="${order.servicePaymentMethod == 1}">
-                            ATM 轉帳
-                        </span>
-
-                        <span class="status status--not-selected"
-                              th:if="${order.servicePaymentMethod == null}">
-                            尚未付款
-                        </span>
-
-                        <span class="status status--unknown"
-                              th:if="${order.servicePaymentMethod != null
-                                       and order.servicePaymentMethod != 0
-                                       and order.servicePaymentMethod != 1}">
-                            未知方式
-                        </span>
-
-                    </td>
-
-                    <!-- =====================
-                         訂單狀態
-                         ===================== -->
-
-                    <td>
-
-                        <span class="status status--pending"
-                              th:if="${order.orderStatus == 0}">
-                            待賣家確認
-                        </span>
-
-                        <span class="status status--payment"
-                              th:if="${order.orderStatus == 1}">
-                            待買家付款
-                        </span>
-
-                        <span class="status status--confirmed"
-                              th:if="${order.orderStatus == 2}">
-                            已成立
-                        </span>
-
-                        <span class="status status--completed"
-                              th:if="${order.orderStatus == 3}">
-                            已完成
-                        </span>
-
-                        <span class="status status--cancelled"
-                              th:if="${order.orderStatus == 4}">
-                            已取消
-                        </span>
-
-                        <span class="status status--not-selected"
-                              th:if="${order.orderStatus == null}">
-                            未設定
-                        </span>
-
-                    </td>
-
-                    <!-- =====================
-                         撥款及退款狀態
-                         ===================== -->
-
-                    <td>
-
-                        <!-- 撥款狀態 -->
-                        <div class="finance-status">
-
-                            <span class="status status--unpaid"
-                                  th:if="${order.payoutStatus == 0}">
-                                未撥款
-                            </span>
-
-                            <span class="status status--paid"
-                                  th:if="${order.payoutStatus == 1}">
-                                已撥款
-                            </span>
-
-                            <span class="status status--not-selected"
-                                  th:if="${order.payoutStatus == null}">
-                                撥款未設定
-                            </span>
-
-                        </div>
-
-                        <!-- 退款狀態 -->
-                        <div class="finance-status">
-
-                            <span class="status status--refund-none"
-                                  th:if="${order.refundStatus == 0}">
-                                不需退款
-                            </span>
-
-                            <span class="status status--refund-pending"
-                                  th:if="${order.refundStatus == 1}">
-                                待退款
-                            </span>
-
-                            <span class="status status--refunded"
-                                  th:if="${order.refundStatus == 2}">
-                                已退款
-                            </span>
-
-                            <span class="status status--refund-rejected"
-                                  th:if="${order.refundStatus == 3}">
-                                退款未通過
-                            </span>
-
-                            <span class="status status--not-selected"
-                                  th:if="${order.refundStatus == null}">
-                                退款未設定
-                            </span>
-
-                        </div>
-
-                    </td>
-
-                    <!-- =====================
-                         處理資訊
-                         ===================== -->
-
-                    <td>
-
-                        <div th:if="${order.employeeId != null}">
-                            員工 #
-
-                            <strong th:text="${order.employeeId}">
-                                1001
-                            </strong>
-                        </div>
-
-                        <div th:if="${order.employeeId == null}">
-                            尚未處理
-                        </div>
-
-                        <div class="secondary-text"
-                             th:if="${order.handledAt != null}"
-                             th:text="${#temporals.format(
-                                     order.handledAt,
-                                     'yyyy-MM-dd HH:mm'
-                             )}">
-                            2026-07-15 15:26
-                        </div>
-
-                        <!-- 取消訂單資訊 -->
-                        <details class="cancel-detail"
-                                 th:if="${order.orderStatus == 4}">
-
-                            <summary>
-                                取消資訊
-                            </summary>
-
-                            <div class="cancel-detail__content">
-
-                                <div>
-                                    取消方：
-
-                                    <span th:if="${order.cancelledByRole == 0}">
-                                        買方
-                                    </span>
-
-                                    <span th:if="${order.cancelledByRole == 1}">
-                                        賣方
-                                    </span>
-
-                                    <span th:if="${order.cancelledByRole == 2}">
-                                        後台
-                                    </span>
-
-                                    <span th:if="${order.cancelledByRole == 3}">
-                                        系統
-                                    </span>
-
-                                    <span th:if="${order.cancelledByRole == null}">
-                                        未紀錄
-                                    </span>
+                            </td>
+
+                            <!-- 服務資訊 -->
+                            <td>
+
+                                <a class="service-link"
+                                   th:if="${order.serviceId != null}"
+                                   th:href="@{/admin/services/{serviceId}(
+                                           serviceId=${order.serviceId}
+                                   )}"
+                                   th:text="${order.serviceNameSnapshot != null
+                                            and !#strings.isEmpty(
+                                                order.serviceNameSnapshot
+                                            )
+                                            ? order.serviceNameSnapshot
+                                            : '未命名服務'}">
+                                    咖啡聊天
+                                </a>
+
+                                <div class="primary-text"
+                                     th:if="${order.serviceId == null}"
+                                     th:text="${order.serviceNameSnapshot != null
+                                              and !#strings.isEmpty(
+                                                  order.serviceNameSnapshot
+                                              )
+                                              ? order.serviceNameSnapshot
+                                              : '未命名服務'}">
+                                    咖啡聊天
                                 </div>
 
-                                <div>
-                                    取消原因：
-
-                                    <span th:text="${order.cancelReason != null
-                                                   and !#strings.isEmpty(
-                                                       order.cancelReason
-                                                   )
-                                                   ? order.cancelReason
-                                                   : '未填寫取消原因'}">
-                                        取消原因
-                                    </span>
+                                <div class="secondary-text"
+                                     th:text="${order.serviceTypeNameSnapshot != null
+                                              and !#strings.isEmpty(
+                                                  order.serviceTypeNameSnapshot
+                                              )
+                                              ? order.serviceTypeNameSnapshot
+                                              : '未分類'}">
+                                    陪伴聊天
                                 </div>
 
-                                <div th:if="${order.cancelledAt != null}">
-                                    取消時間：
+                                <div class="secondary-text"
+                                     th:if="${order.serviceId != null}">
 
-                                    <span th:text="${#temporals.format(
-                                            order.cancelledAt,
-                                            'yyyy-MM-dd HH:mm'
+                                    服務編號 #
+
+                                    <span th:text="${order.serviceId}">
+                                        1
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                            <!-- 交易雙方 -->
+                            <td>
+
+                                <div class="member-line">
+
+                                    買家：
+
+                                    <strong th:text="${order.buyerMemberId != null
+                                            ? order.buyerMemberId
+                                            : '未設定'}">
+                                        3
+                                    </strong>
+
+                                </div>
+
+                                <div class="member-line">
+
+                                    賣家：
+
+                                    <strong th:text="${order.sellerMemberId != null
+                                            ? order.sellerMemberId
+                                            : '未設定'}">
+                                        1
+                                    </strong>
+
+                                </div>
+
+                            </td>
+
+                            <!-- 預約時段 -->
+                            <td>
+
+                                <div th:if="${order.slotStartTimeSnapshot != null
+                                             and order.slotEndTimeSnapshot != null}">
+
+                                    <div th:text="${#temporals.format(
+                                            order.slotStartTimeSnapshot,
+                                            'yyyy-MM-dd'
                                     )}">
-                                        2026-07-15 15:26
-                                    </span>
+                                        2026-07-20
+                                    </div>
+
+                                    <div class="secondary-text">
+
+                                        <span th:text="${#temporals.format(
+                                                order.slotStartTimeSnapshot,
+                                                'HH:mm'
+                                        )}">
+                                            10:00
+                                        </span>
+
+                                        ～
+
+                                        <span th:text="${#temporals.format(
+                                                order.slotEndTimeSnapshot,
+                                                'HH:mm'
+                                        )}">
+                                            11:00
+                                        </span>
+
+                                    </div>
+
                                 </div>
 
-                            </div>
+                                <span th:if="${order.slotStartTimeSnapshot == null
+                                              or order.slotEndTimeSnapshot == null}">
+                                    未設定
+                                </span>
 
-                        </details>
+                            </td>
 
-                    </td>
+                            <!-- 訂單金額 -->
+                            <td>
 
-                    <!-- =====================
-                         後台操作
-                         ===================== -->
+                                <div class="amount-text">
 
-                    <td>
+                                    NT$
 
-                        <!--
-                            完成撥款條件：
+                                    <span th:text="${#numbers.formatInteger(
+                                            order.totalAmount != null
+                                                ? order.totalAmount
+                                                : 0,
+                                            1,
+                                            'COMMA'
+                                    )}">
+                                        400
+                                    </span>
 
-                            ORDER_STATUS = 3
-                            PAYOUT_STATUS = 0
-                            REFUND_STATUS = 0
-                        -->
-                        <form class="action-form"
-                              th:if="${order.orderStatus == 3
-                                       and order.payoutStatus == 0
-                                       and order.refundStatus == 0}"
-                              th:action="@{/admin/services/orders/{orderId}/payout(
-                                      orderId=${order.serviceOrderId}
-                              )}"
-                              method="post"
-                              onsubmit="return confirm('確定已完成這筆訂單的撥款嗎？');">
+                                </div>
 
-                            <input type="hidden"
-                                   name="view"
-                                   th:value="${selectedView}">
+                                <div class="secondary-text"
+                                     th:if="${order.refundAmount != null
+                                              and order.refundAmount > 0}">
 
-                            <input type="hidden"
-                                   th:if="${_csrf != null}"
-                                   th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}">
+                                    退款 NT$
 
-                            <button class="btn btn--primary"
-                                    type="submit">
-                                完成撥款
-                            </button>
+                                    <span th:text="${#numbers.formatInteger(
+                                            order.refundAmount,
+                                            1,
+                                            'COMMA'
+                                    )}">
+                                        400
+                                    </span>
 
-                        </form>
+                                </div>
 
-                        <!--
-                            完成退款條件：
+                            </td>
 
-                            ORDER_STATUS = 4
-                            PAYOUT_STATUS = 0
-                            REFUND_STATUS = 1
-                        -->
-                        <form class="action-form"
-                              th:if="${order.orderStatus == 4
-                                       and order.payoutStatus == 0
-                                       and order.refundStatus == 1}"
-                              th:action="@{/admin/services/orders/{orderId}/refund(
-                                      orderId=${order.serviceOrderId}
-                              )}"
-                              method="post"
-                              onsubmit="return confirm('確定已完成這筆訂單的退款嗎？');">
+                            <!-- 付款方式 -->
+                            <td>
 
-                            <input type="hidden"
-                                   name="view"
-                                   th:value="${selectedView}">
+                                <span class="status status--credit-card"
+                                      th:if="${order.servicePaymentMethod == 0}">
+                                    信用卡
+                                </span>
 
-                            <input type="hidden"
-                                   th:if="${_csrf != null}"
-                                   th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}">
+                                <span class="status status--atm"
+                                      th:if="${order.servicePaymentMethod == 1}">
+                                    ATM 轉帳
+                                </span>
 
-                            <button class="btn btn--refund"
-                                    type="submit">
-                                完成退款
-                            </button>
+                                <span class="status status--not-selected"
+                                      th:if="${order.servicePaymentMethod == null}">
+                                    尚未付款
+                                </span>
 
-                        </form>
+                                <span class="status status--unknown"
+                                      th:if="${order.servicePaymentMethod != null
+                                               and order.servicePaymentMethod != 0
+                                               and order.servicePaymentMethod != 1}">
+                                    未知方式
+                                </span>
 
-                        <!-- 沒有可執行的操作 -->
-                        <span class="no-action"
-                              th:if="${!(
-                                          order.orderStatus == 3
-                                          and order.payoutStatus == 0
-                                          and order.refundStatus == 0
-                                      )
-                                      and !(
-                                          order.orderStatus == 4
-                                          and order.payoutStatus == 0
-                                          and order.refundStatus == 1
-                                      )}">
-                            —
-                        </span>
+                            </td>
 
-                    </td>
+                            <!-- 訂單狀態 -->
+                            <td>
 
-                </tr>
+                                <span class="status status--pending"
+                                      th:if="${order.orderStatus == 0}">
+                                    待賣家確認
+                                </span>
 
-                </tbody>
+                                <span class="status status--payment"
+                                      th:if="${order.orderStatus == 1}">
+                                    待買家付款
+                                </span>
 
-            </table>
+                                <span class="status status--confirmed"
+                                      th:if="${order.orderStatus == 2}">
+                                    已成立
+                                </span>
+
+                                <span class="status status--completed"
+                                      th:if="${order.orderStatus == 3}">
+                                    已完成
+                                </span>
+
+                                <span class="status status--cancelled"
+                                      th:if="${order.orderStatus == 4}">
+                                    已取消
+                                </span>
+
+                                <span class="status status--not-selected"
+                                      th:if="${order.orderStatus == null}">
+                                    未設定
+                                </span>
+
+                            </td>
+
+                            <!-- 撥款及退款狀態 -->
+                            <td>
+
+                                <div class="finance-status">
+
+                                    <span class="status status--unpaid"
+                                          th:if="${order.payoutStatus == 0}">
+                                        未撥款
+                                    </span>
+
+                                    <span class="status status--paid"
+                                          th:if="${order.payoutStatus == 1}">
+                                        已撥款
+                                    </span>
+
+                                    <span class="status status--not-selected"
+                                          th:if="${order.payoutStatus == null}">
+                                        撥款未設定
+                                    </span>
+
+                                </div>
+
+                                <div class="finance-status">
+
+                                    <span class="status status--refund-none"
+                                          th:if="${order.refundStatus == 0}">
+                                        不需退款
+                                    </span>
+
+                                    <span class="status status--refund-pending"
+                                          th:if="${order.refundStatus == 1}">
+                                        待退款
+                                    </span>
+
+                                    <span class="status status--refunded"
+                                          th:if="${order.refundStatus == 2}">
+                                        已退款
+                                    </span>
+
+                                    <span class="status status--refund-rejected"
+                                          th:if="${order.refundStatus == 3}">
+                                        退款未通過
+                                    </span>
+
+                                    <span class="status status--not-selected"
+                                          th:if="${order.refundStatus == null}">
+                                        退款未設定
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                            <!-- 處理資訊 -->
+                            <td>
+
+                                <div th:if="${order.employeeId != null}">
+
+                                    員工 #
+
+                                    <strong th:text="${order.employeeId}">
+                                        1001
+                                    </strong>
+
+                                </div>
+
+                                <div th:if="${order.employeeId == null}">
+                                    尚未處理
+                                </div>
+
+                                <div class="secondary-text"
+                                     th:if="${order.handledAt != null}"
+                                     th:text="${#temporals.format(
+                                             order.handledAt,
+                                             'yyyy-MM-dd HH:mm'
+                                     )}">
+                                    2026-07-15 15:26
+                                </div>
+
+                                <details class="cancel-detail"
+                                         th:if="${order.orderStatus == 4}">
+
+                                    <summary>
+                                        取消資訊
+                                    </summary>
+
+                                    <div class="cancel-detail__content">
+
+                                        <div>
+
+                                            取消方：
+
+                                            <span th:if="${order.cancelledByRole == 0}">
+                                                買方
+                                            </span>
+
+                                            <span th:if="${order.cancelledByRole == 1}">
+                                                賣方
+                                            </span>
+
+                                            <span th:if="${order.cancelledByRole == 2}">
+                                                後台
+                                            </span>
+
+                                            <span th:if="${order.cancelledByRole == 3}">
+                                                系統
+                                            </span>
+
+                                            <span th:if="${order.cancelledByRole == null}">
+                                                未紀錄
+                                            </span>
+
+                                        </div>
+
+                                        <div>
+
+                                            取消原因：
+
+                                            <span th:text="${order.cancelReason != null
+                                                           and !#strings.isEmpty(
+                                                               order.cancelReason
+                                                           )
+                                                           ? order.cancelReason
+                                                           : '未填寫取消原因'}">
+                                                取消原因
+                                            </span>
+
+                                        </div>
+
+                                        <div th:if="${order.cancelledAt != null}">
+
+                                            取消時間：
+
+                                            <span th:text="${#temporals.format(
+                                                    order.cancelledAt,
+                                                    'yyyy-MM-dd HH:mm'
+                                            )}">
+                                                2026-07-15 15:26
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                </details>
+
+                            </td>
+
+                            <!-- 後台操作 -->
+                            <td>
+
+                                <!-- 完成撥款 -->
+                                <form class="action-form"
+                                      th:if="${order.orderStatus == 3
+                                               and order.payoutStatus == 0
+                                               and order.refundStatus == 0}"
+                                      th:action="@{/admin/services/orders/{orderId}/payout(
+                                              orderId=${order.serviceOrderId}
+                                      )}"
+                                      method="post"
+                                      onsubmit="return confirm('確定已完成這筆訂單的撥款嗎？');">
+
+                                    <input type="hidden"
+                                           name="view"
+                                           th:value="${selectedView}">
+
+                                    <input type="hidden"
+                                           th:if="${_csrf != null}"
+                                           th:name="${_csrf.parameterName}"
+                                           th:value="${_csrf.token}">
+
+                                    <button class="btn btn--primary"
+                                            type="submit">
+                                        完成撥款
+                                    </button>
+
+                                </form>
+
+                                <!-- 完成退款 -->
+                                <form class="action-form"
+                                      th:if="${order.orderStatus == 4
+                                               and order.payoutStatus == 0
+                                               and order.refundStatus == 1}"
+                                      th:action="@{/admin/services/orders/{orderId}/refund(
+                                              orderId=${order.serviceOrderId}
+                                      )}"
+                                      method="post"
+                                      onsubmit="return confirm('確定已完成這筆訂單的退款嗎？');">
+
+                                    <input type="hidden"
+                                           name="view"
+                                           th:value="${selectedView}">
+
+                                    <input type="hidden"
+                                           th:if="${_csrf != null}"
+                                           th:name="${_csrf.parameterName}"
+                                           th:value="${_csrf.token}">
+
+                                    <button class="btn btn--refund"
+                                            type="submit">
+                                        完成退款
+                                    </button>
+
+                                </form>
+
+                                <span class="no-action"
+                                      th:if="${!(
+                                                  order.orderStatus == 3
+                                                  and order.payoutStatus == 0
+                                                  and order.refundStatus == 0
+                                              )
+                                              and !(
+                                                  order.orderStatus == 4
+                                                  and order.payoutStatus == 0
+                                                  and order.refundStatus == 1
+                                              )}">
+                                    —
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <!-- 沒有符合條件的訂單 -->
+                <div class="empty-state"
+                     th:if="${orderList == null
+                              or #lists.isEmpty(orderList)}">
+                    目前沒有符合條件的服務訂單
+                </div>
+
+            </section>
 
         </div>
 
-        <!-- 沒有符合條件的訂單 -->
-        <div class="empty-state"
-             th:if="${orderList == null
-                      or #lists.isEmpty(orderList)}">
-            目前沒有符合條件的服務訂單
-        </div>
-
-    </section>
+    </main>
 
 </div>
 
