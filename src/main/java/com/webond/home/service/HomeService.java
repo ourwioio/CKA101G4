@@ -3,7 +3,6 @@ package com.webond.home.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,71 +17,155 @@ import com.webond.venue.service.VenueService;
 
 @Service
 public class HomeService {
-	
 
     @Autowired
     private ServiceService serviceService;
+
     @Autowired
     private ActivityService activityService;
+
     @Autowired
     private VenueService venueService;
 
-    
+
+    // =========================================================
+    // 隨機推薦個人服務
+    //
+    // 條件：
+    // 1. 只顯示上架中的服務
+    // 2. 每次重新整理隨機取指定筆數
+    // =========================================================
 
     public List<ServiceVO> getRecommendedServices(int count) {
-        List<ServiceVO> all = serviceService.getAll();
-        return all.stream()
-                .filter(s -> s.getStatus() != null && s.getStatus() == (byte)1) 
-                .sorted(Comparator.comparing(ServiceVO::getCreatedAt).reversed()) // 依實際欄位調整，例如上架時間
-                .limit(count)
-                .toList();
+
+        List<ServiceVO> activeServices =
+                serviceService.getActiveServices();
+
+        return pickRandomItems(
+                activeServices,
+                count
+        );
     }
-    
 
-    /** 即將截止的團體活動：依截止時間排序，排除已過期 */
+
+    // =========================================================
+    // 隨機推薦團體活動
+    //
+    // 條件：
+    // 1. 活動狀態為 0
+    // 2. 活動尚未結束
+    // 3. 報名尚未截止
+    // 4. 每次重新整理隨機取指定筆數
+    // =========================================================
+
     public List<ActivityVO> getEndingSoonActivities(int count) {
-        LocalDateTime now = LocalDateTime.now();
 
-        // 篩出所有「上架中 + 正常舉行 + 尚未截止」的活動
-        List<ActivityVO> eligible = activityService.getAll().stream()
-                .filter(a -> a.getActivityStatus() != null && a.getActivityStatus() == 0)
-                .filter(a -> a.getEndTime() != null && a.getEndTime().isAfter(now))
-                .toList();
+        LocalDateTime now =
+                LocalDateTime.now();
 
-        // 依截止時間排序，取最急迫的
-        List<ActivityVO> endingSoon = eligible.stream()
-                .sorted(Comparator.comparing(ActivityVO::getEndTime))
-                .limit(count)
-                .toList();
+        List<ActivityVO> availableActivities =
+                activityService.getAll()
+                        .stream()
 
-        // 已經滿額，直接回傳
-        if (endingSoon.size() >= count) {
-            return endingSoon;
+                        // 活動狀態 0：可顯示／正常舉行
+                        .filter(activity ->
+                                activity.getActivityStatus() != null
+                                && activity.getActivityStatus()
+                                           .byteValue() == 0
+                        )
+
+                        // 活動尚未結束
+                        .filter(activity ->
+                                activity.getEndTime() != null
+                                && activity.getEndTime()
+                                           .isAfter(now)
+                        )
+
+                        // 報名尚未截止
+                        .filter(activity ->
+                                activity.getRegistrationDeadline() != null
+                                && activity.getRegistrationDeadline()
+                                           .isAfter(now)
+                        )
+
+                        .toList();
+
+        return pickRandomItems(
+                availableActivities,
+                count
+        );
+    }
+
+
+    // =========================================================
+    // 隨機推薦場地
+    //
+    // 條件：
+    // 1. 只顯示上架中的場地
+    // 2. 每次重新整理隨機取指定筆數
+    // =========================================================
+
+    public List<VenueVO> getRandomVenues(int count) {
+
+        List<VenueVO> activeVenues =
+                venueService.getAll()
+                        .stream()
+
+                        .filter(venue ->
+                                venue.getVenueStatus() != null
+                                && venue.getVenueStatus()
+                                        .byteValue() == 1
+                        )
+
+                        .toList();
+
+        return pickRandomItems(
+                activeVenues,
+                count
+        );
+    }
+
+
+    // =========================================================
+    // 共用方法：從清單中隨機取出指定筆數
+    //
+    // 例如：
+    // 原本有 10 筆，count = 3
+    // 就會洗牌後隨機回傳 3 筆
+    //
+    // 若資料只有 2 筆，就只回傳 2 筆，不會發生錯誤
+    // =========================================================
+
+    private <T> List<T> pickRandomItems(
+            List<T> sourceList,
+            int count) {
+
+        if (sourceList == null
+                || sourceList.isEmpty()
+                || count <= 0) {
+
+            return Collections.emptyList();
         }
 
-        // 不足額，從剩下符合資格但沒被選到的活動中隨機補
-        List<ActivityVO> remaining = new ArrayList<>(eligible);
-        remaining.removeAll(endingSoon);
-        Collections.shuffle(remaining);
+        // 複製一份，避免直接修改原始 List
+        List<T> shuffledList =
+                new ArrayList<>(sourceList);
 
-        int need = count - endingSoon.size();
-        List<ActivityVO> filled = new ArrayList<>(endingSoon);
-        filled.addAll(remaining.stream().limit(need).toList());
+        // 隨機洗牌
+        Collections.shuffle(shuffledList);
 
-        return filled;
+        // 避免要求數量超過目前資料筆數
+        int resultSize =
+                Math.min(
+                        count,
+                        shuffledList.size()
+                );
+
+        return new ArrayList<>(
+                shuffledList.subList(
+                        0,
+                        resultSize
+                )
+        );
     }
-    
-
-    /** 隨機推薦場地 */
-    public List<VenueVO> getRandomVenues(int count) {
-        List<VenueVO> all = venueService.getAll();
-        Collections.shuffle(all);
-        return all.stream()
-                .filter(v -> v.getVenueStatus() != null && v.getVenueStatus() == (byte)1) 
-        		.limit(count).toList();
-    }
-
-    
-    
-
 }
