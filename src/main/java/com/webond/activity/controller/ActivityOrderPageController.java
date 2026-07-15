@@ -41,25 +41,51 @@ public class ActivityOrderPageController {
 	private ActivityNotificationService activityNotificationSvc;
 
 	@GetMapping("/listAllActivityOrder")
-	public String listAllActivityOrder(@RequestParam(value = "financeStatus", required = false) String financeStatus,
-			Model model, HttpSession session) {
+	public String listAllActivityOrder(Model model, HttpSession session) {
 		if (!isLoginEmployee(session)) {
 			return "redirect:/activity/admin/home?loginRequired=true";
 		}
 
-		List<ActivityOrderVO> orderList = orderSvc.getAll();
+		model.addAttribute("orderListData", orderSvc.getAll());
+		model.addAttribute("activityListData", activitySvc.getAll());
+		addFakeEmployee(model, session);
+
+		return "front-end/activityorder/listAllActivityOrder";
+	}
+
+	@GetMapping("/finance")
+	public String financeOrders(@RequestParam(value = "financeStatus", required = false) String financeStatus,
+			@RequestParam(value = "orderStatus", required = false) String orderStatus, Model model, HttpSession session) {
+		if (!isLoginEmployee(session)) {
+			return "redirect:/activity/admin/home?loginRequired=true";
+		}
+
+		List<ActivityOrderVO> orderList = orderSvc.getAll().stream()
+				.filter(orderVO -> isFinanceRelatedOrder(orderVO))
+				.collect(Collectors.toList());
+
 		if ("pending".equals(financeStatus)) {
 			orderList = orderList.stream().filter(this::isPendingFinanceOrder).collect(Collectors.toList());
 		} else if ("done".equals(financeStatus)) {
 			orderList = orderList.stream().filter(this::isDoneFinanceOrder).collect(Collectors.toList());
 		}
 
+		if ("cancelled".equals(orderStatus)) {
+			orderList = orderList.stream().filter(orderVO -> orderVO.getOrderStatus() != null && orderVO.getOrderStatus() == 1)
+					.collect(Collectors.toList());
+		} else if ("completed".equals(orderStatus)) {
+			orderList = orderList.stream().filter(orderVO -> orderVO.getOrderStatus() != null
+					&& (orderVO.getOrderStatus() == 0 || orderVO.getOrderStatus() == 4))
+					.collect(Collectors.toList());
+		}
+
 		model.addAttribute("orderListData", orderList);
 		model.addAttribute("activityListData", activitySvc.getAll());
 		model.addAttribute("selectedFinanceStatus", financeStatus);
+		model.addAttribute("selectedOrderStatus", orderStatus);
 		addFakeEmployee(model, session);
 
-		return "front-end/activityorder/listAllActivityOrder";
+		return "front-end/activityorder/activityOrderFinance";
 	}
 
 	@GetMapping("/detail")
@@ -99,7 +125,8 @@ public class ActivityOrderPageController {
 
 	@PostMapping("/confirmRefundFromList")
 	public String confirmRefundFromList(@RequestParam("activityOrderId") Integer activityOrderId,
-			@RequestParam(value = "financeStatus", required = false) String financeStatus, HttpSession session) {
+			@RequestParam(value = "financeStatus", required = false) String financeStatus,
+			@RequestParam(value = "orderStatus", required = false) String orderStatus, HttpSession session) {
 		Integer employeeId = employeeSession.getLoginEmployeeId(session);
 		if (employeeId == null) {
 			return "redirect:/activity/admin/home?loginRequired=true";
@@ -109,7 +136,7 @@ public class ActivityOrderPageController {
 		if (orderVO != null && orderVO.getRefundStatus() != null && orderVO.getRefundStatus() == 2) {
 			activityNotificationSvc.notifyBuyerRefundDone(activitySvc.getOneActivity(orderVO.getActivityId()), orderVO);
 		}
-		return redirectToList(financeStatus);
+		return redirectToFinance(financeStatus, orderStatus);
 	}
 
 	@PostMapping("/confirmPayout")
@@ -128,7 +155,8 @@ public class ActivityOrderPageController {
 
 	@PostMapping("/confirmPayoutFromList")
 	public String confirmPayoutFromList(@RequestParam("activityOrderId") Integer activityOrderId,
-			@RequestParam(value = "financeStatus", required = false) String financeStatus, HttpSession session) {
+			@RequestParam(value = "financeStatus", required = false) String financeStatus,
+			@RequestParam(value = "orderStatus", required = false) String orderStatus, HttpSession session) {
 		Integer employeeId = employeeSession.getLoginEmployeeId(session);
 		if (employeeId == null) {
 			return "redirect:/activity/admin/home?loginRequired=true";
@@ -138,7 +166,7 @@ public class ActivityOrderPageController {
 		if (orderVO != null && Boolean.TRUE.equals(orderVO.getPayoutAmount())) {
 			activityNotificationSvc.notifyHostPayoutDone(activitySvc.getOneActivity(orderVO.getActivityId()), orderVO);
 		}
-		return redirectToList(financeStatus);
+		return redirectToFinance(financeStatus, orderStatus);
 	}
 
 	@PostMapping("/approve")
@@ -179,25 +207,42 @@ public class ActivityOrderPageController {
 	}
 
 	private boolean isPendingRefund(ActivityOrderVO orderVO) {
-		return orderVO.getRefundStatus() != null && orderVO.getRefundStatus() == 1;
+		return hasPositiveAmount(orderVO) && orderVO.getRefundStatus() != null && orderVO.getRefundStatus() == 1;
 	}
 
 	private boolean isRefundDone(ActivityOrderVO orderVO) {
-		return orderVO.getRefundStatus() != null && orderVO.getRefundStatus() == 2;
+		return hasPositiveAmount(orderVO) && orderVO.getRefundStatus() != null && orderVO.getRefundStatus() == 2;
 	}
 
 	private boolean isPendingPayout(ActivityOrderVO orderVO) {
 		boolean noRefund = orderVO.getRefundStatus() == null || orderVO.getRefundStatus() == 0;
 		boolean payableOrder = orderVO.getOrderStatus() != null
 				&& (orderVO.getOrderStatus() == 0 || orderVO.getOrderStatus() == 4);
-		return payableOrder && noRefund && !Boolean.TRUE.equals(orderVO.getPayoutAmount());
+		return hasPositiveAmount(orderVO) && payableOrder && noRefund && !Boolean.TRUE.equals(orderVO.getPayoutAmount());
 	}
 
-	private String redirectToList(String financeStatus) {
-		if (financeStatus == null || financeStatus.trim().isEmpty()) {
-			return "redirect:/activityOrder/listAllActivityOrder";
+	private boolean isFinanceRelatedOrder(ActivityOrderVO orderVO) {
+		return isPendingFinanceOrder(orderVO) || isDoneFinanceOrder(orderVO)
+				|| (orderVO.getOrderStatus() != null && orderVO.getOrderStatus() == 1);
+	}
+
+	private boolean hasPositiveAmount(ActivityOrderVO orderVO) {
+		return orderVO != null && orderVO.getTotalAmount() != null && orderVO.getTotalAmount() > 0;
+	}
+
+	private String redirectToFinance(String financeStatus, String orderStatus) {
+		StringBuilder redirectUrl = new StringBuilder("redirect:/activityOrder/finance");
+		boolean hasParam = false;
+
+		if (financeStatus != null && !financeStatus.trim().isEmpty()) {
+			redirectUrl.append("?financeStatus=").append(financeStatus);
+			hasParam = true;
 		}
 
-		return "redirect:/activityOrder/listAllActivityOrder?financeStatus=" + financeStatus;
+		if (orderStatus != null && !orderStatus.trim().isEmpty()) {
+			redirectUrl.append(hasParam ? "&" : "?").append("orderStatus=").append(orderStatus);
+		}
+
+		return redirectUrl.toString();
 	}
 }

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>&#24460;&#21488;&#35330;&#21934;&#32000;&#37636;</title>
+<title>&#24460;&#21488;&#25765;&#36864;&#27454;&#20316;&#26989;</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
@@ -40,6 +40,39 @@ body {
 	color: #64748b;
 	font-weight: bold;
 	margin-bottom: 20px;
+}
+
+.toolbar {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 16px;
+}
+
+.toolbar label {
+	color: #475569;
+	font-weight: bold;
+}
+
+.toolbar select {
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	padding: 9px 12px;
+	font: inherit;
+	font-weight: bold;
+	color: #0f172a;
+	background: white;
+}
+
+.toolbar button {
+	border: 0;
+	border-radius: 8px;
+	padding: 10px 16px;
+	font-weight: bold;
+	color: white;
+	background: #2563eb;
+	cursor: pointer;
 }
 
 .notice {
@@ -189,6 +222,27 @@ td {
 	font-weight: bold;
 }
 
+.action-form {
+	margin: 0 0 8px;
+}
+
+.btn-action {
+	border: 0;
+	border-radius: 8px;
+	color: white;
+	cursor: pointer;
+	font-weight: bold;
+	padding: 8px 14px;
+	min-width: 96px;
+}
+
+.btn-refund {
+	background: #d97706;
+}
+
+.btn-payout {
+	background: #16a34a;
+}
 </style>
 </head>
 
@@ -196,13 +250,13 @@ td {
 <body>
 	<div class="page-card">
 		<div class="header">
-			<h2>&#24460;&#21488;&#35330;&#21934;&#32000;&#37636;</h2>
+			<h2>&#24460;&#21488;&#25765;&#36864;&#27454;&#20316;&#26989;</h2>
 		</div>
 
 		<div class="admin-nav">
 			<a th:href="@{/activity/listAllActivity}" class="admin-btn btn-activity">&#27963;&#21205;&#31649;&#29702;</a>
 			<a th:href="@{/activityType/listAllActivityType}" class="admin-btn btn-type">&#39006;&#21029;&#31649;&#29702;</a>
-			<a th:href="@{/activityOrder/finance}" class="admin-btn btn-finance">&#25765;&#36864;&#27454;&#20316;&#26989;</a>
+			<a th:href="@{/activityOrder/listAllActivityOrder}" class="admin-btn btn-order">&#35330;&#21934;&#32000;&#37636;</a>
 			<a th:href="@{/activity/admin/home}" class="admin-btn btn-home">&#22238;&#24460;&#21488;&#39318;&#38913;</a>
 		</div>
 
@@ -214,6 +268,23 @@ td {
 		<div th:if="${param.hostReviewOnly}" class="notice error">
 			&#22577;&#21517;&#23529;&#26680;&#30001;&#27963;&#21205;&#20027;&#36774;&#20154;&#34389;&#29702;&#65292;&#24460;&#21488;&#21482;&#26597;&#30475;&#35330;&#21934;&#12289;&#36864;&#27454;&#33287;&#25765;&#27454;&#36039;&#35338;&#12290;
 		</div>
+
+		<form class="toolbar" th:action="@{/activityOrder/finance}" method="get">
+			<label for="orderStatus">&#35330;&#21934;&#29376;&#24907;</label>
+			<select id="orderStatus" name="orderStatus">
+				<option value="" th:selected="${selectedOrderStatus == null or selectedOrderStatus == ''}">&#20840;&#37096;</option>
+				<option value="cancelled" th:selected="${selectedOrderStatus == 'cancelled'}">&#24050;&#21462;&#28040;</option>
+				<option value="completed" th:selected="${selectedOrderStatus == 'completed'}">&#24050;&#23436;&#25104;</option>
+			</select>
+
+			<label for="financeStatus">&#25765;&#36864;&#27454;&#29376;&#24907;</label>
+			<select id="financeStatus" name="financeStatus">
+				<option value="" th:selected="${selectedFinanceStatus == null or selectedFinanceStatus == ''}">&#20840;&#37096;</option>
+				<option value="pending" th:selected="${selectedFinanceStatus == 'pending'}">&#24453;&#25765;&#36864;&#27454;</option>
+				<option value="done" th:selected="${selectedFinanceStatus == 'done'}">&#24050;&#25765;&#36864;&#27454;</option>
+			</select>
+			<button type="submit">&#26597;&#35426;</button>
+		</form>
 
 		<div class="table-card">
 			<table>
@@ -228,6 +299,7 @@ td {
 						<th>&#22577;&#21517;&#20633;&#35387;</th>
 						<th>&#20184;&#27454;&#26041;&#24335;</th>
 						<th>&#36864;&#27454; / &#25765;&#27454;</th>
+						<th>&#25805;&#20316;</th>
 					</tr>
 				</thead>
 
@@ -250,7 +322,7 @@ td {
 						<td>
 							<span th:if="${order.orderStatus == 2}" class="status pending">&#24453;&#23529;&#26680;</span>
 							<span th:if="${order.orderStatus == 3}" class="status pending">&#24453;&#20184;&#27454;</span>
-							<span th:if="${order.orderStatus == 0}" class="status active">&#24050;&#20184;&#27454;</span>
+							<span th:if="${order.orderStatus == 0}" class="status completed">&#24050;&#23436;&#25104;</span>
 							<span th:if="${order.orderStatus == 1}" class="status cancel">&#24050;&#21462;&#28040;</span>
 							<span th:if="${order.orderStatus == 4}" class="status completed">&#24050;&#23436;&#25104;</span>
 						</td>
@@ -278,9 +350,31 @@ td {
 							</div>
 						</td>
 
+						<td>
+							<form class="action-form" th:if="${order.totalAmount != null and order.totalAmount > 0 and order.refundStatus == 1}"
+								th:action="@{/activityOrder/confirmRefundFromList}" method="post"
+								onsubmit="return confirm('&#30906;&#35469;&#27492;&#35330;&#21934;&#24050;&#23436;&#25104;&#36864;&#27454;&#65311;');">
+								<input type="hidden" name="activityOrderId" th:value="${order.activityOrderId}">
+								<input type="hidden" name="financeStatus" th:value="${selectedFinanceStatus}">
+								<input type="hidden" name="orderStatus" th:value="${selectedOrderStatus}">
+								<button type="submit" class="btn-action btn-refund">&#30906;&#35469;&#36864;&#27454;</button>
+							</form>
+
+							<form class="action-form"
+								th:action="@{/activityOrder/confirmPayoutFromList}" method="post"
+								th:if="${order.totalAmount != null and order.totalAmount > 0 and (order.orderStatus == 0 or order.orderStatus == 4) and !order.payoutAmount and (order.refundStatus == null or order.refundStatus == 0)}"
+								onsubmit="return confirm('&#30906;&#35469;&#27492;&#35330;&#21934;&#24050;&#25765;&#27454;&#32102;&#27963;&#21205;&#20027;&#36774;&#20154;&#65311;');">
+								<input type="hidden" name="activityOrderId" th:value="${order.activityOrderId}">
+								<input type="hidden" name="financeStatus" th:value="${selectedFinanceStatus}">
+								<input type="hidden" name="orderStatus" th:value="${selectedOrderStatus}">
+								<button type="submit" class="btn-action btn-payout">&#30906;&#35469;&#25765;&#27454;</button>
+							</form>
+
+							<span th:unless="${(order.totalAmount != null and order.totalAmount > 0 and order.refundStatus == 1) or (order.totalAmount != null and order.totalAmount > 0 and (order.orderStatus == 0 or order.orderStatus == 4) and !order.payoutAmount and (order.refundStatus == null or order.refundStatus == 0))}">-</span>
+						</td>
 					</tr>
 					<tr th:if="${#lists.isEmpty(orderListData)}">
-						<td colspan="9">&#30446;&#21069;&#27794;&#26377;&#35330;&#21934;&#36039;&#26009;</td>
+						<td colspan="10">&#30446;&#21069;&#27794;&#26377;&#31526;&#21512;&#26781;&#20214;&#30340;&#25765;&#36864;&#27454;&#36039;&#26009;</td>
 					</tr>
 				</tbody>
 			</table>
