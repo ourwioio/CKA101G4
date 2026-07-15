@@ -116,7 +116,7 @@
 						            th:attr="data-order-id=${order.venueOrderId}"
 						            onclick="openReviewModal(this)">評價場地</button>
 						
-						    <a th:href="@{/front/report/add(venueOrderId=${order.venueOrderId})}" class="btn-report">檢舉</a>
+						    <a th:href="@{/venueReports/addVenueReport(venueOrderId=${order.venueOrderId})}" class="btn-report">檢舉</a>
 						    <span class="badge status-done" th:if="${order.venueRating != null}">已評價</span>
 						</th:block>
 			        </div>
