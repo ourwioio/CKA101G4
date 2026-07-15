@@ -49,7 +49,7 @@ body {
 
 @media ( min-width : 1024px) {
 	.container {
-		grid-template-columns: 1.5fr 1.1fr;
+		grid-template-columns: 1.7fr 1.1fr;
 	} /* 微調比例，給右側審核區多一點空間 */
 	.main-panel {
 		grid-column: span 1;
@@ -94,7 +94,7 @@ body {
 }
 
 .tab-btn {
-	padding: 10px 20px;
+	padding: 10px 10px;
 	border: none;
 	background: none;
 	font-size: 14px;
@@ -472,9 +472,8 @@ textarea.input-control {
 	<div class="container">
 		<div class="card-panel main-panel">
 			<div class="header-area">
-				<h2>⚖️ 會員檢舉案審核中心 (權限五專用)</h2>
-				<a th:href="@{/backend/memberreport/select_page}"
-					class="btn-top-action">🏠 回導覽首頁</a>
+				<h2>⚖️ 會員檢舉案審核</h2>
+				
 			</div>
 			<!-- 狀態編碼對齊資料庫：0待處理, 1處理中, 2成立, 3不成立 -->
 			<div class="tabs-container">
