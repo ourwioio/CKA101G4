@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class OtpService {
 
-	@Autowired
+	@Autowired 
 	private StringRedisTemplate redisTemplate;
 
 	// 1. 產生 6 位數隨機數字驗證碼

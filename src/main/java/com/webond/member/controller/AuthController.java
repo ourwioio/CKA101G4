@@ -27,7 +27,7 @@ public class AuthController {
     
  // 🟢 手動宣告 log 物件 (紅線保證立刻消失)
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
-
+ 
     // =========================================================================
     // 1. 發送 Email 驗證碼 API
     // =========================================================================
