@@ -18,6 +18,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.employee.model.EmployeeVO;
 import com.webond.employee.repository.EmployeeRepository;
+import com.webond.member.model.NotificationVO;
+import com.webond.member.service.NotificationService;
 import com.webond.venue.model.VenueImagesVO;
 import com.webond.venue.model.VenueReviewVO;
 import com.webond.venue.model.VenueVO;
@@ -35,6 +37,9 @@ public class VenueReviewController {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
+	
+	@Autowired
+	private NotificationService notificationService;
 
 	@Autowired
 	VenueService venueService;
@@ -142,6 +147,16 @@ public class VenueReviewController {
 			@RequestParam(value = "reviewNote", required = false) String reviewNote, RedirectAttributes redirectAttrs) {
 		venueReviewSvc.approve(venueReviewId, employeeId, reviewNote);
 		redirectAttrs.addFlashAttribute("success", "- (審核通過)");
+		VenueReviewVO venueReviewVO = venueReviewSvc.getOneVenueReview(venueReviewId);
+		VenueVO venueVO = venueService.getOneVenue(venueReviewVO.getVenueId());
+		// 新增通知給場地主
+		NotificationVO notificationVO = new NotificationVO();
+		notificationVO.setMember(venueVO.getMember());
+		notificationVO.setTitle("場地審核通過");
+		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + "　審核已通過，謝謝");
+		notificationVO.setNotificationType((byte) 2);
+		notificationService.addNotification(notificationVO);
+		
 		return "redirect:/venueReview/listAllVenueReview";
 	}
 
@@ -152,6 +167,16 @@ public class VenueReviewController {
 			@RequestParam(value = "reviewNote", required = false) String reviewNote, RedirectAttributes redirectAttrs) {
 		venueReviewSvc.reject(venueReviewId, employeeId, reviewNote);
 		redirectAttrs.addFlashAttribute("success", "- (已標記為審核未通過)");
+		VenueReviewVO venueReviewVO = venueReviewSvc.getOneVenueReview(venueReviewId);
+		VenueVO venueVO = venueService.getOneVenue(venueReviewVO.getVenueId());
+		// 新增通知給場地主
+		NotificationVO notificationVO = new NotificationVO();
+		notificationVO.setMember(venueVO.getMember());
+		notificationVO.setTitle("場地審核未通過");
+		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + "　審核未通過，請重新修改上傳資料，謝謝");
+		notificationVO.setNotificationType((byte) 2);
+		notificationService.addNotification(notificationVO);
+		
 		return "redirect:/venueReview/listAllVenueReview";
 	}
 
