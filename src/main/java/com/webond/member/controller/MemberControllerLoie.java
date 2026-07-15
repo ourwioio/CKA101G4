@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.webond.member.model.MemberVO;
 import com.webond.member.service.MemberServiceLoie;
+import com.webond.member.service.OtpService;
 import com.webond.member.service.RedisService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -38,6 +39,10 @@ public class MemberControllerLoie {
 	private RedisService redisService;
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private OtpService otpService;
+	
+	
 
 	@GetMapping("/register")
 	public String registerPage(Model model) {
@@ -128,6 +133,13 @@ public class MemberControllerLoie {
 			result.put("message", "該 Email 尚未註冊會員！");
 			return result;
 		}
+		// 🔒 帳號狀態檢查：只有「正常使用中(1)」的帳號才能重設密碼
+		Byte status = memberVO.getAccountStatus();
+		if (status != null && status != 1) {
+			result.put("success", false);
+			result.put("message", buildAccountStatusMessage(status));
+			return result;
+		}
 		// 產生 6 位數隨機數字驗證碼
 		String otpCode = String.format("%06d", new Random().nextInt(900000) + 100000);
 		// 存入 Redis (5 分鐘有效，60 秒冷卻)
@@ -150,7 +162,15 @@ public class MemberControllerLoie {
 			model.addAttribute("emailError", "找不到該 Email 對應的帳號！");
 			hasError = true;
 		}
-		// 2. 檢查 Redis 內的驗證碼
+		// 🔒 2. 帳號狀態檢查：只有「正常使用中(1)」的帳號才能重設密碼
+		if (memberVO != null) {
+			Byte status = memberVO.getAccountStatus();
+			if (status != null && status != 1) {
+				model.addAttribute("emailError", buildAccountStatusMessage(status));
+				hasError = true;
+			}
+		}
+		// 3. 檢查 Redis 內的驗證碼
 		String realOtp = redisService.getForgotOtp(email);
 		if (realOtp == null) {
 			model.addAttribute("otpError", "驗證碼已過期或未發送，請重新取得！");
@@ -159,7 +179,7 @@ public class MemberControllerLoie {
 			model.addAttribute("otpError", "驗證碼不正確！");
 			hasError = true;
 		}
-		// 3. 檢查新密碼
+		// 4. 檢查新密碼
 		if (newPassword == null || newPassword.trim().isEmpty()) {
 			model.addAttribute("passwordError", "新密碼請勿空白！");
 			hasError = true;
@@ -169,14 +189,26 @@ public class MemberControllerLoie {
 			model.addAttribute("email", email);
 			return "front-end/member/forgotPassword";
 		}
-		// 4. 更新 DB 密碼
+		// 5. 更新 DB 密碼
 		memberVO.setPasswordHash(passwordEncoder.encode(newPassword));
 		memberService.updateMember(memberVO);
-		// 5. 密碼重設成功，清理 Redis 驗證碼
+		// 6. 密碼重設成功，清理 Redis 驗證碼
 		redisService.deleteForgotOtp(email);
 		redirectAttributes.addFlashAttribute("successMsg", "密碼重設成功，請使用新密碼登入！");
 		return "redirect:/member/login";
 	}
+	// 依帳號狀態產生對應的封鎖訊息（登入、忘記密碼共用邏輯保持一致）
+	private String buildAccountStatusMessage(Byte status) {
+		if (status == 0) {
+			return "您的帳號尚在審核中，請等待管理員核准後再使用忘記密碼功能！";
+		} else if (status == 2) {
+			return "此帳號已被註銷或實名認證未通過，如有疑問請聯繫客服！";
+		} else if (status == 3) {
+			return "您的帳號因違規已被系統停權，暫無法重設密碼！";
+		}
+		return "此帳號目前無法使用忘記密碼功能！";
+	}
+	
 
 	// =========================================================================
 	// 📝 API 2：註冊表單送出（對齊前端個別欄位下方顯示錯誤提示）
@@ -217,6 +249,14 @@ public class MemberControllerLoie {
 		memberVO.setMemberPic(memberPicBytes != null ? memberPicBytes : new byte[0]);
 		memberVO.setIdImage(combinedBase64.getBytes());
 		memberVO.setFaceImage(faceImageBytes);
+
+		// 🔒 後端把關：確認此 Email 已完成 OTP 驗證（防止繞過前端直接送出表單註冊）
+		String cleanEmail = memberVO.getEmail() != null ? memberVO.getEmail().trim() : null;
+		if (cleanEmail == null || !otpService.isVerified(cleanEmail)) {
+			model.addAttribute("otpError", "請先完成 Email 驗證碼驗證後再送出註冊！");
+			hasImageError = true; // 借用既有的錯誤旗標一併導回表單並保留已上傳的圖片
+		}
+
 		if (result.hasErrors() || hasImageError) {
 			model.addAttribute("memberVO", memberVO);
 			model.addAttribute("tempMemberPic", encodeToBase641(memberPicBytes));
@@ -227,6 +267,7 @@ public class MemberControllerLoie {
 		}
 		try {
 			memberService.registerMember(memberVO);
+			otpService.clearVerified(cleanEmail); // 註冊成功，清除驗證標記避免殘留
 			session.setAttribute("memberVO", memberVO);
 			return "redirect:/";
 		} catch (Exception e) {
@@ -390,5 +431,6 @@ public class MemberControllerLoie {
 			return Base64.getEncoder().encodeToString(imageBytes);
 		}
 		return "";
+		
 	}
 }
