@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>填寫檢舉表單</title>
+</head>
+<body>
+
+    <h2>填寫活動檢舉</h2>
+
+    <form th:action="@{/activity/rptSubmit}" th:object="${actRptVO}" method="post" enctype="multipart/form-data">
+        
+        <!-- 1. 顯示並綁定被檢舉的活動編號 (唯讀) -->
+        <p>
+            <label>被檢舉的活動編號：</label>
+            <span th:text="*{actId.activityId}">0</span>
+            <input type="hidden" th:field="*{actId.activityId}" />
+        </p>
+
+        <!-- 2. 選擇檢舉類型 -->
+        <p>
+            <label for="rptType">檢舉類型：</label>
+            <select id="rptType" th:field="*{rptType}" required>
+                <option value="">-- 請選擇原因 --</option>
+                <option value="0">詐騙/虛假活動</option>
+                <option value="1">色情/不當活動</option>
+                <option value="2">暴力/危險活動</option>
+                <option value="3">違法行為(聚賭、毒品)</option>
+                <option value="4">其他</option>
+            </select>
+        </p>
+
+        <!-- 3. 填寫詳細說明 -->
+        <p>
+            <label for="actRptCom">詳細說明：</label><br>
+            <textarea id="actRptCom" th:field="*{actRptCom}" rows="4" cols="40" required placeholder="請輸入檢舉原因..."></textarea>
+        </p>
+
+        <!-- 4. 上傳佐證圖片 -->
+        <p>
+            <label for="imageFile">上傳佐證圖片：</label>
+            <input type="file" id="imageFile" name="imageFile" accept="image/*">
+        </p>
+
+        <!-- 5. 提交按鈕 -->
+        <p>
+            <button type="submit">提交檢舉</button>
+            <a th:href="@{/activity/actButton}">取消返回</a>
+        </p>
+
+    </form>
+
+</body>
+</html>

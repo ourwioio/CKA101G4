@@ -1,5 +1,7 @@
 package com.webond.employee.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -7,17 +9,23 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.webond.employee.dto.EmpPasswordDTO;
 import com.webond.employee.model.EmpService;
 import com.webond.employee.model.EmployeeVO;
+import com.webond.member.model.MemberVO;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	
 	private final EmpService empSvc;
 	
@@ -51,7 +59,7 @@ public class AdminController {
 	public String upPassword(
 			@Valid @ModelAttribute("empPasswordDTO") EmpPasswordDTO empPassword,
 			BindingResult result,
-			@SessionAttribute("loginEmp") EmployeeVO loginEmp,
+			@SessionAttribute("employeeVO") EmployeeVO loginEmp,
 			Model model) {
 		
 		if(result.hasErrors()) {
@@ -83,6 +91,7 @@ public class AdminController {
 		
 		return"back-end/employee/index";
 	}
+	
 	
 
 }

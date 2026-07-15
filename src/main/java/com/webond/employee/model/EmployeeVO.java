@@ -38,7 +38,7 @@ public class EmployeeVO implements java.io.Serializable{
 	private Integer employeeId;
 	
 	@NotBlank(message = "帳號請勿空白", groups = ValidGroup.First.class)
-	@Pattern(regexp = "^[a-zA-Z0-9]{8,20}@webond\\.com$", message = "帳號長度為 8 到 20 的英文或數字，@webond.com 結尾", groups = ValidGroup.Second.class)
+	@Pattern(regexp = "^[a-zA-Z0-9]{5,20}@webond\\.com$", message = "帳號長度為 5 到 20 的英文或數字，@webond.com 結尾", groups = ValidGroup.Second.class)
 	@Column(name = "EMP_ACCOUNT", unique = true, nullable = false)
 	private String empAccount;
 	

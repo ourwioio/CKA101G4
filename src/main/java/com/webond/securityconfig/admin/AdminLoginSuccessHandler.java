@@ -46,7 +46,7 @@ public class AdminLoginSuccessHandler implements AuthenticationSuccessHandler {
 			empRepository.updateLastLoginAt(emp.getEmployeeId(), now);
 			
 			HttpSession session = request.getSession();
-	        session.setAttribute("loginEmp", emp);
+	        session.setAttribute("employeeVO", emp);
 	        
 			if(Integer.valueOf(0).equals(emp.getEmpStatus())) {
 				response.sendRedirect(request.getContextPath()+"/admin/updatePassword");

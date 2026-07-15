@@ -3,6 +3,7 @@ package com.webond.activity.model;
 import java.sql.Timestamp;
 
 import com.webond.employee.model.EmployeeVO;
+import com.webond.member.model.MemberVO;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 
 
 @Entity
@@ -24,14 +26,18 @@ public class ActRptVO {
 	private Integer actRptId;		
 	
 	@ManyToOne
-	@JoinColumn(name = "ACTIVITY_ORDER_ID", referencedColumnName = "ACTIVITY_ORDER_ID")
-	private ActivityOrderVO actOrdId;	
+	@JoinColumn(name = "ACTIVITY_ID", referencedColumnName = "ACTIVITY_ID")
+	private ActivityVO actId;
+	
+	@ManyToOne
+	@JoinColumn(name = "REPORTER_ID", referencedColumnName = "MEMBER_ID")
+	private MemberVO reporterId;
 	
 	@ManyToOne
 	@JoinColumn(name = "EMPLOYEE_ID", referencedColumnName = "EMPLOYEE_ID")
 	private EmployeeVO empId;		
 	
-	@Column(name = "ACTIVITY_REPORT_TIME", updatable = false)
+	@Column(name = "ACTIVITY_REPORT_TIME")
 	private Timestamp actRptTime;	
 	
 	@Column(name = "UPDATED")
@@ -52,7 +58,7 @@ public class ActRptVO {
 	@Column(name = "APPEAL_IMAGE", columnDefinition = "longblob")
 	private byte[] appealImg;		
 	
-	@Column(name = "APPEAL_TIME", updatable = false)
+	@Column(name = "APPEAL_TIME")
 	private Timestamp appealTime;	
 	
 	@Column(name = "ACTIVITY_REPORT_STATUS")
@@ -65,33 +71,12 @@ public class ActRptVO {
 	private Integer penaltyValue;	
 	
 	@Column(name ="REMARK")
-	private String remark; 			
+	private String remark;
 
-	
 	public ActRptVO() {
 		super();
 	}
 
-	public ActRptVO(Integer actRptId, ActivityOrderVO actOrdId, EmployeeVO empId, Timestamp actRptTime, Timestamp updated,
-			Integer rptType, String actRptCom, byte[] actRptImg, String appealContent, byte[] appealImg,
-			Timestamp appealTime, Integer actRptStatus, Integer penaltyType, Integer penaltyValue, String remark) {
-		super();
-		this.actRptId = actRptId;
-		this.actOrdId = actOrdId;
-		this.empId = empId;
-		this.actRptTime = actRptTime;
-		this.updated = updated;
-		this.rptType = rptType;
-		this.actRptCom = actRptCom;
-		this.actRptImg = actRptImg;
-		this.appealContent = appealContent;
-		this.appealImg = appealImg;
-		this.appealTime = appealTime;
-		this.actRptStatus = actRptStatus;
-		this.penaltyType = penaltyType;
-		this.penaltyValue = penaltyValue;
-		this.remark = remark;
-	}
 
 	public Integer getActRptId() {
 		return actRptId;
@@ -101,12 +86,20 @@ public class ActRptVO {
 		this.actRptId = actRptId;
 	}
 
-	public ActivityOrderVO getActOrdId() {
-		return actOrdId;
+	public ActivityVO getActId() {
+		return actId;
 	}
 
-	public void setActOrdId(ActivityOrderVO actOrdId) {
-		this.actOrdId = actOrdId;
+	public void setActId(ActivityVO actId) {
+		this.actId = actId;
+	}
+
+	public MemberVO getReporterId() {
+		return reporterId;
+	}
+
+	public void setReporterId(MemberVO reporterId) {
+		this.reporterId = reporterId;
 	}
 
 	public EmployeeVO getEmpId() {
@@ -211,7 +204,12 @@ public class ActRptVO {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
-	}
+	} 	
+	
+	
+	
+
+	
 	
 
 }

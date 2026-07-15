@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+<title>活動檢舉申訴</title>
+</head>
+<body>
+	<div class="container">
+		<h2>活動申訴提出</h2>
+
+		<!-- 顯示原始遭檢舉的活動資訊，讓會員確認 -->
+		<div class="alert alert-danger">
+			<p>
+				遭檢舉活動：<span th:text="${actRpt.actId.activityTitle}">活動名稱</span>
+			</p>
+			<p>
+				違反事由：<span th:text="${actRpt.rptType}">違規類型</span>
+			</p>
+		</div>
+
+		<!-- 申訴提交表單 -->
+		<form th:action="@{/member/activity/appeal/submit}" th:object="${actRpt}" method="post"
+			enctype="multipart/form-data">
+			<input type="hidden" th:field="*{actRptId}" />
+
+			<div class="mb-3">
+				<label>原始違規類型：</label> <span th:text="${actRpt.rptType}">違規代碼</span>
+			</div>
+
+			<div class="mb-3">
+				<label for="appealContent">申訴理由說明：</label>
+				<textarea th:field="*{appealContent}"
+					class="form-control" rows="5" required></textarea>
+			</div>
+
+			<div class="mb-3">
+				<label for="appealImgFile">上傳佐證圖片（選填）：</label> <input type="file"
+					id="appealImgFile" name="appealImgFile" class="form-control"
+					accept="image/*" />
+			</div>
+
+			<button type="submit" class="btn btn-primary">送出申訴</button>
+		</form>
+
+	</div>
+</body>
+</html>
