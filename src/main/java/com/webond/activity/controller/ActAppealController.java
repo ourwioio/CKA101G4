@@ -45,7 +45,7 @@ public class ActAppealController {
         
         if (actRpt.getAppealTime() != null) {
             model.addAttribute("message", "本案已在申訴處理程序中。");
-            return "member/appealStatus";
+            return "redirect:/front/notification/listAllNotification";
         }
 
         model.addAttribute("actRpt", actRpt);
@@ -72,9 +72,15 @@ public class ActAppealController {
         }
         actRptSvc.submitAppeal(actRptId, appealContent, imgBytes);
 	    
-	    return "redirect:/member/activity/appeal-success"; 
+	    return "redirect:/member/activity/Appeal/success"; 
 	}
 
+	// 成功畫面    
+    @GetMapping("/Appeal/success")
+    public String showSuccessPage() {
+        // 導向你存放成功頁面的 HTML 路徑
+        return "front-end/activityReport/appealSuccess";
+    }
 	
 	
 	
