@@ -13,6 +13,7 @@
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/front-end/venue/listOneVenue.css}" href="venue-detail.css">
 <link rel="stylesheet" th:href="@{/css/front-end/venue/loginModal.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/venue/photoLightbox.css}">
 </head>
 <body>
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
@@ -52,7 +53,7 @@
 			<div class="detail-card__photos" th:if="${not #lists.isEmpty(venueVO.venueImages)}">
 				<div class="section-label">場地照片</div>
 				<div class="photo-grid">
-					<img th:each="img : ${venueVO.venueImages}"
+					<img class="lightbox-trigger" th:each="img : ${venueVO.venueImages}"
 						th:src="@{/front/venue/getImage(imagesId=${img.imagesId})}" alt="場地照片" />
 				</div>
 			</div>
@@ -126,6 +127,23 @@
 	</div>
 </div>
 
+<!-- 場地照片放大檢視 -->
+<div class="lightbox" id="photoLightbox" hidden>
+	<div class="lightbox__backdrop" data-lightbox-close></div>
+	<button type="button" class="lightbox__nav lightbox__nav--prev" data-lightbox-prev aria-label="上一張">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+	</button>
+	<img class="lightbox__img" id="lightboxImg" src="" alt="場地照片放大">
+	<button type="button" class="lightbox__nav lightbox__nav--next" data-lightbox-next aria-label="下一張">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+	</button>
+	<button type="button" class="lightbox__close" data-lightbox-close aria-label="關閉">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+	</button>
+	<div class="lightbox__counter" id="lightboxCounter"></div>
+</div>
+
 <script th:src="@{/js/front-end/venue/loginModal.js}"></script>
+<script th:src="@{/js/front-end/venue/photoLightbox.js}"></script>
 </body>
 </html>
