@@ -104,6 +104,54 @@ public class ServiceOrderService {
 	// 測試用：買家有 60 秒付款
 	private static final long BUYER_PAYMENT_SECONDS = 60;
 
+	// =========================================================
+	// 通知標題
+	//
+	// 前端通知列表會依照這些標題，
+	// 決定導向買家訂單頁或賣家訂單頁。
+	// =========================================================
+
+	// 賣家收到的通知
+	private static final String NOTIFY_SELLER_NEW_REQUEST =
+			"收到新的服務預約申請";
+
+	private static final String NOTIFY_SELLER_PAYMENT_COMPLETED =
+			"服務訂單付款完成";
+
+	private static final String NOTIFY_SELLER_BUYER_CANCELLED =
+			"服務訂單已由買家取消";
+
+	private static final String NOTIFY_SELLER_BUYER_PAYMENT_EXPIRED =
+			"服務訂單買家付款逾期";
+
+	private static final String NOTIFY_SELLER_PLATFORM_CANCELLED =
+			"平台已取消服務訂單";
+
+	// 買家收到的通知
+	private static final String NOTIFY_BUYER_REQUEST_ACCEPTED =
+			"服務預約申請已通過";
+
+	private static final String NOTIFY_BUYER_REQUEST_REJECTED =
+			"服務預約申請未通過";
+
+	private static final String NOTIFY_BUYER_SLOT_TAKEN =
+			"服務預約時段已被其他會員預約";
+
+	private static final String NOTIFY_BUYER_SELLER_CANCELLED =
+			"服務訂單已由賣家取消";
+
+	private static final String NOTIFY_BUYER_PLATFORM_CANCELLED =
+			"平台已取消服務預約";
+
+	private static final String NOTIFY_BUYER_REFUND_COMPLETED =
+			"服務退款完成";
+
+	private static final String NOTIFY_BUYER_REQUEST_EXPIRED =
+			"服務預約申請已逾期";
+
+	private static final String NOTIFY_BUYER_PAYMENT_EXPIRED =
+			"服務付款期限已過";
+
 	private final ServiceOrderRepository orderRepo;
 	private final ServiceRepository serviceRepo;
 	private final ServiceSlotRepository slotRepo;
@@ -304,7 +352,7 @@ public class ServiceOrderService {
 		// 通知賣方：收到新的預約申請
 		sendNotification(
 				savedOrder.getSellerMemberId(),
-				"收到新的服務預約申請",
+				NOTIFY_SELLER_NEW_REQUEST,
 				"您的服務「"
 						+ savedOrder.getServiceNameSnapshot()
 						+ "」收到新的預約申請，預約時段為 "
@@ -407,8 +455,8 @@ public class ServiceOrderService {
 		// 通知買方：賣方已接受申請，請完成付款
 		sendNotification(
 				savedOrder.getBuyerMemberId(),
-				"預約申請已通過",
-				"賣方已同意您對「"
+				NOTIFY_BUYER_REQUEST_ACCEPTED,
+				"賣家已同意您對服務「"
 						+ savedOrder.getServiceNameSnapshot()
 						+ "」的預約申請，請於付款期限內完成付款。預約時段為 "
 						+ formatOrderSlot(savedOrder)
@@ -501,7 +549,7 @@ public class ServiceOrderService {
 		// 通知買家：賣家拒絕預約申請
 		sendNotification(
 				savedOrder.getBuyerMemberId(),
-				"預約申請未通過",
+				NOTIFY_BUYER_REQUEST_REJECTED,
 				"賣家未接受您對服務「"
 						+ savedOrder.getServiceNameSnapshot()
 						+ "」的預約申請。預約時段為 "
@@ -657,7 +705,7 @@ public class ServiceOrderService {
 		// 通知賣方：買方已完成付款
 		sendNotification(
 				savedOrder.getSellerMemberId(),
-				"買家已完成付款",
+				NOTIFY_SELLER_PAYMENT_COMPLETED,
 				"您的服務「"
 						+ savedOrder.getServiceNameSnapshot()
 						+ "」已有買家完成付款，訂單已正式成立。預約時段為 "
@@ -669,7 +717,7 @@ public class ServiceOrderService {
 
 			sendNotification(
 					otherOrder.getBuyerMemberId(),
-					"預約時段已被其他會員預約",
+					NOTIFY_BUYER_SLOT_TAKEN,
 					"您申請的服務「"
 							+ otherOrder.getServiceNameSnapshot()
 							+ "」時段 "
@@ -805,7 +853,7 @@ public class ServiceOrderService {
 
 		sendNotification(
 				savedOrder.getSellerMemberId(),
-				"買家已取消服務訂單",
+				NOTIFY_SELLER_BUYER_CANCELLED,
 				notificationContent
 		);
 
@@ -971,7 +1019,7 @@ public class ServiceOrderService {
 
 		sendNotification(
 				savedOrder.getBuyerMemberId(),
-				"賣家已取消服務訂單",
+				NOTIFY_BUYER_SELLER_CANCELLED,
 				notificationContent
 		);
 
@@ -1080,14 +1128,14 @@ public class ServiceOrderService {
 		// 通知買家
 		sendNotification(
 				savedOrder.getBuyerMemberId(),
-				"平台已取消服務訂單",
+				NOTIFY_BUYER_PLATFORM_CANCELLED,
 				notificationContent
 		);
 
 		// 通知賣家
 		sendNotification(
 				savedOrder.getSellerMemberId(),
-				"平台已取消服務訂單",
+				NOTIFY_SELLER_PLATFORM_CANCELLED,
 				notificationContent
 		);
 
@@ -1169,19 +1217,18 @@ public class ServiceOrderService {
 		 */
 
 		ServiceOrderVO savedOrder =
-				orderRepo.save(order);
+		        orderRepo.save(order);
 
 		// 通知買家：退款完成
 		sendNotification(
-				savedOrder.getBuyerMemberId(),
-				"服務訂單退款完成",
-				"服務「"
-						+ savedOrder.getServiceNameSnapshot()
-						+ "」的退款已完成，退款金額為 NT$ "
-						+ savedOrder.getRefundAmount()
-						+ "，原預約時段為 "
-						+ formatOrderSlot(savedOrder)
-						+ "。"
+		        savedOrder.getBuyerMemberId(),
+		        NOTIFY_BUYER_REFUND_COMPLETED,
+		        "您訂購的服務「"
+		                + savedOrder.getServiceNameSnapshot()
+		                + "」退款已完成，退款金額為 NT$ "
+		                + savedOrder.getRefundAmount()
+		                + "，原預約時段為 "
+		                + formatOrderSlot(savedOrder)
 		);
 
 		return savedOrder;
@@ -1501,7 +1548,7 @@ public class ServiceOrderService {
 
 		sendNotification(
 				order.getBuyerMemberId(),
-				"預約申請已逾期",
+				NOTIFY_BUYER_REQUEST_EXPIRED,
 				"賣家未在期限內確認您對服務「"
 						+ order.getServiceNameSnapshot()
 						+ "」的預約申請，系統已自動取消。預約時段為 "
@@ -1552,7 +1599,7 @@ public class ServiceOrderService {
 
 		sendNotification(
 				order.getBuyerMemberId(),
-				"付款期限已過",
+				NOTIFY_BUYER_PAYMENT_EXPIRED,
 				"您未在期限內完成服務「"
 						+ order.getServiceNameSnapshot()
 						+ "」的付款，系統已自動取消訂單。預約時段為 "
@@ -1562,7 +1609,7 @@ public class ServiceOrderService {
 
 		sendNotification(
 				order.getSellerMemberId(),
-				"買家付款逾期",
+				NOTIFY_SELLER_BUYER_PAYMENT_EXPIRED,
 				"服務「"
 						+ order.getServiceNameSnapshot()
 						+ "」的買家未在期限內完成付款，系統已自動取消訂單並重新開放時段。預約時段為 "
