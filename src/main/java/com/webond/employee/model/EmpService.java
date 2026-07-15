@@ -21,6 +21,7 @@ import com.webond.employee.model.EmployeeVO;
 import com.webond.employee.model.PermissionVO;
 import com.webond.employee.repository.EmpPermRepository;
 import com.webond.employee.repository.EmployeeRepository;
+import com.webond.member.model.MemberVO;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -251,6 +252,15 @@ public class EmpService {
     	empPermRepo.deleteByEmployeeId(currentEmp.getEmployeeId());
     
     	repository.delete(currentEmp);
+    }
+    
+    
+    public EmployeeVO findByEmpAccount(String empAccount) {
+		if (empAccount == null || empAccount.trim().isEmpty()) {
+			return null;
+		}
+		Optional<EmployeeVO> optional = repository.findByEmpAccount(empAccount.trim());
+		return optional.orElse(null);
     }
     
     
