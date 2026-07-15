@@ -210,7 +210,7 @@
       <div class="card-grid" id="venueGrid">
         <div th:each="venue : ${venueListData}" class="item-card">
 
-          <a th:href="@{/front/memberPage/oneMember(memberId=${venue.member.memberId}, venueId=${venue.venueId})}"
+          <a th:href="@{/front/venue/getOneMyVenue(venueId=${venue.venueId})}"
             class="item-card-body" style="text-decoration: none; color: inherit;">
 
             <!-- 顯示圖片 -->
