@@ -439,7 +439,7 @@ td {
 						<p id="detNickname" style="color: #64748b; font-size: 14px;"></p>
 					</div>
 				</div>
-				<div class="info-grid">
+								<div class="info-grid">
 					<div class="info-item">
 						<div class="info-label">會員 ID</div>
 						<div class="info-value" id="detId"></div>
@@ -460,6 +460,14 @@ td {
 						<div class="info-label">檢舉點數</div>
 						<div class="info-value" id="detPoints"
 							style="color: var(--rose-600);"></div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">性別</div>
+						<div class="info-value" id="detGender"></div>
+					</div>
+					<div class="info-item">
+						<div class="info-label">註冊日期</div>
+						<div class="info-value" id="detCreatedAt"></div>
 					</div>
 				</div>
 				<div class="kyc-img-box">
@@ -486,44 +494,80 @@ td {
 		<img id="modalTargetImg" src="">
 	</div>
 
-	<script>
+		<script>
 	   function switchTab(btn, tabId) {
 	       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
 	       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 	       btn.classList.add('active');
 	       document.getElementById(tabId).classList.add('active');
 	   }
+
 	   function showDetail(row) {
 	       const d = row.dataset;
 	       document.getElementById('placeholderText').style.display = 'none';
 	       document.getElementById('detailContent').style.display = 'block';
 	       document.getElementById('detId').innerText = d.id;
 	       document.getElementById('detRealName').innerText = d.realname;
+	       document.getElementById('detNickname').innerText = d.nickname || '';       // 🟢 補：原本漏掉暱稱
+	       document.getElementById('detPhone').innerText = d.phone || '未填寫';        // 🟢 補：原本漏掉手機
 	       document.getElementById('detEmail').innerText = d.email;
 	       document.getElementById('detIdNumber').innerText = d.idnumber;
 	       document.getElementById('detPoints').innerText = d.points + ' / 5 點';
-	       
+	       document.getElementById('detGender').innerText =
+	           d.gender == 1 ? '男' : (d.gender == 0 ? '女' : '其他');                  // 🟢 補：性別
+	       document.getElementById('detCreatedAt').innerText = d.createdat || '—';    // 🟢 補：註冊日期
+
 	       // 設定圖片來源 (對應後端 displayImage)
 	       document.getElementById('detAvatar').src = '/member/back-end/displayImage?memberId=' + d.id + '&type=memberPic';
 	       document.getElementById('detIdFrontImg').src = '/member/back-end/displayImage?memberId=' + d.id + '&type=idFront';
 	       document.getElementById('detIdBackImg').src = '/member/back-end/displayImage?memberId=' + d.id + '&type=idBack';
 	       document.getElementById('detFaceImg').src = '/member/back-end/displayImage?memberId=' + d.id + '&type=faceImage';
-	       
-	       // 動態按鈕生成 (與原邏輯一致)
+
+	       // 動態按鈕生成：依帳號狀態決定可執行的操作
 	       let area = document.getElementById('detActionArea');
 	       area.innerHTML = '';
-	       if(d.status == 0 || d.status == 2) {
-	           area.innerHTML = `<form action="/member/back-end/toggleStatus" method="post" style="display:inline;"><input type="hidden" name="memberId" value="${d.id}"><input type="hidden" name="newStatus" value="1"><button type="submit" class="btn-action btn-recover">✅ 核准</button></form>`;
-	       } else if(d.status == 1) {
-	           area.innerHTML = `<form action="/member/back-end/toggleStatus" method="post" style="display:inline;"><input type="hidden" name="memberId" value="${d.id}"><input type="hidden" name="newStatus" value="3"><button type="submit" class="btn-action btn-suspend">⛔ 停權</button></form>`;
+	       if (d.status == 0) {
+	           // ⏳ 待審核：可「核准」或「駁回」
+	           area.innerHTML =
+	               buildActionForm(d.id, 1, 'btn-recover', '✅ 核准', '確定要核准這位會員的實名認證嗎？') +
+	               buildActionForm(d.id, 2, 'btn-fail', '❌ 駁回', '確定要駁回這位會員的實名認證嗎？（帳號將標記為審核失敗）');
+	       } else if (d.status == 2) {
+	           // ❌ 審核失敗：可重新「核准」
+	           area.innerHTML =
+	               buildActionForm(d.id, 1, 'btn-recover', '✅ 重新核准', '確定要核准這位會員的實名認證嗎？');
+	       } else if (d.status == 1) {
+	           // 🟢 正常：可「停權」
+	           area.innerHTML =
+	               buildActionForm(d.id, 3, 'btn-suspend', '⛔ 停權', '確定要停權這位會員嗎？');
+	       } else if (d.status == 3) {
+	           // 🚫 已停權：可「恢復權限」（後端會同時重置檢舉點數）
+	           area.innerHTML =
+	               buildActionForm(d.id, 1, 'btn-recover', '♻️ 恢復權限', '確定要恢復這位會員的使用權限嗎？（檢舉點數將重置為 0）');
 	       }
 	   }
-	   function zoomImage(img) { 
-		   if(!img.src) return;
+
+	   // 產生操作表單的共用方法（含送出前確認，避免誤點）
+	   function buildActionForm(memberId, newStatus, btnClass, label, confirmMsg) {
+	       return `<form action="/member/back-end/toggleStatus" method="post" style="display:inline;"
+	                     onsubmit="return confirm('${confirmMsg}')">
+	                   <input type="hidden" name="memberId" value="${memberId}">
+	                   <input type="hidden" name="newStatus" value="${newStatus}">
+	                   <button type="submit" class="btn-action ${btnClass}">${label}</button>
+	               </form>`;
+	   }
+
+	   function zoomImage(img) {
+		   if(!img.src || img.dataset.broken === '1') return;
 		   document.getElementById('modalTargetImg').src = img.src;
-		   document.getElementById('imgModal').style.display = 'flex'; 
+		   document.getElementById('imgModal').style.display = 'flex';
 	   }
 	   function closeZoom() { document.getElementById('imgModal').style.display = 'none'; }
+
+	   // 圖片載入失敗（例如會員沒上傳、或後端回 404）時降低透明度標示，避免點擊放大破圖
+	   document.querySelectorAll('.kyc-img-box img, .detail-avatar').forEach(img => {
+	       img.onerror = function() { this.style.opacity = '0.15'; this.dataset.broken = '1'; };
+	       img.addEventListener('load', function() { this.style.opacity = '1'; this.dataset.broken = ''; });
+	   });
 	</script>
 </body>
 </html>

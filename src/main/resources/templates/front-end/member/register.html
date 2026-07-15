@@ -237,8 +237,8 @@ button[type="submit"]:hover {
 				<div class="form-group">
 					<label>性別 *</label>
 					<div class="radio-group">
-						<label><input type="radio" th:field="*{gender}" value="1"> 男</label> 
-						<label><input type="radio" th:field="*{gender}" value="0"> 女</label> 
+						<label><input type="radio" th:field="*{gender}" value="0"> 男</label> 
+						<label><input type="radio" th:field="*{gender}" value="1"> 女</label> 
 						<label><input type="radio" th:field="*{gender}" value="2"> 其他</label>
 					</div>
 					<span class="field-error" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
