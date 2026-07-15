@@ -22,6 +22,11 @@ public interface NotificationRepository  extends JpaRepository<NotificationVO, I
 	@Transactional
 	@Query("UPDATE NotificationVO n SET n.isRead = 1 WHERE n.notificationId = :notificationId")
 	void markAsRead(@Param("notificationId") Integer notificationId);
+    
+    @Modifying
+	@Transactional
+	@Query("UPDATE NotificationVO n SET n.isRead = 1 WHERE n.member.memberId = :memberId And n.isRead = 0")
+	void markAllAsRead(@Param("memberId") Integer memberId);
 	
 
 }

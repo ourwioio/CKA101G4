@@ -16,8 +16,7 @@ public class NotificationService {
     @Autowired
     private NotificationRepository repository;
 
-    public void addNotification(
-            NotificationVO notificationVO) {
+    public void addNotification(NotificationVO notificationVO) {
 
         notificationVO.setCreatedAt(LocalDate.now());
         notificationVO.setIsRead((byte) 0);
@@ -29,20 +28,12 @@ public class NotificationService {
         repository.save(notificationVO);
     }
 
-    public void updateNotification(
-            NotificationVO notificationVO) {
+    public void updateNotification(NotificationVO notificationVO) {
 
-        NotificationVO original =
-                repository
-                    .findById(
-                        notificationVO.getNotificationId()
-                    )
-                    .orElse(null);
+        NotificationVO original = repository .findById(notificationVO.getNotificationId()).orElse(null);
 
         if (original != null) {
-            notificationVO.setCreatedAt(
-                original.getCreatedAt()
-            );
+            notificationVO.setCreatedAt(original.getCreatedAt());
         }
 
         notificationVO.setIsRead((byte) 0);
@@ -50,30 +41,24 @@ public class NotificationService {
         repository.save(notificationVO);
     }
 
-    public NotificationVO getOneForUpdate(
-            Integer notificationId) {
+    public NotificationVO getOneForUpdate(Integer notificationId) {
 
-        return repository
-                .findById(notificationId)
-                .orElse(null);
+        return repository.findById(notificationId).orElse(null);
     }
 
-    public void deleteNotification(
-            Integer notificationId) {
+    public void deleteNotification(Integer notificationId) {
 
         if (repository.existsById(notificationId)) {
             repository.deleteById(notificationId);
         }
     }
 
-    public NotificationVO getOneNotification(
-            Integer notificationId) {
+    public NotificationVO getOneNotification(Integer notificationId) {
 
         Optional<NotificationVO> optional =
                 repository.findById(notificationId);
 
-        NotificationVO notificationVO =
-                optional.orElse(null);
+        NotificationVO notificationVO = optional.orElse(null);
 
         if (notificationVO != null) {
 
@@ -85,15 +70,13 @@ public class NotificationService {
         return notificationVO;
     }
 
-    public List<NotificationVO> getNotificationByMemberId(
-            Integer memberId) {
+    public List<NotificationVO> getNotificationByMemberId(Integer memberId) {
 
         return repository
                 .findByMember_MemberId(memberId);
     }
 
-    public List<NotificationVO> getNotificationByEmployeeId(
-            Integer employeeId) {
+    public List<NotificationVO> getNotificationByEmployeeId(Integer employeeId) {
 
         return repository
                 .findByEmployee_EmployeeId(employeeId);
@@ -103,10 +86,14 @@ public class NotificationService {
         return repository.findAll();
     }
 
-    public void markNotificationAsRead(
-            Integer notificationId) {
+    public void markNotificationAsRead(Integer notificationId) {
 
         repository.markAsRead(notificationId);
+    }
+
+    public void markAllNotificationAsRead(Integer memberId) {
+
+        repository.markAllAsRead(memberId);
     }
 
     public int countUnread(

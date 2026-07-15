@@ -13,6 +13,7 @@
 
     <div>
         <h1>全部通知</h1>
+    	<button type="button" id="markAllReadBtn">全部標為已讀</button>
 
         <span th:if="${session.memberVO != null}">
             當前登入會員編號：
@@ -26,11 +27,13 @@
 
     <table>
         <thead>
-            <td>標題</td>
-            <td>內容</td>
-            <td>通知類型</td>
-            <td>是否已讀</td>
-            <td>建立時間</td>
+	        <tr>
+	            <td>標題</td>
+	            <td>內容</td>
+	            <td>通知類型</td>
+	            <td>是否已讀</td>
+	            <td>建立時間</td>
+            </tr>
         </thead>
         <tbody>
             <tr th:each="n:${notificationVO}">
@@ -53,5 +56,20 @@
 
 
 </body>
+<script type="text/javascript">
+	document.getElementById('markAllReadBtn').addEventListener('click', function () {
+	    fetch('/front/notification/markAllRead', {
+	        method: 'POST'
+	    })
+	    .then(res => {
+	        if (!res.ok) throw new Error('未登入或發生錯誤');
+	        return res.text();
+	    })
+	    .then(() => {
+	        location.reload(); // 重新整理，navbar 角標和列表的已讀狀態都會自動更新
+	    })
+	    .catch(err => console.error(err));
+	});
+</script>
 
 </html>
