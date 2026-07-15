@@ -103,44 +103,59 @@ public class MemberReportController {
 	// =========================================================================
 	@GetMapping("/DBGifReader")
 	public void dbGifReader(
-			@RequestParam("reportId") Integer reportId,
-			@RequestParam(value = "index", defaultValue = "0") Integer index,
-			HttpServletResponse response) {
-		
-		try (ServletOutputStream out = response.getOutputStream()) {
-			MemberReportVO memberReportVO = reportSvc.getOneMemberReport(reportId);
-			if (memberReportVO != null && memberReportVO.getEvidence() != null) {
-				byte[] rawData = memberReportVO.getEvidence();
-				String dataStr = new String(rawData, StandardCharsets.UTF_8).trim();
+	        @RequestParam("reportId") Integer reportId,
+	        @RequestParam(value = "index", defaultValue = "0") Integer index,
+	        HttpServletResponse response) {
 
-				// 判斷是否為多圖 JSON 格式 (以 "[" 開頭)
-				if (dataStr.startsWith("[")) {
-					List<String> base64List = objectMapper.readValue(dataStr, List.class);
-					if (index >= 0 && index < base64List.size()) {
-						String base64Image = base64List.get(index);
-						
-						// 解析 Content-Type (例如 data:image/png;base64,...)
-						if (base64Image.contains(",")) {
-							String mimeType = base64Image.substring(5, base64Image.indexOf(";"));
-							response.setContentType(mimeType);
-							String pureBase64 = base64Image.substring(base64Image.indexOf(",") + 1);
-							out.write(Base64.getDecoder().decode(pureBase64));
-						} else {
-							response.setContentType("image/png");
-							out.write(Base64.getDecoder().decode(base64Image));
-						}
-					}
-				} else {
-					// 舊式傳統單檔直接輸出的 byte[] 處理
-					response.setContentType("image/jpeg");
-					out.write(rawData);
-				}
-			}
-		} catch (IOException e) {
-			System.out.println("[Error] 讀取圖片發生串流異常: " + e.getMessage());
-		}
+	    MemberReportVO memberReportVO = reportSvc.getOneMemberReport(reportId);
+	    // 查無案件或無證據資料 → 回 404，讓前端 onerror 正確停止探測
+	    if (memberReportVO == null || memberReportVO.getEvidence() == null) {
+	        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	        return;
+	    }
+
+	    try (ServletOutputStream out = response.getOutputStream()) {
+	        byte[] rawData = memberReportVO.getEvidence();
+	        String dataStr = new String(rawData, StandardCharsets.UTF_8).trim();
+
+	        // 檢查是否為 JSON 陣列（新版多圖格式）
+	        if (dataStr.startsWith("[")) {
+	            List<String> base64List = objectMapper.readValue(dataStr, List.class);
+
+	            // index 超出張數範圍 → 404，前端探測到此為止
+	            if (index < 0 || index >= base64List.size()) {
+	                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	                return;
+	            }
+
+	            String base64Image = base64List.get(index);
+
+	            // 防呆解析：完整 Data URL（data:image/png;base64,xxx）才解析 mimeType，
+	            // 否則視為純 Base64 字串，預設以 image/png 輸出
+	            if (base64Image.startsWith("data:") && base64Image.contains(";") && base64Image.contains(",")) {
+	                String mimeType = base64Image.substring(5, base64Image.indexOf(";"));
+	                String pureBase64 = base64Image.substring(base64Image.indexOf(",") + 1);
+	                response.setContentType(mimeType);
+	                out.write(Base64.getDecoder().decode(pureBase64));
+	            } else {
+	                response.setContentType("image/png");
+	                out.write(Base64.getDecoder().decode(base64Image.replaceAll("\\s", "")));
+	            }
+	        } else {
+	            // 舊版非 JSON 的單張圖片資料：只在 index=0 時輸出，
+	            // 避免前端多圖探測時同一張舊圖被重複顯示
+	            if (index == 0) {
+	                response.setContentType("image/jpeg");
+	                out.write(rawData);
+	            } else {
+	                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	            }
+	        }
+	    } catch (Exception e) {
+	        System.err.println("[Error] 讀取證據圖片失敗: " + e.getMessage());
+	        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	    }
 	}
-
 	// =========================================================================
 	// 🛡️ 【防呆 GET 路由】防止 F5 重複提交
 	// =========================================================================

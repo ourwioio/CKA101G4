@@ -82,20 +82,21 @@
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
         th { background: var(--slate-50); padding: 12px; border-bottom: 2px solid var(--border-color); text-align: left; color: var(--slate-600); font-weight: 600; }
         td { padding: 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
-                    
+
         .clickable-row { cursor: pointer; transition: background 0.15s; }
         .clickable-row:hover { background-color: #f0f9ff !important; }
         .clickable-row.hidden { display: none !important; }
 
         .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; }
         .badge-pending { background: #fef9c3; color: #713f12; }
+        .badge-processing { background: #dbeafe; color: #1e40af; }
         .badge-approved { background: #d1fae5; color: #065f46; }
         .badge-rejected { background: #ffe4e6; color: #9f1239; }
 
         .detail-panel { position: sticky; top: 40px; align-self: start; background: #ffffff; }
         .detail-placeholder { text-align: center; color: #94a3b8; padding: 8px 20px; font-weight: 500; }
         .detail-placeholder h3 { font-size: 18px; margin-bottom: 8px; color: var(--slate-700); }
-                    
+
         .detail-header { border-bottom: 1px solid var(--slate-200); padding-bottom: 16px; margin-bottom: 16px; }
         .detail-header h3 { font-size: 18px; font-weight: 700; color: var(--slate-800); }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 14px; margin-bottom: 20px; }
@@ -103,47 +104,89 @@
         .info-item.full-width { grid-column: span 2; }
         .info-label { font-size: 12px; color: #64748b; margin-bottom: 4px; font-weight: 600; }
         .info-value { font-weight: 600; color: var(--slate-800); white-space: pre-wrap; word-break: break-all; }
-        
-        .evidence-img-box { margin-top: 10px; min-height: 50px; display: flex; align-items: center; justify-content: center; background: var(--slate-50); border-radius: 8px; border: 1px dashed var(--slate-200); }
-        .evidence-img-box img { width: 100%; max-height: 180px; object-fit: contain; background: #1e293b; border-radius: 8px; cursor: zoom-in; }
-        .no-img-text { color: #94a3b8; font-size: 13px; font-weight: 500; padding: 15px; }
-        
+
+        /* 📸 多張證據縮圖牆 */
+        .evidence-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+            min-height: 50px;
+            background: var(--slate-50);
+            border-radius: 8px;
+            border: 1px dashed var(--slate-200);
+            padding: 10px;
+        }
+        .evidence-thumb {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--slate-200);
+            background: #1e293b;
+            cursor: zoom-in;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .evidence-thumb:hover {
+            transform: scale(1.04);
+            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+        }
+        .no-img-text { color: #94a3b8; font-size: 13px; font-weight: 500; padding: 15px; grid-column: 1 / -1; text-align: center; }
+
         /* 審核表單特有樣式 */
         .audit-form-section { border-top: 2px dashed var(--slate-200); padding-top: 20px; margin-top: 20px; }
         .audit-title { font-size: 16px; font-weight: 700; color: var(--slate-800); margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
         .form-group { margin-bottom: 14px; }
         .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--slate-700); margin-bottom: 6px; }
         .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        
+
         .input-control { width: 100%; padding: 10px 12px; border: 1px solid var(--slate-300); border-radius: 8px; font-size: 14px; font-family: inherit; transition: border 0.15s; color: var(--slate-800); font-weight: 500; }
         .input-control:focus { outline: none; border-color: var(--sky-600); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1); }
         textarea.input-control { resize: vertical; min-height: 80px; }
-        
+
         .btn-submit-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
         .btn-audit-action { padding: 12px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: white; transition: background 0.15s; }
         .btn-approve { background: var(--emerald-600); }
         .btn-approve:hover { background: var(--emerald-700); }
         .btn-reject { background: var(--rose-600); }
         .btn-reject:hover { background: var(--rose-700); }
-        
+
+        /* 🔍 放大檢視 Modal（含多圖導覽） */
         .image-modal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); justify-content: center; align-items: center; cursor: zoom-out; }
-        .image-modal img { max-width: 90%; max-height: 90%; border-radius: 12px; }
+        .image-modal img { max-width: 85%; max-height: 85%; border-radius: 12px; cursor: default; }
+        .modal-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 26px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s;
+            line-height: 1;
+        }
+        .modal-nav:hover { background: rgba(255, 255, 255, 0.35); }
+        .modal-nav.prev { left: 24px; }
+        .modal-nav.next { right: 24px; }
+        .modal-counter {
+            position: absolute;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            background: rgba(15, 23, 42, 0.65);
+            padding: 6px 16px;
+            border-radius: 16px;
+        }
         .read-only-box { text-align: center; padding: 16px; background: var(--slate-50); border: 1px dashed var(--slate-200); border-radius: 8px; color: var(--slate-600); font-weight: 600; font-size: 14px; }
     </style>
-
-    <script>
-        function handleImageError() {
-            let img = document.getElementById('detEvidenceImg');
-            if (img) img.style.display = 'none';
-            let wrapper = document.getElementById('imgWrapper');
-            if (wrapper && !document.getElementById('noImgTxt')) {
-                let txt = document.createElement('div');
-                txt.id = 'noImgTxt'; txt.className = 'no-img-text';
-                txt.innerText = '📁 本案未提供或無有效的證據截圖檔案';
-                wrapper.appendChild(txt);
-            }
-        }
-    </script>
 </head>
 <body>
 <div class="container">
@@ -152,11 +195,13 @@
             <h2>⚖️ 會員檢舉案審核中心 (權限五專用)</h2>
             <a th:href="@{/backend/memberreport/select_page}" class="btn-top-action">🏠 回導覽首頁</a>
         </div>
+        <!-- 狀態編碼對齊資料庫：0待處理, 1處理中, 2成立, 3不成立 -->
         <div class="tabs-container">
             <button class="tab-btn active" onclick="switchTab('all', this)">全部案件</button>
             <button class="tab-btn" onclick="switchTab('0', this)">⏳ 待處理</button>
-            <button class="tab-btn" onclick="switchTab('1', this)">🟢 審核通過</button>
-            <button class="tab-btn" onclick="switchTab('2', this)">❌ 審核未通過</button>
+            <button class="tab-btn" onclick="switchTab('1', this)">🔵 處理中</button>
+            <button class="tab-btn" onclick="switchTab('2', this)">🟢 審核成立</button>
+            <button class="tab-btn" onclick="switchTab('3', this)">❌ 審核不成立</button>
         </div>
         <table>
             <thead>
@@ -183,7 +228,7 @@
                     th:data-points="${reportVO.violationPoints != null ? reportVO.violationPoints : 0}"
                     th:data-time="${#dates.format(reportVO.createdAt, 'yyyy-MM-dd HH:mm')}"
                     onclick="showReportDetail(this)">
-                                            
+
                     <td th:text="${reportVO.reportId}" style="font-weight: 600;"></td>
                     <td th:text="${reportVO.reporter?.memberId}"></td>
                     <td th:text="${reportVO.reported?.memberId}"></td>
@@ -193,8 +238,9 @@
                     <td th:text="${#dates.format(reportVO.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
                     <td>
                         <span th:if="${reportVO.reportStatus == 0}" class="status-badge badge-pending">⏳ 待處理</span>
-                        <span th:if="${reportVO.reportStatus == 1}" class="status-badge badge-approved">🟢 檢舉成立</span>
-                        <span th:if="${reportVO.reportStatus == 2}" class="status-badge badge-rejected">❌ 退件/不成立</span>
+                        <span th:if="${reportVO.reportStatus == 1}" class="status-badge badge-processing">🔵 處理中</span>
+                        <span th:if="${reportVO.reportStatus == 2}" class="status-badge badge-approved">🟢 檢舉成立</span>
+                        <span th:if="${reportVO.reportStatus == 3}" class="status-badge badge-rejected">❌ 退件/不成立</span>
                     </td>
                 </tr>
             </tbody>
@@ -205,26 +251,24 @@
         <div class="detail-placeholder" id="placeholderText">
             <h3>📑 請點選左側任意案件</h3>
             <p style="font-size: 13px; margin-top: 6px;">點選待處理案件即可進入審核判定流程。</p>
-        </div>                
+        </div>
         <div id="detailContent" style="display: none;">
             <div class="detail-header">
                 <h3>案號 #<span id="detReportId"></span> 詳細資訊</h3>
             </div>
-            
+
             <div class="info-grid">
                 <div class="info-item"><div class="info-label">檢舉人 ID</div><div class="info-value" id="detReporter"></div></div>
                 <div class="info-item"><div class="info-label">被檢舉人 ID</div><div class="info-value" id="detReported"></div></div>
                 <div class="info-item"><div class="info-label">檢舉類別</div><div class="info-value" id="detCategory"></div></div>
-                <div class="info-item"><div class="info-label">檢舉時間</div><div class="info-value" id="detTime"></div></div>                                
+                <div class="info-item"><div class="info-label">檢舉時間</div><div class="info-value" id="detTime"></div></div>
                 <div class="info-item full-width">
                     <div class="info-label">📋 詳細具體事證描述</div>
                     <div class="info-value" id="detContentDesc" style="line-height: 1.6;"></div>
                 </div>
                 <div class="info-item full-width">
-                    <div class="info-label">📸 檢舉事證截圖 (點擊可放大)</div>
-                    <div class="evidence-img-box" id="imgWrapper">
-                        <img id="detEvidenceImg" src="" alt="證據截圖" onclick="zoomEvidence(this)" onerror="handleImageError()">
-                    </div>
+                    <div class="info-label" id="evidenceCountLabel">📸 檢舉事證截圖 (點擊可放大)</div>
+                    <div class="evidence-gallery" id="evidenceGallery"></div>
                 </div>
             </div>
 
@@ -235,7 +279,7 @@
 
                     <div id="auditInteractiveArea">
                         <div class="audit-title">🛠️ 權限五審核判定作業</div>
-                        
+
                         <div class="form-row-2">
                             <div class="form-group">
                                 <label for="employeeId"><span style="color:var(--rose-600)">*</span> 經辦員工編號</label>
@@ -253,15 +297,16 @@
                         </div>
 
                         <div class="btn-submit-group">
-                            <button type="button" class="btn-audit-action btn-approve" onclick="submitAudit(1)">🟢 審核通過 (成立)</button>
-                            <button type="button" class="btn-audit-action btn-reject" onclick="submitAudit(2)">❌ 審核駁回 (不成立)</button>
+                            <!-- 狀態編碼對齊資料庫：成立=2, 不成立=3 -->
+                            <button type="button" class="btn-audit-action btn-approve" onclick="submitAudit(2)">🟢 審核通過 (成立)</button>
+                            <button type="button" class="btn-audit-action btn-reject" onclick="submitAudit(3)">❌ 審核駁回 (不成立)</button>
                         </div>
                     </div>
 
                     <div id="auditReadOnlyArea" style="display: none;">
                         <div class="info-grid" style="margin-bottom: 0;">
                             <div class="info-item"><div class="info-label">經辦員工編號</div><div class="info-value" id="lblEmpId"></div></div>
-                            <div class="info-item"><div class="info-label">裁決扣除點數</div><div class="info-value" id="lblPoints" style="color: var(--rose-600);"></div></div>                                
+                            <div class="info-item"><div class="info-label">裁決扣除點數</div><div class="info-value" id="lblPoints" style="color: var(--rose-600);"></div></div>
                             <div class="info-item full-width">
                                 <div class="info-label">💬 審核處理批註歷史紀錄</div>
                                 <div class="info-value" id="lblAdminNote" style="color: var(--slate-600); font-weight: 500;"></div>
@@ -277,10 +322,19 @@
 </div>
 
 <div id="imgModal" class="image-modal" onclick="closeEvidenceZoom()">
-    <img id="modalTargetImg" src="" alt="放大證據圖">
+    <button type="button" class="modal-nav prev" id="modalPrevBtn" onclick="navEvidence(-1, event)">‹</button>
+    <img id="modalTargetImg" src="" alt="放大證據圖" onclick="event.stopPropagation()">
+    <button type="button" class="modal-nav next" id="modalNextBtn" onclick="navEvidence(1, event)">›</button>
+    <div class="modal-counter" id="modalCounter"></div>
 </div>
 
 <script>
+    // ================== 📸 多張證據截圖：狀態變數 ==================
+    let currentReportId = null;   // 目前檢視中的案件（防止快速切換案件時，舊請求汙染畫面）
+    let evidenceSrcList = [];     // 目前案件所有證據圖的網址清單
+    let currentZoomIndex = 0;     // 放大檢視目前所在的張數
+    const MAX_EVIDENCE_PROBE = 30; // 最多探測 30 張，防止異常資料造成無限請求
+
     function switchTab(statusType, btn) {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
@@ -294,21 +348,21 @@
     }
 
     function showReportDetail(row) {
-        if (!row) return;                
+        if (!row) return;
         let id = row.dataset.id;
         let reporter = row.dataset.reporter;
         let reported = row.dataset.reported;
         let category = row.dataset.category;
         let content = row.dataset.content;
-        let status = row.dataset.status; // 0=待處理, 1=通過, 2=駁回
+        let status = row.dataset.status; // 0=待處理, 1=處理中, 2=成立, 3=不成立
         let emp = row.dataset.emp;
         let note = row.dataset.note;
         let points = row.dataset.points;
-        let time = row.dataset.time;                
-        
+        let time = row.dataset.time;
+
         document.getElementById('placeholderText').style.display = 'none';
-        document.getElementById('detailContent').style.display = 'block';                
-        
+        document.getElementById('detailContent').style.display = 'block';
+
         // 渲染基本案情資料
         document.getElementById('detReportId').innerText = id;
         document.getElementById('formReportId').value = id; // 同步寫入表單隱藏欄位
@@ -317,34 +371,30 @@
         document.getElementById('detCategory').innerText = category;
         document.getElementById('detTime').innerText = time;
         document.getElementById('detContentDesc').innerText = content || '無文字描述';
-        
-        // 處理圖片事證
-        let img = document.getElementById('detEvidenceImg');
-        if (img) img.style.display = 'block';
-        let oldTxt = document.getElementById('noImgTxt');
-        if (oldTxt) oldTxt.remove();
-        if (img) img.src = '/backend/memberreport/DBGifReader?reportId=' + id;                
-        
-        // 【核心邏輯判定】：根據案件狀態，切換「審核輸入模式」或「結案唯讀模式」
-        if (status === "0") {
-            // 待處理：重置並開啟輸入表單區
+
+        // 📸 載入本案「全部」證據截圖（多圖縮圖牆）
+        loadEvidenceGallery(id);
+
+        // 【核心邏輯判定】：0待處理、1處理中 → 可審核；2成立、3不成立 → 結案唯讀
+        if (status === "0" || status === "1") {
+            // 未結案：重置並開啟輸入表單區
             document.getElementById('auditInteractiveArea').style.display = 'block';
             document.getElementById('auditReadOnlyArea').style.display = 'none';
-            
+
             document.getElementById('employeeId').value = '';
             document.getElementById('violationPoints').value = '0';
             document.getElementById('adminNote').value = '';
         } else {
-            // 已結案（1或2）：隱藏表單，顯示唯讀歷程
+            // 已結案（2或3）：隱藏表單，顯示唯讀歷程
             document.getElementById('auditInteractiveArea').style.display = 'none';
             document.getElementById('auditReadOnlyArea').style.display = 'block';
-            
+
             document.getElementById('lblEmpId').innerText = emp || '系統自動結案';
             document.getElementById('lblPoints').innerText = (points || 0) + ' 點';
             document.getElementById('lblAdminNote').innerText = note || '無處理批註';
-            
+
             let statusBox = document.getElementById('lblStatusBox');
-            if (status === "1") {
+            if (status === "2") {
                 statusBox.className = "read-only-box";
                 statusBox.style.borderColor = "var(--emerald-600)";
                 statusBox.innerHTML = "🔒 🟢 本案已由主管判定【檢舉成立】並結案";
@@ -356,16 +406,120 @@
         }
     }
 
-    // 按鈕點擊事件：設定審核代碼並提交表單
+    // ================== 📸 多張證據截圖：載入邏輯 ==================
+    // 後端 DBGifReader 支援 ?reportId=X&index=N 逐張讀取（超出張數會回 404），
+    // 因此從 index=0 開始依序探測，成功一張就顯示一張，直到失敗為止。
+    function loadEvidenceGallery(reportId) {
+        currentReportId = reportId;
+        evidenceSrcList = [];
+        updateEvidenceCountLabel();
+
+        const gallery = document.getElementById('evidenceGallery');
+        gallery.innerHTML = '<div class="no-img-text">⏳ 證據圖片載入中...</div>';
+
+        probeEvidence(reportId, 0);
+    }
+
+    function probeEvidence(reportId, index) {
+        // 使用者已切到別的案件，或已達張數上限 → 中止
+        if (reportId !== currentReportId || index >= MAX_EVIDENCE_PROBE) return;
+
+        const src = '/backend/memberreport/DBGifReader?reportId=' + reportId + '&index=' + index;
+        const probeImg = new Image();
+
+        probeImg.onload = function () {
+            if (reportId !== currentReportId) return; // 過期請求，丟棄
+
+            const gallery = document.getElementById('evidenceGallery');
+            if (index === 0) gallery.innerHTML = ''; // 第一張成功時清掉「載入中」
+
+            evidenceSrcList.push(src);
+
+            const thumb = document.createElement('img');
+            thumb.src = src;
+            thumb.className = 'evidence-thumb';
+            thumb.alt = '證據截圖 ' + (index + 1);
+            const zoomIdx = index;
+            thumb.onclick = function () { openEvidenceZoom(zoomIdx); };
+            gallery.appendChild(thumb);
+
+            updateEvidenceCountLabel();
+            probeEvidence(reportId, index + 1); // 繼續探測下一張
+        };
+
+        probeImg.onerror = function () {
+            if (reportId !== currentReportId) return;
+            if (index === 0) {
+                document.getElementById('evidenceGallery').innerHTML =
+                    '<div class="no-img-text">📁 本案未提供或無有效的證據截圖檔案</div>';
+            }
+            updateEvidenceCountLabel();
+        };
+
+        probeImg.src = src;
+    }
+
+    function updateEvidenceCountLabel() {
+        const label = document.getElementById('evidenceCountLabel');
+        if (evidenceSrcList.length > 0) {
+            label.innerText = '📸 檢舉事證截圖（共 ' + evidenceSrcList.length + ' 張，點擊可放大）';
+        } else {
+            label.innerText = '📸 檢舉事證截圖 (點擊可放大)';
+        }
+    }
+
+    // ================== 🔍 放大檢視（含左右翻頁） ==================
+    function openEvidenceZoom(index) {
+        if (evidenceSrcList.length === 0) return;
+        currentZoomIndex = index;
+        renderZoomImage();
+        document.getElementById('imgModal').style.display = 'flex';
+    }
+
+    function renderZoomImage() {
+        document.getElementById('modalTargetImg').src = evidenceSrcList[currentZoomIndex];
+        document.getElementById('modalCounter').innerText =
+            '第 ' + (currentZoomIndex + 1) + ' / ' + evidenceSrcList.length + ' 張';
+
+        // 只有一張圖時隱藏翻頁按鈕與計數器
+        const showNav = evidenceSrcList.length > 1;
+        document.getElementById('modalPrevBtn').style.display = showNav ? 'block' : 'none';
+        document.getElementById('modalNextBtn').style.display = showNav ? 'block' : 'none';
+        document.getElementById('modalCounter').style.display = showNav ? 'block' : 'none';
+    }
+
+    function navEvidence(delta, ev) {
+        if (ev) ev.stopPropagation(); // 避免點按鈕時觸發背景關閉
+        const total = evidenceSrcList.length;
+        if (total <= 1) return;
+        currentZoomIndex = (currentZoomIndex + delta + total) % total; // 循環翻頁
+        renderZoomImage();
+    }
+
+    function closeEvidenceZoom() {
+        document.getElementById('imgModal').style.display = 'none';
+    }
+
+    // 鍵盤操作：Esc 關閉、← → 翻頁
+    document.addEventListener('keydown', function (e) {
+        const modal = document.getElementById('imgModal');
+        if (modal.style.display !== 'flex') return;
+        if (e.key === 'Escape') closeEvidenceZoom();
+        if (e.key === 'ArrowLeft') navEvidence(-1);
+        if (e.key === 'ArrowRight') navEvidence(1);
+    });
+
+    // ================== 🛠️ 審核表單 ==================
+    // 按鈕點擊事件：設定審核代碼並提交表單（成立=2, 不成立=3）
     function submitAudit(statusType) {
         document.getElementById('formReportStatus').value = statusType;
-        
-        // 如果選擇駁回(2)，點數自動校正歸 0 較符合常規
-        if (statusType === 2) {
+
+        // 如果選擇駁回不成立(3)，點數自動校正歸 0 較符合常規
+        if (statusType === 3) {
             document.getElementById('violationPoints').value = '0';
         }
-        
-        let confirmMsg = statusType === 1 ? '確定要通過此檢舉案並執行扣點嗎？' : '確定要駁回此檢舉案件嗎？';
+
+        let confirmMsg = statusType === 2 ? '確定要通過此檢舉案並執行扣點嗎？' : '確定要駁回此檢舉案件嗎？';
         if (confirm(confirmMsg)) {
             document.getElementById('auditForm').submit();
         }
@@ -375,7 +529,7 @@
     function validateAuditForm() {
         let empId = document.getElementById('employeeId').value.trim();
         let points = document.getElementById('violationPoints').value;
-        
+
         if (!empId) {
             alert('請填寫經辦員工編號以利責任追蹤！');
             return false;
@@ -385,19 +539,6 @@
             return false;
         }
         return true;
-    }
-    
-    function zoomEvidence(img) {
-        if (!img || img.style.display === 'none' || !img.src) return;
-        let modal = document.getElementById('imgModal');
-        let modalImg = document.getElementById('modalTargetImg');
-        modalImg.src = img.src;
-        modal.style.display = 'flex';
-    }
-    
-    function closeEvidenceZoom() {
-        let modal = document.getElementById('imgModal');
-        modal.style.display = 'none';
     }
 </script>
 </body>
