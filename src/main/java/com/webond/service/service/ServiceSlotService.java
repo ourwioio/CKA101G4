@@ -243,6 +243,18 @@ public class ServiceSlotService {
 	public List<ServiceSlotVO> getByServiceId(Integer serviceId) {
 		return serviceSlotRepository.findByServiceIdWithService(serviceId);
 	}
+	
+	// 前台公開服務詳情：只查尚未開始的時段
+	@Transactional(readOnly = true)
+	public List<ServiceSlotVO> getPublicFutureSlotsByServiceId(
+	        Integer serviceId) {
+
+	    return serviceSlotRepository
+	            .findPublicFutureSlotsByServiceId(
+	                    serviceId,
+	                    LocalDateTime.now()
+	            );
+	}
 
 	
 	// 會員清空自己的某個服務底下全部可預約時段

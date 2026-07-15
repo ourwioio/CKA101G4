@@ -141,15 +141,30 @@ public class ServiceOrderService {
 		if (buyerId == null) {
 			throw new RuntimeException("請先登入");
 		}
+		
+		ServiceSlotVO slot =
+		        getSlotOrThrow(slotId);
 
-		ServiceSlotVO slot = getSlotOrThrow(slotId);
+		LocalDateTime now =
+		        LocalDateTime.now();
 
-		if (!Byte.valueOf(SLOT_AVAILABLE)
-				.equals(slot.getSlotStatus())) {
+		// 已經開始或時間異常的時段，不接受申請
+		if (slot.getStartTime() == null
+		        || !slot.getStartTime().isAfter(now)) {
 
-			throw new RuntimeException("此時段目前不可申請");
+		    throw new RuntimeException(
+		            "此服務時段已經開始或已過期"
+		    );
 		}
 
+		if (!Byte.valueOf(SLOT_AVAILABLE)
+		        .equals(slot.getSlotStatus())) {
+
+		    throw new RuntimeException(
+		            "此時段目前不可申請"
+		    );
+		}
+		
 		ServiceVO service = serviceRepo
 				.findById(slot.getServiceId())
 				.orElseThrow(
@@ -164,7 +179,6 @@ public class ServiceOrderService {
 			throw new RuntimeException("不能預約自己的服務");
 		}
 
-		LocalDateTime now = LocalDateTime.now();
 
 		ServiceOrderVO order = new ServiceOrderVO();
 

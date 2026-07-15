@@ -118,4 +118,19 @@ public interface ServiceSlotRepository extends JpaRepository<ServiceSlotVO, Inte
 	       """)
 	int deleteAvailableSlotsWithoutOrders(Integer serviceId,
 	                                      Byte availableStatus);
+	
+	// 前台服務詳情：只顯示尚未開始、且未封存的服務時段
+	@Query("""
+	        select ss
+	        from ServiceSlotVO ss
+	        left join fetch ss.service
+	        where ss.service.serviceId = :serviceId
+	        and ss.slotStatus in (0, 1, 2)
+	        and ss.startTime > :now
+	        order by ss.startTime
+	        """)
+	List<ServiceSlotVO> findPublicFutureSlotsByServiceId(
+	        Integer serviceId,
+	        LocalDateTime now
+	);
 }
