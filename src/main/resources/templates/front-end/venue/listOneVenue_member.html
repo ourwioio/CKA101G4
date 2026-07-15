@@ -2,88 +2,105 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>場地詳情（會員管理）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>場地詳情（管理）</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/front-end/venue/listOneVenue_member.css}" href="venue-detail-manage.css">
+<link rel="stylesheet" th:href="@{/css/front-end/venue/photoLightbox.css}">
 </head>
 <body>
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 
-    <a class="back-link" th:href="@{/front/venue/myVenue}">← 回我的場地</a>
+<main class="venue-detail-page">
 
-    <div class="card">
-        <img class="main-img"
-             th:if="${venueVO.coverImage != null}"
-             th:src="@{/front/venue/getImage(imagesId=${venueVO.coverImage.imagesId})}" />
-             
-        <div class="body">
-            <div class="venue-name" th:text="${venueVO.venueName}"></div>
-            <div class="venue-addr" th:text="${venueVO.address}"></div>
-            
-            <span th:class="${venueVO.venueStatus == 0 ? 'badge badge-down' : 'badge badge-up'}"
-                  th:text="${venueVO.venueStatus == 0 ? '下架' : '上架'}"></span>
-                
-            <div class="info-row">
-                <div class="info-item">
-                    <div class="info-label">容納人數</div>
-                    <div class="info-value">
-                        <span th:text="${venueVO.capacity}"></span> 人
-                    </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">每小時費用</div>
-                    <div class="info-value">
-                        <span th:text="${venueVO.hourlyRate}"></span> 元
-                    </div>
-                </div>
-            </div>
-            
-            <div class="info-row">
-                <div class="info-item">
-                    <div class="info-label">場地類型</div>
-                    <div class="info-value">
-                        <span th:text="${venueVO.venueTypeVO != null ? venueVO.venueTypeVO.typeName : '未設定'}"></span>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <div class="info-label">場地狀態</div>
-                    <div class="info-value">
-                        <span th:text="${venueVO.venueStatus == 0 ? '下架' : '上架'}"></span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="info-row">
-                <div class="info-item">
-                    <div class="info-label">建立時間</div>
-                    <div class="info-value">
-                        <span th:text="${#temporals.format(venueVO.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="section-title">場地介紹：</div>
-			<div class="venue-desc" th:if="${venueVO.venueDescription != null and !venueVO.venueDescription.isEmpty()}" 
-			     th:text="${venueVO.venueDescription}"></div>
-            <hr />
-            
-            <div class="section-title">場地照片</div>
-            <div class="img-grid">
-                <img th:each="img : ${venueVO.venueImages}"
-                     th:src="@{/front/venue/getImage(imagesId=${img.imagesId})}" />
-            </div>
-            
-            <div class="book-row">
-                <div class="price-note">
-                    每小時 <span th:text="${venueVO.hourlyRate}"></span> 元
-                </div>
-                <div class="btn-group">
-                    <form th:action="@{/front/venue/getOne_For_Update}" method="post">
-                        <input type="hidden" name="venueId" th:value="${venueVO.venueId}"/>
-                        <button type="submit" class="btn-book">修改場地</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+	<a class="back-link" th:href="@{/front/venue/myVenue}">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+		回我的場地
+	</a>
 
+	<div class="detail-card">
+
+		<div class="detail-card__gallery">
+			<img class="detail-card__main-img lightbox-trigger"
+				th:if="${venueVO.coverImage != null}"
+				th:src="@{/front/venue/getImage(imagesId=${venueVO.coverImage.imagesId})}"
+				alt="場地圖片" onerror="this.src='/images/default-venue.jpeg'" />
+			<img class="detail-card__main-img"
+				th:if="${venueVO.coverImage == null}"
+				src="/images/default-venue.jpeg" alt="暫無圖片" />
+		</div>
+
+		<div class="detail-card__body">
+
+			<div class="detail-card__head">
+				<h1 class="detail-card__title" th:text="${venueVO.venueName}"></h1>
+				<span th:class="${venueVO.venueStatus == 1} ? 'status-badge status-badge--up' : (${venueVO.venueStatus == 2} ? 'status-badge status-badge--pending' : 'status-badge status-badge--down')"
+				      th:switch="${venueVO.venueStatus}">
+					<span th:case="0">下架</span>
+					<span th:case="1">上架</span>
+					<span th:case="2">審核中</span>
+				</span>
+			</div>
+
+			<p class="detail-card__addr" th:text="${venueVO.address}"></p>
+
+			<div class="detail-card__tags">
+				<span class="tag">容納 <span th:text="${venueVO.capacity}"></span> 人</span>
+				<span class="tag">NT$ <span th:text="${venueVO.hourlyRate}"></span> / 小時</span>
+				<span class="tag" th:text="${venueVO.venueTypeVO != null ? venueVO.venueTypeVO.typeName : '未設定類型'}"></span>
+			</div>
+
+			<p class="detail-card__meta-line">
+				建立時間：<span th:text="${#temporals.format(venueVO.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+			</p>
+
+			<div class="detail-card__desc"
+				th:if="${venueVO.venueDescription != null and !venueVO.venueDescription.isEmpty()}"
+				th:text="${venueVO.venueDescription}"></div>
+
+			<div class="detail-card__photos" th:if="${not #lists.isEmpty(venueVO.venueImages)}">
+				<div class="section-label">場地照片</div>
+				<div class="photo-grid">
+					<img class="lightbox-trigger" th:each="img : ${venueVO.venueImages}"
+						th:src="@{/front/venue/getImage(imagesId=${img.imagesId})}" alt="場地照片" />
+				</div>
+			</div>
+
+			<div class="detail-card__book-row">
+				<div class="price-note">每小時 <strong th:text="${venueVO.hourlyRate}"></strong> 元</div>
+				<form th:action="@{/front/venue/getOne_For_Update}" method="post">
+					<input type="hidden" name="venueId" th:value="${venueVO.venueId}"/>
+					<button type="submit" class="btn-book">修改場地</button>
+				</form>
+			</div>
+		</div>
+
+	</div>
+
+</main>
+
+<!-- 場地照片放大檢視 -->
+<div class="lightbox" id="photoLightbox" hidden>
+	<div class="lightbox__backdrop" data-lightbox-close></div>
+	<button type="button" class="lightbox__nav lightbox__nav--prev" data-lightbox-prev aria-label="上一張">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+	</button>
+	<img class="lightbox__img" id="lightboxImg" src="" alt="場地照片放大">
+	<button type="button" class="lightbox__nav lightbox__nav--next" data-lightbox-next aria-label="下一張">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+	</button>
+	<button type="button" class="lightbox__close" data-lightbox-close aria-label="關閉">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+	</button>
+	<div class="lightbox__counter" id="lightboxCounter"></div>
+</div>
+
+<script th:src="@{/js/front-end/venue/photoLightbox.js}"></script>
 </body>
 </html>
