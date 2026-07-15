@@ -1,185 +1,247 @@
-* {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
+/* ==========================================================
+   Webond 場地詳情 — 沿用 navbar.css 的 design tokens，
+   這裡補上尚未宣告、本頁會用到的變數。
+   ========================================================== */
+:root{
+	--color-bg:      #F7F3EC;
+	--color-venue:   #A9D3FF;
+
+	--radius-lg: 26px;
+	--radius-md: 16px;
+
+	--shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
 }
+
+*{ box-sizing: border-box; }
 
 body {
-	background: #f5f5f5;
-	padding: 2rem;
-	font-family: sans-serif;
+	font-family: var(--font-body);
+	background: var(--color-bg);
+	color: var(--color-ink);
+	margin: 0;
+	line-height: 1.6;
 }
 
-.back-link {
-	display: inline-block;
-	margin-bottom: 1rem;
-	font-size: 13px;
-	color: #888;
-	text-decoration: none;
-}
+img{ max-width: 100%; }
 
-.card {
-	background: white;
-	border-radius: 12px;
-	border: 1px solid #e0e0e0;
-	max-width: 820px;
+.venue-detail-page{
+	max-width: 900px;
 	margin: 0 auto;
-	overflow: hidden;
+	padding: calc(var(--nav-height) + 40px) 20px 60px;
 }
 
-.main-img {
+/* ---------- 返回連結 ---------- */
+.back-link{
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 20px;
+	font-size: 13.5px;
+	font-weight: 700;
+	color: var(--color-ink-soft);
+	text-decoration: none;
+	transition: color .15s ease;
+}
+.back-link svg{ width: 16px; height: 16px; }
+.back-link:hover{ color: var(--color-ink); }
+
+/* ---------- 場地卡片 ---------- */
+.detail-card{
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+	overflow: hidden;
+	margin-bottom: 40px;
+}
+
+.detail-card__gallery{
 	width: 100%;
 	height: 320px;
+	background: var(--color-surface-soft);
+	overflow: hidden;
+}
+.detail-card__main-img{
+	width: 100%;
+	height: 100%;
 	object-fit: cover;
 	display: block;
 }
 
-.body {
-	padding: 1.5rem;
+.detail-card__body{ padding: 28px 32px 32px; }
+
+.detail-card__title{
+	font-family: var(--font-display);
+	font-size: 24px;
+	font-weight: 800;
+	margin: 0 0 6px;
 }
 
-.venue-name {
-	font-size: 22px;
-	font-weight: 500;
-	color: #1a1a1a;
-	margin-bottom: 0.5rem;
-}
-
-.venue-addr {
+.detail-card__addr{
 	font-size: 14px;
-	color: #888;
-	margin-bottom: 1.25rem;
+	color: var(--color-ink-soft);
+	margin: 0 0 18px;
 }
 
-.venue-desc {
+.detail-card__tags{
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin-bottom: 22px;
+}
+.detail-card__tags .tag{
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--color-ink);
+}
+
+.detail-card__desc{
 	font-size: 14px;
-	color: #444;
-	line-height: 1.7;
-	background: #f8f8f8;
-	border-radius: 8px;
-	padding: 1rem 1.25rem;
-	margin-bottom: 1.5rem;
+	color: var(--color-ink);
+	line-height: 1.8;
+	background: var(--color-surface-soft);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	padding: 16px 20px;
+	margin-bottom: 24px;
 	white-space: pre-line;
 }
 
-.info-row {
+.section-label{
+	font-size: 14px;
+	font-weight: 800;
+	margin-bottom: 12px;
+}
+
+.photo-grid{
 	display: flex;
-	gap: 1.5rem;
-	margin-bottom: 1.5rem;
-}
-
-.info-item {
-	background: #f8f8f8;
-	border-radius: 8px;
-	padding: 0.75rem 1.25rem;
-	flex: 1;
-}
-
-.info-label {
-	font-size: 12px;
-	color: #888;
-	margin-bottom: 4px;
-}
-
-.info-value {
-	font-size: 16px;
-	font-weight: 500;
-	color: #1a1a1a;
-}
-
-hr {
-	border: none;
-	border-top: 1px solid #e0e0e0;
-	margin: 1.25rem 0;
-}
-
-.section-title {
-	font-size: 15px;
-	font-weight: 500;
-	margin-bottom: 0.75rem;
-}
-
-.img-grid {
-	display: flex;
-	gap: 10px;
 	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 24px;
 }
-
-.img-grid img {
-	width: 160px;
-	height: 120px;
+.photo-grid img{
+	width: 150px;
+	height: 112px;
 	object-fit: cover;
-	border-radius: 8px;
-	border: 1px solid #e0e0e0;
+	border-radius: var(--radius-md);
+	border: 1px solid var(--color-border);
 }
 
-.book-row {
+.detail-card__book-row{
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	margin-top: 1.5rem;
+	flex-wrap: wrap;
+	gap: 16px;
+	padding-top: 20px;
+	border-top: 1px solid var(--color-border);
 }
 
-.price-note {
-	font-size: 13px;
-	color: #888;
-}
+.price-note{ font-size: 13px; color: var(--color-ink-soft); }
+.price-note strong{ font-size: 20px; color: var(--color-ink); font-weight: 800; }
 
-.price-note span {
-	font-size: 20px;
-	font-weight: 500;
-	color: #1a1a1a;
-}
-
-.btn-book {
-	background: #1d9e75;
-	color: white;
-	border: none;
-	border-radius: 8px;
+.btn-book{
+	display: inline-block;
 	padding: 12px 28px;
+	background: var(--color-ink);
+	color: #fff;
+	border: none;
+	border-radius: var(--radius-full);
 	font-size: 15px;
-	cursor: pointer;
+	font-weight: 700;
 	text-decoration: none;
+	cursor: pointer;
+	transition: background .15s ease, color .15s ease, transform .15s ease;
 }
+.btn-book:hover{
+	background: var(--color-yellow-deep);
+	color: var(--color-ink);
+	transform: translateY(-2px);
+}
+
+/* ---------- 評價區 ---------- */
+.review-section .section-title{
+	font-family: var(--font-display);
+	font-size: 20px;
+	font-weight: 800;
+	margin: 0 0 16px;
+}
+
+.rating-summary{ margin-bottom: 20px; }
 
 .review-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 16px;
-    margin-top: 12px;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 16px;
 }
 
 .review-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 12px 16px;
-    background: #fafafa;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm);
+	padding: 16px 18px;
 }
 
 .review-header {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    color: #666;
-    margin-bottom: 6px;
+	display: flex;
+	justify-content: space-between;
+	font-size: 13px;
+	color: var(--color-ink-soft);
+	margin-bottom: 8px;
 }
-
-.review-card .stars-readonly span {
-    color: #ddd;
-}
-
-.review-card .stars-readonly span.filled {
-    color: #f5a623;
-}
+.reviewer-name{ font-weight: 700; color: var(--color-ink); }
 
 .review-comment {
-    margin-top: 8px;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    color: #333;
+	margin-top: 10px;
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: var(--color-ink);
+}
+.review-empty {
+	color: var(--color-ink-soft);
+	font-style: italic;
 }
 
-.review-empty {
-    color: #999;
-    font-style: italic;
+/* ---------- 星星（含半星） ---------- */
+.stars-readonly span {
+	font-size: 15px;
+	color: #ddd;
+}
+.stars-readonly span.filled { color: #f5a623; }
+.stars-readonly span.half {
+	background: linear-gradient(90deg, #f5a623 50%, #ddd 50%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+.stars-readonly .rating-count {
+	font-size: 13px;
+	color: var(--color-ink-soft);
+	margin-left: 4px;
+}
+
+/* ---------- 空狀態 ---------- */
+.empty-state {
+	padding: 40px 20px;
+	text-align: center;
+	color: var(--color-ink-soft);
+	background: var(--color-surface-soft);
+	border: 1.5px dashed var(--color-border);
+	border-radius: var(--radius-lg);
+}
+.empty-state .blob {
+	width: 48px;
+	height: 48px;
+	margin: 0 auto 12px;
+	border-radius: 46% 54% 62% 38% / 46% 42% 58% 54%;
+	background: var(--color-border);
+}
+
+/* ---------- RWD ---------- */
+@media (max-width: 640px){
+	.detail-card__gallery{ height: 220px; }
+	.detail-card__body{ padding: 22px 20px 24px; }
+	.detail-card__book-row{ flex-direction: column; align-items: stretch; }
+	.btn-book{ text-align: center; }
 }

@@ -1,0 +1,115 @@
+/* ==========================================================
+   登入提示視窗（訪客點擊需登入功能時顯示）
+   自帶 fallback 色值，未載入全站 tokens 的頁面也能正常顯示
+   ========================================================== */
+.login-modal{
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+}
+.login-modal[hidden]{ display: none; }
+
+.login-modal__backdrop{
+	position: absolute;
+	inset: 0;
+	background: rgba(23, 20, 15, 0.45);
+}
+
+.login-modal__card{
+	position: relative;
+	background: var(--color-surface, #FFFFFF);
+	border: 1px solid var(--color-border, #ECE4D6);
+	border-radius: var(--radius-lg, 26px);
+	box-shadow: 0 14px 34px rgba(23, 20, 15, 0.18);
+	padding: 36px 32px 30px;
+	max-width: 360px;
+	width: 100%;
+	text-align: center;
+	font-family: var(--font-body, 'Noto Sans TC', sans-serif);
+	color: var(--color-ink, #17140F);
+	animation: login-modal-pop .22s ease;
+}
+@keyframes login-modal-pop{
+	from{ transform: scale(0.92); opacity: 0; }
+	to{ transform: scale(1); opacity: 1; }
+}
+
+.login-modal__blob{
+	position: relative;
+	display: block;
+	width: 64px;
+	height: 64px;
+	margin: 0 auto 16px;
+	background: var(--color-yellow, #FFE59A);
+	border-radius: 46% 54% 62% 38% / 46% 42% 58% 54%;
+}
+.login-modal__blob::before,
+.login-modal__blob::after{
+	content: '';
+	position: absolute;
+	top: 42%;
+	width: 7px;
+	height: 7px;
+	background: var(--color-ink, #17140F);
+	border-radius: 50%;
+}
+.login-modal__blob::before{ left: 37%; }
+.login-modal__blob::after{ left: 55%; }
+
+.login-modal__title{
+	margin: 0 0 10px;
+	font-size: 18px;
+	font-weight: 800;
+	font-family: var(--font-display, 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif);
+}
+
+.login-modal__desc{
+	margin: 0 0 22px;
+	font-size: 14px;
+	line-height: 1.8;
+	color: var(--color-ink-soft, #726A5F);
+}
+
+.login-modal__actions{
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.login-modal__btn{
+	display: block;
+	width: 100%;
+	padding: 11px 20px;
+	border-radius: 999px;
+	font-family: inherit;
+	font-size: 14px;
+	font-weight: 700;
+	text-decoration: none;
+	text-align: center;
+	cursor: pointer;
+	background: var(--color-ink, #17140F);
+	color: #fff;
+	border: none;
+	transition: background .15s ease, color .15s ease, transform .15s ease;
+}
+.login-modal__btn:hover{
+	background: var(--color-yellow-deep, #FFC94D);
+	color: var(--color-ink, #17140F);
+	transform: translateY(-2px);
+}
+
+.login-modal__btn--ghost{
+	background: transparent;
+	color: var(--color-ink-soft, #726A5F);
+	border: 1.5px solid var(--color-border, #ECE4D6);
+}
+.login-modal__btn--ghost:hover{
+	background: transparent;
+	border-color: var(--color-ink, #17140F);
+	color: var(--color-ink, #17140F);
+	transform: none;
+}
