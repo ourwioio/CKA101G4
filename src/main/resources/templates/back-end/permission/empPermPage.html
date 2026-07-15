@@ -10,7 +10,14 @@
 	<table border="1" cellpadding="10" cellspacing="0"
 		style="width: 100%; max-width: 1500px; table-layout: fixed; margin: 0 auto;">
 		<tr>
-			<td th:replace="~{back-end/employee/adminPage :: sidebar}"></td>
+			<td style="width: 270px; padding: 0; vertical-align: top;">
+
+                <div
+                    th:replace="~{back-end/fragments/adminSidebar
+                       :: adminSidebar}">
+                </div>
+
+            </td>
 
 
 			<td >
