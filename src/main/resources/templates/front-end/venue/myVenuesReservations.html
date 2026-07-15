@@ -2,55 +2,59 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>場地預約狀況</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/front-end/venue/myVenue.css}">
-<style>
-    table {
-        border-collapse: collapse;
-        width: 100%;
-    }
-    th, td {
-        border: 1px solid #ccc;
-        padding: 8px 12px;
-        text-align: center;
-    }
-    thead tr {
-        border-bottom: 2px solid #333;
-    }
-</style>
 </head>
 <body>
-	<div th:replace="~{front-end/venue/venueHeader :: header}"></div>
-	<span>場地預約狀況 myVenuesReservations.html</span>
-<!-- 	<a th:href="@{/front/venue/myVenue}" class="btn-primary"> 回到我的場地 </a> -->
-	<table>
-		<thead>
-			<tr>
-				<th>訂單編號</th>
-				<th>場地編號</th>
-				<th>場地名稱</th>
-				<th>預約日期</th>
-				<th>預約時段</th>
-				<th>詳細資訊</th>
-			</tr>
-		</thead>
-		<tbody>
-			<th:block th:each="venueOrderVO : ${myReservationslist}">
+<div th:replace="~{front-end/venue/venueHeader :: header('myVenuesReservations')}"></div>
+
+<main class="myvenue-page">
+
+	<h2 class="section-title">場地預約狀況</h2>
+
+	<div class="table-card" th:if="${not #lists.isEmpty(myReservationslist)}">
+		<table class="data-table">
+			<thead>
 				<tr>
+					<th>訂單編號</th>
+					<th>場地編號</th>
+					<th>場地名稱</th>
+					<th>預約日期</th>
+					<th>預約時段</th>
+					<th>詳細資訊</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="venueOrderVO : ${myReservationslist}">
 					<td th:text="${venueOrderVO.venueOrderId}"></td>
 					<td th:text="${venueOrderVO.venueVO.venueId}"></td>
-			        <td th:text="${venueOrderVO.venueVO.venueName}"></td>
-			        <td th:text="${venueOrderVO.bookDate}"></td>
-			        <td th:text="${venueOrderVO.startAt} + '~' + ${venueOrderVO.endAt}"></td>
-			        <td>
-			        	<form th:action="@{/front/venueOrder/getOneReservations}" method="get">
-			        		<input type="hidden" name="venueOrderId" th:value="${venueOrderVO.venueOrderId}">
-			        		<button type="submit">詳細</button>
-			        	</form>
-			        </td>
+					<td th:text="${venueOrderVO.venueVO.venueName}"></td>
+					<td th:text="${venueOrderVO.bookDate}"></td>
+					<td th:text="${venueOrderVO.startAt} + '~' + ${venueOrderVO.endAt}"></td>
+					<td>
+						<form th:action="@{/front/venueOrder/getOneReservations}" method="get">
+							<input type="hidden" name="venueOrderId" th:value="${venueOrderVO.venueOrderId}">
+							<button type="submit" class="btn-table">詳細</button>
+						</form>
+					</td>
 				</tr>
-			</th:block>
-		</tbody>
-	</table>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="empty-state" th:if="${#lists.isEmpty(myReservationslist)}">
+		<span class="blob"></span>
+		目前沒有場地預約紀錄
+	</div>
+
+</main>
 </body>
 </html>
