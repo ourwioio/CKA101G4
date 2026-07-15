@@ -1,21 +1,24 @@
 package com.webond.venue.controller;
 
-import java.util.LinkedHashMap;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.webond.employee.model.EmpService;
 import com.webond.employee.model.EmployeeVO;
+import com.webond.employee.repository.EmployeeRepository;
+import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueReportVO;
 import com.webond.venue.service.VenueReportService;
 
@@ -24,70 +27,96 @@ import com.webond.venue.service.VenueReportService;
 public class VenueReportController {
 
 	@Autowired
-	VenueReportService venueReportService;
+	private VenueReportService venueReportSvc;
 
 	@Autowired
-	EmpService empService; // 負責員工姓名對照用
+	private EmployeeRepository employeeRepository;
 
-	// 檢舉處理狀態文字對照（畫面顯示用）
-	private static final Map<Byte, String> STATUS_LABEL_MAP = new LinkedHashMap<>();
-	static {
-		STATUS_LABEL_MAP.put((byte) 0, "審核中");
-		STATUS_LABEL_MAP.put((byte) 1, "通過（下架場地）");
-		STATUS_LABEL_MAP.put((byte) 2, "未通過");
+	// ===== 提供狀態對照表：0 審核中 / 1 審核通過 / 2 審核未通過 =====
+	@ModelAttribute("statusLabelMap")
+	protected Map<Byte, String> referenceStatusLabelMap() {
+		return VenueReportService.STATUS_LABEL_MAP;
 	}
 
-	// 員工編號 → 姓名 對照表
-	private Map<Integer, String> buildEmployeeNameMap() {
-		return empService.getAll().stream()
+	// ===== 提供員工清單，給審核操作區的下拉選單用 =====
+	@ModelAttribute("employeeListData")
+	protected List<EmployeeVO> referenceEmployeeList() {
+		return employeeRepository.findAll();
+	}
+
+	// ===== 提供「員工編號 → 姓名」對照表，給列表頁/詳情頁顯示用 =====
+	@ModelAttribute("employeeNameMap")
+	protected Map<Integer, String> referenceEmployeeNameMap() {
+		return employeeRepository.findAll().stream()
 				.collect(Collectors.toMap(EmployeeVO::getEmployeeId, EmployeeVO::getEmpName));
 	}
 
-	// ===== 列表頁 =====
-	@GetMapping("/listAllVenueReport")
-	public String listAll(Model model) {
-		List<VenueReportVO> list = venueReportService.getAll();
+	// ===== 查詢全部 =====
+	@GetMapping("listAllVenueReport")
+	public String listAllVenueReport(ModelMap model) {
+		List<VenueReportVO> list = venueReportSvc.getAll();
 		model.addAttribute("venueReportListData", list);
-		model.addAttribute("statusLabelMap", STATUS_LABEL_MAP);
-		model.addAttribute("employeeNameMap", buildEmployeeNameMap());
+		model.addAttribute("searchStatus", null);
+		model.addAttribute("searchKeyword", null);
+		model.addAttribute("searchStartDate", null);
+		model.addAttribute("searchEndDate", null);
 		return "back-end/venueReport/listAllVenueReport";
 	}
 
-	// ===== 依狀態查詢 =====
-	@GetMapping("/listByStatus")
-	public String listByStatus(@RequestParam(value = "reportStatus", required = false) Byte reportStatus, Model model) {
-		List<VenueReportVO> list = (reportStatus == null) ? venueReportService.getAll()
-				: venueReportService.getByStatus(reportStatus);
+	// ===== 複合查詢：處理狀態 + 檢舉內容關鍵字 + 檢舉時間區間 =====
+	@GetMapping("search")
+	public String search(@RequestParam(value = "reportStatus", required = false) Byte reportStatus,
+			@RequestParam(value = "keyword", required = false) String keyword,
+			@RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+			@RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+			ModelMap model) {
+
+		List<VenueReportVO> list = venueReportSvc.search(reportStatus, keyword, startDate, endDate);
+
 		model.addAttribute("venueReportListData", list);
-		model.addAttribute("statusLabelMap", STATUS_LABEL_MAP);
-		model.addAttribute("employeeNameMap", buildEmployeeNameMap());
-		model.addAttribute("searchReportStatus", reportStatus);
+		model.addAttribute("searchStatus", reportStatus);
+		model.addAttribute("searchKeyword", keyword);
+		model.addAttribute("searchStartDate", startDate);
+		model.addAttribute("searchEndDate", endDate);
 		return "back-end/venueReport/listAllVenueReport";
 	}
 
-	// ===== 查詢單筆（詳細/處理頁） =====
-	@GetMapping("/viewOne")
-	public String viewOne(@RequestParam("venueReportId") Integer venueReportId, Model model) {
-		VenueReportVO existingVenueReport = venueReportService.getOneVenueReport(venueReportId);
-		model.addAttribute("existingVenueReport", existingVenueReport);
-		model.addAttribute("statusLabelMap", STATUS_LABEL_MAP);
-		model.addAttribute("employeeNameMap", buildEmployeeNameMap());
+	// ===== 查看單筆內容 =====
+	@GetMapping("viewOne")
+	public String viewOne(@RequestParam("venueReportId") Integer venueReportId, ModelMap model) {
+
+		VenueReportVO venueReportVO = venueReportSvc.getOneVenueReport(venueReportId);
+		if (venueReportVO == null) {
+			return "redirect:/venueReport/listAllVenueReport";
+		}
+
+		VenueOrderVO venueOrderVO = venueReportSvc.getVenueOrder(venueReportVO.getVenueOrderId());
+
+		model.addAttribute("venueReportVO", venueReportVO);
+		model.addAttribute("venueOrderVO", venueOrderVO);
+		model.addAttribute("venueVO", venueOrderVO != null ? venueOrderVO.getVenueVO() : null);
 		return "back-end/venueReport/listOneVenueReport";
 	}
 
-	// ===== 審核通過（下架場地） =====
-	@PostMapping("/approve")
+	// ===== 審核通過（檢舉成立） =====
+	// TODO 員工登入完成後，employeeId 改由 session 的 loginEmp 帶入，移除 @RequestParam
+	@PostMapping("approve")
 	public String approve(@RequestParam("venueReportId") Integer venueReportId,
-			@SessionAttribute("loginEmp") EmployeeVO loginEmp) {
-		venueReportService.approve(venueReportId, loginEmp.getEmployeeId());
-		return "redirect:/venueReport/listAllVenueReport";
+			@RequestParam("employeeId") Integer employeeId, RedirectAttributes redirectAttrs) {
+
+		venueReportSvc.approve(venueReportId, employeeId);
+		redirectAttrs.addFlashAttribute("success", "- (檢舉成立，場地已退回待審核)");
+		return "redirect:/venueReport/viewOne?venueReportId=" + venueReportId;
 	}
 
-	// ===== 審核未通過 =====
-	@PostMapping("/reject")
+	// ===== 審核未通過（檢舉不成立） =====
+	// TODO 員工登入完成後，employeeId 改由 session 的 loginEmp 帶入，移除 @RequestParam
+	@PostMapping("reject")
 	public String reject(@RequestParam("venueReportId") Integer venueReportId,
-			@SessionAttribute("loginEmp") EmployeeVO loginEmp) {
-		venueReportService.reject(venueReportId, loginEmp.getEmployeeId());
-		return "redirect:/venueReport/listAllVenueReport";
+			@RequestParam("employeeId") Integer employeeId, RedirectAttributes redirectAttrs) {
+
+		venueReportSvc.reject(venueReportId, employeeId);
+		redirectAttrs.addFlashAttribute("success", "- (檢舉不成立，場地狀態未變更)");
+		return "redirect:/venueReport/viewOne?venueReportId=" + venueReportId;
 	}
 }

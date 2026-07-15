@@ -30,6 +30,7 @@ public class VenueReviewService {
 	// 場地狀態常數（對照 VENUE 表的 venueStatus）
 	private static final byte VENUE_STATUS_INACTIVE = 0; // 下架
 	private static final byte VENUE_STATUS_ACTIVE = 1; // 上架
+	private static final byte VENUE_STATUS_PENDING = 2; // 待審核
 
 	// ===== 新增 =====
 	public void addVenueReview(VenueReviewVO venueReviewVO) {
@@ -106,7 +107,7 @@ public class VenueReviewService {
 
 	// ===== 業務邏輯：審核未通過 =====
 	/**
-	 * 審核未通過：更新審核紀錄狀態，並將對應場地的 venueStatus 切換為下架。
+	 * 審核未通過：更新審核紀錄狀態，並將對應場地的 venueStatus 退回待審核， 待場地提供者修改資料後重新送審。
 	 */
 	@Transactional
 	public void reject(Integer venueReviewId, Integer employeeId, String reviewNote) {
@@ -121,12 +122,26 @@ public class VenueReviewService {
 
 		VenueVO venue = venueRepository.findById(venueReview.getVenueId()).orElse(null);
 		if (venue != null) {
-			venue.setVenueStatus((byte) 2);
+			venue.setVenueStatus(VENUE_STATUS_PENDING);
 			venueRepository.save(venue);
 		}
 	}
-	
+
 	public VenueReviewVO getOneVenueReviewByVenueId(Integer venueId) {
-	    return repository.findTopByVenueIdOrderByVenueReviewIdDesc(venueId);
+		return repository.findTopByVenueIdOrderByVenueReviewIdDesc(venueId);
+	}
+
+	// ===== 檢舉成立：把該場地的審核紀錄退回審核中，重新走審核流程 =====
+	@Transactional
+	public void resetToReviewing(Integer venueId) {
+		VenueReviewVO venueReview = getOneVenueReviewByVenueId(venueId);
+		if (venueReview == null) {
+			return;
+		}
+		venueReview.setReviewStatus(STATUS_REVIEWING);
+		venueReview.setEmployeeId(null);
+		venueReview.setReviewNote(null);
+		venueReview.setReviewedAt(null);
+		repository.save(venueReview);
 	}
 }
