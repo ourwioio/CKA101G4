@@ -1,20 +1,28 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-    <div class="header" th:fragment="header">
-        <h1>我的場地</h1>
-        <div class="user-info">
-            <span>
-                當前登入會員:<strong th:text="${session.memberVO.nickname}"></strong>
-            </span>
-            <a th:if="${session.memberVO != null}" th:href="@{/member/logout}">登出</a>
-        </div>
-        <a class="btn-add" th:href="@{/front/venue/myVenue}">我的場地</a>
-        <a class="btn-add" th:href="@{/front/venueOrder/myVenuesReservations}">場地預約狀況</a>
-        <a class="btn-add" th:href="@{/front/venueOrder/myVenuesCompleted}">我的場地評價</a>
-        <a class="btn-add" th:href="@{/front/venueOrder/myVenueOrder}">我的訂單</a>
-        <a class="btn-add" th:href="@{/front/venue/listAllVenue}">瀏覽場地頁面</a>
-        <a class="btn-add" th:href="@{/front/venue/addVenue}">新增場地</a>
-    </div>
+	<div th:fragment="header(active)">
+
+		<div th:replace="~{front-end/common/navbar :: navbar}"></div>
+
+		<div class="myvenue-topbar">
+			<div class="myvenue-topbar__inner">
+				<h1 class="myvenue-topbar__title">我的場地</h1>
+				<nav class="myvenue-tabs">
+					<a th:href="@{/front/venue/myVenue}"
+					   th:classappend="${active == 'myVenue'} ? 'is-active' : ''">我的場地</a>
+					<a th:href="@{/front/venueOrder/myVenuesReservations}"
+					   th:classappend="${active == 'myVenuesReservations'} ? 'is-active' : ''">場地預約狀況</a>
+					<a th:href="@{/front/venueOrder/myVenuesCompleted}"
+					   th:classappend="${active == 'myVenuesCompleted'} ? 'is-active' : ''">我的場地評價</a>
+					<a th:href="@{/front/venueOrder/myVenueOrder}"
+					   th:classappend="${active == 'myVenueOrder'} ? 'is-active' : ''">我的訂單</a>
+					<a th:href="@{/front/venue/listAllVenue}">瀏覽場地頁面</a>
+					<a th:href="@{/front/venue/addVenue}" class="myvenue-tabs__cta">＋ 新增場地</a>
+				</nav>
+			</div>
+		</div>
+
+	</div>
 </body>
 </html>

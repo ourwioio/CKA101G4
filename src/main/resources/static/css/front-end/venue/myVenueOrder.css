@@ -1,100 +1,119 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: sans-serif; background: #f5f5f5; padding: 2rem; }
-.container { max-width: 800px; margin: 0 auto; }
-.back-link { display: inline-block; margin-bottom: 1rem; font-size: 13px; color: #888; text-decoration: none; }
-.back-link:hover { color: #1d9e75; }
-h1 { font-size: 24px; font-weight: 600; color: #333; margin-bottom: 1.5rem; }
+.container { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px; }
 
-.no-orders { background: white; border-radius: 12px; border: 1px solid #e0e0e0; padding: 3rem; text-align: center; color: #888; }
-.btn-browse { display: inline-block; margin-top: 1rem; background: #1d9e75; color: white; border: none; border-radius: 6px; padding: 10px 20px; font-size: 14px; text-decoration: none; cursor: pointer; }
+.back-link { display: inline-block; margin-bottom: 1rem; font-size: 13.5px; font-weight: 700; color: var(--color-ink-soft); text-decoration: none; transition: color .15s ease; }
+.back-link:hover { color: var(--color-ink); }
 
-.order-card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-.order-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 12px; }
-.order-id { font-size: 14px; font-weight: bold; color: #444; }
-.order-date { font-size: 13px; color: #999; }
+h1 { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--color-ink); margin-bottom: 1.5rem; }
 
-.order-body { display: flex; justify-content: space-between; align-items: flex-start; }
-.venue-details h2 { font-size: 18px; font-weight: 500; color: #222; margin-bottom: 6px; }
-.venue-details p { font-size: 14px; color: #666; margin-bottom: 4px; }
+.no-orders { background: var(--color-surface); border-radius: var(--radius-lg); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); padding: 3rem; text-align: center; color: var(--color-ink-soft); }
+.btn-browse { display: inline-block; margin-top: 1rem; background: var(--color-ink); color: white; border: none; border-radius: var(--radius-full); padding: 10px 22px; font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer; transition: background .15s ease, color .15s ease, transform .15s ease; }
+.btn-browse:hover { background: var(--color-yellow-deep); color: var(--color-ink); transform: translateY(-2px); }
 
-.badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; margin-right: 5px; margin-bottom: 4px; }
-.badge-payment { background: #e1f5ee; color: #0f6e56; }
-.badge-status { background: #f1f3f5; color: #495057; }
+.filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.filter-bar select {
+    font-family: var(--font-body);
+    font-size: 13.5px;
+    padding: 9px 14px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    cursor: pointer;
+}
+.filter-bar select:focus { outline: none; border-color: var(--color-yellow-deep); }
 
-/* 🌟 訂單狀態顏色 */
-.status-pending { background: #fff3bf; color: #997404; }
-.status-paid { background: #d3f9d8; color: #2b8a3e; }
-.status-cancel { background: #f1f3f5; color: #868e96; }
-.status-done { background: #d0ebff; color: #1864ab; }
+.order-card { background: var(--color-surface); border-radius: var(--radius-lg); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); padding: 1.5rem; margin-bottom: 1rem; transition: box-shadow .2s ease; }
+.order-card:hover { box-shadow: var(--shadow-md); }
+.order-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin-bottom: 12px; }
+.order-id { font-size: 14px; font-weight: 800; color: var(--color-ink); }
+.order-date { font-size: 13px; color: var(--color-ink-soft); }
+
+.order-body { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
+.venue-details h2 { font-family: var(--font-display); font-size: 17px; font-weight: 800; color: var(--color-ink); margin-bottom: 6px; }
+.venue-details p { font-size: 13.5px; color: var(--color-ink-soft); margin-bottom: 4px; }
+.venue-details strong { color: var(--color-ink); }
+
+.badge { display: inline-block; padding: 4px 12px; border-radius: var(--radius-full); font-size: 12px; font-weight: 700; margin-right: 5px; margin-bottom: 4px; }
+.badge-payment { background: var(--color-venue); color: var(--color-ink); }
+.badge-status { background: var(--color-surface-soft); color: var(--color-ink-soft); border: 1px solid var(--color-border); }
+
+/* 訂單狀態顏色 */
+.status-pending { background: var(--color-yellow); color: var(--color-ink); }
+.status-paid { background: var(--color-green); color: var(--color-ink); }
+.status-cancel { background: var(--color-surface-soft); color: var(--color-ink-soft); }
+.status-done { background: var(--color-venue); color: var(--color-ink); }
 
 .order-right { text-align: right; }
-.total-amount { font-size: 20px; font-weight: 600; color: #1d9e75; margin-bottom: 10px; }
-.total-amount span { font-size: 14px; font-weight: normal; color: #666; }
+.total-amount { font-size: 20px; font-weight: 800; color: var(--color-ink); margin-bottom: 10px; }
+.total-amount .currency { font-size: 13px; font-weight: 700; color: var(--color-ink-soft); }
 
 .order-right .actions {
     margin-top: 12px;
     display: flex;
     gap: 8px;
     justify-content: flex-end;
+    flex-wrap: wrap;
 }
 
 .btn-review, .btn-pay {
     display: inline-block;
-    padding: 6px 16px;
-    background: #1d9e75;
+    padding: 7px 18px;
+    background: var(--color-ink);
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: var(--radius-full);
     font-size: 13px;
+    font-weight: 700;
     text-decoration: none;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background .15s ease, color .15s ease;
 }
-.btn-review:hover, .btn-pay:hover { background: #157353; }
+.btn-review:hover, .btn-pay:hover { background: var(--color-yellow-deep); color: var(--color-ink); }
 
-/* 🌟 前往付款按鈕（用橘色提醒尚未付款） */
+/* 前往付款按鈕（用橘色提醒尚未付款） */
 .btn-pay { background: #f76707; }
-.btn-pay:hover { background: #d9600a; }
+.btn-pay:hover { background: #d9600a; color: #fff; }
 
 .btn-report {
     display: inline-block;
-    padding: 6px 16px;
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 6px;
+    padding: 7px 18px;
+    background: transparent;
+    color: #c0392b;
+    border: 1.5px solid #f1c3bb;
+    border-radius: var(--radius-full);
     font-size: 13px;
+    font-weight: 700;
     text-decoration: none;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background .15s ease, color .15s ease;
 }
-.btn-report:hover { background: #bd2130; }
+.btn-report:hover { background: #c0392b; color: #fff; border-color: #c0392b; }
 
 /* 已評價的星星顯示（唯讀） */
 .review-display { margin-top: 10px; text-align: right; }
-.review-display .stars-readonly { font-size: 16px; color: #ddd; letter-spacing: 1px; }
+.review-display .stars-readonly { font-size: 15px; color: #ddd; letter-spacing: 1px; }
 .review-display .stars-readonly .filled { color: #f5a623; }
-.review-display .comment-text { font-size: 13px; color: #666; margin-top: 4px; max-width: 220px; word-break: break-word; }
+.review-display .comment-text { font-size: 12.5px; color: var(--color-ink-soft); margin-top: 4px; max-width: 220px; word-break: break-word; }
 
 /* Modal 遮罩 */
 .modal-overlay {
     display: none;
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(23, 20, 15, 0.5);
     z-index: 999;
     align-items: center;
     justify-content: center;
 }
 .modal-box {
-    background: white;
-    border-radius: 12px;
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
     padding: 2rem;
     width: 90%;
     max-width: 400px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: var(--shadow-md);
 }
-.modal-box h3 { font-size: 18px; margin-bottom: 1.2rem; color: #333; }
+.modal-box h3 { font-family: var(--font-display); font-size: 18px; font-weight: 800; margin-bottom: 1.2rem; color: var(--color-ink); }
 
 /* 星星選擇器 */
 .star-rating {
@@ -120,36 +139,42 @@ h1 { font-size: 24px; font-weight: 600; color: #333; margin-bottom: 1.5rem; }
 .modal-box textarea {
     width: 100%;
     min-height: 90px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 10px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
     font-size: 14px;
-    font-family: inherit;
+    font-family: var(--font-body);
+    color: var(--color-ink);
     resize: vertical;
     margin-bottom: 1.2rem;
 }
-.modal-box textarea:focus { outline: none; border-color: #1d9e75; }
+.modal-box textarea:focus { outline: none; border-color: var(--color-yellow-deep); }
 
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
 .btn-cancel {
-    background: #f1f3f5;
-    color: #495057;
-    border: none;
-    border-radius: 6px;
-    padding: 8px 18px;
+    background: transparent;
+    color: var(--color-ink-soft);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-full);
+    padding: 8px 20px;
     font-size: 14px;
+    font-weight: 700;
     cursor: pointer;
+    transition: border-color .15s ease, color .15s ease;
 }
+.btn-cancel:hover { border-color: var(--color-ink); color: var(--color-ink); }
 .btn-submit {
-    background: #1d9e75;
+    background: var(--color-ink);
     color: white;
     border: none;
-    border-radius: 6px;
-    padding: 8px 18px;
+    border-radius: var(--radius-full);
+    padding: 8px 20px;
     font-size: 14px;
+    font-weight: 700;
     cursor: pointer;
+    transition: background .15s ease, color .15s ease;
 }
-.btn-submit:hover { background: #157353; }
+.btn-submit:hover { background: var(--color-yellow-deep); color: var(--color-ink); }
 
 .pagination {
     display: flex;
@@ -163,24 +188,25 @@ h1 { font-size: 24px; font-weight: 600; color: #333; margin-bottom: 1.5rem; }
     min-width: 36px;
     height: 36px;
     padding: 0 10px;
-    border: 1px solid #e0e0e0;
-    background: white;
-    color: #444;
-    border-radius: 6px;
-    font-size: 14px;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-ink-soft);
+    border-radius: var(--radius-full);
+    font-size: 13.5px;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.15s;
 }
 
 .page-btn:hover:not(:disabled) {
-    background: #f1f3f5;
+    border-color: var(--color-ink);
+    color: var(--color-ink);
 }
 
 .page-btn.active {
-    background: #1d9e75;
+    background: var(--color-ink);
     color: white;
-    border-color: #1d9e75;
-    font-weight: 600;
+    border-color: var(--color-ink);
 }
 
 .page-btn:disabled {
@@ -188,12 +214,12 @@ h1 { font-size: 24px; font-weight: 600; color: #333; margin-bottom: 1.5rem; }
     cursor: not-allowed;
 }
 
-.btn-danger-submit { background: #dc3545; }
-.btn-danger-submit:hover { background: #bd2130; }
+.btn-danger-submit { background: #c0392b; }
+.btn-danger-submit:hover { background: #a5342a; color: #fff; }
 
 .cancel-label {
     display: block;
     margin-bottom: 8px;
     font-size: 14px;
-    color: #555;
+    color: var(--color-ink-soft);
 }

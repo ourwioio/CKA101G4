@@ -1,19 +1,316 @@
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: sans-serif; background: #f5f5f5; padding: 2rem; }
-.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-h1 { font-size: 22px; font-weight: 500; }
-.btn-add { padding: 8px 16px; background: #1d9e75; color: white; border-radius: 6px; font-size: 14px; text-decoration: none; }
-.venue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem; }
-.venue-card { background: white; border-radius: 12px; border: 1px solid #e0e0e0; overflow: hidden; }
-.card-img { width: 100%; height: 160px; object-fit: cover; display: block; }
-.card-body { padding: 1rem; }
-.card-body h3 { font-size: 16px; font-weight: 500; margin: 0 0 6px; }
-.card-body p { font-size: 14px; color: #666; margin: 4px 0; }
-.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-.badge-up { background: #e1f5ee; color: #0f6e56; }
-.badge-down { background: #f5f5f5; color: #888; }
-.actions { display: flex; gap: 8px; margin-top: 12px; }
-.btn-edit { padding: 6px 16px; background: #1d9e75; color: white; border: none; border-radius: 6px; font-size: 13px; cursor: pointer; }
+/* ==========================================================
+   Webond 我的場地區塊 — 沿用 navbar.css 的 design tokens，
+   這裡補上尚未宣告、本區塊會用到的變數。
+   ========================================================== */
+:root{
+	--color-bg:      #F7F3EC;
+	--color-venue:   #A9D3FF;
+	--color-green:   #B7E1D1;
 
-.created-at { font-size: 12px; color: #999; }
-.btn-edit-link { text-decoration: none; display: inline-block; }
+	--radius-lg: 26px;
+	--radius-md: 16px;
+
+	--shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+}
+
+*{ box-sizing: border-box; }
+
+body {
+	font-family: var(--font-body);
+	background: var(--color-bg);
+	color: var(--color-ink);
+	margin: 0;
+	line-height: 1.6;
+}
+
+img{ max-width: 100%; }
+
+/* ---------- 子導覽列 ---------- */
+.myvenue-topbar{
+	background: var(--color-surface);
+	border-bottom: 1px solid var(--color-border);
+	margin-top: calc(var(--nav-height) + 16px);
+}
+.myvenue-topbar__inner{
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 22px 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+.myvenue-topbar__title{
+	font-family: var(--font-display);
+	font-size: 22px;
+	font-weight: 800;
+	margin: 0;
+}
+
+.myvenue-tabs{
+	display: flex;
+	align-items: center;
+	gap: 22px;
+	flex-wrap: wrap;
+	font-size: 13.5px;
+	font-weight: 700;
+}
+.myvenue-tabs a{
+	position: relative;
+	padding: 4px 0;
+	color: var(--color-ink-soft);
+	text-decoration: none;
+	transition: color .15s ease;
+}
+.myvenue-tabs a:hover{ color: var(--color-ink); }
+.myvenue-tabs a.is-active{ color: var(--color-ink); }
+.myvenue-tabs a.is-active::after{
+	content: '';
+	position: absolute;
+	left: 0; right: 0; bottom: -2px;
+	height: 2px;
+	background: var(--color-yellow-deep);
+}
+.myvenue-tabs__cta{
+	background: var(--color-ink);
+	color: #fff !important;
+	padding: 8px 18px;
+	border-radius: var(--radius-full);
+	transition: background .15s ease, color .15s ease, transform .15s ease;
+}
+.myvenue-tabs__cta:hover{
+	background: var(--color-yellow-deep);
+	color: var(--color-ink) !important;
+	transform: translateY(-2px);
+}
+
+/* ---------- 頁面容器 ---------- */
+.myvenue-page{
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 32px 20px 60px;
+}
+
+.section-title{
+	font-family: var(--font-display);
+	font-size: 20px;
+	font-weight: 800;
+	margin: 0 0 20px;
+}
+
+/* ---------- 場地卡片（我的場地列表） ---------- */
+.card-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 20px;
+}
+
+.item-card {
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+	overflow: hidden;
+	transition: transform .2s ease, box-shadow .2s ease;
+}
+.item-card:hover {
+	transform: translateY(-6px);
+	box-shadow: var(--shadow-md);
+}
+
+.item-card__link {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	color: inherit;
+	text-decoration: none;
+}
+
+.item-card__thumb-wrap {
+	width: 100%;
+	height: 180px;
+	overflow: hidden;
+	background: var(--color-surface-soft);
+	flex-shrink: 0;
+}
+.item-card__thumb-wrap img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	transition: transform .35s ease;
+}
+.item-card:hover .item-card__thumb-wrap img{ transform: scale(1.06); }
+
+.item-card__body {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	padding: 18px 20px 20px;
+}
+
+.item-card__title {
+	font-size: 16px;
+	font-weight: 800;
+	margin: 8px 0 6px;
+}
+
+.item-card__addr {
+	font-size: 13px;
+	color: var(--color-ink-soft);
+	margin: 0 0 12px;
+}
+
+.item-card__meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 6px;
+}
+.item-card__meta span {
+	font-size: 12.5px;
+	font-weight: 700;
+	color: var(--color-ink);
+}
+
+.item-card__created {
+	font-size: 12px;
+	color: var(--color-ink-soft);
+	margin: 8px 0 0;
+}
+
+.item-card__detail {
+	align-self: flex-end;
+	margin-top: auto;
+	padding-top: 14px;
+	font-size: 13px;
+	font-weight: 800;
+	color: var(--color-ink);
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+.item-card__detail::after {
+	content: '\2192';
+	transition: transform .15s ease;
+}
+.item-card:hover .item-card__detail::after {
+	transform: translateX(4px);
+}
+
+/* ---------- 狀態徽章 ---------- */
+.status-badge{
+	display: inline-block;
+	font-size: 12px;
+	font-weight: 700;
+	padding: 4px 12px;
+	border-radius: var(--radius-full);
+	background: var(--color-surface-soft);
+	color: var(--color-ink-soft);
+}
+.status-badge--up{ background: var(--color-green); color: var(--color-ink); }
+.status-badge--down{ background: var(--color-surface-soft); color: var(--color-ink-soft); }
+.status-badge--pending{ background: var(--color-yellow); color: var(--color-ink); }
+
+/* ---------- 表格（場地預約狀況／我的場地評價） ---------- */
+.table-card{
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+	overflow: auto;
+}
+
+.data-table{
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13.5px;
+}
+.data-table th,
+.data-table td{
+	padding: 14px 16px;
+	text-align: center;
+	white-space: nowrap;
+}
+.data-table thead th{
+	font-weight: 800;
+	color: var(--color-ink);
+	background: var(--color-surface-soft);
+	border-bottom: 1px solid var(--color-border);
+}
+.data-table tbody tr{
+	border-bottom: 1px solid var(--color-border);
+}
+.data-table tbody tr:last-child{ border-bottom: none; }
+.data-table tbody tr:hover{ background: var(--color-surface-soft); }
+.data-table td{ color: var(--color-ink-soft); }
+
+.btn-table{
+	padding: 6px 16px;
+	background: var(--color-ink);
+	color: #fff;
+	border: none;
+	border-radius: var(--radius-full);
+	font-size: 13px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background .15s ease;
+}
+.btn-table:hover{ background: var(--color-yellow-deep); color: var(--color-ink); }
+
+/* ---------- 星星（唯讀） ---------- */
+.stars-readonly span {
+	font-size: 14px;
+	color: #ddd;
+}
+.stars-readonly span.filled { color: #f5a623; }
+
+/* ---------- 空狀態 ---------- */
+.empty-state {
+	padding: 46px 20px;
+	text-align: center;
+	color: var(--color-ink-soft);
+	background: var(--color-surface-soft);
+	border: 1.5px dashed var(--color-border);
+	border-radius: var(--radius-lg);
+}
+.empty-state .blob {
+	width: 56px;
+	height: 56px;
+	margin: 0 auto 14px;
+	border-radius: 46% 54% 62% 38% / 46% 42% 58% 54%;
+	background: var(--color-border);
+}
+.empty-state__cta{
+	display: inline-block;
+	margin-top: 16px;
+}
+
+.btn-primary {
+	display: inline-block;
+	padding: 10px 22px;
+	background: var(--color-ink);
+	color: #fff;
+	border: none;
+	border-radius: var(--radius-full);
+	font-size: 14px;
+	font-weight: 700;
+	text-decoration: none;
+	cursor: pointer;
+	transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+.btn-primary:hover {
+	background: var(--color-yellow-deep);
+	color: var(--color-ink);
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-sm);
+}
+
+/* ---------- RWD ---------- */
+@media (max-width: 760px){
+	.myvenue-tabs{ gap: 14px; }
+}
+@media (max-width: 520px) {
+	.card-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); }
+}
