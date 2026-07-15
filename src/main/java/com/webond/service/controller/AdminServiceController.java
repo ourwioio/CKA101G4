@@ -17,6 +17,9 @@ import com.webond.service.service.ServiceService;
 
 import jakarta.servlet.http.HttpSession;
 
+import com.webond.service.service.ServiceImageImportService;
+import com.webond.service.service.ServiceImageImportService.ImportResult;
+
 @Controller
 @RequestMapping("/admin/services")
 public class AdminServiceController {
@@ -43,11 +46,17 @@ public class AdminServiceController {
     // =========================================================
 
     private final ServiceService serviceSvc;
+    private final ServiceImageImportService
+    serviceImageImportService;
 
     public AdminServiceController(
-            ServiceService serviceSvc) {
+            ServiceService serviceSvc,
+            ServiceImageImportService serviceImageImportService) {
 
         this.serviceSvc = serviceSvc;
+
+        this.serviceImageImportService =
+                serviceImageImportService;
     }
 
     // =========================================================
@@ -357,4 +366,63 @@ public class AdminServiceController {
 
         return employeeVO.getEmployeeId();
     }
+    
+ // =========================================================
+ // 後台手動匯入服務圖片
+ //
+ // POST /admin/services/import-images
+ // =========================================================
+
+ @PostMapping("/import-images")
+ public String importServiceImages(
+         HttpSession session,
+         RedirectAttributes redirectAttributes) {
+
+     Integer loginEmployeeId =
+             getLoginEmployeeId(session);
+
+     if (loginEmployeeId == null) {
+         return "redirect:"
+                 + BASE_PATH
+                 + "/fake-login";
+     }
+
+     try {
+         ImportResult result =
+                 serviceImageImportService
+                         .importServiceImages();
+
+         if (result.getFailureCount() == 0) {
+
+             redirectAttributes.addFlashAttribute(
+                     "successMsg",
+                     "服務圖片匯入完成，共成功匯入 "
+                     + result.getSuccessCount()
+                     + " 張圖片"
+             );
+
+         } else {
+
+             redirectAttributes.addFlashAttribute(
+                     "errorMsg",
+                     "圖片匯入完成：成功 "
+                     + result.getSuccessCount()
+                     + " 張，失敗 "
+                     + result.getFailureCount()
+                     + " 張。"
+                     + result.getFailureMessage()
+             );
+         }
+
+     } catch (RuntimeException e) {
+
+         redirectAttributes.addFlashAttribute(
+                 "errorMsg",
+                 "圖片匯入失敗："
+                 + e.getMessage()
+         );
+     }
+
+     return "redirect:" + BASE_PATH + "/home";
+ }
 }
