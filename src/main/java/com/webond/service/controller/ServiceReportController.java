@@ -1,18 +1,12 @@
 package com.webond.service.controller;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.propertyeditors.CustomDateEditor;
-import org.springframework.expression.ParseException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,10 +31,21 @@ public class ServiceReportController {
 		return "back-end/member/empPage";
 	}
 	
-	@GetMapping("listAllServiceReport")
-	public String listAllServiceReport(ModelMap model) {
-		List<ServiceReportVO> list = serviceReportService.getAll();
+	@GetMapping("/listAllServiceReport")
+	public String listAllServiceReport(
+	        @RequestParam(required = false) Byte status,
+	        ModelMap model) {
+		List<ServiceReportVO> list;
+		
+	    if (status == null) {
+	        list = serviceReportService.getAll();
+	    } else {
+	        list = serviceReportService.getByStatus(status);
+	    }
+	    
 		model.addAttribute("serviceReportListData", list);
+	    model.addAttribute("currentStatus", status);
+	    
 		return "back-end/service/serviceReportList";
 	}
 	
@@ -65,7 +70,6 @@ public class ServiceReportController {
 		if (employeeId == null) {
 			return "redirect:/serviceReport/fakeLogin";
 		}
-
 
 	    EmployeeVO employee = new EmployeeVO();
 	    employee.setEmployeeId(employeeId);
