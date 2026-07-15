@@ -90,7 +90,7 @@ public class VenueOrderController {
 	    if (params.getPayoutAmount() == null) {
 	        params.setPayoutAmount((byte) 0);
 	    }
-
+	    params.setOrderStatus((byte) 3);
 	    List<VenueOrderVO> list = venueOrderService.search(params);
 
 	    if (list.isEmpty()) {
