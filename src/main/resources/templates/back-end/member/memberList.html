@@ -47,9 +47,6 @@ body {
 	.container {
 		grid-template-columns: 1.6fr 1fr;
 	}
-	.main-panel {
-		grid-column: span 1;
-	}
 }
 
 .card-panel {
@@ -85,10 +82,6 @@ body {
 	transition: all 0.2s;
 }
 
-.tab-btn:hover {
-	color: var(--sky-600);
-}
-
 .tab-btn.active {
 	color: var(--sky-600);
 	border-bottom: 2px solid var(--sky-600);
@@ -113,7 +106,6 @@ body {
 	padding: 10px;
 	border: 1px solid var(--slate-200);
 	border-radius: 6px;
-	font-size: 14px;
 }
 
 .btn-search {
@@ -123,7 +115,6 @@ body {
 	padding: 0 16px;
 	border-radius: 6px;
 	cursor: pointer;
-	font-weight: 600;
 }
 
 table {
@@ -142,7 +133,6 @@ th {
 td {
 	padding: 12px;
 	border-bottom: 1px solid var(--border-color);
-	vertical-align: middle;
 }
 
 .clickable-row {
@@ -195,13 +185,6 @@ td {
 	background: #ffffff;
 }
 
-.detail-placeholder {
-	text-align: center;
-	color: #94a3b8;
-	padding: 60px 20px;
-	font-weight: 500;
-}
-
 .detail-header {
 	display: flex;
 	align-items: center;
@@ -249,24 +232,18 @@ td {
 
 .kyc-img-box {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 10px;
+	grid-template-columns: 1fr 1fr 1fr;
+	gap: 8px;
 	margin-top: 10px;
 }
 
 .kyc-img-box img {
 	width: 100%;
-	height: 110px;
+	height: 90px;
 	object-fit: cover;
 	border-radius: 6px;
 	border: 1px solid var(--slate-200);
 	cursor: zoom-in;
-	transition: transform 0.2s;
-}
-
-.kyc-img-box img:hover {
-	transform: scale(1.02);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .btn-action {
@@ -297,14 +274,6 @@ td {
 	color: white;
 }
 
-.action-container-box {
-	display: flex;
-	justify-content: flex-end;
-	align-items: center;
-	gap: 4px;
-}
-
-/* 🔍 燈箱彈出視窗樣式 (Image Modal) */
 .image-modal {
 	display: none;
 	position: fixed;
@@ -313,8 +282,7 @@ td {
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background-color: rgba(15, 23, 42, 0.85); /* 深色透明背景 */
-	backdrop-filter: blur(4px); /* 背景模糊效果 */
+	background-color: rgba(15, 23, 42, 0.85);
 	justify-content: center;
 	align-items: center;
 	cursor: zoom-out;
@@ -324,43 +292,21 @@ td {
 	max-width: 90%;
 	max-height: 90%;
 	border-radius: 12px;
-	box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-	transform: scale(0.95);
-	transition: transform 0.3s ease;
-}
-
-.image-modal.show img {
-	transform: scale(1);
-}
-
-.close-modal-btn {
-	position: absolute;
-	top: 20px;
-	right: 30px;
-	color: #ffffff;
-	font-size: 40px;
-	font-weight: bold;
-	cursor: pointer;
-	user-select: none;
 }
 </style>
 </head>
 <body>
-
 	<div class="container">
-
 		<div class="card-panel main-panel">
 			<div class="header-area">
 				<h2>👥 會員權限狀態管理中心</h2>
 			</div>
-
 			<form th:action="@{/member/back-end/memberList}" method="get"
 				class="search-box">
 				<input type="text" name="keyword" class="search-input"
 					placeholder="快速搜尋 姓名 / Email / 手機..." th:value="${keyword}">
 				<button type="submit" class="btn-search">🔍 搜尋</button>
 			</form>
-
 			<div class="tabs-nav">
 				<button class="tab-btn active"
 					onclick="switchTab(this, 'tab-pending')">⏳ 待核准 / 未驗證</button>
@@ -369,7 +315,6 @@ td {
 				<button class="tab-btn" onclick="switchTab(this, 'tab-suspended')">🚫
 					已停權</button>
 			</div>
-
 			<div id="tab-pending" class="tab-content active">
 				<table>
 					<thead>
@@ -407,7 +352,6 @@ td {
 					</tbody>
 				</table>
 			</div>
-
 			<div id="tab-active" class="tab-content">
 				<table>
 					<thead>
@@ -415,7 +359,6 @@ td {
 							<th>ID</th>
 							<th>照片</th>
 							<th>真實姓名</th>
-							<th>聯絡資訊</th>
 							<th>檢舉點數</th>
 							<th>狀態</th>
 						</tr>
@@ -437,7 +380,6 @@ td {
 							<td><img class="avatar"
 								th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
 							<td th:text="${member.realName}" style="font-weight: 700;"></td>
-							<td th:text="${member.email}"></td>
 							<td
 								th:text="${(member.reportPoints != null ? member.reportPoints : 0) + ' / 5 點'}"></td>
 							<td><span class="status-badge badge-active">🟢 正常使用</span></td>
@@ -445,7 +387,6 @@ td {
 					</tbody>
 				</table>
 			</div>
-
 			<div id="tab-suspended" class="tab-content">
 				<table>
 					<thead>
@@ -453,7 +394,6 @@ td {
 							<th>ID</th>
 							<th>照片</th>
 							<th>真實姓名</th>
-							<th>聯絡資訊</th>
 							<th>檢舉點數</th>
 							<th>狀態</th>
 						</tr>
@@ -476,7 +416,6 @@ td {
 							<td><img class="avatar"
 								th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
 							<td th:text="${member.realName}" style="font-weight: 700;"></td>
-							<td th:text="${member.email}"></td>
 							<td
 								th:text="${(member.reportPoints != null ? member.reportPoints : 0) + ' / 5 點'}"
 								style="color: red; font-weight: 700;"></td>
@@ -488,14 +427,10 @@ td {
 			</div>
 		</div>
 
-
 		<div class="card-panel detail-panel" id="detailPanel">
 			<div class="detail-placeholder" id="placeholderText">
-				<h3>🫵 請點選左側任意會員</h3>
-				<p style="margin-top: 10px; font-size: 13px;">點選後，此處將自動載入該會員的完整
-					KYC 實名與評價詳細資料。</p>
+				<h3>🫵 請點選左側會員</h3>
 			</div>
-
 			<div id="detailContent" style="display: none;">
 				<div class="detail-header">
 					<img class="detail-avatar" id="detAvatar" src="" alt="大頭貼">
@@ -504,172 +439,91 @@ td {
 						<p id="detNickname" style="color: #64748b; font-size: 14px;"></p>
 					</div>
 				</div>
-
 				<div class="info-grid">
 					<div class="info-item">
 						<div class="info-label">會員 ID</div>
 						<div class="info-value" id="detId"></div>
 					</div>
 					<div class="info-item">
-						<div class="info-label">手機號碼</div>
+						<div class="info-label">手機</div>
 						<div class="info-value" id="detPhone"></div>
 					</div>
 					<div class="info-item" style="grid-column: span 2;">
-						<div class="info-label">電子信箱</div>
+						<div class="info-label">信箱</div>
 						<div class="info-value" id="detEmail"></div>
 					</div>
 					<div class="info-item">
-						<div class="info-label">身分證字號</div>
+						<div class="info-label">身分證</div>
 						<div class="info-value" id="detIdNumber"></div>
 					</div>
 					<div class="info-item">
-						<div class="info-label">性別</div>
-						<div class="info-value" id="detGender"></div>
-					</div>
-					<div class="info-item">
-						<div class="info-label">累計檢舉點數</div>
+						<div class="info-label">檢舉點數</div>
 						<div class="info-value" id="detPoints"
 							style="color: var(--rose-600);"></div>
 					</div>
-					<div class="info-item">
-						<div class="info-label">註冊日期</div>
-						<div class="info-value" id="detCreatedAt"></div>
+				</div>
+				<div class="kyc-img-box">
+					<div>
+						<span style="font-size: 11px; color: #64748b;">正面</span><img
+							id="detIdFrontImg" src="" onclick="zoomImage(this)">
+					</div>
+					<div>
+						<span style="font-size: 11px; color: #64748b;">反面</span><img
+							id="detIdBackImg" src="" onclick="zoomImage(this)">
+					</div>
+					<div>
+						<span style="font-size: 11px; color: #64748b;">人臉</span><img
+							id="detFaceImg" src="" onclick="zoomImage(this)">
 					</div>
 				</div>
-
-				<div style="margin-bottom: 20px;">
-					<div class="info-label"
-						style="font-weight: 700; color: var(--slate-700);">🪪 KYC
-						證件照片核對 (點擊照片可放大)</div>
-					<div class="kyc-img-box">
-						<div>
-							<span style="font-size: 12px; color: #64748b;">身分證件正面</span> <img
-								id="detIdImg" src="" alt="身分證" onclick="zoomImage(this)">
-						</div>
-						<div>
-							<span style="font-size: 12px; color: #64748b;">現場自拍人臉</span> <img
-								id="detFaceImg" src="" alt="自拍圖" onclick="zoomImage(this)">
-						</div>
-					</div>
-				</div>
-
 				<div id="detActionArea"
-					style="border-top: 1px solid var(--slate-200); padding-top: 16px; text-align: right;">
-				</div>
+					style="border-top: 1px solid var(--slate-200); padding-top: 16px; text-align: right;"></div>
 			</div>
 		</div>
-
 	</div>
 
 	<div id="imgModal" class="image-modal" onclick="closeZoom()">
-		<span class="close-modal-btn">&times;</span> <img id="modalTargetImg"
-			src="" alt="放大圖">
+		<img id="modalTargetImg" src="">
 	</div>
 
-	<script th:inline="javascript">
-    // 1. 頁籤切換邏輯
-    function switchTab(btn, tabId) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        
-        btn.classList.add('active');
-        document.getElementById(tabId).classList.add('active');
-    }
-
-    // 2. 透過 DOM Dataset 屬性動態顯示會員明細
-    function showDetail(row) {
-        if (!row) return;
-        
-        let memberId = row.dataset.id;
-        let realName = row.dataset.realname;
-        let nickname = row.dataset.nickname;
-        let email = row.dataset.email;
-        let phone = row.dataset.phone;
-        let idNumber = row.dataset.idnumber;
-        let gender = row.dataset.gender;
-        let points = row.dataset.points;
-        let createdAt = row.dataset.createdat;
-        let accountStatus = row.dataset.status;
-        
-        document.getElementById('placeholderText').style.display = 'none';
-        document.getElementById('detailContent').style.display = 'block';
-        
-        document.getElementById('detId').innerText = memberId;
-        document.getElementById('detRealName').innerText = realName || '未填寫';
-        document.getElementById('detNickname').innerText = '暱稱: ' + (nickname || '無');
-        document.getElementById('detEmail').innerText = email;
-        document.getElementById('detPhone').innerText = phone || '無';
-        document.getElementById('detIdNumber').innerText = idNumber || '未送審';
-        document.getElementById('detGender').innerText = (gender == 1) ? '👨 男' : ((gender == 2) ? '👩 女' : '秘密');
-        document.getElementById('detPoints').innerText = points + ' / 5 點';
-        document.getElementById('detCreatedAt').innerText = createdAt || '未知';
-        
-        document.getElementById('detAvatar').src = '/member/back-end/displayImage?memberId=' + memberId + '&type=memberPic';
-        document.getElementById('detIdImg').src = '/member/back-end/displayImage?memberId=' + memberId + '&type=idImage';
-        document.getElementById('detFaceImg').src = '/member/back-end/displayImage?memberId=' + memberId + '&type=faceImage';
-        
-        let actionArea = document.getElementById('detActionArea');
-        actionArea.innerHTML = ''; 
-        
-        if (accountStatus == 0 || accountStatus == 2) {
-            actionArea.innerHTML = `
-                <div class="action-container-box">
-                    <form action="/member/back-end/toggleStatus" method="post" onsubmit="return confirm('確定要【核准通過】此會員的實名認證嗎？')" style="display:inline;">
-                        <input type="hidden" name="memberId" value="${memberId}">
-                        <input type="hidden" name="newStatus" value="1">
-                        <button type="submit" class="btn-action btn-recover">👑 核准審核通過</button>
-                    </form>
-                    <form action="/member/back-end/toggleStatus" method="post" onsubmit="return confirm('確定要判定此會員【審核失敗】嗎？')" style="display:inline;">
-                        <input type="hidden" name="memberId" value="${memberId}">
-                        <input type="hidden" name="newStatus" value="2">
-                        <button type="submit" class="btn-action btn-fail">❌ 設為審核失敗</button>
-                    </form>
-                </div>
-            `;
-        } else if (accountStatus == 1) {
-            actionArea.innerHTML = `
-                <form action="/member/back-end/toggleStatus" method="post" onsubmit="return confirm('警告：確定要強制【停權】此會員帳號嗎？')">
-                    <input type="hidden" name="memberId" value="${memberId}">
-                    <input type="hidden" name="newStatus" value="3">
-                    <button type="submit" class="btn-action btn-suspend">⛔ 執行強制停權</button>
-                </form>
-            `;
-        } else if (accountStatus == 3) {
-            actionArea.innerHTML = `
-                <form action="/member/back-end/toggleStatus" method="post" onsubmit="return confirm('確定要【恢復】該會員權限並將點數歸零嗎？')">
-                    <input type="hidden" name="memberId" value="${memberId}">
-                    <input type="hidden" name="newStatus" value="1">
-                    <button type="submit" class="btn-action btn-recover">✅ 解除封鎖・恢復權限</button>
-                </form>
-            `;
-        }
-    }
-
-    // 🔍 3. 點擊放大照片邏輯
-    function zoomImage(imgElement) {
-        if (!imgElement || !imgElement.src || imgElement.src.includes('window.location')) return;
-        
-        let modal = document.getElementById('imgModal');
-        let modalImg = document.getElementById('modalTargetImg');
-        
-        modalImg.src = imgElement.src; // 複製圖片位址
-        modal.style.display = 'flex';   // 顯示燈箱
-        
-        // 延遲加上 class 做出淡入動畫效果
-        setTimeout(() => {
-            modal.classList.add('show');
-        }, 10);
-    }
-
-    // ❌ 4. 關閉放大照片邏輯
-    function closeZoom() {
-        let modal = document.getElementById('imgModal');
-        modal.classList.remove('show');
-        setTimeout(() => {
-            modal.style.display = 'none';
-        }, 200);
-    }
-</script>
-
+	<script>
+	   function switchTab(btn, tabId) {
+	       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+	       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+	       btn.classList.add('active');
+	       document.getElementById(tabId).classList.add('active');
+	   }
+	   function showDetail(row) {
+	       const d = row.dataset;
+	       document.getElementById('placeholderText').style.display = 'none';
+	       document.getElementById('detailContent').style.display = 'block';
+	       document.getElementById('detId').innerText = d.id;
+	       document.getElementById('detRealName').innerText = d.realname;
+	       document.getElementById('detEmail').innerText = d.email;
+	       document.getElementById('detIdNumber').innerText = d.idnumber;
+	       document.getElementById('detPoints').innerText = d.points + ' / 5 點';
+	       
+	       // 設定圖片來源 (對應後端 displayImage)
+	       document.getElementById('detAvatar').src = '/member/back-end/displayImage?memberId=' + d.id + '&type=memberPic';
+	       document.getElementById('detIdFrontImg').src = '/member/back-end/displayImage?memberId=' + d.id + '&type=idFront';
+	       document.getElementById('detIdBackImg').src = '/member/back-end/displayImage?memberId=' + d.id + '&type=idBack';
+	       document.getElementById('detFaceImg').src = '/member/back-end/displayImage?memberId=' + d.id + '&type=faceImage';
+	       
+	       // 動態按鈕生成 (與原邏輯一致)
+	       let area = document.getElementById('detActionArea');
+	       area.innerHTML = '';
+	       if(d.status == 0 || d.status == 2) {
+	           area.innerHTML = `<form action="/member/back-end/toggleStatus" method="post" style="display:inline;"><input type="hidden" name="memberId" value="${d.id}"><input type="hidden" name="newStatus" value="1"><button type="submit" class="btn-action btn-recover">✅ 核准</button></form>`;
+	       } else if(d.status == 1) {
+	           area.innerHTML = `<form action="/member/back-end/toggleStatus" method="post" style="display:inline;"><input type="hidden" name="memberId" value="${d.id}"><input type="hidden" name="newStatus" value="3"><button type="submit" class="btn-action btn-suspend">⛔ 停權</button></form>`;
+	       }
+	   }
+	   function zoomImage(img) { 
+		   if(!img.src) return;
+		   document.getElementById('modalTargetImg').src = img.src;
+		   document.getElementById('imgModal').style.display = 'flex'; 
+	   }
+	   function closeZoom() { document.getElementById('imgModal').style.display = 'none'; }
+	</script>
 </body>
 </html>
