@@ -3,9 +3,12 @@ package com.webond.venue.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -69,6 +72,21 @@ public class VenueReportService {
 	public boolean hasReviewingReport(Integer venueOrderId) {
 		return venueReportRepository.findByVenueOrderId(venueOrderId).stream()
 				.anyMatch(report -> report.getReportStatus() != null && report.getReportStatus() == STATUS_REVIEWING);
+	}
+
+	// ===== 防重複檢舉：同一筆訂單是否已經檢舉過（不論審核結果，每筆訂單僅能檢舉一次）=====
+	public boolean hasAnyReport(Integer venueOrderId) {
+		return !venueReportRepository.findByVenueOrderId(venueOrderId).isEmpty();
+	}
+
+	// ===== 批次查詢：這些訂單裡哪些已經檢舉過（供列表頁一次判斷用）=====
+	public Set<Integer> getReportedOrderIds(List<Integer> venueOrderIds) {
+		if (venueOrderIds == null || venueOrderIds.isEmpty()) {
+			return Collections.emptySet();
+		}
+		return venueReportRepository.findByVenueOrderIdIn(venueOrderIds).stream()
+				.map(VenueReportVO::getVenueOrderId)
+				.collect(Collectors.toSet());
 	}
 
 	/**

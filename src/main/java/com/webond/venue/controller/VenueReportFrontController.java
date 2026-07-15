@@ -46,9 +46,9 @@ public class VenueReportFrontController {
 			return ORDER_LIST_URL;
 		}
 
-		// 3. 防重複檢舉
-		if (venueReportSvc.hasReviewingReport(venueOrderId)) {
-			redirectAttrs.addFlashAttribute("errorMsg", "此訂單已有檢舉正在審核中，請等待處理結果");
+		// 3. 防重複檢舉：每筆訂單僅能檢舉一次，不論先前的審核結果為何
+		if (venueReportSvc.hasAnyReport(venueOrderId)) {
+			redirectAttrs.addFlashAttribute("errorMsg", "此訂單已檢舉過，每筆訂單僅能檢舉一次");
 			return ORDER_LIST_URL;
 		}
 
@@ -87,9 +87,9 @@ public class VenueReportFrontController {
 			return ORDER_LIST_URL;
 		}
 
-		// 4. 防重複檢舉
-		if (venueReportSvc.hasReviewingReport(venueOrderId)) {
-			redirectAttrs.addFlashAttribute("errorMsg", "此訂單已有檢舉正在審核中，請等待處理結果");
+		// 4. 防重複檢舉：每筆訂單僅能檢舉一次，不論先前的審核結果為何
+		if (venueReportSvc.hasAnyReport(venueOrderId)) {
+			redirectAttrs.addFlashAttribute("errorMsg", "此訂單已檢舉過，每筆訂單僅能檢舉一次");
 			return ORDER_LIST_URL;
 		}
 

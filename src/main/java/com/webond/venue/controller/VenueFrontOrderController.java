@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -25,6 +26,7 @@ import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueTypeVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueOrderService;
+import com.webond.venue.service.VenueReportService;
 import com.webond.venue.service.VenueService;
 import com.webond.venue.service.VenueSlotService;
 import com.webond.venue.service.VenueTypeService;
@@ -49,9 +51,12 @@ public class VenueFrontOrderController {
 	
 	@Autowired
 	NotificationService notificationService;
-	
+
 	@Autowired
 	VenueTypeService venueTypeService;
+
+	@Autowired
+	VenueReportService venueReportService;
 
 	@GetMapping("addVenueOrder")
 	public String add(@RequestParam("venueId") Integer venueId, Model model, HttpSession session) {
@@ -239,10 +244,13 @@ public class VenueFrontOrderController {
 
 		List<VenueOrderVO> list = venueOrderService.getVenuesByMember(loginMember.getMemberId());
 		model.addAttribute("venueOrderListData", list);
-		
+
+		List<Integer> orderIds = list.stream().map(VenueOrderVO::getVenueOrderId).collect(Collectors.toList());
+		model.addAttribute("reportedOrderIds", venueReportService.getReportedOrderIds(orderIds));
+
 		LocalDate cutoff = LocalDate.now().plusDays(3);
 	    model.addAttribute("cancelCutoff", cutoff);
-		
+
 		return "front-end/venue/myVenueOrder";
 	}
 
