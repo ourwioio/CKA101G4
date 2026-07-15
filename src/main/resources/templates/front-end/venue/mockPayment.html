@@ -2,10 +2,19 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>付款頁面</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/front-end/venue/mockPayment.css}" href="payment.css">
 </head>
 <body>
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 
 <div class="container">
     <div class="card">
@@ -30,12 +39,12 @@
 		        <label for="card-name">持卡人姓名</label>
 		        <input type="text" id="card-name" autocomplete="cc-name" required placeholder="王小明">
 		    </div>
-		
+
 		    <div class="form-group">
 		        <label for="card-number">信用卡卡號</label>
 		        <input type="text" id="card-number" inputmode="numeric" pattern="\d{13,19}" autocomplete="cc-number" maxlength="19" required placeholder="XXXX XXXX XXXX XXXX">
 		    </div>
-		
+
 		    <div class="row">
 		        <div class="form-group">
 		            <label for="expiry-date">有效年月</label>
@@ -57,7 +66,7 @@
             <button type="submit" class="btn-confirm">付款</button>
         </form>
         <!-- 取消付款 -->
-		<form th:action="@{/front/venueOrder/cancelPayment}" method="post" style="margin-top: 10px;">
+		<form th:action="@{/front/venueOrder/cancelPayment}" method="post" class="cancel-form">
 		    <input type="hidden" name="venueOrderId" th:value="${order.venueOrderId}" />
 		    <button type="submit" class="btn-cancel-pay">取消付款</button>
 		</form>

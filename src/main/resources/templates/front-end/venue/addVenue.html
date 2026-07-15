@@ -1,125 +1,136 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>新增場地</title>
-    <link rel="stylesheet" th:href="@{/css/front-end/venue/addVenue.css}" />
-    <style>
-		.error {
-		    color: #c0392b;
-		    font-size: 12px;
-		    margin-top: 4px;
-		}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>新增場地</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+<link rel="stylesheet" th:href="@{/css/front-end/venue/addVenue.css}" />
 </head>
 <body>
-    <div class="card">
-        <div class="card-title">新增場地</div>
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 
-        <form th:action="@{/front/venue/insert}" th:object="${venueVO}" method="post" enctype="multipart/form-data">
+<main class="form-page">
 
-            <!-- 場地名稱 -->
-            <div class="form-group">
-                <label>場地名稱</label>
-                <input type="text" th:field="*{venueName}" placeholder="請輸入場地名稱" />
-                <div class="error" th:if="${#fields.hasErrors('venueName')}" th:errors="*{venueName}"></div>
-            </div>
+	<a class="back-link" th:href="@{/front/venue/myVenue}">← 返回我的場地</a>
 
-            <!-- 地址連動選擇器：僅此處使用 JavaScript -->
-            <div class="form-group">
-                <label>地址</label>
-                <div class="address-row">
-                    <select id="citySelect" class="address-select" onchange="updateDistrict()">
-                        <option value="">請選擇縣市</option>
-                    </select>
-                    <select id="districtSelect" class="address-select">
-                        <option value="">請選擇區域</option>
-                    </select>
-                    <input type="text" id="streetInput" class="address-street" placeholder="請輸入詳細地址" required/>
-                </div>
-                <input type="hidden" th:field="*{address}" id="addressHidden" />
-                <div class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
-            </div>
+	<div class="card">
+		<div class="card-title">新增場地</div>
 
-            <!-- 容納人數 -->
-            <div class="form-group">
-                <label>容納人數</label>
-                <input type="text" th:field="*{capacity}" placeholder="請輸入容納人數" />
-                <div class="error" th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}"></div>
-            </div>
+		<form th:action="@{/front/venue/insert}" th:object="${venueVO}" method="post" enctype="multipart/form-data">
 
-            <div class="form-group">
-                <label>每小時金額（元）</label>
-                <input type="text" th:field="*{hourlyRate}" placeholder="請輸入時租金額" />
-                <div class="error" th:if="${#fields.hasErrors('hourlyRate')}" th:errors="*{hourlyRate}"></div>
-            </div>
+			<!-- 場地名稱 -->
+			<div class="form-group">
+				<label>場地名稱</label>
+				<input type="text" th:field="*{venueName}" placeholder="請輸入場地名稱" />
+				<div class="error" th:if="${#fields.hasErrors('venueName')}" th:errors="*{venueName}"></div>
+			</div>
 
-            <!-- 場地類型 -->
-            <div class="form-group">
-                <label>場地類型</label>
-                <select th:field="*{venueTypeVO.venueTypeId}">
-                    <option value="">請選擇場地類型</option>
-                    <option th:each="type : ${venueTypeData}" th:value="${type.venueTypeId}" th:text="${type.typeName}"></option>
-                </select>
-                <div class="error" th:if="${venueTypeError}" th:text="${venueTypeError}"></div>
-            </div>
+			<!-- 地址連動選擇器：僅此處使用 JavaScript -->
+			<div class="form-group">
+				<label>地址</label>
+				<div class="address-row">
+					<select id="citySelect" class="address-select" onchange="updateDistrict()">
+						<option value="">請選擇縣市</option>
+					</select>
+					<select id="districtSelect" class="address-select">
+						<option value="">請選擇區域</option>
+					</select>
+					<input type="text" id="streetInput" class="address-street" placeholder="請輸入詳細地址" required/>
+				</div>
+				<input type="hidden" th:field="*{address}" id="addressHidden" />
+				<div class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></div>
+			</div>
 
-            <div class="form-group">
-                <label>每週開放日</label>
-                <div class="checkbox-group">
-                    <label th:each="dayEntry : ${ {0:'週一',1:'週二',2:'週三',3:'週四',4:'週五',5:'週六',6:'週日'} }">
-                        <input type="checkbox" name="openDays"
-                               th:value="${dayEntry.key}"
-                               th:checked="${savedOpenDays != null and savedOpenDays.contains(dayEntry.key)}"/>
-                        <span th:text="${dayEntry.value}"></span>
-                    </label>
-                </div>
-            </div>
+			<!-- 容納人數 -->
+			<div class="form-group">
+				<label>容納人數</label>
+				<input type="text" th:field="*{capacity}" placeholder="請輸入容納人數" />
+				<div class="error" th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}"></div>
+			</div>
 
-            <div class="form-group">
-                <label>營業時間</label>
-                <div class="time-row">
-                    <select name="startHour" id="startHour">
-                        <option th:each="h : ${#numbers.sequence(0, 23)}"
-                                th:value="${h}"
-                                th:text="${h} + ':00'"
-                                th:selected="${savedStartHour != null and savedStartHour == h}"></option>
-                    </select>
-                    <span>到</span>
-                    <select name="endHour" id="endHour">
-                        <option th:each="h : ${#numbers.sequence(1, 24)}" th:value="${h}" th:text="${h} + ':00'"
-                                th:selected="${savedEndHour != null and savedEndHour == h}"></option>
-                    </select>
-                </div>
-                <div class="error" th:if="${hourError}" th:text="${hourError}"></div>
-            </div>
-            <!-- 場地簡介 -->
+			<div class="form-group">
+				<label>每小時金額（元）</label>
+				<input type="text" th:field="*{hourlyRate}" placeholder="請輸入時租金額" />
+				<div class="error" th:if="${#fields.hasErrors('hourlyRate')}" th:errors="*{hourlyRate}"></div>
+			</div>
+
+			<!-- 場地類型 -->
+			<div class="form-group">
+				<label>場地類型</label>
+				<select th:field="*{venueTypeVO.venueTypeId}">
+					<option value="">請選擇場地類型</option>
+					<option th:each="type : ${venueTypeData}" th:value="${type.venueTypeId}" th:text="${type.typeName}"></option>
+				</select>
+				<div class="error" th:if="${venueTypeError}" th:text="${venueTypeError}"></div>
+			</div>
+
+			<div class="form-group">
+				<label>每週開放日</label>
+				<div class="checkbox-group">
+					<label th:each="dayEntry : ${ {0:'週一',1:'週二',2:'週三',3:'週四',4:'週五',5:'週六',6:'週日'} }">
+						<input type="checkbox" name="openDays"
+						       th:value="${dayEntry.key}"
+						       th:checked="${savedOpenDays != null and savedOpenDays.contains(dayEntry.key)}"/>
+						<span th:text="${dayEntry.value}"></span>
+					</label>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label>營業時間</label>
+				<div class="time-row">
+					<select name="startHour" id="startHour">
+						<option th:each="h : ${#numbers.sequence(0, 23)}"
+						        th:value="${h}"
+						        th:text="${h} + ':00'"
+						        th:selected="${savedStartHour != null and savedStartHour == h}"></option>
+					</select>
+					<span>到</span>
+					<select name="endHour" id="endHour">
+						<option th:each="h : ${#numbers.sequence(1, 24)}" th:value="${h}" th:text="${h} + ':00'"
+						        th:selected="${savedEndHour != null and savedEndHour == h}"></option>
+					</select>
+				</div>
+				<div class="error" th:if="${hourError}" th:text="${hourError}"></div>
+			</div>
+
+			<!-- 場地簡介 -->
 			<div class="form-group">
 			    <label>場地介紹</label>
-			    <textarea th:field="*{venueDescription}" 
-			              placeholder="請輸入場地介紹、特色說明等" 
+			    <textarea th:field="*{venueDescription}"
+			              placeholder="請輸入場地介紹、特色說明等"
 			              rows="5"></textarea>
 			    <div class="error" th:if="${#fields.hasErrors('venueDescription')}" th:errors="*{venueDescription}"></div>
 			</div>
 
-            <div class="form-group">
-                <label>場地照片</label>
-                <input type="file" name="upFiles" id="upFiles" multiple accept="image/*" onchange="previewImages()"/>
-                <div id="previewArea" class="preview-area"></div>
-                <input type="hidden" name="coverIndex" id="coverIndex" value="0"/>
-                <div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
-                <div th:if="${savedStartHour != null and errorMessage == null}" class="warning-text error">
-                    其他欄位有誤，請重新選擇場地照片
-                </div>
-            </div>
+			<div class="form-group">
+				<label>場地照片</label>
+				<input type="file" name="upFiles" id="upFiles" multiple accept="image/*" onchange="previewImages()"/>
+				<div id="previewArea" class="preview-area"></div>
+				<input type="hidden" name="coverIndex" id="coverIndex" value="0"/>
+				<div class="error" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+				<div th:if="${savedStartHour != null and errorMessage == null}" class="warning-text error">
+					其他欄位有誤，請重新選擇場地照片
+				</div>
+			</div>
 
-            <div class="btn-row">
-                <button type="submit" class="btn-submit">新增場地</button>
-                <a class="btn-back" th:href="@{/front/venue/listAllVenue}">取消</a>
-            </div>
-        </form>
-    </div>
+			<div class="btn-row">
+				<button type="submit" class="btn-submit">新增場地</button>
+				<a class="btn-back" th:href="@{/front/venue/listAllVenue}">取消</a>
+			</div>
+		</form>
+	</div>
 
-    <script th:src="@{/js/front-end/venue/addVenue.js}"></script>
+</main>
+
+<script th:src="@{/js/front-end/venue/addressSelector.js}"></script>
+<script th:src="@{/js/front-end/venue/addVenue.js}"></script>
 </body>
 </html>
