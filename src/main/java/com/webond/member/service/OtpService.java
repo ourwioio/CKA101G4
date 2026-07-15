@@ -54,8 +54,25 @@ public class OtpService {
 		return false;
 	}
 
-	public void deleteOtp(String cleanEmail) {
-		// TODO Auto-generated method stub
-		
+	// 5. 刪除 OTP 驗證碼（修正：原本是空的 TODO stub，什麼都沒做）
+	public void deleteOtp(String email) {
+		redisTemplate.delete("auth:otp:" + email);
+	}
+
+	// 6. 驗證成功後，標記此 Email 為「已通過驗證」(給 30 分鐘完成註冊)
+	public void markVerified(String email) {
+		String verifiedKey = "auth:verified:" + email;
+		redisTemplate.opsForValue().set(verifiedKey, "1", 30, TimeUnit.MINUTES);
+	}
+
+	// 7. 檢查此 Email 是否已通過驗證 (供 doRegister 後端把關，防止繞過前端直接註冊)
+	public boolean isVerified(String email) {
+		String verifiedKey = "auth:verified:" + email;
+		return "1".equals(redisTemplate.opsForValue().get(verifiedKey));
+	}
+
+	// 8. 註冊完成後，清除驗證標記
+	public void clearVerified(String email) {
+		redisTemplate.delete("auth:verified:" + email);
 	}
 }

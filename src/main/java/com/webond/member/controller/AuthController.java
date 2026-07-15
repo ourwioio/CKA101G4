@@ -85,6 +85,9 @@ public class AuthController {
             // 🟢 4. 驗證成功後立即刪除 Redis 中的驗證碼，防止二次重用
             otpService.deleteOtp(cleanEmail);
 
+            // 🟢 5. 標記此 Email 已通過驗證，供 doRegister 後端把關使用（防止繞過前端直接註冊）
+            otpService.markVerified(cleanEmail);
+
             return ResponseEntity.ok(Map.of("success", true, "message", "驗證成功！"));
         } else {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "驗證碼錯誤或已過期，請重新取得！"));
