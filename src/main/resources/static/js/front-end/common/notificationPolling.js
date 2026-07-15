@@ -1,136 +1,220 @@
-(() => {
-    'use strict';
+document.addEventListener("DOMContentLoaded", function () {
 
-    const POLLING_INTERVAL = 1000;
+    const POLLING_INTERVAL_MS = 3000;
 
-    let isRequesting = false;
+    let pollingTimer = null;
 
-    async function refreshUnreadBadge() {
 
-        const notifyButton =
-            document.querySelector('.icon-btn--notify');
+    // =========================================================
+    // 尋找通知按鈕
+    //
+    // 新版、舊版 Navbar 都支援
+    // =========================================================
 
-        if (!notifyButton) {
-            console.log('目前頁面找不到通知按鈕');
+    function findNotificationButton() {
+
+        return document.querySelector(
+            "[data-unread-url]"
+        );
+    }
+
+
+    // =========================================================
+    // 取得未讀數量
+    // =========================================================
+
+    async function refreshUnreadNotificationCount() {
+
+        const notificationButton =
+            findNotificationButton();
+
+        // 未登入時沒有通知按鈕，直接結束
+        if (!notificationButton) {
             return;
         }
-
-        if (isRequesting) {
-            return;
-        }
-
-        isRequesting = true;
 
         const unreadUrl =
-            notifyButton.dataset.unreadUrl
-            || '/front/notification/unread-count';
+            notificationButton.dataset.unreadUrl;
+
+        if (!unreadUrl) {
+            return;
+        }
 
         try {
-            const response = await fetch(
-                unreadUrl,
-                {
-                    method: 'GET',
-                    credentials: 'same-origin',
-                    cache: 'no-store',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                }
-            );
+            const response =
+                await fetch(unreadUrl, {
+                    method: "GET",
 
-            console.log(
-                '通知 API 狀態：',
-                response.status
-            );
+                    headers: {
+                        "Accept": "application/json"
+                    },
+
+                    // 避免瀏覽器使用舊快取
+                    cache: "no-store",
+
+                    // 帶上目前 Session Cookie
+                    credentials: "same-origin"
+                });
 
             if (!response.ok) {
-                console.error(
-                    '通知 API 請求失敗：',
-                    response.status
-                );
                 return;
             }
 
-            const responseText =
-                await response.text();
+            const responseData =
+                await response.json();
 
-            console.log(
-                '後端回傳的未讀數：',
-                responseText
+            /*
+             * 支援後端直接回傳：
+             * 3
+             *
+             * 也支援：
+             * { "count": 3 }
+             * { "unreadCount": 3 }
+             */
+            let unreadCount;
+
+            if (typeof responseData === "number") {
+
+                unreadCount =
+                    responseData;
+
+            } else if (responseData != null
+                    && responseData.unreadCount != null) {
+
+                unreadCount =
+                    Number(responseData.unreadCount);
+
+            } else if (responseData != null
+                    && responseData.count != null) {
+
+                unreadCount =
+                    Number(responseData.count);
+
+            } else {
+
+                unreadCount = 0;
+            }
+
+            if (!Number.isFinite(unreadCount)
+                    || unreadCount < 0) {
+
+                unreadCount = 0;
+            }
+
+            updateNotificationBadge(
+                notificationButton,
+                unreadCount
             );
-
-            const count =
-                Number(responseText);
-
-            if (!Number.isFinite(count)) {
-                console.error(
-                    '後端回傳的不是有效數字：',
-                    responseText
-                );
-                return;
-            }
-
-            let badge =
-                notifyButton.querySelector(
-                    '.icon-badge--unread'
-                );
-
-            if (count > 0) {
-
-                if (!badge) {
-                    badge =
-                        document.createElement('span');
-
-                    badge.className =
-                        'icon-badge icon-badge--unread';
-
-                    notifyButton.appendChild(badge);
-                }
-
-                badge.textContent =
-                    count > 99
-                        ? '99+'
-                        : String(count);
-
-            } else if (badge) {
-                badge.remove();
-            }
 
         } catch (error) {
+
             console.error(
-                '取得未讀通知數量失敗：',
+                "取得未讀通知數量失敗：",
                 error
             );
-
-        } finally {
-            isRequesting = false;
         }
     }
+
+
+    // =========================================================
+    // 更新導覽列上的通知數字
+    // =========================================================
+
+    function updateNotificationBadge(
+            notificationButton,
+            unreadCount) {
+
+        let badge =
+            notificationButton.querySelector(
+                ".badge-dot, .icon-badge--unread"
+            );
+
+        // 有未讀通知
+        if (unreadCount > 0) {
+
+            // 原本沒有 badge，就動態建立
+            if (!badge) {
+
+                badge =
+                    document.createElement("span");
+
+                /*
+                 * 同時加入新版與舊版 class：
+                 *
+                 * badge-dot：
+                 * 新版 navbar.css 外觀
+                 *
+                 * icon-badge icon-badge--unread：
+                 * 相容舊版
+                 */
+                badge.className =
+                    "badge-dot icon-badge icon-badge--unread";
+
+                notificationButton.appendChild(
+                    badge
+                );
+            }
+
+            badge.textContent =
+                unreadCount > 99
+                    ? "99+"
+                    : String(unreadCount);
+
+            return;
+        }
+
+        // 沒有未讀通知時移除數字
+        if (badge) {
+            badge.remove();
+        }
+    }
+
+
+    // =========================================================
+    // 啟動輪詢
+    // =========================================================
 
     function startNotificationPolling() {
 
-        console.log(
-            '通知輪詢已啟動，每 1 秒查詢一次'
-        );
+        if (pollingTimer !== null) {
+            clearInterval(pollingTimer);
+        }
 
-        // 進入頁面立即查一次
-        refreshUnreadBadge();
+        // 頁面一開啟先立即查一次
+        refreshUnreadNotificationCount();
 
-        // 之後每秒查一次
-        window.setInterval(
-            refreshUnreadBadge,
-            POLLING_INTERVAL
-        );
+        pollingTimer =
+            setInterval(
+                refreshUnreadNotificationCount,
+                POLLING_INTERVAL_MS
+            );
     }
 
-    if (document.readyState === 'loading') {
 
-        document.addEventListener(
-            'DOMContentLoaded',
-            startNotificationPolling
-        );
+    // =========================================================
+    // 切回分頁時立即更新
+    // =========================================================
 
-    } else {
-        startNotificationPolling();
-    }
-})();
+    document.addEventListener(
+        "visibilitychange",
+        function () {
+
+            if (!document.hidden) {
+                refreshUnreadNotificationCount();
+            }
+        }
+    );
+
+
+    // =========================================================
+    // 視窗重新取得焦點時立即更新
+    // =========================================================
+
+    window.addEventListener(
+        "focus",
+        refreshUnreadNotificationCount
+    );
+
+
+    startNotificationPolling();
+});
