@@ -1,110 +1,709 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
-    <title>後台服務詳情</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>服務詳情</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: #2d3436;
+            background: #f5f6fa;
+            font-family:
+                    "Noto Sans TC",
+                    Arial,
+                    sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .page {
+            width: min(1000px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 28px 0 60px;
+        }
+
+        /* =========================
+           頂部
+           ========================= */
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 40px;
+            padding: 8px 14px;
+            color: #5a4acb;
+            background: #efedff;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .employee-info {
+            color: #69727b;
+            font-size: 13px;
+        }
+
+        /* =========================
+           訊息
+           ========================= */
+
+        .message {
+            margin-bottom: 18px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .message--success {
+            color: #176b45;
+            background: #e8f8ef;
+            border: 1px solid #b7e4ca;
+        }
+
+        .message--error {
+            color: #a12622;
+            background: #fff0ef;
+            border: 1px solid #f3c0bd;
+        }
+
+        /* =========================
+           服務詳情卡片
+           ========================= */
+
+        .detail-card {
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #e1e5ea;
+            border-radius: 16px;
+            box-shadow:
+                    0 5px 20px
+                    rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-header {
+            padding: 24px;
+            color: #ffffff;
+            background:
+                    linear-gradient(
+                            135deg,
+                            #6c5ce7,
+                            #8c7ae6
+                    );
+        }
+
+        .service-number {
+            margin-bottom: 8px;
+            font-size: 13px;
+            opacity: 0.86;
+        }
+
+        .service-title {
+            margin: 0;
+            font-size: 29px;
+            font-weight: 800;
+        }
+
+        .service-type {
+            margin-top: 9px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .detail-body {
+            padding: 24px;
+        }
+
+        /* =========================
+           狀態及金額
+           ========================= */
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns:
+                    repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        .summary-card {
+            padding: 17px;
+            background: #f8f9fb;
+            border: 1px solid #e5e8ec;
+            border-radius: 11px;
+        }
+
+        .summary-label {
+            margin-bottom: 7px;
+            color: #737c85;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .summary-value {
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 78px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .badge--active {
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .badge--inactive {
+            color: #9a3412;
+            background: #ffedd5;
+        }
+
+        .badge--archived {
+            color: #475569;
+            background: #e2e8f0;
+        }
+
+        .badge--disabled {
+            color: #991b1b;
+            background: #fee2e2;
+        }
+
+        /* =========================
+           詳細欄位
+           ========================= */
+
+        .section-title {
+            margin: 0 0 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e7eaee;
+            font-size: 19px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            gap: 0;
+            margin-bottom: 24px;
+            overflow: hidden;
+            border: 1px solid #e3e7eb;
+            border-radius: 11px;
+        }
+
+        .detail-item {
+            min-height: 78px;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e8ebee;
+        }
+
+        .detail-item:nth-child(odd) {
+            border-right: 1px solid #e8ebee;
+        }
+
+        .detail-label {
+            margin-bottom: 6px;
+            color: #7b838b;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .description-panel {
+            margin-bottom: 24px;
+            padding: 18px;
+            line-height: 1.8;
+            background: #f8f9fb;
+            border: 1px solid #e5e8ec;
+            border-radius: 11px;
+            white-space: pre-wrap;
+        }
+
+        /* =========================
+           操作區
+           ========================= */
+
+        .action-panel {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+            padding-top: 20px;
+            border-top: 1px solid #e7eaee;
+        }
+
+        .action-description {
+            color: #69727b;
+            font-size: 13px;
+        }
+
+        .action-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .action-form {
+            margin: 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 9px 16px;
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 800;
+            transition:
+                    transform 0.15s ease,
+                    background 0.15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn--danger {
+            color: #ffffff;
+            background: #d63031;
+        }
+
+        .btn--danger:hover {
+            background: #b92526;
+        }
+
+        .btn--success {
+            color: #ffffff;
+            background: #00a878;
+        }
+
+        .btn--success:hover {
+            background: #008f66;
+        }
+
+        .archived-message {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        /* =========================
+           RWD
+           ========================= */
+
+        @media (max-width: 700px) {
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-item:nth-child(odd) {
+                border-right: 0;
+            }
+
+            .top-bar,
+            .action-panel {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .action-group,
+            .action-form,
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>後台服務詳情</h1>
+<div class="page">
 
-<p>
-    <a th:href="@{/admin/services}">回後台服務列表</a>
-</p>
+    <!-- =========================
+         頂部
+         ========================= -->
 
-<hr>
+    <div class="top-bar">
 
-<!-- 成功 / 錯誤訊息 -->
-<p th:if="${successMsg}" th:text="${successMsg}" style="color: green;"></p>
-<p th:if="${errorMsg}" th:text="${errorMsg}" style="color: red;"></p>
+        <a class="back-link"
+           th:href="@{/admin/services}">
+            ← 返回服務列表
+        </a>
 
-<div th:if="${serviceVO != null}">
+        <div class="employee-info">
+            處理員工 #
+            <strong th:text="${loginEmployeeId}">
+                1001
+            </strong>
+        </div>
 
-    <h2 th:text="${serviceVO.serviceName}">服務名稱</h2>
+    </div>
 
-    <table border="1" cellpadding="8" cellspacing="0">
-        <tr>
-            <th>服務ID</th>
-            <td th:text="${serviceVO.serviceId}">1</td>
-        </tr>
+    <!-- =========================
+         訊息
+         ========================= -->
 
-        <tr>
-            <th>賣家會員ID</th>
-            <td th:text="${serviceVO.memberId}">1001</td>
-        </tr>
+    <div class="message message--success"
+         th:if="${successMsg != null}"
+         th:text="${successMsg}">
+        操作成功
+    </div>
 
-        <tr>
-            <th>服務類型</th>
-            <td>
+    <div class="message message--error"
+         th:if="${errorMsg != null}"
+         th:text="${errorMsg}">
+        操作失敗
+    </div>
+
+    <!-- =========================
+         服務詳情
+         ========================= -->
+
+    <article class="detail-card"
+             th:if="${serviceVO != null}">
+
+        <header class="detail-header">
+
+            <div class="service-number">
+                服務編號 #
+                <span th:text="${serviceVO.serviceId}">
+                    1
+                </span>
+            </div>
+
+            <h1 class="service-title"
+                th:text="${serviceVO.serviceName != null
+                         ? serviceVO.serviceName
+                         : '未命名服務'}">
+                咖啡聊天
+            </h1>
+
+            <div class="service-type">
+
+                服務類型：
+
                 <span th:if="${serviceVO.serviceType != null}"
                       th:text="${serviceVO.serviceType.typeName}">
-                    服務類型
+                    陪伴聊天
                 </span>
+
                 <span th:if="${serviceVO.serviceType == null}">
                     未分類
                 </span>
-            </td>
-        </tr>
 
-        <tr>
-            <th>服務描述</th>
-            <td th:text="${serviceVO.description}">服務描述</td>
-        </tr>
+            </div>
 
-        <tr>
-            <th>每小時費率</th>
-            <td th:text="${serviceVO.hourlyRate}">500</td>
-        </tr>
+        </header>
 
-        <tr>
-            <th>狀態</th>
-            <td>
-                <span th:if="${serviceVO.status == 0}">會員下架</span>
-                <span th:if="${serviceVO.status == 1}">上架中</span>
-                <span th:if="${serviceVO.status == 2}">已封存</span>
-                <span th:if="${serviceVO.status == 3}">平台停用</span>
-            </td>
-        </tr>
+        <div class="detail-body">
 
-        <tr>
-            <th>建立時間</th>
-            <td th:text="${#temporals.format(serviceVO.createdAt, 'yyyy-MM-dd HH:mm')}">
-                2026-07-06 12:00
-            </td>
-        </tr>
-    </table>
+            <!-- =====================
+                 摘要
+                 ===================== -->
 
-    <hr>
+            <section class="summary-grid">
 
-    <h3>後台操作</h3>
+                <div class="summary-card">
 
-    <!-- 平台停用 -->
-    <form th:if="${serviceVO.status != 2 and serviceVO.status != 3}"
-          th:action="@{/admin/services/{serviceId}/disable(serviceId=${serviceVO.serviceId})}"
-          method="post"
-          style="display:inline;">
-        <button type="submit"
-                onclick="return confirm('確定要停用這個服務嗎？')">
-            平台停用
-        </button>
-    </form>
+                    <div class="summary-label">
+                        每小時費率
+                    </div>
 
-    <!-- 恢復上架 -->
-    <form th:if="${serviceVO.status == 3}"
-          th:action="@{/admin/services/{serviceId}/restore(serviceId=${serviceVO.serviceId})}"
-          method="post"
-          style="display:inline;">
-        <button type="submit"
-                onclick="return confirm('確定要恢復這個服務嗎？')">
-            恢復上架
-        </button>
-    </form>
+                    <div class="summary-value">
+                        NT$
+                        <span th:text="${#numbers.formatInteger(
+                                serviceVO.hourlyRate != null
+                                    ? serviceVO.hourlyRate
+                                    : 0,
+                                1,
+                                'COMMA'
+                        )}">
+                            500
+                        </span>
+                    </div>
 
-</div>
+                </div>
 
-<div th:if="${serviceVO == null}">
-    <p style="color: red;">查無此服務</p>
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        賣家會員
+                    </div>
+
+                    <div class="summary-value">
+                        會員 #
+                        <span th:text="${serviceVO.memberId}">
+                            1
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="summary-card">
+
+                    <div class="summary-label">
+                        服務狀態
+                    </div>
+
+                    <div class="summary-value">
+
+                        <span class="badge badge--inactive"
+                              th:if="${serviceVO.status == 0}">
+                            會員下架
+                        </span>
+
+                        <span class="badge badge--active"
+                              th:if="${serviceVO.status == 1}">
+                            上架中
+                        </span>
+
+                        <span class="badge badge--archived"
+                              th:if="${serviceVO.status == 2}">
+                            已封存
+                        </span>
+
+                        <span class="badge badge--disabled"
+                              th:if="${serviceVO.status == 3}">
+                            平台停用
+                        </span>
+
+                        <span class="badge badge--archived"
+                              th:if="${serviceVO.status == null}">
+                            未設定
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- =====================
+                 基本資料
+                 ===================== -->
+
+            <h2 class="section-title">
+                基本資料
+            </h2>
+
+            <section class="detail-grid">
+
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        服務編號
+                    </div>
+
+                    <div class="detail-value"
+                         th:text="${serviceVO.serviceId}">
+                        1
+                    </div>
+
+                </div>
+
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        服務類型編號
+                    </div>
+
+                    <div class="detail-value"
+                         th:text="${serviceVO.serviceTypeId != null
+                                  ? serviceVO.serviceTypeId
+                                  : '未設定'}">
+                        1
+                    </div>
+
+                </div>
+
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        賣家會員編號
+                    </div>
+
+                    <div class="detail-value">
+                        會員 #
+                        <span th:text="${serviceVO.memberId}">
+                            1
+                        </span>
+                    </div>
+
+                </div>
+
+                <div class="detail-item">
+
+                    <div class="detail-label">
+                        建立時間
+                    </div>
+
+                    <div class="detail-value">
+
+                        <span th:if="${serviceVO.createdAt != null}"
+                              th:text="${#temporals.format(
+                                      serviceVO.createdAt,
+                                      'yyyy-MM-dd HH:mm:ss'
+                              )}">
+                            2026-07-15 14:30:00
+                        </span>
+
+                        <span th:if="${serviceVO.createdAt == null}">
+                            未紀錄
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- =====================
+                 服務描述
+                 ===================== -->
+
+            <h2 class="section-title">
+                服務描述
+            </h2>
+
+            <div class="description-panel"
+                 th:text="${serviceVO.description != null
+                          and !#strings.isEmpty(serviceVO.description)
+                          ? serviceVO.description
+                          : '此服務尚未填寫詳細說明'}">
+                服務內容說明
+            </div>
+
+            <!-- =====================
+                 後台操作
+                 ===================== -->
+
+            <section class="action-panel">
+
+                <div class="action-description">
+
+                    <span th:if="${serviceVO.status == 0
+                                  or serviceVO.status == 1}">
+                        平台停用後，會員將無法重新上架此服務。
+                    </span>
+
+                    <span th:if="${serviceVO.status == 3}">
+                        此服務目前已被平台停用，可由後台恢復上架。
+                    </span>
+
+                    <span th:if="${serviceVO.status == 2}">
+                        已封存服務不可再執行停用或恢復操作。
+                    </span>
+
+                </div>
+
+                <div class="action-group">
+
+                    <!-- 平台停用 -->
+                    <form class="action-form"
+                          th:if="${serviceVO.status == 0
+                                   or serviceVO.status == 1}"
+                          th:action="@{/admin/services/{serviceId}/disable(
+                                  serviceId=${serviceVO.serviceId}
+                          )}"
+                          method="post"
+                          onsubmit="return confirm('確定要由平台停用這筆服務嗎？');">
+
+                        <input type="hidden"
+                               th:if="${_csrf != null}"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
+
+                        <button class="btn btn--danger"
+                                type="submit">
+                            平台停用服務
+                        </button>
+
+                    </form>
+
+                    <!-- 恢復服務 -->
+                    <form class="action-form"
+                          th:if="${serviceVO.status == 3}"
+                          th:action="@{/admin/services/{serviceId}/restore(
+                                  serviceId=${serviceVO.serviceId}
+                          )}"
+                          method="post"
+                          onsubmit="return confirm('確定要恢復這筆服務上架嗎？');">
+
+                        <input type="hidden"
+                               th:if="${_csrf != null}"
+                               th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}">
+
+                        <button class="btn btn--success"
+                                type="submit">
+                            恢復服務上架
+                        </button>
+
+                    </form>
+
+                    <span class="archived-message"
+                          th:if="${serviceVO.status == 2}">
+                        此服務已封存，無法操作
+                    </span>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </article>
+
 </div>
 
 </body>
-</html> 	
+</html>
