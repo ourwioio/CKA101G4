@@ -52,7 +52,7 @@ public class VenueFrontController {
 	
 	@Autowired
 	VenueOrderService venueOrderService;
-
+	
 	@GetMapping("addVenue")
 	public String addVenue(ModelMap model, HttpSession session) {
 		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
@@ -202,7 +202,11 @@ public class VenueFrontController {
 				}
 			}
 		}
-
+		if (venueVO.getVenueStatus() == 2) {
+			VenueReviewVO venueReviewVO = venueReviewService.getOneVenueReviewByVenueId(venueVO.getVenueId());
+			venueReviewVO.setReviewStatus((byte) 0);
+			venueReviewService.updateVenueReview(venueReviewVO);
+		}
 		venueService.updateVenueCover(venueVO, newImageBytesList, coverImageId, coverNewIndex, deleteImageIds);
 
 		return "redirect:/front/venue/myVenue";

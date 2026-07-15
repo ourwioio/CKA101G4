@@ -27,4 +27,8 @@ public interface VenueReviewRepository extends JpaRepository<VenueReviewVO, Inte
 
     // 依負責員工查詢
     List<VenueReviewVO> findByEmployeeId(Integer employeeId);
+    
+ // 取該場地最新一筆審核紀錄
+    VenueReviewVO findTopByVenueIdOrderByVenueReviewIdDesc(Integer venueId);
+    
 }

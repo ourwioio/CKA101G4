@@ -26,10 +26,10 @@ public class VenueReviewService {
 	public static final byte STATUS_REVIEWING = 0; // 審核中
 	public static final byte STATUS_APPROVED = 1; // 審核通過
 	public static final byte STATUS_REJECTED = 2; // 審核未通過
-	
+
 	// 場地狀態常數（對照 VENUE 表的 venueStatus）
 	private static final byte VENUE_STATUS_INACTIVE = 0; // 下架
-	private static final byte VENUE_STATUS_ACTIVE = 1;   // 上架
+	private static final byte VENUE_STATUS_ACTIVE = 1; // 上架
 
 	// ===== 新增 =====
 	public void addVenueReview(VenueReviewVO venueReviewVO) {
@@ -83,9 +83,9 @@ public class VenueReviewService {
 	}
 
 	// ===== 業務邏輯：審核通過 =====
-    /**
-     * 審核通過：更新審核紀錄狀態，並將對應場地的 venueStatus 切換為上架中。
-     */
+	/**
+	 * 審核通過：更新審核紀錄狀態，並將對應場地的 venueStatus 切換為上架中。
+	 */
 	@Transactional
 	public void approve(Integer venueReviewId, Integer employeeId, String reviewNote) {
 		VenueReviewVO venueReview = getOneVenueReview(venueReviewId);
@@ -96,18 +96,18 @@ public class VenueReviewService {
 		venueReview.setReviewNote(reviewNote);
 		venueReview.setReviewedAt(LocalDateTime.now());
 		repository.save(venueReview);
-		
-        VenueVO venue = venueRepository.findById(venueReview.getVenueId()).orElse(null);
-        if (venue != null) {
-            venue.setVenueStatus(VENUE_STATUS_ACTIVE);
-            venueRepository.save(venue);
-        }
+
+		VenueVO venue = venueRepository.findById(venueReview.getVenueId()).orElse(null);
+		if (venue != null) {
+			venue.setVenueStatus(VENUE_STATUS_ACTIVE);
+			venueRepository.save(venue);
+		}
 	}
 
 	// ===== 業務邏輯：審核未通過 =====
-    /**
-     * 審核未通過：更新審核紀錄狀態，並將對應場地的 venueStatus 切換為下架。
-     */
+	/**
+	 * 審核未通過：更新審核紀錄狀態，並將對應場地的 venueStatus 切換為下架。
+	 */
 	@Transactional
 	public void reject(Integer venueReviewId, Integer employeeId, String reviewNote) {
 		VenueReviewVO venueReview = getOneVenueReview(venueReviewId);
@@ -118,11 +118,15 @@ public class VenueReviewService {
 		venueReview.setReviewNote(reviewNote);
 		venueReview.setReviewedAt(LocalDateTime.now());
 		repository.save(venueReview);
-		
-        VenueVO venue = venueRepository.findById(venueReview.getVenueId()).orElse(null);
-        if (venue != null) {
-            venue.setVenueStatus(VENUE_STATUS_INACTIVE);
-            venueRepository.save(venue);
-        }
+
+		VenueVO venue = venueRepository.findById(venueReview.getVenueId()).orElse(null);
+		if (venue != null) {
+			venue.setVenueStatus((byte) 2);
+			venueRepository.save(venue);
+		}
+	}
+	
+	public VenueReviewVO getOneVenueReviewByVenueId(Integer venueId) {
+	    return repository.findTopByVenueIdOrderByVenueReviewIdDesc(venueId);
 	}
 }
