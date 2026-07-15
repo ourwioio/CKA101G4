@@ -70,6 +70,59 @@ body {
 	background-color: #f1f5f9;
 }
 
+.admin-nav {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	flex-wrap: wrap;
+	margin-bottom: 16px;
+}
+
+.admin-nav .btn-secondary {
+	color: #ffffff;
+	border: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 48px;
+	min-width: 132px;
+	padding: 0 20px;
+	border-radius: 12px;
+	font-size: 18px;
+}
+
+.admin-nav .btn-activity {
+	background-color: #2563eb;
+}
+
+.admin-nav .btn-activity:hover {
+	background-color: #1d4ed8;
+}
+
+.admin-nav .btn-order {
+	background-color: #059669;
+}
+
+.admin-nav .btn-order:hover {
+	background-color: #047857;
+}
+
+.admin-nav .btn-finance {
+	background-color: #d97706;
+}
+
+.admin-nav .btn-finance:hover {
+	background-color: #b45309;
+}
+
+.admin-nav .btn-home {
+	background-color: #475569;
+}
+
+.admin-nav .btn-home:hover {
+	background-color: #334155;
+}
+
 .table-card {
 	background-color: #ffffff;
 	max-width: 900px;
@@ -156,11 +209,16 @@ td {
 		</div>
 		<div class="btn-group">
 			<a th:href="@{/activityType/addActivityType}" class="btn-primary">➕
-				新增分類</a> <a th:href="@{/activity/admin/home}" class="btn-secondary">🏠
-				返回後台首頁</a>
+				新增分類</a>
 		</div>
 	</div>
 	<div class="table-card">
+		<div class="admin-nav">
+			<a th:href="@{/activity/listAllActivity}" class="btn-secondary btn-activity">&#27963;&#21205;&#31649;&#29702;</a>
+			<a th:href="@{/activityOrder/listAllActivityOrder}" class="btn-secondary btn-order">&#35330;&#21934;&#32000;&#37636;</a>
+			<a th:href="@{/activityOrder/finance}" class="btn-secondary btn-finance">&#25765;&#36864;&#27454;&#20316;&#26989;</a>
+			<a th:href="@{/activity/admin/home}" class="btn-secondary btn-home">&#22238;&#24460;&#21488;&#39318;&#38913;</a>
+		</div>
 		<table>
 			<thead>
 				<tr>

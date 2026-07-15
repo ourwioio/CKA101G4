@@ -15,9 +15,24 @@
 	<div class="max-w-6xl mx-auto bg-white shadow-md rounded-lg p-6">
 		<div class="flex justify-between items-center mb-6">
 			<h1 class="text-2xl font-bold text-gray-800">活動管理</h1>
+		</div>
+
+		<div class="flex gap-2 flex-wrap justify-end mb-6">
+			<a th:href="@{/activityType/listAllActivityType}"
+				class="inline-flex items-center justify-center min-h-[48px] min-w-[132px] bg-violet-600 text-white px-5 py-0 rounded-xl text-lg font-bold hover:bg-violet-700 transition whitespace-nowrap">
+				&#39006;&#21029;&#31649;&#29702;
+			</a>
+			<a th:href="@{/activityOrder/listAllActivityOrder}"
+				class="inline-flex items-center justify-center min-h-[48px] min-w-[132px] bg-emerald-600 text-white px-5 py-0 rounded-xl text-lg font-bold hover:bg-emerald-700 transition whitespace-nowrap">
+				&#35330;&#21934;&#32000;&#37636;
+			</a>
+			<a th:href="@{/activityOrder/finance}"
+				class="inline-flex items-center justify-center min-h-[48px] min-w-[132px] bg-amber-600 text-white px-5 py-0 rounded-xl text-lg font-bold hover:bg-amber-700 transition whitespace-nowrap">
+				&#25765;&#36864;&#27454;&#20316;&#26989;
+			</a>
 			<a th:href="@{/activity/admin/home}"
-				class="bg-slate-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-slate-600 transition">
-				回後台首頁
+				class="inline-flex items-center justify-center min-h-[48px] min-w-[132px] bg-slate-600 text-white px-5 py-0 rounded-xl text-lg font-bold hover:bg-slate-700 transition whitespace-nowrap">
+				&#22238;&#24460;&#21488;&#39318;&#38913;
 			</a>
 		</div>
 

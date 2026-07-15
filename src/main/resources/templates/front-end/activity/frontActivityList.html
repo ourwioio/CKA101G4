@@ -264,8 +264,9 @@ body {
 		</div>
 
 		<div style="display: flex; gap: 12px;">
-			<a th:if="${isLoginMember}" th:href="@{/activity/front/myOrder}" class="back-btn">我的報名</a>
-			<a th:href="@{/activity/home}" class="back-btn">回活動首頁</a>
+			<a th:href="${isLoginMember} ? @{/activity/front/myOrder} : @{/member/login}" class="back-btn">&#25105;&#30340;&#22577;&#21517;</a>
+			<a th:href="${isLoginMember} ? @{/activity/front/myHostActivity} : @{/member/login}" class="back-btn">&#25105;&#33289;&#36774;&#30340;&#27963;&#21205;</a>
+			<a th:href="@{/}" class="back-btn">&#36820;&#22238;&#24179;&#21488;&#39318;&#38913;</a>
 		</div>
 	</div>
 

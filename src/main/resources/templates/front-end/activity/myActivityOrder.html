@@ -261,10 +261,13 @@ td {
 							<span th:if="${order.orderStatus == 2}" class="status pending">&#24453;&#23529;&#26680;</span>
 							<span th:if="${order.orderStatus == 3}" class="status pending">&#24453;&#20184;&#27454;</span>
 							<span th:if="${order.orderStatus == 4}" class="status active">&#24050;&#23436;&#25104;</span>
-							<div th:if="${order.refundStatus == 1}" style="margin-top: 6px;">
+							<div th:if="${order.totalAmount == null or order.totalAmount <= 0}" style="margin-top: 6px;">
+								<span class="status active">&#28961;&#36864;&#27454;</span>
+							</div>
+							<div th:if="${order.totalAmount != null and order.totalAmount > 0 and order.refundStatus == 1}" style="margin-top: 6px;">
 								<span class="status refund">&#24453;&#36864;&#27454;</span>
 							</div>
-							<div th:if="${order.refundStatus == 2}" style="margin-top: 6px;">
+							<div th:if="${order.totalAmount != null and order.totalAmount > 0 and order.refundStatus == 2}" style="margin-top: 6px;">
 								<span class="status active">&#24050;&#36864;&#27454;</span>
 							</div>
 						</td>

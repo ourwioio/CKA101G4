@@ -100,8 +100,13 @@ public class ActivityOrderService {
 
 		if (ORDER_STATUS_ACTIVE.equals(orderVO.getOrderStatus())) {
 			orderVO.setOrderStatus(ORDER_STATUS_CANCELLED);
-			orderVO.setRefundStatus(REFUND_STATUS_REQUESTED);
-			orderVO.setRefundReason("\u6703\u54e1\u53d6\u6d88\u5df2\u4ed8\u6b3e\u6d3b\u52d5\uff0c\u7533\u8acb\u5168\u984d\u9000\u6b3e");
+			if (isFreeOrder(orderVO)) {
+				orderVO.setRefundStatus(REFUND_STATUS_NONE);
+				orderVO.setRefundReason("\u0030\u5143\u8a02\u55ae\u53d6\u6d88\uff0c\u7121\u9700\u9000\u6b3e");
+			} else {
+				orderVO.setRefundStatus(REFUND_STATUS_REQUESTED);
+				orderVO.setRefundReason("\u6703\u54e1\u53d6\u6d88\u5df2\u4ed8\u6b3e\u6d3b\u52d5\uff0c\u7533\u8acb\u5168\u984d\u9000\u6b3e");
+			}
 			return orderRepo.save(orderVO);
 		}
 
@@ -121,8 +126,13 @@ public class ActivityOrderService {
 		}
 
 		orderVO.setOrderStatus(ORDER_STATUS_CANCELLED);
-		orderVO.setRefundStatus(REFUND_STATUS_REQUESTED);
-		orderVO.setRefundReason(refundReason);
+		if (isFreeOrder(orderVO)) {
+			orderVO.setRefundStatus(REFUND_STATUS_NONE);
+			orderVO.setRefundReason("\u0030\u5143\u8a02\u55ae\u53d6\u6d88\uff0c\u7121\u9700\u9000\u6b3e");
+		} else {
+			orderVO.setRefundStatus(REFUND_STATUS_REQUESTED);
+			orderVO.setRefundReason(refundReason);
+		}
 		return orderRepo.save(orderVO);
 	}
 
@@ -316,6 +326,10 @@ public class ActivityOrderService {
 	private boolean isPaymentExpired(ActivityOrderVO orderVO) {
 		return orderVO.getApprovedAt() != null
 				&& orderVO.getApprovedAt().plusSeconds(PAYMENT_TIMEOUT_SECONDS).isBefore(LocalDateTime.now());
+	}
+
+	private boolean isFreeOrder(ActivityOrderVO orderVO) {
+		return orderVO == null || orderVO.getTotalAmount() == null || orderVO.getTotalAmount() <= 0;
 	}
 
 	private void applyDefaultRefundStatus(ActivityOrderVO orderVO) {
