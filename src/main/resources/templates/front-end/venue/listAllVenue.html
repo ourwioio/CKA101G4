@@ -91,7 +91,7 @@
 		</form>
 	</section>
 
-	<section class="card-grid" th:if="${not #lists.isEmpty(venueListData)}">
+	<section class="card-grid" id="venueCardGrid" th:if="${not #lists.isEmpty(venueListData)}">
 		<div class="item-card" th:each="venue : ${venueListData}">
 			<a th:href="@{/front/venue/getOneVenue(venueId=${venue.venueId})}" class="item-card__link">
 
@@ -129,6 +129,16 @@
 			</a>
 		</div>
 	</section>
+
+	<nav class="pagination" id="venuePagination" aria-label="分頁" th:if="${not #lists.isEmpty(venueListData)}">
+		<button type="button" class="pagination__btn pagination__btn--prev" data-page-prev aria-label="上一頁">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+		</button>
+		<div class="pagination__pages" id="paginationPages"></div>
+		<button type="button" class="pagination__btn pagination__btn--next" data-page-next aria-label="下一頁">
+			<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+		</button>
+	</nav>
 
 	<div class="empty-state" th:if="${#lists.isEmpty(venueListData)}">
 		<span class="blob"></span>
