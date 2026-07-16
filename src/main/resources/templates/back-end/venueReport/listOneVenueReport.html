@@ -12,12 +12,14 @@
 }
 
 body {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-		Arial, sans-serif;
-	background-color: #f4f6f9;
+	font-family: "Noto Sans TC", Arial, sans-serif;
+	background-color: #f5f6fa;
 	color: #333;
 	margin: 0;
-	padding: 2rem 1rem;
+}
+
+a {
+	color: inherit;
 }
 
 .container {
@@ -48,8 +50,8 @@ body {
 .section-title {
 	font-size: 16px;
 	font-weight: 600;
-	color: #0f6e56;
-	border-left: 4px solid #0f6e56;
+	color: #6c5ce7;
+	border-left: 4px solid #6c5ce7;
 	padding-left: 8px;
 	margin: 1.5rem 0 1rem 0;
 }
@@ -157,12 +159,12 @@ body {
 }
 
 .btn-approve {
-	background: #0f6e56;
+	background: #6c5ce7;
 	color: #ffffff;
 }
 
 .btn-approve:hover {
-	background: #0b5240;
+	background: #5748c8;
 }
 
 .btn-reject {
@@ -176,6 +178,13 @@ body {
 </style>
 </head>
 <body>
+
+<div class="wb-admin-layout">
+
+<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}">
+</div>
+
+<main class="wb-admin-content">
 
 	<div class="container">
 
@@ -328,6 +337,10 @@ body {
 		</div>
 
 	</div>
+
+	</main>
+
+</div>
 
 	<script>
 		function submitReport(action) {

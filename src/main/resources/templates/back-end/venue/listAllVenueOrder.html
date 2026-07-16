@@ -2,118 +2,159 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-	<title>場地資料管理</title>
-    <th:block th:insert="~{back-end/venue/index}"></th:block>
+	<title>場地訂單管理</title>
+    <link rel="stylesheet" th:href="@{/css/back-end/venue/listAllVenue.css}">
+    <style>
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 74px;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+        .status-pending { background-color: #fff4cc; color: #8a6100; }
+        .status-paid { background-color: #dcfce7; color: #166534; }
+        .status-cancelled { background-color: #fee2e2; color: #991b1b; }
+        .status-completed { background-color: #ede9fe; color: #4c1d95; }
+        .status-unpaid { background-color: #ffedd5; color: #9a3412; }
+        .status-done { background-color: #dcfce7; color: #166534; }
+        .status-none { background-color: #e2e8f0; color: #475569; }
+        .error { color: #d63031; font-size: 12px; margin-top: 4px; }
+    </style>
 </head>
 <body>
-	<span>全部訂單 listAllVenue.html</span>
-	
-	<form th:action="@{/venueOrder/listAllVenueOrder}" method="get">
-	
-		訂單編號：
-		<input type="text" name="venueOrderId" th:value="${params.venueOrderId}">
-		<div class="error" style="color: red"
-		     th:if="${#fields.hasErrors('venueOrderQueryDTO.venueOrderId')}"
-		     th:errors="${venueOrderQueryDTO.venueOrderId}"></div>	
-	
-	    訂單建立日期：
-	    <input type="date" name="createdAtStart" th:value="${params.createdAtStart}">
-	    ~
-	    <input type="date" name="createdAtEnd" th:value="${params.createdAtEnd}">
-	    <br>
-	
-	    訂單狀態：
-	    <select name="orderStatus">
-	        <option value="">全部</option>
-	        <option value="0" th:selected="${params.orderStatus == 0}">待付款</option>
-	        <option value="1" th:selected="${params.orderStatus == 1}">已付款</option>
-	        <option value="2" th:selected="${params.orderStatus == 2}">已取消</option>
-	        <option value="3" th:selected="${params.orderStatus == 3}">已完成</option>
-	    </select>
-	
-	    撥款狀態：
-	    <select name="payoutAmount">
-	        <option value="">全部</option>
-	        <option value="0" th:selected="${params.payoutAmount == 0}">未撥款</option>
-	        <option value="1" th:selected="${params.payoutAmount == 1}">已撥款</option>
-	    </select>
-	
-	    退款狀態：
-	    <select name="refundStatus">
-	        <option value="">全部</option>
-	        <option value="0" th:selected="${params.refundStatus == 0}">進行中</option>
-	        <option value="1" th:selected="${params.refundStatus == 1}">完成</option>
-	        <option value="2" th:selected="${params.refundStatus == 2}">未申請</option>
-	    </select>
-	
-	    處理員工：
-	    <select name="employeeId">
-	        <option value="">全部</option>
-	        <th:block th:each="emp : ${empList}">
-	            <option th:value="${emp.employeeId}" 
-	                    th:text="${emp.employeeId}" 
-	                    th:selected="${params.employeeId == emp.employeeId}"></option>
-	        </th:block>
-	    </select>
-	
-	    <button type="submit">查詢</button>
-	    <a th:href="@{/venueOrder/listAllVenueOrder}">清除條件</a>
-	    
-		<div th:if="${noDataMessage != null}" style="color:orange;">
-		    <p th:text="${noDataMessage}"></p>
-		</div>
-		
-	</form>
-	
-	<br>
-	
-	<table>
-		<thead>
-			<tr>
-				<th>訂單編號</th>
-				<th>訂單建立時間</th>
-				<th>總金額</th>
-				<th>訂單狀態</th>
-				<th>撥款狀態</th>
-				<th>退款狀態</th>
-				<th>處理員工</th>
-				<th>詳細</th>
-			</tr>
-		</thead>
-		
-		<tbody>
-			<th:block th:each="venueOrderVO : ${venueListData}">
-				<tr>
-					<td th:text="${venueOrderVO.venueOrderId}"></td>
-					<td th:text="${#temporals.format(venueOrderVO.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
-					<td th:text="${venueOrderVO.totalAmount} + '元'"></td>
-					<td th:switch="${venueOrderVO.orderStatus}">
-						<span th:case="0">待付款</span>
-						<span th:case="1">已付款</span>
-						<span th:case="2">已取消</span>
-						<span th:case="3">已完成</span>
-						<span th:case="4">已取消(退款)</span>
-					</td>
-					<td th:switch="${venueOrderVO.payoutAmount}">
-						<span th:case="0">未撥款</span>
-						<span th:case="1">已撥款</span>
-					</td>
-					<td th:switch="${venueOrderVO.refundStatus}">
-						<span th:case="0">進行中</span>
-						<span th:case="1">完成</span>
-						<span th:case="2">未申請</span>
-					</td>
-					<td th:text="${venueOrderVO.empVO != null ? venueOrderVO.empVO.employeeId : '沒有處理員工'}"></td>
-					<td>
-						<form th:action="@{/venueOrder/getOneVenueOrder}" method="get">
-							<input type="hidden" name="venueOrderId" th:value="${venueOrderVO.venueOrderId}">
-							<button type="submit">查看詳細</button>
-						</form>
-					</td>
-				</tr>
-			</th:block>
-		</tbody>
-		
-	</table>
+
+<div class="wb-admin-layout">
+
+    <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}">
+    </div>
+
+    <main class="wb-admin-content">
+
+    <div class="page">
+
+        <header class="page-header">
+            <div>
+                <h1 class="page-title">場地訂單管理</h1>
+                <p class="page-subtitle">查詢全部場地訂單並查看訂單詳細資訊</p>
+            </div>
+        </header>
+
+        <form class="filter-bar" th:action="@{/venueOrder/listAllVenueOrder}" method="get">
+
+            訂單編號：
+            <input type="text" name="venueOrderId" th:value="${params.venueOrderId}">
+            <div class="error"
+                 th:if="${#fields.hasErrors('venueOrderQueryDTO.venueOrderId')}"
+                 th:errors="${venueOrderQueryDTO.venueOrderId}"></div>
+
+            訂單建立日期：
+            <input type="date" name="createdAtStart" th:value="${params.createdAtStart}">
+            ~
+            <input type="date" name="createdAtEnd" th:value="${params.createdAtEnd}">
+
+            訂單狀態：
+            <select name="orderStatus">
+                <option value="">全部</option>
+                <option value="0" th:selected="${params.orderStatus == 0}">待付款</option>
+                <option value="1" th:selected="${params.orderStatus == 1}">已付款</option>
+                <option value="2" th:selected="${params.orderStatus == 2}">已取消</option>
+                <option value="3" th:selected="${params.orderStatus == 3}">已完成</option>
+            </select>
+
+            撥款狀態：
+            <select name="payoutAmount">
+                <option value="">全部</option>
+                <option value="0" th:selected="${params.payoutAmount == 0}">未撥款</option>
+                <option value="1" th:selected="${params.payoutAmount == 1}">已撥款</option>
+            </select>
+
+            退款狀態：
+            <select name="refundStatus">
+                <option value="">全部</option>
+                <option value="0" th:selected="${params.refundStatus == 0}">進行中</option>
+                <option value="1" th:selected="${params.refundStatus == 1}">完成</option>
+                <option value="2" th:selected="${params.refundStatus == 2}">未申請</option>
+            </select>
+
+            處理員工：
+            <select name="employeeId">
+                <option value="">全部</option>
+                <th:block th:each="emp : ${empList}">
+                    <option th:value="${emp.employeeId}"
+                            th:text="${emp.employeeId}"
+                            th:selected="${params.employeeId == emp.employeeId}"></option>
+                </th:block>
+            </select>
+
+            <button type="submit" class="btn btn-primary">查詢</button>
+            <a class="btn btn-secondary" th:href="@{/venueOrder/listAllVenueOrder}">清除條件</a>
+
+        </form>
+
+        <div th:if="${noDataMessage != null}" class="message message--warning">
+            <p th:text="${noDataMessage}" style="margin:0;"></p>
+        </div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>訂單編號</th>
+                        <th>訂單建立時間</th>
+                        <th>總金額</th>
+                        <th>訂單狀態</th>
+                        <th>撥款狀態</th>
+                        <th>退款狀態</th>
+                        <th>處理員工</th>
+                        <th>詳細</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <th:block th:each="venueOrderVO : ${venueListData}">
+                        <tr>
+                            <td th:text="${venueOrderVO.venueOrderId}"></td>
+                            <td th:text="${#temporals.format(venueOrderVO.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                            <td th:text="${venueOrderVO.totalAmount} + '元'"></td>
+                            <td th:switch="${venueOrderVO.orderStatus}">
+                                <span class="status-badge status-pending" th:case="0">待付款</span>
+                                <span class="status-badge status-paid" th:case="1">已付款</span>
+                                <span class="status-badge status-cancelled" th:case="2">已取消</span>
+                                <span class="status-badge status-completed" th:case="3">已完成</span>
+                                <span class="status-badge status-cancelled" th:case="4">已取消(退款)</span>
+                            </td>
+                            <td th:switch="${venueOrderVO.payoutAmount}">
+                                <span class="status-badge status-unpaid" th:case="0">未撥款</span>
+                                <span class="status-badge status-done" th:case="1">已撥款</span>
+                            </td>
+                            <td th:switch="${venueOrderVO.refundStatus}">
+                                <span class="status-badge status-pending" th:case="0">進行中</span>
+                                <span class="status-badge status-done" th:case="1">完成</span>
+                                <span class="status-badge status-none" th:case="2">未申請</span>
+                            </td>
+                            <td th:text="${venueOrderVO.empVO != null ? venueOrderVO.empVO.employeeId : '沒有處理員工'}"></td>
+                            <td>
+                                <form th:action="@{/venueOrder/getOneVenueOrder}" method="get" class="inline-form">
+                                    <input type="hidden" name="venueOrderId" th:value="${venueOrderVO.venueOrderId}">
+                                    <button type="submit" class="btn btn-edit">查看詳細</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </th:block>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+    </main>
+
+</div>
+
 </body>
 </html>
