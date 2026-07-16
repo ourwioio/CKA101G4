@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <title>&#27963;&#21205;&#24460;&#21488;</title>
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
-
 <style>
 body {
 	margin: 0;
-	padding: 40px;
 	background: #f8fafc;
 	font-family: "Microsoft JhengHei", sans-serif;
 	color: #1e293b;
+}
+
+.activity-admin-content {
+	padding: 40px;
 }
 
 .top-actions {
@@ -65,30 +65,6 @@ body {
 
 .login-panel strong {
 	color: #0f172a;
-}
-
-.login-form {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-}
-
-.login-form select {
-	min-width: 220px;
-	padding: 10px 12px;
-	border: 1px solid #cbd5e1;
-	border-radius: 8px;
-	font-size: 15px;
-}
-
-.login-form button {
-	background: #2563eb;
-	color: white;
-	border: 0;
-	border-radius: 8px;
-	padding: 10px 18px;
-	font-weight: bold;
-	cursor: pointer;
 }
 
 .warning {
@@ -155,11 +131,17 @@ body {
 .finance {
 	background: #d97706;
 }
+
+.report {
+	background: #e11d48;
+}
 </style>
 </head>
 
-<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 <body>
+<div class="wb-admin-layout">
+	<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
+	<main class="wb-admin-content activity-admin-content">
 	<div class="top-actions">
 		<a th:href="@{/activity/home}" class="btn-home">&#22238;&#21069;&#24460;&#21488;&#36984;&#21934;</a>
 	</div>
@@ -178,21 +160,14 @@ body {
 
 	<div class="login-panel">
 		<div>
-			<strong>&#28204;&#35430;&#24460;&#21488;&#21729;&#24037;</strong>
-			<div>&#36984;&#25799;&#24460;&#21488;&#21729;&#24037;&#24460;&#65292;&#25165;&#33021;&#26597;&#30475;&#27963;&#21205;&#36039;&#26009;&#12289;&#35330;&#21934;&#32000;&#37636;&#33287;&#19979;&#26550;&#27963;&#21205;&#12290;</div>
+			<strong>&#24460;&#21488;&#21729;&#24037;&#30331;&#20837;&#29376;&#24907;</strong>
+			<div th:if="${isLoginEmployee}">
+				&#24050;&#20351;&#29992;&#27491;&#24335;&#21729;&#24037;&#30331;&#20837;&#65292;&#21487;&#26597;&#30475;&#27963;&#21205;&#36039;&#26009;&#12289;&#35330;&#21934;&#32000;&#37636;&#33287;&#25765;&#36864;&#27454;&#20316;&#26989;&#12290;
+			</div>
+			<div th:unless="${isLoginEmployee}">
+				&#35531;&#20808;&#20351;&#29992;&#21729;&#24037;&#24115;&#34399;&#30331;&#20837;&#24460;&#21488;&#65292;&#25165;&#33021;&#20351;&#29992;&#27963;&#21205;&#24460;&#21488;&#21151;&#33021;&#12290;
+			</div>
 		</div>
-
-		<form class="login-form" th:action="@{/activity/admin/fakeLogin}" method="post">
-			<select name="employeeId">
-				<option value="" th:selected="${!isLoginEmployee}">&#26410;&#30331;&#20837;</option>
-				<option th:each="employee : ${employeeListData}"
-					th:value="${employee.employeeId}"
-					th:selected="${employee.employeeId == loginEmployeeId}"
-					th:text="${'Employee ' + employee.employeeId + ' - ' + (employee.empName ?: 'No name')}">
-				</option>
-			</select>
-			<button type="submit">&#20999;&#25563;</button>
-		</form>
 	</div>
 
 	<div th:unless="${isLoginEmployee}" class="warning">
@@ -226,9 +201,11 @@ body {
 		
 		<div class="card">
 			<h2>活動檢舉審核</h2>
-			<p>活動檢舉審核</p>
-			<a class="btn repoet" th:href="@{/admin/actRptList}">活動檢舉審核</a>
+			<p>處理活動檢舉與申訴案件。</p>
+			<a class="btn report" th:href="@{/admin/actRptList}">進入活動檢舉審核</a>
 		</div>
 	</div>
+	</main>
+</div>
 </body>
 </html>

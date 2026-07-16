@@ -29,6 +29,14 @@
 						<h2>活動檢舉管理系統</h2>
 					</div>
 
+					<div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
+						<a th:href="@{/activity/listAllActivity}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #2563eb; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">活動管理</a>
+						<a th:href="@{/activityType/listAllActivityType}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #7c3aed; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">類別管理</a>
+						<a th:href="@{/activityOrder/listAllActivityOrder}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #059669; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">訂單紀錄</a>
+						<a th:href="@{/activityOrder/finance}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #d97706; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">撥退款作業</a>
+						<a th:href="@{/activity/admin/home}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #475569; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">回後台首頁</a>
+					</div>
+
 					<div
 						style="margin-bottom: 20px; text-align: left; background: #f8f9fa; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
 						<span style="font-weight: bold; margin-right: 15px;">狀態篩選：</span>
