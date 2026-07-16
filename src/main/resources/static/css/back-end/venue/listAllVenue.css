@@ -1,28 +1,277 @@
+/* =========================================================
+   Webond 後台場地模組 - 共用列表頁樣式
+   給場地 / 場地類型 / 場地審核 / 場地檢舉 / 場地訂單
+   各列表頁共用，維持與 adminService 系列頁面一致的風格
+   ========================================================= */
+
 * {
     box-sizing: border-box;
 }
 
+body {
+    margin: 0;
+    color: #2d3436;
+    background: #f5f6fa;
+    font-family: "Noto Sans TC", Arial, sans-serif;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+.page {
+    width: 100%;
+    max-width: 1380px;
+    margin: 0 auto;
+    padding-bottom: 60px;
+}
+
+/* =========================
+   頁面標題
+   ========================= */
+
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.page-subtitle {
+    margin: 7px 0 0;
+    color: #69727b;
+    font-size: 14px;
+}
+
+.header-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+/* =========================
+   訊息
+   ========================= */
+
+.message {
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+.message--success {
+    color: #176b45;
+    background: #e8f8ef;
+    border: 1px solid #b7e4ca;
+}
+
+.message--error,
+.message--warning {
+    color: #a12622;
+    background: #fff0ef;
+    border: 1px solid #f3c0bd;
+}
+
+/* =========================
+   查詢 / 篩選區
+   ========================= */
+
+.filter-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 22px;
+    padding: 18px 20px;
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.filter-bar input[type="text"],
+.filter-bar input[type="number"],
+.filter-bar input[type="date"],
+.filter-bar select {
+    min-height: 40px;
+    padding: 8px 11px;
+    color: #2d3436;
+    background: #ffffff;
+    border: 1px solid #d9dee5;
+    border-radius: 8px;
+}
+
+.filter-bar input:focus,
+.filter-bar select:focus {
+    border-color: #6c5ce7;
+    outline: 2px solid rgba(108, 92, 231, 0.15);
+}
+
+/* =========================
+   按鈕
+   ========================= */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 8px 15px;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-add,
+.btn-submit,
+.btn-primary {
+    color: #ffffff;
+    background: #6c5ce7;
+}
+
+.btn-add:hover,
+.btn-submit:hover,
+.btn-primary:hover {
+    background: #5748c8;
+}
+
+.btn-edit,
+.btn-back,
+.btn-secondary {
+    color: #4f5964;
+    background: #edf0f3;
+    border: 0;
+}
+
+.btn-edit:hover,
+.btn-back:hover,
+.btn-secondary:hover {
+    background: #dfe4e8;
+}
+
+.btn-del,
+.btn-danger {
+    color: #ffffff;
+    background: #d63031;
+}
+
+.btn-del:hover,
+.btn-danger:hover {
+    background: #b92526;
+}
+
+.btn-toggle {
+    color: #ffffff;
+    background: #6c5ce7;
+    border: 0;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.btn-toggle-up {
+    background: #00a878;
+}
+
+.btn-toggle-down {
+    background: #9aa1a8;
+}
+
+.inline-form {
+    display: inline-block;
+    margin: 0;
+}
+
+/* =========================
+   徽章 / 狀態標籤
+   ========================= */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 74px;
+    padding: 5px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.badge-up {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.badge-down {
+    color: #475569;
+    background: #e2e8f0;
+}
+
+/* =========================
+   共用面板
+   ========================= */
+
 .wrap {
-    padding: 1.5rem;
+    width: 100%;
+    max-width: 1380px;
+    margin: 0 auto;
+    padding-bottom: 60px;
 }
 
 .header {
     display: flex;
+    align-items: flex-start;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.25rem;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 22px;
 }
 
 .title {
-    font-size: 18px;
-    font-weight: 500;
+    font-size: 28px;
+    font-weight: 800;
 }
 
 .table-wrap {
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
     overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
 }
+
+/* =========================
+   資料表格
+   ========================= */
 
 table {
     width: 100%;
@@ -31,121 +280,100 @@ table {
 }
 
 thead {
-    background: #f8f8f8;
+    background: #f7f8fa;
 }
 
 thead th {
-    padding: 10px 14px;
+    padding: 14px 12px;
+    color: #4f5964;
     font-size: 13px;
-    color: #666;
+    font-weight: 800;
     text-align: left;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e7eaee;
 }
 
 tbody tr {
-    border-bottom: 1px solid #e0e0e0;
-    background: white;
+    background: #ffffff;
+    border-bottom: 1px solid #edf0f2;
 }
 
 tbody tr:last-child {
-    border-bottom: none;
+    border-bottom: 0;
 }
 
 tbody tr:hover {
-    background: #fafafa;
+    background: #fafaff;
 }
 
 td {
-    padding: 12px 14px;
-    font-size: 14px;
+    padding: 14px 12px;
+    font-size: 13px;
     vertical-align: middle;
+    word-break: break-word;
 }
 
 .img-cell img {
+    display: block;
     width: 64px;
     height: 48px;
     object-fit: cover;
     border-radius: 6px;
-    display: block;
 }
 
 .no-img {
-    width: 64px;
-    height: 48px;
-    border-radius: 6px;
-    border: 1px dashed #ccc;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #aaa;
+    width: 64px;
+    height: 48px;
+    color: #aaaaaa;
+    background: #f7f8fa;
+    border: 1px dashed #cfd4da;
+    border-radius: 6px;
     font-size: 11px;
-}
-
-.badge {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.badge-up {
-    background: #e1f5ee;
-    color: #0f6e56;
-}
-
-.badge-down {
-    background: #f5f5f5;
-    color: #888;
-    border: 1px solid #e0e0e0;
 }
 
 .actions {
     display: flex;
-    gap: 6px;
+    flex-wrap: wrap;
+    gap: 7px;
 }
 
-.btn-edit {
-    background: white;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 5px 12px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s;
+.empty-state,
+.empty-msg {
+    padding: 48px 20px;
+    color: #69727b;
+    text-align: center;
 }
 
-.btn-edit:hover {
-    background: #f5f5f5;
-    border-color: #999;
+/* =========================
+   RWD
+   ========================= */
+
+@media (max-width: 800px) {
+
+    .page-header,
+    .header {
+        flex-direction: column;
+    }
 }
 
-.btn-del {
-    background: white;
-    border: 1px solid #ffb3b3;
-    border-radius: 6px;
-    padding: 5px 12px;
-    font-size: 13px;
-    color: #c0392b;
-    cursor: pointer;
-}
+@media (max-width: 620px) {
 
-.inline-form {
-    display: inline;
-}
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
 
-.btn-toggle {
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-}
+    .filter-bar .btn {
+        width: 100%;
+    }
 
-.btn-toggle-up {
-    background: #2ecc71;
-}
+    .header-links {
+        flex-direction: column;
+    }
 
-.btn-toggle-down {
-    background: #95a5a6;
+    .header-links .btn {
+        width: 100%;
+    }
 }

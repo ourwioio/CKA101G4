@@ -12,12 +12,14 @@
 }
 
 body {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-		Arial, sans-serif;
-	background-color: #f4f6f9;
+	font-family: "Noto Sans TC", Arial, sans-serif;
+	background-color: #f5f6fa;
 	color: #333;
 	margin: 0;
-	padding: 2rem 1rem;
+}
+
+a {
+	color: inherit;
 }
 
 .container {
@@ -59,8 +61,8 @@ body {
 .section-title {
 	font-size: 16px;
 	font-weight: 600;
-	color: #0f6e56;
-	border-left: 4px solid #0f6e56;
+	color: #6c5ce7;
+	border-left: 4px solid #6c5ce7;
 	padding-left: 8px;
 	margin: 1.5rem 0 1rem 0;
 }
@@ -145,7 +147,7 @@ select, textarea {
 }
 
 select:focus, textarea:focus {
-	border-color: #0f6e56;
+	border-color: #6c5ce7;
 	box-shadow: 0 0 0 3px rgba(15, 110, 86, 0.15);
 }
 
@@ -180,12 +182,12 @@ select:focus, textarea:focus {
 }
 
 .btn-approve {
-	background: #0f6e56;
+	background: #6c5ce7;
 	color: #ffffff;
 }
 
 .btn-approve:hover {
-	background: #0b5240;
+	background: #5748c8;
 }
 
 .btn-reject {
@@ -199,6 +201,13 @@ select:focus, textarea:focus {
 </style>
 </head>
 <body>
+
+<div class="wb-admin-layout">
+
+<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}">
+</div>
+
+<main class="wb-admin-content">
 
 	<div class="container">
 
@@ -305,7 +314,7 @@ select:focus, textarea:focus {
 					<img th:src="@{/front/venue/getImage(imagesId=${img.imagesId})}"
 						style="width: 100%; height: 120px; object-fit: cover; border-radius: 6px; border: 1px solid #cbd5e1;" />
 					<span th:if="${img.cover != null && img.cover == 1}"
-						style="position: absolute; top: 6px; left: 6px; background: #0f6e56; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 50px;">
+						style="position: absolute; top: 6px; left: 6px; background: #6c5ce7; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 50px;">
 						封面照 </span>
 				</div>
 			</div>
@@ -355,7 +364,10 @@ select:focus, textarea:focus {
 		</div>
 
 	</div>
-	</div>
+
+	</main>
+
+</div>
 
 	<script>
 		function submitReview(action) {

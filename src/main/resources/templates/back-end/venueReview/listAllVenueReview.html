@@ -5,19 +5,25 @@
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>場地審核管理</title>
-<th:block th:insert="~{back-end/venue/index}"></th:block>
 <link rel="stylesheet" th:href="@{/css/back-end/venue/listAllVenue.css}"
 	href="venue-admin-list.css">
 </head>
 <body>
+
+<div class="wb-admin-layout">
+
+	<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}">
+	</div>
+
+	<main class="wb-admin-content">
+
 	<div class="wrap">
 		<div class="header">
 			<span class="title">場地審核清單</span>
 		</div>
 
 		<!-- 搜尋區 -->
-		<form th:action="@{/venueReview/search}" method="post"
-			style="margin-bottom: 1.5rem; display: flex; gap: 12px; flex-wrap: wrap;">
+		<form class="filter-bar" th:action="@{/venueReview/search}" method="post">
 			<select name="reviewStatus">
 				<option value="">-- 全部狀態 --</option>
 				<option value="0"
@@ -36,7 +42,7 @@
 				</option>
 			</select>
 
-			<button type="submit" class="btn-edit">搜尋</button>
+			<button type="submit" class="btn btn-primary">搜尋</button>
 		</form>
 
 		<div class="table-wrap">
@@ -81,5 +87,10 @@
 			</table>
 		</div>
 	</div>
+
+	</main>
+
+</div>
+
 </body>
 </html>

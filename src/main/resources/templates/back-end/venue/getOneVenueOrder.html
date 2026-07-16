@@ -2,34 +2,204 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>訂單詳細</title>
+
+<style>
+	* { box-sizing: border-box; }
+	body {
+		font-family: "Noto Sans TC", Arial, sans-serif;
+		background-color: #f5f6fa;
+		color: #333;
+		margin: 0;
+	}
+	a { color: inherit; }
+	.container {
+		max-width: 900px;
+		margin: 0 auto;
+	}
+	.page-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1.5rem;
+	}
+	.page-title {
+		font-size: 24px;
+		font-weight: 600;
+		color: #2c3e50;
+	}
+	.card {
+		background: #ffffff;
+		border-radius: 8px;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+		padding: 2.5rem;
+	}
+	.section-title {
+		font-size: 16px;
+		font-weight: 600;
+		color: #6c5ce7;
+		border-left: 4px solid #6c5ce7;
+		padding-left: 8px;
+		margin: 1.5rem 0 1rem 0;
+	}
+	.section-title:first-child {
+		margin-top: 0;
+	}
+	.info-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.5rem;
+		margin-bottom: 1rem;
+	}
+	.info-group {
+		border-bottom: 1px solid #f1f5f9;
+		padding-bottom: 10px;
+	}
+	.info-group.full-width {
+		grid-column: span 2;
+	}
+	.info-label {
+		font-size: 13px;
+		font-weight: 500;
+		color: #64748b;
+		margin-bottom: 4px;
+	}
+	.info-value {
+		font-size: 15px;
+		font-weight: 600;
+		color: #1e293b;
+	}
+	.status-badge {
+		display: inline-block;
+		padding: 4px 12px;
+		border-radius: 50px;
+		font-size: 12px;
+		font-weight: 600;
+	}
+	.status-pending { background-color: #fff4cc; color: #8a6100; }
+	.status-paid { background-color: #dcfce7; color: #166534; }
+	.status-cancelled { background-color: #fee2e2; color: #991b1b; }
+	.status-completed { background-color: #ede9fe; color: #4c1d95; }
+	.status-unpaid { background-color: #ffedd5; color: #9a3412; }
+	.status-done { background-color: #dcfce7; color: #166534; }
+	.status-none { background-color: #e2e8f0; color: #475569; }
+	.action-bar {
+		margin-top: 2.5rem;
+		display: flex;
+		justify-content: flex-end;
+		gap: 12px;
+		border-top: 1px solid #e2e8f0;
+		padding-top: 1.5rem;
+	}
+	.btn {
+		padding: 10px 24px;
+		font-size: 14px;
+		font-weight: 500;
+		border-radius: 6px;
+		cursor: pointer;
+		text-decoration: none;
+		transition: all 0.2s;
+		display: inline-flex;
+		align-items: center;
+	}
+	.btn-secondary {
+		background: #ffffff;
+		border: 1px solid #cbd5e1;
+		color: #475569;
+	}
+	.btn-secondary:hover { background: #f8fafc; }
+</style>
 </head>
 <body>
-	<a th:href="@{/venueOrder/listAllVenueOrder}">回到訂單管理</a><br>
-	<h3><span>查詢結果 :</span></h3>
-	<span>訂單編號：</span><span th:text="${venueOrderVO.venueOrderId}"></span><br>
-	<span>場地提供者：</span><span th:text="${venueOrderVO.venueVO.member.memberId}"></span><br>
-	<span>買方會員編號：</span><span th:text="${venueOrderVO.member.memberId}"></span><br>
-	<span>處理員工編號：</span><span th:text="${venueOrderVO.empVO != null ? venueOrderVO.empVO.employeeId : '沒有處理員工'}"></span><br>
-	<span>預約日期：</span><span th:text="${venueOrderVO.bookDate}"></span><br>
-	<span>預約時段：</span><span th:text="${venueOrderVO.startAt} + '~' + ${venueOrderVO.endAt}"></span><br>
-	<span>訂單建立時間：</span><span th:text="${#temporals.format(venueOrderVO.createdAt, 'yyyy-MM-dd HH:mm')}"></span><br>
-	<span>總金額：</span><span th:text="${venueOrderVO.totalAmount} + '元'"></span><br>
-	<span>訂單狀態：</span><span th:switch="${venueOrderVO.orderStatus}">
-		<span th:case="0">待撥款</span>
-		<span th:case="1">已付款</span>
-		<span th:case="2">已取消</span>
-		<span th:case="3">已完成</span>
-	</span><br>
-	<span>撥款狀態：</span><span th:switch="${venueOrderVO.payoutAmount}">
-		<span th:case="0">未撥款</span>
-		<span th:case="1">已撥款</span>
-	</span><br>
-	<span>退款狀態：</span><span th:switch="${venueOrderVO.refundStatus}">
-		<span th:case="0">進行中</span>
-		<span th:case="1">完成</span>
-		<span th:case="2">未申請</span>
-	</span><br>
+
+<div class="wb-admin-layout">
+
+<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}">
+</div>
+
+<main class="wb-admin-content">
+
+<div class="container">
+
+	<div class="page-header">
+		<h1 class="page-title">訂單詳細</h1>
+		<a th:href="@{/venueOrder/listAllVenueOrder}" class="btn btn-secondary">回到訂單管理</a>
+	</div>
+
+	<div class="card">
+
+		<div class="section-title">訂單基本資訊</div>
+		<div class="info-grid">
+			<div class="info-group">
+				<div class="info-label">訂單編號</div>
+				<div class="info-value" th:text="${venueOrderVO.venueOrderId}"></div>
+			</div>
+			<div class="info-group">
+				<div class="info-label">場地提供者</div>
+				<div class="info-value" th:text="${venueOrderVO.venueVO.member.memberId}"></div>
+			</div>
+			<div class="info-group">
+				<div class="info-label">買方會員編號</div>
+				<div class="info-value" th:text="${venueOrderVO.member.memberId}"></div>
+			</div>
+			<div class="info-group">
+				<div class="info-label">處理員工編號</div>
+				<div class="info-value" th:text="${venueOrderVO.empVO != null ? venueOrderVO.empVO.employeeId : '沒有處理員工'}"></div>
+			</div>
+			<div class="info-group">
+				<div class="info-label">預約日期</div>
+				<div class="info-value" th:text="${venueOrderVO.bookDate}"></div>
+			</div>
+			<div class="info-group">
+				<div class="info-label">預約時段</div>
+				<div class="info-value" th:text="${venueOrderVO.startAt} + '~' + ${venueOrderVO.endAt}"></div>
+			</div>
+			<div class="info-group">
+				<div class="info-label">訂單建立時間</div>
+				<div class="info-value" th:text="${#temporals.format(venueOrderVO.createdAt, 'yyyy-MM-dd HH:mm')}"></div>
+			</div>
+			<div class="info-group">
+				<div class="info-label">總金額</div>
+				<div class="info-value" th:text="${venueOrderVO.totalAmount} + ' 元'"></div>
+			</div>
+		</div>
+
+		<div class="section-title">訂單狀態</div>
+		<div class="info-grid">
+			<div class="info-group">
+				<div class="info-label">訂單狀態</div>
+				<div th:switch="${venueOrderVO.orderStatus}">
+					<span class="status-badge status-pending" th:case="0">待撥款</span>
+					<span class="status-badge status-paid" th:case="1">已付款</span>
+					<span class="status-badge status-cancelled" th:case="2">已取消</span>
+					<span class="status-badge status-completed" th:case="3">已完成</span>
+				</div>
+			</div>
+			<div class="info-group">
+				<div class="info-label">撥款狀態</div>
+				<div th:switch="${venueOrderVO.payoutAmount}">
+					<span class="status-badge status-unpaid" th:case="0">未撥款</span>
+					<span class="status-badge status-done" th:case="1">已撥款</span>
+				</div>
+			</div>
+			<div class="info-group full-width">
+				<div class="info-label">退款狀態</div>
+				<div th:switch="${venueOrderVO.refundStatus}">
+					<span class="status-badge status-pending" th:case="0">進行中</span>
+					<span class="status-badge status-done" th:case="1">完成</span>
+					<span class="status-badge status-none" th:case="2">未申請</span>
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+</div>
+
+</main>
+
+</div>
 
 </body>
 </html>

@@ -1,27 +1,381 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<!-- <link rel="stylesheet" th:href="@{}" /> -->
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>後台場地管理</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: #2d3436;
+            background: #f5f6fa;
+            font-family: Arial, "Noto Sans TC", sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /*
+         * adminSidebar.html 裡已經有：
+         *
+         * .wb-admin-layout
+         * .wb-admin-content
+         *
+         * 這裡只處理右側場地首頁內容。
+         */
+
+        .venue-home {
+            width: 100%;
+            max-width: 1150px;
+            margin: 0 auto;
+        }
+
+        /* =========================================
+           頁面標頭
+           ========================================= */
+
+        .venue-home-header {
+            margin-bottom: 28px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #dfe4e8;
+        }
+
+        .venue-home-title {
+            margin: 0 0 10px;
+            font-size: 30px;
+        }
+
+        .venue-home-description {
+            margin: 0;
+            color: #636e72;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        /* =========================================
+           功能卡片
+           ========================================= */
+
+        .venue-menu {
+            display: grid;
+            grid-template-columns:
+                    repeat(3, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .venue-card {
+            display: flex;
+            flex-direction: column;
+            min-height: 190px;
+            padding: 26px;
+            background: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 10px;
+            box-shadow:
+                    0 3px 12px
+                    rgba(0, 0, 0, 0.05);
+        }
+
+        .venue-card-title {
+            margin: 0 0 12px;
+            font-size: 20px;
+        }
+
+        .venue-card-description {
+            flex: 1;
+            margin: 0 0 24px;
+            color: #636e72;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .venue-card-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            align-self: flex-start;
+            min-height: 40px;
+            padding: 9px 17px;
+            color: #ffffff;
+            background: #343a40;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            transition:
+                    background 0.15s ease,
+                    transform 0.15s ease;
+        }
+
+        .venue-card-link:hover {
+            background: #111111;
+            transform: translateY(-1px);
+        }
+
+        .venue-card-link--report {
+            background: #c0392b;
+        }
+
+        .venue-card-link--report:hover {
+            background: #962d22;
+        }
+
+        .venue-card-link--finance {
+            background: #0984e3;
+        }
+
+        .venue-card-link--finance:hover {
+            background: #0769b5;
+        }
+
+        /* =========================================
+           RWD
+           ========================================= */
+
+        @media (max-width: 950px) {
+
+            .venue-menu {
+                grid-template-columns:
+                        repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 620px) {
+
+            .venue-menu {
+                grid-template-columns: 1fr;
+            }
+
+            .venue-home-title {
+                font-size: 25px;
+            }
+
+            .venue-card {
+                min-height: auto;
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-success fixed-top">
-    <div align="center" style="width:100%">
-        <h2>後台場地管理</h2>
-        <ul style="list-style:none; display:flex; gap:20px; justify-content:center;">
-            <li><a th:href="@{/venue/listAllVenue}">瀏覽全部場地</a></li>
-            <li><a th:href="@{/venueType/listAllVenueType}">場地類型管理</a></li>
-            <li><a th:href="@{/venueReview/listAllVenueReview}">場地審核</a></li>
-            <li><a th:href="@{/venueReport/listAllVenueReport}">場地檢舉管理</a></li>
-            <li><a th:href="@{/venueOrder/listAllVenueOrder}">訂單管理</a></li>
-            <li><a th:href="@{/venueOrder/listAllRefund}">退款管理</a></li>
-            <li><a th:href="@{/venueOrder/listAllPayout}">撥款管理</a></li>
-            <li><a th:href="@{/venue/index}">回到index</a></li>
-        </ul>
+<div class="wb-admin-layout">
+
+    <!-- =========================================
+         左側共用後台 Sidebar
+         ========================================= -->
+
+    <div th:replace="~{back-end/fragments/adminSidebar
+                       :: adminSidebar}">
     </div>
-</nav>
+
+    <!-- =========================================
+         右側場地管理內容
+         ========================================= -->
+
+    <main class="wb-admin-content">
+
+        <div class="venue-home">
+
+            <!-- =====================================
+                 頁面標頭
+                 ===================================== -->
+
+            <header class="venue-home-header">
+
+                <h1 class="venue-home-title">
+                    場地管理首頁
+                </h1>
+
+                <p class="venue-home-description">
+                    請選擇需要管理的場地功能。
+                </p>
+
+            </header>
+
+            <!-- =====================================
+                 場地管理功能選單
+                 ===================================== -->
+
+            <section class="venue-menu">
+
+                <!-- =============================
+                     場地管理
+                     ============================= -->
+
+                <article class="venue-card">
+
+                    <h2 class="venue-card-title">
+                        場地管理
+                    </h2>
+
+                    <p class="venue-card-description">
+                        查看平台上的所有場地與場地詳細資料，
+                        並可進行上下架管理。
+                    </p>
+
+                    <a class="venue-card-link"
+                       th:href="@{/venue/listAllVenue}">
+                        瀏覽全部場地
+                    </a>
+
+                </article>
+
+                <!-- =============================
+                     場地類型管理
+                     ============================= -->
+
+                <article class="venue-card">
+
+                    <h2 class="venue-card-title">
+                        場地類型管理
+                    </h2>
+
+                    <p class="venue-card-description">
+                        查詢、新增及修改平台場地類型，
+                        提供會員刊登場地時選擇。
+                    </p>
+
+                    <a class="venue-card-link"
+                       th:href="@{/venueType/listAllVenueType}">
+                        進入場地類型管理
+                    </a>
+
+                </article>
+
+                <!-- =============================
+                     場地審核
+                     ============================= -->
+
+                <article class="venue-card">
+
+                    <h2 class="venue-card-title">
+                        場地審核
+                    </h2>
+
+                    <p class="venue-card-description">
+                        審核會員新上架或修改後的場地資料，
+                        確認通過後才可對外開放預約。
+                    </p>
+
+                    <a class="venue-card-link"
+                       th:href="@{/venueReview/listAllVenueReview}">
+                        進入場地審核
+                    </a>
+
+                </article>
+
+                <!-- =============================
+                     場地檢舉管理
+                     ============================= -->
+
+                <article class="venue-card">
+
+                    <h2 class="venue-card-title">
+                        場地檢舉管理
+                    </h2>
+
+                    <p class="venue-card-description">
+                        查看會員提出的場地檢舉，
+                        並進行檢舉內容審核及後續處理。
+                    </p>
+
+                    <a class="venue-card-link
+                              venue-card-link--report"
+                       th:href="@{/venueReport/listAllVenueReport}">
+                        進入場地檢舉管理
+                    </a>
+
+                </article>
+
+                <!-- =============================
+                     訂單管理
+                     ============================= -->
+
+                <article class="venue-card">
+
+                    <h2 class="venue-card-title">
+                        訂單管理
+                    </h2>
+
+                    <p class="venue-card-description">
+                        查看場地訂單、篩選訂單狀態，
+                        並可查看訂單完整詳細資訊。
+                    </p>
+
+                    <a class="venue-card-link
+                              venue-card-link--finance"
+                       th:href="@{/venueOrder/listAllVenueOrder}">
+                        進入訂單管理
+                    </a>
+
+                </article>
+
+                <!-- =============================
+                     退款管理
+                     ============================= -->
+
+                <article class="venue-card">
+
+                    <h2 class="venue-card-title">
+                        退款管理
+                    </h2>
+
+                    <p class="venue-card-description">
+                        查看已取消訂單的退款狀態，
+                        並處理尚待退款的訂單。
+                    </p>
+
+                    <a class="venue-card-link
+                              venue-card-link--finance"
+                       th:href="@{/venueOrder/listAllRefund}">
+                        進入退款管理
+                    </a>
+
+                </article>
+
+                <!-- =============================
+                     撥款管理
+                     ============================= -->
+
+                <article class="venue-card">
+
+                    <h2 class="venue-card-title">
+                        撥款管理
+                    </h2>
+
+                    <p class="venue-card-description">
+                        查看已完成訂單的撥款狀態，
+                        並處理尚未撥款的訂單。
+                    </p>
+
+                    <a class="venue-card-link
+                              venue-card-link--finance"
+                       th:href="@{/venueOrder/listAllPayout}">
+                        進入撥款管理
+                    </a>
+
+                </article>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
 
 </body>
 </html>
