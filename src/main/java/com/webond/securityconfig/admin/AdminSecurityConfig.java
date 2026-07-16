@@ -39,7 +39,6 @@ public class AdminSecurityConfig {
 				.requestMatchers("/admin/services/**").hasAuthority("服務管理")
 				.requestMatchers("/admin/activity/**").hasAuthority("活動管理")
 				.requestMatchers("/admin/venue/**").hasAuthority("場地管理")
-				.requestMatchers("/admin/venue/**").hasAuthority("場地審核管理")
 				.requestMatchers("/admin/members/**").hasAuthority("會員管理")
 				.requestMatchers("/admin/order/**").hasAuthority("訂單交易管理")
 				.requestMatchers("/admin/platform/**").hasAuthority("平台管理")
