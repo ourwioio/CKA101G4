@@ -282,6 +282,21 @@ public class ActivityOrderService {
 		return overdueOrders.size();
 	}
 
+	public int completeEndedPaidOrders() {
+		LocalDateTime now = LocalDateTime.now();
+		List<ActivityOrderVO> endedOrders = orderRepo.findByOrderStatusAndActivityEnded(ORDER_STATUS_ACTIVE, now);
+
+		for (ActivityOrderVO orderVO : endedOrders) {
+			orderVO.setOrderStatus(ORDER_STATUS_COMPLETED);
+			if (orderVO.getActivityCompletedAt() == null) {
+				orderVO.setActivityCompletedAt(now);
+			}
+			orderRepo.save(orderVO);
+		}
+
+		return endedOrders.size();
+	}
+
 	public ActivityOrderVO confirmRefund(Integer activityOrderId, Integer employeeId) {
 		ActivityOrderVO orderVO = getOneOrder(activityOrderId);
 

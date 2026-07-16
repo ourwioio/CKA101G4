@@ -21,6 +21,11 @@ public interface ActivityOrderRepository extends JpaRepository<ActivityOrderVO, 
 
 	List<ActivityOrderVO> findByOrderStatusAndApprovedAtBefore(Byte orderStatus, LocalDateTime approvedAt);
 
+	@Query("SELECT o FROM ActivityOrderVO o JOIN ActivityVO a ON o.activityId = a.activityId "
+			+ "WHERE o.orderStatus = :orderStatus AND a.endTime <= :now")
+	List<ActivityOrderVO> findByOrderStatusAndActivityEnded(@Param("orderStatus") Byte orderStatus,
+			@Param("now") LocalDateTime now);
+
 	Long countByActivityIdAndOrderStatus(Integer activityId, Byte orderStatus);
 
 	boolean existsByActivityIdAndBuyerMemberIdAndOrderStatus(Integer activityId, Integer buyerMemberId, Byte orderStatus);
