@@ -63,8 +63,8 @@ public class MemberReportService {
 			employee.setEmployeeId(employeeId);
 			memberReportVO.setEmployee(employee); 
 			
-			// 2. 防呆機制：若駁回不成立(2)，違規點數一律歸 0
-			if (Integer.valueOf(2).equals(reportStatus)) {
+			// 2. 防呆機制：若駁回不成立(3)，違規點數一律歸 0
+			if (Integer.valueOf(3).equals(reportStatus)) {
 				violationPoints = 0;
 			}
 			
@@ -73,8 +73,8 @@ public class MemberReportService {
 			memberReportVO.setViolationPoints(violationPoints); 
 			memberReportVO.setProcessedAt(new Timestamp(System.currentTimeMillis())); 
 			
-			// 3. 🚀【核心連動】審核通過 (1)，將裁決點數「累加」至被檢舉人的會員累計點數 (reportPoints)
-			if (Integer.valueOf(1).equals(reportStatus) && violationPoints != null && violationPoints > 0) {
+			// 3. 🚀【核心連動】審核通過 (2)，將裁決點數「累加」至被檢舉人的會員累計點數 (reportPoints)
+			if (Integer.valueOf(2).equals(reportStatus) && violationPoints != null && violationPoints > 0) {
 				MemberVO proxyReported = memberReportVO.getReported(); 
 				
 				if (proxyReported != null && proxyReported.getMemberId() != null) {
