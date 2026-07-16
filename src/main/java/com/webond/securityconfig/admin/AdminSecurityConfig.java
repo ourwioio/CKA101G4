@@ -41,10 +41,10 @@ public class AdminSecurityConfig {
 				.requestMatchers("/admin/employees/updatePassword").authenticated() 
 				
 				.requestMatchers("/admin/employees/**").hasAuthority("員工管理")
-				.requestMatchers("/admin/service/**").hasAuthority("服務管理")
+				.requestMatchers("/admin/services/**").hasAuthority("服務管理")
 				.requestMatchers("/admin/activity/**").hasAuthority("活動管理")
 				.requestMatchers("/admin/venue/**").hasAuthority("管理場地訂單")
-				.requestMatchers("/admin/venueReport/**").hasAuthority("場地檢舉管理")
+				.requestMatchers("/admin/venue/**").hasAuthority("場地審核管理")
 				.requestMatchers("/admin/members/**").hasAuthority("會員管理")
 				.requestMatchers("/admin/order/**").hasAuthority("訂單交易管理")
 				.requestMatchers("/admin/platform/**").hasAuthority("平台管理")
