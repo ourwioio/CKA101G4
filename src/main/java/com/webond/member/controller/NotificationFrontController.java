@@ -62,11 +62,33 @@ public class NotificationFrontController {
 
         NotificationVO notificationVO =notificationService.getOneNotification(notificationId);
 
-        notificationService.markNotificationAsRead(notificationId);
-
         model.addAttribute("notificationVO",notificationVO);
 
         return "front-end/member/listOneNotification";
+    }
+    
+    @GetMapping("/goTo")
+    public String goToNotification(
+            @RequestParam("notificationId") Integer notificationId,
+            HttpSession session) {
+
+        MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+        if (loginMember == null) {
+            return "redirect:/member/login";
+        }
+
+        NotificationVO notificationVO = notificationService.getOneForUpdate(notificationId);
+        if (notificationVO == null) {
+            return "redirect:/front/notification/listAllNotification";
+        }
+
+        // 標記已讀
+        notificationService.markNotificationAsRead(notificationId);
+
+        // 依類型決定跳轉位置
+        String targetUrl = notificationService.redirectUrl(notificationVO);
+
+        return "redirect:" + targetUrl;
     }
     
     @PostMapping("/markAllRead")
