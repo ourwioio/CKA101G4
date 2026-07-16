@@ -3,121 +3,68 @@
 <head>
 <meta charset="UTF-8">
 <title>雙欄私訊聊天室</title>
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
-<style>
-.container {
-	display: flex;
-	width: 600px;
-	height: 350px;
-	border: 1px solid black;
-}
-
-.left-list {
-	width: 180px;
-	border-right: 1px solid black;
-	padding: 10px;
-	background: #eee;
-}
-
-.right-chat {
-	flex: 1;
-	padding: 10px;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-}
-
-#messagesArea ul {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-}
-
-#messagesArea li {
-	margin: 8px 0;
-	padding: 5px 10px;
-	border-radius: 4px;
-	max-width: 80%;
-	word-break: break-all;
-}
-
-.me {
-	background-color: #dcf8c6;
-	text-align: right;
-	margin-left: auto !important;
-}
-
-.friend {
-	background-color: #ffffff;
-	text-align: left;
-	border: 1px solid #ddd;
-}
-</style>
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/chat/chatRoom.css}">
+    <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 </head>
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
+
 <body onload="connect();">
 
-	<h2>
+	<!-- 上方人員狀態提示 -->
+	<div class="user-info-bar">
 		當前登入者：<span th:text="${currentUserName}">未登入</span>
-	</h2>
+	</div>
 
 	<!-- 隱藏欄位：用來存放當前對話者的名字，供 sendMessage() 讀取 -->
 	<span id="statusOutput" th:text="${targetName}" style="display: none;"></span>
-	<br>
 
-	<div class="container">
+	<!-- 💡 核心置中大面板結構 -->
+	<div class="chat-container">
 
-		<!-- 【左欄：Thymeleaf 真實會員清單】 -->
-		<div class="left-list">
-			<div style="margin-bottom: 15px;">
-				<a th:href="@{/member/chatButton}"
-					style="display: inline-block; width: 100%; text-align: center; padding: 6px 0; background-color: #333; color: white; text-decoration: none; border-radius: 4px; font-size: 14px; font-weight: bold;">
-					⬅ 返回私訊列表 </a>
-			</div>
-
+		<!-- 【左欄：真實會員清單】 -->
+		<div class="left-sidebar">
+			<a th:href="@{/member/chatButton}" class="back-btn">⬅ 返回私訊列表</a>
 			<h3>選擇聯絡人</h3>
-			<hr>
-			<ul>
-				<li th:each="mem : ${memList}" style="margin: 10px 0;"><a
-					th:if="${mem.memberId != currentUserId}"
-					th:href="@{/member/chatRoom(to=${mem.memberId})}"
-					th:text="${mem.realName}"
-					th:style="${mem.memberId == targetUserId} ? 'font-weight:bold; color:red;' : ''"></a>
+			<hr style="border: 0; border-top: 1px solid #e9ecef; margin-bottom: 10px;">
+			
+			<ul class="contact-list">
+				<li th:each="mem : ${memList}" class="contact-item">
+					<!-- 利用動態 class 決定是否套用 active-chat 樣式 -->
+					<a th:if="${mem.memberId != currentUserId}"
+					   th:href="@{/member/chatRoom(to=${mem.memberId})}"
+					   th:text="${mem.realName}"
+					   th:class="${mem.memberId == targetUserId} ? 'contact-link active-chat' : 'contact-link'">
+					</a>
 				</li>
 			</ul>
 		</div>
 
 		<!-- 【右欄：對話視窗】 -->
-		<div class="right-chat">
-			<div>
-				<h3
-					th:text="${targetName != null} ? '與 ' + ${targetName} + ' 聊天中' : '請選擇對象'"></h3>
-				<hr>
-
-				<div id="messagesArea"
-					style="height: 220px; overflow-y: auto; padding: 10px; margin-top: 15px; border: 1px dashed #ccc;">
-					<!-- 初始化一個 ul 給歷史紀錄塞入 -->
-					<ul id="area">
-						<p th:if="${targetName != null}"
-							style="color: gray; font-size: 12px; text-align: center;">---
-							已建立專屬私訊連線 ---</p>
-					</ul>
-				</div>
+		<div class="right-chatbox">
+			<!-- 對話視窗頂部標題 -->
+			<div class="chat-header">
+				<h3 th:text="${targetName != null} ? '與 ' + ${targetName} + ' 聊天中' : '請選擇對象'"></h3>
 			</div>
 
-			<!-- 輸入與發送 -->
-			<div>
-				<input type="text" id="message" placeholder="請輸入私訊內容..."
-					th:disabled="${targetName == null}"
-					style="width: 70%; padding: 5px;">
-				<button id="sendMessage" onclick="sendMessage()"
-					th:disabled="${targetName == null}" style="padding: 5px 15px;">發送</button>
+			<!-- 訊息滾動顯示區 -->
+			<div id="messagesArea" class="messages-display">
+				<ul id="area" class="messages-list">
+					<!-- 連線成功系統提示 -->
+					<p th:if="${targetName != null}" class="system-status">--- 已建立專屬私訊連線 ---</p>
+				</ul>
+			</div>
+
+			<!-- 底部輸入與發送功能 -->
+			<div class="chat-input-area">
+				<input type="text" id="message" placeholder="請輸入私訊內容..." th:disabled="${targetName == null}">
+				<button id="sendMessage" onclick="sendMessage()" th:disabled="${targetName == null}">發送</button>
 			</div>
 		</div>
 
 	</div>
 
+	<!-- 💡 原生 JavaScript 邏輯完全保留，不影響你的 WebSocket 機制 -->
 	<script th:inline="javascript">
 		const selfId = /*[[${currentUserId}]]*/'guest';
 		const targetId = /*[[${targetUserId}]]*/null;
@@ -130,9 +77,7 @@
 		const messagesArea = document.getElementById("messagesArea");
 
 		function connect() {
-			// 只有當確實有選擇對話對象時，才建立 WebSocket 連線
-			if (!targetId)
-				return;
+			if (!targetId) return;
 
 			webSocket = new WebSocket(endPointURL);
 
@@ -157,16 +102,13 @@
 				webSocket.send(JSON.stringify(readReq));
 			};
 
-			// 處理後端傳來的 json 事件型態
 			webSocket.onmessage = function(event) {
 				const jsonObj = JSON.parse(event.data);
 
 				if ("history" === jsonObj.type) {
-					messagesArea.innerHTML = '<ul id="area"></ul>';
+					messagesArea.innerHTML = '<ul id="area" class="messages-list"></ul>';
 					const messages = JSON.parse(jsonObj.message);
 					
-				    console.log("=== 後端傳過來的歷史紀錄完整 JSON 內容 ===");
-				    console.log(messages); // 💡 加這一行在網頁上印出來
 					
 					for (let i = 0; i < messages.length; i++) {
 						const historyData = JSON.parse(messages[i]);
@@ -178,10 +120,11 @@
 						if (isMe) {
 							const statusText = (historyData.msgRead === 1) ? '已讀': '未讀';
 							const statusColor = (historyData.msgRead === 1) ? 'lightgray': 'gray';
-							const markerClass = (historyData.msgRead === 1) ? '' : 'class="unread-marker"';	
+							
+							const markerClass = (Number(historyData.msgRead) === 1) ? '' : 'class="unread-marker"';
 							
 							li.innerHTML = historyData.message
-									+ ` <span style="font-size:10px; color:${statusColor}; margin-left:5px;">${statusText}</span>`;
+		                    + ` <span ${markerClass} style="font-size:10px; color:${statusColor}; margin-left:5px;">${statusText}</span>`;
 						} else {
 							li.innerHTML = historyData.message;
 						}
@@ -213,15 +156,17 @@
 					
 					document.getElementById("area").appendChild(li);
 					messagesArea.scrollTop = messagesArea.scrollHeight;
-				}else if("read" === jsonObj.type){
-					const unreadLabels = document.querySelectorAll(".unread-marker");
-					
-					unreadLabels.forEach(label => {
-						label.innerText = "已讀";
-						label.style.color = "lightgray";
-						
-						label.classList.remove("unread-marker"); 
-					});
+				} else if("read" === jsonObj.type){
+					const readerId = jsonObj.senderId; 
+
+				    if (String(readerId) === String(targetId)) {
+				        const unreadLabels = document.querySelectorAll(".unread-marker");
+				        unreadLabels.forEach(label => {
+				            label.innerText = "已讀";
+				            label.style.color = "lightgray";
+				            label.classList.remove("unread-marker"); 
+				        });
+				    }
 				}
 			};
 		}
@@ -244,7 +189,24 @@
 				inputMessage.focus();
 			}
 		}
+		
+		window.addEventListener("DOMContentLoaded", function() {
+		    const inputMessage = document.getElementById("message");
+		    
+		    if (inputMessage) {
+		        inputMessage.addEventListener("keydown", function(event) {
+		            if (event.key === "Enter") {
+		                if (event.isComposing || event.keyCode === 229) {
+		                    return;
+		                }
+		                
+		                event.preventDefault(); 
+		                
+		                sendMessage(); 
+		            }
+		        });
+		    }
+		});
 	</script>
-
 </body>
 </html>

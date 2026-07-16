@@ -40,12 +40,14 @@ public class AdminSecurityConfig {
 				.requestMatchers("/admin/login").permitAll()
 				.requestMatchers("/admin/employees/updatePassword").authenticated() 
 				
-				.requestMatchers("/admin/employees/**").hasAuthority("管理員工")
-				.requestMatchers("/admin/service-orders/**").hasAuthority("管理服務訂單")
-				.requestMatchers("/admin/activity-orders/**").hasAuthority("管理活動訂單")
-				.requestMatchers("/admin/venue-orders/**").hasAuthority("管理場地訂單")
-				.requestMatchers("/admin/members/**").hasAuthority("管理會員")
-				.requestMatchers("/admin/frontend/**").hasAuthority("管理前台")
+				.requestMatchers("/admin/employees/**").hasAuthority("員工管理")
+				.requestMatchers("/admin/service/**").hasAuthority("服務管理")
+				.requestMatchers("/admin/activity/**").hasAuthority("活動管理")
+				.requestMatchers("/admin/venue/**").hasAuthority("管理場地訂單")
+				.requestMatchers("/admin/venueReport/**").hasAuthority("場地檢舉管理")
+				.requestMatchers("/admin/members/**").hasAuthority("會員管理")
+				.requestMatchers("/admin/order/**").hasAuthority("訂單交易管理")
+				.requestMatchers("/admin/platform/**").hasAuthority("平台管理")
 				
 				.anyRequest().authenticated()					
 			)
@@ -78,7 +80,13 @@ public class AdminSecurityConfig {
             )
             .requestCache(cache -> cache
             	.requestCache(new HttpSessionRequestCache())		
+            )
+            .exceptionHandling(exception -> exception
+            	 .accessDeniedHandler((request, response, accessDeniedException) -> {
+            	      	response.sendRedirect("/admin/adminPage?error=no_permission"); 
+            	    })
             );
+		
             
 		return http.build();
 	}

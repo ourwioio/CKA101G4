@@ -73,11 +73,6 @@ public class ChatService {
 	public List<String> getHistoryMsg(String senderId, String receiverId) throws Exception{
 		String key = getRedisKey(senderId, receiverId);
 		
-		int updateRows = chatMsgRepo.markMessagesAsRead(Integer.parseInt(senderId), Integer.parseInt(receiverId));
-		
-		if(updateRows >0) {
-			chatRedisRepo.deleteMessages(key);
-		}
 		
 		// 先拿Redis
 		List<String> redisData = chatRedisRepo.getMessages(key);
@@ -100,6 +95,7 @@ public class ChatService {
 		if (!restoredList.isEmpty()) {
 			chatRedisRepo.saveAllMessages(key, restoredList);
 		}
+		
 		
 		return restoredList;
 	}
@@ -145,7 +141,12 @@ public class ChatService {
 		Integer s = Integer.parseInt(senderId); 
         Integer r = Integer.parseInt(receiverId); 
         
-        chatMsgRepo.markMessagesAsRead(s, r);
+        int updatedRows = chatMsgRepo.markMessagesAsRead(s, r);
+        
+        if (updatedRows > 0) {
+            String key = getRedisKey(senderId, receiverId);
+            chatRedisRepo.deleteMessages(key);
+        }
         
 	}
 	
