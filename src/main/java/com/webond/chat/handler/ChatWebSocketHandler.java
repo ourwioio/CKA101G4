@@ -14,6 +14,7 @@ import com.webond.chat.model.ChatMessageDTO;
 import com.webond.chat.service.ChatService;
 
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 @Component
 public class ChatWebSocketHandler extends TextWebSocketHandler{
@@ -58,10 +59,14 @@ public class ChatWebSocketHandler extends TextWebSocketHandler{
 				userSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(cmHistory)));
 			}
 			
-			WebSocketSession friendSession = sessionsMap.get(senderId);
+			WebSocketSession friendSession = sessionsMap.get(receiverId);
 			if (friendSession != null && friendSession.isOpen()) {
-				ChatMessageDTO readNotification = new ChatMessageDTO("read", receiverId, senderId, "READ");
-				friendSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(readNotification)));
+				
+				ObjectNode readNotice = objectMapper.createObjectNode();
+	            readNotice.put("type", "read");
+	            readNotice.put("senderId", String.valueOf(senderId));
+				
+				friendSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(readNotice)));
 			}
 			
 			return;
@@ -93,7 +98,13 @@ public class ChatWebSocketHandler extends TextWebSocketHandler{
 		
 			WebSocketSession originalSenderSession = sessionsMap.get(senderId);
 			if(originalSenderSession != null && originalSenderSession.isOpen()) {
-				String readJson = objectMapper.writeValueAsString(chatMessage);
+				
+				ObjectNode readNotice = objectMapper.createObjectNode();
+				
+				readNotice.put("type", "read");
+		        readNotice.put("senderId", String.valueOf(receiverId));
+		        
+				String readJson = objectMapper.writeValueAsString(readNotice);
 				originalSenderSession.sendMessage(new TextMessage(readJson));
 			}
 		}

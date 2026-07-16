@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>填寫活動評價</title>
+    <link rel="stylesheet" href="https://jsdelivr.net">
+</head>
+<body class="container mt-5">
+
+    <div class="card mx-auto" style="max-width: 550px;">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">活動心得分享</h5>
+        </div>
+        <div class="card-body">
+            
+            <!-- 關鍵 1：利用 Model 傳進來的 errorMessage 控制錯誤訊息顯示 -->
+            <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert" th:text="${errorMessage}">
+                這裡會動態顯示「該筆訂單您已經評價過了！」或「訂單尚未完成」
+            </div>
+
+            <div class="alert alert-secondary py-2" role="alert">
+                <strong>活動訂單編號：</strong> <span th:text="${order.orderId}">10023</span>
+            </div>
+
+            <!-- 標準傳統表單提交，完全不需要任何 JavaScript -->
+            <form th:action="@{/reviews/submit}" method="post">
+                <input type="hidden" name="orderId" th:value="${order.orderId}" />
+
+                <!-- 關鍵 2：還原上次選的星星（比對 prevRating） -->
+                <div class="mb-3">
+                    <label for="buyerRating" class="form-label fw-bold">給予本次活動評分</label>
+                    <select class="form-select" id="buyerRating" name="buyerRating" required>
+                        <option value="5" th:selected="${prevRating == 5}">⭐⭐⭐⭐⭐ 5 分 (非常推薦)</option>
+                        <option value="4" th:selected="${prevRating == 4}">⭐⭐⭐⭐ 4 分 (很滿意)</option>
+                        <option value="3">⭐⭐⭐ 3 分 (普通)</option> <!-- 預設值 -->
+                        <option value="2" th:selected="${prevRating == 2}">⭐⭐ 2 分 (不滿意)</option>
+                        <option value="1" th:selected="${prevRating == 1}">⭐ 1 分 (非常差)</option>
+                    </select>
+                </div>
+
+                <!-- 關鍵 3：還原上次打的評論內文（帶入 prevComment） -->
+                <div class="mb-3">
+                    <label for="buyerComment" class="form-label fw-bold">評價內容</label>
+                    <textarea class="form-control" id="buyerComment" name="buyerComment" rows="4" 
+                              placeholder="歡迎分享您參與這次活動的真實心得..." 
+                              maxlength="1000" required 
+                              th:text="${prevComment}"></textarea>
+                </div>
+
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary">提交評價</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
