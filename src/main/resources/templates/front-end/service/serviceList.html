@@ -349,16 +349,22 @@
                             服務描述
                         </p>
 
-                        <!-- 提供者 -->
-                        <p class="service-card-provider">
-
-                            提供者會員編號：
-
-                            <span th:text="${service.memberId}">
-                                1
-                            </span>
-
-                        </p>
+						<!-- 提供者 -->
+						<p class="service-card-provider">
+						
+						    <a th:href="@{/front/memberPage/oneMember(
+						            memberId=${service.memberId}
+						        )}"
+						       class="service-provider-link">
+						
+						        提供者會員編號：
+						        <span th:text="${service.memberId}">
+						            1
+						        </span>
+						
+						    </a>
+						
+						</p>
 
                         <!-- 價格與按鈕 -->
                         <div class="service-card-footer">
@@ -404,4 +410,4 @@
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
 </body>
-</html>x`
+</html>
