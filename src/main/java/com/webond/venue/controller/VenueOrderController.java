@@ -93,9 +93,16 @@ public class VenueOrderController {
 	public String refund(@RequestParam("venueOrderId") Integer venueOrderId, 
 			Model model,
 			HttpSession session) {
+		
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+		
 		VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
 		venueOrderVO.setRefundStatus((byte) 1);
 		venueOrderVO.setPayoutAmount((byte) 1);
+		venueOrderVO.setEmpVO(loginEmp);
 		venueOrderService.updateVenueOrder(venueOrderVO);
 		
 		// 新增通知給買家
@@ -110,7 +117,12 @@ public class VenueOrderController {
 	}
 	
 	@GetMapping("listAllPayout")
-	public String listAllPayOut(VenueOrderQueryDTO params, Model model) {
+	public String listAllPayOut(VenueOrderQueryDTO params, Model model, HttpSession session) {
+		
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
 		
 		// 如果使用者是第一次進來(還沒選過退款狀態),預設先看「進行中」的撥款
 	    if (params.getPayoutAmount() == null) {
@@ -141,6 +153,7 @@ public class VenueOrderController {
 		
 		VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
 		venueOrderVO.setPayoutAmount((byte) 1);
+		venueOrderVO.setEmpVO(loginEmp);
 		venueOrderService.updateVenueOrder(venueOrderVO);
 		
 		VenueVO venueVO = venueService.getOneVenue(venueOrderVO.getVenueVO().getVenueId());
