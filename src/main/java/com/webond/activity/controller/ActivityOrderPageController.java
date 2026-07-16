@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +16,6 @@ import com.webond.activity.model.ActivityNotificationService;
 import com.webond.activity.model.ActivityOrderService;
 import com.webond.activity.model.ActivityOrderVO;
 import com.webond.activity.model.ActivityService;
-import com.webond.employee.repository.EmployeeRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -30,9 +28,6 @@ public class ActivityOrderPageController {
 
 	@Autowired
 	private ActivityService activitySvc;
-
-	@Autowired
-	private EmployeeRepository employeeRepo;
 
 	@Autowired
 	private ActivityEmployeeSession employeeSession;
@@ -48,7 +43,7 @@ public class ActivityOrderPageController {
 
 		model.addAttribute("orderListData", orderSvc.getAll());
 		model.addAttribute("activityListData", activitySvc.getAll());
-		addFakeEmployee(model, session);
+		addLoginEmployee(model, session);
 
 		return "front-end/activityorder/listAllActivityOrder";
 	}
@@ -83,7 +78,7 @@ public class ActivityOrderPageController {
 		model.addAttribute("activityListData", activitySvc.getAll());
 		model.addAttribute("selectedFinanceStatus", financeStatus);
 		model.addAttribute("selectedOrderStatus", orderStatus);
-		addFakeEmployee(model, session);
+		addLoginEmployee(model, session);
 
 		return "front-end/activityorder/activityOrderFinance";
 	}
@@ -102,7 +97,7 @@ public class ActivityOrderPageController {
 
 		model.addAttribute("orderVO", orderVO);
 		model.addAttribute("activityVO", activitySvc.getOneActivity(orderVO.getActivityId()));
-		addFakeEmployee(model, session);
+		addLoginEmployee(model, session);
 
 		return "front-end/activityorder/activityOrderDetail";
 	}
@@ -185,13 +180,12 @@ public class ActivityOrderPageController {
 		return "redirect:/activityOrder/listAllActivityOrder?hostReviewOnly=true";
 	}
 
-	private void addFakeEmployee(Model model, HttpSession session) {
+	private void addLoginEmployee(Model model, HttpSession session) {
 		Integer employeeId = employeeSession.getLoginEmployeeId(session);
 		String employeeName = employeeSession.getLoginEmployeeName(session);
 
 		model.addAttribute("loginEmployeeId", employeeId);
 		model.addAttribute("loginEmployeeName", employeeName);
-		model.addAttribute("employeeListData", employeeRepo.findAll(Sort.by(Sort.Direction.ASC, "employeeId")));
 	}
 
 	private boolean isLoginEmployee(HttpSession session) {

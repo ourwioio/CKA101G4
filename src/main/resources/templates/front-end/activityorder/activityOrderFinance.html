@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <title>&#24460;&#21488;&#25765;&#36864;&#27454;&#20316;&#26989;</title>
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
-
 <style>
 body {
 	background: #f8fafc;
 	font-family: "Microsoft JhengHei", sans-serif;
 	margin: 0;
+}
+
+.activity-admin-content {
 	padding: 40px;
 }
 
@@ -144,6 +144,14 @@ body {
 	background: #b45309;
 }
 
+.btn-report {
+	background: #e11d48;
+}
+
+.btn-report:hover {
+	background: #be123c;
+}
+
 .admin-nav {
 	display: flex;
 	justify-content: flex-end;
@@ -246,8 +254,10 @@ td {
 </style>
 </head>
 
-<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 <body>
+<div class="wb-admin-layout">
+	<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
+	<main class="wb-admin-content activity-admin-content">
 	<div class="page-card">
 		<div class="header">
 			<h2>&#24460;&#21488;&#25765;&#36864;&#27454;&#20316;&#26989;</h2>
@@ -257,6 +267,7 @@ td {
 			<a th:href="@{/activity/listAllActivity}" class="admin-btn btn-activity">&#27963;&#21205;&#31649;&#29702;</a>
 			<a th:href="@{/activityType/listAllActivityType}" class="admin-btn btn-type">&#39006;&#21029;&#31649;&#29702;</a>
 			<a th:href="@{/activityOrder/listAllActivityOrder}" class="admin-btn btn-order">&#35330;&#21934;&#32000;&#37636;</a>
+			<a th:href="@{/admin/actRptList}" class="admin-btn btn-report">活動檢舉審核</a>
 			<a th:href="@{/activity/admin/home}" class="admin-btn btn-home">&#22238;&#24460;&#21488;&#39318;&#38913;</a>
 		</div>
 
@@ -380,5 +391,7 @@ td {
 			</table>
 		</div>
 	</div>
+	</main>
+</div>
 </body>
 </html>

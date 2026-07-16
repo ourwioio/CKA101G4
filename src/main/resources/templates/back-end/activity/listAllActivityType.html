@@ -9,6 +9,9 @@ body {
 	color: #1e293b;
 	font-family: 'Inter', 'PingFang TC', sans-serif;
 	margin: 0;
+}
+
+.activity-admin-content {
 	padding: 40px;
 }
 
@@ -115,6 +118,14 @@ body {
 	background-color: #b45309;
 }
 
+.admin-nav .btn-report {
+	background-color: #e11d48;
+}
+
+.admin-nav .btn-report:hover {
+	background-color: #be123c;
+}
+
 .admin-nav .btn-home {
 	background-color: #475569;
 }
@@ -203,6 +214,9 @@ td {
 </style>
 </head>
 <body>
+<div class="wb-admin-layout">
+	<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
+	<main class="wb-admin-content activity-admin-content">
 	<div class="header-container">
 		<div class="header-title">
 			🏷️ 活動類型字典管理 <span class="highlight"></span>
@@ -217,6 +231,7 @@ td {
 			<a th:href="@{/activity/listAllActivity}" class="btn-secondary btn-activity">&#27963;&#21205;&#31649;&#29702;</a>
 			<a th:href="@{/activityOrder/listAllActivityOrder}" class="btn-secondary btn-order">&#35330;&#21934;&#32000;&#37636;</a>
 			<a th:href="@{/activityOrder/finance}" class="btn-secondary btn-finance">&#25765;&#36864;&#27454;&#20316;&#26989;</a>
+			<a th:href="@{/admin/actRptList}" class="btn-secondary btn-report">活動檢舉審核</a>
 			<a th:href="@{/activity/admin/home}" class="btn-secondary btn-home">&#22238;&#24460;&#21488;&#39318;&#38913;</a>
 		</div>
 		<table>
@@ -245,5 +260,7 @@ td {
 			</tbody>
 		</table>
 	</div>
+	</main>
+</div>
 </body>
 </html>

@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <title>&#24460;&#21488;&#35330;&#21934;&#26126;&#32048;</title>
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
-
 <style>
 body {
 	margin: 0;
-	padding: 40px;
 	background: #f8fafc;
 	font-family: "Microsoft JhengHei", sans-serif;
 	color: #1e293b;
+}
+
+.activity-admin-content {
+	padding: 40px;
 }
 
 .page-card {
@@ -51,6 +51,10 @@ body {
 
 .btn-back {
 	background: #64748b;
+}
+
+.btn-report {
+	background: #e11d48;
 }
 
 .btn-refund {
@@ -133,12 +137,17 @@ body {
 </style>
 </head>
 
-<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 <body>
+<div class="wb-admin-layout">
+	<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
+	<main class="wb-admin-content activity-admin-content">
 	<div class="page-card">
 		<div class="header">
 			<h1>&#24460;&#21488;&#35330;&#21934;&#26126;&#32048;</h1>
-			<a th:href="@{/activityOrder/listAllActivityOrder}" class="btn-back">&#22238;&#35330;&#21934;&#32000;&#37636;</a>
+			<div class="actions" style="margin-top: 0;">
+				<a th:href="@{/admin/actRptList}" class="btn-action btn-report">活動檢舉審核</a>
+				<a th:href="@{/activityOrder/listAllActivityOrder}" class="btn-back">&#22238;&#35330;&#21934;&#32000;&#37636;</a>
+			</div>
 		</div>
 
 		<div th:if="${param.refundSuccess}" class="notice success">&#24050;&#30906;&#35469;&#36864;&#27454;&#23436;&#25104;</div>
@@ -284,5 +293,7 @@ body {
 			</div>
 		</div>
 	</div>
+	</main>
+</div>
 </body>
 </html>
