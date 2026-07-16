@@ -95,7 +95,8 @@
                             <td th:text="${venueOrderVO.refundReason}"></td>
                             <td th:text="${venueOrderVO.empVO != null ? venueOrderVO.empVO.employeeId : '沒有處理員工'}"></td>
                             <td>
-                                <form th:action="@{/venueOrder/refund}" method="get" class="inline-form">
+                                <form th:action="@{/venueOrder/refund}" method="get" class="inline-form"
+                                      onsubmit="return confirm('請確認是否要執行這筆訂單的退款操作？');">
                                     <input type="hidden" name="venueOrderId" th:value="${venueOrderVO.venueOrderId}">
                                     <button type="submit" class="btn btn-primary"
                                             th:if="${venueOrderVO.refundStatus == 0}">退款</button>

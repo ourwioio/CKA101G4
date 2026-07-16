@@ -94,7 +94,8 @@
                             </td>
                             <td th:text="${venueOrderVO.empVO != null ? venueOrderVO.empVO.employeeId : '沒有處理員工'}"></td>
                             <td>
-                                <form th:action="@{/venueOrder/payout}" method="get" class="inline-form">
+                                <form th:action="@{/venueOrder/payout}" method="get" class="inline-form"
+                                      onsubmit="return confirm('請確認是否要執行這筆訂單的撥款操作？');">
                                     <input type="hidden" name="venueOrderId" th:value="${venueOrderVO.venueOrderId}">
                                     <button type="submit" class="btn btn-primary"
                                             th:if="${venueOrderVO.payoutAmount == 0}">撥款</button>
