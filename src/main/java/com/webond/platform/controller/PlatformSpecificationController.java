@@ -20,10 +20,11 @@ import com.webond.employee.repository.EmployeeRepository;
 import com.webond.platform.model.PlatformSpecificationVO;
 import com.webond.platform.service.PlatformSpecificationService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/platformSpecification")
+@RequestMapping("/admin/platform/platformSpecification")
 public class PlatformSpecificationController {
 
 	@Autowired
@@ -105,7 +106,13 @@ public class PlatformSpecificationController {
 
 	// ===== 查詢全部 =====
 	@GetMapping("listAllSpec")
-	public String listAllSpec(ModelMap model) {
+	public String listAllSpec(ModelMap model, HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
 		List<PlatformSpecificationVO> list = specSvc.getAll();
 		model.addAttribute("specListData", list);
 		return "back-end/platformSpecification/listAllSpec";

@@ -461,7 +461,7 @@
                 <div class="panel-body">
 
                     <form class="search-form"
-                          th:action="@{/faq/search}"
+                          th:action="@{/admin/platform/faq/search}"
                           method="post">
 
                         <select name="status">
@@ -504,7 +504,7 @@
                             </button>
 
                             <a class="btn btn--secondary"
-                               th:href="@{/faq/listAllFaq}">
+                               th:href="@{/admin/platform/faq/listAllFaq}">
                                 清除條件
                             </a>
 
@@ -543,7 +543,7 @@
                     </span>
 
                     <a class="btn btn--primary"
-                       th:href="@{/faq/addFaq}">
+                       th:href="@{/admin/platform/faq/addFaq}">
                         新增 FAQ
                     </a>
 
@@ -611,7 +611,7 @@
                             <td>
 
                                 <form class="action-form"
-                                      th:action="@{/faq/viewOne}"
+                                      th:action="@{/admin/platform/faq/viewOne}"
                                       method="get">
 
                                     <input type="hidden"
@@ -674,7 +674,7 @@
                                 <div class="action-group">
 
                                     <form class="action-form"
-                                          th:action="@{/faq/getOne_For_Update}"
+                                          th:action="@{/admin/platform/faq/getOne_For_Update}"
                                           method="post">
 
                                         <input type="hidden"
@@ -690,7 +690,7 @@
 
                                     <form class="action-form"
                                           th:if="${faq.status == 0}"
-                                          th:action="@{/faq/publish}"
+                                          th:action="@{/admin/platform/faq/publish}"
                                           method="post"
                                           onsubmit="return confirm('發布後將無法改回草稿，確定要發布嗎？');">
 
@@ -706,7 +706,7 @@
                                     </form>
 
                                     <form class="action-form"
-                                          th:action="@{/faq/delete}"
+                                          th:action="@{/admin/platform/faq/delete}"
                                           method="post"
                                           onsubmit="return confirm('確定要刪除這筆FAQ嗎？');">
 

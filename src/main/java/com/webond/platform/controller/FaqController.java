@@ -20,10 +20,11 @@ import com.webond.employee.repository.EmployeeRepository;
 import com.webond.platform.model.FaqVO;
 import com.webond.platform.service.FaqService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/faq")
+@RequestMapping("/admin/platform/faq")
 public class FaqController {
 
 	@Autowired
@@ -104,7 +105,13 @@ public class FaqController {
 
 	// ===== 查詢全部 =====
 	@GetMapping("listAllFaq")
-	public String listAllFaq(ModelMap model) {
+	public String listAllFaq(ModelMap model, HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
 		List<FaqVO> list = faqSvc.getAll();
 		model.addAttribute("faqListData", list);
 		return "back-end/faq/listAllFaq";

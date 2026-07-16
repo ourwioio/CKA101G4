@@ -22,10 +22,11 @@ import com.webond.employee.repository.EmployeeRepository;
 import com.webond.platform.model.BulletinVO;
 import com.webond.platform.service.BulletinService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/bulletin")
+@RequestMapping("/admin/platform/bulletin")
 public class BulletinController {
 
 	@Autowired
@@ -118,7 +119,13 @@ public class BulletinController {
 	
 	// ===== 查詢全部 =====
 	@GetMapping("listAllBulletin")
-	public String listAllBulletin(ModelMap model) {
+	public String listAllBulletin(ModelMap model, HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
 		List<BulletinVO> list = bulletinSvc.getAll();
 		model.addAttribute("bulletinListData", list);
 		return "back-end/bulletin/listAllBulletin";

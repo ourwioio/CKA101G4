@@ -260,7 +260,7 @@
                 </div>
 
                 <a class="back-link"
-                   th:href="@{/bulletin/listAllBulletin}">
+                   th:href="@{/admin/platform/bulletin/listAllBulletin}">
                     ← 返回公告管理
                 </a>
 
@@ -274,7 +274,7 @@
 
                 <div class="panel-body">
 
-                    <form th:action="@{/bulletin/insert}"
+                    <form th:action="@{/admin/platform/bulletin/insert}"
                           th:object="${bulletinVO}"
                           method="post">
 
@@ -391,7 +391,7 @@
                             </button>
 
                             <a class="btn btn--secondary"
-                               th:href="@{/bulletin/listAllBulletin}">
+                               th:href="@{/admin/platform/bulletin/listAllBulletin}">
                                 取消
                             </a>
 
