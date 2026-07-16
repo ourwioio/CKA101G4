@@ -26,6 +26,7 @@ import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueReviewService;
 import com.webond.venue.service.VenueService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -116,7 +117,13 @@ public class VenueReviewController {
 
 	// ===== 查詢全部 =====
 	@GetMapping("listAllVenueReview")
-	public String listAllVenueReview(ModelMap model) {
+	public String listAllVenueReview(ModelMap model, HttpSession session) {
+		
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+		
 		List<VenueReviewVO> list = venueReviewSvc.getAll();
 		model.addAttribute("venueReviewListData", list);
 		return "back-end/venueReview/listAllVenueReview";

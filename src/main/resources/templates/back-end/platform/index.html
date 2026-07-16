@@ -1,66 +1,291 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+
 <head>
 <meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>平台管理</title>
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-	rel="stylesheet">
+
 <style>
-.menu-card {
-	transition: box-shadow 0.15s, transform 0.15s;
+* {
+	box-sizing: border-box;
 }
 
-.menu-card:hover {
-	box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
+body {
+	margin: 0;
+	color: #2d3436;
+	background: #f5f6fa;
+	font-family: Arial, "Noto Sans TC", sans-serif;
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+button {
+	font-family: inherit;
+}
+
+/*
+         * adminSidebar.html 裡已經有：
+         *
+         * .wb-admin-layout
+         * .wb-admin-content
+         *
+         * 這裡只處理右側平台管理首頁內容。
+         */
+.platform-home {
+	width: 100%;
+	max-width: 1150px;
+	margin: 0 auto;
+}
+
+/* =========================================
+           頁面標頭
+           ========================================= */
+.platform-home-header {
+	margin-bottom: 28px;
+	padding-bottom: 18px;
+	border-bottom: 1px solid #dfe4e8;
+}
+
+.platform-home-header-top {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 24px;
+}
+
+.platform-home-header-content {
+	min-width: 0;
+}
+
+.platform-home-title {
+	margin: 0 0 10px;
+	font-size: 30px;
+}
+
+.platform-home-description {
+	margin: 0;
+	color: #636e72;
+	font-size: 15px;
+	line-height: 1.7;
+}
+
+/* =========================================
+           成功／錯誤訊息
+           ========================================= */
+.platform-alert {
+	margin-bottom: 22px;
+	padding: 13px 16px;
+	border: 1px solid transparent;
+	border-radius: 8px;
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+.platform-alert--success {
+	color: #146c43;
+	background: #d1e7dd;
+	border-color: #badbcc;
+}
+
+.platform-alert--error {
+	color: #842029;
+	background: #f8d7da;
+	border-color: #f5c2c7;
+}
+
+/* =========================================
+           功能卡片
+           ========================================= */
+.platform-menu {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 20px;
+}
+
+.platform-card {
+	display: flex;
+	flex-direction: column;
+	min-height: 230px;
+	padding: 26px;
+	background: #ffffff;
+	border: 1px solid #dfe4e8;
+	border-radius: 10px;
+	box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.platform-card:hover {
 	transform: translateY(-2px);
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.platform-card-title {
+	margin: 0 0 12px;
+	font-size: 21px;
+}
+
+.platform-card-description {
+	flex: 1;
+	margin: 0 0 24px;
+	color: #636e72;
+	font-size: 14px;
+	line-height: 1.8;
+}
+
+.platform-card-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	align-self: flex-start;
+	min-height: 40px;
+	padding: 9px 17px;
+	color: #ffffff;
+	background: #343a40;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: bold;
+	transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.platform-card-link:hover {
+	background: #111111;
+	transform: translateY(-1px);
+}
+
+/* =========================================
+           RWD
+           ========================================= */
+@media ( max-width : 1050px) {
+	.platform-menu {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media ( max-width : 850px) {
+	.platform-menu {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media ( max-width : 680px) {
+	.platform-home-header-top {
+		flex-direction: column;
+		align-items: stretch;
+	}
+}
+
+@media ( max-width : 580px) {
+	.platform-home-title {
+		font-size: 25px;
+	}
+	.platform-card {
+		min-height: auto;
+		padding: 20px;
+	}
 }
 </style>
 </head>
-<body class="bg-light">
-	<div class="container py-4">
+<body>
 
-		<div class="d-flex justify-content-between align-items-center mb-4">
-			<h2>平台管理</h2>
+	<div class="wb-admin-layout">
+
+		<!-- 後台共用左側選單 -->
+		<div
+			th:replace="~{back-end/fragments/adminSidebar
+                           :: adminSidebar}">
 		</div>
 
-		<div class="row g-3">
-			<div class="col-md-4">
-				<a th:href="@{/bulletin/listAllBulletin}"
-					class="text-decoration-none">
-					<div class="card h-100 menu-card">
-						<div class="card-body">
-							<h5 class="card-title text-dark">公告管理</h5>
-							<p class="card-text text-muted mb-0">平台公告的新增、發布與維護。</p>
+		<div class="wb-admin-content">
+
+			<div class="platform-home">
+
+				<!-- =========================================
+                     頁面標頭
+                     ========================================= -->
+
+				<div class="platform-home-header">
+
+					<div class="platform-home-header-top">
+
+						<div class="platform-home-header-content">
+
+							<h1 class="platform-home-title">平台管理</h1>
+
+							<p class="platform-home-description">
+								管理平台公告、平台規範與常見問題，維護前台呈現給會員的各項平台資訊。</p>
+
 						</div>
+
 					</div>
-				</a>
+
+				</div>
+
+				<!-- =========================================
+                     成功／錯誤訊息
+                     ========================================= -->
+
+				<div class="platform-alert platform-alert--success"
+					th:if="${successMessage != null}" th:text="${successMessage}">
+				</div>
+
+				<div class="platform-alert platform-alert--error"
+					th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
+
+				<!-- =========================================
+                     功能卡片
+                     ========================================= -->
+
+				<div class="platform-menu">
+
+					<div class="platform-card">
+
+						<h2 class="platform-card-title">公告管理</h2>
+
+						<p class="platform-card-description">
+							建立、修改與發布平台公告，並可依狀態、發布日期與關鍵字查詢公告內容。</p>
+
+						<a class="platform-card-link"
+							th:href="@{/bulletin/listAllBulletin}"> 進入公告管理 </a>
+
+					</div>
+
+					<div class="platform-card">
+
+						<h2 class="platform-card-title">平台規範管理</h2>
+
+						<p class="platform-card-description">
+							維護各類平台使用規範內容，控管草稿與發布狀態，供前台會員查閱。</p>
+
+						<a class="platform-card-link"
+							th:href="@{/platformSpecification/listAllSpec}"> 進入平台規範管理 </a>
+
+					</div>
+
+					<div class="platform-card">
+
+						<h2 class="platform-card-title">常見問題管理</h2>
+
+						<p class="platform-card-description">
+							管理八大類常見問題（FAQ）的問題與解答，維護前台常見問題頁面內容。</p>
+
+						<a class="platform-card-link" th:href="@{/faq/listAllFaq}">
+							進入常見問題管理 </a>
+
+					</div>
+
+				</div>
+
 			</div>
 
-			<div class="col-md-4">
-				<a th:href="@{/platformSpecification/listAllSpec}"
-					class="text-decoration-none">
-					<div class="card h-100 menu-card">
-						<div class="card-body">
-							<h5 class="card-title text-dark">平台規範管理</h5>
-							<p class="card-text text-muted mb-0">平台使用規範的建立與維護。</p>
-						</div>
-					</div>
-				</a>
-			</div>
-
-			<div class="col-md-4">
-				<a th:href="@{/faq/listAllFaq}" class="text-decoration-none">
-					<div class="card h-100 menu-card">
-						<div class="card-body">
-							<h5 class="card-title text-dark">常見問題管理</h5>
-							<p class="card-text text-muted mb-0">常見問題（FAQ）的建立與維護。</p>
-						</div>
-					</div>
-				</a>
-			</div>
 		</div>
 
 	</div>
+
 </body>
 </html>

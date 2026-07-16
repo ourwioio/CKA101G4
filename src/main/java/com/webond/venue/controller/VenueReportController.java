@@ -25,6 +25,8 @@ import com.webond.venue.model.VenueReportVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueReportService;
 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 @RequestMapping("/venueReport")
 public class VenueReportController {
@@ -59,7 +61,13 @@ public class VenueReportController {
 
 	// ===== 查詢全部 =====
 	@GetMapping("listAllVenueReport")
-	public String listAllVenueReport(ModelMap model) {
+	public String listAllVenueReport(ModelMap model, HttpSession session) {
+		
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+		
 		List<VenueReportVO> list = venueReportSvc.getAll();
 		model.addAttribute("venueReportListData", list);
 		model.addAttribute("searchStatus", null);
