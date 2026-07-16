@@ -238,7 +238,7 @@ h1 {
 		<div class="actions">
 			<a class="btn-report"
 				th:href="${isLoginMember} ? @{/activity/report(activityId=${activityVO.activityId})} : @{/member/login}"
-				th:title="${isLoginMember} ? '&#27298;&#33289;&#27492;&#27963;&#21205;' : '&#35531;&#20808;&#30331;&#20837;&#24460;&#20877;&#27298;&#33289;&#27963;&#21205;'">&#27298;&#33289;&#27963;&#21205;</a>
+				th:title="${isLoginMember} ? '檢舉此活動' : '請先登入後再檢舉活動'">檢舉活動</a>
 			<a th:href="${backUrl}" class="btn-back" th:text="${backText}">返回列表</a> <a
 				th:if="${showOrderButton}"
 				th:href="@{/activity/front/order(activityId=${activityVO.activityId})}"

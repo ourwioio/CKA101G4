@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>&#24460;&#21488;&#35330;&#21934;&#32000;&#37636;</title>
+<title>後台訂單紀錄</title>
 <style>
 body {
 	background: #f8fafc;
@@ -206,39 +206,39 @@ td {
 	<main class="wb-admin-content activity-admin-content">
 	<div class="page-card">
 		<div class="header">
-			<h2>&#24460;&#21488;&#35330;&#21934;&#32000;&#37636;</h2>
+			<h2>後台訂單紀錄</h2>
 		</div>
 
 		<div class="admin-nav">
-			<a th:href="@{/activity/listAllActivity}" class="admin-btn btn-activity">&#27963;&#21205;&#31649;&#29702;</a>
-			<a th:href="@{/activityType/listAllActivityType}" class="admin-btn btn-type">&#39006;&#21029;&#31649;&#29702;</a>
-			<a th:href="@{/activityOrder/finance}" class="admin-btn btn-finance">&#25765;&#36864;&#27454;&#20316;&#26989;</a>
+			<a th:href="@{/activity/listAllActivity}" class="admin-btn btn-activity">活動管理</a>
+			<a th:href="@{/activityType/listAllActivityType}" class="admin-btn btn-type">類別管理</a>
+			<a th:href="@{/activityOrder/finance}" class="admin-btn btn-finance">撥退款作業</a>
 			<a th:href="@{/admin/actRptList}" class="admin-btn btn-report">活動檢舉審核</a>
-			<a th:href="@{/activity/admin/home}" class="admin-btn btn-home">&#22238;&#24460;&#21488;&#39318;&#38913;</a>
+			<a th:href="@{/activity/admin/home}" class="admin-btn btn-home">回後台首頁</a>
 		</div>
 
 		<div class="employee">
-			&#30446;&#21069;&#21729;&#24037;&#65306;<span th:text="${loginEmployeeName}"></span>
-			&#65288;&#21729;&#24037;&#32232;&#34399; <span th:text="${loginEmployeeId}"></span>&#65289;
+			目前員工：<span th:text="${loginEmployeeName}"></span>
+			（員工編號 <span th:text="${loginEmployeeId}"></span>）
 		</div>
 
 		<div th:if="${param.hostReviewOnly}" class="notice error">
-			&#22577;&#21517;&#23529;&#26680;&#30001;&#27963;&#21205;&#20027;&#36774;&#20154;&#34389;&#29702;&#65292;&#24460;&#21488;&#21482;&#26597;&#30475;&#35330;&#21934;&#12289;&#36864;&#27454;&#33287;&#25765;&#27454;&#36039;&#35338;&#12290;
+			報名審核由活動主辦人處理，後台只查看訂單、退款與撥款資訊。
 		</div>
 
 		<div class="table-card">
 			<table>
 				<thead>
 					<tr>
-						<th>&#35330;&#21934;&#32232;&#34399;</th>
-						<th>&#27963;&#21205;&#21517;&#31281;</th>
-						<th>&#26371;&#21729;&#32232;&#34399;</th>
-						<th>&#35330;&#21934;&#29376;&#24907;</th>
-						<th>&#22577;&#21517;&#20154;&#25976;</th>
-						<th>&#35330;&#21934;&#37329;&#38989;</th>
-						<th>&#22577;&#21517;&#20633;&#35387;</th>
-						<th>&#20184;&#27454;&#26041;&#24335;</th>
-						<th>&#36864;&#27454; / &#25765;&#27454;</th>
+						<th>訂單編號</th>
+						<th>活動名稱</th>
+						<th>會員編號</th>
+						<th>訂單狀態</th>
+						<th>報名人數</th>
+						<th>訂單金額</th>
+						<th>報名備註</th>
+						<th>付款方式</th>
+						<th>退款 / 撥款</th>
 					</tr>
 				</thead>
 
@@ -259,11 +259,11 @@ td {
 						<td th:text="${order.buyerMemberId}"></td>
 
 						<td>
-							<span th:if="${order.orderStatus == 2}" class="status pending">&#24453;&#23529;&#26680;</span>
-							<span th:if="${order.orderStatus == 3}" class="status pending">&#24453;&#20184;&#27454;</span>
-							<span th:if="${order.orderStatus == 0}" class="status active">&#24050;&#20184;&#27454;</span>
-							<span th:if="${order.orderStatus == 1}" class="status cancel">&#24050;&#21462;&#28040;</span>
-							<span th:if="${order.orderStatus == 4}" class="status completed">&#24050;&#23436;&#25104;</span>
+							<span th:if="${order.orderStatus == 2}" class="status pending">待審核</span>
+							<span th:if="${order.orderStatus == 3}" class="status pending">待付款</span>
+							<span th:if="${order.orderStatus == 0}" class="status active">已付款</span>
+							<span th:if="${order.orderStatus == 1}" class="status cancel">已取消</span>
+							<span th:if="${order.orderStatus == 4}" class="status completed">已完成</span>
 						</td>
 
 						<td th:text="${order.bookingCount}"></td>
@@ -271,27 +271,27 @@ td {
 						<td class="note" th:text="${order.orderNote ?: '-'}"></td>
 
 						<td>
-							<span th:if="${order.activityPaymentMethod == 0}">&#20449;&#29992;&#21345;</span>
-							<span th:if="${order.activityPaymentMethod == 1}">ATM&#36681;&#24115;</span>
-							<span th:if="${order.activityPaymentMethod == null}">&#26410;&#20184;&#27454;</span>
+							<span th:if="${order.activityPaymentMethod == 0}">信用卡</span>
+							<span th:if="${order.activityPaymentMethod == 1}">ATM轉帳</span>
+							<span th:if="${order.activityPaymentMethod == null}">未付款</span>
 						</td>
 
 						<td>
 							<div>
-								<span th:if="${order.totalAmount == null or order.totalAmount <= 0}" class="status active">&#28961;&#36864;&#27454;</span>
-								<span th:if="${order.totalAmount != null and order.totalAmount > 0 and order.refundStatus == 2}" class="status completed">&#24050;&#36864;&#27454;</span>
-								<span th:if="${order.totalAmount != null and order.totalAmount > 0 and order.refundStatus == 1}" class="status refund">&#24453;&#36864;&#27454;</span>
-								<span th:if="${order.totalAmount != null and order.totalAmount > 0 and order.orderStatus != 0 and order.orderStatus != 4 and (order.refundStatus == null or order.refundStatus == 0)}" class="status active">&#28961;&#36864;&#27454;</span>
+								<span th:if="${order.totalAmount == null or order.totalAmount <= 0}" class="status active">無退款</span>
+								<span th:if="${order.totalAmount != null and order.totalAmount > 0 and order.refundStatus == 2}" class="status completed">已退款</span>
+								<span th:if="${order.totalAmount != null and order.totalAmount > 0 and order.refundStatus == 1}" class="status refund">待退款</span>
+								<span th:if="${order.totalAmount != null and order.totalAmount > 0 and order.orderStatus != 0 and order.orderStatus != 4 and (order.refundStatus == null or order.refundStatus == 0)}" class="status active">無退款</span>
 							</div>
 							<div th:if="${order.totalAmount != null and order.totalAmount > 0 and (order.orderStatus == 0 or order.orderStatus == 4) and order.refundStatus != 2}" style="margin-top: 6px;">
-								<span th:if="${order.payoutAmount}" class="status completed">&#24050;&#25765;&#27454;</span>
-								<span th:unless="${order.payoutAmount}" class="status refund">&#24453;&#25765;&#27454;</span>
+								<span th:if="${order.payoutAmount}" class="status completed">已撥款</span>
+								<span th:unless="${order.payoutAmount}" class="status refund">待撥款</span>
 							</div>
 						</td>
 
 					</tr>
 					<tr th:if="${#lists.isEmpty(orderListData)}">
-						<td colspan="9">&#30446;&#21069;&#27794;&#26377;&#35330;&#21934;&#36039;&#26009;</td>
+						<td colspan="9">目前沒有訂單資料</td>
 					</tr>
 				</tbody>
 			</table>
