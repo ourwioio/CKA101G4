@@ -1,0 +1,182 @@
+/* ==========================================================================
+   1. 全域初始化設定
+   ========================================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'PingFang TC', 'Heiti TC', 'Microsoft JhengHei', sans-serif;
+}
+
+body {
+    /* 建立帶有現代感的漸層背景 */
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    min-height: 100vh;
+    width: 100%;
+    /* 🎯 關鍵技術：使用 Flex 完美水平垂直置中 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* ==========================================================================
+   2. 登入卡片主體（置中核心）
+   ========================================================================== */
+.login-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   3. 標題與錯誤訊息
+   ========================================================================== */
+.title-area {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.title-area h2 {
+    color: #ffffff;
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.error-message {
+    background-color: rgba(239, 68, 68, 0.15);
+    border: 1px solid #ef4444;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 24px;
+    text-align: center;
+    animation: shake 0.4s ease-in-out;
+}
+
+.error-message span {
+    color: #fca5a5;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* ==========================================================================
+   4. 表單與輸入框
+   ========================================================================== */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #9ca3af;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 16px;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #ffffff;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #3b82f6;
+    background-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.form-control::placeholder {
+    color: #6b7280;
+}
+
+/* ==========================================================================
+   5. 多選框與連結
+   ========================================================================== */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #9ca3af;
+    font-size: 14px;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: #3b82f6;
+}
+
+.link-primary {
+    color: #3b82f6;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s ease;
+}
+
+.link-primary:hover {
+    color: #60a5fa;
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   6. 提交按鈕與動畫
+   ========================================================================== */
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background-color: #3b82f6;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    background-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.btn-submit:active {
+    transform: scale(0.98);
+}
+
+/* 錯誤提示錯誤時的水平抖動動畫 */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}

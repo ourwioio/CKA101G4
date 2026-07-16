@@ -11,7 +11,7 @@
 	<div th:fragment="updatePermContent">
 
 		<h3>修改員工資料</h3>
-		<form th:action="@{/admin/updatePerm}" method="POST"
+		<form th:action="@{/admin/employees/updatePerm}" method="POST"
 			th:object="${permissionVO}" >
 			<tr>
 				<td style="white-space: nowrap;">權限編號：</td>
@@ -51,7 +51,7 @@
 			<br>
 			<button type="submit">確認儲存</button>
 			<button type="button"
-				th:onclick="|window.location.href='@{/admin/empPermPage}'|"
+				th:onclick="|window.location.href='@{/admin/employees/empPermPage}'|"
 				onclick="closeEditModal()">取消</button>
 		</form>
 	</div>

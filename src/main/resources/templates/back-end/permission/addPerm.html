@@ -10,7 +10,7 @@
 	<div th:fragment="addPermContent">
 
 		<h3>新增員工權限資料</h3>
-		<form th:action="@{/admin/addPerm}" method="POST"
+		<form th:action="@{/admin/employees/addPerm}" method="POST"
 			th:object="${permissionVO}">
 			<table border="0" cellpadding="5">
 				<tr>
@@ -40,7 +40,7 @@
 			<br>
 			<button type="submit">確認儲存</button>
 			<button type="button"
-				th:onclick="|window.location.href='@{/admin/empPermPage}'|"
+				th:onclick="|window.location.href='@{/admin/employees/empPermPage}'|"
 				onclick="closeAddModal()">取消</button>
 		</form>
 	</div>
