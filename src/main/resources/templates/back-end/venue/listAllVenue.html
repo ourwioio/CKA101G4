@@ -40,7 +40,7 @@
                         <td th:text="${venue.venueId}"></td>
                         <td class="img-cell">
                             <img th:if="${venue.venueImages != null and !venue.venueImages.isEmpty()}"
-                                 th:src="@{/venue/getImage(imagesId=${venue.venueImages[0].imagesId})}" />
+                                 th:src="@{/admin/venue/getImage(imagesId=${venue.venueImages[0].imagesId})}" />
                             <div th:unless="${venue.venueImages != null and !venue.venueImages.isEmpty()}"
                                  class="no-img">無圖片</div>
                         </td>
@@ -50,7 +50,7 @@
                         <td th:text="${venue.hourlyRate}"></td>
                         <td th:text="${#temporals.format(venue.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
 						<td>
-						    <form th:action="@{/venue/toggleStatus}" method="post" class="inline-form">
+						    <form th:action="@{/admin/venue/toggleStatus}" method="post" class="inline-form">
 						        <input type="hidden" name="venueId" th:value="${venue.venueId}" />
 						        <button type="submit" 
 						                th:class="${venue.venueStatus == 1} ? 'btn-toggle btn-toggle-up' : 'btn-toggle btn-toggle-down'"
@@ -63,7 +63,7 @@
 						    </form>
 						</td>
                         <td>
-                            <form th:action="@{/venue/getOneVenue}" method="get" class="inline-form">
+                            <form th:action="@{/admin/venue/getOneVenue}" method="get" class="inline-form">
                                 <input type="hidden" name="venueId" th:value="${venue.venueId}" />
                                 <button type="submit" class="btn-edit">查看場地</button>
                             </form>

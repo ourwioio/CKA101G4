@@ -130,7 +130,7 @@ td {
 
 	<div class="header">
 		<span class="title">場地類型管理</span> <a class="btn-add"
-			th:href="@{/venueType/addVenueType}">新增場地類型</a>
+			th:href="@{/admin/venue/venueType/addVenueType}">新增場地類型</a>
 	</div>
 	<div class="table-wrap">
 		<table>
@@ -149,7 +149,7 @@ td {
 					<td th:text="${venueType.typeDesc}"></td>
 					<td>
 						<div class="actions">
-							<form th:action="@{/venueType/getOne_For_Update}" method="post"
+							<form th:action="@{/admin/venue/venueType/getOne_For_Update}" method="post"
 								style="display: inline">
 								<input type="hidden" name="venueTypeId"
 									th:value="${venueType.venueTypeId}" />

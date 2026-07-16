@@ -118,7 +118,7 @@ textarea {
 
 	<div class="card">
 		<div class="card-title">新增場地類型</div>
-		<form th:action="@{/venueType/insert}" th:object="${venueTypeVO}"
+		<form th:action="@{/admin/venue/venueType/insert}" th:object="${venueTypeVO}"
 			method="post">
 
 			<div class="form-group">
@@ -144,7 +144,7 @@ textarea {
 
 			<div class="btn-row">
 				<button type="submit" class="btn-submit">新增</button>
-				<a class="btn-back" th:href="@{/venueType/listAllVenueType}">取消</a>
+				<a class="btn-back" th:href="@{/admin/venue/venueType/listAllVenueType}">取消</a>
 			</div>
 		</form>
 	</div>

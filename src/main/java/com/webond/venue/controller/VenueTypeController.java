@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/venueType")
+@RequestMapping("/admin/venue/venueType")
 public class VenueTypeController {
 
 	@Autowired
@@ -42,7 +42,7 @@ public class VenueTypeController {
 		}
 		// 輸入無誤 轉交給listAllVenueType
 		venueTypeService.addVenueType(venueTypeVO);
-		return "redirect:/venueType/listAllVenueType";
+		return "redirect:/admin/venue/venueType/listAllVenueType";
 	}
 
 	@PostMapping("getOne_For_Update")
@@ -63,13 +63,13 @@ public class VenueTypeController {
 		// 開始修改資料
 		venueTypeService.updateVenueType(venueTypeVO);
 		// 修改完成，準備轉交
-		return "redirect:/venueType/listAllVenueType";
+		return "redirect:/admin/venue/venueType/listAllVenueType";
 	}
 
 	@PostMapping("delete")
 	public String delete(@RequestParam("venueTypeId") String venueTypeId, ModelMap model) {
 		venueTypeService.deleteVenueType(Integer.valueOf(venueTypeId));
-		return "redirect:/venueType/listAllVenueType";
+		return "redirect:/admin/venue/venueType/listAllVenueType";
 	}
 
 	@GetMapping("listAllVenueType")

@@ -42,7 +42,7 @@
             </div>
         </header>
 
-        <form class="filter-bar" th:action="@{/venueOrder/listAllPayout}" method="get">
+        <form class="filter-bar" th:action="@{/admin/venue/venueOrder/listAllPayout}" method="get">
 
             撥款狀態：
             <select name="payoutAmount">
@@ -76,7 +76,7 @@
                     <th:block th:each="venueOrderVO : ${listAllPayout}">
                         <tr>
                             <td>
-                                <a th:href="@{/venueOrder/getOneVenueOrder(venueOrderId=${venueOrderVO.venueOrderId})}"
+                                <a th:href="@{/admin/venue/venueOrder/getOneVenueOrder(venueOrderId=${venueOrderVO.venueOrderId})}"
                                    th:text="${venueOrderVO.venueOrderId}"></a>
                             </td>
                             <td th:text="${#temporals.format(venueOrderVO.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
@@ -94,7 +94,7 @@
                             </td>
                             <td th:text="${venueOrderVO.empVO != null ? venueOrderVO.empVO.employeeId : '沒有處理員工'}"></td>
                             <td>
-                                <form th:action="@{/venueOrder/payout}" method="get" class="inline-form"
+                                <form th:action="@{/admin/venue/venueOrder/payout}" method="get" class="inline-form"
                                       onsubmit="return confirm('請確認是否要執行這筆訂單的撥款操作？');">
                                     <input type="hidden" name="venueOrderId" th:value="${venueOrderVO.venueOrderId}">
                                     <button type="submit" class="btn btn-primary"
