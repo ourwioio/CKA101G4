@@ -17,6 +17,9 @@ public interface EmployeeRepository extends JpaRepository<EmployeeVO, Integer> {
 	// 給adminService的
 	Optional<EmployeeVO> findByEmpAccount(String empAccount);
 	
+	// 忘記密碼用
+	Optional<EmployeeVO> findByResetToken(String resetToken);
+	
 	// 判斷新增時帳號存不存在
 	boolean existsByEmpAccount(String empAccount);
 	
@@ -25,5 +28,7 @@ public interface EmployeeRepository extends JpaRepository<EmployeeVO, Integer> {
 	@Transactional
 	@Query("UPDATE EmployeeVO e SET e.lastLoginAt = :now WHERE e.employeeId = :id")
 	void updateLastLoginAt(@Param("id") Integer id, @Param("now") LocalDateTime now);
-
+	
+	
+	
 }

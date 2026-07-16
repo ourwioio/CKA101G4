@@ -1,54 +1,262 @@
 <!DOCTYPE html>
 <html xmlns:th="http://thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>填寫檢舉表單</title>
+<meta charset="UTF-8">
+<title>填寫檢舉表單</title>
+<style>
+body {
+	font-family: system-ui, -apple-system, sans-serif;
+	background-color: #f8fafc;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+	margin: 0;
+	padding: 20px;
+	box-sizing: border-box;
+}
+
+.card {
+	background: white;
+	padding: 30px;
+	border-radius: 12px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+	border-top: 5px solid #dc2626;
+	width: 100%;
+	max-width: 480px;
+	box-sizing: border-box;
+}
+
+.card-header {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 25px;
+}
+
+h2 {
+	margin: 0;
+	color: #1e293b;
+	font-size: 22px;
+	font-weight: 700;
+}
+
+.alert-icon {
+	color: #dc2626;
+	width: 24px;
+	height: 24px;
+}
+
+.form-group {
+	margin-bottom: 20px;
+}
+
+label {
+	display: block;
+	margin-bottom: 6px;
+	font-weight: 600;
+	font-size: 14px;
+	color: #475569;
+}
+
+.readonly-box {
+	background-color: #f1f5f9;
+	padding: 10px 14px;
+	border-radius: 6px;
+	border: 1px solid #e2e8f0;
+	font-size: 14px;
+	color: #334155;
+	font-weight: bold;
+}
+
+select, textarea, input[type="file"] {
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 6px;
+	font-size: 14px;
+	color: #334155;
+	background-color: #fff;
+	box-sizing: border-box;
+	transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+select:focus, textarea:focus {
+	outline: none;
+	border-color: #dc2626;
+	box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+textarea {
+	resize: vertical;
+}
+
+input[type="file"] {
+	padding: 8px;
+	background-color: #f8fafc;
+	cursor: pointer;
+}
+
+.preview-container {
+	display: none;
+	margin-top: 12px;
+	text-align: center;
+	background-color: #f8fafc;
+	border: 1px dashed #cbd5e1;
+	border-radius: 6px;
+	padding: 10px;
+	position: relative;
+}
+
+.preview-image {
+	max-width: 100%;
+	max-height: 200px;
+	border-radius: 4px;
+	object-fit: contain;
+}
+
+.btn-group {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-top: 30px;
+}
+
+.btn-submit {
+	flex: 2;
+	background-color: #dc2626;
+	color: white;
+	border: none;
+	padding: 11px;
+	border-radius: 6px;
+	font-size: 15px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	text-align: center;
+}
+
+.btn-submit:hover {
+	background-color: #b91c1c;
+}
+
+.btn-cancel {
+	flex: 1;
+	background-color: white;
+	color: #64748b;
+	border: 1px solid #cbd5e1;
+	padding: 11px;
+	border-radius: 6px;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: none;
+	text-align: center;
+	transition: background-color 0.2s;
+}
+
+.btn-cancel:hover {
+	background-color: #f1f5f9;
+	color: #334155;
+}
+</style>
 </head>
 <body>
 
-    <h2>填寫活動檢舉</h2>
+	<div class="card">
+		<div class="card-header">
+			<svg class="alert-icon" fill="none" viewBox="0 0 24 24"
+				stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+					d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.008v.008H12v-.008Z" />
+            </svg>
+			<h2>填寫活動檢舉</h2>
+		</div>
 
-    <form th:action="@{/activity/rptSubmit}" th:object="${actRptVO}" method="post" enctype="multipart/form-data">
-        
-        <!-- 1. 顯示並綁定被檢舉的活動編號 (唯讀) -->
-        <p>
-            <label>被檢舉的活動編號：</label>
-            <span th:text="*{actId.activityId}">0</span>
-            <input type="hidden" th:field="*{actId.activityId}" />
-        </p>
+		<form th:action="@{/activity/rptSubmit}" th:object="${actRptVO}"
+			method="post" enctype="multipart/form-data">
 
-        <!-- 2. 選擇檢舉類型 -->
-        <p>
-            <label for="rptType">檢舉類型：</label>
-            <select id="rptType" th:field="*{rptType}" required>
-                <option value="">-- 請選擇原因 --</option>
-                <option value="0">詐騙/虛假活動</option>
-                <option value="1">色情/不當活動</option>
-                <option value="2">暴力/危險活動</option>
-                <option value="3">違法行為(聚賭、毒品)</option>
-                <option value="4">其他</option>
-            </select>
-        </p>
+			<!-- 1. 被檢舉的活動編號 -->
+			<div class="form-group">
+				<label>被檢舉的活動編號</label>
+				<div class="readonly-box">
+					No. <span th:text="*{actId.activityId}">0</span>
+				</div>
+				<input type="hidden" th:field="*{actId.activityId}" />
+			</div>
 
-        <!-- 3. 填寫詳細說明 -->
-        <p>
-            <label for="actRptCom">詳細說明：</label><br>
-            <textarea id="actRptCom" th:field="*{actRptCom}" rows="4" cols="40" required placeholder="請輸入檢舉原因..."></textarea>
-        </p>
 
-        <!-- 4. 上傳佐證圖片 -->
-        <p>
-            <label for="imageFile">上傳佐證圖片：</label>
-            <input type="file" id="imageFile" name="imageFile" accept="image/*">
-        </p>
+			<!-- 2. 選擇檢舉類型 -->
+			<div class="form-group">
+				<label for="rptType">檢舉類型</label> <select id="rptType"
+					th:field="*{rptType}" required>
+					<option value="">-- 請選擇原因 --</option>
+					<option value="0">詐騙/虛假活動</option>
+					<option value="1">色情/不當活動</option>
+					<option value="2">暴力/危險活動</option>
+					<option value="3">違法行為(聚賭、毒品)</option>
+					<option value="4">其他</option>
+				</select>
+			</div>
 
-        <!-- 5. 提交按鈕 -->
-        <p>
-            <button type="submit">提交檢舉</button>
-            <a th:href="@{/activity/actButton}">取消返回</a>
-        </p>
+			<!-- 3. 填寫詳細說明 -->
+			<div class="form-group">
+				<label for="actRptCom">詳細說明 (最少 10 個字)</label>
+				<textarea id="actRptCom" th:field="*{actRptCom}" rows="4" required
+					minlength="10" maxlength="500" placeholder="請詳細說明檢舉原因，以利管理員加快審核..."
+					oninput="updateCount(this)"></textarea>
+				<div
+					style="text-align: right; font-size: 12px; color: #64748b; margin-top: 4px;">
+					目前字數: <span id="charCount">0</span> / 500
+				</div>
 
-    </form>
+			</div>
+
+			<!-- 4. 上傳佐證圖片 + 預覽區塊 -->
+			<div class="form-group">
+				<label for="imageFile">上傳佐證圖片</label> <input type="file"
+					id="imageFile" name="imageFile" accept="image/*"
+					onchange="previewImage(this)">
+
+				<!-- 預覽容器，預設隱藏 -->
+				<div id="previewContainer" class="preview-container">
+					<img id="imagePreview" class="preview-image" src="" alt="佐證圖片預覽">
+				</div>
+			</div>
+
+			<!-- 5. 按鈕區 -->
+			<div class="btn-group">
+				<a th:href="@{/activity/actButton}" class="btn-cancel">取消返回</a>
+				<button type="submit" class="btn-submit">提交檢舉</button>
+			</div>
+
+		</form>
+	</div>
+
+	<script>
+		function previewImage(input) {
+			const container = document.getElementById('previewContainer');
+			const preview = document.getElementById('imagePreview');
+
+			if (input.files && input.files[0]) {
+				const reader = new FileReader();
+
+				reader.onload = function(e) {
+					preview.src = e.target.result;
+					container.style.display = 'block';
+				}
+
+				reader.readAsDataURL(input.files[0]);
+			} else {
+				preview.src = '';
+				container.style.display = 'none';
+			}
+		}
+
+		function updateCount(textarea) {
+			document.getElementById('charCount').innerText = textarea.value.length;
+		}
+	</script>
 
 </body>
 </html>

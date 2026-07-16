@@ -89,14 +89,14 @@
 						style="text-align: center; margin-top: 20px; font-family: Arial, sans-serif;">
 
 						<a th:if="${currentPage > 0}"
-							th:href="@{/admin/empPermPage(p=${(currentPage ?: 0) - 1})}"
+							th:href="@{/admin/employees/empPermPage(p=${(currentPage ?: 0) - 1})}"
 							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
 							上一頁 </a> <span
 							style="margin: 0 10px; font-weight: bold; color: #555;"
 							th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?:1} + ' 頁'">
 							第 1 頁 / 共 1 頁 </span> <a
 							th:if="${(currentPage ?: 0) < (totalPages?: 1) - 1}"
-							th:href="@{/admin/empPermPage(p=${currentPage + 1})}"
+							th:href="@{/admin/employees/empPermPage(p=${currentPage + 1})}"
 							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
 							下一頁 </a>
 
