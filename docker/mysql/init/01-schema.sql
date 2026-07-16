@@ -71,11 +71,13 @@ CREATE TABLE EMPLOYEE
   EMP_ACCOUNT       VARCHAR(50)  NOT NULL  UNIQUE COMMENT '登入帳號',
   PASSWORD_HASH     VARCHAR(255) NOT NULL COMMENT '密碼雜湊',
   EMP_NAME          VARCHAR(50)  NOT NULL COMMENT '員工姓名',
-  ROLE_TITLE        TINYINT  NOT NULL COMMENT '職稱:0 系統管理員;1營運總監;2客服專員;3場地審核專員;4財務專員;5行銷專員',
+  ROLE_TITLE        TINYINT  NOT NULL COMMENT '職稱:0 系統管理員;1營運總監;2客服專員;3財務專員;4行銷專員',
   EMP_STATUS        TINYINT  NOT NULL COMMENT '帳號狀態：0未驗證、1正常、2註銷、3停權',
   CREATED_AT        DATETIME COMMENT '建立時間',
   UPDATED_AT        DATETIME COMMENT '更新時間',	
   LAST_LOGIN_AT     DATETIME COMMENT '最後登入時間',
+  RESET_TOKEN VARCHAR(255) NULL COMMENT '密碼重設Token', 
+TOKEN_EXPIRY        DATETIME NULL COMMENT 'Token過期時間', 
   EMP_IMG           LONGBLOB COMMENT '員工頭貼',
   CONSTRAINT EMP_ID_PK PRIMARY KEY (EMPLOYEE_ID)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='員工';
@@ -99,9 +101,8 @@ VALUES
 (7004, 'employee1@webond.com', '$2a$10$DLeRy4Q0ohqaarO535ieue2H4SHmrr/2EHCbvFPT86er88kN2eH6m', '有所有權限者', '0', 1, '2026-05-01 00:00:00', '2026-05-25 00:00:00'),
 (7005, 'employee2@webond.com', '$2a$10$DLeRy4Q0ohqaarO535ieue2H4SHmrr/2EHCbvFPT86er88kN2eH6m', '除了員工管理和交易', '1', 1, '2026-05-01 00:00:00', '2026-05-25 00:00:00'),
 (7006, 'employee3@webond.com', '$2a$10$DLeRy4Q0ohqaarO535ieue2H4SHmrr/2EHCbvFPT86er88kN2eH6m', '處理會員跟檢舉', '2', 1, '2026-05-01 00:00:00', '2026-05-25 00:00:00'),
-(7007, 'employee4@webond.com', '$2a$10$DLeRy4Q0ohqaarO535ieue2H4SHmrr/2EHCbvFPT86er88kN2eH6m', '處理場地審核', '3', 1, '2026-05-01 00:00:00', '2026-05-25 00:00:00'),
-(7008, 'employee5@webond.com', '$2a$10$DLeRy4Q0ohqaarO535ieue2H4SHmrr/2EHCbvFPT86er88kN2eH6m', '處理交易', '4', 1, '2026-05-01 00:00:00', '2026-05-25 00:00:00'),
-(7009, 'employee6@webond.com', '$2a$10$DLeRy4Q0ohqaarO535ieue2H4SHmrr/2EHCbvFPT86er88kN2eH6m', '處理行銷', '5', 1, '2026-05-01 00:00:00', '2026-05-25 00:00:00');
+(7007, 'employee5@webond.com', '$2a$10$DLeRy4Q0ohqaarO535ieue2H4SHmrr/2EHCbvFPT86er88kN2eH6m', '處理交易', '3', 1, '2026-05-01 00:00:00', '2026-05-25 00:00:00'),
+(7008, 'employee6@webond.com', '$2a$10$DLeRy4Q0ohqaarO535ieue2H4SHmrr/2EHCbvFPT86er88kN2eH6m', '處理行銷', '4', 1, '2026-05-01 00:00:00', '2026-05-25 00:00:00');
 
 
 -- =====================================================
@@ -156,16 +157,16 @@ INSERT INTO MEMBER (
     REPORT_POINTS, KYC_ID, REAL_NAME, EMPLOYEE_ID, 
     ID_IMAGE, FACE_IMAGE, ID_NUMBER, KYC_STATUS, SUBMITTED_AT, REVIEWED_AT, BANK_CODE, BANK_ACCOUNT
 ) VALUES 
-(1, '$2a$10$hash001', '小咪', NULL, 1, '0912345678', 'mimi@email.com', '喜歡羽球與慢跑', 1,  CURDATE(), 60, 12, 44, 8, 60, 15, 25, 5, 0, 1001, '林小咪', 1003, NULL, NULL, 'F223456789', 1, '2026-04-15', '2026-04-17', '007', '123456789012'),
-(2, '$2a$10$hash002', '小汪', NULL, 0, '0922333444', 'wang@email.com', '熱愛揪團打球', 1,  CURDATE(), 100, 20, 42, 10, 48, 18, 4.4, 6, 0, 1002, '王大汪', 1003,NULL, NULL, 'A123456789', 1, '2026-04-15', '2026-04-18', '822', '987654321098'),
-(3, '$2a$10$hash003', '小鹿', NULL, 2, '0955666777', 'bambi@email.com', '喜歡參加各種活動', 3,  CURDATE(), 25, 5, 7, 2, 28, 4, 2.7, 1, 7, 1003, '張小鹿', 1003, NULL, NULL, 'E199999999', 1, '2026-04-15', '2026-04-18', '013', '555666777888'),
-(4, '$2a$10$hash004', '歐巴', NULL, 0, '0933111222', 'oppa@email.com', '提供專業陪打服務', 1,  CURDATE(), 80, 50, 80, 120, 120, 80, 277, 60, 0, 1004, '崔歐巴', 1003, NULL, NULL, 'A112233445', 1, '2025-06-10', '2025-06-12', '012', '999888777666'),
-(5, '$2a$10$hash005', '達人阿奇', NULL, 0, '0955999888', 'achie@email.com', '揪團狂熱份子', 1,  CURDATE() , 400, 80, 50, 30, 4.8, 100, 120, 25, 0, 1005, '洪阿奇', 1003, NULL, NULL, 'H123456789', 1, '2025-11-15', '2025-11-18', '812', '111222333444'),
-(6, '$2a$10$hash006', 'Tom', NULL, 0, '0911222333', 'tom@gmail.com', '專業羽球教練', 1,  CURDATE(), 400, 10, 33, 8, 37, 5, 0, 0, 0, 1006, 'Tom Chen', 1003,NULL, NULL, 'T123456789', 1, '2026-04-20', '2026-04-21', '007', '123456789012'),
-(7, '$2a$10$hash007', 'Mary', NULL, 1, '0922333444', 'mary@gmail.com', '喜歡揪團打球', 1,  CURDATE() , 35, 7, 25, 5, 38, 9, 0, 0, 0, 1007, 'Mary Lin', 1003, NULL, NULL, 'M223456789', 1, '2026-04-20', '2026-04-21', '822', '123456789012'),
-(8, '$2a$10$hash008', 'John', NULL, 0, '0933444555', 'john@gmail.com', '場地管理員', 1,  CURDATE(), 43, 15, 27, 14, 47, 10, 0, 0, 0, 1008, 'John Wang', 1003, NULL, NULL, 'J123456789', 1, '2026-04-20', '2026-04-21', '700', '123456789012'),
-(9, '$2a$10$hash009', 'Lisa', NULL, 1, '0944555666', 'lisa@gmail.com', '熱愛運動與旅行', 0,  CURDATE(), 13, 4, 23, 6, 9, 3, 6, 5, 0, 1009, 'Lisa Huang', 1003, NULL, NULL, 'L123456789', 0, '2026-04-20', NULL, '012', '123456789012'),
-(10, '$2a$10$hash010', 'Kevin', NULL, 0, '0955666777', 'kevin@gmail.com', '兼職教練與活動主辦', 1,  CURDATE(), 11, 6, 9, 4, 13, 5, 7, 2, 1, 1010, 'Kevin Lee', 1003, NULL, NULL, 'F123456789', 2, '2026-04-20', '2026-04-22', '808', '123456789012'),
+(1, '$2a$10$na53f.GCUQp0hYuuNXFPReOcnpeCO/gRSpsGHY4uYbn1OKXZvA.8e', '小咪', NULL, 1, '0912345678', 'david01@gmail.com', '喜歡羽球與慢跑', 1,  CURDATE(), 60, 12, 44, 8, 60, 15, 25, 5, 0, 1001, '林小咪', 1003, NULL, NULL, 'F223456789', 1, '2026-04-15', '2026-04-17', '007', '123456789012'),
+(2, '$2a$10$na53f.GCUQp0hYuuNXFPReOcnpeCO/gRSpsGHY4uYbn1OKXZvA.8e', '小汪', NULL, 0, '0922333444', 'david02@gmail.com', '熱愛揪團打球', 1,  CURDATE(), 100, 20, 42, 10, 48, 18, 4.4, 6, 0, 1002, '王大汪', 1003,NULL, NULL, 'A123456789', 1, '2026-04-15', '2026-04-18', '822', '987654321098'),
+(3, '$2a$10$na53f.GCUQp0hYuuNXFPReOcnpeCO/gRSpsGHY4uYbn1OKXZvA.8e', '小鹿', NULL, 2, '0955666777', 'david03@gmail.com', '喜歡參加各種活動', 3,  CURDATE(), 25, 5, 7, 2, 28, 4, 2.7, 1, 7, 1003, '張小鹿', 1003, NULL, NULL, 'E199999999', 1, '2026-04-15', '2026-04-18', '013', '555666777888'),
+(4, '$2a$10$na53f.GCUQp0hYuuNXFPReOcnpeCO/gRSpsGHY4uYbn1OKXZvA.8e', '歐巴', NULL, 0, '0933111222', 'david04@gmail.com', '提供專業陪打服務', 1,  CURDATE(), 80, 50, 80, 120, 120, 80, 277, 60, 0, 1004, '崔歐巴', 1003, NULL, NULL, 'A112233445', 1, '2025-06-10', '2025-06-12', '012', '999888777666'),
+(5, '$2a$10$na53f.GCUQp0hYuuNXFPReOcnpeCO/gRSpsGHY4uYbn1OKXZvA.8e', '達人阿奇', NULL, 0, '0955999888', 'david05@gmail.com', '揪團狂熱份子', 1,  CURDATE() , 400, 80, 50, 30, 4.8, 100, 120, 25, 0, 1005, '洪阿奇', 1003, NULL, NULL, 'H123456789', 1, '2025-11-15', '2025-11-18', '812', '111222333444'),
+(6, '$2a$10$na53f.GCUQp0hYuuNXFPReOcnpeCO/gRSpsGHY4uYbn1OKXZvA.8e', 'Tom', NULL, 0, '0911222333', 'david06@gmail.com', '專業羽球教練', 1,  CURDATE(), 400, 10, 33, 8, 37, 5, 0, 0, 0, 1006, 'Tom Chen', 1003,NULL, NULL, 'T123456789', 1, '2026-04-20', '2026-04-21', '007', '123456789012'),
+(7, '$2a$10$na53f.GCUQp0hYuuNXFPReOcnpeCO/gRSpsGHY4uYbn1OKXZvA.8e', 'Mary', NULL, 1, '0922333444', 'david07@gmail.com', '喜歡揪團打球', 1,  CURDATE() , 35, 7, 25, 5, 38, 9, 0, 0, 0, 1007, 'Mary Lin', 1003, NULL, NULL, 'M223456789', 1, '2026-04-20', '2026-04-21', '822', '123456789012'),
+(8, '$2a$10$na53f.GCUQp0hYuuNXFPReOcnpeCO/gRSpsGHY4uYbn1OKXZvA.8e', 'John', NULL, 0, '0933444555', 'david08@gmail.com', '場地管理員', 1,  CURDATE(), 43, 15, 27, 14, 47, 10, 0, 0, 0, 1008, 'John Wang', 1003, NULL, NULL, 'J123456789', 1, '2026-04-20', '2026-04-21', '700', '123456789012'),
+(9, '$2a$10$na53f.GCUQp0hYuuNXFPReOcnpeCO/gRSpsGHY4uYbn1OKXZvA.8e', 'Lisa', NULL, 1, '0944555666', 'david09@gmail.com', '熱愛運動與旅行', 0,  CURDATE(), 13, 4, 23, 6, 9, 3, 6, 5, 0, 1009, 'Lisa Huang', 1003, NULL, NULL, 'L123456789', 0, '2026-04-20', NULL, '012', '123456789012'),
+(10, '$2a$10$na53f.GCUQp0hYuuNXFPReOcnpeCO/gRSpsGHY4uYbn1OKXZvA.8e', 'Kevin', NULL, 0, '0955666777', 'david10@gmail.com', '兼職教練與活動主辦', 1,  CURDATE(), 11, 6, 9, 4, 13, 5, 7, 2, 1, 1010, 'Kevin Lee', 1003, NULL, NULL, 'F123456789', 2, '2026-04-20', '2026-04-22', '808', '123456789012'),
 (11,'$2a$10$SY.goAPRT.qSAKN.OHtaA.3WxOHFxFPNzYf.G2C5rEclV.t.Ov2we' , 'tomcat01', NULL, 0, '0912000001', 'tomcat01@email.com', '我是 tomcat01，帳號功能正常', 1, CURDATE(), 0, 0, 0, 0, 0, 0, 0, 0, 0, 1011, '湯姆一號', 1003, NULL, NULL, 'B123456789', 1, NOW(), NOW(), '822', '123456789012'),
 (12, '$2a$10$SY.goAPRT.qSAKN.OHtaA.3WxOHFxFPNzYf.G2C5rEclV.t.Ov2we', 'tomcat02', NULL, 1, '0912000002', 'tomcat02@email.com', '我是 tomcat02，剛註冊待審核', 0, CURDATE(), 0, 0, 0, 0, 0, 0, 0, 0, 0, 1012, '湯姆二號', NULL, NULL, NULL, 'C220011223', 0, NOW(), NULL, '013', '008123456789'),
 (13, '$2a$10$SY.goAPRT.qSAKN.OHtaA.3WxOHFxFPNzYf.G2C5rEclV.t.Ov2we', 'tomcat03', NULL, 2, '0912000003', 'tomcat03@email.com', '我是 tomcat03，實名審核失敗', 2, CURDATE(), 0, 0, 0, 0, 0, 0, 0, 0, 0, 1013, '湯姆三號', 1003, NULL, NULL, 'D188776655', 2, NOW(), NOW(), '700', '00012345678912'),
@@ -192,9 +193,8 @@ INSERT INTO PERMISSION (PERMISSION_ID, PERMISSION_NAME, PERM_DESCRIPTION) VALUES
 (3, '活動管理', '會員對揪團活動的檢舉審核與管理，爭議訂單的檢舉審核與管理，惡意評價檢舉的審核與管理。'),
 (4, '場地管理', '爭議訂單的檢舉審核與管理，場地訂單，惡意評價檢舉的審核與管理。'),
 (5, '會員管理', '負責會員的KYC審核，會員狀態的管理，會員的停權與復權管理。'),
-(6, '場地審核管理', '負責場地審核的管理。'),
-(7, '訂單交易管理', '負責付款狀態管理，撥款狀態管理，對交易紀錄的訂單及收入總額進行管理，包括服務訂單、揪團活動訂單及場地訂單。'),
-(8, '平台管理', '平台內容管理，包括消息的發布、公告的管理及FAQ的管理。');
+(6, '訂單交易管理', '負責付款狀態管理，撥款狀態管理，對交易紀錄的訂單及收入總額進行管理，包括服務訂單、揪團活動訂單及場地訂單。'),
+(7, '平台管理', '平台內容管理，包括消息的發布、公告的管理及FAQ的管理。');
 
 CREATE TABLE EMPLOYEE_PERMISSION
 ( EMP_PERM_ID       INT  NOT NULL AUTO_INCREMENT COMMENT '員工權限編號',
@@ -221,20 +221,18 @@ INSERT INTO EMPLOYEE_PERMISSION (EMPLOYEE_ID, PERMISSION_ID, ASSIGNED_AT)VALUES
 (7004, 5, '2025-05-22 00:00:00'),
 (7004, 6, '2025-05-22 00:00:00'),
 (7004, 7, '2025-05-22 00:00:00'),
-(7004, 8, '2025-05-22 00:00:00'),
 (7005, 2, '2025-05-22 00:00:00'),
 (7005, 3, '2025-05-22 00:00:00'),
 (7005, 4, '2025-05-22 00:00:00'),
 (7005, 5, '2025-05-22 00:00:00'),
-(7005, 6, '2025-05-22 00:00:00'),
-(7005, 8, '2025-05-22 00:00:00'),
+(7005, 7, '2025-05-22 00:00:00'),
 (7006, 2, '2025-05-22 00:00:00'),
 (7006, 3, '2025-05-22 00:00:00'),
 (7006, 4, '2025-05-22 00:00:00'),
 (7006, 5, '2025-05-22 00:00:00'),
+(7006, 6, '2025-05-22 00:00:00'),
 (7007, 6, '2025-05-22 00:00:00'),
-(7008, 7, '2025-05-22 00:00:00'),
-(7009, 8, '2025-05-22 00:00:00');
+(7008, 7, '2025-05-22 00:00:00');
 
 
 
@@ -1413,10 +1411,11 @@ INSERT INTO VENUE (VENUE_ID, MEMBER_ID, VENUE_TYPE_ID, VENUE_NAME, ADDRESS, CAPA
 (2001, 8, 1, '羽球場', '臺中市北區北屯路99號', 10, 500, 1, '1111111', '222222220000000000002222', '超讚的場地', 5, 1),
 (2002, 8, 2, '桌遊店', '臺北市中山區123號', 10, 1000, 2, '1111111', '222222220000000000002222', '超讚的場地', 0, 0),
 (2003, 8, 4, '會議室', '桃園市中壢區123號', 30, 1500, 1, '0111001', '222222220000000000002222', '超讚的場地', 5, 1),
-(2004, 11, 3, '大場地', '臺中市北區北屯路99號', 100, 5000, 1, '1111111', '222222220000000000002222', '超讚的場地', 0, 0),
-(2005, 12, 1, '桌球場', '臺中市北區北屯路99號', 15, 500, 1, '1111111', '222222220000000000002222', '超讚的場地', 0, 0),
-(2006, 13, 3, '活動場地', '臺中市北區北屯路99號', 50, 500, 1, '1111111', '222222220000000000002222', '超讚的場地', 0, 0),
-(2007, 14, 1, '桌遊場地', '臺中市北區北屯路99號', 20, 500, 1, '1111111', '222222220000000000002222', '超讚的場地', 0, 0);
+(2004, 8, 3, '大場地', '臺中市北區北屯路99號', 100, 5000, 1, '1111111', '222222220000000000002222', '超讚的場地', 0, 0),
+(2005, 8, 1, '桌球場', '臺中市北區北屯路99號', 15, 500, 1, '1111111', '222222220000000000002222', '超讚的場地', 0, 0),
+(2006, 8, 3, '活動場地', '臺中市北區北屯路99號', 50, 500, 1, '1111111', '222222220000000000002222', '超讚的場地', 0, 0),
+(2007, 8, 1, '桌遊場地', '臺中市北區北屯路99號', 20, 500, 1, '1111111', '222222220000000000002222', '超讚的場地', 0, 0);
+
 
 
 
@@ -1482,11 +1481,17 @@ CREATE TABLE VENUE_ORDER(
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci AUTO_INCREMENT = 6001 COMMENT='場地訂單';
 
 INSERT INTO VENUE_ORDER (VENUE_ID, MEMBER_ID, VENUE_RATING, VENUE_COMMENT, START_AT, END_AT, TOTAL_AMOUNT, VENUE_PAYMENT_METHOD, BOOKING_DATE,ORDER_STATUS) VALUES
-(2001, 8, 5, '乾淨', '13:00:00', '15:00:00', 1000, 0, '2026-07-12', 3);
-INSERT INTO VENUE_ORDER (VENUE_ID, MEMBER_ID, EMPLOYEE_ID, REFUND_REASON, REFUND_STATUS, START_AT, END_AT, TOTAL_AMOUNT, VENUE_PAYMENT_METHOD, BOOKING_DATE,ORDER_STATUS) VALUES
-(2002, 8, 7001, '找到更好的場地', 0, '15:00:00', '17:00:00', 1000, 1, '2026-07-10', 4);
-INSERT INTO VENUE_ORDER (VENUE_ID, MEMBER_ID, EMPLOYEE_ID, VENUE_RATING, VENUE_COMMENT, START_AT, END_AT, TOTAL_AMOUNT, VENUE_PAYMENT_METHOD, BOOKING_DATE,ORDER_STATUS) VALUES
-(2003, 8, 7001, 5, '乾淨', '15:00:00', '17:00:00', 1000, 1, '2026-07-10', 3);
+(2001, 11, 5, '乾淨', '13:00:00', '15:00:00', 1000, 0, '2026-07-12', 3);
+INSERT INTO VENUE_ORDER (VENUE_ID, MEMBER_ID, REFUND_REASON, REFUND_STATUS, START_AT, END_AT, TOTAL_AMOUNT, VENUE_PAYMENT_METHOD, BOOKING_DATE,ORDER_STATUS) VALUES
+(2002, 11, '找到更好的場地', 0, '15:00:00', '17:00:00', 1000, 1, '2026-07-10', 4);
+INSERT INTO VENUE_ORDER (VENUE_ID, MEMBER_ID, VENUE_RATING, VENUE_COMMENT, START_AT, END_AT, TOTAL_AMOUNT, VENUE_PAYMENT_METHOD, BOOKING_DATE,ORDER_STATUS) VALUES
+(2003, 11, 5, '乾淨', '15:00:00', '17:00:00', 1000, 1, '2026-07-10', 3);
+INSERT INTO VENUE_ORDER (VENUE_ID, MEMBER_ID, START_AT, END_AT, TOTAL_AMOUNT, VENUE_PAYMENT_METHOD, BOOKING_DATE,ORDER_STATUS) VALUES
+(2004, 11, '15:00:00', '17:00:00', 1000, 1, '2026-07-10', 3);
+INSERT INTO VENUE_ORDER (VENUE_ID, MEMBER_ID, START_AT, END_AT, TOTAL_AMOUNT, VENUE_PAYMENT_METHOD, BOOKING_DATE,ORDER_STATUS) VALUES
+(2005, 11, '15:00:00', '17:00:00', 1000, 1, '2026-07-10', 3);
+
+
 
 
 CREATE TABLE VENUE_REPORT (
