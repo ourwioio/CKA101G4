@@ -21,7 +21,7 @@ import com.webond.venue.service.VenueTypeService;
 
 import jakarta.transaction.Transactional;
 
-@SpringBootApplication // 注意: 當使用 maven install 匯出 jar 檔時，整個系統只能保留一個 @SpringBootApplication 的設定
+//@SpringBootApplication // 注意: 當使用 maven install 匯出 jar 檔時，整個系統只能保留一個 @SpringBootApplication 的設定
 public class TestVenue_Application_CommandLineRunner implements CommandLineRunner {
 
 	@Autowired
