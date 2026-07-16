@@ -1,81 +1,395 @@
-<!doctype html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-<title>通知更新</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>修改通知 - Webond 後台管理</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: #2d3436;
+            background: #f5f6fa;
+            font-family: Arial, "Noto Sans TC", sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* =========================================
+           表單頁面主容器
+           ========================================= */
+        .form-container {
+            width: 100%;
+            max-width: 750px; /* 寬度稍微拉寬，以容納並排的唯讀屬性 */
+            margin: 0 auto;
+        }
+
+        /* =========================================
+           頁面標頭
+           ========================================= */
+        .page-header {
+            margin-bottom: 28px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #dfe4e8;
+        }
+
+        .page-title {
+            margin: 0 0 8px;
+            font-size: 30px;
+            color: #2d3436;
+        }
+
+        .page-subtitle {
+            margin: 0;
+            color: #636e72;
+            font-size: 15px;
+        }
+
+        /* =========================================
+           卡片式表單區塊
+           ========================================= */
+        .form-card {
+            background: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+        }
+
+        /* 表單區段標題（如：唯讀資訊、內容編輯） */
+        .form-section-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2d3436;
+            margin: 0 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #343a40;
+        }
+
+        .form-section-title--readonly {
+            border-bottom-color: #b2bec3;
+            color: #636e72;
+        }
+
+        /* 雙欄網格（用於系統唯讀欄位排版） */
+        .readonly-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #dfe4e8;
+        }
+
+        /* 表單單一列 */
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        /* 欄位標題 */
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #2d3436;
+        }
+
+        /* 唯讀狀態下的欄位標題 */
+        .form-label--readonly {
+            color: #636e72;
+        }
+
+        /* 輸入框、下拉選單、文本域共用樣式 */
+        .form-control {
+            width: 100%;
+            padding: 11px 15px;
+            font-size: 14px;
+            color: #2d3436;
+            background-color: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .form-control:focus {
+            border-color: #0984e3; /* 財務藍焦點外框 */
+            box-shadow: 0 0 0 3px rgba(9, 132, 227, 0.15);
+        }
+
+        /* 唯讀/禁用輸入框外觀 */
+        .form-control:disabled {
+            background-color: #eef1f6;
+            color: #747d8c;
+            cursor: not-allowed;
+            border-color: #dfe4e8;
+        }
+
+        /* 文本域樣式 */
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* =========================================
+           唯讀文字區塊樣式（備註、檢舉編號等）
+           ========================================= */
+        .readonly-text-box {
+            background: #f8fafc;
+            border: 1px solid #dfe4e8;
+            border-radius: 6px;
+            padding: 12px 16px;
+            min-height: 44px;
+            color: #2d3436;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .readonly-text-box:empty::before {
+            content: "無資料";
+            color: #b2bec3;
+            font-style: italic;
+        }
+
+        /* =========================================
+           員工資訊與 Badge 樣式
+           ========================================= */
+        .employee-info-box {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f8fafc;
+            border: 1px solid #dfe4e8;
+            border-radius: 6px;
+            padding: 12px 18px;
+            margin-bottom: 30px;
+        }
+
+        .employee-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #636e72;
+        }
+
+        .employee-badge {
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: #0984e3;
+            background: #e1f5fe;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        /* =========================================
+           錯誤驗證訊息
+           ========================================= */
+        .error-feedback {
+            display: block;
+            margin-top: 6px;
+            color: #c0392b; /* 警示紅 */
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* =========================================
+           表單動作按鈕
+           ========================================= */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            padding-top: 15px;
+            border-top: 1px solid #dfe4e8;
+        }
+
+        .btn-form {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 9px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.15s ease;
+            border: none;
+            white-space: nowrap;
+        }
+
+        /* 返回按鈕 (灰色框線樣式) */
+        .btn-form--cancel {
+            background: #ffffff;
+            color: #636e72;
+            border: 1px solid #dfe4e8;
+        }
+
+        .btn-form--cancel:hover {
+            background: #f5f6fa;
+            color: #2d3436;
+            border-color: #b2bec3;
+        }
+
+        /* 儲存按鈕 (深灰色底樣式) */
+        .btn-form--submit {
+            background: #343a40;
+            color: #ffffff;
+        }
+
+        .btn-form--submit:hover {
+            background: #111111;
+            transform: translateY(-1px);
+        }
+
+        /* =========================================
+           響應式 RWD 調整
+           ========================================= */
+        @media (max-width: 650px) {
+            .readonly-grid {
+                grid-template-columns: 1fr; /* 小螢幕自動切換為單欄 */
+            }
+        }
+    </style>
 </head>
 
 <body>
-	<form th:action="@{/admin/platform/notification/update}" method="post"
-		th:object="${notificationVO}">
-		<input type="hidden" th:field="*{notificationId}" /> 
-		<input type="hidden" th:field="*{member.memberId}" />
-		<div>
-			<label for="">通知編號</label> <input type="text" name="" id="" th:value="*{notificationId}" disabled />
-		</div>
-		<div>
-			<label for="">建立時間</label> <input type="text" th:value="*{createdAt}"
-				disabled />
-		</div>
-		<div>
-			<label for="">是否已讀</label> <input type="text" name="" id=""
-				th:value="*{isRead}" disabled />
-		</div>
-		<div>
-			<label for="">會員編號</label> <input type="text"
-				th:value="*{member.memberId}" placeholder="請輸入會員編號">
-		</div>
-		<div>
-			<label for="">標題</label> <input type="text" th:field="*{title}"
-				placeholder="請輸入標題名稱" /> <label for=""
-				th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></label>
-		</div>
-		<div>
-			<label for="">內容</label>
-			<textarea th:field="*{content}" placeholder="請輸入內容"></textarea>
-		</div>
-		<div>
-			<label for="">通知類型</label> <select name="" id=""
-				th:field="*{notificationType}">
-				<option value="">請選擇類型</option>
-				<option value="0">訂單通知</option>
-				<option value="1">評價通知</option>
-				<option value="2">系統通知</option>
-				<option value="3">聊天室</option>
-			</select> <span th:if="${#fields.hasErrors('notificationType')}"
-				th:errors="*{notificationType}"></span>
-		</div>
-		<div>
-			<label for="">管理員處裡備註</label>
-			<p th:text="${notificationVO.report?.adminNote}"></p>
-		</div>
-		<div>
-			<label for="">檢舉編號</label>
-			<p th:text="${notificationVO.report?.reportId}"></p>
-		</div>
-		<div>
-			<label for="">員工編號</label>
-			<!-- <select th:field="*{employee}">
-          <option value="">請選擇員工</option>
-          <option
-            th:each="emp : ${empList}"
-            th:value="${emp.employeeId}"
-            th:text="${emp.employeeName}"
-          ></option>
-        </select> -->
-			<p th:text="${session.employeeVO?.employeeId}"></p>
-			<input type="hidden" name="employee.employeeId"
-				th:value="${session.employeeVO?.employeeId}" />
-		</div>
-		<div>
-			<button type="button">
-				<a th:href="@{/admin/platform/notification/listAllNotification}">返回</a>
-			</button>
 
-			<button type="submit">儲存</button>
-		</div>
-	</form>
+<div class="wb-admin-layout">
+
+    <!-- =========================================
+         左側共用後台 Sidebar (維持原引入方式)
+         ========================================= -->
+    <div th:replace="~{back-end/fragments/adminSidebar:: adminSidebar}"></div>
+
+    <!-- =========================================
+         右側主要內容區
+         ========================================= -->
+    <main class="wb-admin-content">
+
+        <div class="form-container">
+
+            <!-- =====================================
+                 頁面標頭
+                 ===================================== -->
+            <header class="page-header">
+                <h1 class="page-title">修改通知</h1>
+                <p class="page-subtitle">更新已發布通知的內容資訊、變更目標會員與分類狀態。</p>
+            </header>
+
+            <!-- =====================================
+                 修改通知表單
+                 ===================================== -->
+            <div class="form-card">
+
+                <form th:action="@{/admin/platform/notification/update}" method="post" th:object="${notificationVO}">
+                    
+                    <!-- 隱藏的主鍵 & 關聯欄位 (維持不變) -->
+                    <input type="hidden" th:field="*{notificationId}" /> 
+                    <input type="hidden" th:field="*{member.memberId}" />
+
+                    <!-- Section 1: 系統唯讀資訊 -->
+                    <h3 class="form-section-title form-section-title--readonly">系統唯讀資訊</h3>
+                    
+                    <div class="readonly-grid">
+                        <!-- 通知編號 -->
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label form-label--readonly">通知編號</label>
+                            <input type="text" class="form-control" th:value="*{notificationId}" disabled />
+                        </div>
+                        
+                        <!-- 建立時間 -->
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label form-label--readonly">建立時間</label>
+                            <input type="text" class="form-control" th:value="*{createdAt}" disabled />
+                        </div>
+                        
+                        <!-- 是否已讀 -->
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label class="form-label form-label--readonly">已讀狀態</label>
+                            <input type="text" class="form-control" th:value="*{isRead} ? '已讀' : '未讀'" disabled />
+                        </div>
+
+                        
+                    </div>
+
+                    <!-- 管理員處理備註 (若有則獨立於下方顯示) -->
+                    <div class="form-group" th:if="${notificationVO.report?.adminNote != null}">
+                        <label class="form-label form-label--readonly">管理員處理備註</label>
+                        <p class="readonly-text-box" th:text="${notificationVO.report?.adminNote}"></p>
+                    </div>
+
+
+                    <!-- Section 2: 通知內容編輯 -->
+                    <h3 class="form-section-title">編輯通知欄位</h3>
+
+                    <!-- 會員編號 -->
+                    <div class="form-group">
+                        <label class="form-label">目標會員編號</label>
+                        <!-- 原 HTML 寫法 th:value 且無 th:field，此處百分之百維持你原本的傳值設計 -->
+                        <input type="text" class="form-control" th:value="*{member.memberId}" placeholder="請輸入會員編號">
+                    </div>
+
+                    <!-- 標題 -->
+                    <div class="form-group">
+                        <label class="form-label">通知標題</label>
+                        <input type="text" class="form-control" th:field="*{title}" placeholder="請輸入標題名稱" />
+                        <!-- Spring Validation 錯誤訊息 -->
+                        <div class="error-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                    </div>
+
+                    <!-- 內容 -->
+                    <div class="form-group">
+                        <label class="form-label">通知內容</label>
+                        <textarea class="form-control" th:field="*{content}" placeholder="請輸入通知內容"></textarea>
+                    </div>
+
+                    <!-- 通知類型 -->
+                    <div class="form-group">
+                        <label class="form-label">通知類型</label>
+                        <select class="form-control" th:field="*{notificationType}" disabled>   
+                            <option value="2">系統通知</option>
+                        </select>
+                        <input type="hidden" name="notificationType" value="2" />
+                        <span class="error-feedback" th:if="${#fields.hasErrors('notificationType')}" th:errors="*{notificationType}"></span>
+                    </div>
+
+                    <!-- 負責員工 (唯讀整合) -->
+                    <div class="employee-info-box">
+                        <span class="employee-label">目前經辦員工 :</span>
+                        <span class="employee-badge" th:text="${session.employeeVO?.employeeId}">暫無登入</span>
+                        
+                        <!-- 隱藏提交欄位保持原樣 -->
+                        <input type="hidden" name="employee.employeeId" th:value="${session.employeeVO?.employeeId}" />
+                    </div>
+
+                    <!-- 表單按鈕 -->
+                    <div class="form-actions">
+                        <!-- 返回按鈕更換為標準 A 標籤按鈕化，移除嵌套 button 提升 HTML 合規度 -->
+                        <a class="btn-form btn-form--cancel" th:href="@{/admin/platform/notification/listAllNotification}">返回</a>
+                        <button type="submit" class="btn-form btn-form--submit">儲存修改</button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
 </body>
 </html>
