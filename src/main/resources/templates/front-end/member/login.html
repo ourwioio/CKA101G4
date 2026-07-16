@@ -1,197 +1,342 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Webond 會員登入</title>
-    <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Microsoft JhengHei"; 
-            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%); 
-            min-height: 100vh;
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .login-box { 
-            width: 100%;
-            max-width: 450px; 
-            background: #ffffff; 
-            padding: 40px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(186, 230, 253, 0.6); 
-        }
-        h2 { 
-            text-align: center; 
-            color: #0369a1; 
-            margin-top: 0;
-            margin-bottom: 5px; 
-            font-size: 26px;
-        }
-        p.subtitle {
-            text-align: center;
-            color: #64748b;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-        .form-group { 
-            margin-bottom: 20px; 
-            text-align: left;
-        }
-        .label-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-        }
-        label { 
-            font-weight: 600; 
-            color: #0c4a6e; 
-            font-size: 14px;
-        }
-        .forgot-link {
-            font-size: 13px;
-            color: #0284c7;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s ease;
-        }
-        .forgot-link:hover {
-            color: #0369a1;
-            text-decoration: underline;
-        }
-        input[type="text"], input[type="email"], input[type="password"] { 
-            width: 100%; 
-            padding: 12px; 
-            box-sizing: border-box; 
-            border: 1.5px solid #cbd5e1; 
-            border-radius: 8px; 
-            font-size: 14px;
-            background-color: #f8fafc;
-            transition: all 0.3s ease;
-        }
-        input:focus {
-            outline: none;
-            border-color: #38bdf8;
-            background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
-        }
-        button { 
-            width: 100%; 
-            padding: 14px; 
-            background: #0ea5e9; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-size: 16px; 
-            font-weight: bold;
-            transition: background 0.2s ease;
-            margin-top: 10px;
-        }
-        button:hover { 
-            background: #0284c7; 
-        }
-        
-        /* 🎯 高質感錯誤訊息提示框 (紅色) */
-        .error-message {
-            padding: 0.75rem; 
-            font-size: 0.875rem; 
-            color: #b91c1c; 
-            background-color: #fee2e2; 
-            border: 1px solid #fca5a5; 
-            border-radius: 0.5rem; 
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            text-align: left;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Webond 會員登入</title>
 
-        .error-message svg {
-            width: 1.25rem; 
-            height: 1.25rem; 
-            margin-right: 0.5rem; 
-            fill: currentColor;
-            flex-shrink: 0;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-        /* 🟢 高質感成功訊息提示框 (綠色) */
-        .success-message {
-            padding: 0.75rem; 
-            font-size: 0.875rem; 
-            color: #15803d; 
-            background-color: #dcfce7; 
-            border: 1px solid #86efac; 
-            border-radius: 0.5rem; 
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            text-align: left;
-        }
+<style>
+:root {
+	--color-bg: #F7F3EC;
+	--color-surface: #FFFFFF;
+	--color-surface-soft: #FFFDF8;
+	--color-ink: #17140F;
+	--color-ink-soft: #726A5F;
+	--color-border: #ECE4D6;
+	--color-yellow: #FFE59A;
+	--color-yellow-deep: #FFC94D;
+	--font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+	--font-body: 'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+	--radius-lg: 26px;
+	--radius-md: 16px;
+	--radius-full: 999px;
+	--shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+	--shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+}
 
-        .success-message svg {
-            width: 1.25rem; 
-            height: 1.25rem; 
-            margin-right: 0.5rem; 
-            fill: currentColor;
-            flex-shrink: 0;
-        }
+* {
+	box-sizing: border-box;
+}
 
-        .register-link {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 14px;
-            color: #64748b;
-        }
-        .register-link a {
-            color: #0ea5e9;
-            text-decoration: none;
-            font-weight: bold;
-        }
-    </style>
+body {
+	font-family: var(--font-body);
+	background-color: var(--color-bg);
+	min-height: 100vh;
+	margin: 0;
+	padding: 40px 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: var(--color-ink);
+}
+
+.login-box {
+	width: 100%;
+	max-width: 440px;
+	background: var(--color-surface);
+	padding: 44px 40px;
+	border-radius: var(--radius-lg);
+	border: 1px solid var(--color-border);
+	box-shadow: var(--shadow-md);
+}
+
+/* 🌙 首頁角色插畫（縮小版） */
+.auth-mascot {
+	position: relative;
+	width: 100%;
+	max-width: 130px;
+	aspect-ratio: 1 / 0.95;
+	margin: 0 auto 18px;
+}
+
+.auth-mascot__blob {
+	position: absolute;
+	inset: 12% 6% 10% 18%;
+	background: var(--color-yellow);
+	border-radius: 58% 42% 48% 52% / 44% 55% 45% 56%;
+}
+
+.auth-mascot__head {
+	position: absolute;
+	top: 0;
+	right: 6%;
+	width: 66%;
+	height: 66%;
+	background: var(--color-surface-soft);
+	border: 1.5px solid var(--color-border);
+	border-radius: 56% 44% 45% 55% / 58% 50% 50% 42%;
+	box-shadow: var(--shadow-sm);
+}
+
+.auth-mascot__head .eye {
+	position: absolute;
+	top: 44%;
+	width: 9px;
+	height: 11px;
+	background: var(--color-ink);
+	border-radius: 50%;
+}
+
+.auth-mascot__head .eye--l {
+	left: 30%;
+}
+
+.auth-mascot__head .eye--r {
+	left: 52%;
+}
+
+/* 🏷️ 品牌小標 */
+.auth-brand {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	margin-bottom: 4px;
+}
+
+.auth-brand-mark {
+	display: flex;
+	gap: 4px;
+}
+
+.auth-brand-eye {
+	position: relative;
+	width: 12px;
+	height: 12px;
+	background: var(--color-ink);
+	border-radius: 50%;
+}
+
+.auth-brand-eye::after {
+	content: '';
+	position: absolute;
+	width: 3px;
+	height: 3px;
+	top: 2.5px;
+	left: 2.5px;
+	background: #fff;
+	border-radius: 50%;
+}
+
+.auth-brand-text {
+	font-family: var(--font-display);
+	font-weight: 800;
+	font-size: 14px;
+	letter-spacing: 0.5px;
+	color: var(--color-ink);
+}
+
+.header-group {
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+h2 {
+	font-family: var(--font-display);
+	font-size: 26px;
+	font-weight: 800;
+	color: var(--color-ink);
+	margin: 0 0 6px;
+}
+
+.subtitle {
+	color: var(--color-ink-soft);
+	font-size: 14px;
+	margin: 0;
+}
+
+.form-group {
+	margin-bottom: 22px;
+}
+
+label {
+	font-weight: 700;
+	font-size: 14px;
+	color: var(--color-ink);
+	margin-bottom: 8px;
+	display: block;
+}
+
+.password-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 8px;
+}
+
+.password-header label {
+	margin-bottom: 0;
+}
+
+.forgot-link {
+	font-size: 13px;
+	color: var(--color-ink-soft);
+	text-decoration: underline;
+	transition: color 0.15s ease;
+}
+
+.forgot-link:hover {
+	color: var(--color-ink);
+}
+
+input[type="email"], input[type="password"] {
+	width: 100%;
+	padding: 14px 16px;
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-md);
+	background: var(--color-surface-soft);
+	font-size: 15px;
+	font-family: inherit;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="email"]:focus, input[type="password"]:focus {
+	outline: none;
+	border-color: var(--color-yellow-deep);
+	box-shadow: 0 0 0 3px rgba(255, 201, 77, 0.35);
+}
+
+button[type="submit"] {
+	width: 100%;
+	padding: 16px;
+	background: var(--color-ink);
+	color: #fff;
+	border: none;
+	border-radius: var(--radius-full);
+	font-size: 15px;
+	font-weight: 800;
+	font-family: var(--font-display);
+	cursor: pointer;
+	margin-top: 10px;
+	transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+button[type="submit"]:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-md);
+}
+
+.error-message {
+	padding: 12px 14px;
+	font-size: 13.5px;
+	color: #9f1239;
+	background-color: #ffe4e6;
+	border: 1px solid #fda4af;
+	border-radius: var(--radius-md);
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
+	text-align: left;
+}
+
+.success-message {
+	padding: 12px 14px;
+	font-size: 13.5px;
+	color: #065f46;
+	background-color: #d1fae5;
+	border: 1px solid #6ee7b7;
+	border-radius: var(--radius-md);
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
+	text-align: left;
+}
+
+.error-message svg, .success-message svg {
+	width: 1.2rem;
+	height: 1.2rem;
+	margin-right: 0.5rem;
+	fill: currentColor;
+	flex-shrink: 0;
+}
+
+.register-link {
+	text-align: center;
+	margin-top: 26px;
+	font-size: 14px;
+	color: var(--color-ink-soft);
+}
+
+.register-link a {
+	color: var(--color-ink);
+	text-decoration: underline;
+	font-weight: 700;
+}
+</style>
 </head>
 <body>
 
 <div class="login-box">
-    <h2>歡迎回來 Webond</h2>
-    <p class="subtitle">請輸入您的帳號密碼進行登入</p>
-    
-    <div class="success-message" th:if="${successMsg != null}">
-        <svg viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-        </svg>
-        <span th:text="${successMsg}">操作成功！</span>
-    </div>
 
-    <div class="error-message" th:if="${errorMsgs != null}">
-        <svg viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-        </svg>
-        <span th:text="${errorMsgs}">帳號或密碼錯誤，請稍後再試。</span>
-    </div>
+	<div class="auth-mascot" aria-hidden="true">
+		<div class="auth-mascot__blob"></div>
+		<div class="auth-mascot__head">
+			<span class="eye eye--l"></span>
+			<span class="eye eye--r"></span>
+		</div>
+	</div>
 
-    <form th:action="@{/member/logincontroller}" method="post">
-        
-        <div class="form-group">
-            <label for="email">Email 帳號 *</label>
-            <input type="email" id="email" name="email" th:value="${email}" placeholder="example@email.com" required>
-        </div>
-        
-        <div class="form-group">
-            <div class="label-row">
-                <label for="password">密碼 *</label>
-                <a th:href="@{/member/forgotPassword}" class="forgot-link">忘記密碼？</a>
-            </div>
-            <input type="password" id="password" name="password" placeholder="請輸入密碼" required>
-        </div>
+	<div class="auth-brand">
+		<span class="auth-brand-mark">
+			<span class="auth-brand-eye"></span>
+			<span class="auth-brand-eye"></span>
+		</span>
+		<span class="auth-brand-text">Webond 閒人出租</span>
+	</div>
 
-        <button type="submit">立即登入</button>
-    </form>
-    
-    <div class="register-link">
-        還沒有帳號嗎？ <a th:href="@{/member/register}">立即註冊</a>
-    </div>
+	<div class="header-group">
+		<h2>歡迎回來 Webond</h2>
+		<p class="subtitle">請輸入您的帳號密碼進行登入</p>
+	</div>
+
+	<div class="success-message" th:if="${successMsg != null}">
+		<svg viewBox="0 0 20 20">
+			<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+		</svg>
+		<span th:text="${successMsg}">操作成功！</span>
+	</div>
+
+	<div class="error-message" th:if="${errorMsgs != null}">
+		<svg viewBox="0 0 20 20">
+			<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+		</svg>
+		<span th:text="${errorMsgs}">帳號或密碼錯誤，請稍後再試。</span>
+	</div>
+
+	<form th:action="@{/member/logincontroller}" method="post">
+		<div class="form-group">
+			<label for="email">Email 帳號 *</label>
+			<input type="email" id="email" name="email" th:value="${email}" placeholder="example@email.com" required>
+		</div>
+
+		<div class="form-group">
+			<div class="password-header">
+				<label for="password">密碼 *</label>
+				<a th:href="@{/member/forgotPassword}" class="forgot-link">忘記密碼？</a>
+			</div>
+			<input type="password" id="password" name="password" placeholder="請輸入密碼" required>
+		</div>
+
+		<button type="submit">立即登入</button>
+	</form>
+
+	<div class="register-link">
+		還沒有帳號嗎？ <a th:href="@{/member/register}">立即註冊</a>
+	</div>
 </div>
 
 </body>

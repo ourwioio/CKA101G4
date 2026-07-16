@@ -3,49 +3,165 @@
 <head>
 <meta charset="UTF-8">
 <title>Webond 會員註冊與實名認證</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+
 <style>
+:root {
+	--color-bg: #F7F3EC;
+	--color-surface: #FFFFFF;
+	--color-surface-soft: #FFFDF8;
+	--color-ink: #17140F;
+	--color-ink-soft: #726A5F;
+	--color-border: #ECE4D6;
+	--color-yellow: #FFE59A;
+	--color-yellow-deep: #FFC94D;
+	--font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+	--font-body: 'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+	--radius-lg: 26px;
+	--radius-md: 16px;
+	--radius-full: 999px;
+	--shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+	--shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+}
+
+* {
+	box-sizing: border-box;
+}
+
 body {
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Microsoft JhengHei";
-	background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+	font-family: var(--font-body);
+	background-color: var(--color-bg);
 	min-height: 100vh;
 	margin: 0;
 	padding: 40px 20px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	color: var(--color-ink);
 }
 
 .register-box {
 	width: 100%;
 	max-width: 650px;
-	background: #ffffff;
-	padding: 40px;
-	border-radius: 16px;
-	box-shadow: 0 10px 25px rgba(186, 230, 253, 0.6);
+	background: var(--color-surface);
+	padding: 44px 40px;
+	border-radius: var(--radius-lg);
+	border: 1px solid var(--color-border);
+	box-shadow: var(--shadow-md);
+}
+
+.auth-mascot {
+	position: relative;
+	width: 100%;
+	max-width: 110px;
+	aspect-ratio: 1 / 0.95;
+	margin: 0 auto 14px;
+}
+
+.auth-mascot__blob {
+	position: absolute;
+	inset: 12% 6% 10% 18%;
+	background: var(--color-yellow);
+	border-radius: 58% 42% 48% 52% / 44% 55% 45% 56%;
+}
+
+.auth-mascot__head {
+	position: absolute;
+	top: 0;
+	right: 6%;
+	width: 66%;
+	height: 66%;
+	background: var(--color-surface-soft);
+	border: 1.5px solid var(--color-border);
+	border-radius: 56% 44% 45% 55% / 58% 50% 50% 42%;
+	box-shadow: var(--shadow-sm);
+}
+
+.auth-mascot__head .eye {
+	position: absolute;
+	top: 44%;
+	width: 8px;
+	height: 10px;
+	background: var(--color-ink);
+	border-radius: 50%;
+}
+
+.auth-mascot__head .eye--l {
+	left: 30%;
+}
+
+.auth-mascot__head .eye--r {
+	left: 52%;
+}
+
+.auth-brand {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	margin-bottom: 4px;
+}
+
+.auth-brand-mark {
+	display: flex;
+	gap: 4px;
+}
+
+.auth-brand-eye {
+	position: relative;
+	width: 12px;
+	height: 12px;
+	background: var(--color-ink);
+	border-radius: 50%;
+}
+
+.auth-brand-eye::after {
+	content: '';
+	position: absolute;
+	width: 3px;
+	height: 3px;
+	top: 2.5px;
+	left: 2.5px;
+	background: #fff;
+	border-radius: 50%;
+}
+
+.auth-brand-text {
+	font-family: var(--font-display);
+	font-weight: 800;
+	font-size: 14px;
+	letter-spacing: 0.5px;
+	color: var(--color-ink);
 }
 
 h2 {
 	text-align: center;
-	color: #0369a1;
+	font-family: var(--font-display);
+	color: var(--color-ink);
 	margin-top: 0;
 	margin-bottom: 5px;
 	font-size: 26px;
+	font-weight: 800;
 }
 
 p.subtitle {
 	text-align: center;
-	color: #64748b;
+	color: var(--color-ink-soft);
 	font-size: 14px;
 	margin-bottom: 30px;
 }
 
 .section-title {
 	text-align: left;
-	font-size: 16px;
-	font-weight: bold;
-	color: #0c4a6e;
-	border-bottom: 2px solid #e2e8f0;
-	padding-bottom: 6px;
+	font-size: 15px;
+	font-weight: 800;
+	font-family: var(--font-display);
+	color: var(--color-ink);
+	border-bottom: 2px solid var(--color-border);
+	padding-bottom: 8px;
 	margin-top: 25px;
 	margin-bottom: 15px;
 }
@@ -68,27 +184,28 @@ p.subtitle {
 label {
 	display: block;
 	margin-bottom: 6px;
-	font-weight: 600;
-	color: #0c4a6e;
+	font-weight: 700;
+	color: var(--color-ink);
 	font-size: 14px;
 }
 
 input[type="text"], input[type="email"], input[type="password"], select, input[type="file"] {
 	width: 100%;
-	padding: 10px;
+	padding: 12px;
 	box-sizing: border-box;
-	border: 1.5px solid #cbd5e1;
-	border-radius: 8px;
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-md);
 	font-size: 14px;
-	background-color: #f8fafc;
-	transition: all 0.3s ease;
+	font-family: inherit;
+	background-color: var(--color-surface-soft);
+	transition: all 0.2s ease;
 }
 
 input:focus, select:focus {
 	outline: none;
-	border-color: #38bdf8;
+	border-color: var(--color-yellow-deep);
 	background-color: #fff;
-	box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25);
+	box-shadow: 0 0 0 3px rgba(255, 201, 77, 0.35);
 }
 
 .radio-group {
@@ -99,25 +216,27 @@ input:focus, select:focus {
 
 button[type="submit"] {
 	width: 100%;
-	padding: 14px;
-	background: #0ea5e9;
+	padding: 16px;
+	background: var(--color-ink);
 	color: white;
 	border: none;
-	border-radius: 8px;
+	border-radius: var(--radius-full);
 	cursor: pointer;
 	font-size: 16px;
-	font-weight: bold;
-	transition: background 0.2s ease;
+	font-weight: 800;
+	font-family: var(--font-display);
+	transition: transform 0.18s ease, box-shadow 0.18s ease;
 	margin-top: 25px;
 }
 
 button[type="submit"]:hover {
-	background: #0284c7;
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-md);
 }
 
 /* 🎯 統一的欄位下方紅字錯誤訊息樣式 */
 .field-error {
-	color: #b91c1c;
+	color: #be123c;
 	font-size: 12px;
 	font-weight: 500;
 	margin-top: 6px;
@@ -129,14 +248,14 @@ button[type="submit"]:hover {
 	margin-top: 8px;
 	max-width: 100%;
 	max-height: 120px;
-	border-radius: 6px;
-	border: 1px dashed #cbd5e1;
+	border-radius: var(--radius-md);
+	border: 1px dashed var(--color-border);
 	object-fit: cover;
 }
 
 .img-preview-container {
 	font-size: 12px;
-	color: #0284c7;
+	color: var(--color-ink-soft);
 	margin-top: 6px;
 	margin-bottom: 4px;
 }
@@ -153,26 +272,27 @@ button[type="submit"]:hover {
 
 .btn-send-otp {
 	width: auto;
-	padding: 0 14px;
+	padding: 0 16px;
 	margin-top: 0;
-	background: #0284c7;
+	background: var(--color-ink);
 	color: white;
 	border: none;
 	font-size: 13px;
-	font-weight: 600;
+	font-weight: 700;
 	white-space: nowrap;
-	border-radius: 8px;
+	border-radius: var(--radius-full);
 	cursor: pointer;
-	transition: background 0.2s ease;
+	transition: transform 0.15s ease;
 }
 
 .btn-send-otp:hover {
-	background: #0369a1;
+	transform: translateY(-2px);
 }
 
 .btn-send-otp:disabled {
-	background: #94a3b8;
+	background: #b8b0a2;
 	cursor: not-allowed;
+	transform: none;
 }
 
 .otp-msg {
@@ -181,11 +301,41 @@ button[type="submit"]:hover {
 	display: block;
 	font-weight: 500;
 }
+
+.login-link {
+	text-align: center;
+	margin-top: 20px;
+	font-size: 14px;
+	color: var(--color-ink-soft);
+}
+
+.login-link a {
+	color: var(--color-ink);
+	text-decoration: underline;
+	font-weight: 700;
+}
 </style>
 </head>
 <body>
 
 	<div class="register-box">
+
+		<div class="auth-mascot" aria-hidden="true">
+			<div class="auth-mascot__blob"></div>
+			<div class="auth-mascot__head">
+				<span class="eye eye--l"></span>
+				<span class="eye eye--r"></span>
+			</div>
+		</div>
+
+		<div class="auth-brand">
+			<span class="auth-brand-mark">
+				<span class="auth-brand-eye"></span>
+				<span class="auth-brand-eye"></span>
+			</span>
+			<span class="auth-brand-text">Webond 閒人出租</span>
+		</div>
+
 		<h2>加入 Webond 會員</h2>
 		<p class="subtitle">請填寫以下欄位，註冊同時完成 KYC 實名認證與金流綁定</p>
 
@@ -194,27 +344,6 @@ button[type="submit"]:hover {
 
 			<div class="section-title">🔒 帳戶基本資料</div>
 			<div class="form-grid">
-
-				<div class="form-group full-width">
-					<label for="email">Email 帳號 (登入用) *</label>
-					<div class="input-with-btn">
-						<input type="email" id="email" th:field="*{email}" placeholder="example@email.com">
-						<button type="button" class="btn-send-otp" id="sendOtpBtn" onclick="sendOtp()">取得驗證碼</button>
-					</div>
-					<span id="otpMsg" class="otp-msg"></span>
-					<span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
-				</div>
-
-				<div class="form-group full-width">
-					<label for="otpCode">Email 驗證碼 *</label>
-					<div class="input-with-btn">
-						<input type="text" id="otpCode" name="otpCode" maxlength="6" 
-							   th:value="${inputOtpCode}" placeholder="請輸入 6 位數字驗證碼">
-						<button type="button" class="btn-send-otp" id="verifyOtpBtn" style="background:#059669;" onclick="verifyOtp()">核對驗證碼</button>
-					</div>
-					<span id="verifyMsg" class="otp-msg"></span>
-					<span class="field-error" th:if="${otpError != null}" th:text="${otpError}"></span>
-				</div>
 
 				<div class="form-group">
 					<label for="password">登入密碼 *</label>
@@ -237,8 +366,8 @@ button[type="submit"]:hover {
 				<div class="form-group">
 					<label>性別 *</label>
 					<div class="radio-group">
-						<label><input type="radio" th:field="*{gender}" value="0"> 男</label> 
-						<label><input type="radio" th:field="*{gender}" value="1"> 女</label> 
+						<label><input type="radio" th:field="*{gender}" value="1"> 男</label>
+						<label><input type="radio" th:field="*{gender}" value="0"> 女</label>
 						<label><input type="radio" th:field="*{gender}" value="2"> 其他</label>
 					</div>
 					<span class="field-error" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}"></span>
@@ -254,7 +383,7 @@ button[type="submit"]:hover {
 					</div>
 					<span class="field-error" th:if="${#fields.hasErrors('memberPic')}" th:errors="*{memberPic}"></span>
 				</div>
- 
+
 				<div class="form-group full-width">
 					<label for="memberIntro">個人簡介</label>
 					<input type="text" id="memberIntro" th:field="*{memberIntro}" placeholder="一兩句話介紹一下自己吧！">
@@ -279,7 +408,7 @@ button[type="submit"]:hover {
 
 				<div class="form-group">
 					<label for="idFrontImageFile">身分證正面照片 *</label>
-					<input type="file" id="idFrontImageFile" name="idFrontImageFile" accept="image/*"> 
+					<input type="file" id="idFrontImageFile" name="idFrontImageFile" accept="image/*">
 					<input type="hidden" id="tempIdFrontImage" name="tempIdFrontImage" th:value="${tempIdFrontImage}">
 					<div class="img-preview-container" th:if="${tempIdFrontImage != null and !tempIdFrontImage.isEmpty()}">
 						<span>✓ 已暫存身分證正面照片：</span><br>
@@ -290,7 +419,7 @@ button[type="submit"]:hover {
 
 				<div class="form-group">
 					<label for="idBackImageFile">身分證反面照片 *</label>
-					<input type="file" id="idBackImageFile" name="idBackImageFile" accept="image/*"> 
+					<input type="file" id="idBackImageFile" name="idBackImageFile" accept="image/*">
 					<input type="hidden" id="tempIdBackImage" name="tempIdBackImage" th:value="${tempIdBackImage}">
 					<div class="img-preview-container" th:if="${tempIdBackImage != null and !tempIdBackImage.isEmpty()}">
 						<span>✓ 已暫存身分證反面照片：</span><br>
@@ -300,7 +429,7 @@ button[type="submit"]:hover {
 				</div>
 
 				<div class="form-group full-width">
-					<label for="faceImageFile">現場自拍人臉照片 *</label>
+					<label for="faceImageFile">自拍人臉照片 *</label>
 					<input type="file" id="faceImageFile" name="faceImageFile" accept="image/*">
 					<input type="hidden" id="tempFaceImage" name="tempFaceImage" th:value="${tempFaceImage}">
 					<div class="img-preview-container" th:if="${tempFaceImage != null and !tempFaceImage.isEmpty()}">
@@ -324,6 +453,32 @@ button[type="submit"]:hover {
 					<label for="bankAccount">銀行帳號 *</label>
 					<input type="text" id="bankAccount" th:field="*{bankAccount}" placeholder="10-14位數字">
 					<span class="field-error" th:if="${#fields.hasErrors('bankAccount')}" th:errors="*{bankAccount}"></span>
+				</div>
+			</div>
+
+			<!-- 📧 最後一步：Email 驗證與送出（避免驗證碼在填完前面一長串資料後過期） -->
+			<div class="section-title">📧 Email 驗證（最後一步）</div>
+			<div class="form-grid">
+
+				<div class="form-group full-width">
+					<label for="email">Email 帳號 (登入用) *</label>
+					<div class="input-with-btn">
+						<input type="email" id="email" th:field="*{email}" placeholder="example@email.com">
+						<button type="button" class="btn-send-otp" id="sendOtpBtn" onclick="sendOtp()">取得驗證碼</button>
+					</div>
+					<span id="otpMsg" class="otp-msg"></span>
+					<span class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+				</div>
+
+				<div class="form-group full-width">
+					<label for="otpCode">Email 驗證碼 *</label>
+					<div class="input-with-btn">
+						<input type="text" id="otpCode" name="otpCode" maxlength="6"
+							   th:value="${inputOtpCode}" placeholder="請輸入 6 位數字驗證碼">
+						<button type="button" class="btn-send-otp" id="verifyOtpBtn" style="background:#15803d;" onclick="verifyOtp()">核對驗證碼</button>
+					</div>
+					<span id="verifyMsg" class="otp-msg"></span>
+					<span class="field-error" th:if="${otpError != null}" th:text="${otpError}"></span>
 				</div>
 			</div>
 
@@ -447,6 +602,14 @@ button[type="submit"]:hover {
 			// 如果頁面上已經有 OTP 錯誤訊息或未驗證，防止表單送出
 			if (!isEmailVerified) {
 				alert('請先點擊「核對驗證碼」成功完成 Email 驗證後，再提交註冊表單！');
+				return false;
+			}
+
+			// 人臉照片檢查：需上傳檔案，或已有先前驗證失敗回填的暫存照片
+			const faceFile = document.getElementById('faceImageFile');
+			const tempFace = document.getElementById('tempFaceImage');
+			if (faceFile.files.length === 0 && (!tempFace.value || tempFace.value.trim() === '')) {
+				alert('請上傳自拍人臉照片！');
 				return false;
 			}
 			return true;
