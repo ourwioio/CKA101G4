@@ -15,294 +15,262 @@
 
 	<th:block th:fragment="adminSidebar">
 
-		<style>
-/* 使用 Sidebar 頁面的共同外層 */
-.wb-admin-layout {
-	display: grid;
-	grid-template-columns: 270px minmax(0, 1fr);
-	min-height: 100vh;
-}
-
-/* 各頁面右側內容 */
-.wb-admin-content {
-	min-width: 0;
-	padding: 30px;
-}
-
-/* =========================
-           Sidebar
-           ========================= */
-.wb-admin-sidebar {
-	position: sticky;
-	top: 0;
-	width: 270px;
-	height: 100vh;
-	overflow-y: auto;
-	color: #f8fafc;
-	background: #25292e;
-	border-right: 1px solid #3d4349;
-	font-family: Arial, "Noto Sans TC", sans-serif;
-}
-
-.wb-admin-sidebar, .wb-admin-sidebar * {
-	box-sizing: border-box;
-}
-
-.wb-admin-sidebar a {
-	color: inherit;
-	text-decoration: none;
-}
-
-/* =========================
-           品牌區
-           ========================= */
-.wb-sidebar-brand {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	padding: 22px 18px;
-	border-bottom: 1px solid #40464c;
-}
-
-.wb-sidebar-logo {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex: 0 0 44px;
-	width: 44px;
-	height: 44px;
-	color: #17140f;
-	background: #ffe59a;
-	border-radius: 10px;
-	font-size: 20px;
-	font-weight: 900;
-}
-
-.wb-sidebar-brand-text {
-	display: flex;
-	min-width: 0;
-	flex-direction: column;
-	line-height: 1.25;
-}
-
-.wb-sidebar-brand-title {
-	color: #ffffff;
-	font-size: 18px;
-	font-weight: 900;
-}
-
-.wb-sidebar-brand-subtitle {
-	color: #9ca3ab;
-	font-size: 10px;
-	font-weight: 700;
-	letter-spacing: 1.3px;
-}
-
-/* =========================
-           員工資訊
-           ========================= */
-.wb-sidebar-employee {
-	margin: 15px 13px 7px;
-	padding: 12px 14px;
-	background: #30353a;
-	border: 1px solid #43494f;
-	border-radius: 8px;
-}
-
-.wb-sidebar-employee-label {
-	margin-bottom: 4px;
-	color: #9ca3ab;
-	font-size: 11px;
-}
-
-.wb-sidebar-employee-value {
-	color: #ffffff;
-	font-size: 14px;
-	font-weight: 800;
-}
-
-/* =========================
-           選單
-           ========================= */
-.wb-sidebar-nav {
-	padding: 7px 12px 28px;
-}
-
-.wb-sidebar-section-title {
-	margin: 19px 8px 8px;
-	color: #858d95;
-	font-size: 10px;
-	font-weight: 900;
-	letter-spacing: 1.3px;
-}
-
-.wb-sidebar-link {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	min-height: 45px;
-	margin-bottom: 6px;
-	padding: 8px 11px;
-	color: #dce0e4;
-	background: transparent;
-	border: 1px solid transparent;
-	border-radius: 8px;
-	font-size: 13px;
-	font-weight: 700;
-	transition: color 0.16s ease, background 0.16s ease, border-color 0.16s
-		ease;
-}
-
-.wb-sidebar-link:hover {
-	color: #ffffff;
-	background: #383e44;
-	border-color: #4a5158;
-}
-
-.wb-sidebar-icon {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex: 0 0 31px;
-	width: 31px;
-	height: 31px;
-	color: #ffffff;
-	background: #464c52;
-	border-radius: 7px;
-	font-size: 12px;
-	font-weight: 900;
-}
-
-.wb-sidebar-label {
-	flex: 1;
-	min-width: 0;
-}
-
-.wb-sidebar-arrow {
-	color: #858d95;
-	font-size: 16px;
-}
-
-/* =========================
-           後台首頁
-           ========================= */
-.wb-sidebar-link--home {
-	color: #17140f;
-	background: #ffe59a;
-	border-color: #ffe59a;
-}
-
-.wb-sidebar-link--home:hover {
-	color: #17140f;
-	background: #ffc94d;
-	border-color: #ffc94d;
-}
-
-.wb-sidebar-link--home .wb-sidebar-icon {
-	color: #17140f;
-	background: rgba(255, 255, 255, 0.55);
-}
-
-/* =========================
-           三大模組
-           ========================= */
-.wb-sidebar-link--activity:hover {
-	color: #163229;
-	background: #b7e1d1;
-	border-color: #b7e1d1;
-}
-
-.wb-sidebar-link--venue:hover {
-	color: #123047;
-	background: #a9d3ff;
-	border-color: #a9d3ff;
-}
-
-.wb-sidebar-link--service:hover {
-	color: #4b2342;
-	background: #ffb5c1;
-	border-color: #ffb5c1;
-}
-
-/* =========================
-           尚未確認網址
-           ========================= */
-.wb-sidebar-link--disabled {
-	color: #858c93;
-	cursor: not-allowed;
-}
-
-.wb-sidebar-link--disabled:hover {
-	color: #858c93;
-	background: transparent;
-	border-color: transparent;
-}
-
-.wb-sidebar-link--disabled .wb-sidebar-icon {
-	color: #858c93;
-	background: #353a3f;
-}
-
-.wb-sidebar-status {
-	padding: 3px 6px;
-	color: #90979e;
-	background: #30353a;
-	border: 1px solid #454b51;
-	border-radius: 999px;
-	font-size: 9px;
-	white-space: nowrap;
-}
-
-/* =========================
-           頁尾
-           ========================= */
-.wb-sidebar-footer {
-	margin: 20px 13px 0;
-	padding: 16px 0 4px;
-	color: #747c84;
-	border-top: 1px solid #3d4349;
-	font-size: 10px;
-	line-height: 1.7;
-	text-align: center;
-}
-
-/* =========================
-           RWD
-           ========================= */
-@media ( max-width : 900px) {
-	.wb-admin-layout {
-		display: block;
-	}
-	.wb-admin-sidebar {
-		position: static;
-		width: 100%;
-		height: auto;
-	}
-	.wb-sidebar-nav {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 7px;
-	}
-	.wb-sidebar-section-title, .wb-sidebar-footer {
-		grid-column: 1/-1;
-	}
-	.wb-sidebar-link {
-		margin-bottom: 0;
-	}
-}
-
-@media ( max-width : 580px) {
-	.wb-sidebar-nav {
-		grid-template-columns: 1fr;
-	}
-	.wb-sidebar-section-title, .wb-sidebar-footer {
-		grid-column: auto;
-	}
-	.wb-admin-content {
-		padding: 18px;
-	}
-}
-</style>
+	<style>
+		/* 使用 Sidebar 頁面的共同外層 */
+		.wb-admin-layout {
+			display: grid;
+			grid-template-columns: 270px minmax(0, 1fr);
+			min-height: 100vh;
+		}
+		
+		/* 各頁面右側內容 */
+		.wb-admin-content {
+			min-width: 0;
+			padding: 30px;
+		}
+		
+		/* =========================
+		           Sidebar
+		========================= */
+		.wb-admin-sidebar {
+			position: sticky;
+			top: 0;
+			width: 270px;
+			height: 100vh;
+			overflow-y: auto;
+			color: #f8fafc;
+			background: #25292e;
+			border-right: 1px solid #3d4349;
+			font-family: Arial, "Noto Sans TC", sans-serif;
+		}
+		
+		.wb-admin-sidebar, .wb-admin-sidebar * {
+			box-sizing: border-box;
+		}
+		
+		.wb-admin-sidebar a {
+			color: inherit;
+			text-decoration: none;
+		}
+		
+		/* =========================
+		           品牌區
+		========================= */
+		.wb-sidebar-brand {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			padding: 22px 18px;
+			border-bottom: 1px solid #40464c;
+		}
+		
+		.wb-sidebar-logo {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex: 0 0 44px;
+			width: 44px;
+			height: 44px;
+			color: #17140f;
+			background: #ffe59a;
+			border-radius: 10px;
+			font-size: 20px;
+			font-weight: 900;
+		}
+		
+		.wb-sidebar-brand-text {
+			display: flex;
+			min-width: 0;
+			flex-direction: column;
+			line-height: 1.25;
+		}
+		
+		.wb-sidebar-brand-title {
+			color: #ffffff;
+			font-size: 18px;
+			font-weight: 600;
+		}
+		
+		.wb-sidebar-brand-subtitle {
+			color: #9ca3ab;
+			font-size: 10px;
+			font-weight: 400;
+			letter-spacing: 1.3px;
+		}
+		
+		/* =========================
+		           員工資訊
+		           ========================= */
+		.wb-sidebar-employee {
+			margin: 15px 13px 7px;
+			padding: 12px 14px;
+			background: #30353a;
+			border: 1px solid #43494f;
+			border-radius: 8px;
+		}
+		
+		.wb-sidebar-employee-label {
+			margin-bottom: 4px;
+			color: #9ca3ab;
+			font-size: 11px;
+		}
+		
+		.wb-sidebar-employee-value {
+			color: #ffffff;
+			font-size: 14px;
+			font-weight: 600;
+		}
+		
+		/* =========================
+		           選單
+		           ========================= */
+		.wb-sidebar-nav {
+			padding: 7px 12px 28px;
+		}
+		
+		.wb-sidebar-section-title {
+			margin: 19px 8px 8px;
+			color: #858d95;
+			font-size: 10px;
+			font-weight: 600;
+			letter-spacing: 1.3px;
+		}
+		
+		.wb-sidebar-link {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			min-height: 45px;
+			margin-bottom: 6px;
+			padding: 8px 11px;
+			color: #ffffff ;
+			background: transparent;
+			border: 1px solid transparent;
+			border-radius: 8px;
+			font-size: 13px;
+			font-weight: 500;
+			transition: color 0.16s ease, background 0.16s ease, border-color 0.16s
+				ease;
+		}
+		
+		.wb-sidebar-link:hover {
+			color: #17140f;
+			background: #ffc94d;
+			border-color: #ffc94d;
+		}
+		
+		.wb-sidebar-icon {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			flex: 0 0 31px;
+			width: 31px;
+			height: 31px;
+			color: #ffffff;
+			background: #464c52;
+			border-radius: 7px;
+			font-size: 12px;
+			font-weight: 700;
+		}
+		
+		.wb-sidebar-label {
+			flex: 1;
+			min-width: 0;
+		}
+		
+		.wb-sidebar-arrow {
+			color: #858d95;
+			font-size: 16px;
+		}
+		
+		/* =========================
+		           後台首頁
+		           ========================= */
+		
+		.wb-sidebar-link--home:hover {
+			color: #17140f;
+			background: #ffc94d;
+			border-color: #ffc94d;
+		}
+		
+		.wb-sidebar-link--home .wb-sidebar-icon {
+			color: #17140f;
+			background: rgba(255, 255, 255, 0.55);
+		}
+		
+		/* =========================
+		           三大模組
+		           ========================= */
+		.wb-sidebar-link--activity:hover {
+			color: #17140f;
+			background: #ffc94d;
+			border-color: #ffc94d;
+		}
+		
+		.wb-sidebar-link--venue:hover {
+			color: #17140f;
+			background: #ffc94d;
+			border-color: #ffc94d;
+		}
+		
+		.wb-sidebar-link--service:hover {
+			color: #17140f;
+			background: #ffc94d;
+			border-color: #ffc94d;
+		}	
+		
+	
+		
+		/* =========================
+		           頁尾
+		           ========================= */
+		.wb-sidebar-footer {
+			margin: 20px 13px 0;
+			padding: 16px 0 4px;
+			color: #747c84;
+			border-top: 1px solid #3d4349;
+			font-size: 10px;
+			line-height: 1.7;
+			text-align: center;
+		}
+		
+		/* =========================
+		           RWD
+		           ========================= */
+		@media ( max-width : 900px) {
+			.wb-admin-layout {
+				display: block;
+			}
+			.wb-admin-sidebar {
+				position: static;
+				width: 100%;
+				height: auto;
+			}
+			.wb-sidebar-nav {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
+				gap: 7px;
+			}
+			.wb-sidebar-section-title, .wb-sidebar-footer {
+				grid-column: 1/-1;
+			}
+			.wb-sidebar-link {
+				margin-bottom: 0;
+			}
+		}
+		
+		@media ( max-width : 580px) {
+			.wb-sidebar-nav {
+				grid-template-columns: 1fr;
+			}
+			.wb-sidebar-section-title, .wb-sidebar-footer {
+				grid-column: auto;
+			}
+			.wb-admin-content {
+				padding: 18px;
+			}
+		}
+	</style>
 
 		<aside class="wb-admin-sidebar">
 
@@ -349,7 +317,7 @@
 					class="wb-sidebar-link
                       wb-sidebar-link--home"
 					th:href="@{/admin/adminPage}"> <span class="wb-sidebar-icon">
-						首 </span> <span class="wb-sidebar-label"> 後台管理首頁 </span> <span
+						首頁 </span> <span class="wb-sidebar-label"> 後台管理首頁 </span> <span
 					class="wb-sidebar-arrow"> › </span>
 
 				</a>
@@ -358,44 +326,31 @@
                  三大模組
                  ===================== -->
 
-				<p class="wb-sidebar-section-title">模組管理</p>
+				<p class="wb-sidebar-section-title">服務管理</p>
+				
+				 <a
+					class="wb-sidebar-link
+                      wb-sidebar-link--service"
+					th:href="@{/admin/services/home}"> <span
+					class="wb-sidebar-icon"> 服務 </span> <span class="wb-sidebar-label">
+						服務管理 </span> <span class="wb-sidebar-arrow"> › </span>
+
+				</a>
 
 				<a
 					class="wb-sidebar-link
                       wb-sidebar-link--activity"
 					th:href="@{/activity/admin/home}"> <span
-					class="wb-sidebar-icon"> 活 </span> <span class="wb-sidebar-label">
+					class="wb-sidebar-icon"> 活動 </span> <span class="wb-sidebar-label">
 						活動管理 </span> <span class="wb-sidebar-arrow"> › </span>
 
-				</a> <a
+				</a> 
+				<a
 					class="wb-sidebar-link
                       wb-sidebar-link--venue"
 					th:href="@{/venue/index}"> <span class="wb-sidebar-icon">
-						場 </span> <span class="wb-sidebar-label"> 場地管理 </span> <span
+						場地 </span> <span class="wb-sidebar-label"> 場地管理 </span> <span
 					class="wb-sidebar-arrow"> › </span>
-
-				</a> <a
-					class="wb-sidebar-link
-                      wb-sidebar-link--service"
-					th:href="@{/admin/services/home}"> <span
-					class="wb-sidebar-icon"> 服 </span> <span class="wb-sidebar-label">
-						服務管理 </span> <span class="wb-sidebar-arrow"> › </span>
-
-				</a>
-
-				<!-- =====================
-                 員工及權限
-                 ===================== -->
-
-				<p class="wb-sidebar-section-title">員工及權限</p>
-
-				<a class="wb-sidebar-link" th:href="@{/admin/empPage}"> <span
-					class="wb-sidebar-icon"> 員 </span> <span class="wb-sidebar-label">
-						員工管理系統 </span> <span class="wb-sidebar-arrow"> › </span>
-
-				</a> <a class="wb-sidebar-link" th:href="@{/admin/empPermPage}"> <span
-					class="wb-sidebar-icon"> 權 </span> <span class="wb-sidebar-label">
-						員工權限管理 </span> <span class="wb-sidebar-arrow"> › </span>
 
 				</a>
 
@@ -404,26 +359,52 @@
                  ===================== -->
 
 				<p class="wb-sidebar-section-title">平台內容管理</p>
+				
+				
+				<!-- 會員管理 -->
+				<a class="wb-sidebar-link" th:href="@{/member/back-end/memberList}"> <span
+					class="wb-sidebar-icon"> 會員 </span> <span class="wb-sidebar-label">
+						會員管理 </span> <span class="wb-sidebar-arrow"> › </span>
+
+				</a>
 
 				<!-- 一對一情境中的會員檢舉 -->
 				<a class="wb-sidebar-link" th:href="@{/backend/memberreport/manageReport}"> <span
-					class="wb-sidebar-icon"> 檢 </span> <span class="wb-sidebar-label">
-						一對一會員檢舉 </span> <span class="wb-sidebar-arrow"> › </span>
+					class="wb-sidebar-icon"> 檢舉 </span> <span class="wb-sidebar-label">
+						會員檢舉管理 </span> <span class="wb-sidebar-arrow"> › </span>
 
 				</a>
 
 				<!-- 通知管理 -->
 				<a class="wb-sidebar-link"
 					th:href="@{/notification/listAllNotification}"> <span
-					class="wb-sidebar-icon"> 知 </span> <span class="wb-sidebar-label">
+					class="wb-sidebar-icon"> 通知 </span> <span class="wb-sidebar-label">
 						通知管理 </span> <span class="wb-sidebar-arrow"> › </span>
 
 				</a>
 
 				<!-- 公告管理網址尚未提供 -->
 				<a class="wb-sidebar-link" th:href="@{/platform/index}"> <span
-					class="wb-sidebar-icon"> 告 </span> <span class="wb-sidebar-label">
-						平台管理 </span> <span class="wb-sidebar-arrow"> › </span>
+					class="wb-sidebar-icon"> 公告 </span> <span class="wb-sidebar-label">
+						公告管理 </span> <span class="wb-sidebar-arrow"> › </span>
+
+				</a>
+				
+				
+
+				<!-- =====================
+                 員工及權限
+                 ===================== -->
+
+				<p class="wb-sidebar-section-title">員工及權限</p>
+
+				<a class="wb-sidebar-link" th:href="@{/admin/empPage}"> <span
+					class="wb-sidebar-icon"> 員工 </span> <span class="wb-sidebar-label">
+						員工管理系統 </span> <span class="wb-sidebar-arrow"> › </span>
+
+				</a> <a class="wb-sidebar-link" th:href="@{/admin/empPermPage}"> <span
+					class="wb-sidebar-icon"> 權限 </span> <span class="wb-sidebar-label">
+						員工權限管理 </span> <span class="wb-sidebar-arrow"> › </span>
 
 				</a>
 
