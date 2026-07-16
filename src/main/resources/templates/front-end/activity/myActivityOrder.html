@@ -339,8 +339,8 @@ td {
 								</form>
 							</div>
 
-							<div class="actions" th:if="${order.orderStatus == 4 and order.buyerRateSeller == null}">
-								<button type="button" class="btn-small btn-rating">&#35413;&#20729;</button>
+							<div class="actions" th:if="${order.orderStatus == 4 and order.buyerRateSeller == null}" >
+								<a class="btn-small btn-rating" th:href="@{/activity/review(orderId=${order.activityOrderId})}" >&#35413;&#20729;</a>
 							</div>
 
 							<span th:if="${order.orderStatus == 4 and order.buyerRateSeller != null}" class="status active">&#24050;&#35413;&#20729;</span>

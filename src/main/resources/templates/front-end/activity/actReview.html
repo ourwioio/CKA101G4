@@ -1,58 +1,172 @@
 <!DOCTYPE html>
 <html xmlns:th="http://thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>填寫活動評價</title>
-    <link rel="stylesheet" href="https://jsdelivr.net">
+<meta charset="UTF-8">
+<title>填寫活動評價</title>
+<style>
+body {
+	margin: 0;
+	padding: 40px;
+	background: #f8fafc;
+	font-family: "Microsoft JhengHei", sans-serif;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 80vh;
+}
+
+.card {
+	background: white;
+	border-radius: 15px;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+	width: 100%;
+	max-width: 550px;
+	overflow: hidden;
+}
+
+.card-header {
+	background: #0f172a; /* 深藍色調，呼叫你原本標題的色彩 */
+	color: white;
+	padding: 20px;
+}
+
+.card-header h2 {
+	margin: 0;
+	font-size: 20px;
+}
+
+.card-body {
+	padding: 30px;
+}
+
+.alert-error {
+	padding: 14px 18px;
+	border-radius: 8px;
+	margin-bottom: 20px;
+	font-weight: bold;
+	background: #fee2e2;
+	color: #991b1b;
+	border: 1px solid #fecaca;
+	font-size: 14px;
+}
+
+.info-box {
+	background: #e2e8f0;
+	padding: 12px 16px;
+	border-radius: 8px;
+	margin-bottom: 25px;
+	color: #334155;
+	font-size: 15px;
+}
+
+.form-group {
+	margin-bottom: 20px;
+}
+
+.form-label {
+	display: block;
+	font-weight: bold;
+	color: #1e293b;
+	margin-bottom: 8px;
+	font-size: 15px;
+}
+
+.form-select, 
+.form-control {
+	width: 100%;
+	box-sizing: border-box;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	padding: 12px;
+	font-size: 15px;
+	font-family: inherit;
+	background-color: #fff;
+	color: #0f172a;
+	transition: border-color 0.2s;
+}
+
+.form-select:focus, 
+.form-control:focus {
+	outline: none;
+	border-color: #6366f1; /* 聚焦時轉為質感紫色 */
+}
+
+.form-control {
+	resize: vertical;
+}
+
+.btn-submit {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	min-height: 48px;
+	box-sizing: border-box;
+	border: 0;
+	border-radius: 8px;
+	padding: 10px 14px;
+	color: white;
+	font-weight: bold;
+	cursor: pointer;
+	text-align: center;
+	font-size: 16px;
+	background: #7c3aed; /* 採用與你原本 .btn-rating 一致的紫色 */
+	transition: background 0.2s;
+}
+
+.btn-submit:hover {
+	background: #6d28d9;
+}
+</style>
 </head>
-<body class="container mt-5">
+<body>
 
-    <div class="card mx-auto" style="max-width: 550px;">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">活動心得分享</h5>
-        </div>
-        <div class="card-body">
-            
-            <!-- 關鍵 1：利用 Model 傳進來的 errorMessage 控制錯誤訊息顯示 -->
-            <div th:if="${errorMessage != null}" class="alert alert-danger" role="alert" th:text="${errorMessage}">
-                這裡會動態顯示「該筆訂單您已經評價過了！」或「訂單尚未完成」
-            </div>
+	<div class="card">
+		<div class="card-header">
+			<h2>活動心得分享</h2>
+		</div>
+		<div class="card-body">
+			
+			<!-- 錯誤訊息提示區 -->
+			<div th:if="${errorMessage != null}" class="alert-error" th:text="${errorMessage}">
+				這裡會動態顯示錯誤訊息
+			</div>
 
-            <div class="alert alert-secondary py-2" role="alert">
-                <strong>活動訂單編號：</strong> <span th:text="${order.orderId}">10023</span>
-            </div>
+			<!-- 訂單資訊顯示 -->
+			<div class="info-box">
+				<strong>活動訂單編號：</strong> 
+				<span th:text="${orderData.activityOrderId}"></span>
+			</div>
 
-            <!-- 標準傳統表單提交，完全不需要任何 JavaScript -->
-            <form th:action="@{/reviews/submit}" method="post">
-                <input type="hidden" name="orderId" th:value="${order.orderId}" />
+			<!-- 標準表單提交 -->
+			<form th:action="@{/reviews/submit}" method="post">
+				<input type="hidden" name="orderId" th:value="${orderData.activityOrderId}" />
 
-                <!-- 關鍵 2：還原上次選的星星（比對 prevRating） -->
-                <div class="mb-3">
-                    <label for="buyerRating" class="form-label fw-bold">給予本次活動評分</label>
-                    <select class="form-select" id="buyerRating" name="buyerRating" required>
-                        <option value="5" th:selected="${prevRating == 5}">⭐⭐⭐⭐⭐ 5 分 (非常推薦)</option>
-                        <option value="4" th:selected="${prevRating == 4}">⭐⭐⭐⭐ 4 分 (很滿意)</option>
-                        <option value="3">⭐⭐⭐ 3 分 (普通)</option> <!-- 預設值 -->
-                        <option value="2" th:selected="${prevRating == 2}">⭐⭐ 2 分 (不滿意)</option>
-                        <option value="1" th:selected="${prevRating == 1}">⭐ 1 分 (非常差)</option>
-                    </select>
-                </div>
+				<!-- 評分選單 -->
+				<div class="form-group">
+					<label for="buyerRating" class="form-label">給予本次活動評分</label>
+					<select class="form-select" id="buyerRating" name="buyerRating" required>
+						<option value="5" th:selected="${prevRating == 5}">⭐⭐⭐⭐⭐ 5 分 (非常推薦)</option>
+						<option value="4" th:selected="${prevRating == 4}">⭐⭐⭐⭐ 4 分 (很滿意)</option>
+						<option value="3" th:selected="${prevRating == 3 or prevRating == null}">⭐⭐⭐ 3 分 (普通)</option>
+						<option value="2" th:selected="${prevRating == 2}">⭐⭐ 2 分 (不滿意)</option>
+						<option value="1" th:selected="${prevRating == 1}">⭐ 1 分 (非常差)</option>
+					</select>
+				</div>
 
-                <!-- 關鍵 3：還原上次打的評論內文（帶入 prevComment） -->
-                <div class="mb-3">
-                    <label for="buyerComment" class="form-label fw-bold">評價內容</label>
-                    <textarea class="form-control" id="buyerComment" name="buyerComment" rows="4" 
+				<!-- 內文輸入 -->
+				<div class="form-group">
+					<label for="buyerComment" class="form-label">評價內容</label>
+					<textarea class="form-control" id="buyerComment" name="buyerComment" rows="5" 
                               placeholder="歡迎分享您參與這次活動的真實心得..." 
                               maxlength="1000" required 
                               th:text="${prevComment}"></textarea>
-                </div>
+				</div>
 
-                <div class="d-grid mt-4">
-                    <button type="submit" class="btn btn-primary">提交評價</button>
-                </div>
-            </form>
-        </div>
-    </div>
+				<button type="submit" class="btn-submit">提交評價</button>
+			</form>
+		</div>
+	</div>
 
 </body>
 </html>
