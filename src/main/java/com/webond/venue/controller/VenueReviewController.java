@@ -147,12 +147,14 @@ public class VenueReviewController {
 			@RequestParam(value = "reviewNote", required = false) String reviewNote, RedirectAttributes redirectAttrs) {
 		venueReviewSvc.approve(venueReviewId, employeeId, reviewNote);
 		redirectAttrs.addFlashAttribute("success", "- (審核通過)");
+		
 		VenueReviewVO venueReviewVO = venueReviewSvc.getOneVenueReview(venueReviewId);
 		VenueVO venueVO = venueService.getOneVenue(venueReviewVO.getVenueId());
-		// 新增通知給場地主
+		
+		// 通知場地主：場地審核通過
 		NotificationVO notificationVO = new NotificationVO();
 		notificationVO.setMember(venueVO.getMember());
-		notificationVO.setTitle("場地審核通過");
+		notificationVO.setTitle("場地審核通過通知");
 		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + "　審核已通過，謝謝");
 		notificationVO.setNotificationType((byte) 2);
 		notificationService.addNotification(notificationVO);
@@ -167,12 +169,14 @@ public class VenueReviewController {
 			@RequestParam(value = "reviewNote", required = false) String reviewNote, RedirectAttributes redirectAttrs) {
 		venueReviewSvc.reject(venueReviewId, employeeId, reviewNote);
 		redirectAttrs.addFlashAttribute("success", "- (已標記為審核未通過)");
+		
 		VenueReviewVO venueReviewVO = venueReviewSvc.getOneVenueReview(venueReviewId);
 		VenueVO venueVO = venueService.getOneVenue(venueReviewVO.getVenueId());
-		// 新增通知給場地主
+		
+		// 通知場地主：場地審核未通過
 		NotificationVO notificationVO = new NotificationVO();
 		notificationVO.setMember(venueVO.getMember());
-		notificationVO.setTitle("場地審核未通過");
+		notificationVO.setTitle("場地審核未通過通知");
 		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + "　審核未通過，請重新修改上傳資料，謝謝");
 		notificationVO.setNotificationType((byte) 2);
 		notificationService.addNotification(notificationVO);
