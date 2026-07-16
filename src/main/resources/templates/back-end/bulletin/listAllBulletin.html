@@ -472,7 +472,7 @@
                 <div class="panel-body">
 
                     <form class="search-form"
-                          th:action="@{/bulletin/search}"
+                          th:action="@{/admin/platform/bulletin/search}"
                           method="post">
 
                         <select name="status">
@@ -519,7 +519,7 @@
                             </button>
 
                             <a class="btn btn--secondary"
-                               th:href="@{/bulletin/listAllBulletin}">
+                               th:href="@{/admin/platform/bulletin/listAllBulletin}">
                                 清除條件
                             </a>
 
@@ -558,7 +558,7 @@
                     </span>
 
                     <a class="btn btn--primary"
-                       th:href="@{/bulletin/addBulletin}">
+                       th:href="@{/admin/platform/bulletin/addBulletin}">
                         新增公告
                     </a>
 
@@ -626,7 +626,7 @@
                             <td>
 
                                 <form class="action-form"
-                                      th:action="@{/bulletin/viewOne}"
+                                      th:action="@{/admin/platform/bulletin/viewOne}"
                                       method="post">
 
                                     <input type="hidden"
@@ -690,7 +690,7 @@
                                 <div class="action-group">
 
                                     <form class="action-form"
-                                          th:action="@{/bulletin/getOne_For_Update}"
+                                          th:action="@{/admin/platform/bulletin/getOne_For_Update}"
                                           method="post">
 
                                         <input type="hidden"
@@ -706,7 +706,7 @@
 
                                     <form class="action-form"
                                           th:if="${bulletin.status == 0}"
-                                          th:action="@{/bulletin/publish}"
+                                          th:action="@{/admin/platform/bulletin/publish}"
                                           method="post"
                                           onsubmit="return confirm('發布後將無法改回草稿，確定要發布嗎？');">
 
@@ -722,7 +722,7 @@
                                     </form>
 
                                     <form class="action-form"
-                                          th:action="@{/bulletin/delete}"
+                                          th:action="@{/admin/platform/bulletin/delete}"
                                           method="post"
                                           onsubmit="return confirm('確定要刪除這筆公告嗎？');">
 

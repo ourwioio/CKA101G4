@@ -461,7 +461,7 @@
                 <div class="panel-body">
 
                     <form class="search-form"
-                          th:action="@{/platformSpecification/search}"
+                          th:action="@{/admin/platform/platformSpecification/search}"
                           method="post">
 
                         <select name="status">
@@ -504,7 +504,7 @@
                             </button>
 
                             <a class="btn btn--secondary"
-                               th:href="@{/platformSpecification/listAllSpec}">
+                               th:href="@{/admin/platform/platformSpecification/listAllSpec}">
                                 清除條件
                             </a>
 
@@ -543,7 +543,7 @@
                     </span>
 
                     <a class="btn btn--primary"
-                       th:href="@{/platformSpecification/addSpec}">
+                       th:href="@{/admin/platform/platformSpecification/addSpec}">
                         新增規範
                     </a>
 
@@ -611,7 +611,7 @@
                             <td>
 
                                 <form class="action-form"
-                                      th:action="@{/platformSpecification/viewOne}"
+                                      th:action="@{/admin/platform/platformSpecification/viewOne}"
                                       method="get">
 
                                     <input type="hidden"
@@ -665,7 +665,7 @@
                                 <div class="action-group">
 
                                     <form class="action-form"
-                                          th:action="@{/platformSpecification/getOne_For_Update}"
+                                          th:action="@{/admin/platform/platformSpecification/getOne_For_Update}"
                                           method="post">
 
                                         <input type="hidden"
@@ -681,7 +681,7 @@
 
                                     <form class="action-form"
                                           th:if="${spec.status == 0}"
-                                          th:action="@{/platformSpecification/publish}"
+                                          th:action="@{/admin/platform/platformSpecification/publish}"
                                           method="post"
                                           onsubmit="return confirm('發布後將無法改回草稿，確定要發布嗎？');">
 
@@ -697,7 +697,7 @@
                                     </form>
 
                                     <form class="action-form"
-                                          th:action="@{/platformSpecification/delete}"
+                                          th:action="@{/admin/platform/platformSpecification/delete}"
                                           method="post"
                                           onsubmit="return confirm('確定要刪除這筆規範嗎？');">
 
