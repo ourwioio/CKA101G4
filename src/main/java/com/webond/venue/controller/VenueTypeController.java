@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.webond.employee.model.EmployeeVO;
 import com.webond.venue.model.VenueTypeVO;
 import com.webond.venue.service.VenueTypeService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -71,7 +73,11 @@ public class VenueTypeController {
 	}
 
 	@GetMapping("listAllVenueType")
-	public String listAllVenueType(ModelMap model) {
+	public String listAllVenueType(ModelMap model, HttpSession session) {
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
 		return "back-end/venueType/listAllVenueType";
 	}
 
