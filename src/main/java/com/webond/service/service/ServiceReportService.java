@@ -12,6 +12,7 @@ import com.webond.member.model.MemberReportVO;
 import com.webond.member.model.MemberVO;
 import com.webond.member.model.NotificationVO;
 import com.webond.member.repository.MemberReportRepository;
+import com.webond.member.repository.MemberRepository;
 import com.webond.member.service.MemberService;
 import com.webond.member.service.NotificationService;
 import com.webond.service.model.ServiceReportVO;
@@ -29,7 +30,7 @@ public class ServiceReportService {
     private ServiceRepository serviceRepository;
     
     @Autowired
-    private MemberReportRepository memberReportRepository;
+    private MemberRepository memberRepository;
 
     @Autowired
     private NotificationService notificationService;
@@ -94,16 +95,16 @@ public class ServiceReportService {
 	            serviceRepository.save(serviceVO);
 	        }
 	        
-	        if (memberVO != null) {
-	            MemberReportVO memberReportVO = new MemberReportVO();
-	            memberReportVO.setReporter(reporterId);  // 服務檢舉的發起人
-	            memberReportVO.setReported(memberVO); // 服務檢舉的發起人
-	            memberReportVO.setReportCategory(3);;                         // 被記點的會員（服務擁有者）
-	            memberReportVO.setReportContent("因服務檢舉審核通過，服務已違規下架，自動記點");
-	            memberReportVO.setViolationPoints(1);
-	            memberReportVO.setReportStatus(1); // 狀態代碼要跟組員確認
-	            memberReportRepository.save(memberReportVO);
-	        }
+
+			if (memberVO != null) {
+				int currentPoints = memberVO.getReportPoints() != null ? memberVO.getReportPoints() : 0;
+				memberVO.setReportPoints(currentPoints + 1);
+				memberRepository.save(memberVO);
+			}
+	        
+	        
+	        
+	        
 	        
 		}
 	}
