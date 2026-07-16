@@ -36,35 +36,6 @@ public class ActRptService {
     }
      
     
-    // 前台檢查內容有沒有亂打
-    public class ReportDiagnosticUtils {
-
-        public static boolean isSpamReport(String content) {
-            if (content == null || content.trim().isEmpty()) {
-                return true;
-            }
-            
-            String trimmed = content.trim();
-
-            if (trimmed.length() < 8) {
-                return true;
-            }
-
-            long uniqueChars = trimmed.chars().distinct().count();
-            double uniqueRatio = (double) uniqueChars / trimmed.length();
-            
-            if (uniqueRatio < 0.3) {
-                return true;
-            }
-
-            if (trimmed.matches(".*(.)\\1{3,}.*")) {
-                return true;
-            }
-
-            return false;
-        }
-    }
-    
 //===============    後台審核
     public Page<ActRptVO> getRptsByStatusWithPage(Integer status, int page, int size){
     	Pageable pageable = PageRequest.of(page, size, Sort.by("actRptTime"));

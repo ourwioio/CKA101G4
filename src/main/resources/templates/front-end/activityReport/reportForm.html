@@ -67,6 +67,7 @@ label {
 	font-size: 14px;
 	color: #334155;
 	font-weight: bold;
+	line-height: 1.6;
 }
 
 select, textarea, input[type="file"] {
@@ -159,6 +160,46 @@ input[type="file"] {
 	background-color: #f1f5f9;
 	color: #334155;
 }
+
+/* --- 高級感表單輔助元件樣式 --- */
+.form-helper-bar {
+	display: flex;
+	justify-content: space-between; 
+	align-items: flex-start;
+	margin-top: 6px;
+}
+
+.error-msg {
+	color: #dc2626;          
+	font-size: 13px;         
+	margin: 4px 0;
+	font-weight: 600;        
+	display: flex;           
+	align-items: center;     
+	gap: 4px;                
+	text-align: left;
+}
+
+.error-msg::before {
+	content: "⚠️";
+	font-size: 12px;
+}
+
+.char-count-box {
+	font-size: 12px;
+	color: #64748b;
+	white-space: nowrap;     
+	margin-left: auto;       
+	margin-top: 4px;
+}
+
+/* 【修正點】錯誤時的輸入框變色（已整合 select、textarea 與 input file，確保視覺與主視覺高度統一） */
+select.input-error, textarea.input-error, input[type="file"].input-error {
+	border-color: #dc2626 !important;
+	box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+	background-color: #fef2f2; 
+}
+
 </style>
 </head>
 <body>
@@ -170,26 +211,35 @@ input[type="file"] {
                 <path stroke-linecap="round" stroke-linejoin="round"
 					d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.008v.008H12v-.008Z" />
             </svg>
-			<h2>填寫活動檢舉</h2>
+			<h2>填寫活動檢舉表單</h2>
 		</div>
 
 		<form th:action="@{/activity/rptSubmit}" th:object="${actRptVO}"
-			method="post" enctype="multipart/form-data">
+			method="post" enctype="multipart/form-data" id="reportForm">
 
-			<!-- 1. 被檢舉的活動編號 -->
+			<!-- 1. 被檢舉的活動資訊 -->
 			<div class="form-group">
-				<label>被檢舉的活動編號</label>
+				<label>被檢舉的活動資訊</label>
 				<div class="readonly-box">
-					No. <span th:text="*{actId.activityId}">0</span>
+					<div>
+						<strong>活動編號：</strong> <span th:text="*{actId.activityId}"></span>
+					</div>
+					<div>
+						<strong>活動名稱：</strong> <span th:text="*{actId.activityTitle}"></span>
+					</div>
+					<div>
+						<strong>活動主辦人：</strong> <span th:text="${hostUserName}"></span>
+					</div>
 				</div>
+
 				<input type="hidden" th:field="*{actId.activityId}" />
 			</div>
 
 
-			<!-- 2. 選擇檢舉類型 -->
+			<!-- 2. 選擇檢舉類型（已補上 th:errorclass 與錯誤提示標籤） -->
 			<div class="form-group">
-				<label for="rptType">檢舉類型</label> <select id="rptType"
-					th:field="*{rptType}" required>
+				<label for="rptType">檢舉類型</label> 
+				<select id="rptType" th:field="*{rptType}" th:errorclass="input-error" required>
 					<option value="">-- 請選擇原因 --</option>
 					<option value="0">詐騙/虛假活動</option>
 					<option value="1">色情/不當活動</option>
@@ -197,39 +247,48 @@ input[type="file"] {
 					<option value="3">違法行為(聚賭、毒品)</option>
 					<option value="4">其他</option>
 				</select>
+				<!-- 補上檢舉類型的欄位錯誤訊息顯示點 -->
+				<span class="error-msg" th:if="${#fields.hasErrors('rptType')}" th:errors="*{rptType}"></span>
 			</div>
 
 			<!-- 3. 填寫詳細說明 -->
 			<div class="form-group">
 				<label for="actRptCom">詳細說明 (最少 10 個字)</label>
-				<textarea id="actRptCom" th:field="*{actRptCom}" rows="4" required
-					minlength="10" maxlength="500" placeholder="請詳細說明檢舉原因，以利管理員加快審核..."
+				<textarea id="actRptCom" th:field="*{actRptCom}" th:errorclass="input-error" rows="4" 
+					required maxlength="500" 
+					placeholder="請詳細說明檢舉原因，以利管理員加快審核..."
 					oninput="updateCount(this)"></textarea>
-				<div
-					style="text-align: right; font-size: 12px; color: #64748b; margin-top: 4px;">
-					目前字數: <span id="charCount">0</span> / 500
-				</div>
 
+				<div class="form-helper-bar">
+					<span class="error-msg" th:if="${#fields.hasErrors('actRptCom')}" th:errors="*{actRptCom}"></span>
+					<span th:unless="${#fields.hasErrors('actRptCom')}"></span>
+					<div class="char-count-box">
+						目前字數: <span id="charCount">0</span> / 500
+					</div>
+				</div>
 			</div>
 
 			<!-- 4. 上傳佐證圖片 + 預覽區塊 -->
-			<div class="form-group">
-				<label for="imageFile">上傳佐證圖片</label> <input type="file"
-					id="imageFile" name="imageFile" accept="image/*"
-					onchange="previewImage(this)">
+<div class="form-group">
+    <label for="imageFile">上傳佐證圖片</label> 
+    <!-- 注意：name 必須與 Controller 的 @RequestParam 一致，不可使用 th:field -->
+    <input type="file" id="imageFile" name="imageFile" accept="image/*"
+        th:classappend="${#fields.hasErrors('actRptImg')} ? 'input-error' : ''" 
+        onchange="previewImage(this)">
 
-				<!-- 預覽容器，預設隱藏 -->
-				<div id="previewContainer" class="preview-container">
-					<img id="imagePreview" class="preview-image" src="" alt="佐證圖片預覽">
-				</div>
-			</div>
+    <!-- 錯誤訊息顯示點綁定在 Entity 的屬性 actRptImg 上 -->
+    <span class="error-msg" th:if="${#fields.hasErrors('actRptImg')}" th:errors="*{actRptImg}"></span>
 
-			<!-- 5. 按鈕區 -->
+    <div id="previewContainer" class="preview-container">
+        <img id="imagePreview" class="preview-image" src="" alt="佐證圖片預覽">
+    </div>
+</div>
+
+			<!-- 5. 按鈕區（已補回表單內，確保點擊可正常 Submit） -->
 			<div class="btn-group">
-				<a th:href="@{/activity/actButton}" class="btn-cancel">取消返回</a>
-				<button type="submit" class="btn-submit">提交檢舉</button>
+				<a th:href="@{/activity/front/detail(id=*{actId.activityId})}" class="btn-cancel">取消返回</a>
+				<button type="submit" class="btn-submit" id="submitBtn">提交檢舉</button>
 			</div>
-
 		</form>
 	</div>
 
@@ -256,7 +315,17 @@ input[type="file"] {
 		function updateCount(textarea) {
 			document.getElementById('charCount').innerText = textarea.value.length;
 		}
+
+		// 防止惡意連點重複提交
+		document.getElementById('reportForm').addEventListener('submit', function() {
+			const btn = document.getElementById('submitBtn');
+			btn.disabled = true;
+			btn.innerText = '處理中...';
+			btn.style.backgroundColor = '#94a3b8';
+			btn.style.cursor = 'not-allowed';
+		});
 	</script>
 
 </body>
+
 </html>
