@@ -57,12 +57,34 @@
 			</div>
 
 			<p class="detail-card__meta-line">
-				建立時間：<span th:text="${#temporals.format(venueVO.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
+				場地編號：<span th:text="${venueVO.venueId}"></span>　｜　建立時間：<span th:text="${#temporals.format(venueVO.createdAt, 'yyyy-MM-dd HH:mm')}"></span>
 			</p>
 
 			<div class="detail-card__desc"
 				th:if="${venueVO.venueDescription != null and !venueVO.venueDescription.isEmpty()}"
 				th:text="${venueVO.venueDescription}"></div>
+
+			<div class="detail-card__section">
+				<div class="section-label">每週開放日</div>
+				<div class="day-badge-group">
+					<span class="day-badge" th:classappend="${venueVO.openDays != null and venueVO.openDays.length() == 7 and venueVO.openDays.substring(0,1) == '1'} ? 'day-open' : 'day-close'">週一</span>
+					<span class="day-badge" th:classappend="${venueVO.openDays != null and venueVO.openDays.length() == 7 and venueVO.openDays.substring(1,2) == '1'} ? 'day-open' : 'day-close'">週二</span>
+					<span class="day-badge" th:classappend="${venueVO.openDays != null and venueVO.openDays.length() == 7 and venueVO.openDays.substring(2,3) == '1'} ? 'day-open' : 'day-close'">週三</span>
+					<span class="day-badge" th:classappend="${venueVO.openDays != null and venueVO.openDays.length() == 7 and venueVO.openDays.substring(3,4) == '1'} ? 'day-open' : 'day-close'">週四</span>
+					<span class="day-badge" th:classappend="${venueVO.openDays != null and venueVO.openDays.length() == 7 and venueVO.openDays.substring(4,5) == '1'} ? 'day-open' : 'day-close'">週五</span>
+					<span class="day-badge" th:classappend="${venueVO.openDays != null and venueVO.openDays.length() == 7 and venueVO.openDays.substring(5,6) == '1'} ? 'day-open' : 'day-close'">週六</span>
+					<span class="day-badge" th:classappend="${venueVO.openDays != null and venueVO.openDays.length() == 7 and venueVO.openDays.substring(6,7) == '1'} ? 'day-open' : 'day-close'">週日</span>
+				</div>
+			</div>
+
+			<div class="detail-card__section" th:with="
+				hoursStr=${venueVO.availableHours},
+				hasZero=${hoursStr != null and hoursStr.contains('0')},
+				startH=${hasZero ? hoursStr.indexOf('0') : 9},
+				endH=${hasZero ? hoursStr.lastIndexOf('0') + 1 : 18}">
+				<div class="section-label">每日營業時段</div>
+				<div class="detail-card__meta-line" th:text="${startH} + ':00 至 ' + ${endH} + ':00'"></div>
+			</div>
 
 			<div class="detail-card__photos" th:if="${not #lists.isEmpty(venueVO.venueImages)}">
 				<div class="section-label">場地照片</div>

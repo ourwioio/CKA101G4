@@ -56,11 +56,15 @@ input[type="text"], select, textarea {
 	background: var(--color-surface-soft);
 	outline: none;
 }
-input:disabled { color: var(--color-ink-soft); background: var(--color-surface-soft); }
+input:disabled, select:disabled, input:read-only, textarea:read-only { color: var(--color-ink-soft); background: var(--color-surface-soft); cursor: not-allowed; }
 input:focus, select:focus, textarea:focus { border-color: var(--color-yellow-deep); }
 textarea { resize: vertical; }
 
 .error-text { color: #c0392b; font-size: 12px; margin-top: 4px; display: block; }
+
+.locked-note { background: #fff8e6; border: 1px solid var(--color-yellow-deep); border-radius: var(--radius-md); padding: 12px 16px; font-size: 13px; color: var(--color-ink); margin-bottom: 24px; }
+.locked-note p { margin: 0 0 10px; }
+.locked-note .btn { padding: 8px 18px; font-size: 13px; }
 
 .checkbox-cluster { display: flex; flex-wrap: wrap; gap: 14px; background: var(--color-surface-soft); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--color-border); }
 .checkbox-item { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 500; color: var(--color-ink); cursor: pointer; }

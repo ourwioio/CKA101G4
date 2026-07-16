@@ -227,6 +227,30 @@ public class VenueFrontController {
 		return "front-end/venue/update_venue_input";
 	}
 
+	@PostMapping("requestReReview")
+	public String requestReReview(@RequestParam("venueId") Integer venueId, HttpSession session) {
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+		if (loginMember == null) {
+			return "redirect:/member/login";
+		}
+
+		VenueVO venueVO = venueService.getOneVenue(venueId);
+		if (venueVO == null || !venueVO.getMember().getMemberId().equals(loginMember.getMemberId())) {
+			return "redirect:/front/venue/myVenue";
+		}
+
+		if (venueVO.getVenueStatus() != null && venueVO.getVenueStatus() != 2) {
+			venueService.requestReReview(venueId);
+
+			VenueReviewVO venueReviewVO = new VenueReviewVO();
+			venueReviewVO.setVenueId(venueId);
+			venueReviewVO.setReviewStatus((byte) 0);
+			venueReviewService.addVenueReview(venueReviewVO);
+		}
+
+		return "redirect:/front/venue/getOneMyVenue?venueId=" + venueId;
+	}
+
 	@GetMapping("listAllVenue")
 	public String listAllVenue(ModelMap model) {
 		List<VenueVO> list = venueService.getAllActive();
