@@ -46,42 +46,57 @@ public class ActReviewController {
 	}
 	
 
-	@PostMapping("/submit")
-	public String handleReviewSubmit(@RequestParam Integer orderId, 
-									 @RequestParam byte buyerRating,
-									 @RequestParam String buyerComment, 
+	@PostMapping("/review/submit")
+	public String handleReviewSubmit(@RequestParam("orderId") Integer orderId, 
+            						 @RequestParam("buyerRating") Byte buyerRating, 
+            						 @RequestParam("buyerComment") String buyerComment,
 									 HttpSession session, 
 									 Model model) {
-		try {
+		
 
 	    	MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 	        if (loginMember == null) {
 	            return "redirect:/member/login"; 
 	        }
 	        
-			reviewSvc.submitBuyerReview(orderId, buyerRating, buyerComment);
-
-			return "redirect:/reviews/success";
-
-		} catch (IllegalStateException | IllegalArgumentException e) {
-
-			model.addAttribute("errorMessage", e.getMessage());
-
-			ActivityOrderVO orderTemp = new ActivityOrderVO();
-			orderTemp.setActivityOrderId(orderId);
-			model.addAttribute("order", orderTemp);
-
-			model.addAttribute("prevRating", buyerRating);
-			model.addAttribute("prevComment", buyerComment);
-
-			return "form-end/activity/actReview";
-
-		} catch (Exception e) {
-			model.addAttribute("errorMessage", "系統 busy，請稍後再試");
-			return "form-end/activity/actReview";
-		}
+	        ActivityOrderVO order = actOrdSvc.getOneOrder(orderId);
+	        
+	        
+	        // 避免重複評價
+	        if (order.getBuyerRateSeller() != null) {
+	            model.addAttribute("orderData", order);
+	            model.addAttribute("errorMessage", "該筆訂單您已經評價過了！");
+	            model.addAttribute("prevRating", buyerRating);
+	            model.addAttribute("prevComment", buyerComment);
+	            return "front-end/activity/myActivityOrder";
+	        }
+	        
+	        // 欄位長度驗證
+	        if (buyerComment == null || buyerComment.trim().isEmpty() || buyerComment.length() > 500) {
+	            model.addAttribute("orderData", order);
+	            model.addAttribute("errorMessage", "評論內容長度必須在 1 到 500 字之間。");
+	            model.addAttribute("prevRating", buyerRating);
+	            model.addAttribute("prevComment", buyerComment);
+	            return "front-end/activity/actReview";
+	        }
+	        
+	        try {
+	            reviewSvc.saveBuyerReview(order, buyerRating, buyerComment);
+	            return "redirect:/activity/review/success";
+	            
+	        } catch (Exception e) {
+	            model.addAttribute("orderData", order);
+	            model.addAttribute("errorMessage", "系統繁忙，請稍後再試。");
+	            model.addAttribute("prevRating", buyerRating);
+	            model.addAttribute("prevComment", buyerComment);
+	            return "front-end/activity/actReview";
+	        }
+	
 	}
 	
 	
-	
+    @GetMapping("/activity/review/success")
+    public String showSuccessPage() {
+        return "front-end/activityReport/reviewSuccess";
+    }
 }

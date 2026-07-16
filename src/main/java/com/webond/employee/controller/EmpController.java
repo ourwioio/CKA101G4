@@ -36,7 +36,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/admin/employees")
 public class EmpController {
 
 	@Autowired

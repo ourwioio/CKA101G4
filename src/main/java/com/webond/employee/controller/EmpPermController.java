@@ -21,7 +21,7 @@ import com.webond.employee.model.PermissionVO;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/admin/employees")
 public class EmpPermController {
 	
 	

@@ -340,7 +340,7 @@
 				<a
 					class="wb-sidebar-link
                       wb-sidebar-link--activity"
-					th:href="@{/activity/admin/home}"> <span
+					th:href="@{/admin/activity/home}"> <span
 					class="wb-sidebar-icon"> 活動 </span> <span class="wb-sidebar-label">
 						活動管理 </span> <span class="wb-sidebar-arrow"> › </span>
 
@@ -348,7 +348,7 @@
 				<a
 					class="wb-sidebar-link
                       wb-sidebar-link--venue"
-					th:href="@{/venue/index}"> <span class="wb-sidebar-icon">
+					th:href="@{/admin/venue/index}"> <span class="wb-sidebar-icon">
 						場地 </span> <span class="wb-sidebar-label"> 場地管理 </span> <span
 					class="wb-sidebar-arrow"> › </span>
 
@@ -362,14 +362,14 @@
 				
 				
 				<!-- 會員管理 -->
-				<a class="wb-sidebar-link" th:href="@{/member/back-end/memberList}"> <span
+				<a class="wb-sidebar-link" th:href="@{/admin/members/back-end/memberList}"> <span
 					class="wb-sidebar-icon"> 會員 </span> <span class="wb-sidebar-label">
 						會員管理 </span> <span class="wb-sidebar-arrow"> › </span>
 
 				</a>
 
 				<!-- 一對一情境中的會員檢舉 -->
-				<a class="wb-sidebar-link" th:href="@{/backend/memberreport/manageReport}"> <span
+				<a class="wb-sidebar-link" th:href="@{/admin/members/backend/memberreport/manageReport}"> <span
 					class="wb-sidebar-icon"> 檢舉 </span> <span class="wb-sidebar-label">
 						會員檢舉管理 </span> <span class="wb-sidebar-arrow"> › </span>
 
@@ -377,14 +377,14 @@
 
 				<!-- 通知管理 -->
 				<a class="wb-sidebar-link"
-					th:href="@{/notification/listAllNotification}"> <span
+					th:href="@{/admin/platform/notification/listAllNotification}"> <span
 					class="wb-sidebar-icon"> 通知 </span> <span class="wb-sidebar-label">
 						通知管理 </span> <span class="wb-sidebar-arrow"> › </span>
 
 				</a>
 
 				<!-- 公告管理網址尚未提供 -->
-				<a class="wb-sidebar-link" th:href="@{/platform/index}"> <span
+				<a class="wb-sidebar-link" th:href="@{/admin/platform/index}"> <span
 					class="wb-sidebar-icon"> 公告 </span> <span class="wb-sidebar-label">
 						公告管理 </span> <span class="wb-sidebar-arrow"> › </span>
 
@@ -398,11 +398,11 @@
 
 				<p class="wb-sidebar-section-title">員工及權限</p>
 
-				<a class="wb-sidebar-link" th:href="@{/admin/empPage}"> <span
+				<a class="wb-sidebar-link" th:href="@{/admin/employees/empPage}"> <span
 					class="wb-sidebar-icon"> 員工 </span> <span class="wb-sidebar-label">
 						員工管理系統 </span> <span class="wb-sidebar-arrow"> › </span>
 
-				</a> <a class="wb-sidebar-link" th:href="@{/admin/empPermPage}"> <span
+				</a> <a class="wb-sidebar-link" th:href="@{/admin/employees/empPermPage}"> <span
 					class="wb-sidebar-icon"> 權限 </span> <span class="wb-sidebar-label">
 						員工權限管理 </span> <span class="wb-sidebar-arrow"> › </span>
 
@@ -413,10 +413,23 @@
 				</div>
 
 			</nav>
+			
+			<script>
+				const urlParams = new URLSearchParams(window.location.search);
+				const errorParam = urlParams.get('error');
+				
+				if (errorParam === 'no_permission') {
+					alert("⚠️ 存取被拒絕：您的帳號不具備該管理權限！");
+					// 清除網址參數，防止重新整理網頁時重複跳出
+					window.history.replaceState({}, document.title, window.location.pathname);
+				}
+			</script>
 
 		</aside>
 
 	</th:block>
+
+
 
 </body>
 </html>
