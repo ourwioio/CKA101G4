@@ -105,14 +105,15 @@ public class MemberFrontControllerAyaka {
 	
 	//會員個人頁面
 	@GetMapping("my")
-	public String getMyMemberPage(@RequestParam("memberId") Integer memberId,
-	        @RequestParam(value = "venueId", required = false) Integer venueId,
+	public String getMyMemberPage(
 	        ModelMap model, HttpSession session) {	
 		
 		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 		if(loginMember == null) {
 			return "redirect:/member/login";
 		}
+		
+		Integer memberId = loginMember.getMemberId();
 		
 		MemberVO memberVO = memberService.getOneMember(memberId);
 	    ServiceVO serviceList = serviceService.getOneService(memberId);
