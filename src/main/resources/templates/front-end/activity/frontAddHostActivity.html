@@ -1,5 +1,5 @@
-﻿<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
 <meta charset="UTF-8">
 <title>我要辦活動</title>
@@ -148,7 +148,7 @@ textarea.form-control {
 	<div class="header-container">
 		<div class="header-title" th:text="${formTitle ?: '我要辦活動'}">我要辦活動</div>
 
-		<a th:href="${cancelUrl ?: '/activity/front/home'}" class="btn-secondary"
+		<a th:href="${cancelUrl ?: '/'}" class="btn-secondary"
 			th:text="${cancelText ?: '返回使用者首頁'}">返回使用者首頁</a>
 	</div>
 
@@ -228,7 +228,7 @@ textarea.form-control {
 				<div class="form-group">
 					<label>報名開始時間 <span class="required">*</span></label> <input
 						type="datetime-local" th:field="*{registrationStartTime}"
-						class="form-control"
+						class="form-control" step="300" lang="zh-TW"
 						th:classappend="${#fields.hasErrors('registrationStartTime')} ? ' input-error'">
 
 					<div class="error"
@@ -239,7 +239,7 @@ textarea.form-control {
 				<div class="form-group">
 					<label>報名截止時間 <span class="required">*</span></label> <input
 						type="datetime-local" th:field="*{registrationDeadline}"
-						class="form-control"
+						class="form-control" step="300" lang="zh-TW"
 						th:classappend="${#fields.hasErrors('registrationDeadline')} ? ' input-error'">
 
 					<div class="error"
@@ -250,6 +250,7 @@ textarea.form-control {
 				<div class="form-group">
 					<label>活動開始時間 <span class="required">*</span></label> <input
 						type="datetime-local" th:field="*{startTime}" class="form-control"
+						step="300" lang="zh-TW"
 						th:classappend="${#fields.hasErrors('startTime')} ? ' input-error'">
 
 					<div class="error" th:if="${#fields.hasErrors('startTime')}"
@@ -259,6 +260,7 @@ textarea.form-control {
 				<div class="form-group">
 					<label>活動結束時間 <span class="required">*</span></label> <input
 						type="datetime-local" th:field="*{endTime}" class="form-control"
+						step="300" lang="zh-TW"
 						th:classappend="${#fields.hasErrors('endTime')} ? ' input-error'">
 
 					<div class="error" th:if="${#fields.hasErrors('endTime')}"
@@ -291,7 +293,7 @@ textarea.form-control {
 			</div>
 
 			<div class="form-actions">
-				<a th:href="${cancelUrl ?: '/activity/front/home'}" class="btn-cancel">取消</a>
+				<a th:href="${cancelUrl ?: '/'}" class="btn-cancel">取消</a>
 				<button type="submit" class="btn-submit" th:text="${submitText ?: '建立活動'}">建立活動</button>
 			</div>
 

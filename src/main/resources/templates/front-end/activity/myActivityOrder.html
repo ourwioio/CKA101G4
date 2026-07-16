@@ -299,7 +299,7 @@ td {
 						<td>
 							<div class="actions" th:if="${order.orderStatus == 0}">
 								<a class="btn-small btn-pay"
-									th:href="@{/activity/front/chat(activityId=${order.activityId})}">
+									th:href="@{/activity/front/chat(activityId=${order.activityId}, from='order')}">
 									進入聊天室
 								</a>
 								<form th:action="@{/activity/front/order/cancel}" method="post"

@@ -163,6 +163,11 @@ tr:hover{
     background:#dc2626;
 }
 
+.btn-approve:disabled{
+    background:#94a3b8;
+    cursor:not-allowed;
+}
+
 .notice{
     border-radius:10px;
     padding:12px 16px;
@@ -239,7 +244,8 @@ tr:hover{
 
     <div th:if="${param.approveSuccess}" class="notice success">已同意報名，訂單已改為待付款。</div>
     <div th:if="${param.rejectSuccess}" class="notice success">已拒絕報名申請。</div>
-    <div th:if="${param.approveFailed}" class="notice error">同意失敗，名額已满。</div>
+    <div th:if="${param.approveFailed}" class="notice error">同意失敗，名額已满。</div>
+    <div th:if="${param.approveExpired}" class="notice error">審核時間已逾時，無法再同意報名。</div>
 
     <div class="group-status">
         目前已付款人數：
@@ -373,6 +379,14 @@ tr:hover{
                 text.textContent = formatRemaining(remaining);
             }
             item.classList.toggle('expired', remaining <= 0);
+            if (item.dataset.deadline) {
+                const row = item.closest('[data-order-id]');
+                const approveButton = row ? row.querySelector('.btn-approve') : null;
+                if (approveButton && remaining <= 0) {
+                    approveButton.disabled = true;
+                    approveButton.textContent = '已逾時';
+                }
+            }
         });
     }
 
@@ -412,6 +426,12 @@ tr:hover{
                     })
                     .then(function(result) {
                         if (!result.success) {
+                            if (result.message === 'reviewExpired') {
+                                const url = new URL(window.location.href);
+                                url.searchParams.set('approveExpired', 'true');
+                                window.location.href = url.toString();
+                                return;
+                            }
                             window.location.reload();
                             return;
                         }

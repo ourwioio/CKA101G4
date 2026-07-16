@@ -30,33 +30,54 @@ public class GroupChatController {
 	private ActivityOrderService activityOrderSvc;
 
 	@GetMapping("/activity/front/chat")
-	public String chatRoom(@RequestParam("activityId") Integer activityId, Model model, HttpSession session) {
+	public String chatRoom(@RequestParam("activityId") Integer activityId,
+			@RequestParam(value = "from", required = false) String from, Model model, HttpSession session) {
 		Integer loginMemberId = getLoginMemberId(session);
 		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
 
 		if (!canEnterChat(activityVO, loginMemberId)) {
-			return "redirect:/activity/front/home?chatDenied=true";
+			return "redirect:" + resolveChatBackUrl(from) + "?chatDenied=true";
 		}
 
 		model.addAttribute("activityVO", activityVO);
 		model.addAttribute("loginMemberId", loginMemberId);
 		model.addAttribute("loginMemberName", resolveLoginMemberName(session, loginMemberId));
 		model.addAttribute("messageListData", groupChatMessageSvc.getMessagesByActivityId(activityId));
+		model.addAttribute("from", from);
+		model.addAttribute("backUrl", resolveChatBackUrl(from));
 		return "front-end/activity/groupChatRoom";
 	}
 
 	@PostMapping("/activity/front/chat/send")
 	public String sendMessage(@RequestParam("activityId") Integer activityId,
+			@RequestParam(value = "from", required = false) String from,
 			@RequestParam("content") String content, HttpSession session) {
 		Integer loginMemberId = getLoginMemberId(session);
 		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
 
 		if (!canEnterChat(activityVO, loginMemberId)) {
-			return "redirect:/activity/front/home?chatDenied=true";
+			return "redirect:" + resolveChatBackUrl(from) + "?chatDenied=true";
 		}
 
 		groupChatMessageSvc.sendMessage(activityId, loginMemberId, content);
-		return "redirect:/activity/front/chat?activityId=" + activityId;
+		return "redirect:/activity/front/chat?activityId=" + activityId + "&from=" + normalizeFrom(from);
+	}
+
+	private String resolveChatBackUrl(String from) {
+		if ("host".equals(from)) {
+			return "/activity/front/myHostActivity";
+		}
+		if ("order".equals(from)) {
+			return "/activity/front/myOrder";
+		}
+		return "/activity/front/list";
+	}
+
+	private String normalizeFrom(String from) {
+		if ("host".equals(from) || "order".equals(from)) {
+			return from;
+		}
+		return "list";
 	}
 
 	private boolean canEnterChat(ActivityVO activityVO, Integer loginMemberId) {

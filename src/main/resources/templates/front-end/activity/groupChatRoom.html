@@ -141,7 +141,7 @@ body {
 					目前會員：<span th:text="${loginMemberName}">會員1</span>
 				</p>
 			</div>
-			<a class="btn-back" th:href="@{/activity/front/home}">回到活動前台</a>
+			<a class="btn-back" th:href="${backUrl ?: '/activity/front/list'}">返回上一頁</a>
 		</div>
 
 		<div class="message-list">
@@ -161,6 +161,7 @@ body {
 
 		<form class="chat-form" th:action="@{/activity/front/chat/send}" method="post">
 			<input type="hidden" name="activityId" th:value="${activityVO.activityId}">
+			<input type="hidden" name="from" th:value="${from}">
 			<textarea name="content" maxlength="500" placeholder="輸入訊息..." required></textarea>
 			<button type="submit">送出</button>
 		</form>

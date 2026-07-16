@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
 <meta charset="UTF-8">
 <title>修改活動</title>
@@ -221,7 +221,7 @@ textarea.form-control {
 				<div class="form-group">
 					<label>報名開始時間 <span class="required">*</span></label> <input
 						type="datetime-local" th:field="*{registrationStartTime}"
-						class="form-control"
+						class="form-control" step="300" lang="zh-TW"
 						th:classappend="${#fields.hasErrors('registrationStartTime')} ? ' input-error'">
 
 					<div class="error"
@@ -232,7 +232,7 @@ textarea.form-control {
 				<div class="form-group">
 					<label>報名截止時間 <span class="required">*</span></label> <input
 						type="datetime-local" th:field="*{registrationDeadline}"
-						class="form-control"
+						class="form-control" step="300" lang="zh-TW"
 						th:classappend="${#fields.hasErrors('registrationDeadline')} ? ' input-error'">
 
 					<div class="error"
@@ -243,6 +243,7 @@ textarea.form-control {
 				<div class="form-group">
 					<label>活動開始時間 <span class="required">*</span></label> <input
 						type="datetime-local" th:field="*{startTime}" class="form-control"
+						step="300" lang="zh-TW"
 						th:classappend="${#fields.hasErrors('startTime')} ? ' input-error'">
 
 					<div class="error" th:if="${#fields.hasErrors('startTime')}"
@@ -252,6 +253,7 @@ textarea.form-control {
 				<div class="form-group">
 					<label>活動結束時間 <span class="required">*</span></label> <input
 						type="datetime-local" th:field="*{endTime}" class="form-control"
+						step="300" lang="zh-TW"
 						th:classappend="${#fields.hasErrors('endTime')} ? ' input-error'">
 
 					<div class="error" th:if="${#fields.hasErrors('endTime')}"

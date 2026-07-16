@@ -157,13 +157,13 @@ textarea.form-control {
 
 	<div class="header-container">
 		<div class="header-title">✏️ 修改活動內容</div>
-		<a th:href="@{/activity/listAllActivity}" class="btn-secondary">🔙
+		<a th:href="@{/admin/activity/listAllActivity}" class="btn-secondary">🔙
 			返回列表</a>
 	</div>
 
 	<div class="form-card">
 
-		<form th:action="@{/activity/update}" th:object="${activityVO}"
+		<form th:action="@{/admin/activity/update}" th:object="${activityVO}"
 			method="post">
 
 			<input type="hidden" th:field="*{activityId}"> <input
@@ -330,7 +330,7 @@ textarea.form-control {
 
 			<div class="form-actions">
 
-				<a th:href="@{/activity/listAllActivity}" class="btn-cancel"> 取消
+				<a th:href="@{/admin/activity/listAllActivity}" class="btn-cancel"> 取消
 				</a>
 
 				<button type="submit" class="btn-submit">💾 儲存修改</button>

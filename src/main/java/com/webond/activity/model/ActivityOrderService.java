@@ -85,6 +85,10 @@ public class ActivityOrderService {
 		return orderRepo.findByActivityId(activityId);
 	}
 
+	public List<ActivityOrderVO> getReviewedOrdersByActivityId(Integer activityId) {
+		return orderRepo.findByActivityIdAndBuyerReviewCommentIsNotNullOrderByBuyerReviewedAtDesc(activityId);
+	}
+
 	public ActivityOrderVO cancelOrder(Integer activityOrderId, Integer buyerMemberId) {
 		ActivityOrderVO orderVO = getOneOrder(activityOrderId);
 

@@ -20,8 +20,13 @@ import com.webond.activity.model.ActivityService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/activityOrder")
+@RequestMapping({ "/activityOrder", "/admin/activity/order" })
 public class ActivityOrderPageController {
+
+	private static final String ADMIN_ACTIVITY_HOME = "/admin/activity/home";
+	private static final String ADMIN_ORDER_LIST = "/admin/activity/order/listAllActivityOrder";
+	private static final String ADMIN_ORDER_DETAIL = "/admin/activity/order/detail";
+	private static final String ADMIN_ORDER_FINANCE = "/admin/activity/order/finance";
 
 	@Autowired
 	private ActivityOrderService orderSvc;
@@ -38,7 +43,7 @@ public class ActivityOrderPageController {
 	@GetMapping("/listAllActivityOrder")
 	public String listAllActivityOrder(Model model, HttpSession session) {
 		if (!isLoginEmployee(session)) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
 
 		model.addAttribute("orderListData", orderSvc.getAll());
@@ -52,7 +57,7 @@ public class ActivityOrderPageController {
 	public String financeOrders(@RequestParam(value = "financeStatus", required = false) String financeStatus,
 			@RequestParam(value = "orderStatus", required = false) String orderStatus, Model model, HttpSession session) {
 		if (!isLoginEmployee(session)) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
 
 		List<ActivityOrderVO> orderList = orderSvc.getAll().stream()
@@ -87,12 +92,12 @@ public class ActivityOrderPageController {
 	public String orderDetail(@RequestParam("activityOrderId") Integer activityOrderId, Model model,
 			HttpSession session) {
 		if (!isLoginEmployee(session)) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
 
 		ActivityOrderVO orderVO = orderSvc.getOneOrder(activityOrderId);
 		if (orderVO == null) {
-			return "redirect:/activityOrder/listAllActivityOrder";
+			return "redirect:" + ADMIN_ORDER_LIST;
 		}
 
 		model.addAttribute("orderVO", orderVO);
@@ -106,16 +111,16 @@ public class ActivityOrderPageController {
 	public String confirmRefund(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
 		Integer employeeId = employeeSession.getLoginEmployeeId(session);
 		if (employeeId == null) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
 
 		ActivityOrderVO orderVO = orderSvc.confirmRefund(activityOrderId, employeeId);
 		if (orderVO == null || orderVO.getRefundStatus() == null || orderVO.getRefundStatus() != 2) {
-			return "redirect:/activityOrder/detail?activityOrderId=" + activityOrderId + "&refundFailed=true";
+			return "redirect:" + ADMIN_ORDER_DETAIL + "?activityOrderId=" + activityOrderId + "&refundFailed=true";
 		}
 
 		activityNotificationSvc.notifyBuyerRefundDone(activitySvc.getOneActivity(orderVO.getActivityId()), orderVO);
-		return "redirect:/activityOrder/detail?activityOrderId=" + activityOrderId + "&refundSuccess=true";
+		return "redirect:" + ADMIN_ORDER_DETAIL + "?activityOrderId=" + activityOrderId + "&refundSuccess=true";
 	}
 
 	@PostMapping("/confirmRefundFromList")
@@ -124,7 +129,7 @@ public class ActivityOrderPageController {
 			@RequestParam(value = "orderStatus", required = false) String orderStatus, HttpSession session) {
 		Integer employeeId = employeeSession.getLoginEmployeeId(session);
 		if (employeeId == null) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
 
 		ActivityOrderVO orderVO = orderSvc.confirmRefund(activityOrderId, employeeId);
@@ -138,14 +143,14 @@ public class ActivityOrderPageController {
 	public String confirmPayout(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
 		Integer employeeId = employeeSession.getLoginEmployeeId(session);
 		if (employeeId == null) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
 
 		ActivityOrderVO orderVO = orderSvc.confirmPayout(activityOrderId, employeeId);
 		if (orderVO != null && Boolean.TRUE.equals(orderVO.getPayoutAmount())) {
 			activityNotificationSvc.notifyHostPayoutDone(activitySvc.getOneActivity(orderVO.getActivityId()), orderVO);
 		}
-		return "redirect:/activityOrder/detail?activityOrderId=" + activityOrderId + "&payoutSuccess=true";
+		return "redirect:" + ADMIN_ORDER_DETAIL + "?activityOrderId=" + activityOrderId + "&payoutSuccess=true";
 	}
 
 	@PostMapping("/confirmPayoutFromList")
@@ -154,7 +159,7 @@ public class ActivityOrderPageController {
 			@RequestParam(value = "orderStatus", required = false) String orderStatus, HttpSession session) {
 		Integer employeeId = employeeSession.getLoginEmployeeId(session);
 		if (employeeId == null) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
 
 		ActivityOrderVO orderVO = orderSvc.confirmPayout(activityOrderId, employeeId);
@@ -167,17 +172,17 @@ public class ActivityOrderPageController {
 	@PostMapping("/approve")
 	public String approveOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
 		if (!isLoginEmployee(session)) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
-		return "redirect:/activityOrder/listAllActivityOrder?hostReviewOnly=true";
+		return "redirect:" + ADMIN_ORDER_LIST + "?hostReviewOnly=true";
 	}
 
 	@PostMapping("/reject")
 	public String rejectOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
 		if (!isLoginEmployee(session)) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
-		return "redirect:/activityOrder/listAllActivityOrder?hostReviewOnly=true";
+		return "redirect:" + ADMIN_ORDER_LIST + "?hostReviewOnly=true";
 	}
 
 	private void addLoginEmployee(Model model, HttpSession session) {
@@ -225,7 +230,7 @@ public class ActivityOrderPageController {
 	}
 
 	private String redirectToFinance(String financeStatus, String orderStatus) {
-		StringBuilder redirectUrl = new StringBuilder("redirect:/activityOrder/finance");
+		StringBuilder redirectUrl = new StringBuilder("redirect:" + ADMIN_ORDER_FINANCE);
 		boolean hasParam = false;
 
 		if (financeStatus != null && !financeStatus.trim().isEmpty()) {

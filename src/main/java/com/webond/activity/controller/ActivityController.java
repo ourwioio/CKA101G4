@@ -17,8 +17,11 @@ import com.webond.activity.model.ActivityVO;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/activity")
+@RequestMapping({ "/activity", "/admin/activity" })
 public class ActivityController {
+
+	private static final String ADMIN_ACTIVITY_HOME = "/admin/activity/home";
+	private static final String ADMIN_ACTIVITY_LIST = "/admin/activity/listAllActivity";
 
 	@Autowired
 	private ActivityService activitySvc;
@@ -35,7 +38,7 @@ public class ActivityController {
 	@GetMapping("/listAllActivity")
 	public String listAllActivity(Model model, HttpSession session) {
 		if (!isLoginEmployee(session)) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
 
 		model.addAttribute("activityListData", activitySvc.getAll());
@@ -46,7 +49,7 @@ public class ActivityController {
 	@PostMapping("/takeDown")
 	public String takeDownActivity(@RequestParam("activityId") Integer activityId, HttpSession session) {
 		if (!isLoginEmployee(session)) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
 
 		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
@@ -57,52 +60,52 @@ public class ActivityController {
 			activityOrderSvc.rejectPendingOrdersByActivity(activityId, null);
 		}
 
-		return "redirect:/activity/listAllActivity";
+		return "redirect:" + ADMIN_ACTIVITY_LIST;
 	}
 
 	@GetMapping("/addActivity")
 	public String addActivityDisabled(HttpSession session) {
 		if (!isLoginEmployee(session)) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
-		return "redirect:/activity/listAllActivity";
+		return "redirect:" + ADMIN_ACTIVITY_LIST;
 	}
 
 	@PostMapping("/insert")
 	public String insertDisabled(HttpSession session) {
 		if (!isLoginEmployee(session)) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
-		return "redirect:/activity/listAllActivity";
+		return "redirect:" + ADMIN_ACTIVITY_LIST;
 	}
 
 	@GetMapping("/updateActivity")
 	public String updateActivityDisabled(HttpSession session) {
 		if (!isLoginEmployee(session)) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
-		return "redirect:/activity/listAllActivity";
+		return "redirect:" + ADMIN_ACTIVITY_LIST;
 	}
 
 	@PostMapping("/update")
 	public String updateDisabled(HttpSession session) {
 		if (!isLoginEmployee(session)) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
-		return "redirect:/activity/listAllActivity";
+		return "redirect:" + ADMIN_ACTIVITY_LIST;
 	}
 
 	@PostMapping("/deleteActivity")
 	public String deleteActivityDisabled(HttpSession session) {
 		if (!isLoginEmployee(session)) {
-			return "redirect:/activity/admin/home?loginRequired=true";
+			return "redirect:" + ADMIN_ACTIVITY_HOME + "?loginRequired=true";
 		}
-		return "redirect:/activity/listAllActivity";
+		return "redirect:" + ADMIN_ACTIVITY_LIST;
 	}
 
 	@GetMapping("/activityHome")
 	public String activityHome() {
-		return "redirect:/activity/admin/home";
+		return "redirect:" + ADMIN_ACTIVITY_HOME;
 	}
 
 	private boolean isLoginEmployee(HttpSession session) {

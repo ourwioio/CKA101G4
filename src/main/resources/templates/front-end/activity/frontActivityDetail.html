@@ -144,6 +144,60 @@ h1 {
 .btn-report:hover {
 	background: #b91c1c;
 }
+
+.btn-review {
+	background: #7c3aed;
+	color: white;
+	text-decoration: none;
+	padding: 12px 24px;
+	border-radius: 8px;
+	font-weight: bold;
+}
+
+.btn-review:hover {
+	background: #6d28d9;
+}
+
+.review-section {
+	margin-top: 30px;
+	padding: 22px;
+	background: #f8fafc;
+	border-radius: 12px;
+	border: 1px solid #e2e8f0;
+}
+
+.review-section h2 {
+	margin: 0 0 16px 0;
+	color: #0f172a;
+}
+
+.review-card {
+	background: white;
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	padding: 16px;
+	margin-top: 12px;
+}
+
+.review-meta {
+	display: flex;
+	justify-content: space-between;
+	gap: 12px;
+	color: #64748b;
+	font-weight: bold;
+	margin-bottom: 8px;
+}
+
+.review-rating {
+	color: #7c3aed;
+	font-weight: bold;
+	margin-bottom: 8px;
+}
+
+.review-empty {
+	color: #64748b;
+	font-weight: bold;
+}
 </style>
 </head>
 
@@ -243,6 +297,22 @@ h1 {
 				th:if="${showOrderButton}"
 				th:href="@{/activity/front/order(activityId=${activityVO.activityId})}"
 				class="btn-order"> 立即報名 </a>
+			<a th:if="${showReviewButton}" href="#activityReviews" class="btn-review">瀏覽評價</a>
+		</div>
+		<div id="activityReviews" class="review-section" th:if="${showReviewButton}">
+			<h2>活動評價</h2>
+			<div th:if="${#lists.isEmpty(reviewListData)}" class="review-empty">
+				目前尚無會員評價。
+			</div>
+			<div th:each="review : ${reviewListData}" class="review-card">
+				<div class="review-meta">
+					<span th:text="|會員 ${review.buyerMemberId}|">會員</span>
+					<span th:if="${review.buyerReviewedAt != null}"
+						th:text="${#temporals.format(review.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}">評價時間</span>
+				</div>
+				<div class="review-rating" th:text="|評分：${review.buyerRateSeller} / 5|">評分：5 / 5</div>
+				<div th:text="${review.buyerReviewComment}">評價內容</div>
+			</div>
 		</div>
 
 	</div>

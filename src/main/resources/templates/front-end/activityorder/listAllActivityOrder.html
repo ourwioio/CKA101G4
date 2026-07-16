@@ -210,11 +210,11 @@ td {
 		</div>
 
 		<div class="admin-nav">
-			<a th:href="@{/activity/listAllActivity}" class="admin-btn btn-activity">活動管理</a>
-			<a th:href="@{/activityType/listAllActivityType}" class="admin-btn btn-type">類別管理</a>
-			<a th:href="@{/activityOrder/finance}" class="admin-btn btn-finance">撥退款作業</a>
-			<a th:href="@{/admin/actRptList}" class="admin-btn btn-report">活動檢舉審核</a>
-			<a th:href="@{/activity/admin/home}" class="admin-btn btn-home">回後台首頁</a>
+			<a th:href="@{/admin/activity/listAllActivity}" class="admin-btn btn-activity">活動管理</a>
+			<a th:href="@{/admin/activity/type/listAllActivityType}" class="admin-btn btn-type">類別管理</a>
+			<a th:href="@{/admin/activity/order/finance}" class="admin-btn btn-finance">撥退款作業</a>
+			<a th:href="@{/admin/activity/actRptList}" class="admin-btn btn-report">活動檢舉審核</a>
+			<a th:href="@{/admin/activity/home}" class="admin-btn btn-home">回後台首頁</a>
 		</div>
 
 		<div class="employee">
@@ -248,7 +248,7 @@ td {
 
 						<td>
 							<a class="btn-detail"
-								th:href="@{/activityOrder/detail(activityOrderId=${order.activityOrderId})}">
+								th:href="@{/admin/activity/order/detail(activityOrderId=${order.activityOrderId})}">
 								<span th:each="activity : ${activityListData}"
 									th:if="${activity.activityId == order.activityId}"
 									th:text="${activity.activityTitle}">

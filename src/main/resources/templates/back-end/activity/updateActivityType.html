@@ -32,10 +32,10 @@
 <body>
     <div class="header-container">
         <div class="header-title">✏️ 修改活動分類</div>
-        <a th:href="@{/activityType/listAllActivityType}" class="btn-secondary">🔙 返回列表</a>
+        <a th:href="@{/admin/activity/type/listAllActivityType}" class="btn-secondary">🔙 返回列表</a>
     </div>
     <div class="form-card">
-        <form th:action="@{/activityType/update}" th:object="${activityTypeVO}" method="post">
+        <form th:action="@{/admin/activity/type/update}" th:object="${activityTypeVO}" method="post">
             
             <!-- 隱藏主鍵 ID，更新時必須有 -->
             <input type="hidden" th:field="*{activityTypeId}" />
@@ -46,7 +46,7 @@
             </div>
             
             <div class="form-actions">
-                <a th:href="@{/activityType/listAllActivityType}" class="btn-cancel">取消</a>
+                <a th:href="@{/admin/activity/type/listAllActivityType}" class="btn-cancel">取消</a>
                 <button type="submit" class="btn-submit">💾 儲存修改</button>
             </div>
         </form>
