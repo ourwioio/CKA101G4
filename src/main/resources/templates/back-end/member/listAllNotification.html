@@ -1,49 +1,330 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>全部通知 - Webond 後台管理</title>
     
-<title>全部通知</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: #2d3436;
+            background: #f5f6fa;
+            font-family: Arial, "Noto Sans TC", sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* =========================================
+           通知頁面主容器
+           ========================================= */
+        .notification-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* =========================================
+           頁面標頭與動作按鈕
+           ========================================= */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #dfe4e8;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .page-title-group h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+            color: #2d3436;
+        }
+
+        .page-subtitle {
+            margin: 0;
+            color: #636e72;
+            font-size: 15px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 9px 18px;
+            color: #ffffff;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.15s ease, transform 0.15s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* 負責的通知 - 採用場地首頁的財務藍 */
+        .btn-action--my-noti {
+            background: #0984e3;
+        }
+
+        .btn-action--my-noti:hover {
+            background: #0769b5;
+            transform: translateY(-1px);
+        }
+
+        /* 新增通知 - 採用深灰 */
+        .btn-action--add {
+            background: #343a40;
+        }
+
+        .btn-action--add:hover {
+            background: #111111;
+            transform: translateY(-1px);
+        }
+
+        /* =========================================
+           數據表格卡片
+           ========================================= */
+        .table-card {
+            background: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto; /* 當欄位過多時自動啟用水平滾動，避免撐壞佈局 */
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .custom-table th {
+            background: #f8fafc;
+            color: #636e72;
+            font-weight: 600;
+            padding: 16px 20px;
+            border-bottom: 1px solid #dfe4e8;
+            white-space: nowrap;
+        }
+
+        .custom-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #dfe4e8;
+            color: #2d3436;
+            vertical-align: middle;
+        }
+
+        .custom-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .custom-table tbody tr:hover {
+            background-color: #fbfcfe;
+        }
+
+        /* =========================================
+           精緻化元件樣式（ID、按鈕、文字等）
+           ========================================= */
+        .badge-id {
+            display: inline-block;
+            font-family: monospace;
+            font-weight: bold;
+            color: #0984e3;
+            background: #e1f5fe;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        /* 內容字數過多時的優雅截斷 */
+        .text-ellipsis {
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 表格內操作按鈕 */
+        .btn-table {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            white-space: nowrap;
+        }
+
+        /* 修改按鈕 */
+        .btn-table--edit {
+            background: #f5f6fa;
+            color: #2d3436;
+            border: 1px solid #dfe4e8;
+        }
+
+        .btn-table--edit:hover {
+            background: #eef1f6;
+            border-color: #b2bec3;
+        }
+
+        /* 刪除按鈕 */
+        .btn-table--delete {
+            background: #fff0f0;
+            color: #c0392b;
+            border: 1px solid #ffccd0;
+        }
+
+        .btn-table--delete:hover {
+            background: #c0392b;
+            color: #ffffff;
+            border-color: #c0392b;
+        }
+
+        /* =========================================
+           響應式 RWD 調整
+           ========================================= */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .header-actions {
+                width: 100%;
+            }
+            .btn-action {
+                flex: 1;
+            }
+        }
+    </style>
 </head>
 <body>
-	<div>
-		<h1>全部通知</h1>
-	</div>
-	<a th:href="@{/admin/platform/notification/myNotification}">負責的通知</a>
-	<a th:href="@{/admin/platform/notification/addNotification}">新增通知</a>
-	<table>
-		<thead>
-			<tr> 	
-			</tr>		    
-	    </thead>
-	    <tbody>
-	    	
-	    	<tr th:each="n : ${notificationListData}">
-		        <td th:text="${n.notificationId}"></td>
-		        <td th:text="${n.member.memberId}"></td>
-		        <td th:text="${n.title}"></td>
-		        <td th:text="${n.content}"></td>
-		        <td th:text="${n.notificationType}"></td>
-		        <td th:text="${n.isRead}"></td>
-		        <td th:text="${n.report != null ? n.report.reportId : '無'}"></td>
-		        <td th:text="${n.employee?.employeeId}"></td>
-		        <td th:text="${n.createdAt}"></td>
-				<td>
-					<form th:action="@{/admin/platform/notification/getOne_For_update}" method="post">
-						<input type="hidden"  name="notificationId" th:value="${n.notificationId}"/>
-						<button type="submit">修改</button>
-					</form>
-				</td>
-				<td>
-					<form th:action="@{/admin/platform/notification/delete}" method="post">
-						<input type="hidden"  name="notificationId" th:value="${n.notificationId}"/>
-						<button type="submit">刪除</button>
-					</form>
-				</td>
-		    </tr>
-	    </tbody>
-	</table>
+
+<div class="wb-admin-layout">
+
+    <!-- =========================================
+         左側共用後台 Sidebar (維持原引入方式)
+         ========================================= -->
+    <div th:replace="~{back-end/fragments/adminSidebar:: adminSidebar}"></div>
+
+    <!-- =========================================
+         右側主要內容區 (採用一致的 .wb-admin-content)
+         ========================================= -->
+    <main class="wb-admin-content">
+
+        <div class="notification-container">
+
+            <!-- =====================================
+                 頁面標頭
+                 ===================================== -->
+            <header class="page-header">
+                
+                <div class="page-title-group">
+                    <h1>全部通知</h1>
+                    <p class="page-subtitle">管理與發送系統通知，掌握平台最新消息與檢舉回饋。</p>
+                </div>
+
+                <div class="header-actions">
+                    <a class="btn-action btn-action--my-noti" th:href="@{/admin/platform/notification/myNotification}">
+                        負責的通知
+                    </a>
+                    <a class="btn-action btn-action--add" th:href="@{/admin/platform/notification/addNotification}">
+                        新增通知
+                    </a>
+                </div>
+
+            </header>
+
+            <!-- =====================================
+                 表格區塊 (含響應式水平捲軸滾動)
+                 ===================================== -->
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>通知 ID</th>
+                                <th>會員 ID</th>
+                                <th>通知標題</th>
+                                <th>通知內容</th>
+                                <th>通知類型</th>
+                                <th>已讀狀態</th>
+                                <th>負責員工</th>
+                                <th>建立時間</th>
+                                <th>修改</th>
+                                <th>刪除</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="n : ${notificationListData}">
+                                <!-- 通知 ID 加上高對比 Badge 外觀 -->
+                                <td>
+                                    <span class="badge-id" th:text="${n.notificationId}"></span>
+                                </td>
+                                <td th:text="${n.member.memberId}"></td>
+                                <td style="font-weight: bold;" th:text="${n.title}"></td>
+                                <!-- 內容部分限制最大寬度，避免過長文字擠爆表格 -->
+                                <td>
+                                    <div class="text-ellipsis" th:text="${n.content}"></div>
+                                </td>
+                                <td  th:text="${n.notificationType == 0 ? '訂單' : 
+								              (n.notificationType == 1 ? '評價' : 
+								              (n.notificationType == 2 ? '系統' : 
+								              (n.notificationType == 3 ? '聊天室' : '未知')))}"></td>
+                                <td th:text="${n.isRead != null and n.isRead == 1 ? '已讀' : '未讀'}"></td>
+                                <td th:text="${n.employee?.employeeId}"></td>
+                                <td th:text="${n.createdAt}"></td>
+                                
+                                <!-- 修改按鈕 -->
+                                <td>
+                                    <form th:action="@{/admin/platform/notification/getOne_For_update}" method="post">
+                                        <input type="hidden" name="notificationId" th:value="${n.notificationId}"/>
+                                        <button type="submit" class="btn-table btn-table--edit">修改</button>
+                                    </form>
+                                </td>
+                                
+                                <!-- 刪除按鈕 -->
+                                <td>
+                                    <form th:action="@{/admin/platform/notification/delete}" method="post">
+                                        <input type="hidden" name="notificationId" th:value="${n.notificationId}"/>
+                                        <button type="submit" class="btn-table btn-table--delete">刪除</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
 
 </body>
 </html>

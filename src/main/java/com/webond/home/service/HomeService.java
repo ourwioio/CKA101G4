@@ -71,7 +71,9 @@ public class HomeService {
                         .filter(activity ->
                                 activity.getActivityStatus() != null
                                 && activity.getActivityStatus()
-                                           .byteValue() == 0
+                                           .byteValue() == 0 
+                                ||activity.getActivityStatus()
+                                           .byteValue() == 1
                         )
 
                         // 活動尚未結束

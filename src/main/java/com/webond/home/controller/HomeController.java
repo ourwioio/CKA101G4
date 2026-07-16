@@ -20,9 +20,9 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(ModelMap model) {
-        model.addAttribute("recommendedServices", homeService.getRecommendedServices(3));
-        model.addAttribute("endingSoonActivities", homeService.getEndingSoonActivities(3));
-        model.addAttribute("randomVenues", homeService.getRandomVenues(3));
+        model.addAttribute("recommendedServices", homeService.getRecommendedServices(4));
+        model.addAttribute("endingSoonActivities", homeService.getEndingSoonActivities(4));
+        model.addAttribute("randomVenues", homeService.getRandomVenues(4));
         return "index";
     }
 }
