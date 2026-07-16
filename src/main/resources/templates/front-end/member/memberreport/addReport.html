@@ -2,15 +2,40 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Webond 會員系統 - 送出檢舉案</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+
 <style>
+:root {
+	--color-bg: #F7F3EC;
+	--color-surface: #FFFFFF;
+	--color-surface-soft: #FFFDF8;
+	--color-ink: #17140F;
+	--color-ink-soft: #726A5F;
+	--color-border: #ECE4D6;
+	--color-yellow: #FFE59A;
+	--color-yellow-deep: #FFC94D;
+	--font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+	--font-body: 'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+	--radius-lg: 26px;
+	--radius-md: 16px;
+	--radius-full: 999px;
+	--shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+	--shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+}
+
 body {
-	background: linear-gradient(185deg, #e6f0fa 0%, #f4f8fc 100%);
+	background: var(--color-bg);
 	min-height: 100vh;
-	font-family: "Microsoft JhengHei", sans-serif;
+	font-family: var(--font-body);
+	color: var(--color-ink);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -20,69 +45,88 @@ body {
 .report-container {
 	max-width: 750px;
 	width: 100%;
-	background: #ffffff;
+	background: var(--color-surface);
 	padding: 45px 50px;
-	border-radius: 16px; 
-	box-shadow: 0 10px 30px rgba(0, 64, 133, 0.05);
+	border-radius: var(--radius-lg);
+	border: 1px solid var(--color-border);
+	box-shadow: var(--shadow-md);
 }
 
 .form-title {
-	font-weight: 700;
-	color: #0056b3; 
+	font-family: var(--font-display);
+	font-weight: 800;
+	color: var(--color-ink);
 	text-align: center;
 	margin-bottom: 12px;
 }
 
 .form-subtitle {
-	color: #6c757d;
+	color: var(--color-ink-soft);
 	text-align: center;
 	font-size: 14px;
 	margin-bottom: 35px;
 }
 
 .section-divider {
-	color: #004085;
-	font-weight: 600;
-	border-bottom: 1px solid #dee2e6;
+	font-family: var(--font-display);
+	color: var(--color-ink);
+	font-weight: 700;
+	border-bottom: 2px solid var(--color-border);
 	padding-bottom: 10px;
 	margin-bottom: 30px;
 }
 
 .success-msg {
-	color: #15803d;
-	background: #f0fdf4;
+	color: #065f46;
+	background: #d1fae5;
 	padding: 12px 20px;
-	border-radius: 10px;
+	border-radius: var(--radius-md);
 	margin-bottom: 25px;
 	font-size: 14px;
-	border: 1px solid #86efac;
+	border: 1px solid #6ee7b7;
 }
 
 .form-control, .form-select {
-	background-color: #f1f5f9;
-	border: 1px solid #e2e8f0;
-	border-radius: 10px !important; 
+	background-color: var(--color-surface-soft);
+	border: 1.5px solid var(--color-border) !important;
+	border-radius: var(--radius-md) !important;
 	padding: 12px 16px;
-	color: #334155;
+	color: var(--color-ink);
 	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	font-family: inherit;
 	transition: all 0.2s ease;
+}
+
+/* 文字內容欄位固定寬度，僅允許上下拉高，不允許左右拖曳超出範圍 */
+textarea.form-control {
+	resize: vertical;
+	max-width: 100%;
 }
 
 .form-control:focus, .form-select:focus {
 	background-color: #ffffff;
-	border-color: #3b82f6;
-	box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+	border-color: var(--color-yellow-deep) !important;
+	box-shadow: 0 0 0 4px rgba(255, 201, 77, 0.25) !important;
 }
 
 .form-label {
-	font-weight: 600;
-	color: #334155;
-	margin-bottom: 8px;
+	display: block;
+	font-weight: 700;
+	color: var(--color-ink);
+	margin-bottom: 10px;
 	font-size: 15px;
 }
 
+/* 欄位之間的呼吸空間：避免上一個欄位與下一個標籤太靠近 */
+.row .col-md-6.mb-4,
+.mb-4 {
+	margin-bottom: 30px !important;
+}
+
 .field-error {
-	color: #b91c1c;
+	color: #be123c;
 	font-size: 12px;
 	font-weight: 500;
 	margin-top: 5px;
@@ -101,10 +145,10 @@ body {
 	position: relative;
 	width: 100px;
 	height: 100px;
-	border-radius: 10px;
+	border-radius: var(--radius-md);
 	overflow: hidden;
-	border: 1px solid #cbd5e1;
-	background-color: #f8fafc;
+	border: 1px solid var(--color-border);
+	background-color: var(--color-surface-soft);
 }
 
 .preview-item img {
@@ -118,7 +162,7 @@ body {
 	position: absolute;
 	top: 4px;
 	right: 4px;
-	background: rgba(220, 38, 38, 0.85);
+	background: rgba(190, 18, 60, 0.85);
 	color: white;
 	border: none;
 	border-radius: 50%;
@@ -133,7 +177,7 @@ body {
 }
 
 .delete-btn:hover {
-	background: rgba(185, 28, 28, 1);
+	background: rgba(190, 18, 60, 1);
 }
 
 /* 🎯 底部按鈕區塊 */
@@ -147,87 +191,91 @@ body {
 }
 
 .btn-submit-webond {
-	background-color: #0056b3;
+	background-color: var(--color-ink);
 	color: white;
 	border: none;
-	border-radius: 10px;
+	border-radius: var(--radius-full);
 	padding: 12px 32px;
-	font-weight: 600;
-	transition: background-color 0.2s;
+	font-weight: 700;
+	font-family: var(--font-display);
+	transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 .btn-submit-webond:hover {
-	background-color: #004085;
+	background-color: var(--color-ink);
 	color: white;
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-md);
 }
 
 .btn-cancel-webond {
 	background-color: transparent;
-	color: #64748b;
-	border: 1px solid #cbd5e1;
-	border-radius: 10px;
+	color: var(--color-ink-soft);
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-full);
 	padding: 12px 32px;
-	font-weight: 600;
+	font-weight: 700;
 	text-decoration: none;
 	text-align: center;
+	transition: color 0.15s ease, border-color 0.15s ease;
 }
 .btn-cancel-webond:hover {
-	background-color: #f8fafc;
-	color: #334155;
+	color: var(--color-ink);
+	border-color: var(--color-ink-soft);
 }
 </style>
 </head>
-<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 <body>
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 
 	<div class="report-container">
-		<h2 class="form-title">建立新檢舉案件</h2>
+		<h2 class="form-title">我要檢舉!</h2>
 		<p class="form-subtitle">請填寫以下欄位，提交後將由系統管理員盡速為您審核辦理</p>
 
 		<div class="success-msg" th:if="${successMsg != null}" th:text="${successMsg}"></div>
 
 		<form id="reportForm" th:action="@{/backend/memberreport/addReport}" th:object="${addMemberReportDTO}" method="post" enctype="multipart/form-data">
-			
+
 			<div class="section-divider">
 				🛡️ 案件基本資料
 			</div>
 
 			<div class="row">
 				<div class="col-md-6 mb-4">
-					<label for="reporterId" class="form-label">您的會員編號 (檢舉人) <span class="text-danger">*</span></label> 
+					<label for="reporterId" class="form-label">您的會員編號 <span class="text-danger">*</span></label>
 					<input type="number" class="form-control" id="reporterId" th:field="*{reporterId}" placeholder="請輸入您的會員編號">
 					<span class="field-error" th:if="${#fields.hasErrors('reporterId')}" th:errors="*{reporterId}"></span>
 				</div>
 
 				<div class="col-md-6 mb-4">
-					<label for="reportedId" class="form-label">被檢舉人編號 <span class="text-danger">*</span></label> 
+					<label for="reportedId" class="form-label">想檢舉誰? <span class="text-danger">*</span></label>
 					<input type="number" class="form-control" id="reportedId" th:field="*{reportedId}" placeholder="請輸入對方的會員編號">
 					<span class="field-error" th:if="${#fields.hasErrors('reportedId')}" th:errors="*{reportedId}"></span>
 				</div>
 			</div>
 
 			<div class="mb-4">
-				<label for="reportCategory" class="form-label">檢舉違規類別 <span class="text-danger">*</span></label> 
+				<label for="reportCategory" class="form-label">檢舉違規類別 <span class="text-danger">*</span></label>
 				<select class="form-select" id="reportCategory" th:field="*{reportCategory}">
 					<option value="">-- 請選擇檢舉原因 --</option>
-					<option value="0">騷擾</option>
-					<option value="1">內容不實</option>
-					<option value="2">私下交易</option>
-					<option value="3">其他</option>
+					<option value="0">不當言論</option>
+					<option value="1">惡意騷擾</option>
+					<option value="2">詐騙行為</option>
+					<option value="3">其他原因</option>
 				</select>
 				<span class="field-error" th:if="${#fields.hasErrors('reportCategory')}" th:errors="*{reportCategory}"></span>
 			</div>
 
 			<div class="mb-4">
 				<label for="reportContent" class="form-label">詳細內容描述 <span class="text-danger">*</span></label>
-				<textarea class="form-control" id="reportContent" th:field="*{reportContent}" rows="5" 
+				<textarea class="form-control" id="reportContent" th:field="*{reportContent}" rows="5"
 					placeholder="請詳細敘述違規事件經過（時間、聊天室內容等）..."></textarea>
 				<span class="field-error" th:if="${#fields.hasErrors('reportContent')}" th:errors="*{reportContent}"></span>
 			</div>
 
 			<div class="mb-4">
-				<label for="evidenceInput" class="form-label">上傳證據截圖 (可複選多張) <span class="text-danger">*</span></label> 
-				<input class="form-control" type="file" id="evidenceInput" accept="image/*" multiple onchange="handleFileSelect(this)"> 
-				
+				<label for="evidenceInput" class="form-label">上傳證據截圖 (可複選多張) <span class="text-danger">*</span></label>
+				<input class="form-control" type="file" id="evidenceInput" accept="image/*" multiple onchange="handleFileSelect(this)">
+
 				<input type="file" id="realEvidenceInput" th:field="*{evidencePath}" multiple style="display: none;">
 
 				<span class="field-error" th:if="${#fields.hasErrors('evidencePath')}" th:errors="*{evidencePath}"></span>
@@ -318,7 +366,7 @@ body {
 	function renderPreviews() {
 		const container = document.getElementById('previewContainer');
 		if (!container) return;
-		
+
 		container.innerHTML = ''; // 清空舊預覽
 
 		const files = fileStore.files;
