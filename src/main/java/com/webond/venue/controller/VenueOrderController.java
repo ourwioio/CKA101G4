@@ -11,8 +11,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.webond.employee.model.EmpService;
+import com.webond.member.model.NotificationVO;
+import com.webond.member.service.NotificationService;
 import com.webond.venue.dto.VenueOrderQueryDTO;
 import com.webond.venue.model.VenueOrderVO;
+import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueOrderService;
 import com.webond.venue.service.VenueService;
 
@@ -30,6 +33,9 @@ public class VenueOrderController {
 
 	@Autowired
 	EmpService empService;
+	
+	@Autowired
+	NotificationService notificationService;
 
 	@GetMapping("listAllVenueOrder")
 	public String listAllVenueOrder(VenueOrderQueryDTO params, BindingResult result, Model model) {
@@ -80,6 +86,16 @@ public class VenueOrderController {
 		venueOrderVO.setRefundStatus((byte) 1);
 		venueOrderVO.setPayoutAmount((byte) 1);
 		venueOrderService.updateVenueOrder(venueOrderVO);
+		
+		VenueVO venueVO = venueService.getOneVenue(venueOrderVO.getVenueVO().getVenueId());
+		// 新增通知給買家
+		NotificationVO notificationVO = new NotificationVO();
+		notificationVO.setMember(venueOrderVO.getMember());
+		notificationVO.setTitle("場地訂單退款通知");
+		notificationVO.setContent("您的場地訂單已完成退款，退款金額為：" + venueOrderVO.getTotalAmount() + "元");
+		notificationVO.setNotificationType((byte) 0);
+		notificationService.addNotification(notificationVO);
+		
 		return "redirect:/venueOrder/listAllRefund";
 	}
 	
@@ -110,6 +126,15 @@ public class VenueOrderController {
 		VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
 		venueOrderVO.setPayoutAmount((byte) 1);
 		venueOrderService.updateVenueOrder(venueOrderVO);
+		
+		VenueVO venueVO = venueService.getOneVenue(venueOrderVO.getVenueVO().getVenueId());
+		// 新增通知給場地主
+		NotificationVO notificationVO = new NotificationVO();
+		notificationVO.setMember(venueVO.getMember());
+		notificationVO.setTitle("場地撥款通知");
+		notificationVO.setContent("您的場地訂單已完成撥款，撥款金額為：" + venueOrderVO.getTotalAmount() + "元");
+		notificationVO.setNotificationType((byte) 0);
+		notificationService.addNotification(notificationVO);
 		return "redirect:/venueOrder/listAllPayout";
 	}
 
