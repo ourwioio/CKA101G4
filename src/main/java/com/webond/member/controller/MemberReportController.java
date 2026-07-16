@@ -319,46 +319,46 @@ public class MemberReportController {
 	// =========================================================================
 	// 🟢 其他輔助頁面進入點
 	// =========================================================================
-	@GetMapping("/select_page")
-	public String select_page(HttpSession session, ModelMap model) {
-		List<MemberReportVO> list = reportSvc.getAll();
-		model.addAttribute("memberReportListData", list);
-		model.addAttribute("isManager", hasPermissionFive(session));
-		return "front-end/member/memberreport/select_page";
-	}
-
-	@PostMapping("/getOne_For_Display")
-	public String getOne_For_Display(@RequestParam(value = "reportId", required = false) String str,
-			HttpSession session, ModelMap model) {
-		List<String> errorMsgs = new LinkedList<>();
-		model.addAttribute("errorMsgs", errorMsgs);
-		if (str == null || (str.trim()).length() == 0) {
-			errorMsgs.add("請輸入檢舉案號");
-		}
-		if (!errorMsgs.isEmpty()) {
-			return "front-end/member/memberreport/select_page";
-		}
-
-		Integer reportId = null;
-		try {
-			reportId = Integer.valueOf(str.trim());
-		} catch (Exception e) {
-			errorMsgs.add("檢舉案號格式不正確，請輸入數字");
-		}
-		if (!errorMsgs.isEmpty()) {
-			return "front-end/member/memberreport/select_page";
-		}
-
-		MemberReportVO memberReportVO = reportSvc.getOneMemberReport(reportId);
-		if (memberReportVO == null) {
-			errorMsgs.add("查無此案號資料");
-		}
-		if (!errorMsgs.isEmpty()) {
-			return "front-end/member/memberreport/select_page";
-		}
-
-		model.addAttribute("isManager", hasPermissionFive(session));
-		model.addAttribute("memberReportVO", memberReportVO);
-		return "front-end/member/memberreport/listOneReport";
-	}
+//	@GetMapping("/select_page")
+//	public String select_page(HttpSession session, ModelMap model) {
+//		List<MemberReportVO> list = reportSvc.getAll();
+//		model.addAttribute("memberReportListData", list);
+//		model.addAttribute("isManager", hasPermissionFive(session));
+//		return "front-end/member/memberreport/select_page";
+//	}
+//
+//	@PostMapping("/getOne_For_Display")
+//	public String getOne_For_Display(@RequestParam(value = "reportId", required = false) String str,
+//			HttpSession session, ModelMap model) {
+//		List<String> errorMsgs = new LinkedList<>();
+//		model.addAttribute("errorMsgs", errorMsgs);
+//		if (str == null || (str.trim()).length() == 0) {
+//			errorMsgs.add("請輸入檢舉案號");
+//		}
+//		if (!errorMsgs.isEmpty()) {
+//			return "front-end/member/memberreport/select_page";
+//		}
+//
+//		Integer reportId = null;
+//		try {
+//			reportId = Integer.valueOf(str.trim());
+//		} catch (Exception e) {
+//			errorMsgs.add("檢舉案號格式不正確，請輸入數字");
+//		}
+//		if (!errorMsgs.isEmpty()) {
+//			return "front-end/member/memberreport/select_page";
+//		}
+//
+//		MemberReportVO memberReportVO = reportSvc.getOneMemberReport(reportId);
+//		if (memberReportVO == null) {
+//			errorMsgs.add("查無此案號資料");
+//		}
+//		if (!errorMsgs.isEmpty()) {
+//			return "front-end/member/memberreport/select_page";
+//		}
+//
+//		model.addAttribute("isManager", hasPermissionFive(session));
+//		model.addAttribute("memberReportVO", memberReportVO);
+//		return "front-end/member/memberreport/listOneReport";
+//	}
 }
