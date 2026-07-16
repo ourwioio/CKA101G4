@@ -35,17 +35,36 @@ public class PlatformSpecificationController {
 
 	// ===== 新增：顯示表單 =====
 	@GetMapping("addSpec")
-	public String addSpec(ModelMap model) {
-		model.addAttribute("specVO", new PlatformSpecificationVO());
+	public String addSpec(ModelMap model, HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
+		PlatformSpecificationVO specVO = new PlatformSpecificationVO();
+		specVO.setEmployeeId(loginEmp.getEmployeeId());
+		model.addAttribute("specVO", specVO);
+		model.addAttribute("loginEmp", loginEmp);
 		return "back-end/platformSpecification/addSpec";
 	}
 
 	// ===== 新增：送出表單 =====
 	@PostMapping("insert")
-	public String insert(@Valid @ModelAttribute("specVO") PlatformSpecificationVO specVO, BindingResult result, ModelMap model) {
+	public String insert(@Valid @ModelAttribute("specVO") PlatformSpecificationVO specVO, BindingResult result, ModelMap model,
+			HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
+		// 負責員工一律代入目前登入的員工，不開放手動選擇
+		specVO.setEmployeeId(loginEmp.getEmployeeId());
 
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		if (result.hasErrors()) {
+			model.addAttribute("loginEmp", loginEmp);
 			return "back-end/platformSpecification/addSpec";
 		}
 
@@ -54,28 +73,46 @@ public class PlatformSpecificationController {
 
 		/*************************** 3.新增完成,準備轉交(Send the Success view) **************/
 		model.addAttribute("success", "- (新增成功)");
-		return "redirect:/platformSpecification/listAllSpec";
+		return "redirect:/admin/platform/platformSpecification/listAllSpec";
 	}
 
 	// ===== 查詢單筆（供修改用） =====
 	@PostMapping("getOne_For_Update")
-	public String getOneForUpdate(@RequestParam("specId") Integer specId, ModelMap model) {
+	public String getOneForUpdate(@RequestParam("specId") Integer specId, ModelMap model, HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		/*************************** 2.開始查詢資料 *****************************************/
 		PlatformSpecificationVO specVO = specSvc.getOneSpec(specId);
+		// 負責員工一律代入目前登入的員工，不開放手動選擇
+		specVO.setEmployeeId(loginEmp.getEmployeeId());
 
 		/*************************** 3.查詢完成,準備轉交(Send the Success view) **************/
 		model.addAttribute("specVO", specVO);
+		model.addAttribute("loginEmp", loginEmp);
 		return "back-end/platformSpecification/update_spec_input"; // 查詢完成後轉交update_spec_input.html
 	}
 
 	// ===== 修改 =====
 	@PostMapping("update")
 	public String update(@Valid @ModelAttribute("specVO") PlatformSpecificationVO specVO, BindingResult result, ModelMap model,
-			RedirectAttributes redirectAttrs) {
+			RedirectAttributes redirectAttrs, HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
+		// 負責員工一律代入目前登入的員工，不開放手動選擇
+		specVO.setEmployeeId(loginEmp.getEmployeeId());
 
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		if (result.hasErrors()) {
+			model.addAttribute("loginEmp", loginEmp);
 			return "back-end/platformSpecification/update_spec_input";
 		}
 
@@ -86,7 +123,7 @@ public class PlatformSpecificationController {
 		// 用 FlashAttribute 保存訊息，確保 redirect 後列表頁仍能用 ${success} 抓到它
 		redirectAttrs.addFlashAttribute("success", "- (修改成功)");
 		// 安全地重導向回列表頁，徹底解決上一頁 404 的問題
-		return "redirect:/platformSpecification/listAllSpec";
+		return "redirect:/admin/platform/platformSpecification/listAllSpec";
 	}
 
 	// ===== 刪除 =====
@@ -131,7 +168,7 @@ public class PlatformSpecificationController {
 	public String publish(@RequestParam("specId") Integer specId, RedirectAttributes redirectAttrs) {
 		specSvc.publish(specId);
 		redirectAttrs.addFlashAttribute("success", "- (發布成功)");
-		return "redirect:/platformSpecification/listAllSpec";
+		return "redirect:/admin/platform/platformSpecification/listAllSpec";
 	}
 
 	// ===== 複合查詢：狀態 + 規範類型 + 標題關鍵字，任意組合 =====
@@ -168,12 +205,6 @@ public class PlatformSpecificationController {
 	@ModelAttribute("specTypeListData")
 	protected Map<Byte, String> referenceSpecTypeList() {
 		return PlatformSpecificationService.SPEC_TYPE_LABELS;
-	}
-
-	// ===== 提供員工編號清單 =====
-	@ModelAttribute("employeeListData")
-	protected List<EmployeeVO> referenceEmployeeList() {
-		return employeeRepository.findAll();
 	}
 
 	// ===== 提供「員工編號 → 姓名」對照表，給列表頁/單筆顯示頁查詢用 =====

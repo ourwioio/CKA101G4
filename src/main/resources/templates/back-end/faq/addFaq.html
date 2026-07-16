@@ -348,25 +348,14 @@
                                 建立人
                             </label>
 
-                            <select id="employeeId"
-                                    class="form-control"
-                                    th:field="*{employeeId}">
+                            <input id="employeeId"
+                                   class="form-control"
+                                   type="text"
+                                   th:value="${loginEmp.employeeId} + ' - ' + ${loginEmp.empName}"
+                                   disabled>
 
-                                <option value="">
-                                    請選擇員工
-                                </option>
-
-                                <option th:each="emp : ${employeeListData}"
-                                        th:value="${emp.employeeId}"
-                                        th:text="${emp.employeeId} + ' - ' + ${emp.empName}">
-                                </option>
-
-                            </select>
-
-                            <div class="field-error"
-                                 th:if="${#fields.hasErrors('employeeId')}"
-                                 th:errors="*{employeeId}">
-                            </div>
+                            <input type="hidden"
+                                   th:field="*{employeeId}">
 
                         </div>
 

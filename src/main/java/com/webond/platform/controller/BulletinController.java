@@ -39,57 +39,91 @@ public class BulletinController {
 	 * This method will serve as addBulletin.html handler.
 	 */
 	@GetMapping("addBulletin")
-	public String addBulletin(ModelMap model) {
+	public String addBulletin(ModelMap model, HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
 		BulletinVO bulletinVO = new BulletinVO();
+		bulletinVO.setEmployeeId(loginEmp.getEmployeeId());
 		model.addAttribute("bulletinVO", bulletinVO);
+		model.addAttribute("loginEmp", loginEmp);
 		return "back-end/bulletin/addBulletin";
 	}
-	
+
 	/*
 	 * This method will be called on addBulletin.html form submission, handling POST request It also validates the user input
 	 */
 	@PostMapping("insert")
-	public String insert(@Valid BulletinVO bulletinVO, BindingResult result, ModelMap model) {
-	
+	public String insert(@Valid BulletinVO bulletinVO, BindingResult result, ModelMap model, HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
+		// 負責員工一律代入目前登入的員工，不開放手動選擇
+		bulletinVO.setEmployeeId(loginEmp.getEmployeeId());
+
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		if (result.hasErrors()) {
+			model.addAttribute("loginEmp", loginEmp);
 			return "back-end/bulletin/addBulletin";
 		}
-		
+
 		/*************************** 2.開始新增資料 *****************************************/
 		bulletinSvc.addBulletin(bulletinVO);
-		
+
 		/*************************** 3.新增完成,準備轉交(Send the Success view) **************/
 		model.addAttribute("success", "- (新增成功)");
-		return "redirect:/bulletin/listAllBulletin";
+		return "redirect:/admin/platform/bulletin/listAllBulletin";
 	}
-	
+
 	/*
 	 * This method will be called on listAllBulletin.html form submission, handling POST request
 	 */
 	@PostMapping("getOne_For_Update")
-	public String getOne_For_Update(@RequestParam("bulletinId") String bulletinId, ModelMap model) {
-		
+	public String getOne_For_Update(@RequestParam("bulletinId") String bulletinId, ModelMap model, HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		/*************************** 2.開始查詢資料 *****************************************/
 		BulletinVO bulletinVO = bulletinSvc.getOneBulletin(Integer.valueOf(bulletinId));
-		
+		// 負責員工一律代入目前登入的員工，不開放手動選擇
+		bulletinVO.setEmployeeId(loginEmp.getEmployeeId());
+
 		/*************************** 3.查詢完成,準備轉交(Send the Success view) **************/
 		model.addAttribute("bulletinVO", bulletinVO);
+		model.addAttribute("loginEmp", loginEmp);
 		return "back-end/bulletin/update_bulletin_input"; // 查詢完成後轉交update_bulletin_input.html
 	}
-	
+
 	/*
 	 * This method will be called on update_emp_input.html form submission, handling POST request It also validates the user input
 	 */
 	@PostMapping("update")
-	public String update(@Valid BulletinVO bulletinVO, BindingResult result, ModelMap model) {
-		
+	public String update(@Valid BulletinVO bulletinVO, BindingResult result, ModelMap model, HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
+		// 負責員工一律代入目前登入的員工，不開放手動選擇
+		bulletinVO.setEmployeeId(loginEmp.getEmployeeId());
+
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		if (result.hasErrors()) {
+			model.addAttribute("loginEmp", loginEmp);
 			return "back-end/bulletin/update_bulletin_input";
 		}
-		
+
 		/*************************** 2.開始修改資料 *****************************************/
 		bulletinSvc.updateBulletin(bulletinVO);
 
@@ -136,7 +170,7 @@ public class BulletinController {
 	public String publish(@RequestParam("bulletinId") Integer bulletinId, RedirectAttributes redirectAttrs) {
 		bulletinSvc.publish(bulletinId);
 		redirectAttrs.addFlashAttribute("success", "- (發布成功)");
-		return "redirect:/bulletin/listAllBulletin";
+		return "redirect:/admin/platform/bulletin/listAllBulletin";
 	}
 
 	// ===== 複合查詢：狀態 + （標題或標籤關鍵字）+ 發布日期區間，任意組合 =====
@@ -194,13 +228,7 @@ public class BulletinController {
 	    return "back-end/bulletin/listOneBulletin";
 	}
 	
-	// ===== 提供員工編號清單 =====
-    @ModelAttribute("employeeListData")
-    protected List<EmployeeVO> referenceEmployeeList() {
-        return employeeRepository.findAll();
-    }
-    
-    // ===== 提供「員工編號 → 姓名」對照表，給列表頁/單筆顯示頁查詢用 =====
+	// ===== 提供「員工編號 → 姓名」對照表，給列表頁/單筆顯示頁查詢用 =====
     @ModelAttribute("employeeNameMap")
     protected Map<Integer, String> referenceEmployeeNameMap() {
         return employeeRepository.findAll().stream()
