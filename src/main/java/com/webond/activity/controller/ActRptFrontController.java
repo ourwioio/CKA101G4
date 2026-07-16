@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import com.webond.activity.model.ActRptVO;
 import com.webond.activity.model.ActivityService;
 import com.webond.activity.model.ActivityVO;
 import com.webond.member.model.MemberVO;
+import com.webond.member.service.MemberService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -28,6 +30,9 @@ public class ActRptFrontController {
 	 
 	 @Autowired
 	 private ActRptService actRptSvc;
+	 
+	 @Autowired
+	 private MemberService memSvc;
 	
 // 檢舉按鈕	 
 		 @GetMapping("/activity/actButton")
@@ -54,13 +59,15 @@ public class ActRptFrontController {
 		        }
 		    	
 		        ActRptVO actRptVO = new ActRptVO();
+		        ActivityVO activity = actSvc.getOneActivity(activityId);  
+		        Integer userId = activity.getMemberId();
+		        MemberVO mem = memSvc.getOneMember(userId);
 		        
-		        ActivityVO activity = new ActivityVO();
-		        activity.setActivityId(activityId); 
+		        
 		        actRptVO.setActId(activity);
-		        
 		        actRptVO.setReporterId(loginMember);
 		        
+		        model.addAttribute("hostUserName", mem.getRealName());
 		        model.addAttribute("actRptVO", actRptVO);
 		        return "front-end/activityReport/reportForm"; 
 		    }
@@ -70,6 +77,7 @@ public class ActRptFrontController {
 		    @PostMapping("/activity/rptSubmit")
 		    public String submitReport(
 		    		@ModelAttribute("actRptVO") ActRptVO actRptVO,
+		    		BindingResult result,
 		    		@RequestParam("imageFile") MultipartFile file,
 		    		HttpSession session,
 		    		Model model) {
@@ -80,25 +88,42 @@ public class ActRptFrontController {
 		                return "redirect:/member/login"; 
 		            }
 		            
-		            if (!actRptVO.getActRptCom().matches(".*[\\u4e00-\\u9fa5].*")) {
-		                model.addAttribute("errorMessage", "檢舉說明請使用中文詳細描述具體違規事由。");
-		                return "activity/report";
+//		            if (file != null && !file.isEmpty()) {
+//		                String contentType = file.getContentType();
+//		                if (contentType == null || !contentType.startsWith("image/")) {
+//		                    result.rejectValue("actRptImg", "error.imageType", "佐證檔案必須是圖片格式。");
+//		                }
+//		            }
+
+		            if (result.hasErrors()) {
+		            	
+		            	ActivityVO activity = actSvc.getOneActivity(actRptVO.getActId().getActivityId());  
+				        Integer userId = activity.getMemberId();
+				        MemberVO mem = memSvc.getOneMember(userId);
+				        
+				        
+				        actRptVO.setActId(activity);
+				        actRptVO.setReporterId(loginMember);
+				        
+				        model.addAttribute("hostUserName", mem.getRealName());
+				        model.addAttribute("actRptVO", actRptVO);
+		                
+		                return "front-end/activityReport/reportForm";
 		            }
 		            
-		            actRptVO.setReporterId(loginMember);
+		            actRptVO.setReporterId(loginMember); 
 
 		            if (file != null && !file.isEmpty()) {
 		                actRptVO.setActRptImg(file.getBytes());
 		            }
 
 		            actRptSvc.createReport(actRptVO);
-		            
 		            return "redirect:/activity/success"; 
 		            
 		        } catch (IOException e) {
 		            e.printStackTrace();
-		            model.addAttribute("errorMessage", "圖片上傳失敗，請稍後再試。");
-		            return "activity/report_form";
+		            result.rejectValue("actRptImg", "error.upload", "圖片上傳失敗，請稍後再試。");
+		            return "front-end/activityReport/reportForm";
 		        }
 		    }
 		    
