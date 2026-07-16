@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.webond.activity.model.ActReviewService;
+import com.webond.activity.model.ActivityOrderService;
 import com.webond.activity.model.ActivityOrderVO;
-import com.webond.activity.repository.ActivityOrderRepository;
 import com.webond.member.model.MemberVO;
 
 import jakarta.servlet.http.HttpSession;
@@ -19,6 +19,32 @@ public class ActReviewController {
 
 	@Autowired
 	private ActReviewService reviewSvc;
+	
+	@Autowired
+	private ActivityOrderService actOrdSvc;
+	
+	
+	@GetMapping("/activity/review")
+	public String showReviewPage(@RequestParam("orderId") Integer orderId, 
+	                             HttpSession session,
+	                             Model model) {
+	    
+		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+        if (loginMember == null) {
+            return "redirect:/member/login"; 
+        }
+		
+		ActivityOrderVO order = actOrdSvc.getOneOrder(orderId);
+	    if (order == null || order.getOrderStatus() != 4 ) {
+	        return "redirect:/activity/front/myOrder?error=cannotReview";
+	    }
+	    
+	    
+	    model.addAttribute("orderData", order);
+	    model.addAttribute("orderId", orderId);
+	    return "front-end/activity/actReview"; 
+	}
+	
 
 	@PostMapping("/submit")
 	public String handleReviewSubmit(@RequestParam Integer orderId, 
