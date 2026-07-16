@@ -25,8 +25,9 @@
     <link rel="stylesheet"
           th:href="@{/css/front-end/service/common.css}">
 
-<!-- 前台共用 Navbar CSS -->
-<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <!-- 前台共用 Navbar CSS -->
+    <link rel="stylesheet"
+          th:href="@{/css/front-end/common/navbar.css}">
 
     <!-- 服務列表專屬 CSS -->
     <link rel="stylesheet"
@@ -38,8 +39,8 @@
 <!-- ==========================================================
      共用固定導覽列
      ========================================================== -->
-	<header th:replace="~{front-end/common/navbar :: navbar}">
-	</header>
+<header th:replace="~{front-end/common/navbar :: navbar}">
+</header>
 
 <!-- ==========================================================
      主要內容
@@ -67,12 +68,15 @@
 
         </div>
 
-        <!-- 測試登入狀態 -->
+        <!-- ==================================================
+             會員登入狀態
+             ================================================== -->
         <div class="service-login-status">
 
+            <!-- 已登入 -->
             <span th:if="${session.memberVO != null}">
 
-                目前測試會員：
+                目前會員：
 
                 <strong th:text="${session.memberVO.memberId}">
                     1
@@ -84,20 +88,15 @@
                     我的服務
                 </a>
 
-                ｜
-
-                <a th:href="@{/member/services/fakelogout}">
-                    假登出
-                </a>
-
             </span>
 
+            <!-- 未登入 -->
             <span th:if="${session.memberVO == null}">
 
-                尚未假登入 ｜
+                尚未登入 ｜
 
-                <a th:href="@{/member/services/fakelogin}">
-                    前往假登入
+                <a th:href="@{/member/login}">
+                    前往登入
                 </a>
 
             </span>
@@ -105,6 +104,15 @@
         </div>
 
     </section>
+
+    <!-- ======================================================
+         成功訊息
+         ====================================================== -->
+    <div class="alert alert-success"
+         th:if="${successMsg != null}"
+         th:text="${successMsg}">
+        操作成功
+    </div>
 
     <!-- ======================================================
          錯誤訊息
@@ -134,8 +142,8 @@
                 <!-- 全部服務 -->
                 <a class="service-category-item"
                    th:classappend="${selectedServiceTypeId == null}
-                                  ? ' active'
-                                  : ''"
+                       ? ' active'
+                       : ''"
                    th:href="@{/front/services}">
                     全部服務
                 </a>
@@ -144,13 +152,13 @@
                 <a class="service-category-item"
                    th:each="type : ${serviceTypeList}"
                    th:href="@{/front/services/type/{id}(
-                                id=${type.svcTypeID}
-                            )}"
+                       id=${type.svcTypeID}
+                   )}"
                    th:text="${type.typeName}"
                    th:classappend="${selectedServiceTypeId != null
-                                    and selectedServiceTypeId == type.svcTypeID}
-                                   ? ' active'
-                                   : ''">
+                       and selectedServiceTypeId == type.svcTypeID}
+                       ? ' active'
+                       : ''">
                     服務類型名稱
                 </a>
 
@@ -220,7 +228,7 @@
                     </h2>
 
                     <p th:if="${keyword != null
-                               and !keyword.trim().isEmpty()}">
+                        and !keyword.trim().isEmpty()}">
 
                         搜尋關鍵字：
 
@@ -273,30 +281,34 @@
                 <article class="service-card"
                          th:each="service : ${serviceList}">
 
-                    <!-- 服務圖片 -->
+                    <!-- ==================================================
+                         服務圖片
+                         ================================================== -->
                     <a class="service-card-image-wrap"
                        th:href="@{/front/services/{id}(
-                                    id=${service.serviceId}
-                                )}">
+                           id=${service.serviceId}
+                       )}">
 
                         <img class="service-card-image"
                              th:src="@{/front/services/image/{serviceId}(
-                                        serviceId=${service.serviceId}
-                                     )}"
+                                 serviceId=${service.serviceId}
+                             )}"
                              th:onerror="this.onerror=null;
-                                         this.src='/images/activity/default-activity.jpg';"
+                                 this.src='/images/activity/default-activity.jpg';"
                              alt="服務圖片">
 
                         <span class="service-type-badge"
                               th:text="${service.serviceType != null
-                                       ? service.serviceType.typeName
-                                       : '無類型'}">
+                                  ? service.serviceType.typeName
+                                  : '無類型'}">
                             服務類型
                         </span>
 
                     </a>
 
-                    <!-- 卡片內容 -->
+                    <!-- ==================================================
+                         卡片內容
+                         ================================================== -->
                     <div class="service-card-body">
 
                         <!-- 名稱與編號 -->
@@ -305,8 +317,8 @@
                             <h3 class="service-card-title">
 
                                 <a th:href="@{/front/services/{id}(
-                                                id=${service.serviceId}
-                                             )}"
+                                    id=${service.serviceId}
+                                )}"
                                    th:text="${service.serviceName}">
                                     服務名稱
                                 </a>
@@ -323,13 +335,13 @@
                         <!-- 縣市行政區 -->
                         <p class="service-card-location"
                            th:if="${service.serviceCity != null
-                                    or service.serviceDistrict != null}">
+                               or service.serviceDistrict != null}">
 
                             <span class="service-location-icon">
                             </span>
 
                             <span th:text="|${service.serviceCity ?: ''}
-                                           ${service.serviceDistrict ?: ''}|">
+                                ${service.serviceDistrict ?: ''}|">
                                 桃園市 中壢區
                             </span>
 
@@ -338,7 +350,9 @@
                         <!-- 地點說明 -->
                         <p class="service-card-place"
                            th:if="${service.serviceLocation != null
-                                    and !#strings.isEmpty(service.serviceLocation)}"
+                               and !#strings.isEmpty(
+                                   service.serviceLocation
+                               )}"
                            th:text="${service.serviceLocation}">
                             中壢火車站附近
                         </p>
@@ -349,24 +363,30 @@
                             服務描述
                         </p>
 
-						<!-- 提供者 -->
-						<p class="service-card-provider">
-						
-						    <a th:href="@{/front/memberPage/oneMember(
-						            memberId=${service.memberId}
-						        )}"
-						       class="service-provider-link">
-						
-						        提供者會員編號：
-						        <span th:text="${service.memberId}">
-						            1
-						        </span>
-						
-						    </a>
-						
-						</p>
+                        <!-- ==================================================
+                             服務提供者
+                             點擊後進入會員頁面
+                             ================================================== -->
+                        <p class="service-card-provider">
 
-                        <!-- 價格與按鈕 -->
+                            <a class="service-provider-link"
+                               th:href="@{/front/memberPage/oneMember(
+                                   memberId=${service.memberId}
+                               )}">
+
+                                提供者會員編號：
+
+                                <span th:text="${service.memberId}">
+                                    1
+                                </span>
+
+                            </a>
+
+                        </p>
+
+                        <!-- ==================================================
+                             價格與詳情按鈕
+                             ================================================== -->
                         <div class="service-card-footer">
 
                             <div class="service-price">
@@ -387,8 +407,8 @@
 
                             <a class="btn service-detail-button"
                                th:href="@{/front/services/{id}(
-                                            id=${service.serviceId}
-                                        )}">
+                                   id=${service.serviceId}
+                               )}">
                                 查看詳情
                             </a>
 
@@ -407,7 +427,8 @@
 </main>
 
 <!-- 共用通知 AJAX 輪巡 -->
-<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+<script th:src="@{/js/front-end/common/notificationPolling.js}">
+</script>
 
 </body>
 </html>
