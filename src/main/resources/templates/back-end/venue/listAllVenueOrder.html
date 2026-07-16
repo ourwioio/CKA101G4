@@ -24,6 +24,51 @@
         .status-done { background-color: #dcfce7; color: #166534; }
         .status-none { background-color: #e2e8f0; color: #475569; }
         .error { color: #d63031; font-size: 12px; margin-top: 4px; }
+
+        /* 場地訂單查詢區：改成明確分列，並放大字級與間距 */
+        .order-filter-bar {
+            align-items: flex-start;
+            gap: 18px;
+        }
+        .order-filter-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 18px 28px;
+            width: 100%;
+        }
+        .order-filter-field {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+        .order-filter-field-label {
+            color: #4f5964;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .order-filter-field-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .order-filter-bar input[type="text"],
+        .order-filter-bar input[type="date"],
+        .order-filter-bar select {
+            min-height: 42px;
+            padding: 9px 12px;
+            font-size: 14px;
+        }
+        .order-filter-actions {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        .order-filter-bar .btn {
+            min-height: 42px;
+            padding: 9px 18px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -44,55 +89,80 @@
             </div>
         </header>
 
-        <form class="filter-bar" th:action="@{/venueOrder/listAllVenueOrder}" method="get">
+        <form class="filter-bar order-filter-bar" th:action="@{/venueOrder/listAllVenueOrder}" method="get">
 
-            訂單編號：
-            <input type="text" name="venueOrderId" th:value="${params.venueOrderId}">
-            <div class="error"
-                 th:if="${#fields.hasErrors('venueOrderQueryDTO.venueOrderId')}"
-                 th:errors="${venueOrderQueryDTO.venueOrderId}"></div>
+            <div class="order-filter-row">
 
-            訂單建立日期：
-            <input type="date" name="createdAtStart" th:value="${params.createdAtStart}">
-            ~
-            <input type="date" name="createdAtEnd" th:value="${params.createdAtEnd}">
+                <div class="order-filter-field">
+                    <span class="order-filter-field-label">訂單編號：</span>
+                    <input type="text" name="venueOrderId" th:value="${params.venueOrderId}">
+                    <div class="error"
+                         th:if="${#fields.hasErrors('venueOrderQueryDTO.venueOrderId')}"
+                         th:errors="${venueOrderQueryDTO.venueOrderId}"></div>
+                </div>
 
-            訂單狀態：
-            <select name="orderStatus">
-                <option value="">全部</option>
-                <option value="0" th:selected="${params.orderStatus == 0}">待付款</option>
-                <option value="1" th:selected="${params.orderStatus == 1}">已付款</option>
-                <option value="2" th:selected="${params.orderStatus == 2}">已取消</option>
-                <option value="3" th:selected="${params.orderStatus == 3}">已完成</option>
-            </select>
+                <div class="order-filter-field">
+                    <span class="order-filter-field-label">訂單建立日期：</span>
+                    <div class="order-filter-field-control">
+                        <input type="date" name="createdAtStart" th:value="${params.createdAtStart}">
+                        <span>~</span>
+                        <input type="date" name="createdAtEnd" th:value="${params.createdAtEnd}">
+                    </div>
+                </div>
 
-            撥款狀態：
-            <select name="payoutAmount">
-                <option value="">全部</option>
-                <option value="0" th:selected="${params.payoutAmount == 0}">未撥款</option>
-                <option value="1" th:selected="${params.payoutAmount == 1}">已撥款</option>
-            </select>
+            </div>
 
-            退款狀態：
-            <select name="refundStatus">
-                <option value="">全部</option>
-                <option value="0" th:selected="${params.refundStatus == 0}">進行中</option>
-                <option value="1" th:selected="${params.refundStatus == 1}">完成</option>
-                <option value="2" th:selected="${params.refundStatus == 2}">未申請</option>
-            </select>
+            <div class="order-filter-row">
 
-            處理員工：
-            <select name="employeeId">
-                <option value="">全部</option>
-                <th:block th:each="emp : ${empList}">
-                    <option th:value="${emp.employeeId}"
-                            th:text="${emp.employeeId}"
-                            th:selected="${params.employeeId == emp.employeeId}"></option>
-                </th:block>
-            </select>
+                <div class="order-filter-field">
+                    <span class="order-filter-field-label">訂單狀態：</span>
+                    <select name="orderStatus">
+                        <option value="">全部</option>
+                        <option value="0" th:selected="${params.orderStatus == 0}">待付款</option>
+                        <option value="1" th:selected="${params.orderStatus == 1}">已付款</option>
+                        <option value="2" th:selected="${params.orderStatus == 2}">已取消</option>
+                        <option value="3" th:selected="${params.orderStatus == 3}">已完成</option>
+                        <option value="4" th:selected="${params.orderStatus == 3}">已取消(退款)</option>
+                    </select>
+                </div>
 
-            <button type="submit" class="btn btn-primary">查詢</button>
-            <a class="btn btn-secondary" th:href="@{/venueOrder/listAllVenueOrder}">清除條件</a>
+                <div class="order-filter-field">
+                    <span class="order-filter-field-label">撥款狀態：</span>
+                    <select name="payoutAmount">
+                        <option value="">全部</option>
+                        <option value="0" th:selected="${params.payoutAmount == 0}">未撥款</option>
+                        <option value="1" th:selected="${params.payoutAmount == 1}">已撥款</option>
+                    </select>
+                </div>
+
+                <div class="order-filter-field">
+                    <span class="order-filter-field-label">退款狀態：</span>
+                    <select name="refundStatus">
+                        <option value="">全部</option>
+                        <option value="0" th:selected="${params.refundStatus == 0}">進行中</option>
+                        <option value="1" th:selected="${params.refundStatus == 1}">完成</option>
+                        <option value="2" th:selected="${params.refundStatus == 2}">未申請</option>
+                    </select>
+                </div>
+
+                <div class="order-filter-field">
+                    <span class="order-filter-field-label">處理員工：</span>
+                    <select name="employeeId">
+                        <option value="">全部</option>
+                        <th:block th:each="emp : ${empList}">
+                            <option th:value="${emp.employeeId}"
+                                    th:text="${emp.employeeId}"
+                                    th:selected="${params.employeeId == emp.employeeId}"></option>
+                        </th:block>
+                    </select>
+                </div>
+
+                <div class="order-filter-actions">
+                    <button type="submit" class="btn btn-primary">查詢</button>
+                    <a class="btn btn-secondary" th:href="@{/venueOrder/listAllVenueOrder}">清除條件</a>
+                </div>
+
+            </div>
 
         </form>
 

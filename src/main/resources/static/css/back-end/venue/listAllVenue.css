@@ -95,6 +95,7 @@ textarea {
    ========================= */
 
 .filter-bar {
+	font-size:12px;
     display: flex;
     align-items: center;
     flex-wrap: wrap;
