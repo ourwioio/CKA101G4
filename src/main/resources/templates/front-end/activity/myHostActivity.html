@@ -208,8 +208,7 @@ tr:hover {
 
 			<div style="display: flex; gap: 12px;">
 				<a th:href="@{/activity/front/addHostActivity}" class="btn btn-add">
-					➕ 我要辦活動 </a> <a th:href="@{/activity/front/home}" class="btn btn-back">
-					🏠 返回前台 </a>
+					➕ 我要辦活動 </a> <a th:href="@{/activity/front/list}" class="btn btn-back">返回活動列表</a>
 			</div>
 		</div>
 
@@ -273,7 +272,7 @@ tr:hover {
 									報名名單 </a> <a class="btn-repeat"
 									th:href="@{/activity/front/repeatHostActivity(id=${activity.activityId})}">
 									再次舉辦 </a> <a class="btn-chat"
-									th:href="@{/activity/front/chat(activityId=${activity.activityId})}">
+									th:href="@{/activity/front/chat(activityId=${activity.activityId}, from='host')}">
 									聊天室 </a>
 							</div>
 						</td>

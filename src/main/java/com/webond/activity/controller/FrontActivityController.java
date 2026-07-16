@@ -115,12 +115,17 @@ public class FrontActivityController {
 		addFakeLoginMember(model, session);
 
 		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
+		boolean activityEnded = activitySvc.isActivityEnded(activityId);
 		model.addAttribute("activityVO", activityVO);
 		model.addAttribute("registrationStatusText", getRegistrationStatusText(activityVO));
 		model.addAttribute("backUrl", resolveDetailBackUrl(from));
 		model.addAttribute("backText", resolveDetailBackText(from));
-		model.addAttribute("showOrderButton", isLoginMember(session) && (from == null || from.trim().isEmpty()));
-		model.addAttribute("showLoginPrompt", !isLoginMember(session) && (from == null || from.trim().isEmpty()));
+		model.addAttribute("showOrderButton", isLoginMember(session) && (from == null || from.trim().isEmpty())
+				&& !activityEnded && activitySvc.isRegistrationOpen(activityId));
+		model.addAttribute("showLoginPrompt", !isLoginMember(session) && (from == null || from.trim().isEmpty())
+				&& !activityEnded);
+		model.addAttribute("showReviewButton", activityEnded);
+		model.addAttribute("reviewListData", activityOrderSvc.getReviewedOrdersByActivityId(activityId));
 
 		if (Boolean.TRUE.equals(full)) {
 			model.addAttribute("fullMessage", "活動已額滿，無法報名。");
@@ -222,6 +227,10 @@ public class FrontActivityController {
 			return "redirect:/activity/front/list";
 		}
 
+		if (activitySvc.isActivityEnded(activityId)) {
+			return "redirect:/activity/front/detail?id=" + activityId + "&closed=true";
+		}
+
 		if (loginMemberId.equals(activityVO.getMemberId())) {
 			return "redirect:/activity/front/detail?id=" + activityId + "&owner=true";
 		}
@@ -261,6 +270,10 @@ public class FrontActivityController {
 
 		if (activityVO == null) {
 			return "redirect:/activity/front/list";
+		}
+
+		if (activitySvc.isActivityEnded(orderVO.getActivityId())) {
+			return "redirect:/activity/front/detail?id=" + orderVO.getActivityId() + "&closed=true";
 		}
 
 		if (loginMemberId.equals(activityVO.getMemberId())) {
@@ -429,8 +442,8 @@ public class FrontActivityController {
 		model.addAttribute("typeListData", activityTypeSvc.getAll());
 		model.addAttribute("formTitle", "我要辦活動");
 		model.addAttribute("submitText", "建立活動");
-		model.addAttribute("cancelUrl", "/activity/front/home");
-		model.addAttribute("cancelText", "返回使用者首頁");
+		model.addAttribute("cancelUrl", "/activity/front/myHostActivity");
+		model.addAttribute("cancelText", "返回我舉辦的活動");
 		model.addAttribute("previewImageUrl", "/images/activity/default-activity.jpg");
 
 		return "front-end/activity/frontAddHostActivity";
@@ -505,8 +518,8 @@ public class FrontActivityController {
 			model.addAttribute("formTitle", sourceActivityId == null ? "我要辦活動" : "再次舉辦活動");
 			model.addAttribute("submitText", sourceActivityId == null ? "建立活動" : "建立新場次");
 			model.addAttribute("cancelUrl",
-					sourceActivityId == null ? "/activity/front/home" : "/activity/front/myHostActivity");
-			model.addAttribute("cancelText", sourceActivityId == null ? "返回使用者首頁" : "返回我舉辦的活動");
+					sourceActivityId == null ? "/activity/front/myHostActivity" : "/activity/front/myHostActivity");
+			model.addAttribute("cancelText", "返回我舉辦的活動");
 			model.addAttribute("previewImageUrl", sourceActivityId == null ? "/images/activity/default-activity.jpg"
 					: "/activity/front/image?id=" + sourceActivityId);
 			return "front-end/activity/frontAddHostActivity";
@@ -601,6 +614,11 @@ public class FrontActivityController {
 
 		if (!isLoginMemberActivityHost(orderVO.getActivityId(), session)) {
 			return "redirect:/activity/front/myHostActivity?noPermission=true";
+		}
+
+		if (isActivityReviewExpired(orderVO.getActivityId())) {
+			return "redirect:/activity/front/memberList?activityId=" + orderVO.getActivityId()
+					+ "&approveExpired=true";
 		}
 
 		ActivityOrderVO approvedOrder = activityOrderSvc.approveOrderByHost(activityOrderId);
@@ -779,6 +797,12 @@ public class FrontActivityController {
 		return activityVO != null && activityVO.getMemberId().equals(loginMemberId);
 	}
 
+	private boolean isActivityReviewExpired(Integer activityId) {
+		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
+		return activityVO == null || (activityVO.getRegistrationDeadline() != null
+				&& LocalDateTime.now().isAfter(activityVO.getRegistrationDeadline()));
+	}
+
 	private boolean canViewActivityOrderStatus(ActivityOrderVO orderVO, Integer loginMemberId) {
 		if (orderVO == null || loginMemberId == null) {
 			return false;
@@ -815,6 +839,10 @@ public class FrontActivityController {
 
 		if (!isLoginMemberActivityHost(orderVO.getActivityId(), session)) {
 			return activityOrderActionResult(false, "noPermission", orderVO);
+		}
+
+		if (approve && isActivityReviewExpired(orderVO.getActivityId())) {
+			return activityOrderActionResult(false, "reviewExpired", orderVO);
 		}
 
 		ActivityOrderVO reviewedOrder;

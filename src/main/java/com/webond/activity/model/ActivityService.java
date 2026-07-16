@@ -174,6 +174,10 @@ public class ActivityService {
 			return false;
 		}
 
+		if (isActivityEnded(activityId)) {
+			return false;
+		}
+
 		if (ENFORCE_REGISTRATION_TIME && !isRegistrationOpen(activityId)) {
 			return false;
 		}
@@ -201,6 +205,10 @@ public class ActivityService {
 		}
 
 		if (activityVO.getActivityStatus() == null || activityVO.getActivityStatus() != 0) {
+			return false;
+		}
+
+		if (isActivityEnded(activityId)) {
 			return false;
 		}
 

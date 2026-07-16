@@ -145,8 +145,8 @@ body {
 		<div class="header">
 			<h1>後台訂單明細</h1>
 			<div class="actions" style="margin-top: 0;">
-				<a th:href="@{/admin/actRptList}" class="btn-action btn-report">活動檢舉審核</a>
-				<a th:href="@{/activityOrder/listAllActivityOrder}" class="btn-back">回訂單紀錄</a>
+				<a th:href="@{/admin/activity/actRptList}" class="btn-action btn-report">活動檢舉審核</a>
+				<a th:href="@{/admin/activity/order/listAllActivityOrder}" class="btn-back">回訂單紀錄</a>
 			</div>
 		</div>
 
@@ -269,18 +269,27 @@ body {
 					<div class="value"
 						th:text="${orderVO.activityCompletedAt != null ? #temporals.format(orderVO.activityCompletedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}"></div>
 				</div>
+
+				
+<div class="item">
+					
+<div class="label">處理員工編號</div>
+					
+<div class="value" th:text="${orderVO.employeeId != null ? orderVO.employeeId : '尚未處理'}"></div>
+				
+</div>
 			</div>
 
 			<div class="actions">
 				<form th:if="${orderVO.refundStatus == 1}"
-					th:action="@{/activityOrder/confirmRefund}" method="post"
+					th:action="@{/admin/activity/order/confirmRefund}" method="post"
 					onsubmit="return confirm('確認此訂單已完成退款？');">
 					<input type="hidden" name="activityOrderId" th:value="${orderVO.activityOrderId}">
 					<button type="submit" class="btn-action btn-refund">確認退款</button>
 				</form>
 
 				<form th:if="${(orderVO.orderStatus == 0 or orderVO.orderStatus == 4) and !orderVO.payoutAmount and (orderVO.refundStatus == null or orderVO.refundStatus == 0)}"
-					th:action="@{/activityOrder/confirmPayout}" method="post"
+					th:action="@{/admin/activity/order/confirmPayout}" method="post"
 					onsubmit="return confirm('確認此訂單已撥款給活動主辦人？');">
 					<input type="hidden" name="activityOrderId" th:value="${orderVO.activityOrderId}">
 					<button type="submit" class="btn-action btn-payout">確認撥款</button>

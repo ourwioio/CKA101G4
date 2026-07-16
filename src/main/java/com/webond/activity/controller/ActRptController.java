@@ -127,7 +127,7 @@ public class ActRptController {
 	    
 //===================後台===============// 
 	    
-	    @GetMapping("/admin/actRptList")
+	    @GetMapping({ "/admin/actRptList", "/admin/activity/actRptList" })
 	    public String actRptList(
 	            @RequestParam(value = "status", required = false) Integer status, // 預設看 0:待處理
 	            @RequestParam(value = "page", defaultValue = "0") int page,
@@ -157,7 +157,7 @@ public class ActRptController {
 	    }
 	    
 	    
-	    @GetMapping("/admin/actRpt/img/{id}")
+	    @GetMapping({ "/admin/actRpt/img/{id}", "/admin/activity/actRpt/img/{id}" })
 	    @ResponseBody
 	    public ResponseEntity<byte[]> getReportImg(@PathVariable("id") Integer id) {
 	        ActRptVO vo = actRptSvc.getOneActRpt(id); 
@@ -171,7 +171,7 @@ public class ActRptController {
 	        return null;
 	    }
 	    
-	    @GetMapping("/admin/actRpt/appealImg/{id}")
+	    @GetMapping({ "/admin/actRpt/appealImg/{id}", "/admin/activity/actRpt/appealImg/{id}" })
 	    @ResponseBody
 	    public ResponseEntity<byte[]> getAppealImg(@PathVariable("id") Integer id) {
 	    	ActRptVO vo = actRptSvc.getOneActRpt(id); 
@@ -187,7 +187,7 @@ public class ActRptController {
 	    
 	    
 	    
-	    @PostMapping("/admin/submit")
+	    @PostMapping({ "/admin/submit", "/admin/activity/submit" })
 	    public String submitAudit(
 	    		@ModelAttribute("actRptVO") ActRptVO actRptVO, 
 	    		HttpSession session) {
@@ -198,7 +198,7 @@ public class ActRptController {
 	        //檢舉單
 	        ActRptVO originalRpt = actRptSvc.getOneActRpt(actRptVO.getActRptId());
 	        if (originalRpt == null) {
-	            return "redirect:/admin/actRptList";
+	            return "redirect:/admin/activity/actRptList";
 	        }
 	        
 	        //被檢舉活動的主辦人
@@ -259,7 +259,7 @@ public class ActRptController {
 	        actRptVO.setEmpId(loginEmp);
 	        actRptSvc.reviewRpt(actRptVO);
 	        
-	        return "redirect:/admin/actRptList";
+	        return "redirect:/admin/activity/actRptList";
 	    }
 	    
 	    

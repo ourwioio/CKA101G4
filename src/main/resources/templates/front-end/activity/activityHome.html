@@ -143,7 +143,7 @@ body {
 	<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
 	<main class="wb-admin-content activity-admin-content">
 	<div class="top-actions">
-		<a th:href="@{/activity/home}" class="btn-home">回前後台選單</a>
+		<a th:href="@{/admin/adminPage}" class="btn-home">回後台首頁</a>
 	</div>
 
 	<div class="header">
@@ -178,31 +178,31 @@ body {
 		<div class="card">
 			<h2>活動管理</h2>
 			<p>後台只可查看活動與下架活動，不提供新增或修改活動。</p>
-			<a class="btn activity" th:href="@{/activity/listAllActivity}">進入活動管理</a>
+			<a class="btn activity" th:href="@{/admin/activity/listAllActivity}">進入活動管理</a>
 		</div>
 
 		<div class="card">
 			<h2>活動類別管理</h2>
 			<p>管理活動分類資料。</p>
-			<a class="btn type" th:href="@{/activityType/listAllActivityType}">進入類別管理</a>
+			<a class="btn type" th:href="@{/admin/activity/type/listAllActivityType}">進入類別管理</a>
 		</div>
 
 		<div class="card">
 			<h2>訂單紀錄</h2>
 			<p>查看活動報名、付款與訂單狀態；報名審核由主辦會員處理。</p>
-			<a class="btn order" th:href="@{/activityOrder/listAllActivityOrder}">查看訂單紀錄</a>
+			<a class="btn order" th:href="@{/admin/activity/order/listAllActivityOrder}">查看訂單紀錄</a>
 		</div>
 
 		<div class="card">
 			<h2>撥退款作業</h2>
 			<p>處理活動訂單的待退款、已退款、待撥款與已撥款狀態。</p>
-			<a class="btn finance" th:href="@{/activityOrder/finance}">進入撥退款作業</a>
+			<a class="btn finance" th:href="@{/admin/activity/order/finance}">進入撥退款作業</a>
 		</div>
 		
 		<div class="card">
 			<h2>活動檢舉審核</h2>
 			<p>處理活動檢舉與申訴案件。</p>
-			<a class="btn report" th:href="@{/admin/actRptList}">進入活動檢舉審核</a>
+			<a class="btn report" th:href="@{/admin/activity/actRptList}">進入活動檢舉審核</a>
 		</div>
 	</div>
 	</main>

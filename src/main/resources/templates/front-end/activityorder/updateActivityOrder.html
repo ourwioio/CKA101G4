@@ -153,13 +153,13 @@ textarea {
 	<div class="header-container">
 		<div class="header-title">??? ?鞈?僱?謘橫打???畾?雓?/div>
 
-		<a th:href="@{/activityOrder/listAllActivityOrder}"
+		<a th:href="@{/admin/activity/order/listAllActivityOrder}"
 			class="btn-secondary"> ?? ?????雓飢??</a>
 	</div>
 
 	<div class="form-card">
 
-		<form th:action="@{/activityOrder/update}"
+		<form th:action="@{/admin/activity/order/update}"
 			th:object="${activityOrderVO}" method="post">
 
 			<input type="hidden" th:field="*{activityOrderId}">
@@ -357,7 +357,7 @@ textarea {
 
 			<div class="form-actions">
 
-				<a th:href="@{/activityOrder/listAllActivityOrder}"
+				<a th:href="@{/admin/activity/order/listAllActivityOrder}"
 					class="btn-cancel"> ?雓? </a>
 
 				<button type="submit" class="btn-submit">???????鞈?僱??/button>

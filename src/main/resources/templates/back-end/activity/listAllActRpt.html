@@ -30,30 +30,30 @@
 					</div>
 
 					<div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-						<a th:href="@{/activity/listAllActivity}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #2563eb; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">活動管理</a>
-						<a th:href="@{/activityType/listAllActivityType}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #7c3aed; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">類別管理</a>
-						<a th:href="@{/activityOrder/listAllActivityOrder}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #059669; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">訂單紀錄</a>
-						<a th:href="@{/activityOrder/finance}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #d97706; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">撥退款作業</a>
-						<a th:href="@{/activity/admin/home}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #475569; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">回後台首頁</a>
+						<a th:href="@{/admin/activity/listAllActivity}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #2563eb; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">活動管理</a>
+						<a th:href="@{/admin/activity/type/listAllActivityType}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #7c3aed; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">類別管理</a>
+						<a th:href="@{/admin/activity/order/listAllActivityOrder}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #059669; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">訂單紀錄</a>
+						<a th:href="@{/admin/activity/order/finance}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #d97706; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">撥退款作業</a>
+						<a th:href="@{/admin/activity/home}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #475569; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">回後台首頁</a>
 					</div>
 
 					<div
 						style="margin-bottom: 20px; text-align: left; background: #f8f9fa; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
 						<span style="font-weight: bold; margin-right: 15px;">狀態篩選：</span>
-						<a th:href="@{/admin/actRptList}"
+						<a th:href="@{/admin/activity/actRptList}"
 							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == null} ? 'background-color: #0d6efd ; color: white; font-weight: bold;' : 'background-color: white; color: #333;')"
 							th:class="'tab-btn tab-all ' + (${currentStatus == null} ? 'active' : '')">
-							查看全部 </a> <a th:href="@{/admin/actRptList(status=0)}"
+							查看全部 </a> <a th:href="@{/admin/activity/actRptList(status=0)}"
 							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 0} ? 'background-color: orange; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
-							待處理 </a> <a th:href="@{/admin/actRptList(status=3)}"
+							待處理 </a> <a th:href="@{/admin/activity/actRptList(status=3)}"
 							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 3} ? 'background-color: red; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
-							申訴中/調查中 </a> <a th:href="@{/admin/actRptList(status=1)}"
+							申訴中/調查中 </a> <a th:href="@{/admin/activity/actRptList(status=1)}"
 							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 1} ? 'background-color: green; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
-							檢舉成立 </a> <a th:href="@{/admin/actRptList(status=2)}"
+							檢舉成立 </a> <a th:href="@{/admin/activity/actRptList(status=2)}"
 							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 2} ? 'background-color: gray; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
-							檢舉駁回 </a> <a th:href="@{/admin/actRptList(status=4)}"
+							檢舉駁回 </a> <a th:href="@{/admin/activity/actRptList(status=4)}"
 							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 4} ? 'background-color: #0dcaf0; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
-							申訴成功 </a> <a th:href="@{/admin/actRptList(status=5)}"
+							申訴成功 </a> <a th:href="@{/admin/activity/actRptList(status=5)}"
 							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 5} ? 'background-color: #6c757d; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
 							申訴駁回 </a>
 					</div>
@@ -111,7 +111,7 @@
 								<!-- 檢舉圖片  -->
 								<td style="text-align: center;"><img
 									th:if="${rptVO.actRptImg != null}"
-									th:src="@{/admin/actRpt/img/{id}(id=${rptVO.actRptId})}"
+									th:src="@{/admin/activity/actRpt/img/{id}(id=${rptVO.actRptId})}"
 									style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
 									<span th:unless="${rptVO.actRptImg != null}"
 									style="color: #ccc;">無</span></td>
@@ -142,7 +142,7 @@
 								<!-- 申訴圖片 -->
 								<td style="text-align: center;"><img
 									th:if="${rptVO.appealImg != null}"
-									th:src="@{/admin/actRpt/appealImg/{id}(id=${rptVO.actRptId})}"
+									th:src="@{/admin/activity/actRpt/appealImg/{id}(id=${rptVO.actRptId})}"
 									style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
 									<span th:unless="${rptVO.appealImg != null}"
 									style="color: #ccc;">無</span></td>
@@ -179,7 +179,7 @@
 						style="text-align: center; margin-top: 20px; font-family: Arial, sans-serif;">
 						<!-- 上一頁 -->
 						<a th:if="${currentPage > 0}"
-							th:href="@{/admin/actRptList(status=${currentStatus}, page=${currentPage - 1})}"
+							th:href="@{/admin/activity/actRptList(status=${currentStatus}, page=${currentPage - 1})}"
 							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
 							上一頁 </a> <span
 							style="margin: 0 10px; font-weight: bold; color: #555;"
@@ -188,7 +188,7 @@
 
 						<!-- 下一頁 -->
 						<a th:if="${(currentPage ?: 0) < (totalPages ?: 1) - 1}"
-							th:href="@{/admin/actRptList(status=${currentStatus}, page=${currentPage + 1})}"
+							th:href="@{/admin/activity/actRptList(status=${currentStatus}, page=${currentPage + 1})}"
 							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
 							下一頁 </a>
 					</div>
@@ -202,7 +202,7 @@
 
 		<h4 style="text-align: center; margin-top: 0; margin-bottom: 10px;">檢舉審核處置</h4>
 
-		<form method="post" th:action="@{/admin/submit}">
+		<form method="post" th:action="@{/admin/activity/submit}">
 			<input type="hidden" id="modalActRptId" name="actRptId">
 
 			<div style="margin-bottom: 8px;">
