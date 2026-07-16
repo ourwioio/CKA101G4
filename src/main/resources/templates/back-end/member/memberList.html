@@ -529,10 +529,10 @@ td {
 	       document.getElementById('detCreatedAt').innerText = d.createdat || '—';    // 🟢 補：註冊日期
 
 	       // 設定圖片來源 (對應後端 displayImage)
-	       document.getElementById('detAvatar').src = '/member/back-end/displayImage?memberId=' + d.id + '&type=memberPic';
-	       document.getElementById('detIdFrontImg').src = '/member/back-end/displayImage?memberId=' + d.id + '&type=idFront';
-	       document.getElementById('detIdBackImg').src = '/member/back-end/displayImage?memberId=' + d.id + '&type=idBack';
-	       document.getElementById('detFaceImg').src = '/member/back-end/displayImage?memberId=' + d.id + '&type=faceImage';
+	       document.getElementById('detAvatar').src = '/admin/members/back-end/displayImage?memberId=' + d.id + '&type=memberPic';
+	       document.getElementById('detIdFrontImg').src = '/admin/members/back-end/displayImage?memberId=' + d.id + '&type=idFront';
+	       document.getElementById('detIdBackImg').src = '/admin/members/back-end/displayImage?memberId=' + d.id + '&type=idBack';
+	       document.getElementById('detFaceImg').src = '/admin/members/back-end/displayImage?memberId=' + d.id + '&type=faceImage';
 
 	       // 動態按鈕生成：依帳號狀態決定可執行的操作
 	       let area = document.getElementById('detActionArea');
@@ -559,7 +559,7 @@ td {
 
 	   // 產生操作表單的共用方法（含送出前確認，避免誤點）
 	   function buildActionForm(memberId, newStatus, btnClass, label, confirmMsg) {
-	       return `<form action="/member/back-end/toggleStatus" method="post" style="display:inline;"
+	       return `<form action="/admin/members/back-end/toggleStatus" method="post" style="display:inline;"
 	                     onsubmit="return confirm('${confirmMsg}')">
 	                   <input type="hidden" name="memberId" value="${memberId}">
 	                   <input type="hidden" name="newStatus" value="${newStatus}">
