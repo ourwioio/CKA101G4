@@ -31,7 +31,6 @@ import jakarta.validation.Valid;
 import tools.jackson.databind.ObjectMapper;
 
 @Controller
-@RequestMapping("/backend/memberreport")
 public class MemberReportController {
 
 	@Autowired
@@ -50,7 +49,7 @@ public class MemberReportController {
 	// =========================================================================
 	// 🟢 【後台功能 1】審核中心主頁
 	// =========================================================================
-	@GetMapping("/manageReport")
+	@GetMapping("/admin/members/backend/memberreport/manageReport")
 	public String manageReport(
 			@RequestParam(value = "reportId", required = false) Integer reportId,
 			@RequestParam(value = "activeTab", defaultValue = "all") String activeTab,
@@ -90,7 +89,7 @@ public class MemberReportController {
 	// =========================================================================
 	// 🟢 【後台功能 2】後台總表進入點
 	// =========================================================================
-	@GetMapping("/listAllReport")
+	@GetMapping("/backend/memberreport/listAllReport")
 	public String listAllReport(HttpSession session, ModelMap model) {
 		List<MemberReportVO> list = reportSvc.getAll();
 		model.addAttribute("memberReportListData", list);
@@ -101,7 +100,7 @@ public class MemberReportController {
 	// =========================================================================
 	// 📸 【後台功能 3】影像資料串流讀取器 (支援多圖 JSON 讀取與舊檔相容)
 	// =========================================================================
-	@GetMapping("/DBGifReader")
+	@GetMapping("/backend/memberreport/DBGifReader")
 	public void dbGifReader(
 	        @RequestParam("reportId") Integer reportId,
 	        @RequestParam(value = "index", defaultValue = "0") Integer index,
@@ -159,15 +158,15 @@ public class MemberReportController {
 	// =========================================================================
 	// 🛡️ 【防呆 GET 路由】防止 F5 重複提交
 	// =========================================================================
-	@GetMapping("/updateReportStatus")
+	@GetMapping("/backend/memberreport/updateReportStatus")
 	public String handleGetUpdateReportStatus() {
-		return "redirect:/backend/memberreport/manageReport";
+		return "redirect:/admin/members/backend/memberreport/manageReport";
 	}
 
 	// =========================================================================
 	// 🟢 【後台功能 4】審核提交
 	// =========================================================================
-	@PostMapping("/updateReportStatus")
+	@PostMapping("/backend/memberreport/updateReportStatus")
 	public String updateReportStatus(@RequestParam("reportId") Integer reportId,
 			@RequestParam("reportStatus") Integer reportStatus,
 			@RequestParam("employeeId") String employeeIdStr,
@@ -234,13 +233,13 @@ public class MemberReportController {
 			return "back-end/member/manageReport";
 		}
 
-		return "redirect:/backend/memberreport/manageReport?reportId=" + reportId + "&activeTab=" + reportStatus;
+		return "redirect:/admin/members/backend/memberreport/manageReport?reportId=" + reportId + "&activeTab=" + reportStatus;
 	}
 
 	// =========================================================================
 	// 🟢 【前台功能 1】開啟前台新增檢舉案網頁
 	// =========================================================================
-	@GetMapping("/addReport")
+	@GetMapping("/backend/memberreport/addReport")
 	public String showAddReportPage(ModelMap model) {
 		model.addAttribute("addMemberReportDTO", new AddMemberReportDTO());
 		return "front-end/member/memberreport/addReport";
@@ -249,7 +248,7 @@ public class MemberReportController {
 	// =========================================================================
 	// 🟢 【前台功能 2】送出檢舉案資料驗證 (支援多圖轉 JSON 陣列存入原始 Blob 欄位)
 	// =========================================================================
-	@PostMapping("/addReport")
+	@PostMapping("/backend/memberreport/addReport")
 	public String addReport(
 			@Valid @ModelAttribute("addMemberReportDTO") AddMemberReportDTO dto,
 			BindingResult result,
@@ -319,7 +318,7 @@ public class MemberReportController {
 	// =========================================================================
 	// 🟢 其他輔助頁面進入點
 	// =========================================================================
-//	@GetMapping("/select_page")
+//	@GetMapping("/backend/memberreport/select_page")
 //	public String select_page(HttpSession session, ModelMap model) {
 //		List<MemberReportVO> list = reportSvc.getAll();
 //		model.addAttribute("memberReportListData", list);
@@ -327,7 +326,7 @@ public class MemberReportController {
 //		return "front-end/member/memberreport/select_page";
 //	}
 //
-//	@PostMapping("/getOne_For_Display")
+//	@PostMapping("/backend/memberreport/getOne_For_Display")
 //	public String getOne_For_Display(@RequestParam(value = "reportId", required = false) String str,
 //			HttpSession session, ModelMap model) {
 //		List<String> errorMsgs = new LinkedList<>();
