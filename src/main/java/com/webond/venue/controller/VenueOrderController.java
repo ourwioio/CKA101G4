@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.webond.employee.model.EmpService;
+import com.webond.employee.model.EmployeeVO;
 import com.webond.member.model.NotificationVO;
 import com.webond.member.service.NotificationService;
 import com.webond.venue.dto.VenueOrderQueryDTO;
@@ -38,8 +39,13 @@ public class VenueOrderController {
 	NotificationService notificationService;
 
 	@GetMapping("listAllVenueOrder")
-	public String listAllVenueOrder(VenueOrderQueryDTO params, BindingResult result, Model model) {
+	public String listAllVenueOrder(VenueOrderQueryDTO params, BindingResult result, Model model, HttpSession session) {
 
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+		
 		List<VenueOrderVO> list = venueOrderService.search(params);
 		if (list.isEmpty()) {
 			model.addAttribute("noDataMessage", "查無符合條件的訂單資料");
@@ -59,8 +65,13 @@ public class VenueOrderController {
 	}
 	
 	@GetMapping("listAllRefund")
-	public String listAllRefund(VenueOrderQueryDTO params, Model model) {
+	public String listAllRefund(VenueOrderQueryDTO params, Model model, HttpSession session) {
 
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+		
 	    // 如果使用者是第一次進來(還沒選過退款狀態),預設先看「進行中」的退款
 	    if (params.getRefundStatus() == null) {
 	        params.setRefundStatus((byte) 0);
@@ -87,7 +98,6 @@ public class VenueOrderController {
 		venueOrderVO.setPayoutAmount((byte) 1);
 		venueOrderService.updateVenueOrder(venueOrderVO);
 		
-		VenueVO venueVO = venueService.getOneVenue(venueOrderVO.getVenueVO().getVenueId());
 		// 新增通知給買家
 		NotificationVO notificationVO = new NotificationVO();
 		notificationVO.setMember(venueOrderVO.getMember());
@@ -123,6 +133,12 @@ public class VenueOrderController {
 	public String payout(@RequestParam("venueOrderId") Integer venueOrderId, 
 			Model model,
 			HttpSession session) {
+		
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+		
 		VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
 		venueOrderVO.setPayoutAmount((byte) 1);
 		venueOrderService.updateVenueOrder(venueOrderVO);
