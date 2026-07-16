@@ -116,6 +116,26 @@ public class FrontActivityController {
 
 		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
 		boolean activityEnded = activitySvc.isActivityEnded(activityId);
+		
+		
+		
+		List<ActivityOrderVO> orderListData = activityOrderSvc.getOrdersByActivityId(activityId);
+		double totalScore = 0;
+	    int ratedOrderCount = 0; 
+
+	    if (orderListData != null && !orderListData.isEmpty()) {
+	        for (ActivityOrderVO order : orderListData) {
+	            if (order.getBuyerRateSeller() != null && order.getBuyerRateSeller() > 0) {
+	                totalScore += order.getBuyerRateSeller();
+	                ratedOrderCount++;
+	            }
+	        }
+	    }
+	    double averageScore = (ratedOrderCount > 0) ? (totalScore / ratedOrderCount) : 5.0;
+	    model.addAttribute("averageScore", averageScore);
+		
+	    
+	    
 		model.addAttribute("activityVO", activityVO);
 		model.addAttribute("registrationStatusText", getRegistrationStatusText(activityVO));
 		model.addAttribute("backUrl", resolveDetailBackUrl(from));
