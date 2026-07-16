@@ -71,6 +71,19 @@
 
         <button type="submit">送出評價</button>
     </form>
+
+    <hr>
+
+    <!-- 對方（賣方）對我的評價 -->
+    <h3>賣家對你的評價</h3>
+    <div th:if="${order.sellerReviewedAt != null}">
+        <p>評分：<span th:text="${order.sellerRateBuyer}"></span> / 5</p>
+        <p>評論：<span th:text="${order.sellerReviewComment}"></span></p>
+        <p>評價時間：<span th:text="${#temporals.format(order.sellerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+    </div>
+    <div th:if="${order.sellerReviewedAt == null}">
+        <p>賣家尚未評價</p>
+    </div>
 </div>
 
 <!-- 賣方視角：評買家 -->
@@ -106,10 +119,22 @@
         </div>
 
         <button type="submit">送出評價</button>
-        
-    </form>
-</div>
 
+    </form>
+
+    <hr>
+
+    <!-- 對方（買方）對我的評價 -->
+    <h3>買家對你的評價</h3>
+    <div th:if="${order.buyerReviewedAt != null}">
+        <p>評分：<span th:text="${order.buyerRateSeller}"></span> / 5</p>
+        <p>評論：<span th:text="${order.buyerReviewComment}"></span></p>
+        <p>評價時間：<span th:text="${#temporals.format(order.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+    </div>
+    <div th:if="${order.buyerReviewedAt == null}">
+        <p>買家尚未評價</p>
+    </div>
+</div>
 
 </body>
 </html>
