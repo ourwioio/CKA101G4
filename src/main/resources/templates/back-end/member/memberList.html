@@ -294,6 +294,9 @@ td {
 	border-radius: 12px;
 }
 </style>
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 
@@ -348,7 +351,7 @@ td {
 									onclick="showDetail(this)">
 									<td th:text="${member.memberId}"></td>
 									<td><img class="avatar"
-										th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
+										th:src="@{/admin/members/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
 									<td th:text="${member.realName}" style="font-weight: 700;"></td>
 									<td th:text="${member.email}"></td>
 									<td><span th:if="${member.accountStatus == 0}"
@@ -385,7 +388,7 @@ td {
 									onclick="showDetail(this)">
 									<td th:text="${member.memberId}"></td>
 									<td><img class="avatar"
-										th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
+										th:src="@{/admin/members/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
 									<td th:text="${member.realName}" style="font-weight: 700;"></td>
 									<td
 										th:text="${(member.reportPoints != null ? member.reportPoints : 0) + ' / 5 點'}"></td>
@@ -421,7 +424,7 @@ td {
 									onclick="showDetail(this)">
 									<td th:text="${member.memberId}"></td>
 									<td><img class="avatar"
-										th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
+										th:src="@{/admin/members/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
 									<td th:text="${member.realName}" style="font-weight: 700;"></td>
 									<td
 										th:text="${(member.reportPoints != null ? member.reportPoints : 0) + ' / 5 點'}"
@@ -559,8 +562,20 @@ td {
 
 	   // 產生操作表單的共用方法（含送出前確認，避免誤點）
 	   function buildActionForm(memberId, newStatus, btnClass, label, confirmMsg) {
+		   
+		   const csrfToken = document.querySelector("meta[name='_csrf']")?.getAttribute("content") || "";
+		    
+		    // 2. 安全處理：將確認訊息內可能破壞 HTML 屬性的單雙引號與換行進行轉義處理
+		    const safeConfirmMsg = confirmMsg
+		        .replace(/'/g, "\\'")
+		        .replace(/"/g, "&quot;")
+		        .replace(/\n/g, "\\n");
+		   
 	       return `<form action="/admin/members/back-end/toggleStatus" method="post" style="display:inline;"
 	                     onsubmit="return confirm('${confirmMsg}')">
+	       
+	       			   <input type="hidden" name="_csrf" value="${csrfToken}">
+	       
 	                   <input type="hidden" name="memberId" value="${memberId}">
 	                   <input type="hidden" name="newStatus" value="${newStatus}">
 	                   <button type="submit" class="btn-action ${btnClass}">${label}</button>
