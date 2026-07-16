@@ -8,7 +8,7 @@
 </head>
 
 <body>
-	<form th:action="@{/notification/update}" method="post"
+	<form th:action="@{/admin/platform/notification/update}" method="post"
 		th:object="${notificationVO}">
 		<input type="hidden" th:field="*{notificationId}" /> 
 		<input type="hidden" th:field="*{member.memberId}" />
@@ -65,13 +65,13 @@
             th:text="${emp.employeeName}"
           ></option>
         </select> -->
-			<p th:text="${notificationVO.employee?.employeeId}"></p>
+			<p th:text="${session.employeeVO?.employeeId}"></p>
 			<input type="hidden" name="employee.employeeId"
-				th:value="${notificationVO.employee?.employeeId}" />
+				th:value="${session.employeeVO?.employeeId}" />
 		</div>
 		<div>
 			<button type="button">
-				<a th:href="@{/notification/listAllNotification}">返回</a>
+				<a th:href="@{/admin/platform/notification/listAllNotification}">返回</a>
 			</button>
 
 			<button type="submit">儲存</button>

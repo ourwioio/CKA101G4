@@ -7,7 +7,7 @@
 <body>
 	<h1>新增通知</h1>
 
-	<form th:action="@{/notification/insert}" th:object="${notificationVO}"
+	<form th:action="@{/admin/platform/notification/insert}" th:object="${notificationVO}"
 		method="post">
 		<div>
 			<label for="">會員編號</label> <input type="text"
@@ -38,15 +38,13 @@
 			</select> <span th:if="${#fields.hasErrors('notificationType')}"
 				th:errors="*{notificationType}"></span>
 		</div>
-
-		<p>會員編號</p>
-		<p th:text="${session.loginEmployeeId}"></p>
-		<input type="hidden" name="employee.employeeId"
-			th:value="${session.loginEmployeeId}" />
-
+			<p>員工編號</p>
+			<p th:text="${session.employeeVO?.employeeId}"></p>
+			<input type="hidden" name="employee.employeeId"
+				th:value="${session.employeeVO?.employeeId}" />
 		<div>
 			<button type="button">
-				<a th:href="@{/notification/listAllNotification}">返回</a>
+				<a th:href="@{/admin/platform/notification/listAllNotification}">返回</a>
 			</button>
 			<button type="submit">新增</button>
 		</div>
