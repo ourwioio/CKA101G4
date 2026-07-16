@@ -38,7 +38,7 @@ public class AdminController {
 	//登入頁面
 	@GetMapping("/login")
 	public String loginPage() {
-		return"/back-end/employee/login";
+		return"back-end/employee/login";
 	}
 	
 	@GetMapping("/adminPage")

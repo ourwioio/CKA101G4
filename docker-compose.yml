@@ -1,0 +1,81 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: webond-mysql
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Taipei
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-webond_project}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${MYSQL_HOST_PORT:-3307}:3306"
+    volumes:
+      - webond_mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d:ro
+    command:
+      - --lower-case-table-names=1
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD --silent"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: webond-redis
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Taipei
+    ports:
+      - "${REDIS_HOST_PORT:-6380}:6379"
+    volumes:
+      - webond_redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: webond-app
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Taipei
+      SERVER_PORT: 8080
+
+      SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-webond_project}?serverTimezone=Asia/Taipei&useUnicode=true&characterEncoding=utf8&allowPublicKeyRetrieval=true&useSSL=false"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO:-none}
+      SPRING_THYMELEAF_CACHE: ${SPRING_THYMELEAF_CACHE:-false}
+
+      JAVA_OPTS: >-
+        -XX:MaxRAMPercentage=75.0
+        -Duser.timezone=Asia/Taipei
+        -Dfile.encoding=UTF-8
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  webond_mysql_data:
+  webond_redis_data:

@@ -15,7 +15,7 @@ import com.webond.member.repository.MemberReportRepository;
 import java.util.Optional;
 import jakarta.transaction.Transactional;
 
-@SpringBootApplication
+//@SpringBootApplication
 public class LoieTest_Application_CommandLineRunner implements CommandLineRunner {
 
     @Autowired
