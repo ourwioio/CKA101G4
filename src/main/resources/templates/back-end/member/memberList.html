@@ -296,205 +296,216 @@ td {
 </style>
 </head>
 <body>
-	<div class="container">
-		<div class="card-panel main-panel">
-			<div class="header-area">
-				<h2>👥 會員權限狀態管理中心</h2>
-			</div>
-			<form th:action="@{/member/back-end/memberList}" method="get"
-				class="search-box">
-				<input type="text" name="keyword" class="search-input"
-					placeholder="快速搜尋 姓名 / Email / 手機..." th:value="${keyword}">
-				<button type="submit" class="btn-search">🔍 搜尋</button>
-			</form>
-			<div class="tabs-nav">
-				<button class="tab-btn active"
-					onclick="switchTab(this, 'tab-pending')">⏳ 待核准 / 未驗證</button>
-				<button class="tab-btn" onclick="switchTab(this, 'tab-active')">🟢
-					已核准正常</button>
-				<button class="tab-btn" onclick="switchTab(this, 'tab-suspended')">🚫
-					已停權</button>
-			</div>
-			<div id="tab-pending" class="tab-content active">
-				<table>
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>照片</th>
-							<th>真實姓名</th>
-							<th>聯絡資訊</th>
-							<th>狀態</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="member : ${allMembers}"
-							th:if="${member.accountStatus == 0 or member.accountStatus == 2}"
-							class="clickable-row" th:data-id="${member.memberId}"
-							th:data-realname="${member.realName}"
-							th:data-nickname="${member.nickname}"
-							th:data-email="${member.email}" th:data-phone="${member.phone}"
-							th:data-idnumber="${member.idNumber}"
-							th:data-gender="${member.gender}"
-							th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
-							th:data-createdat="${member.createdAt}"
-							th:data-status="${member.accountStatus}"
-							onclick="showDetail(this)">
-							<td th:text="${member.memberId}"></td>
-							<td><img class="avatar"
-								th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
-							<td th:text="${member.realName}" style="font-weight: 700;"></td>
-							<td th:text="${member.email}"></td>
-							<td><span th:if="${member.accountStatus == 0}"
-								class="status-badge badge-pending">⏳ 待審核</span> <span
-								th:if="${member.accountStatus == 2}"
-								class="status-badge badge-suspended">❌ 審核失敗</span></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div id="tab-active" class="tab-content">
-				<table>
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>照片</th>
-							<th>真實姓名</th>
-							<th>檢舉點數</th>
-							<th>狀態</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="member : ${allMembers}"
-							th:if="${member.accountStatus == 1}" class="clickable-row"
-							th:data-id="${member.memberId}"
-							th:data-realname="${member.realName}"
-							th:data-nickname="${member.nickname}"
-							th:data-email="${member.email}" th:data-phone="${member.phone}"
-							th:data-idnumber="${member.idNumber}"
-							th:data-gender="${member.gender}"
-							th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
-							th:data-createdat="${member.createdAt}"
-							th:data-status="${member.accountStatus}"
-							onclick="showDetail(this)">
-							<td th:text="${member.memberId}"></td>
-							<td><img class="avatar"
-								th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
-							<td th:text="${member.realName}" style="font-weight: 700;"></td>
-							<td
-								th:text="${(member.reportPoints != null ? member.reportPoints : 0) + ' / 5 點'}"></td>
-							<td><span class="status-badge badge-active">🟢 正常使用</span></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-			<div id="tab-suspended" class="tab-content">
-				<table>
-					<thead>
-						<tr>
-							<th>ID</th>
-							<th>照片</th>
-							<th>真實姓名</th>
-							<th>檢舉點數</th>
-							<th>狀態</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr th:each="member : ${allMembers}"
-							th:if="${member.accountStatus == 3}"
-							class="clickable-row auto-suspended-row"
-							th:data-id="${member.memberId}"
-							th:data-realname="${member.realName}"
-							th:data-nickname="${member.nickname}"
-							th:data-email="${member.email}" th:data-phone="${member.phone}"
-							th:data-idnumber="${member.idNumber}"
-							th:data-gender="${member.gender}"
-							th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
-							th:data-createdat="${member.createdAt}"
-							th:data-status="${member.accountStatus}"
-							onclick="showDetail(this)">
-							<td th:text="${member.memberId}"></td>
-							<td><img class="avatar"
-								th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
-							<td th:text="${member.realName}" style="font-weight: 700;"></td>
-							<td
-								th:text="${(member.reportPoints != null ? member.reportPoints : 0) + ' / 5 點'}"
-								style="color: red; font-weight: 700;"></td>
-							<td><span class="status-badge badge-suspended">🚫
-									已被停權</span></td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-		</div>
 
-		<div class="card-panel detail-panel" id="detailPanel">
-			<div class="detail-placeholder" id="placeholderText">
-				<h3>🫵 請點選左側會員</h3>
+	<div class="wb-admin-layout">
+
+		<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
+
+		<main class="wb-admin-content">
+
+			<div class="container">
+				<div class="card-panel main-panel">
+					<div class="header-area">
+						<h2>👥 會員權限狀態管理中心</h2>
+					</div>
+					<form th:action="@{/member/back-end/memberList}" method="get"
+						class="search-box">
+						<input type="text" name="keyword" class="search-input"
+							placeholder="快速搜尋 姓名 / Email / 手機..." th:value="${keyword}">
+						<button type="submit" class="btn-search">🔍 搜尋</button>
+					</form>
+					<div class="tabs-nav">
+						<button class="tab-btn active"
+							onclick="switchTab(this, 'tab-pending')">⏳ 待核准 / 未驗證</button>
+						<button class="tab-btn" onclick="switchTab(this, 'tab-active')">🟢
+							已核准正常</button>
+						<button class="tab-btn" onclick="switchTab(this, 'tab-suspended')">🚫
+							已停權</button>
+					</div>
+					<div id="tab-pending" class="tab-content active">
+						<table>
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>照片</th>
+									<th>真實姓名</th>
+									<th>聯絡資訊</th>
+									<th>狀態</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="member : ${allMembers}"
+									th:if="${member.accountStatus == 0 or member.accountStatus == 2}"
+									class="clickable-row" th:data-id="${member.memberId}"
+									th:data-realname="${member.realName}"
+									th:data-nickname="${member.nickname}"
+									th:data-email="${member.email}" th:data-phone="${member.phone}"
+									th:data-idnumber="${member.idNumber}"
+									th:data-gender="${member.gender}"
+									th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
+									th:data-createdat="${member.createdAt}"
+									th:data-status="${member.accountStatus}"
+									onclick="showDetail(this)">
+									<td th:text="${member.memberId}"></td>
+									<td><img class="avatar"
+										th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
+									<td th:text="${member.realName}" style="font-weight: 700;"></td>
+									<td th:text="${member.email}"></td>
+									<td><span th:if="${member.accountStatus == 0}"
+										class="status-badge badge-pending">⏳ 待審核</span> <span
+										th:if="${member.accountStatus == 2}"
+										class="status-badge badge-suspended">❌ 審核失敗</span></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div id="tab-active" class="tab-content">
+						<table>
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>照片</th>
+									<th>真實姓名</th>
+									<th>檢舉點數</th>
+									<th>狀態</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="member : ${allMembers}"
+									th:if="${member.accountStatus == 1}" class="clickable-row"
+									th:data-id="${member.memberId}"
+									th:data-realname="${member.realName}"
+									th:data-nickname="${member.nickname}"
+									th:data-email="${member.email}" th:data-phone="${member.phone}"
+									th:data-idnumber="${member.idNumber}"
+									th:data-gender="${member.gender}"
+									th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
+									th:data-createdat="${member.createdAt}"
+									th:data-status="${member.accountStatus}"
+									onclick="showDetail(this)">
+									<td th:text="${member.memberId}"></td>
+									<td><img class="avatar"
+										th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
+									<td th:text="${member.realName}" style="font-weight: 700;"></td>
+									<td
+										th:text="${(member.reportPoints != null ? member.reportPoints : 0) + ' / 5 點'}"></td>
+									<td><span class="status-badge badge-active">🟢 正常使用</span></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div id="tab-suspended" class="tab-content">
+						<table>
+							<thead>
+								<tr>
+									<th>ID</th>
+									<th>照片</th>
+									<th>真實姓名</th>
+									<th>檢舉點數</th>
+									<th>狀態</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="member : ${allMembers}"
+									th:if="${member.accountStatus == 3}"
+									class="clickable-row auto-suspended-row"
+									th:data-id="${member.memberId}"
+									th:data-realname="${member.realName}"
+									th:data-nickname="${member.nickname}"
+									th:data-email="${member.email}" th:data-phone="${member.phone}"
+									th:data-idnumber="${member.idNumber}"
+									th:data-gender="${member.gender}"
+									th:data-points="${member.reportPoints != null ? member.reportPoints : 0}"
+									th:data-createdat="${member.createdAt}"
+									th:data-status="${member.accountStatus}"
+									onclick="showDetail(this)">
+									<td th:text="${member.memberId}"></td>
+									<td><img class="avatar"
+										th:src="@{/member/back-end/displayImage(memberId=${member.memberId}, type='memberPic')}"></td>
+									<td th:text="${member.realName}" style="font-weight: 700;"></td>
+									<td
+										th:text="${(member.reportPoints != null ? member.reportPoints : 0) + ' / 5 點'}"
+										style="color: red; font-weight: 700;"></td>
+									<td><span class="status-badge badge-suspended">🚫
+											已被停權</span></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="card-panel detail-panel" id="detailPanel">
+					<div class="detail-placeholder" id="placeholderText">
+						<h3>🫵 請點選左側會員</h3>
+					</div>
+					<div id="detailContent" style="display: none;">
+						<div class="detail-header">
+							<img class="detail-avatar" id="detAvatar" src="" alt="大頭貼">
+							<div>
+								<h3 id="detRealName" style="font-size: 18px; font-weight: 700;"></h3>
+								<p id="detNickname" style="color: #64748b; font-size: 14px;"></p>
+							</div>
+						</div>
+						<div class="info-grid">
+							<div class="info-item">
+								<div class="info-label">會員 ID</div>
+								<div class="info-value" id="detId"></div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">手機</div>
+								<div class="info-value" id="detPhone"></div>
+							</div>
+							<div class="info-item" style="grid-column: span 2;">
+								<div class="info-label">信箱</div>
+								<div class="info-value" id="detEmail"></div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">身分證</div>
+								<div class="info-value" id="detIdNumber"></div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">檢舉點數</div>
+								<div class="info-value" id="detPoints"
+									style="color: var(--rose-600);"></div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">性別</div>
+								<div class="info-value" id="detGender"></div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">註冊日期</div>
+								<div class="info-value" id="detCreatedAt"></div>
+							</div>
+						</div>
+						<div class="kyc-img-box">
+							<div>
+								<span style="font-size: 11px; color: #64748b;">正面</span><img
+									id="detIdFrontImg" src="" onclick="zoomImage(this)">
+							</div>
+							<div>
+								<span style="font-size: 11px; color: #64748b;">反面</span><img
+									id="detIdBackImg" src="" onclick="zoomImage(this)">
+							</div>
+							<div>
+								<span style="font-size: 11px; color: #64748b;">人臉</span><img
+									id="detFaceImg" src="" onclick="zoomImage(this)">
+							</div>
+						</div>
+						<div id="detActionArea"
+							style="border-top: 1px solid var(--slate-200); padding-top: 16px; text-align: right;"></div>
+					</div>
+				</div>
 			</div>
-			<div id="detailContent" style="display: none;">
-				<div class="detail-header">
-					<img class="detail-avatar" id="detAvatar" src="" alt="大頭貼">
-					<div>
-						<h3 id="detRealName" style="font-size: 18px; font-weight: 700;"></h3>
-						<p id="detNickname" style="color: #64748b; font-size: 14px;"></p>
-					</div>
-				</div>
-								<div class="info-grid">
-					<div class="info-item">
-						<div class="info-label">會員 ID</div>
-						<div class="info-value" id="detId"></div>
-					</div>
-					<div class="info-item">
-						<div class="info-label">手機</div>
-						<div class="info-value" id="detPhone"></div>
-					</div>
-					<div class="info-item" style="grid-column: span 2;">
-						<div class="info-label">信箱</div>
-						<div class="info-value" id="detEmail"></div>
-					</div>
-					<div class="info-item">
-						<div class="info-label">身分證</div>
-						<div class="info-value" id="detIdNumber"></div>
-					</div>
-					<div class="info-item">
-						<div class="info-label">檢舉點數</div>
-						<div class="info-value" id="detPoints"
-							style="color: var(--rose-600);"></div>
-					</div>
-					<div class="info-item">
-						<div class="info-label">性別</div>
-						<div class="info-value" id="detGender"></div>
-					</div>
-					<div class="info-item">
-						<div class="info-label">註冊日期</div>
-						<div class="info-value" id="detCreatedAt"></div>
-					</div>
-				</div>
-				<div class="kyc-img-box">
-					<div>
-						<span style="font-size: 11px; color: #64748b;">正面</span><img
-							id="detIdFrontImg" src="" onclick="zoomImage(this)">
-					</div>
-					<div>
-						<span style="font-size: 11px; color: #64748b;">反面</span><img
-							id="detIdBackImg" src="" onclick="zoomImage(this)">
-					</div>
-					<div>
-						<span style="font-size: 11px; color: #64748b;">人臉</span><img
-							id="detFaceImg" src="" onclick="zoomImage(this)">
-					</div>
-				</div>
-				<div id="detActionArea"
-					style="border-top: 1px solid var(--slate-200); padding-top: 16px; text-align: right;"></div>
-			</div>
-		</div>
+
+		</main>
+
 	</div>
 
 	<div id="imgModal" class="image-modal" onclick="closeZoom()">
 		<img id="modalTargetImg" src="">
 	</div>
 
-		<script>
+	<script>
 	   function switchTab(btn, tabId) {
 	       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
 	       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));

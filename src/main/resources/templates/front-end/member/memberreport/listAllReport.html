@@ -1,285 +1,519 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webond 後台管理 - 會員檢舉管理中心</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
-    <style>
-        :root {
-            --slate-50: #f8fafc;
-            --slate-100: #f1f5f9;
-            --slate-200: #e2e8f0;
-            --slate-600: #475569;
-            --slate-700: #334155;
-            --slate-800: #1e293b;
-            --sky-600: #0284c7;
-            --sky-700: #0369a1;
-            --emerald-600: #16a34a;
-            --rose-600: #e11d48;
-            --amber-600: #d97706;
-            --border-color: #e2e8f0;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: 'Inter', "Microsoft JhengHei", sans-serif;
-            background-color: var(--slate-100);
-            color: var(--slate-800);
-            padding: 40px 20px;
-        }
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
-        @media (min-width: 1024px) {
-            .container { grid-template-columns: 1.6fr 1fr; }
-            .main-panel { grid-column: span 1; }
-        }
-        .card-panel {
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            padding: 24px;
-        }
-        .header-area {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .header-area h2 { font-size: 22px; font-weight: 700; }
-        .btn-top-action { text-decoration: none; color: var(--sky-600); font-weight: 600; font-size: 14px; }
-        .btn-top-action:hover { color: var(--sky-700); }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Webond 後台管理 - 會員檢舉管理中心</title>
+<link
+	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+<style>
+:root {
+	--slate-50: #f8fafc;
+	--slate-100: #f1f5f9;
+	--slate-200: #e2e8f0;
+	--slate-600: #475569;
+	--slate-700: #334155;
+	--slate-800: #1e293b;
+	--sky-600: #0284c7;
+	--sky-700: #0369a1;
+	--emerald-600: #16a34a;
+	--rose-600: #e11d48;
+	--amber-600: #d97706;
+	--border-color: #e2e8f0;
+}
 
-        .tabs-container {
-            display: flex;
-            border-bottom: 2px solid var(--slate-200);
-            margin-bottom: 16px;
-            gap: 8px;
-        }
-        .tab-btn {
-            padding: 10px 20px;
-            border: none;
-            background: none;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--slate-600);
-            cursor: pointer;
-            position: relative;
-            transition: color 0.2s;
-        }
-        .tab-btn:hover { color: var(--sky-600); }
-        .tab-btn.active {
-            color: var(--sky-600);
-        }
-        .tab-btn.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: var(--sky-600);
-        }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { background: var(--slate-50); padding: 12px; border-bottom: 2px solid var(--border-color); text-align: left; color: var(--slate-600); font-weight: 600; }
-        td { padding: 12px; border-bottom: 1px solid var(--border-color); vertical-align: middle; }
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
 
-        .clickable-row { cursor: pointer; transition: background 0.15s; }
-        .clickable-row:hover { background-color: #f0f9ff !important; }
-        .clickable-row.hidden { display: none !important; }
+body {
+	font-family: 'Inter', "Microsoft JhengHei", sans-serif;
+	background-color: var(--slate-100);
+	color: var(--slate-800);
+	padding: 40px 20px;
+}
 
-        /* 狀態編碼對齊資料庫：0待處理, 1處理中, 2成立, 3不成立 */
-        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; display: inline-block; }
-        .badge-pending { background: #fef9c3; color: #713f12; }
-        .badge-processing { background: #dbeafe; color: #1e40af; }
-        .badge-approved { background: #d1fae5; color: #065f46; }
-        .badge-rejected { background: #ffe4e6; color: #9f1239; }
+.container {
+	max-width: 1400px;
+	margin: 0 auto;
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 30px;
+}
 
-        .detail-panel { position: sticky; top: 40px; align-self: start; background: #ffffff; }
-        .detail-placeholder { text-align: center; color: #94a3b8; padding: 8px 20px; font-weight: 500; }
-        .detail-placeholder h3 { font-size: 18px; margin-bottom: 8px; color: var(--slate-700); }
+@media ( min-width : 1024px) {
+	.container {
+		grid-template-columns: 1.6fr 1fr;
+	}
+	.main-panel {
+		grid-column: span 1;
+	}
+}
 
-        .detail-header { border-bottom: 1px solid var(--slate-200); padding-bottom: 16px; margin-bottom: 16px; }
-        .detail-header h3 { font-size: 18px; font-weight: 700; color: var(--slate-800); }
-        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 14px; margin-bottom: 20px; }
-        .info-item { background: var(--slate-50); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); }
-        .info-item.full-width { grid-column: span 2; }
-        .info-label { font-size: 12px; color: #64748b; margin-bottom: 4px; font-weight: 600; }
-        .info-value { font-weight: 600; color: var(--slate-800); white-space: pre-wrap; word-break: break-all; }
+.card-panel {
+	background: #ffffff;
+	border-radius: 16px;
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+	padding: 24px;
+}
 
-        /* 📸 多張證據縮圖牆 */
-        .evidence-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-            min-height: 50px;
-            background: var(--slate-50);
-            border-radius: 8px;
-            border: 1px dashed var(--slate-200);
-            padding: 10px;
-        }
-        .evidence-thumb {
-            width: 100%;
-            height: 90px;
-            object-fit: cover;
-            border-radius: 8px;
-            border: 1px solid var(--slate-200);
-            background: #1e293b;
-            cursor: zoom-in;
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
-        .evidence-thumb:hover {
-            transform: scale(1.04);
-            box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
-        }
-        .no-img-text { color: #94a3b8; font-size: 13px; font-weight: 500; padding: 15px; grid-column: 1 / -1; text-align: center; }
+.header-area {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+}
 
-        /* 🔍 放大檢視 Modal（含多圖導覽） */
-        .image-modal { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.85); backdrop-filter: blur(4px); justify-content: center; align-items: center; cursor: zoom-out; }
-        .image-modal img { max-width: 85%; max-height: 85%; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); cursor: default; transform: scale(0.95); transition: transform 0.3s ease; }
-        .image-modal.show img { transform: scale(1); }
-        .modal-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 48px;
-            height: 48px;
-            border: none;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.15);
-            color: #fff;
-            font-size: 26px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background 0.15s;
-            line-height: 1;
-        }
-        .modal-nav:hover { background: rgba(255, 255, 255, 0.35); }
-        .modal-nav.prev { left: 24px; }
-        .modal-nav.next { right: 24px; }
-        .modal-counter {
-            position: absolute;
-            bottom: 28px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #fff;
-            font-size: 14px;
-            font-weight: 600;
-            background: rgba(15, 23, 42, 0.65);
-            padding: 6px 16px;
-            border-radius: 16px;
-        }
+.header-area h2 {
+	font-size: 22px;
+	font-weight: 700;
+}
 
-        .read-only-box { text-align: center; padding: 12px; background: var(--slate-50); border: 1px dashed var(--slate-200); border-radius: 8px; color: var(--slate-600); font-weight: 500; font-size: 13px; }
-    </style>
+.btn-top-action {
+	text-decoration: none;
+	color: var(--sky-600);
+	font-weight: 600;
+	font-size: 14px;
+}
+
+.btn-top-action:hover {
+	color: var(--sky-700);
+}
+
+.tabs-container {
+	display: flex;
+	border-bottom: 2px solid var(--slate-200);
+	margin-bottom: 16px;
+	gap: 8px;
+}
+
+.tab-btn {
+	padding: 10px 20px;
+	border: none;
+	background: none;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--slate-600);
+	cursor: pointer;
+	position: relative;
+	transition: color 0.2s;
+}
+
+.tab-btn:hover {
+	color: var(--sky-600);
+}
+
+.tab-btn.active {
+	color: var(--sky-600);
+}
+
+.tab-btn.active::after {
+	content: '';
+	position: absolute;
+	bottom: -2px;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background-color: var(--sky-600);
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+}
+
+th {
+	background: var(--slate-50);
+	padding: 12px;
+	border-bottom: 2px solid var(--border-color);
+	text-align: left;
+	color: var(--slate-600);
+	font-weight: 600;
+}
+
+td {
+	padding: 12px;
+	border-bottom: 1px solid var(--border-color);
+	vertical-align: middle;
+}
+
+.clickable-row {
+	cursor: pointer;
+	transition: background 0.15s;
+}
+
+.clickable-row:hover {
+	background-color: #f0f9ff !important;
+}
+
+.clickable-row.hidden {
+	display: none !important;
+}
+
+/* 狀態編碼對齊資料庫：0待處理, 1處理中, 2成立, 3不成立 */
+.status-badge {
+	padding: 4px 10px;
+	border-radius: 12px;
+	font-size: 12px;
+	font-weight: 600;
+	display: inline-block;
+}
+
+.badge-pending {
+	background: #fef9c3;
+	color: #713f12;
+}
+
+.badge-processing {
+	background: #dbeafe;
+	color: #1e40af;
+}
+
+.badge-approved {
+	background: #d1fae5;
+	color: #065f46;
+}
+
+.badge-rejected {
+	background: #ffe4e6;
+	color: #9f1239;
+}
+
+.detail-panel {
+	position: sticky;
+	top: 40px;
+	align-self: start;
+	background: #ffffff;
+}
+
+.detail-placeholder {
+	text-align: center;
+	color: #94a3b8;
+	padding: 8px 20px;
+	font-weight: 500;
+}
+
+.detail-placeholder h3 {
+	font-size: 18px;
+	margin-bottom: 8px;
+	color: var(--slate-700);
+}
+
+.detail-header {
+	border-bottom: 1px solid var(--slate-200);
+	padding-bottom: 16px;
+	margin-bottom: 16px;
+}
+
+.detail-header h3 {
+	font-size: 18px;
+	font-weight: 700;
+	color: var(--slate-800);
+}
+
+.info-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 14px;
+	font-size: 14px;
+	margin-bottom: 20px;
+}
+
+.info-item {
+	background: var(--slate-50);
+	padding: 10px;
+	border-radius: 8px;
+	border: 1px solid var(--border-color);
+}
+
+.info-item.full-width {
+	grid-column: span 2;
+}
+
+.info-label {
+	font-size: 12px;
+	color: #64748b;
+	margin-bottom: 4px;
+	font-weight: 600;
+}
+
+.info-value {
+	font-weight: 600;
+	color: var(--slate-800);
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+/* 📸 多張證據縮圖牆 */
+.evidence-gallery {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+	gap: 10px;
+	margin-top: 10px;
+	min-height: 50px;
+	background: var(--slate-50);
+	border-radius: 8px;
+	border: 1px dashed var(--slate-200);
+	padding: 10px;
+}
+
+.evidence-thumb {
+	width: 100%;
+	height: 90px;
+	object-fit: cover;
+	border-radius: 8px;
+	border: 1px solid var(--slate-200);
+	background: #1e293b;
+	cursor: zoom-in;
+	transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.evidence-thumb:hover {
+	transform: scale(1.04);
+	box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+}
+
+.no-img-text {
+	color: #94a3b8;
+	font-size: 13px;
+	font-weight: 500;
+	padding: 15px;
+	grid-column: 1/-1;
+	text-align: center;
+}
+
+/* 🔍 放大檢視 Modal（含多圖導覽） */
+.image-modal {
+	display: none;
+	position: fixed;
+	z-index: 9999;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(15, 23, 42, 0.85);
+	backdrop-filter: blur(4px);
+	justify-content: center;
+	align-items: center;
+	cursor: zoom-out;
+}
+
+.image-modal img {
+	max-width: 85%;
+	max-height: 85%;
+	border-radius: 12px;
+	box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+	cursor: default;
+	transform: scale(0.95);
+	transition: transform 0.3s ease;
+}
+
+.image-modal.show img {
+	transform: scale(1);
+}
+
+.modal-nav {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 48px;
+	height: 48px;
+	border: none;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.15);
+	color: #fff;
+	font-size: 26px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background 0.15s;
+	line-height: 1;
+}
+
+.modal-nav:hover {
+	background: rgba(255, 255, 255, 0.35);
+}
+
+.modal-nav.prev {
+	left: 24px;
+}
+
+.modal-nav.next {
+	right: 24px;
+}
+
+.modal-counter {
+	position: absolute;
+	bottom: 28px;
+	left: 50%;
+	transform: translateX(-50%);
+	color: #fff;
+	font-size: 14px;
+	font-weight: 600;
+	background: rgba(15, 23, 42, 0.65);
+	padding: 6px 16px;
+	border-radius: 16px;
+}
+
+.read-only-box {
+	text-align: center;
+	padding: 12px;
+	background: var(--slate-50);
+	border: 1px dashed var(--slate-200);
+	border-radius: 8px;
+	color: var(--slate-600);
+	font-weight: 500;
+	font-size: 13px;
+}
+</style>
 </head>
 <body>
-<div th:replace="~{front-end/common/navbar :: navbar}"></div>
-<div class="container">
-    <div class="card-panel main-panel">
-        <div class="header-area">
-            <h2>⚖️ 會員檢舉案審核中心</h2>
-            <a th:href="@{/backend/memberreport/select_page}" class="btn-top-action">🏠 回導覽首頁</a>
-        </div>
-        <!-- 狀態編碼對齊資料庫：0待處理, 1處理中, 2成立, 3不成立 -->
-        <div class="tabs-container">
-            <button class="tab-btn active" onclick="switchTab('all', this)">全部案件</button>
-            <button class="tab-btn" onclick="switchTab('0', this)">⏳ 待處理</button>
-            <button class="tab-btn" onclick="switchTab('1', this)">🔵 處理中</button>
-            <button class="tab-btn" onclick="switchTab('2', this)">🟢 審核通過 (成立)</button>
-            <button class="tab-btn" onclick="switchTab('3', this)">❌ 審核未通過 (不成立)</button>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>案號</th>
-                    <th>檢舉人 ID</th>
-                    <th>被檢舉人 ID</th>
-                    <th>檢舉類別</th>
-                    <th>檢舉時間</th>
-                    <th>狀態</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="reportVO : ${memberReportListData}" 
-                    class="clickable-row"
-                    th:data-id="${reportVO.reportId}"
-                    th:data-reporter="${reportVO.reporter?.memberId}"
-                    th:data-reported="${reportVO.reported?.memberId}"
-                    th:data-category="${reportVO.reportCategory == 0 ? '不當言論' : (reportVO.reportCategory == 1 ? '惡意騷擾' : (reportVO.reportCategory == 2 ? '詐騙行為' : '其他原因'))}"
-                    th:data-content="${reportVO.reportContent}"
-                    th:data-status="${reportVO.reportStatus}"
-                    th:data-emp="${reportVO.employee?.employeeId != null ? reportVO.employee.employeeId : '尚未指派'}"
-                    th:data-note="${reportVO.adminNote != null ? reportVO.adminNote : '無備註'}"
-                    th:data-points="${reportVO.violationPoints != null ? reportVO.violationPoints : 0}"
-                    th:data-time="${#dates.format(reportVO.createdAt, 'yyyy-MM-dd HH:mm')}"
-                    onclick="showReportDetail(this)">
+	<div class="wb-admin-layout">
 
-                    <td th:text="${reportVO.reportId}" style="font-weight: 600;"></td>
-                    <td th:text="${reportVO.reporter?.memberId}"></td>
-                    <td th:text="${reportVO.reported?.memberId}"></td>
-                    <td>
-                        <span th:text="${reportVO.reportCategory == 0 ? '🗣️ 不當言論' : (reportVO.reportCategory == 1 ? '⚡ 惡意騷擾' : (reportVO.reportCategory == 2 ? '💸 詐騙行為' : '📁 其他原因'))}"></span>
-                    </td>
-                    <td th:text="${#dates.format(reportVO.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
-                    <td>
-                        <span th:if="${reportVO.reportStatus == 0}" class="status-badge badge-pending">⏳ 待處理</span>
-                        <span th:if="${reportVO.reportStatus == 1}" class="status-badge badge-processing">🔵 處理中</span>
-                        <span th:if="${reportVO.reportStatus == 2}" class="status-badge badge-approved">🟢 檢舉成立</span>
-                        <span th:if="${reportVO.reportStatus == 3}" class="status-badge badge-rejected">❌ 退件/不成立</span>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="card-panel detail-panel" id="detailPanel">
-        <div class="detail-placeholder" id="placeholderText">
-            <h3>📑 請點選左側任意案件</h3>
-            <p style="font-size: 13px; margin-top: 6px;">點選案件後，此處將自動展開該案的詳細內容與證據截圖。</p>
-        </div>
-        <div id="detailContent" style="display: none;">
-            <div class="detail-header">
-                <h3>案號 #<span id="detReportId"></span> 詳細資訊</h3>
-            </div>
-            <div class="info-grid">
-                <div class="info-item"><div class="info-label">檢舉人 ID</div><div class="info-value" id="detReporter"></div></div>
-                <div class="info-item"><div class="info-label">被檢舉人 ID</div><div class="info-value" id="detReported"></div></div>
-                <div class="info-item"><div class="info-label">檢舉類別</div><div class="info-value" id="detCategory"></div></div>
-                <div class="info-item"><div class="info-label">檢舉時間</div><div class="info-value" id="detTime"></div></div>
-                <div class="info-item full-width">
-                    <div class="info-label">📋 詳細具體事證描述</div>
-                    <div class="info-value" id="detContentDesc" style="line-height: 1.6;"></div>
-                </div> 
-                <div class="info-item full-width">
-                    <div class="info-label" id="evidenceCountLabel">📸 檢舉事證截圖 (點擊可放大)</div>
-                    <div class="evidence-gallery" id="evidenceGallery"></div>
-                </div>
-                <div class="info-item"><div class="info-label">經辦員工編號</div><div class="info-value" id="detEmpId"></div></div>
-                <div class="info-item"><div class="info-label">裁決扣除點數</div><div class="info-value" id="detPoints" style="color: var(--rose-600);"></div></div>
-                <div class="info-item full-width">
-                    <div class="info-label">💬 審核處理備註</div>
-                    <div class="info-value" id="detAdminNote" style="color: var(--slate-600); font-weight: 500;"></div>
-                </div> 
-            </div>
-            <div id="actionArea" style="border-top: 1px solid var(--slate-200); padding-top: 16px;">
-            </div>
-        </div>
-    </div>
-</div>
-<div id="imgModal" class="image-modal" onclick="closeEvidenceZoom()">
-    <button type="button" class="modal-nav prev" id="modalPrevBtn" onclick="navEvidence(-1, event)">‹</button>
-    <img id="modalTargetImg" src="" alt="放大證據圖" onclick="event.stopPropagation()">
-    <button type="button" class="modal-nav next" id="modalNextBtn" onclick="navEvidence(1, event)">›</button>
-    <div class="modal-counter" id="modalCounter"></div>
-</div>
-<script th:inline="javascript">
+		<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
+
+		<main class="wb-admin-content">
+			<div class="container">
+				<div class="card-panel main-panel">
+					<div class="header-area">
+						<h2>⚖️ 會員檢舉案審核中心</h2>
+						<a th:href="@{/backend/memberreport/select_page}"
+							class="btn-top-action">🏠 回導覽首頁</a>
+					</div>
+					<!-- 狀態編碼對齊資料庫：0待處理, 1處理中, 2成立, 3不成立 -->
+					<div class="tabs-container">
+						<button class="tab-btn active" onclick="switchTab('all', this)">全部案件</button>
+						<button class="tab-btn" onclick="switchTab('0', this)">⏳
+							待處理</button>
+						<button class="tab-btn" onclick="switchTab('1', this)">🔵
+							處理中</button>
+						<button class="tab-btn" onclick="switchTab('2', this)">🟢
+							審核通過 (成立)</button>
+						<button class="tab-btn" onclick="switchTab('3', this)">❌
+							審核未通過 (不成立)</button>
+					</div>
+					<table>
+						<thead>
+							<tr>
+								<th>案號</th>
+								<th>檢舉人 ID</th>
+								<th>被檢舉人 ID</th>
+								<th>檢舉類別</th>
+								<th>檢舉時間</th>
+								<th>狀態</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:each="reportVO : ${memberReportListData}"
+								class="clickable-row" th:data-id="${reportVO.reportId}"
+								th:data-reporter="${reportVO.reporter?.memberId}"
+								th:data-reported="${reportVO.reported?.memberId}"
+								th:data-category="${reportVO.reportCategory == 0 ? '不當言論' : (reportVO.reportCategory == 1 ? '惡意騷擾' : (reportVO.reportCategory == 2 ? '詐騙行為' : '其他原因'))}"
+								th:data-content="${reportVO.reportContent}"
+								th:data-status="${reportVO.reportStatus}"
+								th:data-emp="${reportVO.employee?.employeeId != null ? reportVO.employee.employeeId : '尚未指派'}"
+								th:data-note="${reportVO.adminNote != null ? reportVO.adminNote : '無備註'}"
+								th:data-points="${reportVO.violationPoints != null ? reportVO.violationPoints : 0}"
+								th:data-time="${#dates.format(reportVO.createdAt, 'yyyy-MM-dd HH:mm')}"
+								onclick="showReportDetail(this)">
+
+								<td th:text="${reportVO.reportId}" style="font-weight: 600;"></td>
+								<td th:text="${reportVO.reporter?.memberId}"></td>
+								<td th:text="${reportVO.reported?.memberId}"></td>
+								<td><span
+									th:text="${reportVO.reportCategory == 0 ? '🗣️ 不當言論' : (reportVO.reportCategory == 1 ? '⚡ 惡意騷擾' : (reportVO.reportCategory == 2 ? '💸 詐騙行為' : '📁 其他原因'))}"></span>
+								</td>
+								<td
+									th:text="${#dates.format(reportVO.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+								<td><span th:if="${reportVO.reportStatus == 0}"
+									class="status-badge badge-pending">⏳ 待處理</span> <span
+									th:if="${reportVO.reportStatus == 1}"
+									class="status-badge badge-processing">🔵 處理中</span> <span
+									th:if="${reportVO.reportStatus == 2}"
+									class="status-badge badge-approved">🟢 檢舉成立</span> <span
+									th:if="${reportVO.reportStatus == 3}"
+									class="status-badge badge-rejected">❌ 退件/不成立</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="card-panel detail-panel" id="detailPanel">
+					<div class="detail-placeholder" id="placeholderText">
+						<h3>📑 請點選左側任意案件</h3>
+						<p style="font-size: 13px; margin-top: 6px;">點選案件後，此處將自動展開該案的詳細內容與證據截圖。</p>
+					</div>
+					<div id="detailContent" style="display: none;">
+						<div class="detail-header">
+							<h3>
+								案號 #<span id="detReportId"></span> 詳細資訊
+							</h3>
+						</div>
+						<div class="info-grid">
+							<div class="info-item">
+								<div class="info-label">檢舉人 ID</div>
+								<div class="info-value" id="detReporter"></div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">被檢舉人 ID</div>
+								<div class="info-value" id="detReported"></div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">檢舉類別</div>
+								<div class="info-value" id="detCategory"></div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">檢舉時間</div>
+								<div class="info-value" id="detTime"></div>
+							</div>
+							<div class="info-item full-width">
+								<div class="info-label">📋 詳細具體事證描述</div>
+								<div class="info-value" id="detContentDesc"
+									style="line-height: 1.6;"></div>
+							</div>
+							<div class="info-item full-width">
+								<div class="info-label" id="evidenceCountLabel">📸 檢舉事證截圖
+									(點擊可放大)</div>
+								<div class="evidence-gallery" id="evidenceGallery"></div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">經辦員工編號</div>
+								<div class="info-value" id="detEmpId"></div>
+							</div>
+							<div class="info-item">
+								<div class="info-label">裁決扣除點數</div>
+								<div class="info-value" id="detPoints"
+									style="color: var(--rose-600);"></div>
+							</div>
+							<div class="info-item full-width">
+								<div class="info-label">💬 審核處理備註</div>
+								<div class="info-value" id="detAdminNote"
+									style="color: var(--slate-600); font-weight: 500;"></div>
+							</div>
+						</div>
+						<div id="actionArea"
+							style="border-top: 1px solid var(--slate-200); padding-top: 16px;">
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="imgModal" class="image-modal" onclick="closeEvidenceZoom()">
+				<button type="button" class="modal-nav prev" id="modalPrevBtn"
+					onclick="navEvidence(-1, event)">‹</button>
+				<img id="modalTargetImg" src="" alt="放大證據圖"
+					onclick="event.stopPropagation()">
+				<button type="button" class="modal-nav next" id="modalNextBtn"
+					onclick="navEvidence(1, event)">›</button>
+				<div class="modal-counter" id="modalCounter"></div>
+			</div>
+		</main>
+
+	</div>
+	<script th:inline="javascript">
     // ================== 📸 多張證據截圖：狀態變數 ==================
     let currentReportId = null;   // 目前檢視中的案件（防止快速切換案件時，舊請求汙染畫面）
     let evidenceSrcList = [];     // 目前案件所有證據圖的網址清單
