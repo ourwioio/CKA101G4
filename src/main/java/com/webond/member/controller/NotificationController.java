@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/notification")
+@RequestMapping("/admin/platform/notification")
 public class NotificationController {
 
 	@Autowired
@@ -41,20 +41,53 @@ public class NotificationController {
 //	    return empService.getAll();
 //	}
 
-	@GetMapping("/fakeLogin")
-	public String fakeLogin(HttpSession session) {
-		session.setAttribute("loginEmployeeId", 1001);
-		return "back-end/member/empPage";
-	}
+//	@GetMapping("/fakeLogin")
+//	public String fakeLogin(HttpSession session) {
+//		session.setAttribute("loginEmployeeId", 1001);
+//		return "back-end/member/empPage";
+//	}
+	
+
+    private static final String EMPLOYEE_SESSION_KEY =
+            "employeeVO";
+    
+
+    private EmployeeVO getLoginEmployeeVO(
+            HttpSession session) {
+
+        Object sessionObject =
+                session.getAttribute(
+                        EMPLOYEE_SESSION_KEY
+                );
+
+        if (sessionObject instanceof EmployeeVO employeeVO) {
+            return employeeVO;
+        }
+
+        return null;
+    }
+
+    private Integer getLoginEmployeeId(
+            HttpSession session) {
+
+        EmployeeVO employeeVO =
+                getLoginEmployeeVO(session);
+
+        if (employeeVO == null) {
+            return null;
+        }
+
+        return employeeVO.getEmployeeId();
+    }
 
 	@GetMapping("myNotification")
 	public String myNotification(ModelMap model, HttpSession session) {
-		Integer employeeId = (Integer) session.getAttribute("loginEmployeeId");
-		if (employeeId == null) {
-			return "redirect:/notification/fakeLogin";
 
-		}
-		List<NotificationVO> list = notificationService.getNotificationByEmployeeId(employeeId);
+
+        Integer loginEmployeeId =
+                getLoginEmployeeId(session);
+		
+		List<NotificationVO> list = notificationService.getNotificationByEmployeeId(getLoginEmployeeId(session));
 
 		model.addAttribute("notificationEmpListData", list);
 		return "back-end/member/myNotification";
@@ -69,33 +102,23 @@ public class NotificationController {
 	}
 
 	@PostMapping("getOne_For_update")
-	public String getOneEmpNotification(@RequestParam("notificationId") Integer notificationId, ModelMap model,
-			HttpSession session) {
+	public String getOneEmpNotification(@RequestParam("notificationId") Integer notificationId, ModelMap model) {
 
-		Integer employeeId = (Integer) session.getAttribute("loginEmployeeId");
-		if (employeeId == null) {
-			return "redirect:/notification/fakeLogin";
-		}
 		NotificationVO notificationVO = notificationService.getOneForUpdate(notificationId);
 		model.addAttribute("notificationVO", notificationVO);
 		return "back-end/member/updateNotification";
 	}
 
 	@PostMapping("update")
-	public String update(@Valid NotificationVO notificationVO, BindingResult result, ModelMap model,
-			HttpSession session) {
+	public String update(@Valid NotificationVO notificationVO, BindingResult result, ModelMap model) {
 
-		Integer employeeId = (Integer) session.getAttribute("loginEmployeeId");
-		if (employeeId == null) {
-			return "redirect:/notification/fakeLogin";
-		}
 		if (result.hasErrors()) {
 			return "back-end/member/updateNotification";
 		}
 		notificationService.updateNotification(notificationVO);
 		model.addAttribute("success", "finish");
 
-		return "redirect:/notification/listAllNotification";
+		return "redirect:/admin/platform/notification/listAllNotification";
 
 	}
 
@@ -107,17 +130,13 @@ public class NotificationController {
 		model.addAttribute("notificationListData", list);
 		model.addAttribute("success", "刪除成功");
 
-		return "redirect:/notification/listAllNotification";
+		return "redirect:/admin/platform/notification/listAllNotification";
 
 	}
 
 	@GetMapping("addNotification")
-	public String addNotification(ModelMap model, HttpSession session) {
+	public String addNotification(ModelMap model) {
 
-		Integer employeeId = (Integer) session.getAttribute("loginEmployeeId");
-		if (employeeId == null) {
-			return "redirect:/notification/fakeLogin";
-		}
 		NotificationVO notificationVO = new NotificationVO();
 		model.addAttribute("notificationVO", notificationVO);
 
@@ -128,13 +147,15 @@ public class NotificationController {
 	public String insert(@Valid NotificationVO notificationVO, BindingResult result, ModelMap model,
 			HttpSession session) {
 
-		Integer employeeId = (Integer) session.getAttribute("loginEmployeeId");
-		if (employeeId == null) {
-			return "redirect:/notification/fakeLogin";
-		}
+
+        Integer loginEmployeeId =
+                getLoginEmployeeId(session);
+		
+		List<NotificationVO> list = notificationService.getNotificationByEmployeeId(getLoginEmployeeId(session));
+
 		
 		EmployeeVO employee = new EmployeeVO();
-		employee.setEmployeeId(employeeId);
+		employee.setEmployeeId(getLoginEmployeeId(session));
 		notificationVO.setEmployee(employee);
 		
 
@@ -163,7 +184,7 @@ public class NotificationController {
 		notificationService.addNotification(notificationVO);
 		model.addAttribute("success", "finish");
 
-		return "redirect:/notification/listAllNotification";
+		return "redirect:/admin/platform/notification/listAllNotification";
 
 	}
 

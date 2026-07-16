@@ -9,17 +9,10 @@
 <body>
 	<div>
 		<h1>場地列表</h1>
-		<span th:if="${session.loginEmployeeId != null}">
-			當前登入員工編號： 
-			<strong th:text="${session.loginEmployeeId}"></strong>
-		</span>
-
-		<span th:if="${session.loginEmployeeId == null}">
-			目前狀態： <strong>未登入</strong>
-		</span>
+		
 	</div>
-	<a th:href="@{/notification/listAllNotification}">查看所有通知</a>
-	<a th:href="@{/notification/addNotification}">新增通知</a>
+	<a th:href="@{/admin/platform/notification/listAllNotification}">查看所有通知</a>
+	<a th:href="@{/admin/platform/notification/addNotification}">新增通知</a>
 	<table>
 		<thead>
 			<tr>
@@ -47,13 +40,13 @@
 		        <td th:text="${n.employee?.employeeId}"></td>
 		        <td th:text="${n.createdAt}"></td>
 				<td>
-					<form th:action="@{/notification/getOne_For_update}" method="post">
+					<form th:action="@{/admin/platform/notification/getOne_For_update}" method="post">
 						<input type="hidden"  name="notificationId" th:value="${n.notificationId}"/>
 						<button type="submit">修改</button>
 					</form>
 				</td>
 				<td>
-					<form th:action="@{/notification/delete}" method="post">
+					<form th:action="@{/admin/platform/notification/delete}" method="post">
 						<input type="hidden"  name="notificationId" th:value="${n.notificationId}"/>
 						<button type="submit">刪除</button>
 					</form>
