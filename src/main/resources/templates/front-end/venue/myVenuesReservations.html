@@ -29,6 +29,7 @@
 					<th>場地名稱</th>
 					<th>預約日期</th>
 					<th>預約時段</th>
+					<th>訂單狀態</th>
 					<th>詳細資訊</th>
 				</tr>
 			</thead>
@@ -39,6 +40,12 @@
 					<td th:text="${venueOrderVO.venueVO.venueName}"></td>
 					<td th:text="${venueOrderVO.bookDate}"></td>
 					<td th:text="${venueOrderVO.startAt} + '~' + ${venueOrderVO.endAt}"></td>
+					<td th:switch="${venueOrderVO.orderStatus}">
+						<span th:case="1" class="status-badge status-badge--up">已付款</span>
+						<span th:case="4" class="status-badge status-badge--down">已取消</span>
+						<span th:case="*" class="status-badge"
+						      th:text="${venueOrderVO.orderStatus}"></span>
+					</td>
 					<td>
 						<form th:action="@{/front/venueOrder/getOneReservations}" method="get">
 							<input type="hidden" name="venueOrderId" th:value="${venueOrderVO.venueOrderId}">
