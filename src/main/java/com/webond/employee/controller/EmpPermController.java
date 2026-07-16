@@ -89,7 +89,7 @@ public class EmpPermController {
 		
 		permSvc.addPermission(permVO);
 		
-		return "redirect:/admin/empPermPage";
+		return "redirect:/admin/employees/empPermPage";
 	}
 	
 	
@@ -129,7 +129,7 @@ public class EmpPermController {
 			
 			permSvc.updatePerm(permVO);
 			
-			return "redirect:/admin/empPermPage";
+			return "redirect:/admin/employees/empPermPage";
 		}
 		
 // === 刪除員工權限(確認送出) ===//
@@ -145,7 +145,7 @@ public class EmpPermController {
 			model.addAttribute("permListData", list); 
 			model.addAttribute("success", "- (刪除成功)");
 			
-			return "redirect:/admin/empPermPage";
+			return "redirect:/admin/employees/empPermPage";
 			
 		}
 	

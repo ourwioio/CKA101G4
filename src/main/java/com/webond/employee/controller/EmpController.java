@@ -210,8 +210,8 @@ public class EmpController {
 		List<EmployeeVO> list = empSvc.getAll();
 		model.addAttribute("empListData", list);
 		model.addAttribute("success", "- (新增成功)");
-		// 使用 redirect 重新導向回主列表（防止使用者按 F5 重新整理網頁導致重複儲存）
-		return "redirect:/admin/empPage";
+		
+		return "redirect:/admin/employees/empPage";
 	}
 	
 //=== 新增的圖片處理 === //
@@ -294,7 +294,7 @@ public class EmpController {
 			empSvc.updateEmp(employeeVO, permIds, upImg);
 			/*************************** 3.修改完成,準備轉交(Send the Success view) **************/
 
-			return "redirect:/admin/empPage";
+			return "redirect:/admin/employees/empPage";
 		}
 		
 		
@@ -336,7 +336,7 @@ public class EmpController {
 			model.addAttribute("empListData", list); 
 			model.addAttribute("success", "- (刪除成功)");
 			
-			return "redirect:/admin/empPage";
+			return "redirect:/admin/employees/empPage";
 			
 		}
 	

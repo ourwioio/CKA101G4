@@ -66,7 +66,7 @@
 
         <!-- 操作按鈕 -->
         <div class="action-buttons" style="margin-top: 20px">
-          <button class="btn btn-primary" onclick="sendMessage()">
+          <button class="btn btn-primary" th:onclick="|window.location.href='@{/member/chat(to=${memberVO.memberId})}'|">
             💬 傳送訊息
           </button>
           <button class="btn btn-secondary" onclick="addFavorite()">
