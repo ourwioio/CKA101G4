@@ -18,8 +18,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.employee.model.EmployeeVO;
 import com.webond.employee.repository.EmployeeRepository;
+import com.webond.member.model.NotificationVO;
+import com.webond.member.service.NotificationService;
 import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueReportVO;
+import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueReportService;
 
 @Controller
@@ -31,6 +34,9 @@ public class VenueReportController {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
+	
+	@Autowired
+	private NotificationService notificationService;
 
 	// ===== 提供狀態對照表：0 審核中 / 1 審核通過 / 2 審核未通過 =====
 	@ModelAttribute("statusLabelMap")
@@ -106,6 +112,27 @@ public class VenueReportController {
 
 		venueReportSvc.approve(venueReportId, employeeId);
 		redirectAttrs.addFlashAttribute("success", "- (檢舉成立，場地已退回待審核)");
+		
+		VenueReportVO venueReportVO = venueReportSvc.getOneVenueReport(venueReportId);
+		VenueOrderVO venueOrderVO = venueReportSvc.getVenueOrder(venueReportVO.getVenueOrderId());
+		VenueVO venueVO = venueOrderVO.getVenueVO();
+		
+		// 通知場地主：場地遭檢舉
+		NotificationVO notificationVO = new NotificationVO();
+		notificationVO.setMember(venueVO.getMember());
+		notificationVO.setTitle("場地遭檢舉通知");
+		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + "　已遭檢舉，請重新修改您的資料再進行審核，謝謝");
+		notificationVO.setNotificationType((byte) 2);
+		notificationService.addNotification(notificationVO);
+		
+		// 通知檢舉人（訂單的租借方）：檢舉成立
+		NotificationVO reporterNotification = new NotificationVO();
+		reporterNotification.setMember(venueOrderVO.getMember());
+		reporterNotification.setTitle("場地檢舉成立通知");
+		reporterNotification.setContent("先生/小姐您好，您對場地：" + venueVO.getVenueName() + "　的檢舉經審核後成立，該場地已下架並退回待審核，感謝您的回報");
+		reporterNotification.setNotificationType((byte) 2);
+		notificationService.addNotification(reporterNotification);
+		
 		return "redirect:/venueReport/viewOne?venueReportId=" + venueReportId;
 	}
 
@@ -117,6 +144,19 @@ public class VenueReportController {
 
 		venueReportSvc.reject(venueReportId, employeeId);
 		redirectAttrs.addFlashAttribute("success", "- (檢舉不成立，場地狀態未變更)");
+		
+		VenueReportVO venueReportVO = venueReportSvc.getOneVenueReport(venueReportId);
+		VenueOrderVO venueOrderVO = venueReportSvc.getVenueOrder(venueReportVO.getVenueOrderId());
+		VenueVO venueVO = venueOrderVO.getVenueVO();
+
+		// 只通知檢舉人（訂單的租借方）：檢舉不成立（無須通知場地主）
+		NotificationVO reporterNotification = new NotificationVO();
+		reporterNotification.setMember(venueOrderVO.getMember());
+		reporterNotification.setTitle("場地檢舉未成立通知");
+		reporterNotification.setContent("先生/小姐您好，您對場地：" + venueVO.getVenueName() + "　的檢舉經審核後不成立，該場地維持原狀態，感謝您的回報");
+		reporterNotification.setNotificationType((byte) 2);
+		notificationService.addNotification(reporterNotification);
+
 		return "redirect:/venueReport/viewOne?venueReportId=" + venueReportId;
 	}
 }

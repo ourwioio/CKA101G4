@@ -3,13 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <title>撥款明細管理</title>
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet">
 </head>
-<body>
-	<div class="container mt-4">
+<body class="bg-light">
+	<div class="container py-4">
 
-		<h3 class="mb-4">撥款所有明細</h3>
+		<!-- 訂單交易管理切換列 -->
+		<ul class="nav nav-pills mb-4 border-bottom pb-3">
+			<li class="nav-item"><a class="nav-link"
+				th:href="@{/orderManagement/index}">訂單交易管理首頁</a></li>
+			<li class="nav-item"><a class="nav-link active"
+				th:href="@{/refundPayout/payoutList}">撥款明細管理</a></li>
+			<li class="nav-item"><a class="nav-link"
+				th:href="@{/refundPayout/refundList}">退款明細管理</a></li>
+			<li class="nav-item"><a class="nav-link"
+				th:href="@{/transaction/revenue}">營收與交易明細</a></li>
+		</ul>
+
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h2>撥款所有明細</h2>
+		</div>
 
 		<!-- 篩選條件 -->
 		<form th:action="@{/refundPayout/payoutList}" method="get"
@@ -61,7 +76,7 @@
 		</form>
 
 		<!-- 明細表格 -->
-		<table class="table table-bordered table-hover align-middle">
+		<table class="table table-bordered table-hover align-middle bg-white">
 			<thead class="table-light">
 				<tr>
 					<th>訂單類型</th>
