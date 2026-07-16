@@ -38,7 +38,7 @@ public class VenueReviewController {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
-	
+
 	@Autowired
 	private NotificationService notificationService;
 
@@ -118,12 +118,12 @@ public class VenueReviewController {
 	// ===== 查詢全部 =====
 	@GetMapping("listAllVenueReview")
 	public String listAllVenueReview(ModelMap model, HttpSession session) {
-		
+
 		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
 		if (loginEmp == null) {
 			return "redirect:/admin/login";
 		}
-		
+
 		List<VenueReviewVO> list = venueReviewSvc.getAll();
 		model.addAttribute("venueReviewListData", list);
 		return "back-end/venueReview/listAllVenueReview";
@@ -140,7 +140,7 @@ public class VenueReviewController {
 				.sorted(Comparator
 						.comparing((VenueImagesVO img) -> (img.getCover() != null && img.getCover() == 1) ? 0 : 1))
 				.toList();
-		
+
 		model.addAttribute("venueVO", venueVO);
 		model.addAttribute("sortedImages", sortedImages);
 		model.addAttribute("venueReviewVO", venueReviewVO);
@@ -150,14 +150,20 @@ public class VenueReviewController {
 	// ===== 審核通過 =====
 	@PostMapping("approve")
 	public String approve(@RequestParam("venueReviewId") Integer venueReviewId,
-			@RequestParam("employeeId") Integer employeeId,
-			@RequestParam(value = "reviewNote", required = false) String reviewNote, RedirectAttributes redirectAttrs) {
-		venueReviewSvc.approve(venueReviewId, employeeId, reviewNote);
+			@RequestParam(value = "reviewNote", required = false) String reviewNote, RedirectAttributes redirectAttrs,
+			HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
+		venueReviewSvc.approve(venueReviewId, loginEmp.getEmployeeId(), reviewNote);
 		redirectAttrs.addFlashAttribute("success", "- (審核通過)");
-		
+
 		VenueReviewVO venueReviewVO = venueReviewSvc.getOneVenueReview(venueReviewId);
 		VenueVO venueVO = venueService.getOneVenue(venueReviewVO.getVenueId());
-		
+
 		// 通知場地主：場地審核通過
 		NotificationVO notificationVO = new NotificationVO();
 		notificationVO.setMember(venueVO.getMember());
@@ -165,21 +171,27 @@ public class VenueReviewController {
 		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + "　審核已通過，謝謝");
 		notificationVO.setNotificationType((byte) 2);
 		notificationService.addNotification(notificationVO);
-		
+
 		return "redirect:/venueReview/listAllVenueReview";
 	}
 
 	// ===== 審核未通過 =====
 	@PostMapping("reject")
 	public String reject(@RequestParam("venueReviewId") Integer venueReviewId,
-			@RequestParam("employeeId") Integer employeeId,
-			@RequestParam(value = "reviewNote", required = false) String reviewNote, RedirectAttributes redirectAttrs) {
-		venueReviewSvc.reject(venueReviewId, employeeId, reviewNote);
+			@RequestParam(value = "reviewNote", required = false) String reviewNote, RedirectAttributes redirectAttrs,
+			HttpSession session) {
+
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
+		venueReviewSvc.reject(venueReviewId, loginEmp.getEmployeeId(), reviewNote);
 		redirectAttrs.addFlashAttribute("success", "- (已標記為審核未通過)");
-		
+
 		VenueReviewVO venueReviewVO = venueReviewSvc.getOneVenueReview(venueReviewId);
 		VenueVO venueVO = venueService.getOneVenue(venueReviewVO.getVenueId());
-		
+
 		// 通知場地主：場地審核未通過
 		NotificationVO notificationVO = new NotificationVO();
 		notificationVO.setMember(venueVO.getMember());
@@ -187,7 +199,7 @@ public class VenueReviewController {
 		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + "　審核未通過，請重新修改上傳資料，謝謝");
 		notificationVO.setNotificationType((byte) 2);
 		notificationService.addNotification(notificationVO);
-		
+
 		return "redirect:/venueReview/listAllVenueReview";
 	}
 
