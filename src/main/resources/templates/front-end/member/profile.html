@@ -5,11 +5,550 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>會員個人檔案</title>
-  <link rel="stylesheet" th:href="@{/css/front-end/member/profile.css}" />
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
   <style>
 
+		
+		@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+		
+		:root{
+		  --color-bg:            #F7F3EC;
+		  --color-surface:       #FFFFFF;
+		  --color-surface-soft:  #FFFDF8;
+		  --color-ink:           #17140F;
+		  --color-ink-soft:      #726A5F;
+		  --color-border:        #ECE4D6;
+		
+		  --color-yellow:       #FFE59A;
+		  --color-yellow-deep:  #FFC94D;
+		  --color-pink:         #FFB5C1;
+		  --color-green:        #B7E1D1;
+		  --color-blue:         #A9D3FF;
+		
+		  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+		  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+		
+		  --radius-lg: 26px;
+		  --radius-md: 16px;
+		  --radius-full: 999px;
+		
+		  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+		  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+		
+		  --nav-height: 76px;
+		}
+		
+		*{ box-sizing: border-box; }
+		
+		body{
+		  margin:0;
+		  font-family: var(--font-body);
+		  background: var(--color-bg);
+		  color: var(--color-ink);
+		  line-height: 1.6;
+		  -webkit-font-smoothing: antialiased;
+		}
+		
+		h1,h2,h3,h4{ font-family: var(--font-display); margin:0; }
+		img{ max-width:100%; }
+		
+		/* ==========================================================
+		   版面容器
+		   ========================================================== */
+		.container{
+		  max-width: 1100px;
+		  margin: 0 auto;
+		  padding: calc(var(--nav-height) + 40px) 20px 60px;
+		}
+		
+		/* ==========================================================
+		   頭部檔案卡
+		   ========================================================== */
+		.profile-header{
+		  position: relative; /* 確保檢舉按鈕能定位在右上方 */
+		  display: flex;
+		  align-items: center;
+		  gap: 36px;
+		  background: var(--color-surface);
+		  border: 1px solid var(--color-border);
+		  border-radius: var(--radius-lg);
+		  box-shadow: var(--shadow-sm);
+		  padding: 42px 36px;
+		  margin-bottom: 24px;
+		}
+		
+		.profile-avatar{ flex-shrink: 0; }
+		.avatar-img{
+		  width: 120px;
+		  height: 120px;
+		  object-fit: cover;
+		  border-radius: 50%;
+		  border: 3px solid var(--color-surface);
+		  box-shadow: var(--shadow-md);
+		  background: var(--color-surface-soft);
+		}
+		
+		.profile-info{ flex: 1; }
+		
+		/* 名字與身份標章 Flex 排列 */
+		.member-name-container {
+		  display: flex;
+		  align-items: center;
+		  gap: 12px;
+		  flex-wrap: wrap;
+		}
+		
+		.member-name{
+		  font-size: 26px;
+		  font-weight: 800;
+		  letter-spacing: 0.5px;
+		}
+		
+		/* 活潑的小尺寸身分標章（帶有 Neo-brutalism 的活潑小黑邊） */
+		.status-badge-mini{
+		  display: inline-flex;
+		  align-items: center;
+		  padding: 4px 10px;
+		  border-radius: var(--radius-full);
+		  font-size: 11px;
+		  font-weight: 800;
+		  letter-spacing: 0.5px;
+		}
+		.status-badge-mini.status0 { background: var(--color-yellow); color: var(--color-ink); }      /* 未認證 */
+		.status-badge-mini.status1 { background: var(--color-green); color: var(--color-ink); }       /* 已認證 */
+		.status-badge-mini.status3 { background: var(--color-pink); color: var(--color-ink); }        /* 停權 */
+		.status-badge-mini.status4 { background: var(--color-yellow-deep); color: var(--color-ink); } /* 限制參加活動 */
+		
+		.member-contact{
+		  display: flex;
+		  flex-direction: column;
+		  gap: 6px;
+		  margin-top: 10px;
+		}
+		.contact-item{
+		  display: flex;
+		  align-items: center;
+		  gap: 8px;
+		  font-size: 13.5px;
+		  color: var(--color-ink-soft);
+		}
+		.contact-icon{ font-size: 15px; }
+		
+		/* ==========================================================
+		   操作按鈕（傳送訊息 / 檢舉）
+		   ========================================================== */
+		.action-buttons{ display: flex; gap: 12px; }
+		
+		.btn{
+		  display: inline-flex;
+		  align-items: center;
+		  gap: 8px;
+		  border: none;
+		  cursor: pointer;
+		  font-family: var(--font-body);
+		  font-weight: 800;
+		  font-size: 14px;
+		  padding: 10px 22px;
+		  border-radius: var(--radius-full);
+		  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
+		}
+		.btn-primary{
+		  background: var(--color-ink);
+		  color: #fff;
+		  box-shadow: var(--shadow-sm);
+		}
+		.btn-primary:hover{ transform: translateY(-2px); box-shadow: var(--shadow-md); background: var(--color-yellow-deep); color: var(--color-ink); }
+		
+		/* 右上角細緻檢舉按鈕 (紅底60%透明、紅字) */
+		.btn-report {
+		  position: absolute;
+		  top: 24px;
+		  right: 24px;
+		  background: rgba(255, 77, 79, 0.6) !important;
+		  color: #8c0000 !important;
+		  font-size: 12px !important;
+		  padding: 6px 14px !important;
+		  border-radius: var(--radius-full) !important;
+		  font-weight: 800 !important;
+		  border: 1.5px solid rgba(255, 77, 79, 0.2) !important;
+		  box-shadow: none !important;
+		  transition: transform .15s ease, background .15s ease !important;
+		}
+		.btn-report:hover {
+		  color: white;
+		  background: rgba(255, 77, 79, 0.75) !important;
+		}
+		
+		/* ==========================================================
+		   通用區塊卡片
+		   ========================================================== */
+		.section{
+		  background: var(--color-surface);
+		  border: 1px solid var(--color-border);
+		  border-radius: var(--radius-lg);
+		  box-shadow: var(--shadow-sm);
+		  padding: 32px 36px;
+		  margin-bottom: 24px;
+		}
+		
+		.section-title{
+		  font-size: 20px;
+		  font-weight: 800;
+		  position: relative;
+		  padding-left: 18px;
+		  margin-bottom: 24px;
+		}
+		.section-title::before{
+		  content:'';
+		  position: absolute;
+		  left:0; top:50%;
+		  transform: translateY(-50%);
+		  width: 10px; height: 10px;
+		  border-radius: 50%;
+		  background: var(--color-yellow-deep);
+		}
+		
+		.intro-text{
+		  color: var(--color-ink-soft);
+		  font-size: 14.5px;
+		  line-height: 1.9;
+		}
+		
+		/* ==========================================================
+		   評分統計
+		   ========================================================== */
+		.rating-stats{
+		  display: grid;
+		  grid-template-columns: repeat(4, 1fr);
+		  gap: 16px;
+		}
+		
+		.stat-card{
+		  border-radius: var(--radius-md);
+		  padding: 20px 16px;
+		  text-align: center;
+		  transition: transform .2s ease;
+		  border: 1px solid var(--color-border);
+		}
+		.stat-card:hover{ transform: translateY(-4px); }
+		.stat-card.service{  background: var(--color-pink); }
+		.stat-card.servicer{ background: var(--color-blue); }
+		.stat-card.activity{ background: var(--color-green); }
+		.stat-card.hold{      background: var(--color-yellow); }
+		
+		.stat-label{
+		  font-size: 12.5px;
+		  font-weight: 800;
+		  color: var(--color-ink);
+		  opacity: .8;
+		  margin-bottom: 8px;
+		}
+		.stat-number{
+		  font-family: var(--font-display);
+		  font-size: 22px;
+		  font-weight: 800;
+		  color: var(--color-ink);
+		}
+		.stat-detail{
+		  margin-top: 4px;
+		  font-size: 12px;
+		  color: var(--color-ink);
+		  opacity: .7;
+		  font-weight: 500;
+		}
+		
+		/* ==========================================================
+		   最近評論區 (全新的膠囊藥丸 Tabs 與對話卡片)
+		   ========================================================== */
+		.review-tabs {
+		  display: flex;
+		  flex-wrap: wrap;
+		  gap: 10px;
+		  margin-bottom: 24px;
+		}
+		.review-tabs button, .review-tabs .tab-btn {
+		  border: 1.5px solid var(--color-border);
+		  background: var(--color-surface);
+		  color: var(--color-ink);
+		  font-family: var(--font-body);
+		  font-weight: 800;
+		  font-size: 13px;
+		  padding: 8px 18px;
+		  border-radius: var(--radius-full);
+		  cursor: pointer;
+		  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+		}
+		.review-tabs button:hover, .review-tabs .tab-btn:hover {
+		  transform: translateY(-2px);
+		  border-color: var(--color-ink);
+		}
+		.review-tabs button.active, .review-tabs .tab-btn.active {
+		  background: var(--color-ink);
+		  color: #fff;
+		  border-color: var(--color-ink);
+		}
+		
+		.reviews-container {
+		  display: flex;
+		  flex-direction: column;
+		  gap: 14px;
+		}
+		.review-item {
+		  background: var(--color-surface-soft);
+		  border: 1.5px solid var(--color-border);
+		  border-radius: var(--radius-md);
+		  padding: 18px 22px;
+		  position: relative;
+		  box-shadow: var(--shadow-sm);
+		  display: flex;
+		  flex-direction: column;
+		  gap: 8px;
+		  transition: transform .15s ease;
+		}
+		.review-item:hover {
+		  transform: translateY(-2px);
+		}
+		.review-item p {
+		  margin: 0;
+		  font-size: 14.5px;
+		  color: var(--color-ink);
+		  font-weight: 500;
+		  line-height: 1.6;
+		}
+		
+		.review-meta {
+		  display: flex;
+		  align-items: center;
+		  justify-content: space-between;
+		  flex-wrap: wrap;
+		  gap: 8px;
+		  font-size: 12.5px;
+		  border-top: 1px dashed var(--color-border);
+		  padding-top: 10px;
+		  margin-top: 4px;
+		}
+		.review-stars {
+		  color: var(--color-yellow-deep);
+		  font-weight: 800;
+		  font-size: 13px;
+		}
+		.review-date {
+		  color: var(--color-ink-soft);
+		}
+		.review-badge {
+		  font-size: 11px;
+		  font-weight: 800;
+		  padding: 3px 10px;
+		  border-radius: 6px;
+		}
+		/* 卡片身份色彩配對 */
+		.review-badge.role-seller { background: var(--color-blue); }
+		.review-badge.role-buyer { background: var(--color-pink); }
+		.review-badge.role-host { background: var(--color-green); }
+		.review-badge.role-venue { background: var(--color-yellow); }
+		
+		.no-reviews{
+		  padding: 40px 20px;
+		  text-align: center;
+		  color: var(--color-ink-soft);
+		  background: var(--color-surface-soft);
+		  border: 1.5px dashed var(--color-border);
+		  border-radius: var(--radius-lg);
+		}
+		
+		/* ==========================================================
+		   全新 RWD 卡片排版 (完全套用首頁 item-card)
+		   ========================================================== */
+		.card-grid{
+		  display: grid;
+		  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+		  gap: 20px;
+		  align-items: stretch;
+		}
+		
+		.item-card{
+		  background: var(--color-surface);
+		  border: 1px solid var(--color-border);
+		  border-radius: var(--radius-lg);
+		  box-shadow: var(--shadow-sm);
+		  overflow: hidden;
+		  transition: transform .2s ease, box-shadow .2s ease;
+		  display: flex;
+		  position: relative;
+		  flex-direction: column;
+		  height: 100%;
+		}
+		.item-card:hover{ transform: translateY(-6px); box-shadow: var(--shadow-md); }
+		
+		.item-card > a{
+		  display: flex;
+		  flex-direction: column;
+		  flex-grow: 1;
+		  text-decoration: none;
+		  color: inherit;
+		}
+		
+		.item-card__thumb-wrap{
+		  width: 100%;
+		  height: 160px;
+		  overflow: hidden;
+		  background: var(--color-surface-soft);
+		}
+		.item-card__thumb-wrap img{
+		  width: 100%; height: 100%;
+		  object-fit: cover; display: block;
+		  transition: transform .35s ease;
+		}
+		.item-card:hover .item-card__thumb-wrap img{ transform: scale(1.06); }
+		
+		.item-card__body{
+		  display: flex;
+		  flex-direction: column;
+		  flex-grow: 1;
+		  padding: 16px;
+		}
+		
+		/* 帶有活動狀態徽章的 Body 需要多上方內距 */
+		.item-card__body--status{
+		  padding-top: 36px;
+		}
+		
+		.item-card__title{
+		  font-size: 15px;
+		  font-weight: 800;
+		  text-align: left;
+		  margin-bottom: 6px;
+		  margin-top: 0;
+		  line-height: 1.4;
+		}
+		
+		.item-card__desc{
+		  margin-top: 0;
+		  margin-bottom: 8px;
+		  font-size: 13px;
+		  color: var(--color-ink-soft);
+		  font-weight: 400;
+		  text-align: left;
+		  display: -webkit-box;
+		  -webkit-line-clamp: 2;
+		  -webkit-box-orient: vertical;
+		  overflow: hidden;
+		}
+		
+		.item-card__price{
+		  display: block;
+		  text-align: left;
+		  font-weight: 800;
+		  font-size: 14px;
+		  color: var(--color-ink);
+		  margin: auto 0 8px; 
+		}
+		
+		/* 卡片底部 (包含時間/查看詳情按鈕) */
+		.item-card__footer{
+		  width: 100%;
+		  display: flex;
+		  justify-content: space-between;
+		  align-items: center;
+		  margin-top: auto;
+		  padding-top: 12px;
+		  border-top: 1px dashed var(--color-border);
+		}
+		
+		.item-card__date{
+		  font-size: 12px;
+		  color: var(--color-ink-soft);
+		}
+		
+		.item-card__detail-btn{
+		  display: inline-flex;
+		  align-items: center;
+		  gap: 6px;
+		  font-size: 12px;
+		  font-weight: 800;
+		  color: var(--color-ink);
+		  background: var(--color-yellow);
+		  padding: 4px 12px;
+		  border-radius: var(--radius-full);
+		  white-space: nowrap;
+		  transition: background .15s ease, transform .15s ease;
+		}
+		.item-card:hover .item-card__detail-btn{
+		  background: var(--color-yellow-deep);
+		  transform: translateX(2px);
+		}
+		
+		/* 活動 / 場地卡片上的定位徽章 */
+		.status-badge {
+		  position: absolute;
+		  top: 12px;
+		  right: 12px;
+		  font-size: 10.5px;
+		  font-weight: 800;
+		  letter-spacing: 0.5px;
+		  padding: 4px 10px;
+		  border-radius: 8px;
+		  white-space: nowrap;
+		  z-index: 2;
+		}
+		.status-badge--cancel{  background: var(--color-pink); color: var(--color-ink); }
+		.status-badge--ongoing{ background: var(--color-green); color: var(--color-ink); }
+		.status-badge--delayed{ background: var(--color-yellow-deep); color: var(--color-ink); }
+		
+		.no-items{
+		  grid-column: 1 / -1;
+		  padding: 46px 20px;
+		  text-align: center;
+		  color: var(--color-ink-soft);
+		  background: var(--color-surface-soft);
+		  border: 1.5px dashed var(--color-border);
+		  border-radius: var(--radius-lg);
+		}
+		
+		/* ==========================================================
+		   分頁按鈕
+		   ========================================================== */
+		.pagination{
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
+		  gap: 16px;
+		  margin-top: 26px;
+		}
+		.pagination button{
+		  border: none;
+		  cursor: pointer;
+		  font-family: var(--font-body);
+		  font-weight: 800;
+		  font-size: 13px;
+		  padding: 8px 18px;
+		  border-radius: var(--radius-full);
+		  background: var(--color-ink);
+		  color: #fff;
+		  transition: transform .15s ease, background .15s ease;
+		}
+		.pagination button:hover{ transform: translateY(-2px); background: var(--color-yellow-deep); color: var(--color-ink); }
+		.pagination button:disabled{ opacity: .4; cursor: not-allowed; transform: none; }
+		
+		.page-info{
+		  font-size: 13px;
+		  font-weight: 800;
+		  color: var(--color-ink-soft);
+		}
+		
+		/* ==========================================================
+		   RWD
+		   ========================================================== */
+		@media (max-width: 760px){
+		  .profile-header{ flex-direction: column; text-align: center; padding-top: 64px; }
+		  .member-name-container { justify-content: center; }
+		  .member-contact { align-items: center; }
+		  .action-buttons { justify-content: center; }
+		  .rating-stats{ grid-template-columns: repeat(2, 1fr); }
+		  .card-grid{ grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); }
+		  .btn-report { top: 16px; right: 16px; }
+		}
   </style>
 </head>
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
@@ -18,48 +557,31 @@
   <div class="container">
     <!-- ========== 頭部檔案 ========== -->
     <div class="profile-header">
+      
+      <!-- 檢舉帳號 (右上方紅底透明紅字、小尺寸) -->
+      <button class="btn btn-report" th:if="${session.memberVO != null}" th:onclick="|window.location.href='@{/backend/memberreport/addReport}'|">
+        檢舉帳號
+      </button>
+
       <div class="profile-avatar">
-        <img th:src="${memberVO.memberPic != null ? memberVO.memberPic : '/images/file.jpeg'}" alt="會員頭貼"
-          class="avatar-img" th:onerror="'this.src=\'' + @{/images/file.jpeg} + '\''" />
+        <img th:src="@{'/front/memberPage/pic/' + ${memberVO.memberId}}" 
+        alt="會員頭貼" class="avatar-img" th:onerror="'this.src=\'' + @{/images/member/file.jpeg} + '\''" />
       </div>
 
       <div class="profile-info">
-        <h1 class="member-name" th:text="${memberVO.nickname}">會員暱稱</h1>
-
-        <!-- 身份標章 -->
-        <div class="member-status">
-          <span class="status-badge status0" th:if="${memberVO.accountStatus == 0}">
-            身份未認證
-          </span>
-          <span class="status-badge status1" th:if="${memberVO.accountStatus == 1}">
-            身份已認證
-          </span>
-          <span class="status-badge status3" th:if="${memberVO.accountStatus == 3}">
-            帳號停權
-          </span>
-          <span class="status-badge status4" th:if="${memberVO.accountStatus == 4}">
-            限制參加活動
-          </span>
+        <!-- 名字與小尺寸活潑身份標章 -->
+        <div class="member-name-container">
+          <h1 class="member-name" th:text="${memberVO.nickname}">會員暱稱</h1>
+          
+          <span class="status-badge-mini status0" th:if="${memberVO.accountStatus == 0}">未認證</span>
+          <span class="status-badge-mini status1" th:if="${memberVO.accountStatus == 1}">已認證</span>
+          <span class="status-badge-mini status3" th:if="${memberVO.accountStatus == 3}">停權</span>
+          <span class="status-badge-mini status4" th:if="${memberVO.accountStatus == 4}">限制活動</span>
         </div>
 
-
-
-        <!--           聯繫資訊 -->
-        <!--           <div class="member-contact"> -->
-        <!--             <div class="contact-item"> -->
-        <!--               <span class="contact-icon">📧</span> -->
-        <!--               <span th:text="${memberVO.email}">email@example.com</span> -->
-        <!--             </div> -->
-        <!--             <div class="contact-item"> -->
-        <!--               <span class="contact-icon">📞</span> -->
-        <!--               <span th:text="${memberVO.phone}">09xx-xxx-xxx</span> -->
-        <!--             </div> -->
-        <!--           </div> -->
-
         <!-- 加入日期 -->
-        <div class="member-contact" style="margin-top: 10px">
+        <div class="member-contact">
           <div class="contact-item">
-            <span class="contact-icon">📅</span>
             <span th:text="'加入時間： ' + ${memberVO.createdAt}"></span>
           </div>
         </div>
@@ -67,16 +589,8 @@
         <!-- 操作按鈕 -->
         <div class="action-buttons" style="margin-top: 20px">
           <button class="btn btn-primary" th:if="${session.memberVO != null}" th:onclick="|window.location.href='@{/member/chat(to=${memberVO.memberId})}'|">
-            💬 傳送訊息
+            傳送訊息
           </button>
-
-          <!-- 如果是會員自己，顯示編輯按鈕 -->
-          <!--             <a -->
-          <!--               th:if="${memberVO.memberId == session.memberVO.memberId}" -->
-          <!--               th:href="@{/front/memberPage/edit}" -->
-          <!--               class="btn btn-edit"> -->
-          <!--               ✎ 編輯資料 -->
-          <!--             </a> -->
         </div>
       </div>
     </div>
@@ -123,40 +637,85 @@
     </div>
 
     <!-- ========== 最近評論 ========== -->
+    
     <div class="section">
       <h2 class="section-title">最近評論</h2>
-      <div class="reviews-container">
-        <!-- 這裡需要從後端傳來評論列表 -->
-        <div class="no-reviews">
-          <p>📝 暫無評論</p>
+
+      <!-- 切換鍵 -->
+      <div class="review-tabs" th:if="${!reviews.isEmpty()}">
+        <button type="button" class="tab-btn active" data-filter="all" onclick="filterReviews('all', this)">全部</button>
+        <button type="button" class="tab-btn" data-filter="AS_SELLER" onclick="filterReviews('AS_SELLER', this)">賣家評價</button>
+        <button type="button" class="tab-btn" data-filter="AS_BUYER" onclick="filterReviews('AS_BUYER', this)">買家評價</button>
+        <button type="button" class="tab-btn" data-filter="AS_ACTIVITY_HOST" onclick="filterReviews('AS_ACTIVITY_HOST', this)">活動主辦</button>
+        <button type="button" class="tab-btn" data-filter="AS_VENUE_OWNER" onclick="filterReviews('AS_VENUE_OWNER', this)">場地提供</button>
+      </div>
+	
+      <!-- 評論泡泡卡片區 -->
+      <div class="reviews-container" th:if="${!reviews.isEmpty()}">
+        <div class="review-item" th:each="review : ${reviews}" th:data-role="${review.role}">
+          <p th:text="${review.comment}">評論內容</p>
+          <div class="review-meta">
+            <div>
+              <span class="review-stars">
+				  <!-- 根據評分數字，動態重複顯示對應數量的實心星星 -->
+				  <th:block th:if="${review.rating != null and review.rating > 0}" 
+				            th:each="i : ${#numbers.sequence(1, review.rating)}">★</th:block>
+				</span>
+              <span class="review-date" style="margin-left: 10px;" th:text="${#temporals.format(review.reviewedAt, 'yyyy-MM-dd')}">2026-07-17</span>
+            </div>
+            <!-- 角色與標籤顏色樣式匹配 -->
+            <span class="review-badge" 
+                  th:classappend="${review.role == 'AS_SERVICE_SELLER' or review.role == 'AS_SELLER' ? 'role-seller' : 
+                                 (review.role == 'AS_SERVICE_BUYER' or review.role == 'AS_BUYER' ? 'role-buyer' :
+                                 (review.role == 'AS_ACTIVITY_HOST' ? 'role-host' : 'role-venue'))}"
+                  th:text="${review.role == 'AS_SERVICE_SELLER' or review.role == 'AS_SELLER'} ? '服務賣家' : 
+                          (${review.role == 'AS_SERVICE_BUYER' or review.role == 'AS_BUYER'} ? '服務買家' :
+                          (${review.role == 'AS_ACTIVITY_HOST'} ? '活動主辦' : '場地提供'))">角色</span>
+          </div>
         </div>
+      </div>
+	
+      <!-- 評論專屬分頁按鈕 (超過五筆自動顯示) -->
+      <div class="pagination" id="reviewPagination" th:if="${!reviews.isEmpty()}">
+        <button type="button" onclick="changeReviewPage(-1)" id="reviewPrevBtn">上一頁</button>
+        <span class="page-info" id="reviewPageInfo">1 / 1</span>
+        <button type="button" onclick="changeReviewPage(1)" id="reviewNextBtn">下一頁</button>
+      </div>
+
+      <div class="no-reviews" th:unless="${!reviews.isEmpty()}">
+        <p>暫無評論</p>
       </div>
     </div>
 
-    <!-- 服務區塊 -->
+
+    <!-- ========== 服務區塊 ========== -->
     <section class="section">
       <h2 class="section-title">上架服務</h2>
       <div class="card-grid" id="serviceGrid">
         <div th:each="service : ${serviceListData}" class="item-card">
-
-          <a th:href="@{/front/services/{id}(id=${service.serviceId})}" class="item-card-body"
-            style="text-decoration: none; color: inherit;">
-            <div class="item-card-title" th:text="${service.serviceName}"></div>
-            <div class="item-card-desc" th:text="${service.description}"></div>
-            <div class="item-card-footer">
-              <span class="item-price" th:text="'NT ' + ${service.hourlyRate} + ' / 小時'"></span>
-              <span class="item-date" th:text="${#temporals.format(service.createdAt, 'yyyy-MM-dd')}"></span>
+          <a th:href="@{/front/services/{id}(id=${service.serviceId})}">
+            <div class="item-card__thumb-wrap">
+              <img th:src="@{/front/services/image/{serviceId}(serviceId=${service.serviceId})}" alt="服務圖片" th:onerror="this.src='/images/file.jpeg'">
+            </div>
+            <div class="item-card__body">
+              <h3 class="item-card__title" th:text="${service.serviceName}">服務名稱</h3>
+              <div class="item-card__desc" th:text="${service.description}">服務描述</div>
+              <span class="item-card__price">NT$ <span th:text="${service.hourlyRate}">500</span></span>
+              <div class="item-card__footer">
+                <span class="item-card__date" th:text="${#temporals.format(service.createdAt, 'yyyy-MM-dd')}">建立日期</span>
+                <span class="item-card__detail-btn">查看詳情 →</span>
+              </div>
             </div>
           </a>
         </div>
 
         <!-- 沒有資料時顯示 -->
         <div class="no-items" th:if="${serviceListData == null}">
-          📦 目前尚無上架服務
+          目前尚無上架服務
         </div>
       </div>
 
-      <!-- 分頁按鈕（沒有資料時不顯示） -->
+      <!-- 分頁按鈕 -->
       <div class="pagination" id="servicePagination" th:if="${serviceListData != null}">
         <button onclick="changePage('service', -1)" id="servicePrevBtn">上一頁</button>
         <span class="page-info" id="servicePageInfo">1 / 1</span>
@@ -164,30 +723,40 @@
       </div>
     </section>
 
-    <!-- 活動區塊 -->
+    <!-- ========== 活動區塊 ========== -->
     <section class="section">
       <h2 class="section-title">舉辦活動</h2>
       <div class="card-grid" id="activityGrid">
         <div th:each="activity : ${activityListData}" class="item-card">
-
-          <a th:href="@{/}" class="item-card-body" style="text-decoration: none; color: inherit;">
-            <div class="item-card-title" th:text="${activity.activityTitle}"></div>
-            <div class="item-card-desc" th:text="${activity.activityDescription}"></div>
-            <div class="item-card-footer">
-              <span class="item-price" th:text="'NT ' + ${activity.activityPrice}"></span>
-              <span class="item-time"
-                th:text="${#temporals.format(activity.startTime, 'yyyy-MM-dd')+' ~ '+#temporals.format(activity.endTime, 'yyyy-MM-dd')}"></span>
+          <a th:href="@{/activity/front/detail(id=${activity.activityId})}">
+            <div class="item-card__thumb-wrap">
+              <img th:src="@{/activity/front/image(id=${activity.activityId})}" alt="活動圖片" th:onerror="this.src='/images/file.jpeg'">
+            </div>
+            <div class="item-card__body item-card__body--status">
+              
+              <!-- 活動狀態 Badge -->
               <span th:switch="${activity.activityStatus}">
-                <span th:case="0" class="item-status status-normal">正常舉行</span>
-                <span th:case="1" class="item-status status-delay">延期</span>
-                <span th:case="2" class="item-status status-cancel">取消</span>
+                <span th:case="0" class="status-badge status-badge--ongoing">正常舉行</span>
+                <span th:case="1" class="status-badge status-badge--delayed">延期</span>
+                <span th:case="2" class="status-badge status-badge--cancel">取消</span>
               </span>
+
+              <h3 class="item-card__title" th:text="${activity.activityTitle}">活動名稱</h3>
+              <div class="item-card__desc" th:text="${activity.activityDescription}">活動描述</div>
+              <span class="item-card__price">NT$ <span th:text="${activity.activityPrice}">0</span></span>
+              
+              <div class="item-card__footer">
+                <span class="item-card__date"
+                  th:text="${#temporals.format(activity.startTime, 'yyyy-MM-dd')+' ~ '+#temporals.format(activity.endTime, 'yyyy-MM-dd')}">活動時間</span>
+                <span class="item-card__detail-btn">查看詳情 →</span>
+              </div>
             </div>
           </a>
         </div>
 
+        <!-- 沒有資料時顯示 -->
         <div class="no-items" th:if="${activityListData == null}">
-          📦 目前尚無舉辦活動
+          目前尚無舉辦活動
         </div>
       </div>
 
@@ -198,44 +767,50 @@
       </div>
     </section>
 
+    <!-- ========== 場地區塊 ========== -->
     <section class="section">
       <h2 class="section-title">場地提供</h2>
       <div class="card-grid" id="venueGrid">
         <div th:each="venue : ${venueListData}" class="item-card">
-
-          <a th:href="@{/front/memberPage/oneMember(memberId=${venue.member.memberId}, venueId=${venue.venueId})}"
-            class="item-card-body" style="text-decoration: none; color: inherit;">
-
-            <!-- 顯示圖片 -->
-            <div class="item-card-img">
+          <a th:href="@{/front/venue/getOneVenue(venueId=${venue.venueId})}">
+            
+            <div class="item-card__thumb-wrap">
               <!-- 只顯示第一張圖 -->
               <img th:if="${venue.coverImage != null}"
                 th:src="@{/front/venue/getImage(imagesId=${venue.coverImage.imagesId})}"
-                alt="場地圖片" class="venue-thumbnail" th:onerror="this.src='/images/default-venue.jpeg'" />
+                alt="場地圖片" th:onerror="this.src='/images/default-venue.jpeg'" />
 
               <!-- 如果沒圖片用預設 -->
-              <img th:if="${venue.venueImages == null || venue.venueImages.isEmpty()}" src="/images/default-venue.jpeg"
-                alt="暫無圖片" class="venue-thumbnail" />
+              <img th:if="${venue.coverImage == null || venue.venueImages == null || venue.venueImages.isEmpty()}" 
+                src="/images/default-venue.jpeg" alt="暫無圖片" />
             </div>
 
-            <div class="item-card-title" th:text="${venue.venueName}"></div>
-            <div class="item-card-desc" th:text="${'容納人數 ' + venue.capacity + ' 人'}"></div>
-            <div class="item-card-footer">
-              <span class="item-price" th:text="'NT ' + ${venue.hourlyRate}"></span>
-              <span class="item-time" th:text="${#temporals.format(venue.createdAt, 'yyyy-MM-dd')}"></span>
-              <span th:switch="${venue.venueStatus}">
-                <span th:case="0" class="item-status status-normal">下架</span>
-                <span th:case="1" class="item-status status-delay">上架</span>
+            <div class="item-card__body item-card__body--status">
+              
+              <!-- 上下架狀態 Badge -->
+              <span th:switch ="${venue.venueStatus}">
+                <span th:case="0" class="status-badge status-badge--cancel">已下架</span>
+                <span th:case="1" class="status-badge status-badge--ongoing">上架中</span>
+                <span th:case="2" class="status-badge status-badge--cancel">審核中</span>
               </span>
+
+              <h3 class="item-card__title" th:text="${venue.venueName}">場地名稱</h3>
+              <div class="item-card__desc" th:text="${'容納人數 ' + venue.capacity + ' 人'}">容納人數</div>
+              <span class="item-card__price">每小時 <span th:text="${venue.hourlyRate}">0</span> 元</span>
+              
+              <div class="item-card__footer">
+                <span class="item-card__date" th:text="${#temporals.format(venue.createdAt, 'yyyy-MM-dd')}">建立日期</span>
+                <span class="item-card__detail-btn">查看詳情 →</span>
+              </div>
             </div>
           </a>
         </div>
       </div>
 
-
+      <!-- 沒有資料時顯示 -->
       <div>
         <div class="no-items" th:if="${#lists.isEmpty(venueListData)}">
-          📦 目前尚無場地提供
+          目前尚無場地提供
         </div>
       </div>
 
@@ -246,25 +821,10 @@
       </div>
     </section>
   </div>
+
   <script th:src="@{/js/front-end/member/profile.js}"></script>
   <script>
-    function sendMessage() {
-      const memberId =
-        new URLSearchParams(window.location.search).get("memberId") ||
-        window.location.pathname.split("/").pop();
-      alert("跳轉至訊息頁面，傳送給會員 " + memberId);
-      // window.location.href = `/front/message/new?memberId=${memberId}`;
-    }
-
-    function bookService() {
-      alert("跳轉至服務預約頁面");
-      // window.location.href = '/front/service/book';
-    }
-
-    function addFavorite() {
-      alert("已加入收藏");
-      // 這裡可以調用 API 加入收藏
-    }
+    
   </script>
 </body>
 
