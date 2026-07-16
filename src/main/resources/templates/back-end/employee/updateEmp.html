@@ -11,7 +11,7 @@
 	<div th:fragment="updateContent">
 
 		<h3>修改員工資料</h3>
-		<form th:action="@{/admin/update}" method="POST"
+		<form th:action="@{/admin/employees/update}" method="POST"
 			th:object="${employeeVO}" enctype="multipart/form-data">
 			<tr>
 				<td style="white-space: nowrap;">員工編號：</td>
@@ -119,7 +119,7 @@
 			<br>
 			<button type="submit">確認儲存</button>
 			<button type="button"
-				th:onclick="|window.location.href='@{/admin/empPage}'|"
+				th:onclick="|window.location.href='@{/admin/employees/empPage}'|"
 				onclick="closeEditEmpModal()">取消</button>
 		</form>
 	</div>

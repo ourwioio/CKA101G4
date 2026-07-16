@@ -11,7 +11,7 @@
 	<div th:fragment="addContent">
 
 		<h3>新增員工資料</h3>
-		<form th:action="@{/admin/add}" method="POST"
+		<form th:action="@{/admin/employees/add}" method="POST"
 			th:object="${employeeVO}" enctype="multipart/form-data">
 			<table border="0" cellpadding="5">
 				<tr>
@@ -114,7 +114,7 @@
 			<br>
 			<button type="submit">確認儲存</button>
 			<button type="button"
-				th:onclick="|window.location.href='@{/admin/empPage}'|"
+				th:onclick="|window.location.href='@{/admin/employees/empPage}'|"
 				onclick="closeEmpModal()">取消</button>
 		</form>
 	</div>

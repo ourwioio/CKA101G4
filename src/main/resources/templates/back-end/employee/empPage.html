@@ -116,7 +116,7 @@
 
 								<!-- 刪除表單按鈕 -->
 								<td align="center">
-									<form method="post" th:action="@{/admin/empDelete}"
+									<form method="post" th:action="@{/admin/employees/empDelete}"
 										style="margin: 0px;">
 										<input type="hidden" name="employeeId" th:value="${empVO.employeeId}">
 										<input type="submit" value="刪除" style="color: red;"

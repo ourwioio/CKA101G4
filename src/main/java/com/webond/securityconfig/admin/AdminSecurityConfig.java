@@ -1,6 +1,5 @@
 package com.webond.securityconfig.admin;
 
-import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,8 +7,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 
 
@@ -17,14 +14,12 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 @EnableWebSecurity 
 public class AdminSecurityConfig {
 
-	private final DataSource dataSource;
 	private final AdminUserDetailService userDetailsService;
 	private final AdminLoginSuccessHandler successHandler;
 	
 
-	public AdminSecurityConfig(DataSource dataSource, AdminUserDetailService userDetailsService,
+	public AdminSecurityConfig(AdminUserDetailService userDetailsService,
 			AdminLoginSuccessHandler successHandler) {
-		this.dataSource = dataSource;
 		this.userDetailsService = userDetailsService;
 		this.successHandler = successHandler;
 	}
@@ -37,13 +32,13 @@ public class AdminSecurityConfig {
 			.securityMatcher("/admin/**")
 		
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/admin/login").permitAll()
+				.requestMatchers("/admin/login", "/admin/login?error=true").permitAll()
 				.requestMatchers("/admin/employees/updatePassword").authenticated() 
 				
 				.requestMatchers("/admin/employees/**").hasAuthority("員工管理")
 				.requestMatchers("/admin/services/**").hasAuthority("服務管理")
 				.requestMatchers("/admin/activity/**").hasAuthority("活動管理")
-				.requestMatchers("/admin/venue/**").hasAuthority("管理場地訂單")
+				.requestMatchers("/admin/venue/**").hasAuthority("場地管理")
 				.requestMatchers("/admin/venue/**").hasAuthority("場地審核管理")
 				.requestMatchers("/admin/members/**").hasAuthority("會員管理")
 				.requestMatchers("/admin/order/**").hasAuthority("訂單交易管理")
@@ -62,21 +57,14 @@ public class AdminSecurityConfig {
             	
             	.successHandler(successHandler)
             	
-            	.failureUrl("/admin/login?error=true")      
+            	.failureHandler(new AdiminFailureHandler())      
             )
             .logout(logout -> logout
             	.logoutUrl("/admin/logout")
             	.logoutSuccessUrl("/admin/login?logout") 
-            	.invalidateHttpSession(true)              
-            	.deleteCookies("JSESSIONID")				 		
-            )
-            .rememberMe(remember -> remember
-            	.key("adminSecretKeyUnique")			 		
-            	.rememberMeCookieName("remember-me-admin")		
-            	.tokenRepository(persistentTokenRepository())   
-            	.tokenValiditySeconds(32400)					
-            	.userDetailsService(userDetailsService)		
-            	.rememberMeParameter("remember-me")			 	
+            	.invalidateHttpSession(true)
+            	.clearAuthentication(true)
+            	.deleteCookies("JSESSIONID")				 				 	
             )
             .requestCache(cache -> cache
             	.requestCache(new HttpSessionRequestCache())		
@@ -92,11 +80,6 @@ public class AdminSecurityConfig {
 	}
 	
 
-	@Bean
-	public PersistentTokenRepository persistentTokenRepository() {
-		JdbcTokenRepositoryImpl tokenRepository = new JdbcTokenRepositoryImpl();
-		tokenRepository.setDataSource(dataSource);
-		return tokenRepository;
-	}
+
 	
 }
