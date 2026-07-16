@@ -78,6 +78,8 @@ public class MemberFrontControllerAyaka {
 	    ServiceVO serviceList = serviceService.getOneService(memberId);
 	    ActivityVO activityList = activityService.getOneActivity(memberId);
 	    List<VenueVO> venueList = venueService.getVenuesByMember(memberId);
+	    List<MemberReviewDTO> reviews = myReviewService.getReviewsByMemberId(memberId);
+	    model.addAttribute("reviews", reviews);
 	    
 	    // 為每個 venue 載入圖片
 //	    if (venueList != null) {

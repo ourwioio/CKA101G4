@@ -1,40 +1,245 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 
 <head>
-<meta charset="UTF-8">
-<title>會員通知</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>會員通知詳細資訊</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <style>
+/* ==========================================================
+   Webond 通知詳情頁 — 圓潤角色風 (cream / ink / pastel blobs)
+   ========================================================== */
+		
+		@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+		
+		:root{
+		  --color-bg:            #F7F3EC;
+		  --color-surface:       #FFFFFF;
+		  --color-surface-soft:  #FFFDF8;
+		  --color-ink:           #17140F;
+		  --color-ink-soft:      #726A5F;
+		  --color-border:        #ECE4D6;
+		
+		  --color-yellow:       #FFE59A;
+		  --color-yellow-deep:  #FFC94D;
+		  --color-pink:         #FFB5C1;
+		  --color-green:        #B7E1D1;
+		  --color-blue:         #A9D3FF;
+		
+		  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+		  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+		
+		  --radius-lg: 26px;
+		  --radius-md: 16px;
+		  --radius-full: 999px;
+		
+		  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+		  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+		
+		  --nav-height: 76px;
+		}
+		
+		*{ box-sizing: border-box; }
+		
+		body{
+		  margin:0;
+		  font-family: var(--font-body);
+		  background: var(--color-bg);
+		  color: var(--color-ink);
+		  line-height: 1.6;
+		  -webkit-font-smoothing: antialiased;
+		}
+		
+		h1,h2,h3,h4{ font-family: var(--font-display); margin:0; }
+		a{ text-decoration: none; color: inherit; }
+		
+		/* ==========================================================
+		   版面容器
+		   ========================================================== */
+		.container{
+		  max-width: 720px; /* 精緻的閱讀寬度 */
+		  margin: 0 auto;
+		  padding: calc(var(--nav-height) + 40px) 20px 60px;
+		}
+		
+		/* ==========================================================
+		   通知詳細卡片
+		   ========================================================== */
+		.notify-card {
+		  background: var(--color-surface);
+		  border: 1px solid var(--color-border);
+		  border-radius: var(--radius-lg);
+		  box-shadow: var(--shadow-sm);
+		  padding: 42px 36px;
+		}
+		
+		/* 標頭配置：標題與徽章分開 */
+		.notify-card__header {
+		  display: flex;
+		  justify-content: space-between;
+		  align-items: flex-start;
+		  gap: 24px;
+		  border-bottom: 2px dashed var(--color-border);
+		  padding-bottom: 24px;
+		  margin-bottom: 28px;
+		}
+		
+		/* 左側大標題 */
+		.notify-card__title {
+		  font-size: 23px;
+		  font-weight: 800;
+		  line-height: 1.4;
+		  margin: 0;
+		  color: var(--color-ink);
+		  position: relative;
+		  padding-left: 18px;
+		}
+		.notify-card__title::before {
+		  content: '';
+		  position: absolute;
+		  left: 0;
+		  top: 8px;
+		  width: 9px;
+		  height: 9px;
+		  border-radius: 50%;
+		  background: var(--color-yellow-deep);
+		}
+		
+		/* 右上角膠囊型通知類型（採用 Q 萌小黑邊立體影） */
+		.notify-badge {
+		  display: inline-flex;
+		  align-items: center;
+		  background: var(--color-blue);
+		  color: var(--color-ink);
+		  font-weight: 800;
+		  font-size: 11.5px;
+		  padding: 5px 14px;
+		  border-radius: var(--radius-full);
+		}
+		
+		/* 通知內容 */
+		.notify-card__content {
+		  font-size: 15px;
+		  color: var(--color-ink-soft);
+		  line-height: 1.8;
+		  min-height: 160px;
+		  word-break: break-all;
+		}
+		
+		/* 內容最下方時間 */
+		.notify-card__footer {
+		  border-top: 1px dashed var(--color-border);
+		  padding-top: 18px;
+		  margin-top: 32px;
+		  display: flex;
+		  justify-content: flex-end;
+		}
+		
+		.notify-time {
+		  display: inline-flex;
+		  align-items: center;
+		  gap: 6px;
+		  font-size: 12.5px;
+		  color: var(--color-ink-soft);
+		  font-weight: 500;
+		}
+		
+		/* ==========================================================
+		   下方操作區 (返回按鈕)
+		   ========================================================== */
+		.action-container {
+		  margin-top: 24px;
+		  display: flex;
+		  justify-content: flex-start;
+		}
+		
+		.btn-back {
+		  display: inline-flex;
+		  align-items: center;
+		  gap: 8px;
+		  background: var(--color-surface);
+		  color: var(--color-ink);
+		  border: 1.5px solid var(--color-border);
+		  font-family: var(--font-body);
+		  font-weight: 800;
+		  font-size: 13.5px;
+		  padding: 10px 22px;
+		  border-radius: var(--radius-full);
+		  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+		  box-shadow: var(--shadow-sm);
+		  cursor: pointer;
+		}
+		.btn-back:hover {
+		  transform: translateY(-2px);
+		  border-color: var(--color-ink);
+		  box-shadow: var(--shadow-md);
+		}
+		.btn-back svg {
+		  width: 16px;
+		  height: 16px;
+		  transition: transform .18s ease;
+		}
+		.btn-back:hover svg {
+		  transform: translateX(-3px);
+		}
+		
+		/* ==========================================================
+		   RWD
+		   ========================================================== */
+		@media (max-width: 520px) {
+		  .notify-card { padding: 28px 20px; }
+		  .notify-card__header { flex-direction: column; align-items: flex-start; gap: 14px; }
+		  .notify-badge { align-self: flex-start; }
+		}
+  </style>
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 </head>
+
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
 
 <body>
-	<div>
-		<h1>全部通知</h1>
 
-		<span th:if="${session.memberVO != null}"> 當前登入會員編號： <strong
-			th:text="${session.memberVO?.memberId}"></strong>
-		</span> <span th:if="${session.memberVO == null}"> 目前登入狀態： <strong>未登入</strong>
-		</span> <a th:href="@{/front/notification/listAllNotification}">返回通知列表</a>
-	</div>
-	<table th:object="${notificationVO}">
-        <thead>
-            <td>標題</td>
-            <td>內容</td>
-            <td>通知類型</td>
-            <td>是否已讀</td>
-            <td>建立時間</td>
-        </thead>
-		<tr>
-			<input type="hidden" th:field="*{notificationId}" />
-			<td th:text="*{title}"></td>
-			<td th:text="*{content}"></td>
-			<td th:text="*{notificationType}"></td>
-			<td th:text="${notificationVO.isRead != null and notificationVO.isRead == 1 ? '已讀' : '未讀'}"></td>
-			<td th:text="*{createdAt}"></td>
-		</tr>
-	</table>
+  <div class="container">
+    
+    <!-- 改用 div 與原生的 th:object 繫結 -->
+    <div class="notify-card" th:object="${notificationVO}">
+      
+      <!-- 保留你原有的隱藏 ID 欄位 -->
+      <input type="hidden" th:field="*{notificationId}" />
+
+      <!-- 標頭區：大標題置左，通知類型徽章在右 -->
+      <div class="notify-card__header">
+        <h1 class="notify-card__title" th:text="*{title}">通知標題</h1>
+        <span class="notify-badge" th:text="*{notificationType}">通知類型</span>
+      </div>
+
+      <!-- 內容區 -->
+      <div class="notify-card__content" th:utext="*{content}">
+        通知內容
+      </div>
+
+      <!-- 最下方時間區 -->
+      <div class="notify-card__footer">
+        <div class="notify-time">
+          <span th:text="*{createdAt}">建立時間</span>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- 底部返回通知列表操作 -->
+    <div class="action-container">
+      <a href="javascript:history.back()" class="btn-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        返回通知列表
+      </a>
+    </div>
+
+  </div>
+
 </body>
-
 </html>
