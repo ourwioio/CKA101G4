@@ -208,8 +208,17 @@
         }
 
         .search-form input[type="text"] {
-            flex: 1;
-            min-width: 220px;
+            flex: 1 1 200px;
+            min-width: 160px;
+            max-width: 320px;
+        }
+
+        .search-form-actions {
+            display: flex;
+            flex-wrap: nowrap;
+            flex-shrink: 0;
+            gap: 10px;
+            margin-left: auto;
         }
 
         /* =========================
@@ -369,6 +378,19 @@
             .search-form .btn {
                 width: 100%;
             }
+
+            .search-form input[type="text"] {
+                max-width: none;
+            }
+
+            .search-form-actions {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .search-form-actions .btn {
+                flex: 1;
+            }
         }
     </style>
 </head>
@@ -474,15 +496,19 @@
                                placeholder="搜尋標題或內容"
                                th:value="${searchKeyword}">
 
-                        <button class="btn btn--primary"
-                                type="submit">
-                            搜尋
-                        </button>
+                        <div class="search-form-actions">
 
-                        <a class="btn btn--secondary"
-                           th:href="@{/platformSpecification/listAllSpec}">
-                            清除條件
-                        </a>
+                            <button class="btn btn--primary"
+                                    type="submit">
+                                搜尋
+                            </button>
+
+                            <a class="btn btn--secondary"
+                               th:href="@{/platformSpecification/listAllSpec}">
+                                清除條件
+                            </a>
+
+                        </div>
 
                     </form>
 
