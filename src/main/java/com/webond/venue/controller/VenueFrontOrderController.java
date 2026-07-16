@@ -194,8 +194,8 @@ public class VenueFrontOrderController {
 				// 新增通知給場地主
 				NotificationVO notificationVO = new NotificationVO();
 				notificationVO.setMember(venueVO.getMember());
-				notificationVO.setTitle("您的" + venueVO.getVenueName() + "被預約");
-				notificationVO.setContent("預約的時段是" + order.getStartAt() + " ~ " + order.getEndAt());
+				notificationVO.setTitle("場地新預約通知");
+				notificationVO.setContent(venueVO.getVenueName() + "被預約的時段是" + order.getStartAt() + " ~ " + order.getEndAt());
 				notificationVO.setNotificationType((byte) 0);
 				notificationService.addNotification(notificationVO);
 				

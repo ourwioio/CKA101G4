@@ -70,13 +70,13 @@
 					<span th:case="3">已完成</span>
 				</span>
 			</div>
-			<div class="info-row">
-				<span class="info-label">撥款狀態</span>
-				<span class="status-badge" th:switch="${venueOrderVO.payoutAmount}">
-					<span th:case="0">未撥款</span>
-					<span th:case="1">已撥款</span>
-				</span>
-			</div>
+<!-- 			<div class="info-row"> -->
+<!-- 				<span class="info-label">撥款狀態</span> -->
+<!-- 				<span class="status-badge" th:switch="${venueOrderVO.payoutAmount}"> -->
+<!-- 					<span th:case="0">未撥款</span> -->
+<!-- 					<span th:case="1">已撥款</span> -->
+<!-- 				</span> -->
+<!-- 			</div> -->
 			<div class="info-row" th:if="${venueOrderVO.refundStatus == 0 || venueOrderVO.refundStatus == 1}">
 				<span class="info-label">退款狀態</span>
 				<span class="status-badge" th:switch="${venueOrderVO.refundStatus}">

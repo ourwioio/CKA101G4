@@ -1,6 +1,7 @@
 package com.webond.venue.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,7 +73,9 @@ public class VenueOrderService {
 	}
 	
 	public List<VenueOrderVO> getMyAllReservations(Integer memberId){
-		return repository.findPaidOrdersByVenueOwner(memberId, (byte) 1);
+		List<VenueOrderVO> list = new ArrayList<>(repository.findPaidOrdersByVenueOwner(memberId, (byte) 1));
+	    list.addAll(repository.findPaidOrdersByVenueOwner(memberId, (byte) 4));
+		return list;
 	}
 	public List<VenueOrderVO> getMyAllCompletedBookings(Integer memberId){
 		return repository.findPaidOrdersByVenueOwner(memberId, (byte) 3);
