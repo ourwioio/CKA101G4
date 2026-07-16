@@ -23,6 +23,16 @@
 	</div>
 
 	<div class="card">
+		<div class="locked-note" th:if="${venueVO.venueStatus != 2}">
+			<p>此場地已完成審核，僅能修改「租借費用」、「每週開放日」與「每日營業時段」，如需變更其餘資料，請申請重新審核。</p>
+			<form th:action="@{/front/venue/requestReReview}" method="post">
+				<input type="hidden" name="venueId" th:value="${venueVO.venueId}" />
+				<button type="submit" class="btn btn-secondary"
+				        onclick="return confirm('申請重新審核後，此場地會暫時下架、需等待審核通過才能恢復開放預約，確定要申請嗎？');">
+					申請重新審核
+				</button>
+			</form>
+		</div>
 		<form th:action="@{/front/venue/update}" method="post" th:object="${venueVO}" enctype="multipart/form-data">
 			<input type="hidden" th:field="*{venueId}" />
 			<div class="form-grid">
@@ -45,7 +55,7 @@
 			<div class="section-title">場地名稱</div>
 			<div class="form-group">
 				<label for="venueName">場地名稱</label>
-				<input type="text" th:field="*{venueName}" placeholder="請輸入場地名稱" />
+				<input type="text" th:field="*{venueName}" placeholder="請輸入場地名稱" th:readonly="${venueVO.venueStatus != 2}" />
 				<span class="error-text" th:if="${#fields.hasErrors('venueName')}" th:errors="*{venueName}"></span>
 			</div>
 
@@ -55,13 +65,13 @@
 				<label>場地地址</label>
 				<p class="current-address-note">目前地址：<span th:text="${venueVO.address}"></span></p>
 				<div class="address-row">
-					<select id="citySelect" class="address-select" onchange="updateDistrict()">
+					<select id="citySelect" class="address-select" onchange="updateDistrict()" th:disabled="${venueVO.venueStatus != 2}">
 						<option value="">請選擇縣市</option>
 					</select>
-					<select id="districtSelect" class="address-select">
+					<select id="districtSelect" class="address-select" th:disabled="${venueVO.venueStatus != 2}">
 						<option value="">請選擇區域</option>
 					</select>
-					<input type="text" id="streetInput" class="address-street" placeholder="請輸入詳細地址" />
+					<input type="text" id="streetInput" class="address-street" placeholder="請輸入詳細地址" th:readonly="${venueVO.venueStatus != 2}" />
 				</div>
 				<input type="hidden" th:field="*{address}" id="addressHidden" />
 				<span class="error-text" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
@@ -69,7 +79,7 @@
 
 			<div class="form-group">
 			    <label for="capacity">容納人數</label>
-			    <input type="text" th:field="*{capacity}" placeholder="請輸入容納人數" />
+			    <input type="text" th:field="*{capacity}" placeholder="請輸入容納人數" th:readonly="${venueVO.venueStatus != 2}" />
 			    <span class="error-text" th:if="${#fields.hasErrors('capacity')}" th:errors="*{capacity}"></span>
 			</div>
 
@@ -81,7 +91,7 @@
 
 			<div class="form-group">
 			    <label for="venueTypeId">場地類型</label>
-			    <select th:field="*{venueTypeVO.venueTypeId}">
+			    <select th:field="*{venueTypeVO.venueTypeId}" th:disabled="${venueVO.venueStatus != 2}">
 			        <option th:each="type : ${venueTypeData}"
 			                th:value="${type.venueTypeId}"
 			                th:text="${type.typeName}"></option>
@@ -149,7 +159,8 @@
 			    <label>場地介紹</label>
 			    <textarea th:field="*{venueDescription}"
 			              placeholder="請輸入場地介紹、特色說明等"
-			              rows="5"></textarea>
+			              rows="5"
+			              th:readonly="${venueVO.venueStatus != 2}"></textarea>
 			    <div class="error-text" th:if="${#fields.hasErrors('venueDescription')}" th:errors="*{venueDescription}"></div>
 			</div>
 
@@ -163,10 +174,10 @@
 				    <div class="gallery-item" th:each="img : *{venueImages}"
 				         th:id="${'img-item-' + img.imagesId}"
 				         th:classappend="${img.cover != null and img.cover == 1} ? 'is-cover' : ''"
-				         th:onclick="|setExistingCover(${img.imagesId}, this)|">
+				         th:onclick="${venueVO.venueStatus == 2} ? |setExistingCover(${img.imagesId}, this)| : null">
 				        <img th:src="@{/front/venue/getImage(imagesId=${img.imagesId})}" alt="場地環境圖" />
 				        <div class="cover-tag" th:text="${img.cover != null and img.cover == 1} ? '目前封面' : '設為封面'"></div>
-				        <a href="#" class="btn-delete-img"
+				        <a href="#" class="btn-delete-img" th:if="${venueVO.venueStatus == 2}"
 				           th:onclick="|event.stopPropagation(); event.preventDefault(); toggleDeleteMark(${img.imagesId}, this)|">
 				           刪除
 				        </a>
@@ -178,7 +189,7 @@
 			    <input type="hidden" name="coverNewIndex" id="coverNewIndex" value=""/>
 			</div>
 
-			<div class="form-group">
+			<div class="form-group" th:if="${venueVO.venueStatus == 2}">
 			    <label for="upFiles">上傳新照片</label>
 			    <input type="file" name="upFiles" id="upFiles" accept="image/*" multiple onchange="handleFileSelect(event)" />
 			    <div class="gallery" id="newPreviewGallery"></div>

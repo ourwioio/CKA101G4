@@ -157,6 +157,16 @@ public class VenueService {
 		}
 	}
 
+	// 場地審核通過後，會員申請重新審核以解鎖完整編輯權限；只改狀態，不動其他欄位
+	@Transactional
+	public void requestReReview(Integer venueId) {
+		VenueVO venue = repository.findById(venueId).orElse(null);
+		if (venue != null && venue.getVenueStatus() != null && venue.getVenueStatus() != 2) {
+			venue.setVenueStatus((byte) 2);
+			repository.save(venue);
+		}
+	}
+
 	@Transactional
 	public List<VenueVO> getAll(Map<String, String[]> map) {
 		Session session = entityManager.unwrap(Session.class);
@@ -171,11 +181,19 @@ public class VenueService {
 		if (existingVenue == null)
 			return;
 
-		// 基本欄位
-		existingVenue.setVenueName(venueVO.getVenueName());
-		existingVenue.setCapacity(venueVO.getCapacity());
+		// 審核中(2)才能完整編輯場地基本資料；審核通過後（0下架/1上架）只能改租借費用、開放日、營業時段
+		boolean pendingReview = existingVenue.getVenueStatus() != null && existingVenue.getVenueStatus() == 2;
+
+		if (pendingReview) {
+			existingVenue.setVenueName(venueVO.getVenueName());
+			existingVenue.setAddress(venueVO.getAddress());
+			existingVenue.setCapacity(venueVO.getCapacity());
+			existingVenue.setVenueTypeVO(venueVO.getVenueTypeVO());
+			existingVenue.setVenueDescription(venueVO.getVenueDescription());
+		}
+
+		// 租借費用、開放日、營業時段：不論審核狀態皆可修改
 		existingVenue.setHourlyRate(venueVO.getHourlyRate());
-		existingVenue.setVenueTypeVO(venueVO.getVenueTypeVO());
 		existingVenue.setOpenDays(venueVO.getOpenDays());
 		existingVenue.setAvailableHours(venueVO.getAvailableHours());
 
@@ -185,46 +203,49 @@ public class VenueService {
 			existingVenue.setVenueStatus(venueVO.getVenueStatus());
 		}
 
-		// 刪除使用者勾選要刪除的既有照片
-		if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
-			existingVenue.getVenueImages().removeIf(img -> deleteImageIds.contains(img.getImagesId()));
-		}
-
-		// 先把剩下照片的封面狀態清空，等下依使用者選擇重新標記
-		for (VenueImagesVO img : existingVenue.getVenueImages()) {
-			img.setCover((byte) 0);
-		}
-
-		// 加入這次新上傳的照片
-		List<VenueImagesVO> newImages = new ArrayList<>();
-		if (newImageBytesList != null) {
-			for (byte[] bytes : newImageBytesList) {
-				VenueImagesVO imageVO = new VenueImagesVO();
-				imageVO.setImages(bytes);
-				imageVO.setVenueVO(existingVenue);
-				imageVO.setCover((byte) 0);
-				existingVenue.getVenueImages().add(imageVO);
-				newImages.add(imageVO);
+		// 照片管理（刪除既有照片、新增、選封面）僅在審核中開放，審核通過後場地照片不能再改
+		if (pendingReview) {
+			// 刪除使用者勾選要刪除的既有照片
+			if (deleteImageIds != null && !deleteImageIds.isEmpty()) {
+				existingVenue.getVenueImages().removeIf(img -> deleteImageIds.contains(img.getImagesId()));
 			}
-		}
 
-		// 決定封面：優先看是否選了「這次新上傳」的某張，否則看是否選了「既有照片」
-		boolean coverSet = false;
-		if (coverNewIndex != null && coverNewIndex >= 0 && coverNewIndex < newImages.size()) {
-			newImages.get(coverNewIndex).setCover((byte) 1);
-			coverSet = true;
-		} else if (coverImageId != null) {
+			// 先把剩下照片的封面狀態清空，等下依使用者選擇重新標記
 			for (VenueImagesVO img : existingVenue.getVenueImages()) {
-				if (img.getImagesId() != null && img.getImagesId().equals(coverImageId)) {
-					img.setCover((byte) 1);
-					coverSet = true;
+				img.setCover((byte) 0);
+			}
+
+			// 加入這次新上傳的照片
+			List<VenueImagesVO> newImages = new ArrayList<>();
+			if (newImageBytesList != null) {
+				for (byte[] bytes : newImageBytesList) {
+					VenueImagesVO imageVO = new VenueImagesVO();
+					imageVO.setImages(bytes);
+					imageVO.setVenueVO(existingVenue);
+					imageVO.setCover((byte) 0);
+					existingVenue.getVenueImages().add(imageVO);
+					newImages.add(imageVO);
 				}
 			}
-		}
 
-		// 如果封面被刪掉、或使用者沒有另外指定封面，剩下的照片裡自動挑一張當封面
-		if (!coverSet && !existingVenue.getVenueImages().isEmpty()) {
-			existingVenue.getVenueImages().iterator().next().setCover((byte) 1);
+			// 決定封面：優先看是否選了「這次新上傳」的某張，否則看是否選了「既有照片」
+			boolean coverSet = false;
+			if (coverNewIndex != null && coverNewIndex >= 0 && coverNewIndex < newImages.size()) {
+				newImages.get(coverNewIndex).setCover((byte) 1);
+				coverSet = true;
+			} else if (coverImageId != null) {
+				for (VenueImagesVO img : existingVenue.getVenueImages()) {
+					if (img.getImagesId() != null && img.getImagesId().equals(coverImageId)) {
+						img.setCover((byte) 1);
+						coverSet = true;
+					}
+				}
+			}
+
+			// 如果封面被刪掉、或使用者沒有另外指定封面，剩下的照片裡自動挑一張當封面
+			if (!coverSet && !existingVenue.getVenueImages().isEmpty()) {
+				existingVenue.getVenueImages().iterator().next().setCover((byte) 1);
+			}
 		}
 
 		repository.save(existingVenue);
