@@ -36,7 +36,7 @@ public class VenueReportController {
 
 	@Autowired
 	private EmployeeRepository employeeRepository;
-	
+
 	@Autowired
 	private NotificationService notificationService;
 
@@ -46,7 +46,7 @@ public class VenueReportController {
 		return VenueReportService.STATUS_LABEL_MAP;
 	}
 
-	// ===== 提供員工清單，給審核操作區的下拉選單用 =====
+	// ===== 提供員工清單，給列表頁篩選用 =====
 	@ModelAttribute("employeeListData")
 	protected List<EmployeeVO> referenceEmployeeList() {
 		return employeeRepository.findAll();
@@ -62,12 +62,12 @@ public class VenueReportController {
 	// ===== 查詢全部 =====
 	@GetMapping("listAllVenueReport")
 	public String listAllVenueReport(ModelMap model, HttpSession session) {
-		
+
 		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
 		if (loginEmp == null) {
 			return "redirect:/admin/login";
 		}
-		
+
 		List<VenueReportVO> list = venueReportSvc.getAll();
 		model.addAttribute("venueReportListData", list);
 		model.addAttribute("searchStatus", null);
@@ -113,18 +113,22 @@ public class VenueReportController {
 	}
 
 	// ===== 審核通過（檢舉成立） =====
-	// TODO 員工登入完成後，employeeId 改由 session 的 loginEmp 帶入，移除 @RequestParam
 	@PostMapping("approve")
-	public String approve(@RequestParam("venueReportId") Integer venueReportId,
-			@RequestParam("employeeId") Integer employeeId, RedirectAttributes redirectAttrs) {
+	public String approve(@RequestParam("venueReportId") Integer venueReportId, RedirectAttributes redirectAttrs,
+			HttpSession session) {
 
-		venueReportSvc.approve(venueReportId, employeeId);
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
+		venueReportSvc.approve(venueReportId, loginEmp.getEmployeeId());
 		redirectAttrs.addFlashAttribute("success", "- (檢舉成立，場地已退回待審核)");
-		
+
 		VenueReportVO venueReportVO = venueReportSvc.getOneVenueReport(venueReportId);
 		VenueOrderVO venueOrderVO = venueReportSvc.getVenueOrder(venueReportVO.getVenueOrderId());
 		VenueVO venueVO = venueOrderVO.getVenueVO();
-		
+
 		// 通知場地主：場地遭檢舉
 		NotificationVO notificationVO = new NotificationVO();
 		notificationVO.setMember(venueVO.getMember());
@@ -132,7 +136,7 @@ public class VenueReportController {
 		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + "　已遭檢舉，請重新修改您的資料再進行審核，謝謝");
 		notificationVO.setNotificationType((byte) 2);
 		notificationService.addNotification(notificationVO);
-		
+
 		// 通知檢舉人（訂單的租借方）：檢舉成立
 		NotificationVO reporterNotification = new NotificationVO();
 		reporterNotification.setMember(venueOrderVO.getMember());
@@ -140,19 +144,23 @@ public class VenueReportController {
 		reporterNotification.setContent("先生/小姐您好，您對場地：" + venueVO.getVenueName() + "　的檢舉經審核後成立，該場地已下架並退回待審核，感謝您的回報");
 		reporterNotification.setNotificationType((byte) 2);
 		notificationService.addNotification(reporterNotification);
-		
+
 		return "redirect:/venueReport/viewOne?venueReportId=" + venueReportId;
 	}
 
 	// ===== 審核未通過（檢舉不成立） =====
-	// TODO 員工登入完成後，employeeId 改由 session 的 loginEmp 帶入，移除 @RequestParam
 	@PostMapping("reject")
-	public String reject(@RequestParam("venueReportId") Integer venueReportId,
-			@RequestParam("employeeId") Integer employeeId, RedirectAttributes redirectAttrs) {
+	public String reject(@RequestParam("venueReportId") Integer venueReportId, RedirectAttributes redirectAttrs,
+			HttpSession session) {
 
-		venueReportSvc.reject(venueReportId, employeeId);
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+
+		venueReportSvc.reject(venueReportId, loginEmp.getEmployeeId());
 		redirectAttrs.addFlashAttribute("success", "- (檢舉不成立，場地狀態未變更)");
-		
+
 		VenueReportVO venueReportVO = venueReportSvc.getOneVenueReport(venueReportId);
 		VenueOrderVO venueOrderVO = venueReportSvc.getVenueOrder(venueReportVO.getVenueOrderId());
 		VenueVO venueVO = venueOrderVO.getVenueVO();
