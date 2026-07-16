@@ -30,6 +30,10 @@
   --nav-height: 76px;
 }
 
+body{
+  padding-top: calc(var(--nav-height) + 32px) !important;
+}
+
 /* ==========================================================
    浮動導覽列
    ========================================================== */
@@ -151,6 +155,9 @@
 
 /* RWD：手機隱藏文字導覽連結 */
 @media (max-width: 760px){
+  body{
+    padding-top: calc(var(--nav-height) + 28px) !important;
+  }
   .navbar__links{ display:none; }
 }
 @media (max-width: 520px){

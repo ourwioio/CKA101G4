@@ -79,6 +79,16 @@ body {
 	font-size: 15px;
 }
 
+.datetime-picker {
+	display: grid;
+	grid-template-columns: minmax(180px, 1fr) 110px 110px;
+	gap: 10px;
+}
+
+.datetime-picker .form-control {
+	min-width: 0;
+}
+
 textarea.form-control {
 	min-height: 120px;
 	resize: vertical;
@@ -293,6 +303,7 @@ textarea.form-control {
 			</div>
 
 			<div class="form-actions">
+				<div id="timeValidationError" class="error" style="display:none; margin-right:auto;"></div>
 				<a th:href="${cancelUrl ?: '/'}" class="btn-cancel">取消</a>
 				<button type="submit" class="btn-submit" th:text="${submitText ?: '建立活動'}">建立活動</button>
 			</div>
@@ -302,6 +313,189 @@ textarea.form-control {
 	</div>
 
 	<script>
+		document.querySelectorAll('input[type="datetime-local"]').forEach(buildFiveMinutePicker);
+
+		const hostActivityForm = document.querySelector('form[enctype="multipart/form-data"]');
+		if (hostActivityForm) {
+			hostActivityForm.addEventListener('submit', function(event) {
+				clearTimeValidationError();
+				let hasPastDatetime = false;
+				document.querySelectorAll('input[type="datetime-local"]').forEach(function(input) {
+					if (input.value && new Date(input.value).getTime() < getCurrentFiveMinuteFloor().getTime()) {
+						hasPastDatetime = true;
+					}
+				});
+				if (hasPastDatetime) {
+					event.preventDefault();
+					showTimeValidationError('\u6642\u9593\u4e0d\u53ef\u9078\u64c7\u904e\u53bb\u6642\u9593\uff0c\u8acb\u91cd\u65b0\u9078\u64c7\u3002');
+					return;
+				}
+
+				const registrationStart = getDatetimeValue('registrationStartTime');
+				const registrationDeadline = getDatetimeValue('registrationDeadline');
+				const activityStart = getDatetimeValue('startTime');
+				const activityEnd = getDatetimeValue('endTime');
+				if (registrationStart && registrationDeadline && activityStart && activityEnd
+					&& !(registrationStart < registrationDeadline
+						&& registrationDeadline <= activityStart
+						&& activityStart < activityEnd)) {
+					event.preventDefault();
+					showTimeValidationError('\u6642\u9593\u9806\u5e8f\u9700\u70ba\uff1a\u5831\u540d\u958b\u59cb < \u5831\u540d\u622a\u6b62 <= \u6d3b\u52d5\u958b\u59cb < \u6d3b\u52d5\u7d50\u675f\u3002');
+				}
+			});
+		}
+
+		function buildFiveMinutePicker(originalInput) {
+			const picker = document.createElement('div');
+			const dateInput = document.createElement('input');
+			const hourSelect = document.createElement('select');
+			const minuteSelect = document.createElement('select');
+
+			picker.className = 'datetime-picker';
+			dateInput.type = 'date';
+			dateInput.className = 'form-control';
+			dateInput.required = true;
+			hourSelect.className = 'form-control';
+			hourSelect.required = true;
+			minuteSelect.className = 'form-control';
+			minuteSelect.required = true;
+
+			addOption(hourSelect, '', '時');
+			for (let hour = 0; hour < 24; hour++) {
+				const value = String(hour).padStart(2, '0');
+				addOption(hourSelect, value, value);
+			}
+
+			addOption(minuteSelect, '', '分');
+			for (let minute = 0; minute < 60; minute += 5) {
+				const value = String(minute).padStart(2, '0');
+				addOption(minuteSelect, value, value);
+			}
+
+			if (originalInput.value) {
+				const parts = originalInput.value.split('T');
+				dateInput.value = parts[0] || '';
+				if (parts[1]) {
+					const timeParts = parts[1].split(':');
+					hourSelect.value = timeParts[0] || '';
+					minuteSelect.value = normalizeMinute(timeParts[1] || '');
+				}
+			}
+
+			originalInput.type = 'hidden';
+			picker.appendChild(dateInput);
+			picker.appendChild(hourSelect);
+			picker.appendChild(minuteSelect);
+			originalInput.insertAdjacentElement('afterend', picker);
+			dateInput.min = formatDate(getCurrentFiveMinuteFloor());
+
+			[dateInput, hourSelect, minuteSelect].forEach(function(control) {
+				control.addEventListener('change', syncOriginalDatetime);
+			});
+
+			dateInput.addEventListener('change', updateDisabledTimeOptions);
+			hourSelect.addEventListener('change', updateDisabledTimeOptions);
+			updateDisabledTimeOptions();
+			syncOriginalDatetime();
+
+			function syncOriginalDatetime() {
+				updateDisabledTimeOptions();
+				if (dateInput.value && hourSelect.value && minuteSelect.value) {
+					originalInput.value = dateInput.value + 'T' + hourSelect.value + ':' + minuteSelect.value;
+				} else {
+					originalInput.value = '';
+				}
+			}
+
+			function updateDisabledTimeOptions() {
+				const now = getCurrentFiveMinuteFloor();
+				const today = formatDate(now);
+				const selectedDate = dateInput.value;
+				const selectedHour = Number(hourSelect.value);
+
+				Array.from(hourSelect.options).forEach(function(option) {
+					if (!option.value) {
+						return;
+					}
+					option.disabled = selectedDate === today && Number(option.value) < now.getHours();
+				});
+
+				if (hourSelect.value && hourSelect.options[hourSelect.selectedIndex].disabled) {
+					hourSelect.value = '';
+					minuteSelect.value = '';
+				}
+
+				Array.from(minuteSelect.options).forEach(function(option) {
+					if (!option.value) {
+						return;
+					}
+					option.disabled = selectedDate === today
+						&& selectedHour === now.getHours()
+						&& Number(option.value) < now.getMinutes();
+				});
+
+				if (minuteSelect.value && minuteSelect.options[minuteSelect.selectedIndex].disabled) {
+					minuteSelect.value = '';
+				}
+			}
+		}
+
+		function addOption(select, value, text) {
+			const option = document.createElement('option');
+			option.value = value;
+			option.textContent = text;
+			select.appendChild(option);
+		}
+
+		function normalizeMinute(minuteText) {
+			const minute = Number(minuteText);
+			if (Number.isNaN(minute)) {
+				return '';
+			}
+			return String(Math.min(55, Math.round(minute / 5) * 5)).padStart(2, '0');
+		}
+
+		function getCurrentFiveMinuteFloor() {
+			const now = new Date();
+			now.setSeconds(0);
+			now.setMilliseconds(0);
+			now.setMinutes(Math.floor(now.getMinutes() / 5) * 5);
+			return now;
+		}
+
+		function formatDate(date) {
+			const year = date.getFullYear();
+			const month = String(date.getMonth() + 1).padStart(2, '0');
+			const day = String(date.getDate()).padStart(2, '0');
+			return year + '-' + month + '-' + day;
+		}
+
+		function getDatetimeValue(fieldName) {
+			const input = document.querySelector('input[name="' + fieldName + '"]');
+			if (!input || !input.value) {
+				return null;
+			}
+			const date = new Date(input.value);
+			return Number.isNaN(date.getTime()) ? null : date;
+		}
+
+
+		function showTimeValidationError(message) {
+			const error = document.getElementById('timeValidationError');
+			if (error) {
+				error.textContent = message;
+				error.style.display = 'block';
+			}
+		}
+
+		function clearTimeValidationError() {
+			const error = document.getElementById('timeValidationError');
+			if (error) {
+				error.textContent = '';
+				error.style.display = 'none';
+			}
+		}
+
 		const activityImageFile = document.getElementById('activityImageFile');
 		const activityImagePreview = document.getElementById('activityImagePreview');
 		const defaultPreviewSrc = activityImagePreview.src;
