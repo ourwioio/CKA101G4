@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>&#24460;&#21488;&#35330;&#21934;&#26126;&#32048;</title>
+<title>後台訂單明細</title>
 <style>
 body {
 	margin: 0;
@@ -143,79 +143,79 @@ body {
 	<main class="wb-admin-content activity-admin-content">
 	<div class="page-card">
 		<div class="header">
-			<h1>&#24460;&#21488;&#35330;&#21934;&#26126;&#32048;</h1>
+			<h1>後台訂單明細</h1>
 			<div class="actions" style="margin-top: 0;">
 				<a th:href="@{/admin/actRptList}" class="btn-action btn-report">活動檢舉審核</a>
-				<a th:href="@{/activityOrder/listAllActivityOrder}" class="btn-back">&#22238;&#35330;&#21934;&#32000;&#37636;</a>
+				<a th:href="@{/activityOrder/listAllActivityOrder}" class="btn-back">回訂單紀錄</a>
 			</div>
 		</div>
 
-		<div th:if="${param.refundSuccess}" class="notice success">&#24050;&#30906;&#35469;&#36864;&#27454;&#23436;&#25104;</div>
-		<div th:if="${param.refundFailed}" class="notice error">&#27492;&#35330;&#21934;&#30446;&#21069;&#19981;&#31526;&#21512;&#30906;&#35469;&#36864;&#27454;&#26781;&#20214;&#12290;</div>
-		<div th:if="${param.payoutSuccess}" class="notice success">&#24050;&#30906;&#35469;&#25765;&#27454;&#23436;&#25104;</div>
+		<div th:if="${param.refundSuccess}" class="notice success">已確認退款完成</div>
+		<div th:if="${param.refundFailed}" class="notice error">此訂單目前不符合確認退款條件。</div>
+		<div th:if="${param.payoutSuccess}" class="notice success">已確認撥款完成</div>
 
 		<div class="section">
-			<h2>&#35330;&#21934;&#36039;&#35338;</h2>
+			<h2>訂單資訊</h2>
 			<div class="grid">
 				<div class="item">
-					<div class="label">&#35330;&#21934;&#32232;&#34399;</div>
+					<div class="label">訂單編號</div>
 					<div class="value" th:text="${orderVO.activityOrderId}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#35330;&#21934;&#29376;&#24907;</div>
+					<div class="label">訂單狀態</div>
 					<div class="value">
-						<span th:if="${orderVO.orderStatus == 0}">&#24050;&#20184;&#27454;</span>
-						<span th:if="${orderVO.orderStatus == 1}">&#24050;&#21462;&#28040;</span>
-						<span th:if="${orderVO.orderStatus == 2}">&#24453;&#23529;&#26680;</span>
-						<span th:if="${orderVO.orderStatus == 3}">&#24453;&#20184;&#27454;</span>
-						<span th:if="${orderVO.orderStatus == 4}">&#24050;&#23436;&#25104;</span>
+						<span th:if="${orderVO.orderStatus == 0}">已付款</span>
+						<span th:if="${orderVO.orderStatus == 1}">已取消</span>
+						<span th:if="${orderVO.orderStatus == 2}">待審核</span>
+						<span th:if="${orderVO.orderStatus == 3}">待付款</span>
+						<span th:if="${orderVO.orderStatus == 4}">已完成</span>
 					</div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#22577;&#21517;&#26371;&#21729;&#32232;&#34399;</div>
+					<div class="label">報名會員編號</div>
 					<div class="value" th:text="${orderVO.buyerMemberId}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#22577;&#21517;&#20154;&#25976;</div>
+					<div class="label">報名人數</div>
 					<div class="value" th:text="${orderVO.bookingCount}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#35330;&#21934;&#37329;&#38989;</div>
+					<div class="label">訂單金額</div>
 					<div class="value">NT$ <span th:text="${orderVO.totalAmount}"></span></div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#22577;&#21517;&#20633;&#35387;</div>
+					<div class="label">報名備註</div>
 					<div class="value" th:text="${orderVO.orderNote ?: '-'}"></div>
 				</div>
 			</div>
 		</div>
 
 		<div class="section">
-			<h2>&#27963;&#21205;&#36039;&#35338;</h2>
+			<h2>活動資訊</h2>
 			<div class="grid">
 				<div class="item">
-					<div class="label">&#27963;&#21205;&#21517;&#31281;</div>
+					<div class="label">活動名稱</div>
 					<div class="value" th:text="${activityVO != null ? activityVO.activityTitle : '-'}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#20027;&#36774;&#26371;&#21729;&#32232;&#34399;</div>
+					<div class="label">主辦會員編號</div>
 					<div class="value" th:text="${activityVO != null ? activityVO.memberId : '-'}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#27963;&#21205;&#38283;&#22987;&#26178;&#38291;</div>
+					<div class="label">活動開始時間</div>
 					<div class="value"
 						th:text="${activityVO != null && activityVO.startTime != null ? #temporals.format(activityVO.startTime, 'yyyy-MM-dd HH:mm') : '-'}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#27963;&#21205;&#32080;&#26463;&#26178;&#38291;</div>
+					<div class="label">活動結束時間</div>
 					<div class="value"
 						th:text="${activityVO != null && activityVO.endTime != null ? #temporals.format(activityVO.endTime, 'yyyy-MM-dd HH:mm') : '-'}"></div>
 				</div>
@@ -223,49 +223,49 @@ body {
 		</div>
 
 		<div class="section">
-			<h2>&#20184;&#27454; / &#36864;&#27454; / &#25765;&#27454;</h2>
+			<h2>付款 / 退款 / 撥款</h2>
 			<div class="grid">
 				<div class="item">
-					<div class="label">&#20184;&#27454;&#26041;&#24335;</div>
+					<div class="label">付款方式</div>
 					<div class="value">
-						<span th:if="${orderVO.activityPaymentMethod == 0}">&#20449;&#29992;&#21345;</span>
-						<span th:if="${orderVO.activityPaymentMethod == 1}">ATM&#36681;&#24115;</span>
-						<span th:if="${orderVO.activityPaymentMethod == null}">&#26410;&#20184;&#27454;</span>
+						<span th:if="${orderVO.activityPaymentMethod == 0}">信用卡</span>
+						<span th:if="${orderVO.activityPaymentMethod == 1}">ATM轉帳</span>
+						<span th:if="${orderVO.activityPaymentMethod == null}">未付款</span>
 					</div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#20184;&#27454;&#26178;&#38291;</div>
+					<div class="label">付款時間</div>
 					<div class="value"
 						th:text="${orderVO.paidAt != null ? #temporals.format(orderVO.paidAt, 'yyyy-MM-dd HH:mm:ss') : '-'}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#36864;&#27454;&#29376;&#24907;</div>
+					<div class="label">退款狀態</div>
 					<div class="value">
-						<span th:if="${orderVO.refundStatus == 2}">&#24050;&#36864;&#27454;</span>
-						<span th:if="${orderVO.refundStatus == 1}">&#24453;&#36864;&#27454;</span>
-						<span th:if="${orderVO.refundStatus == null or orderVO.refundStatus == 0}">&#28961;&#36864;&#27454;</span>
+						<span th:if="${orderVO.refundStatus == 2}">已退款</span>
+						<span th:if="${orderVO.refundStatus == 1}">待退款</span>
+						<span th:if="${orderVO.refundStatus == null or orderVO.refundStatus == 0}">無退款</span>
 					</div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#36864;&#27454;&#21407;&#22240;</div>
+					<div class="label">退款原因</div>
 					<div class="value" th:text="${orderVO.refundReason ?: '-'}"></div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#25765;&#27454;&#29376;&#24907;</div>
+					<div class="label">撥款狀態</div>
 					<div class="value">
-						<span th:if="${orderVO.payoutAmount}">&#24050;&#25765;&#27454;</span>
-						<span th:if="${!orderVO.payoutAmount and (orderVO.orderStatus == 0 or orderVO.orderStatus == 4) and orderVO.refundStatus != 2}">&#24453;&#25765;&#27454;</span>
+						<span th:if="${orderVO.payoutAmount}">已撥款</span>
+						<span th:if="${!orderVO.payoutAmount and (orderVO.orderStatus == 0 or orderVO.orderStatus == 4) and orderVO.refundStatus != 2}">待撥款</span>
 						<span th:if="${!orderVO.payoutAmount and (orderVO.orderStatus == 1 or orderVO.refundStatus == 2)}">-</span>
 						<span th:if="${!orderVO.payoutAmount and orderVO.orderStatus != 0 and orderVO.orderStatus != 1 and orderVO.orderStatus != 4 and orderVO.refundStatus != 2}">-</span>
 					</div>
 				</div>
 
 				<div class="item">
-					<div class="label">&#23436;&#25104;&#26178;&#38291;</div>
+					<div class="label">完成時間</div>
 					<div class="value"
 						th:text="${orderVO.activityCompletedAt != null ? #temporals.format(orderVO.activityCompletedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}"></div>
 				</div>
@@ -274,21 +274,21 @@ body {
 			<div class="actions">
 				<form th:if="${orderVO.refundStatus == 1}"
 					th:action="@{/activityOrder/confirmRefund}" method="post"
-					onsubmit="return confirm('&#30906;&#35469;&#27492;&#35330;&#21934;&#24050;&#23436;&#25104;&#36864;&#27454;&#65311;');">
+					onsubmit="return confirm('確認此訂單已完成退款？');">
 					<input type="hidden" name="activityOrderId" th:value="${orderVO.activityOrderId}">
-					<button type="submit" class="btn-action btn-refund">&#30906;&#35469;&#36864;&#27454;</button>
+					<button type="submit" class="btn-action btn-refund">確認退款</button>
 				</form>
 
 				<form th:if="${(orderVO.orderStatus == 0 or orderVO.orderStatus == 4) and !orderVO.payoutAmount and (orderVO.refundStatus == null or orderVO.refundStatus == 0)}"
 					th:action="@{/activityOrder/confirmPayout}" method="post"
-					onsubmit="return confirm('&#30906;&#35469;&#27492;&#35330;&#21934;&#24050;&#25765;&#27454;&#32102;&#27963;&#21205;&#20027;&#36774;&#20154;&#65311;');">
+					onsubmit="return confirm('確認此訂單已撥款給活動主辦人？');">
 					<input type="hidden" name="activityOrderId" th:value="${orderVO.activityOrderId}">
-					<button type="submit" class="btn-action btn-payout">&#30906;&#35469;&#25765;&#27454;</button>
+					<button type="submit" class="btn-action btn-payout">確認撥款</button>
 				</form>
 
 				<div class="empty-action"
 					th:unless="${orderVO.refundStatus == 1 or ((orderVO.orderStatus == 0 or orderVO.orderStatus == 4) and !orderVO.payoutAmount and (orderVO.refundStatus == null or orderVO.refundStatus == 0))}">
-					&#30446;&#21069;&#27794;&#26377;&#21487;&#34389;&#29702;&#30340;&#36864;&#27454;&#25110;&#25765;&#27454;&#25805;&#20316;
+					目前沒有可處理的退款或撥款操作
 				</div>
 			</div>
 		</div>

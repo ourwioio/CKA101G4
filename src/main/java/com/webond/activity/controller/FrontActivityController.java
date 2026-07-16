@@ -39,6 +39,7 @@ public class FrontActivityController {
 	private static final String ACTIVITY_LOGIN_MEMBER_ID = "activityLoginMemberId";
 	private static final List<Integer> TEST_MEMBER_IDS = Arrays.asList(1, 2, 3);
 	private static final String DEFAULT_ACTIVITY_IMAGE_PATH = "static/images/activity/default-activity.jpg";
+	private static final String ACTIVITY_IMAGE_STATIC_DIR = "static/images/activity/";
 
 	@Autowired
 	private ActivityService activitySvc;
@@ -163,8 +164,9 @@ public class FrontActivityController {
 	@GetMapping("/activity/front/image")
 	public ResponseEntity<byte[]> activityImage(@RequestParam(value = "id", required = false) Integer activityId)
 			throws IOException {
+		ActivityVO activityVO = null;
 		if (activityId != null) {
-			ActivityVO activityVO = activitySvc.getOneActivity(activityId);
+			activityVO = activitySvc.getOneActivity(activityId);
 			if (activityVO != null && activityVO.getActivityImage() != null
 					&& activityVO.getActivityImage().length > 0) {
 				String imageType = activityVO.getActivityImageType() == null ? "image/jpeg"
@@ -175,10 +177,35 @@ public class FrontActivityController {
 			}
 		}
 
-		ClassPathResource defaultImage = new ClassPathResource(DEFAULT_ACTIVITY_IMAGE_PATH);
+		ClassPathResource defaultImage = resolveDefaultActivityImage(activityVO);
 		return ResponseEntity.ok()
-				.contentType(MediaType.IMAGE_JPEG)
+				.contentType(resolveActivityImageMediaType(defaultImage.getFilename()))
 				.body(defaultImage.getInputStream().readAllBytes());
+	}
+
+	private ClassPathResource resolveDefaultActivityImage(ActivityVO activityVO) {
+		if (activityVO != null && activityVO.getActivityTypeId() != null) {
+			ClassPathResource jpgImage = new ClassPathResource(
+					ACTIVITY_IMAGE_STATIC_DIR + activityVO.getActivityTypeId() + ".jpg");
+			if (jpgImage.exists()) {
+				return jpgImage;
+			}
+
+			ClassPathResource pngImage = new ClassPathResource(
+					ACTIVITY_IMAGE_STATIC_DIR + activityVO.getActivityTypeId() + ".png");
+			if (pngImage.exists()) {
+				return pngImage;
+			}
+		}
+
+		return new ClassPathResource(DEFAULT_ACTIVITY_IMAGE_PATH);
+	}
+
+	private MediaType resolveActivityImageMediaType(String filename) {
+		if (filename != null && filename.toLowerCase().endsWith(".png")) {
+			return MediaType.IMAGE_PNG;
+		}
+		return MediaType.IMAGE_JPEG;
 	}
 
 	@GetMapping("/activity/front/order")

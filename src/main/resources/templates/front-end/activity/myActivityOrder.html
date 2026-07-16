@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
-<title>&#25105;&#30340;&#22577;&#21517;</title>
+<title>我的報名</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
@@ -203,48 +203,48 @@ td {
 	<div class="container">
 		<div class="header">
 			<div>
-				<h1>&#25105;&#30340;&#22577;&#21517;</h1>
+				<h1>我的報名</h1>
 				<div class="member">
-					&#30446;&#21069;&#30331;&#20837;&#65306;<span th:text="${loginMemberName}"></span>
-					&#65288;&#26371;&#21729;&#32232;&#34399; <span th:text="${loginMemberId}"></span>&#65289;
+					目前登入：<span th:text="${loginMemberName}"></span>
+					（會員編號 <span th:text="${loginMemberId}"></span>）
 				</div>
 			</div>
-			<a th:href="@{/activity/front/list}" class="btn btn-back">&#22238;&#21040;&#27963;&#21205;&#21015;&#34920;</a>
+			<a th:href="@{/activity/front/list}" class="btn btn-back">回到活動列表</a>
 		</div>
 
 		<div th:if="${param.cannotCancelEnded}" class="alert-error">
-			&#27963;&#21205;&#24050;&#32080;&#26463;&#65292;&#28961;&#27861;&#21462;&#28040;&#22577;&#21517;&#12290;
+			活動已結束，無法取消報名。
 		</div>
 
 		<div th:if="${param.cannotPay}" class="alert-error">
-			&#21517;&#38989;&#24050;&#28385;&#65292;&#28961;&#27861;&#20184;&#27454;&#12290;
+			名額已满，無法付款。
 		</div>
 
 		<div th:if="${param.paymentCancelled}" class="alert-error">
-			&#20184;&#27454;&#22833;&#25943;&#65292;&#35330;&#21934;&#24050;&#21462;&#28040;&#12290;
+			付款失敗，訂單已取消。
 		</div>
 
 		<div th:if="${param.paySuccess}" class="alert-success">
-			&#20184;&#27454;&#25104;&#21151;&#65292;&#24050;&#23436;&#25104;&#22577;&#21517;&#12290;
+			付款成功，已完成報名。
 		</div>
 
 		<div class="table-card">
 			<table>
 				<thead>
 					<tr>
-						<th>&#35330;&#21934;&#32232;&#34399;</th>
-						<th>&#27963;&#21205;&#21517;&#31281;</th>
-						<th>&#22577;&#21517;&#20154;&#25976;</th>
-						<th>&#32317;&#37329;&#38989;</th>
-						<th>&#20184;&#27454;&#26041;&#24335;</th>
-						<th>&#35330;&#21934;&#29376;&#24907;</th>
-						<th>&#25805;&#20316;</th>
+						<th>訂單編號</th>
+						<th>活動名稱</th>
+						<th>報名人數</th>
+						<th>總金額</th>
+						<th>付款方式</th>
+						<th>訂單狀態</th>
+						<th>操作</th>
 					</tr>
 				</thead>
 
 				<tbody>
 					<tr th:if="${#lists.isEmpty(orderListData)}">
-						<td colspan="7" class="empty">&#30446;&#21069;&#27794;&#26377;&#22577;&#21517;&#27963;&#21205;</td>
+						<td colspan="7" class="empty">目前沒有報名活動</td>
 					</tr>
 
 					<tr th:each="order : ${orderListData}"
@@ -262,37 +262,37 @@ td {
 						<td>NT$ <span th:text="${order.totalAmount}"></span></td>
 
 						<td>
-							<span th:if="${order.activityPaymentMethod == 0}">&#20449;&#29992;&#21345;</span>
-							<span th:if="${order.activityPaymentMethod == 1}">ATM&#36681;&#24115;</span>
-							<span th:if="${order.activityPaymentMethod == null}">&#26410;&#20184;&#27454;</span>
+							<span th:if="${order.activityPaymentMethod == 0}">信用卡</span>
+							<span th:if="${order.activityPaymentMethod == 1}">ATM轉帳</span>
+							<span th:if="${order.activityPaymentMethod == null}">未付款</span>
 						</td>
 
 						<td>
-							<span th:if="${order.orderStatus == 0}" class="status active">&#24050;&#20184;&#27454;</span>
-							<span th:if="${order.orderStatus == 1}" class="status cancel">&#24050;&#21462;&#28040;</span>
-							<span th:if="${order.orderStatus == 2}" class="status pending">&#24453;&#23529;&#26680;</span>
-							<span th:if="${order.orderStatus == 3}" class="status pending">&#24453;&#20184;&#27454;</span>
-							<span th:if="${order.orderStatus == 4}" class="status active">&#24050;&#23436;&#25104;</span>
+							<span th:if="${order.orderStatus == 0}" class="status active">已付款</span>
+							<span th:if="${order.orderStatus == 1}" class="status cancel">已取消</span>
+							<span th:if="${order.orderStatus == 2}" class="status pending">待審核</span>
+							<span th:if="${order.orderStatus == 3}" class="status pending">待付款</span>
+							<span th:if="${order.orderStatus == 4}" class="status active">已完成</span>
 							<th:block th:if="${order.orderStatus == 2}" th:each="activity : ${activityListData}">
 								<div class="countdown"
 									th:if="${activity.activityId == order.activityId}"
 									th:attr="data-deadline=${#temporals.format(activity.registrationDeadline, 'yyyy-MM-dd''T''HH:mm:ss')}">
-									&#24453;&#20027;&#36774;&#23529;&#26680;&#21097;&#39192;&#65306;<span>&#35336;&#31639;&#20013;</span>
+									待主辦審核剩餘：<span>計算中</span>
 								</div>
 							</th:block>
 							<div class="countdown"
 								th:if="${order.orderStatus == 3 and order.approvedAt != null}"
 								th:attr="data-start=${#temporals.format(order.approvedAt, 'yyyy-MM-dd''T''HH:mm:ss')},data-seconds=60">
-								&#20184;&#27454;&#21097;&#39192;&#65306;<span>&#35336;&#31639;&#20013;</span>
+								付款剩餘：<span>計算中</span>
 							</div>
 							<div th:if="${order.totalAmount == null or order.totalAmount <= 0}" style="margin-top: 6px;">
-								<span class="status active">&#28961;&#36864;&#27454;</span>
+								<span class="status active">無退款</span>
 							</div>
 							<div th:if="${order.totalAmount != null and order.totalAmount > 0 and order.refundStatus == 1}" style="margin-top: 6px;">
-								<span class="status refund">&#24453;&#36864;&#27454;</span>
+								<span class="status refund">待退款</span>
 							</div>
 							<div th:if="${order.totalAmount != null and order.totalAmount > 0 and order.refundStatus == 2}" style="margin-top: 6px;">
-								<span class="status active">&#24050;&#36864;&#27454;</span>
+								<span class="status active">已退款</span>
 							</div>
 						</td>
 
@@ -300,23 +300,23 @@ td {
 							<div class="actions" th:if="${order.orderStatus == 0}">
 								<a class="btn-small btn-pay"
 									th:href="@{/activity/front/chat(activityId=${order.activityId})}">
-									&#36914;&#20837;&#32842;&#22825;&#23460;
+									進入聊天室
 								</a>
 								<form th:action="@{/activity/front/order/cancel}" method="post"
-									onsubmit="return confirm('&#30906;&#23450;&#35201;&#21462;&#28040;&#22577;&#21517;&#21966;&#65311;');">
+									onsubmit="return confirm('確定要取消報名嗎？');">
 									<input type="hidden" name="activityOrderId"
 										th:value="${order.activityOrderId}">
-									<button type="submit" class="btn-small btn-cancel">&#21462;&#28040;&#22577;&#21517;</button>
+									<button type="submit" class="btn-small btn-cancel">取消報名</button>
 								</form>
 
 							</div>
 
 							<div class="actions" th:if="${order.orderStatus == 2}">
 								<form th:action="@{/activity/front/order/cancel}" method="post"
-									onsubmit="return confirm('&#30906;&#23450;&#35201;&#21462;&#28040;&#22577;&#21517;&#21966;&#65311;');">
+									onsubmit="return confirm('確定要取消報名嗎？');">
 									<input type="hidden" name="activityOrderId"
 										th:value="${order.activityOrderId}">
-									<button type="submit" class="btn-small btn-cancel">&#21462;&#28040;&#22577;&#21517;</button>
+									<button type="submit" class="btn-small btn-cancel">取消報名</button>
 								</form>
 							</div>
 
@@ -325,25 +325,25 @@ td {
 									<input type="hidden" name="activityOrderId"
 										th:value="${order.activityOrderId}">
 									<select name="activityPaymentMethod" class="payment-select">
-										<option value="0">&#20449;&#29992;&#21345;</option>
-										<option value="1">ATM&#36681;&#24115;</option>
+										<option value="0">信用卡</option>
+										<option value="1">ATM轉帳</option>
 									</select>
-									<button type="submit" class="btn-small btn-pay">&#20184;&#27454;</button>
+									<button type="submit" class="btn-small btn-pay">付款</button>
 								</form>
 
 								<form th:action="@{/activity/front/order/cancel}" method="post"
-									onsubmit="return confirm('&#30906;&#23450;&#35201;&#21462;&#28040;&#22577;&#21517;&#21966;&#65311;');">
+									onsubmit="return confirm('確定要取消報名嗎？');">
 									<input type="hidden" name="activityOrderId"
 										th:value="${order.activityOrderId}">
-									<button type="submit" class="btn-small btn-cancel">&#21462;&#28040;&#22577;&#21517;</button>
+									<button type="submit" class="btn-small btn-cancel">取消報名</button>
 								</form>
 							</div>
 
 							<div class="actions" th:if="${order.orderStatus == 4 and order.buyerRateSeller == null}" >
-								<a class="btn-small btn-rating" th:href="@{/activity/review(orderId=${order.activityOrderId})}" >&#35413;&#20729;</a>
+								<a class="btn-small btn-rating" th:href="@{/activity/review(orderId=${order.activityOrderId})}" >評價</a>
 							</div>
 
-							<span th:if="${order.orderStatus == 4 and order.buyerRateSeller != null}" class="status active">&#24050;&#35413;&#20729;</span>
+							<span th:if="${order.orderStatus == 4 and order.buyerRateSeller != null}" class="status active">已評價</span>
 							<span th:unless="${order.orderStatus == 0 or order.orderStatus == 2 or order.orderStatus == 3 or order.orderStatus == 4}">-</span>
 						</td>
 					</tr>
