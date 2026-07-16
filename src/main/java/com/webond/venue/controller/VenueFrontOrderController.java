@@ -38,7 +38,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/front/venueOrder")
 public class VenueFrontOrderController {
 
-	private static final long PAYMENT_TIMEOUT_MINUTES = 1;
+	private static final long PAYMENT_TIMEOUT_MINUTES = 5;
 
 	@Autowired
 	VenueService venueService;

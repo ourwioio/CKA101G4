@@ -95,6 +95,24 @@ img{ max-width: 100%; }
 	color: var(--color-ink);
 }
 
+.detail-card__provider{
+	font-size: 13px;
+	color: var(--color-ink-soft);
+	margin: 0 0 20px;
+}
+
+.provider-link{
+	color: var(--color-ink);
+	font-weight: 700;
+	text-decoration: none;
+	border-bottom: 1.5px solid transparent;
+	transition: border-color .15s ease, color .15s ease;
+}
+.provider-link:hover{
+	color: var(--color-yellow-deep);
+	border-color: var(--color-yellow-deep);
+}
+
 .detail-card__desc{
 	font-size: 14px;
 	color: var(--color-ink);

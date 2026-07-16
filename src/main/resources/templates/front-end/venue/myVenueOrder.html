@@ -65,9 +65,14 @@
                         <strong>預約時段：</strong>
                         <span th:text="${order.startAt} + ' ～ ' + ${order.endAt}"></span>
                     </p>
+                    <p>
+                        <strong>場地提供者：</strong>
+						<a class="info-value info-link" th:href="@{/front/memberPage/oneMember(memberId=${order.venueVO.member.memberId})}"
+				  		   th:text="${order.venueVO.member.realName}"></a>
+                    </p>
 
                     <div>
-                        <!-- 付款方式：只剩信用卡／銀行轉帳 -->
+                        <!-- 付款方式：信用卡／銀行轉帳 -->
                         <span class="badge badge-payment"
                               th:text="${order.paymentMethod == 0} ? '信用卡' : '銀行轉帳'">
                         </span>

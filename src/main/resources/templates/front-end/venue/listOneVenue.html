@@ -46,6 +46,12 @@
 				<span class="tag">NT$ <span th:text="${venueVO.hourlyRate}"></span> / 小時</span>
 			</div>
 
+			<div class="detail-card__provider">
+				場地提供者：
+				<a class="provider-link" th:href="@{/front/memberPage/oneMember(memberId=${venueVO.member.memberId})}"
+				   th:text="${venueVO.member.realName}"></a>
+			</div>
+
 			<div class="detail-card__desc"
 				th:if="${venueVO.venueDescription != null and !venueVO.venueDescription.isEmpty()}"
 				th:text="${venueVO.venueDescription}"></div>
@@ -85,7 +91,7 @@
 			<div class="review-card" th:each="review : ${reviewList}">
 				<div class="review-header">
 					<span class="reviewer-name" th:text="${review.member.nickname}"></span>
-					<span class="review-date"
+						<span class="review-date"
 					      th:text="${#temporals.format(review.handledAt, 'yyyy-MM-dd')}"></span>
 				</div>
 
