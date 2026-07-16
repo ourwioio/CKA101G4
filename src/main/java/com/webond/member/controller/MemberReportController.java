@@ -207,7 +207,7 @@ public class MemberReportController {
 			errorMsgs.add("違規點數請填數字");
 		}
 
-		if (Integer.valueOf(2).equals(reportStatus)) {
+		if (Integer.valueOf(3).equals(reportStatus)) {
 			violationPoints = 0;
 		}
 
@@ -222,7 +222,7 @@ public class MemberReportController {
 
 		try {
 			reportSvc.jombackProcessReport(reportId, employeeId, reportStatus, adminNote, violationPoints);
-			String statusText = (reportStatus == 1) ? "審核成立 (扣除 " + violationPoints + " 點)" : "審核駁回";
+			String statusText = (reportStatus == 2) ? "審核成立 (扣除 " + violationPoints + " 點)" : "審核駁回";
 			redirectAttributes.addFlashAttribute("successMsg", "案號 #" + reportId + " 已成功處理為【" + statusText + "】！");
 		} catch (Exception e) {
 			errorMsgs.add("資料庫更新失敗：" + e.getMessage());
