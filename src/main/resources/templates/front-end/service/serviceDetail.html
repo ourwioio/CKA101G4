@@ -317,18 +317,34 @@
 
                     </div>
 
-                    <div class="service-detail-info-item">
+<!--                     <div class="service-detail-info-item"> -->
 
-                        <p class="service-detail-info-label">
-                            服務提供者
-                        </p>
+<!--                         <p class="service-detail-info-label"> -->
+<!--                             服務提供者 -->
+<!--                         </p> -->
 
-                        <p class="service-detail-info-value"
-                           th:text="|會員 #${serviceVO.memberId}|">
-                            會員 #1
-                        </p>
+<!--                         <p class="service-detail-info-value" -->
+<!--                            th:text="|會員 #${serviceVO.memberId}|"> -->
+<!--                             會員 #1 -->
+<!--                         </p> -->
 
-                    </div>
+<!--                     </div> -->
+
+							<div class="service-detail-info-item">
+							
+							    <p class="service-detail-info-label">
+							        服務提供者
+							    </p>
+							
+							    <a class="service-provider-link"
+							       th:href="@{/front/memberPage/oneMember(
+							           memberId=${serviceVO.memberId}
+							       )}"
+							       th:text="|會員 #${serviceVO.memberId}|">
+							        會員 #1
+							    </a>
+							
+							</div>
 
                     <div class="service-detail-info-item">
 
@@ -358,27 +374,51 @@
                     服務提供者
                 </h2>
 
-                <div class="service-provider-box">
+<!--                 <div class="service-provider-box"> -->
 
-                    <div class="service-provider-avatar"
-                         th:text="${serviceVO.memberId}">
-                        1
-                    </div>
+<!--                     <div class="service-provider-avatar" -->
+<!--                          th:text="${serviceVO.memberId}"> -->
+<!--                         1 -->
+<!--                     </div> -->
 
-                    <div class="service-provider-info">
+<!--                     <div class="service-provider-info"> -->
 
-                        <p class="service-provider-label">
-                            提供者會員編號
-                        </p>
+<!--                         <p class="service-provider-label"> -->
+<!--                             提供者會員編號 -->
+<!--                         </p> -->
 
-                        <p class="service-provider-value"
-                           th:text="|會員 #${serviceVO.memberId}|">
-                            會員 #1
-                        </p>
+<!--                         <p class="service-provider-value" -->
+<!--                            th:text="|會員 #${serviceVO.memberId}|"> -->
+<!--                             會員 #1 -->
+<!--                         </p> -->
 
-                    </div>
+<!--                     </div> -->
 
-                </div>
+<!--                 </div> -->
+						<a class="service-provider-box service-provider-box-link"
+						   th:href="@{/front/memberPage/oneMember(
+						       memberId=${serviceVO.memberId}
+						   )}">
+						
+						    <div class="service-provider-avatar"
+						         th:text="${serviceVO.memberId}">
+						        1
+						    </div>
+						
+						    <div class="service-provider-info">
+						
+						        <p class="service-provider-label">
+						            提供者會員編號
+						        </p>
+						
+						        <p class="service-provider-value"
+						           th:text="|會員 #${serviceVO.memberId}|">
+						            會員 #1
+						        </p>
+						
+						    </div>
+						
+						</a>
 
             </section>
 
