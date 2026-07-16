@@ -213,7 +213,7 @@ select:focus, textarea:focus {
 
 				<div class="page-header">
 					<h1 class="page-title">場地審核詳細資訊</h1>
-					<a th:href="@{/venueReview/listAllVenueReview}"
+					<a th:href="@{/admin/venue/venueReview/listAllVenueReview}"
 						class="btn btn-secondary">返回列表</a>
 				</div>
 
@@ -331,7 +331,7 @@ select:focus, textarea:focus {
 							placeholder="通過可留空；未通過請務必填寫理由，以便場地方修改"></textarea>
 
 						<!-- 實際送出的表單：approve -->
-						<form th:action="@{/venueReview/approve}" method="post"
+						<form th:action="@{/admin/venue/venueReview/approve}" method="post"
 							id="approveForm" style="display: none;">
 							<input type="hidden" name="venueReviewId"
 								th:value="${venueReviewVO.venueReviewId}" /> <input
@@ -339,7 +339,7 @@ select:focus, textarea:focus {
 						</form>
 
 						<!-- 實際送出的表單：reject -->
-						<form th:action="@{/venueReview/reject}" method="post"
+						<form th:action="@{/admin/venue/venueReview/reject}" method="post"
 							id="rejectForm" style="display: none;">
 							<input type="hidden" name="venueReviewId"
 								th:value="${venueReviewVO.venueReviewId}" /> <input

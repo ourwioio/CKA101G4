@@ -23,7 +23,7 @@
 		</div>
 
 		<!-- 搜尋區 -->
-		<form class="filter-bar" th:action="@{/venueReview/search}" method="post">
+		<form class="filter-bar" th:action="@{/admin/venue/venueReview/search}" method="post">
 			<select name="reviewStatus">
 				<option value="">-- 全部狀態 --</option>
 				<option value="0"
@@ -75,7 +75,7 @@
 						<td
 							th:text="${venueReview.reviewedAt != null ? #temporals.format(venueReview.reviewedAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
 						<td>
-							<form th:action="@{/venueReview/viewOne}" method="get"
+							<form th:action="@{/admin/venue/venueReview/viewOne}" method="get"
 								class="inline-form">
 								<input type="hidden" name="venueReviewId"
 									th:value="${venueReview.venueReviewId}" />

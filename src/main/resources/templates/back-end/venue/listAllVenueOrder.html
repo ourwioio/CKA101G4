@@ -89,7 +89,7 @@
             </div>
         </header>
 
-        <form class="filter-bar order-filter-bar" th:action="@{/venueOrder/listAllVenueOrder}" method="get">
+        <form class="filter-bar order-filter-bar" th:action="@{/admin/venue/venueOrder/listAllVenueOrder}" method="get">
 
             <div class="order-filter-row">
 
@@ -159,7 +159,7 @@
 
                 <div class="order-filter-actions">
                     <button type="submit" class="btn btn-primary">查詢</button>
-                    <a class="btn btn-secondary" th:href="@{/venueOrder/listAllVenueOrder}">清除條件</a>
+                    <a class="btn btn-secondary" th:href="@{/admin/venue/venueOrder/listAllVenueOrder}">清除條件</a>
                 </div>
 
             </div>
@@ -209,7 +209,7 @@
                             </td>
                             <td th:text="${venueOrderVO.empVO != null ? venueOrderVO.empVO.employeeId : '沒有處理員工'}"></td>
                             <td>
-                                <form th:action="@{/venueOrder/getOneVenueOrder}" method="get" class="inline-form">
+                                <form th:action="@{/admin/venue/venueOrder/getOneVenueOrder}" method="get" class="inline-form">
                                     <input type="hidden" name="venueOrderId" th:value="${venueOrderVO.venueOrderId}">
                                     <button type="submit" class="btn btn-edit">查看詳細</button>
                                 </form>

@@ -30,7 +30,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/venueReview")
+@RequestMapping("/admin/venue/venueReview")
 public class VenueReviewController {
 
 	@Autowired
@@ -67,7 +67,7 @@ public class VenueReviewController {
 
 		/*************************** 3.新增完成,準備轉交(Send the Success view) **************/
 		model.addAttribute("success", "- (新增成功)");
-		return "redirect:/venueReview/listAllVenueReview";
+		return "redirect:/admin/venue/venueReview/listAllVenueReview";
 	}
 
 	// ===== 查詢單筆（供修改用） =====
@@ -97,7 +97,7 @@ public class VenueReviewController {
 
 		/*************************** 3.修改完成,準備轉交(Send the Success view) **************/
 		redirectAttrs.addFlashAttribute("success", "- (修改成功)");
-		return "redirect:/venueReview/listAllVenueReview";
+		return "redirect:/admin/venue/venueReview/listAllVenueReview";
 	}
 
 	// ===== 刪除 =====
@@ -172,7 +172,7 @@ public class VenueReviewController {
 		notificationVO.setNotificationType((byte) 2);
 		notificationService.addNotification(notificationVO);
 
-		return "redirect:/venueReview/listAllVenueReview";
+		return "redirect:/admin/venue/venueReview/listAllVenueReview";
 	}
 
 	// ===== 審核未通過 =====
@@ -200,7 +200,7 @@ public class VenueReviewController {
 		notificationVO.setNotificationType((byte) 2);
 		notificationService.addNotification(notificationVO);
 
-		return "redirect:/venueReview/listAllVenueReview";
+		return "redirect:/admin/venue/venueReview/listAllVenueReview";
 	}
 
 	// ===== 複合查詢：狀態 + 場地編號 + 員工編號，任意組合 =====

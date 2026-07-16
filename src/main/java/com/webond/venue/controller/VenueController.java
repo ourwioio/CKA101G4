@@ -30,7 +30,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/venue")
+@RequestMapping("/admin/venue")
 public class VenueController {
 
 	@Autowired
@@ -133,13 +133,13 @@ public class VenueController {
 	@GetMapping("deleteImage")
 	public String deleteImage(@RequestParam("imagesId") Integer imagesId, @RequestParam("venueId") Integer venueId) {
 		venueImagesService.deleteImage(imagesId);
-		return "redirect:/venue/getOne_For_Update?venueId=" + venueId;
+		return "redirect:/admin/venue/getOne_For_Update?venueId=" + venueId;
 	}
 
 	@PostMapping("toggleStatus")
 	public String toggleStatus(@RequestParam("venueId") Integer venueId) {
 		venueService.toggleVenueStatus(venueId);
-		return "redirect:/venue/listAllVenue";
+		return "redirect:/admin/venue/listAllVenue";
 	}
 
 	@ModelAttribute("venueTypeData")

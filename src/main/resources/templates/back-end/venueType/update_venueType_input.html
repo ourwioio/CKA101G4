@@ -124,7 +124,7 @@ textarea {
 
 	<div class="card">
 		<div class="card-title">修改場地類型</div>
-		<form th:action="@{/venueType/update}" th:object="${venueTypeVO}"
+		<form th:action="@{/admin/venue/venueType/update}" th:object="${venueTypeVO}"
 			method="post">
 
 			<!-- 帶入 venueTypeId，讓後端知道要修改哪筆 -->
@@ -157,7 +157,7 @@ textarea {
 
 			<div class="btn-row">
 				<button type="submit" class="btn-submit">儲存修改</button>
-				<a class="btn-back" th:href="@{/venueType/listAllVenueType}">取消</a>
+				<a class="btn-back" th:href="@{/admin/venue/venueType/listAllVenueType}">取消</a>
 			</div>
 		</form>
 	</div>

@@ -23,7 +23,7 @@ import com.webond.venue.service.VenueService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/venueOrder")
+@RequestMapping("/admin/venue/venueOrder")
 public class VenueOrderController {
 
 	@Autowired
@@ -113,7 +113,7 @@ public class VenueOrderController {
 		notificationVO.setNotificationType((byte) 0);
 		notificationService.addNotification(notificationVO);
 		
-		return "redirect:/venueOrder/listAllRefund";
+		return "redirect:/admin/venue/venueOrder/listAllRefund";
 	}
 	
 	@GetMapping("listAllPayout")
@@ -164,7 +164,7 @@ public class VenueOrderController {
 		notificationVO.setContent("您的場地訂單已完成撥款，撥款金額為：" + venueOrderVO.getTotalAmount() + "元");
 		notificationVO.setNotificationType((byte) 0);
 		notificationService.addNotification(notificationVO);
-		return "redirect:/venueOrder/listAllPayout";
+		return "redirect:/admin/venue/venueOrder/listAllPayout";
 	}
 
 }

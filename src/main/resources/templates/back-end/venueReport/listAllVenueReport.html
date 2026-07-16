@@ -23,7 +23,7 @@
 		</div>
 
 		<!-- 搜尋區：處理狀態 + 檢舉時間區間 + 內容關鍵字 -->
-		<form class="filter-bar" th:action="@{/venueReport/search}" method="get">
+		<form class="filter-bar" th:action="@{/admin/venue/venueReport/search}" method="get">
 
 			<select name="reportStatus">
 				<option value="">-- 全部狀態 --</option>
@@ -39,7 +39,7 @@
 				placeholder="檢舉內容關鍵字" th:value="${searchKeyword}" />
 
 			<button type="submit" class="btn btn-primary">搜尋</button>
-			<a th:href="@{/venueReport/listAllVenueReport}" class="btn btn-secondary">清除條件</a>
+			<a th:href="@{/admin/venue/venueReport/listAllVenueReport}" class="btn btn-secondary">清除條件</a>
 		</form>
 
 		<div class="table-wrap">
@@ -80,7 +80,7 @@
 						<td style="white-space: nowrap;"
 							th:text="${venueReport.handledAt != null ? #temporals.format(venueReport.handledAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
 						<td>
-							<form th:action="@{/venueReport/viewOne}" method="get"
+							<form th:action="@{/admin/venue/venueReport/viewOne}" method="get"
 								class="inline-form">
 								<input type="hidden" name="venueReportId"
 									th:value="${venueReport.venueReportId}" />

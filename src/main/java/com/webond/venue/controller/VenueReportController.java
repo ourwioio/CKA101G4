@@ -28,7 +28,7 @@ import com.webond.venue.service.VenueReportService;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/venueReport")
+@RequestMapping("/admin/venue/venueReport")
 public class VenueReportController {
 
 	@Autowired
@@ -101,7 +101,7 @@ public class VenueReportController {
 
 		VenueReportVO venueReportVO = venueReportSvc.getOneVenueReport(venueReportId);
 		if (venueReportVO == null) {
-			return "redirect:/venueReport/listAllVenueReport";
+			return "redirect:/admin/venue/venueReport/listAllVenueReport";
 		}
 
 		VenueOrderVO venueOrderVO = venueReportSvc.getVenueOrder(venueReportVO.getVenueOrderId());
@@ -145,7 +145,7 @@ public class VenueReportController {
 		reporterNotification.setNotificationType((byte) 2);
 		notificationService.addNotification(reporterNotification);
 
-		return "redirect:/venueReport/viewOne?venueReportId=" + venueReportId;
+		return "redirect:/admin/venue/venueReport/viewOne?venueReportId=" + venueReportId;
 	}
 
 	// ===== 審核未通過（檢舉不成立） =====
@@ -173,6 +173,6 @@ public class VenueReportController {
 		reporterNotification.setNotificationType((byte) 2);
 		notificationService.addNotification(reporterNotification);
 
-		return "redirect:/venueReport/viewOne?venueReportId=" + venueReportId;
+		return "redirect:/admin/venue/venueReport/viewOne?venueReportId=" + venueReportId;
 	}
 }
