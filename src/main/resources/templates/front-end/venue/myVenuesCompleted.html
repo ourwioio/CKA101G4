@@ -26,7 +26,7 @@
 				<tr>
 					<th>訂單編號</th>
 					<th>場地編號</th>
-					<th>買方會員編號</th>
+					<th>買方會員姓名</th>
 					<th>場地名稱</th>
 					<th>撥款狀態</th>
 					<th>預約日期</th>
@@ -37,9 +37,10 @@
 			</thead>
 			<tbody>
 				<tr th:each="venueOrderVO : ${myAllCompletedlist}">
-					<td th:text="${venueOrderVO.venueOrderId}"></td>
+					<td ><a th:href="@{/front/venueOrder/getOneReservations(venueOrderId=${venueOrderVO.venueOrderId})}" 
+					th:text="${venueOrderVO.venueOrderId}"></a></td>
 					<td th:text="${venueOrderVO.venueVO.venueId}"></td>
-					<td th:text="${venueOrderVO.member.memberId}"></td>
+					<td th:text="${venueOrderVO.member.realName}"></td>
 					<td th:text="${venueOrderVO.venueVO.venueName}"></td>
 					<td th:switch="${venueOrderVO.payoutAmount}">
 						<span th:case="0" class="status-badge status-badge--down">未撥款</span>
