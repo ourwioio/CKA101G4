@@ -97,6 +97,6 @@ public class ActReviewController {
 	
     @GetMapping("/activity/review/success")
     public String showSuccessPage() {
-        return "front-end/activityReport/reviewSuccess";
+        return "front-end/activity/reviewSuccess";
     }
 }
