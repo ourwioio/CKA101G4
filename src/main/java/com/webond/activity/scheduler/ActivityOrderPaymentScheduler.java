@@ -16,4 +16,9 @@ public class ActivityOrderPaymentScheduler {
 	public void expireOverduePendingPaymentOrders() {
 		activityOrderSvc.expireOverduePendingPaymentOrders();
 	}
+
+	@Scheduled(fixedDelay = 5000)
+	public void completeEndedPaidOrders() {
+		activityOrderSvc.completeEndedPaidOrders();
+	}
 }

@@ -364,6 +364,8 @@ public class FrontActivityController {
 			return statusMap;
 		}
 
+		activityOrderSvc.completeEndedPaidOrders();
+
 		for (String rawOrderId : orderIds.split(",")) {
 			Integer orderId = parseInteger(rawOrderId);
 			if (orderId == null) {
