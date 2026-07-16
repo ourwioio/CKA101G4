@@ -50,7 +50,7 @@
                 <td th:text="${report.serviceReportId}">1</td>
                 <td th:text="${report.service != null ? report.service.serviceId : '-'}">1</td>
                 <td th:text="${report.reporterMember != null ? report.reporterMember.memberId : '-'}">1</td>
-                <td th:text="${report.employee != null ? report.employee.employeeId : '未指派'}">-</td>
+                <td th:text="${report.employee != null ? report.employee.employeeId : '尚未處理'}">-</td>
                 <td class="content-cell" th:text="${report.serviceReportCom}" th:title="${report.serviceReportCom}">檢舉內容...</td>
                 <td th:text="${#temporals.format(report.serviceReportTime, 'yyyy-MM-dd HH:mm')}">2026-01-01</td>
                 <td th:text="${report.serviceReportHandleTime != null ? #temporals.format(report.serviceReportTime, 'yyyy-MM-dd HH:mm') : '尚未處理'}">-</td>
@@ -59,6 +59,10 @@
                           th:class="${report.serviceReportStatus == 0} ? 'status-badge status-pending' : (${report.serviceReportStatus == 1} ? 'status-badge status-approved' : 'status-badge status-rejected')"
                           th:text="${report.serviceReportStatus == 0} ? '未審核' : (${report.serviceReportStatus == 1} ? '已審核通過' : '已審核未通過')">狀態</span>
                 </td>
+                
+			<p th:text="${session.employeeVO?.employeeId}"></p>
+			<input type="hidden" name="employee.employeeId"
+				th:value="${session.employeeVO?.employeeId}" />
                 <td>
                     <form th:action="@{/serviceReport/getOne_For_update}" method="post">
                         <input type="hidden" name="serviceReportId" th:value="${report.serviceReportId}"/>

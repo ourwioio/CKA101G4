@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.webond.employee.model.EmployeeVO;
+import com.webond.employee.repository.EmployeeRepository;
 import com.webond.service.model.ServiceReportVO;
 import com.webond.service.service.ServiceReportService;
 
@@ -25,16 +26,51 @@ public class ServiceReportController {
 	@Autowired
 	ServiceReportService serviceReportService;
 	
-	@GetMapping("/fakeLogin")
-	public String fakeLogin(HttpSession session) {
-		session.setAttribute("loginEmployeeId", 1001);
-		return "back-end/member/empPage";
-	}
+	@Autowired
+	EmployeeRepository employeeRepository;
+	
+
+    private static final String EMPLOYEE_SESSION_KEY =
+            "employeeVO";
+    
+
+    private EmployeeVO getLoginEmployeeVO(
+            HttpSession session) {
+
+        Object sessionObject =
+                session.getAttribute(
+                        EMPLOYEE_SESSION_KEY
+                );
+
+        if (sessionObject instanceof EmployeeVO employeeVO) {
+            return employeeVO;
+        }
+
+        return null;
+    }
+
+    private Integer getLoginEmployeeId(
+            HttpSession session) {
+
+        EmployeeVO employeeVO =
+                getLoginEmployeeVO(session);
+
+        if (employeeVO == null) {
+            return null;
+        }
+
+        return employeeVO.getEmployeeId();
+    }
+
+
 	
 	@GetMapping("/listAllServiceReport")
 	public String listAllServiceReport(
 	        @RequestParam(required = false) Byte status,
-	        ModelMap model) {
+	        ModelMap model,HttpSession session) {
+        Integer loginEmployeeId =
+                getLoginEmployeeId(session);
+	  
 		List<ServiceReportVO> list;
 		
 	    if (status == null) {
@@ -52,10 +88,9 @@ public class ServiceReportController {
 	@PostMapping("getOne_For_update")
 	public String getOneServiceReport(@RequestParam("serviceReportId") Integer serviceReportId, ModelMap model,HttpSession session) {
 
-		Integer employeeId = (Integer) session.getAttribute("loginEmployeeId");
-		if (employeeId == null) {
-			return "redirect:/serviceReport/fakeLogin";
-		}
+        Integer loginEmployeeId =
+                getLoginEmployeeId(session);
+	  
 		
 		ServiceReportVO serviceReportVO = serviceReportService.getOneServiceReport(serviceReportId);
 		model.addAttribute("serviceReportVO", serviceReportVO);
@@ -65,14 +100,9 @@ public class ServiceReportController {
 	
 	@PostMapping("update")
 	public String update(@Valid ServiceReportVO serviceReportVO, BindingResult result, ModelMap model, HttpSession session) {
+	    Integer loginEmployeeId = getLoginEmployeeId(session);
 
-		Integer employeeId = (Integer) session.getAttribute("loginEmployeeId");
-		if (employeeId == null) {
-			return "redirect:/serviceReport/fakeLogin";
-		}
-
-	    EmployeeVO employee = new EmployeeVO();
-	    employee.setEmployeeId(employeeId);
+	    EmployeeVO employee = employeeRepository.getReferenceById(loginEmployeeId);
 	    serviceReportVO.setEmployee(employee);
 	  
 		try {
