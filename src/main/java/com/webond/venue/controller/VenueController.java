@@ -19,12 +19,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.webond.employee.model.EmployeeVO;
 import com.webond.venue.model.VenueTypeVO;
 import com.webond.venue.model.VenueVO;
 import com.webond.venue.service.VenueImagesService;
 import com.webond.venue.service.VenueService;
 import com.webond.venue.service.VenueTypeService;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
@@ -147,7 +149,13 @@ public class VenueController {
 	}
 
 	@GetMapping("listAllVenue")
-	public String listAllVenue(ModelMap model) {
+	public String listAllVenue(ModelMap model, HttpSession session) {
+		
+		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
+		if (loginEmp == null) {
+			return "redirect:/admin/login";
+		}
+		
 		List<VenueVO> list = venueService.getAll();
 		model.addAttribute("venueListData", list);
 		return "back-end/venue/listAllVenue";

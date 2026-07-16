@@ -256,7 +256,8 @@ public class VenueFrontOrderController {
 
 	@PostMapping("updateReview")
 	public String updateReview(@RequestParam("venueOrderId") Integer venueOrderId,
-	        @RequestParam("venueRating") Integer venueRating, @RequestParam("venueComment") String venueComment,
+	        @RequestParam("venueRating") Integer venueRating, 
+	        @RequestParam("venueComment") String venueComment,
 	        HttpSession session) {
 
 	    MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
@@ -266,6 +267,17 @@ public class VenueFrontOrderController {
 
 	    try {
 	        venueOrderService.submitReview(venueOrderId, loginMember.getMemberId(), venueRating, venueComment);
+	        
+	        VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
+	        VenueVO venueVO = venueService.getOneVenue(venueOrderVO.getVenueVO().getVenueId());
+	        // 新增通知給場地主
+			NotificationVO notificationVO = new NotificationVO();
+			notificationVO.setMember(venueVO.getMember());
+			notificationVO.setTitle("場地被評價通知");
+			notificationVO.setContent("您的場地" + venueVO.getVenueName() + "已被評價");
+			notificationVO.setNotificationType((byte) 2);
+			notificationService.addNotification(notificationVO);
+	        
 	    } catch (RuntimeException e) {
 	        // 之後可以視需要用 RedirectAttributes 帶錯誤訊息回頁面顯示
 	        // 目前先讓它靜默失敗、不讓整個 request 500
@@ -320,6 +332,15 @@ public class VenueFrontOrderController {
 	        venueOrderVO.setRefundReason(refundReason);
 	        venueOrderService.updateVenueOrder(venueOrderVO);
 	    }
+	    VenueVO venueVO = venueService.getOneVenue(venueOrderVO.getVenueVO().getVenueId());
+		// 新增通知給場地主
+		NotificationVO notificationVO = new NotificationVO();
+		notificationVO.setMember(venueVO.getMember());
+		notificationVO.setTitle("場地訂單取消通知");
+		notificationVO.setContent("您的" + venueVO.getVenueName() + "預約已被取消");
+		notificationVO.setNotificationType((byte) 0);
+		notificationService.addNotification(notificationVO);
+	    
 	    return "redirect:/front/venueOrder/myVenueOrder";
 	}
 	
