@@ -125,7 +125,7 @@ public class MemberFrontControllerAyaka {
 		MemberVO memberVO = memberService.getOneMember(memberId);
 	    ServiceVO serviceList = serviceService.getOneService(memberId);
 	    List<ActivityVO> activityList = activityService.getActivitiesByMemberId(memberId);
-	    List<VenueVO> venueList = venueService.getVenuesByMember(memberId);
+	    List<VenueVO> venueList = venueService.getActiveByMember(memberId);
 	    List<MemberReviewDTO> reviews = myReviewService.getReviewsByMemberId(memberId);
 	    List<ActivityOrderVO> completedActivityOrders = activityOrderService.getOrdersByBuyerMemberId(memberId)
 	            .stream()
