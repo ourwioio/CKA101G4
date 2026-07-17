@@ -89,6 +89,15 @@ public class VenueReportService {
 				.collect(Collectors.toSet());
 	}
 
+	// ===== 批次查詢：這些訂單各自的檢舉內容（供列表頁點開查看用，每筆訂單僅能檢舉一次）=====
+	public Map<Integer, VenueReportVO> getReportsByOrderIds(List<Integer> venueOrderIds) {
+		if (venueOrderIds == null || venueOrderIds.isEmpty()) {
+			return Collections.emptyMap();
+		}
+		return venueReportRepository.findByVenueOrderIdIn(venueOrderIds).stream()
+				.collect(Collectors.toMap(VenueReportVO::getVenueOrderId, r -> r));
+	}
+
 	/**
 	 * 後台：檢舉成立 ① 檢舉狀態 → 1（審核通過） ② 場地提供者違規點數 +1（停權判斷由會員模組負責） ③
 	 * VENUE_REVIEW.reviewStatus → 0（審核中），清空審核人／備註／審核時間 ④ VENUE.venueStatus →

@@ -118,7 +118,13 @@
                         <th:block th:if="${order.orderStatus == 3}">
 	                         <a th:if="${reportedOrderIds == null or !reportedOrderIds.contains(order.venueOrderId)}"
 							       th:href="@{/venueReports/addVenueReport(venueOrderId=${order.venueOrderId})}" class="btn-report">檢舉</a>
-							    <span class="badge status-cancel" th:if="${reportedOrderIds != null and reportedOrderIds.contains(order.venueOrderId)}">已檢舉</span>
+							    <button type="button" class="btn-view-review"
+							            th:if="${reportedOrderIds != null and reportedOrderIds.contains(order.venueOrderId)}"
+							            th:with="report=${reportsByOrderId.get(order.venueOrderId)}"
+							            th:attr="data-content=${report != null} ? ${report.serReportCom} : '',
+							                     data-time=${report != null and report.serReportTime != null} ? ${#temporals.format(report.serReportTime, 'yyyy-MM-dd HH:mm')} : '',
+							                     data-status=${report != null} ? ${report.reportStatus} : ''"
+							            onclick="openViewReportModal(this)">查看檢舉</button>
 							    <button type="button" class="btn-review"
 							            th:if="${order.venueRating == null}"
 							            th:attr="data-order-id=${order.venueOrderId}"
@@ -193,6 +199,21 @@
 
         <div class="modal-actions">
             <button type="button" class="btn-cancel" onclick="closeViewReviewModal()">關閉</button>
+        </div>
+    </div>
+</div>
+
+<!-- 查看檢舉 Modal -->
+<div class="modal-overlay" id="viewReportModalOverlay">
+    <div class="modal-box">
+        <h3>我的檢舉</h3>
+
+        <span class="badge view-report-status" id="viewReportStatus"></span>
+        <p class="view-review-comment" id="viewReportContent"></p>
+        <p class="view-report-time" id="viewReportTime"></p>
+
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel" onclick="closeViewReportModal()">關閉</button>
         </div>
     </div>
 </div>

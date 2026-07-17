@@ -56,6 +56,30 @@ document.getElementById('viewReviewModalOverlay').addEventListener('click', func
     if (e.target === this) closeViewReviewModal();
 });
 
+var REPORT_STATUS_LABELS = { '0': '審核中', '1': '審核通過（檢舉成立）', '2': '審核未通過' };
+
+function openViewReportModal(btn) {
+    var content = btn.getAttribute('data-content');
+    var time = btn.getAttribute('data-time');
+    var status = btn.getAttribute('data-status');
+
+    var contentEl = document.getElementById('viewReportContent');
+    contentEl.textContent = (content && content.trim() !== '') ? content : '（沒有留下檢舉內容）';
+
+    document.getElementById('viewReportTime').textContent = time ? '檢舉時間：' + time : '';
+    document.getElementById('viewReportStatus').textContent = REPORT_STATUS_LABELS[status] || '審核中';
+
+    document.getElementById('viewReportModalOverlay').style.display = 'flex';
+}
+
+function closeViewReportModal() {
+    document.getElementById('viewReportModalOverlay').style.display = 'none';
+}
+
+document.getElementById('viewReportModalOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeViewReportModal();
+});
+
 // 🌟 分頁設定
 const PAGE_SIZE = 3;
 let currentPage = 1;

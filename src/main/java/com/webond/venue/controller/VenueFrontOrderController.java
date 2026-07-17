@@ -257,6 +257,7 @@ public class VenueFrontOrderController {
 
 		List<Integer> orderIds = list.stream().map(VenueOrderVO::getVenueOrderId).collect(Collectors.toList());
 		model.addAttribute("reportedOrderIds", venueReportService.getReportedOrderIds(orderIds));
+		model.addAttribute("reportsByOrderId", venueReportService.getReportsByOrderIds(orderIds));
 
 		LocalDate cutoff = LocalDate.now().plusDays(3);
 	    model.addAttribute("cancelCutoff", cutoff);
