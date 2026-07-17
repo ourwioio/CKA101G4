@@ -85,6 +85,15 @@ public class VenueFrontOrderController {
 			return "redirect:/member/login";
 		}
 
+		LocalDate today = LocalDate.now();
+		if (venueOrderDTO.getBookDate() != null && venueOrderDTO.getBookDate().isBefore(today)) {
+			result.rejectValue("bookDate", "error.venueOrderDTO", "無法預約過去的日期");
+		} else if (venueOrderDTO.getBookDate() != null && venueOrderDTO.getBookDate().isEqual(today)
+				&& venueOrderDTO.getStartHour() != null
+				&& venueOrderDTO.getStartHour() < LocalDateTime.now().getHour()) {
+			result.rejectValue("startHour", "error.venueOrderDTO", "無法預約今天已經過去的時段");
+		}
+
 		if (result.hasErrors()) {
 			VenueVO venueVO = venueService.getOneVenue(venueOrderDTO.getVenueId());
 			model.addAttribute("venueVO", venueVO);

@@ -21,4 +21,6 @@ public interface VenueSlotRepository extends JpaRepository<VenueSlotVO, Integer>
     
 	@Query("SELECT MAX(s.slotDate) FROM VenueSlotVO s WHERE s.venueVO.venueId = :venueId")
 	LocalDate findMaxSlotDateByVenueId(@Param("venueId") Integer venueId);
+
+	void deleteBySlotDateBefore(LocalDate date);
 }

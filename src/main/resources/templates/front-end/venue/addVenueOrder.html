@@ -35,7 +35,7 @@
 			<div class="form-group">
 				<label>選擇日期</label>
 				<div class="slot-grid">
-					<div th:each="slot : ${venueVO.venueSlots}">
+					<div th:each="slot : ${venueVO.venueSlots}" th:if="${!slot.slotDate.isBefore(T(java.time.LocalDate).now())}">
 						<button type="button"
 						        th:if="${slot.slotStatus != null and slot.slotStatus.contains('0')}"
 						        class="slot-btn slot-available"

@@ -280,4 +280,10 @@ public class VenueService {
 		}
 	}
 
+	// 排程器用，清除已經過去的舊時段紀錄
+	@Transactional
+	public void deletePastSlots() {
+		venueSlotRepository.deleteBySlotDateBefore(LocalDate.now());
+	}
+
 }
