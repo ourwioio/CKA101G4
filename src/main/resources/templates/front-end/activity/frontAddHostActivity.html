@@ -1,518 +1,938 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
-<head>
-<meta charset="UTF-8">
-<title>我要辦活動</title>
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-  <link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
-  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
-<style>
-body {
-	background: #f8fafc;
-	color: #1e293b;
-	font-family: "Microsoft JhengHei", sans-serif;
-	margin: 0;
-	padding: 40px;
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我要辦活動</title>
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+
+  <style>
+/* ==========================================================
+   Webond 我要辦活動頁 — 圓潤角色風 (cream / ink / pastel blobs)
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+
+:root{
+  --color-bg:            #F7F3EC;
+  --color-surface:       #FFFFFF;
+  --color-surface-soft:  #FFFDF8;
+  --color-ink:           #17140F;
+  --color-ink-soft:      #726A5F;
+  --color-border:        #ECE4D6;
+
+  --color-yellow:       #FFE59A;
+  --color-yellow-deep:  #FFC94D;
+  --color-pink:         #FFB5C1;
+  --color-green:        #B7E1D1;
+  --color-blue:         #A9D3FF;
+  --color-red:          #FF5271;
+
+  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+
+  --nav-height: 76px;
 }
 
+*{ box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding: 40px 20px;
+}
+
+h1, h2, h3, h4 { font-family: var(--font-display); margin: 0; }
+a { text-decoration: none; color: inherit; }
+
+/* ==========================================================
+   頂部大標頭與返回按鈕
+   ========================================================== */
 .header-container {
-	max-width: 950px;
-	margin: 0 auto 20px auto;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	border-bottom: 2px solid #e2e8f0;
-	padding-bottom: 20px;
+  max-width: 950px;
+  margin: calc(var(--nav-height) ) auto 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px dashed var(--color-border);
+  padding-bottom: 20px;
+  gap: 20px;
 }
 
 .header-title {
-	font-size: 1.8rem;
-	font-weight: bold;
-	color: #0f172a;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-ink);
+  position: relative;
+  padding-left: 18px;
+  font-family: var(--font-display);
+}
+.header-title::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--color-yellow-deep);
 }
 
-.btn-secondary {
-	background: white;
-	color: #475569;
-	border: 1px solid #cbd5e1;
-	padding: 10px 20px;
-	border-radius: 8px;
-	text-decoration: none;
-	font-weight: bold;
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-border);
+  font-weight: 800;
+  font-size: 13.5px;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.back-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-ink);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface-soft);
 }
 
+/* ==========================================================
+   Q 萌活動建立大卡片
+   ========================================================== */
 .form-card {
-	background: white;
-	max-width: 950px;
-	margin: auto;
-	border-radius: 12px;
-	padding: 30px 40px;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, .08);
+  background: var(--color-surface);
+  max-width: 950px;
+  margin: 0 auto 60px auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 40px;
+  box-shadow: var(--shadow-sm);
 }
 
 .form-grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
 }
 
 .col-span-2 {
-	grid-column: span 2;
+  grid-column: span 2;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .form-group label {
-	display: block;
-	margin-bottom: 8px;
-	font-weight: bold;
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--color-ink);
+  padding-left: 4px;
+  display: block;
 }
 
 .required {
-	color: red;
+  color: var(--color-red);
+  margin-left: 2px;
 }
 
+/* ==========================================================
+   手寫感輸入框樣式
+   ========================================================== */
 .form-control {
-	width: 100%;
-	padding: 12px;
-	border: 1px solid #cbd5e1;
-	border-radius: 8px;
-	box-sizing: border-box;
-	font-size: 15px;
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  font-weight: 450;
+  color: var(--color-ink-soft);
+  background: var(--color-surface-soft);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
 }
 
+.form-control:focus {
+  border-color: var(--color-yellow-deep);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+/* 唯讀/禁用欄位：沙色灰底風格 */
+.form-control[readonly], .form-control:disabled {
+  background: #ECE4D6 !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-ink-soft) !important;
+  cursor: not-allowed;
+  font-weight: 600;
+}
+
+/* ==========================================================
+   🌟 100% 自訂 Q 萌下拉選單造型 CSS
+   ========================================================== */
+.custom-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* 下拉選單觸發按鈕 */
+.custom-select-trigger {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  background: var(--color-surface-soft);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  padding-right: 38px; /* 為箭頭留白 */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color .15s ease, background .15s ease;
+  position: relative;
+  user-select: none;
+}
+
+.custom-select-trigger:hover {
+  border-color: var(--color-ink-soft);
+}
+
+.custom-select-trigger.active {
+  border-color: var(--color-yellow-deep);
+  background: var(--color-surface);
+}
+
+/* 粗線條微胖小箭頭（展開時旋轉 180 度） */
+.custom-select-trigger .trigger-arrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2317140F' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transition: transform .22s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+.custom-select-trigger.active .trigger-arrow {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* 🌟 下拉選項彈出選單（24px 大圓角與陰影效果） */
+.custom-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 24px; /* 24px 大圓角 */
+  box-shadow: var(--shadow-md); /* 舒適的擴散柔和陰影 */
+  padding: 12px;
+  z-index: 100;
+  max-height: 280px;
+  overflow-y: auto;
+  scrollbar-width: none; /* 隱藏滾動條 */
+  -ms-overflow-style: none; /* 隱藏滾動條 */
+}
+
+/* 隱藏 Chrome/Safari 滾動條 */
+.custom-dropdown-menu::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-dropdown-menu.show {
+  display: block;
+}
+
+/* 下拉選項 */
+.custom-option {
+  padding: 12px 16px;
+  border-radius: var(--radius-md); /* 16px */
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+  user-select: none;
+}
+
+/* Hover 滑過時：溫和奶油黃底，字體變深 */
+.custom-option:hover {
+  background: var(--color-surface-soft);
+  color: var(--color-ink);
+}
+
+/* 選中狀態：精緻暖黃色 */
+.custom-option.selected {
+  background: var(--color-yellow);
+  color: var(--color-ink);
+}
+
+/* 🌟 禁用/唯讀狀態下的自訂下拉選單 */
+.custom-select-wrapper.disabled .custom-select-trigger {
+  background: #ECE4D6 !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-ink-soft) !important;
+  cursor: not-allowed;
+  pointer-events: none; /* 防止任何點擊事件 */
+}
+
+/* ==========================================================
+   動態生成時間選擇器排版 (fallback 原生 select 樣式)
+   ========================================================== */
 .datetime-picker {
-	display: grid;
-	grid-template-columns: minmax(180px, 1fr) 110px 110px;
-	gap: 10px;
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 110px 110px;
+  gap: 12px;
 }
 
 .datetime-picker .form-control {
-	min-width: 0;
+  min-width: 0;
+}
+
+/* 原生 Fallback select 小箭頭 */
+select.form-control {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2317140F' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 14px;
+  padding-right: 40px;
+  cursor: pointer;
+}
+
+/* 時間選擇器專屬窄版箭頭設定 */
+.datetime-picker select.form-control {
+  padding-right: 28px;
+  background-position: right 8px center;
+  background-size: 12px;
 }
 
 textarea.form-control {
-	min-height: 120px;
-	resize: vertical;
+  min-height: 130px;
+  resize: vertical;
+  line-height: 1.7;
 }
 
+/* ==========================================================
+   檢核與錯誤提示樣式 (溫和去框線)
+   ========================================================== */
 .error {
-	color: red;
-	font-size: 14px;
-	margin-top: 5px;
-	font-weight: bold;
+  color: var(--color-red);
+  font-size: 13px;
+  margin-top: 6px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
+/* 檢核錯誤時的紅框與粉紅軟底 */
 .input-error {
-	border: 2px solid red !important;
+  border-color: var(--color-red) !important;
+  background-color: #FFF5F6 !important;
 }
 
 .hint {
-	color: #64748b;
-	font-size: 13px;
-	margin-top: 6px;
+  color: var(--color-ink-soft);
+  font-size: 13px;
+  margin-top: 8px;
+  font-weight: 600;
 }
 
+/* 圖片預覽區 */
 .image-preview {
-	width: 160px;
-	height: 120px;
-	object-fit: cover;
-	border-radius: 8px;
-	border: 1px solid #e2e8f0;
-	margin: 8px 0;
-	display: block;
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-border);
+  margin-bottom: 12px;
+  background: var(--color-surface-soft);
+  display: block;
 }
 
+input[type="file"].form-control {
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+/* ==========================================================
+   按鈕操作底列 (與警告框連動)
+   ========================================================== */
 .form-actions {
-	display: flex;
-	justify-content: flex-end;
-	gap: 12px;
-	margin-top: 30px;
-	padding-top: 20px;
-	border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px dashed var(--color-border);
+}
+
+/* 時間檢核警告框 (極簡無框無影、常規字重 400 樣式) */
+#timeValidationError {
+  background: var(--color-pink);
+  color: var(--color-ink);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-size: 13.5px;
+  font-weight: 400;
+  margin-right: auto;
+  display: none; /* 預設不顯示 */
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-submit, .btn-cancel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 14.5px;
+  padding: 11px 26px;
+  border-radius: var(--radius-full);
+  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
 }
 
 .btn-submit {
-	background: #8b5cf6;
-	color: white;
-	border: none;
-	padding: 12px 24px;
-	border-radius: 8px;
-	cursor: pointer;
-	font-weight: bold;
+  background: var(--color-ink);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-yellow-deep);
+  color: var(--color-ink);
 }
 
 .btn-cancel {
-	background: white;
-	color: #475569;
-	border: 1px solid #cbd5e1;
-	padding: 12px 24px;
-	border-radius: 8px;
-	text-decoration: none;
-	font-weight: bold;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
 }
-</style>
+.btn-cancel:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-ink);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface-soft);
+}
+
+/* ==========================================================
+   RWD
+   ========================================================== */
+@media (max-width: 760px) {
+  .header-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin-top: calc(var(--nav-height) + 20px);
+  }
+  .back-btn { width: 100%; text-align: center; }
+  .form-card { padding: 28px 20px; }
+  .form-grid { grid-template-columns: 1fr; gap: 20px; }
+  .col-span-2 { grid-column: span 1; }
+  .datetime-picker { grid-template-columns: 1fr; }
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 12px;
+  }
+  .btn-submit, .btn-cancel { width: 100%; text-align: center; }
+  #timeValidationError { width: 100%; margin-right: 0; }
+}
+  </style>
+  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 </head>
 
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
+
 <body>
 
-	<div class="header-container">
-		<div class="header-title" th:text="${formTitle ?: '我要辦活動'}">我要辦活動</div>
+  <!-- ========== 大標頭區 ========== -->
+  <div class="header-container">
+    <h1 class="header-title" th:text="${formTitle ?: '我要辦活動'}">我要辦活動</h1>
+    <a th:href="${cancelUrl ?: '/'}" class="back-btn" th:text="${cancelText ?: '返回首頁'}">返回首頁</a>
+  </div>
 
-		<a th:href="${cancelUrl ?: '/'}" class="btn-secondary"
-			th:text="${cancelText ?: '返回使用者首頁'}">返回使用者首頁</a>
-	</div>
+  <!-- ========== 活動表單卡片 ========== -->
+  <div class="form-card">
 
-	<div class="form-card">
+    <form th:action="@{/activity/front/insertHostActivity}" th:object="${activityVO}" method="post" enctype="multipart/form-data">
 
-		<form th:action="@{/activity/front/insertHostActivity}"
-			th:object="${activityVO}" method="post" enctype="multipart/form-data">
+      <!-- 隱藏數據繫結欄位 -->
+      <input type="hidden" th:field="*{memberId}"> 
+      <input type="hidden" th:field="*{attendeesCount}"> 
+      <input type="hidden" th:field="*{activityStatus}">
+      <input type="hidden" name="sourceActivityId" th:value="${sourceActivityId}">
 
-			<input type="hidden" th:field="*{memberId}"> <input
-				type="hidden" th:field="*{attendeesCount}"> <input
-				type="hidden" th:field="*{activityStatus}">
-			<input type="hidden" name="sourceActivityId" th:value="${sourceActivityId}">
+      <div class="form-grid">
 
-			<div class="form-grid">
+        <!-- 1. 活動標題 -->
+        <div class="form-group col-span-2">
+          <label>活動標題 <span class="required">*</span></label> 
+          <input type="text" th:field="*{activityTitle}" class="form-control" 
+                 placeholder="請輸入一個響亮好記的活動名稱"
+                 th:readonly="${sourceActivityId != null}"
+                 th:classappend="${#fields.hasErrors('activityTitle')} ? ' input-error'">
 
-				<div class="form-group col-span-2">
-					<label>活動標題 <span class="required">*</span></label> <input
-						type="text" th:field="*{activityTitle}" class="form-control"
-						placeholder="請輸入活動標題"
-						th:readonly="${sourceActivityId != null}"
-						th:classappend="${#fields.hasErrors('activityTitle')} ? ' input-error'">
+          <div class="error" th:if="${#fields.hasErrors('activityTitle')}" th:errors="*{activityTitle}"></div>
+        </div>
 
-					<div class="error" th:if="${#fields.hasErrors('activityTitle')}"
-						th:errors="*{activityTitle}"></div>
-				</div>
+        <!-- 🌟 2. 活動類型 (已升級為 100% 自訂 Q 萌大圓角下拉選單) -->
+        <div class="form-group">
+          <label>活動類型 <span class="required">*</span></label> 
+          
+          <div class="custom-select-wrapper" th:classappend="${sourceActivityId != null} ? 'disabled'">
+            <!-- 完全綁定原本 Thymeleaf 的 th:field，儲存真實的值 -->
+            <input type="hidden" th:field="*{activityTypeId}">
+            
+            <!-- 選單觸發器 -->
+            <div class="custom-select-trigger" th:classappend="${#fields.hasErrors('activityTypeId')} ? ' input-error'">
+              <span class="trigger-text">請選擇活動類別</span>
+              <span class="trigger-arrow"></span>
+            </div>
+            
+            <!-- 彈出式選單 (當再次舉辦被鎖定時，此選單不會渲染以加強安全性) -->
+            <div class="custom-dropdown-menu" th:unless="${sourceActivityId != null}">
+              <div class="custom-option" data-value="">請選擇活動類別</div>
+              <div class="custom-option" th:each="type : ${typeListData}"
+                   th:data-value="${type.activityTypeId}"
+                   th:text="${type.activityTypeName}">類別名稱</div>
+            </div>
+          </div>
 
-				<div class="form-group">
-					<label>活動類型 <span class="required">*</span></label> <select
-						th:field="*{activityTypeId}" class="form-control"
-						th:disabled="${sourceActivityId != null}"
-						th:classappend="${#fields.hasErrors('activityTypeId')} ? ' input-error'">
-						<option value="">請選擇活動類別</option>
-						<option th:each="type : ${typeListData}"
-							th:value="${type.activityTypeId}"
-							th:text="${type.activityTypeName}"></option>
-					</select>
-					<input th:if="${sourceActivityId != null}" type="hidden"
-						th:field="*{activityTypeId}">
+          <div class="error" th:if="${#fields.hasErrors('activityTypeId')}" th:errors="*{activityTypeId}"></div>
+        </div>
 
-					<div class="error" th:if="${#fields.hasErrors('activityTypeId')}"
-						th:errors="*{activityTypeId}"></div>
-				</div>
+        <!-- 3. 活動費用 -->
+        <div class="form-group">
+          <label>活動費用 (NT$) <span class="required">*</span></label> 
+          <input type="number" th:field="*{activityPrice}" class="form-control" min="0"
+                 placeholder="免費活動請填寫 0"
+                 th:readonly="${sourceActivityId != null}"
+                 th:classappend="${#fields.hasErrors('activityPrice')} ? ' input-error'">
 
-				<div class="form-group">
-					<label>活動費用 <span class="required">*</span></label> <input
-						type="number" th:field="*{activityPrice}" class="form-control"
-						min="0"
-						th:readonly="${sourceActivityId != null}"
-						th:classappend="${#fields.hasErrors('activityPrice')} ? ' input-error'">
+          <div class="error" th:if="${#fields.hasErrors('activityPrice')}" th:errors="*{activityPrice}"></div>
+        </div>
 
-					<div class="error" th:if="${#fields.hasErrors('activityPrice')}"
-						th:errors="*{activityPrice}"></div>
-				</div>
+        <!-- 4. 最低成團人數 -->
+        <div class="form-group">
+          <label>最低成團人數 <span class="required">*</span></label> 
+          <input type="number" th:field="*{minParticipants}" class="form-control" min="1"
+                 placeholder="請輸入最低人數限制"
+                 th:readonly="${sourceActivityId != null}"
+                 th:classappend="${#fields.hasErrors('minParticipants')} ? ' input-error'">
 
-				<div class="form-group">
-					<label>最低成團人數 <span class="required">*</span></label> <input
-						type="number" th:field="*{minParticipants}" class="form-control"
-						min="1"
-						th:readonly="${sourceActivityId != null}"
-						th:classappend="${#fields.hasErrors('minParticipants')} ? ' input-error'">
+          <div class="error" th:if="${#fields.hasErrors('minParticipants')}" th:errors="*{minParticipants}"></div>
+        </div>
 
-					<div class="error" th:if="${#fields.hasErrors('minParticipants')}"
-						th:errors="*{minParticipants}"></div>
-				</div>
+        <!-- 5. 最高人數限制 -->
+        <div class="form-group">
+          <label>最高人數限制 <span class="required">*</span></label> 
+          <input type="number" th:field="*{maxParticipants}" class="form-control" min="1"
+                 placeholder="請輸入最高人數限制"
+                 th:readonly="${sourceActivityId != null}"
+                 th:classappend="${#fields.hasErrors('maxParticipants')} ? ' input-error'">
 
-				<div class="form-group">
-					<label>最高人數限制 <span class="required">*</span></label> <input
-						type="number" th:field="*{maxParticipants}" class="form-control"
-						min="1"
-						th:readonly="${sourceActivityId != null}"
-						th:classappend="${#fields.hasErrors('maxParticipants')} ? ' input-error'">
+          <div class="error" th:if="${#fields.hasErrors('maxParticipants')}" th:errors="*{maxParticipants}"></div>
+        </div>
 
-					<div class="error" th:if="${#fields.hasErrors('maxParticipants')}"
-						th:errors="*{maxParticipants}"></div>
-				</div>
+        <!-- 6. 報名開始時間 -->
+        <div class="form-group">
+          <label>報名開始時間 <span class="required">*</span></label> 
+          <input type="datetime-local" th:field="*{registrationStartTime}"
+                 class="form-control" step="300" lang="zh-TW"
+                 th:classappend="${#fields.hasErrors('registrationStartTime')} ? ' input-error'">
 
-				<div class="form-group">
-					<label>報名開始時間 <span class="required">*</span></label> <input
-						type="datetime-local" th:field="*{registrationStartTime}"
-						class="form-control" step="300" lang="zh-TW"
-						th:classappend="${#fields.hasErrors('registrationStartTime')} ? ' input-error'">
+          <div class="error" th:if="${#fields.hasErrors('registrationStartTime')}" th:errors="*{registrationStartTime}"></div>
+        </div>
 
-					<div class="error"
-						th:if="${#fields.hasErrors('registrationStartTime')}"
-						th:errors="*{registrationStartTime}"></div>
-				</div>
+        <!-- 7. 報名截止時間 -->
+        <div class="form-group">
+          <label>報名截止時間 <span class="required">*</span></label> 
+          <input type="datetime-local" th:field="*{registrationDeadline}"
+                 class="form-control" step="300" lang="zh-TW"
+                 th:classappend="${#fields.hasErrors('registrationDeadline')} ? ' input-error'">
 
-				<div class="form-group">
-					<label>報名截止時間 <span class="required">*</span></label> <input
-						type="datetime-local" th:field="*{registrationDeadline}"
-						class="form-control" step="300" lang="zh-TW"
-						th:classappend="${#fields.hasErrors('registrationDeadline')} ? ' input-error'">
+          <div class="error" th:if="${#fields.hasErrors('registrationDeadline')}" th:errors="*{registrationDeadline}"></div>
+        </div>
 
-					<div class="error"
-						th:if="${#fields.hasErrors('registrationDeadline')}"
-						th:errors="*{registrationDeadline}"></div>
-				</div>
+        <!-- 8. 活動開始時間 -->
+        <div class="form-group">
+          <label>活動開始時間 <span class="required">*</span></label> 
+          <input type="datetime-local" th:field="*{startTime}" class="form-control"
+                 step="300" lang="zh-TW"
+                 th:classappend="${#fields.hasErrors('startTime')} ? ' input-error'">
 
-				<div class="form-group">
-					<label>活動開始時間 <span class="required">*</span></label> <input
-						type="datetime-local" th:field="*{startTime}" class="form-control"
-						step="300" lang="zh-TW"
-						th:classappend="${#fields.hasErrors('startTime')} ? ' input-error'">
+          <div class="error" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}"></div>
+        </div>
 
-					<div class="error" th:if="${#fields.hasErrors('startTime')}"
-						th:errors="*{startTime}"></div>
-				</div>
+        <!-- 9. 活動結束時間 -->
+        <div class="form-group">
+          <label>活動結束時間 <span class="required">*</span></label> 
+          <input type="datetime-local" th:field="*{endTime}" class="form-control"
+                 step="300" lang="zh-TW"
+                 th:classappend="${#fields.hasErrors('endTime')} ? ' input-error'">
 
-				<div class="form-group">
-					<label>活動結束時間 <span class="required">*</span></label> <input
-						type="datetime-local" th:field="*{endTime}" class="form-control"
-						step="300" lang="zh-TW"
-						th:classappend="${#fields.hasErrors('endTime')} ? ' input-error'">
+          <div class="error" th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}"></div>
+        </div>
 
-					<div class="error" th:if="${#fields.hasErrors('endTime')}"
-						th:errors="*{endTime}"></div>
-				</div>
+        <!-- 10. 活動描述 -->
+        <div class="form-group col-span-2">
+          <label>活動描述 <span class="required">*</span></label>
+          <textarea th:field="*{activityDescription}" class="form-control"
+                    placeholder="請詳細描述您的活動內容、集合地點或注意事項..."
+                    th:classappend="${#fields.hasErrors('activityDescription')} ? ' input-error'"></textarea>
 
-				<div class="form-group col-span-2">
-					<label>活動描述 <span class="required">*</span></label>
-					<textarea th:field="*{activityDescription}" class="form-control"
-						placeholder="請輸入活動描述"
-						th:classappend="${#fields.hasErrors('activityDescription')} ? ' input-error'"></textarea>
+          <div class="error" th:if="${#fields.hasErrors('activityDescription')}" th:errors="*{activityDescription}"></div>
+        </div>
 
-					<div class="error"
-						th:if="${#fields.hasErrors('activityDescription')}"
-						th:errors="*{activityDescription}"></div>
-				</div>
+        <!-- 11. 活動圖片與預覽 -->
+        <div class="form-group col-span-2">
+          <label>活動圖片</label>
+          <img id="activityImagePreview" class="image-preview"
+               th:src="${previewImageUrl ?: '/images/activity/default-activity.jpg'}"
+               alt="活動圖片預覽">
+          
+          <input th:if="${sourceActivityId == null}" id="activityImageFile" type="file" name="activityImageFile" class="form-control"
+                 accept="image/jpeg,image/png">
+          
+          <div class="hint" th:if="${sourceActivityId == null}">未選擇圖片時會顯示系統預設圖片，圖片格式限制為 JPG 或 PNG。</div>
+          <div class="hint" th:if="${sourceActivityId != null}">再次舉辦活動將會自動沿用原活動經典大圖。</div>
+          <div class="error" th:if="${imageError}" th:text="${imageError}"></div>
+        </div>
 
-				<div class="form-group col-span-2">
-					<label>活動圖片</label>
-					<img id="activityImagePreview" class="image-preview"
-						th:src="${previewImageUrl ?: '/images/activity/default-activity.jpg'}"
-						alt="活動圖片預覽">
-					<input th:if="${sourceActivityId == null}" id="activityImageFile" type="file" name="activityImageFile" class="form-control"
-						accept="image/jpeg,image/png">
-					<div class="hint" th:if="${sourceActivityId == null}">未選擇圖片時會顯示預設活動圖片，圖片格式限 JPG 或 PNG。</div>
-					<div class="hint" th:if="${sourceActivityId != null}">再次舉辦會沿用原活動圖片。</div>
-					<div class="error" th:if="${imageError}" th:text="${imageError}"></div>
-				</div>
+      </div>
 
-			</div>
+      <!-- ========== 表單提交底列 ========== -->
+      <div class="form-actions">
+        <!-- 溫和無邊框無陰影錯誤檢核框 -->
+        <div id="timeValidationError" style="display:none;"></div>
+        
+        <a th:href="${cancelUrl ?: '/'}" class="btn-cancel">取消</a>
+        <button type="submit" class="btn-submit" th:text="${submitText ?: '建立活動 🚀'}">建立活動 </button>
+      </div>
 
-			<div class="form-actions">
-				<div id="timeValidationError" class="error" style="display:none; margin-right:auto;"></div>
-				<a th:href="${cancelUrl ?: '/'}" class="btn-cancel">取消</a>
-				<button type="submit" class="btn-submit" th:text="${submitText ?: '建立活動'}">建立活動</button>
-			</div>
+    </form>
 
-		</form>
+  </div>
 
-	</div>
+  <!-- ==========================================================
+       🌟 原有核心 JS 行為保持不變，同步完美相容
+       ========================================================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // ==========================================================
+      // 🌟 自訂下拉選單 (活動類型) 互動控制
+      // ==========================================================
+      const selectWrappers = document.querySelectorAll('.custom-select-wrapper');
+      
+      selectWrappers.forEach(wrapper => {
+        // 如果此下拉選單被設定為 disabled，則不綁定點擊事件
+        if (wrapper.classList.contains('disabled')) return;
 
-	<script>
-		document.querySelectorAll('input[type="datetime-local"]').forEach(buildFiveMinutePicker);
+        const trigger = wrapper.querySelector('.custom-select-trigger');
+        const menu = wrapper.querySelector('.custom-dropdown-menu');
+        const hiddenInput = wrapper.querySelector('input[type="hidden"]');
+        const options = wrapper.querySelectorAll('.custom-option');
+        const triggerText = trigger.querySelector('.trigger-text');
+        
+        // 1. 初始化設定：根據 Thymeleaf 繫結寫回 hidden input 的預設值，選取對應項目並顯示文字
+        const defaultValue = hiddenInput.value;
+        let hasActiveSelection = false;
 
-		const hostActivityForm = document.querySelector('form[enctype="multipart/form-data"]');
-		if (hostActivityForm) {
-			hostActivityForm.addEventListener('submit', function(event) {
-				clearTimeValidationError();
-				let hasPastDatetime = false;
-				document.querySelectorAll('input[type="datetime-local"]').forEach(function(input) {
-					if (input.value && new Date(input.value).getTime() < getCurrentFiveMinuteFloor().getTime()) {
-						hasPastDatetime = true;
-					}
-				});
-				if (hasPastDatetime) {
-					event.preventDefault();
-					showTimeValidationError('\u6642\u9593\u4e0d\u53ef\u9078\u64c7\u904e\u53bb\u6642\u9593\uff0c\u8acb\u91cd\u65b0\u9078\u64c7\u3002');
-					return;
-				}
+        options.forEach(option => {
+          if (option.getAttribute('data-value') === defaultValue) {
+            option.classList.add('selected');
+            triggerText.textContent = option.textContent;
+            hasActiveSelection = true;
+          } else {
+            option.classList.remove('selected');
+          }
+        });
 
-				const registrationStart = getDatetimeValue('registrationStartTime');
-				const registrationDeadline = getDatetimeValue('registrationDeadline');
-				const activityStart = getDatetimeValue('startTime');
-				const activityEnd = getDatetimeValue('endTime');
-				if (registrationStart && registrationDeadline && activityStart && activityEnd
-					&& !(registrationStart < registrationDeadline
-						&& registrationDeadline <= activityStart
-						&& activityStart < activityEnd)) {
-					event.preventDefault();
-					showTimeValidationError('\u6642\u9593\u9806\u5e8f\u9700\u70ba\uff1a\u5831\u540d\u958b\u59cb < \u5831\u540d\u622a\u6b62 <= \u6d3b\u52d5\u958b\u59cb < \u6d3b\u52d5\u7d50\u675f\u3002');
-				}
-			});
-		}
+        // 如果沒有匹配到，預設選取第一個選項（請選擇活動類別）
+        if (!hasActiveSelection && options.length > 0) {
+          options[0].classList.add('selected');
+          triggerText.textContent = options[0].textContent;
+        }
+        
+        // 2. 開關點擊事件
+        trigger.addEventListener('click', function(e) {
+          e.stopPropagation();
+          menu.classList.toggle('show');
+          trigger.classList.toggle('active');
+        });
+        
+        // 3. 選項點擊事件
+        options.forEach(option => {
+          option.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            const selectedValue = this.getAttribute('data-value');
+            const selectedText = this.textContent;
+            
+            // 同步寫回 Thymeleaf Hidden 欄位，確保順暢送出
+            hiddenInput.value = selectedValue;
+            triggerText.textContent = selectedText;
+            
+            // 切換選中高亮狀態
+            options.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            // 關閉面板
+            menu.classList.remove('show');
+            trigger.classList.remove('active');
+            
+            // 手動觸發變更事件（如有其他監聽器需要）
+            hiddenInput.dispatchEvent(new Event('change'));
+          });
+        });
+      });
+      
+      // 點選頁面空白處時自動收合選單
+      document.addEventListener('click', function() {
+        document.querySelectorAll('.custom-dropdown-menu').forEach(menu => menu.classList.remove('show'));
+        document.querySelectorAll('.custom-select-trigger').forEach(trigger => trigger.classList.remove('active'));
+      });
+    });
 
-		function buildFiveMinutePicker(originalInput) {
-			const picker = document.createElement('div');
-			const dateInput = document.createElement('input');
-			const hourSelect = document.createElement('select');
-			const minuteSelect = document.createElement('select');
+    // ==========================================================
+    // 🌟 原生時間檢核與五分鐘時間選擇器 JS
+    // ==========================================================
+    document.querySelectorAll('input[type="datetime-local"]').forEach(buildFiveMinutePicker);
 
-			picker.className = 'datetime-picker';
-			dateInput.type = 'date';
-			dateInput.className = 'form-control';
-			dateInput.required = true;
-			hourSelect.className = 'form-control';
-			hourSelect.required = true;
-			minuteSelect.className = 'form-control';
-			minuteSelect.required = true;
+    const hostActivityForm = document.querySelector('form[enctype="multipart/form-data"]');
+    if (hostActivityForm) {
+      hostActivityForm.addEventListener('submit', function(event) {
+        clearTimeValidationError();
+        let hasPastDatetime = false;
+        document.querySelectorAll('input[type="datetime-local"]').forEach(function(input) {
+          if (input.value && new Date(input.value).getTime() < getCurrentFiveMinuteFloor().getTime()) {
+            hasPastDatetime = true;
+          }
+        });
+        if (hasPastDatetime) {
+          event.preventDefault();
+          showTimeValidationError('時間不可選擇過去時間，請重新選擇。');
+          return;
+        }
 
-			addOption(hourSelect, '', '時');
-			for (let hour = 0; hour < 24; hour++) {
-				const value = String(hour).padStart(2, '0');
-				addOption(hourSelect, value, value);
-			}
+        const registrationStart = getDatetimeValue('registrationStartTime');
+        const registrationDeadline = getDatetimeValue('registrationDeadline');
+        const activityStart = getDatetimeValue('startTime');
+        const activityEnd = getDatetimeValue('endTime');
+        if (registrationStart && registrationDeadline && activityStart && activityEnd
+          && !(registrationStart < registrationDeadline
+            && registrationDeadline <= activityStart
+            && activityStart < activityEnd)) {
+          event.preventDefault();
+          showTimeValidationError('時間順序需為：報名開始 < 報名截止 <= 活動開始 < 活動結束。');
+        }
+      });
+    }
 
-			addOption(minuteSelect, '', '分');
-			for (let minute = 0; minute < 60; minute += 5) {
-				const value = String(minute).padStart(2, '0');
-				addOption(minuteSelect, value, value);
-			}
+    function buildFiveMinutePicker(originalInput) {
+      const picker = document.createElement('div');
+      const dateInput = document.createElement('input');
+      const hourSelect = document.createElement('select');
+      const minuteSelect = document.createElement('select');
 
-			if (originalInput.value) {
-				const parts = originalInput.value.split('T');
-				dateInput.value = parts[0] || '';
-				if (parts[1]) {
-					const timeParts = parts[1].split(':');
-					hourSelect.value = timeParts[0] || '';
-					minuteSelect.value = normalizeMinute(timeParts[1] || '');
-				}
-			}
+      picker.className = 'datetime-picker';
+      dateInput.type = 'date';
+      dateInput.className = 'form-control';
+      dateInput.required = true;
+      hourSelect.className = 'form-control';
+      hourSelect.required = true;
+      minuteSelect.className = 'form-control';
+      minuteSelect.required = true;
 
-			originalInput.type = 'hidden';
-			picker.appendChild(dateInput);
-			picker.appendChild(hourSelect);
-			picker.appendChild(minuteSelect);
-			originalInput.insertAdjacentElement('afterend', picker);
-			dateInput.min = formatDate(getCurrentFiveMinuteFloor());
+      addOption(hourSelect, '', '時');
+      for (let hour = 0; hour < 24; hour++) {
+        const value = String(hour).padStart(2, '0');
+        addOption(hourSelect, value, value);
+      }
 
-			[dateInput, hourSelect, minuteSelect].forEach(function(control) {
-				control.addEventListener('change', syncOriginalDatetime);
-			});
+      addOption(minuteSelect, '', '分');
+      for (let minute = 0; minute < 60; minute += 5) {
+        const value = String(minute).padStart(2, '0');
+        addOption(minuteSelect, value, value);
+      }
 
-			dateInput.addEventListener('change', updateDisabledTimeOptions);
-			hourSelect.addEventListener('change', updateDisabledTimeOptions);
-			updateDisabledTimeOptions();
-			syncOriginalDatetime();
+      if (originalInput.value) {
+        const parts = originalInput.value.split('T');
+        dateInput.value = parts[0] || '';
+        if (parts[1]) {
+          const timeParts = parts[1].split(':');
+          hourSelect.value = timeParts[0] || '';
+          minuteSelect.value = normalizeMinute(timeParts[1] || '');
+        }
+      }
 
-			function syncOriginalDatetime() {
-				updateDisabledTimeOptions();
-				if (dateInput.value && hourSelect.value && minuteSelect.value) {
-					originalInput.value = dateInput.value + 'T' + hourSelect.value + ':' + minuteSelect.value;
-				} else {
-					originalInput.value = '';
-				}
-			}
+      originalInput.type = 'hidden';
+      picker.appendChild(dateInput);
+      picker.appendChild(hourSelect);
+      picker.appendChild(minuteSelect);
+      originalInput.insertAdjacentElement('afterend', picker);
+      dateInput.min = formatDate(getCurrentFiveMinuteFloor());
 
-			function updateDisabledTimeOptions() {
-				const now = getCurrentFiveMinuteFloor();
-				const today = formatDate(now);
-				const selectedDate = dateInput.value;
-				const selectedHour = Number(hourSelect.value);
+      [dateInput, hourSelect, minuteSelect].forEach(function(control) {
+        control.addEventListener('change', syncOriginalDatetime);
+      });
 
-				Array.from(hourSelect.options).forEach(function(option) {
-					if (!option.value) {
-						return;
-					}
-					option.disabled = selectedDate === today && Number(option.value) < now.getHours();
-				});
+      dateInput.addEventListener('change', updateDisabledTimeOptions);
+      hourSelect.addEventListener('change', updateDisabledTimeOptions);
+      updateDisabledTimeOptions();
+      syncOriginalDatetime();
 
-				if (hourSelect.value && hourSelect.options[hourSelect.selectedIndex].disabled) {
-					hourSelect.value = '';
-					minuteSelect.value = '';
-				}
+      function syncOriginalDatetime() {
+        updateDisabledTimeOptions();
+        if (dateInput.value && hourSelect.value && minuteSelect.value) {
+          originalInput.value = dateInput.value + 'T' + hourSelect.value + ':' + minuteSelect.value;
+        } else {
+          originalInput.value = '';
+        }
+      }
 
-				Array.from(minuteSelect.options).forEach(function(option) {
-					if (!option.value) {
-						return;
-					}
-					option.disabled = selectedDate === today
-						&& selectedHour === now.getHours()
-						&& Number(option.value) < now.getMinutes();
-				});
+      function updateDisabledTimeOptions() {
+        const now = getCurrentFiveMinuteFloor();
+        const today = formatDate(now);
+        const selectedDate = dateInput.value;
+        const selectedHour = Number(hourSelect.value);
 
-				if (minuteSelect.value && minuteSelect.options[minuteSelect.selectedIndex].disabled) {
-					minuteSelect.value = '';
-				}
-			}
-		}
+        Array.from(hourSelect.options).forEach(function(option) {
+          if (!option.value) {
+            return;
+          }
+          option.disabled = selectedDate === today && Number(option.value) < now.getHours();
+        });
 
-		function addOption(select, value, text) {
-			const option = document.createElement('option');
-			option.value = value;
-			option.textContent = text;
-			select.appendChild(option);
-		}
+        if (hourSelect.value && hourSelect.options[hourSelect.selectedIndex].disabled) {
+          hourSelect.value = '';
+          minuteSelect.value = '';
+        }
 
-		function normalizeMinute(minuteText) {
-			const minute = Number(minuteText);
-			if (Number.isNaN(minute)) {
-				return '';
-			}
-			return String(Math.min(55, Math.round(minute / 5) * 5)).padStart(2, '0');
-		}
+        Array.from(minuteSelect.options).forEach(function(option) {
+          if (!option.value) {
+            return;
+          }
+          option.disabled = selectedDate === today
+            && selectedHour === now.getHours()
+            && Number(option.value) < now.getMinutes();
+        });
 
-		function getCurrentFiveMinuteFloor() {
-			const now = new Date();
-			now.setSeconds(0);
-			now.setMilliseconds(0);
-			now.setMinutes(Math.floor(now.getMinutes() / 5) * 5);
-			return now;
-		}
+        if (minuteSelect.value && minuteSelect.options[minuteSelect.selectedIndex].disabled) {
+          minuteSelect.value = '';
+        }
+      }
+    }
 
-		function formatDate(date) {
-			const year = date.getFullYear();
-			const month = String(date.getMonth() + 1).padStart(2, '0');
-			const day = String(date.getDate()).padStart(2, '0');
-			return year + '-' + month + '-' + day;
-		}
+    function addOption(select, value, text) {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = text;
+      select.appendChild(option);
+    }
 
-		function getDatetimeValue(fieldName) {
-			const input = document.querySelector('input[name="' + fieldName + '"]');
-			if (!input || !input.value) {
-				return null;
-			}
-			const date = new Date(input.value);
-			return Number.isNaN(date.getTime()) ? null : date;
-		}
+    function normalizeMinute(minuteText) {
+      const minute = Number(minuteText);
+      if (Number.isNaN(minute)) {
+        return '';
+      }
+      return String(Math.min(55, Math.round(minute / 5) * 5)).padStart(2, '0');
+    }
 
+    // 當前 5 分鐘向下取整
+    function getCurrentFiveMinuteFloor() {
+      const now = new Date();
+      now.setSeconds(0);
+      now.setMilliseconds(0);
+      now.setMinutes(Math.floor(now.getMinutes() / 5) * 5);
+      return now;
+    }
 
-		function showTimeValidationError(message) {
-			const error = document.getElementById('timeValidationError');
-			if (error) {
-				error.textContent = message;
-				error.style.display = 'block';
-			}
-		}
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
 
-		function clearTimeValidationError() {
-			const error = document.getElementById('timeValidationError');
-			if (error) {
-				error.textContent = '';
-				error.style.display = 'none';
-			}
-		}
+    function getDatetimeValue(fieldName) {
+      const input = document.querySelector('input[name="' + fieldName + '"]');
+      if (!input || !input.value) {
+        return null;
+      }
+      const date = new Date(input.value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
 
-		const activityImageFile = document.getElementById('activityImageFile');
-		const activityImagePreview = document.getElementById('activityImagePreview');
-		const defaultPreviewSrc = activityImagePreview.src;
+    function showTimeValidationError(message) {
+      const error = document.getElementById('timeValidationError');
+      if (error) {
+        error.innerHTML = '<span>⚠️</span> ' + message;
+        error.style.display = 'inline-flex';
+      }
+    }
 
-		if (activityImageFile) {
-			activityImageFile.addEventListener('change', function() {
-				const file = this.files && this.files[0];
-				if (!file) {
-					activityImagePreview.src = defaultPreviewSrc;
-					return;
-				}
+    function clearTimeValidationError() {
+      const error = document.getElementById('timeValidationError');
+      if (error) {
+        error.textContent = '';
+        error.style.display = 'none';
+      }
+    }
 
-				activityImagePreview.src = URL.createObjectURL(file);
-			});
-		}
-	</script>
+    // 預覽大圖
+    const activityImageFile = document.getElementById('activityImageFile');
+    const activityImagePreview = document.getElementById('activityImagePreview');
+    const defaultPreviewSrc = activityImagePreview.src;
+
+    if (activityImageFile) {
+      activityImageFile.addEventListener('change', function() {
+        const file = this.files && this.files[0];
+        if (!file) {
+          activityImagePreview.src = defaultPreviewSrc;
+          return;
+        }
+
+        activityImagePreview.src = URL.createObjectURL(file);
+      });
+    }
+  </script>
 
 </body>
 </html>

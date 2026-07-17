@@ -1,288 +1,502 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+
 <head>
-<meta charset="UTF-8">
-<title>我舉辦的活動</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>我舉辦的活動</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
-<style>
+  <style>
+/* ==========================================================
+   Webond 我舉辦的活動頁 — 圓潤角色風 (cream / ink / pastel blobs)
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+
+:root{
+  --color-bg:            #F7F3EC;
+  --color-surface:       #FFFFFF;
+  --color-surface-soft:  #FFFDF8;
+  --color-ink:           #17140F;
+  --color-ink-soft:      #726A5F;
+  --color-border:        #ECE4D6;
+
+  --color-yellow:       #FFE59A;
+  --color-yellow-deep:  #FFC94D;
+  --color-pink:         #FFB5C1;
+  --color-green:        #B7E1D1;
+  --color-blue:         #A9D3FF;
+  --color-red:          #FF5271;
+
+  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+
+  --nav-height: 76px;
+}
+
+*{ box-sizing: border-box; }
+
 body {
-	margin: 0;
-	padding: 40px;
-	background: #f8fafc;
-	font-family: "Microsoft JhengHei", sans-serif;
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding: 40px 20px;
 }
 
+h1, h2, h3, h4 { font-family: var(--font-display); margin: 0; }
+a { text-decoration: none; color: inherit; }
+
+/* ==========================================================
+   版面容器
+   ========================================================== */
 .container {
-	max-width: 1200px;
-	margin: auto;
+  max-width: 1200px;
+  margin: calc(var(--nav-height) + 20px) auto 60px;
 }
 
+/* ==========================================================
+   🌟 提示警告框：極簡無邊框、無立體陰影、字重 400
+   ========================================================== */
 .alert-error {
-	background: #fee2e2;
-	color: #991b1b;
-	padding: 14px 18px;
-	border-radius: 8px;
-	margin-bottom: 20px;
-	font-weight: bold;
-	border: 1px solid #fecaca;
+  background: var(--color-pink);
+  color: var(--color-ink);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 400; /* 🌟 舒適的 400 字重 */
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
+/* ==========================================================
+   頂部大標頭區
+   ========================================================== */
 .header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-bottom: 2px dashed var(--color-border);
+  padding-bottom: 20px;
+  margin-bottom: 32px;
+  gap: 20px;
 }
 
 .header h1 {
-	margin: 0;
-	color: #0f172a;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-ink);
+  position: relative;
+  padding-left: 18px;
+  margin-bottom: 6px;
+}
+.header h1::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--color-yellow-deep);
 }
 
+/* 主辦人名字標示：套用全新柔和規範 */
 .member {
-	color: #64748b;
-	font-weight: bold;
-	margin-top: 8px;
+  font-size: 13.5px;
+  color: var(--color-ink-soft);
+  font-weight: 450; /* 🌟 柔和字重 */
 }
 
+.member span {
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+/* ==========================================================
+   功能按鈕 (頂部右側)
+   ========================================================== */
 .btn {
-	padding: 12px 22px;
-	border-radius: 8px;
-	text-decoration: none;
-	color: white;
-	font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 14px;
+  padding: 11px 22px;
+  border-radius: var(--radius-full);
+  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
+  cursor: pointer;
+  border: none;
 }
 
-.btn-back {
-	background: #64748b;
-}
-
+/* 建立活動：墨黑色藥丸 */
 .btn-add {
-	background: #8b5cf6;
+  background: var(--color-ink);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-yellow-deep);
+  color: var(--color-ink);
 }
 
+/* 返回活動列表：奶油圓角框 */
+.btn-back {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+.btn-back:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-ink);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface-soft);
+}
+
+/* ==========================================================
+   Q 萌管理表格卡片 (Table Card)
+   ========================================================== */
 .table-card {
-	background: white;
-	border-radius: 15px;
-	overflow: hidden;
-	box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden; /* 確保 Table 頂部左右圓角不破開 */
+}
+
+/* 響應式滾動容器 (並隱藏滾動條) */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.table-responsive::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 table {
-	width: 100%;
-	border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 th {
-	background: #e2e8f0;
-	padding: 15px;
+  background: var(--color-surface-soft);
+  color: var(--color-ink);
+  padding: 16px 20px;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: var(--font-display);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+  text-align: center;
 }
 
 td {
-	padding: 15px;
-	text-align: center;
-	border-bottom: 1px solid #e5e7eb;
+  padding: 18px 20px;
+  font-size: 14px;
+  color: var(--color-ink-soft); /* 🌟 套用最新字體顏色規範 */
+  font-weight: 450;              /* 🌟 套用最新柔和字重規範 */
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+  text-align: center;
 }
 
-tr:hover {
-	background: #f8fafc;
+tr:last-child td {
+  border-bottom: none; /* 最後一列去除底邊線 */
 }
 
+tr:hover td {
+  background: var(--color-surface-soft); /* 懸停時整列溫和變色 */
+}
+
+/* 活動縮圖 */
 .activity-thumb {
-	width: 90px;
-	height: 64px;
-	object-fit: cover;
-	border-radius: 8px;
-	background: #e2e8f0;
+  width: 90px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--radius-md); /* 16px 舒適圓角 */
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-soft);
+  display: block;
+  margin: 0 auto;
 }
 
+/* ==========================================================
+   狀態徽章 (統一改為無邊框無陰影膠囊樣式)
+   ========================================================== */
 .status {
-	padding: 5px 12px;
-	border-radius: 20px;
-	font-size: 13px;
-	font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
-.normal {
-	background: #dcfce7;
-	color: #166534;
+/* 正常：溫和草綠 */
+.status.normal {
+  background: var(--color-green);
+  color: var(--color-ink);
 }
 
-.delay {
-	background: #fef3c7;
-	color: #92400e;
+/* 延期：暖黃 */
+.status.delay {
+  background: var(--color-yellow);
+  color: var(--color-ink);
 }
 
-.cancel {
-	background: #fee2e2;
-	color: #991b1b;
+/* 取消：粉紅 */
+.status.cancel {
+  background: var(--color-pink);
+  color: var(--color-ink);
 }
 
-.action {
-	display: flex;
-	justify-content: center;
-	flex-wrap: wrap;
-	gap: 10px;
-}
-
-.btn-edit {
-	background: #3b82f6;
-	color: white;
-	text-decoration: none;
-	padding: 8px 16px;
-	border-radius: 6px;
-}
-
-.btn-detail {
-	background: #6366f1;
-	color: white;
-	text-decoration: none;
-	padding: 8px 16px;
-	border-radius: 6px;
-}
-
-.btn-member {
-	background: #10b981;
-	color: white;
-	text-decoration: none;
-	padding: 8px 16px;
-	border-radius: 6px;
-}
-
-.btn-repeat {
-	background: #f59e0b;
-	color: white;
-	text-decoration: none;
-	padding: 8px 16px;
-	border-radius: 6px;
-}
-
-.btn-chat {
-	background: #0f766e;
-	color: white;
-	text-decoration: none;
-	padding: 8px 16px;
-	border-radius: 6px;
-}
-
+/* 待審核提示：亮紅小氣球 */
 .review-badge {
-	display: inline-block;
-	margin-top: 8px;
-	background: #f97316;
-	color: white;
-	padding: 5px 10px;
-	border-radius: 999px;
-	font-size: 13px;
-	font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-red);
+  color: #FFFFFF;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 800;
+  margin-top: 6px;
+  line-height: 1.2;
 }
 
-.empty {
-	text-align: center;
-	padding: 50px;
-	color: #94a3b8;
-	font-size: 18px;
+/* ==========================================================
+   操作按鈕群組 (馬卡龍色系軟圓角藥丸樣式)
+   ========================================================== */
+.action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
-</style>
+
+.action a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  transition: transform .18s ease, box-shadow .18s ease, filter .15s ease;
+  white-space: nowrap;
+}
+
+.action a:hover {
+  transform: translateY(-2px);
+  filter: brightness(0.96); /* 輕微變深 */
+}
+
+/* 詳情：馬卡龍藍 */
+.btn-detail {
+  background: var(--color-blue);
+  color: var(--color-ink);
+}
+
+/* 修改：馬卡龍綠 */
+.btn-edit {
+  background: var(--color-green);
+  color: var(--color-ink);
+}
+
+/* 報名名單：馬卡龍黃 */
+.btn-member {
+  background: var(--color-yellow);
+  color: var(--color-ink);
+}
+
+/* 再次舉辦：馬卡龍粉 */
+.btn-repeat {
+  background: var(--color-pink);
+  color: var(--color-ink);
+}
+
+/* 聊天室：沙色灰 */
+.btn-chat {
+  background: var(--color-border);
+  color: var(--color-ink);
+}
+
+/* ==========================================================
+   無建立活動空狀態
+   ========================================================== */
+.empty {
+  padding: 60px 24px;
+  text-align: center;
+  color: var(--color-ink-soft);
+  font-size: 15px;
+  font-weight: 800;
+  background: var(--color-surface-soft);
+}
+
+/* ==========================================================
+   RWD 手機版優化
+   ========================================================== */
+@media (max-width: 760px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    margin-top: calc(var(--nav-height) + 10px);
+  }
+  .header div[style*="display: flex"] {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+  .btn { width: 100%; text-align: center; }
+  .table-card { border-radius: var(--radius-md); }
+}
+  </style>
+  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 </head>
 
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
+
 <body>
 
-	<div class="container">
+  <div class="container">
 
-		<div th:if="${param.cannotEdit}" class="alert-error">
-			已有會員報名此活動，無法修改活動內容。</div>
-		<div th:if="${param.noPermission}" class="alert-error">
-			您沒有權限修改其他主辦人的活動。</div>
+    <!-- ========== 溫和無邊框無陰影錯誤檢核提示 (400 字重) ========== -->
+    <div th:if="${param.cannotEdit}" class="alert-error">
+       已有會員報名此活動，為維護權益，目前無法直接修改活動內容。
+    </div>
+    <div th:if="${param.noPermission}" class="alert-error">
+       權限不足！您僅能修改與管理自己所主辦的活動。
+    </div>
 
-		<div class="header">
-			<div>
-				<h1>🎪 我舉辦的活動</h1>
+    <!-- ========== 頂部大標頭區 ========== -->
+    <div class="header">
+      <div>
+        <h1>我舉辦的活動</h1>
+      </div>
 
-				<div class="member">
-					主辦人： <span th:text="${loginMemberName}"></span>
-				</div>
-			</div>
+      <!-- 操作捷徑 -->
+      <div style="display: flex; gap: 12px;">
+        <a th:href="@{/activity/front/addHostActivity}" class="btn btn-add">我要辦活動</a> 
+        <a th:href="@{/activity/front/list}" class="btn btn-back">活動列表</a>
+      </div>
+    </div>
 
-			<div style="display: flex; gap: 12px;">
-				<a th:href="@{/activity/front/addHostActivity}" class="btn btn-add">
-					➕ 我要辦活動 </a> <a th:href="@{/activity/front/list}" class="btn btn-back">返回活動列表</a>
-			</div>
-		</div>
+    <!-- ========== 管理表格卡片 ========== -->
+    <div class="table-card">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th style="padding-left: 24px;">活動編號</th>
+              <th>圖片</th>
+              <th>活動名稱</th>
+              <th>活動價格</th>
+              <th>目前人數</th>
+              <th>活動狀態</th>
+              <th style="padding-right: 24px;">操作管理</th>
+            </tr>
+          </thead>
 
-		<div class="table-card">
-			<table>
-				<thead>
-					<tr>
-						<th>活動編號</th>
-						<th>圖片</th>
-						<th>活動名稱</th>
-						<th>價格</th>
-						<th>目前人數</th>
-						<th>活動狀態</th>
-						<th>操作</th>
-					</tr>
-				</thead>
+          <tbody>
+            <!-- 查無任何活動空狀態 -->
+            <tr th:if="${#lists.isEmpty(activityListData)}">
+              <td colspan="7" class="empty">
+                目前您尚未建立過任何揪團活動
+              </td>
+            </tr>
 
-				<tbody>
-					<tr th:if="${#lists.isEmpty(activityListData)}">
-						<td colspan="7" class="empty">目前尚未建立任何活動</td>
-					</tr>
+            <!-- 數據資料列 (字重 450 / 顏色 ink-soft) -->
+            <tr th:each="activity : ${activityListData}">
+              <!-- 活動編號 (稍加粗區隔) -->
+              <td style="padding-left: 24px; font-weight: 600; color: var(--color-ink);" th:text="${activity.activityId}"></td>
 
-					<tr th:each="activity : ${activityListData}">
-						<td th:text="${activity.activityId}"></td>
+              <!-- 圖片 -->
+              <td>
+                <img class="activity-thumb" th:src="@{/activity/front/image(id=${activity.activityId})}" alt="活動圖片">
+              </td>
 
-						<td>
-							<img class="activity-thumb"
-								th:src="@{/activity/front/image(id=${activity.activityId})}"
-								alt="活動圖片">
-						</td>
+              <!-- 活動名稱與評價審核提醒 -->
+              <td>
+                <div th:text="${activity.activityTitle}" style="font-weight: 600; color: var(--color-ink); font-size: 14.5px;"></div>
+                <span class="review-badge"
+                      th:if="${pendingReviewCountMap[activity.activityId] != null and pendingReviewCountMap[activity.activityId] > 0}"
+                      th:text="| 待審核 ${pendingReviewCountMap[activity.activityId]} 筆|">
+                  待審核 1 筆
+                </span>
+              </td>
 
-						<td>
-							<div th:text="${activity.activityTitle}"></div>
-							<span class="review-badge"
-								th:if="${pendingReviewCountMap[activity.activityId] != null and pendingReviewCountMap[activity.activityId] > 0}"
-								th:text="|待審核 ${pendingReviewCountMap[activity.activityId]} 筆|">
-								待審核 1 筆
-							</span>
-						</td>
+              <!-- 價格 -->
+              <td>
+                <span style="font-family: var(--font-display); font-weight: 600; color: var(--color-ink);">
+                  NT$ <span th:text="${activity.activityPrice}">0</span>
+                </span>
+              </td>
 
-						<td>NT$ <span th:text="${activity.activityPrice}"></span>
-						</td>
+              <!-- 目前人數 -->
+              <td>
+                <span th:text="${activity.attendeesCount}" style="color: var(--color-ink); font-weight: 600;">0</span>
+                <span style="color: var(--color-border); margin: 0 4px;">/</span>
+                <span th:text="${activity.maxParticipants}">10</span> 人
+              </td>
 
-						<td><span th:text="${activity.attendeesCount}"></span> / <span
-							th:text="${activity.maxParticipants}"></span></td>
+              <!-- 活動狀態 (極簡無邊框徽章) -->
+              <td>
+                <span th:if="${activity.activityStatus == 0}" class="status normal">正常舉行</span> 
+                <span th:if="${activity.activityStatus == 1}" class="status delay">延期</span> 
+                <span th:if="${activity.activityStatus == 2}" class="status cancel">已取消</span>
+              </td>
 
-						<td><span th:if="${activity.activityStatus == 0}"
-							class="status normal"> 正常舉行 </span> <span
-							th:if="${activity.activityStatus == 1}" class="status delay">
-								延期 </span> <span th:if="${activity.activityStatus == 2}"
-							class="status cancel"> 已取消 </span></td>
+              <!-- 操作按鈕列 (馬卡龍色系小藥丸) -->
+              <td style="padding-right: 24px;">
+                <div class="action">
+                  <a class="btn-detail" th:href="@{/activity/front/detail(id=${activity.activityId}, from='host')}">
+                    詳情
+                  </a> 
+                  <a class="btn-edit" th:href="@{/activity/front/updateHostActivity(id=${activity.activityId})}">
+                    修改
+                  </a> 
+                  <a class="btn-member" th:href="@{/activity/front/memberList(activityId=${activity.activityId})}">
+                    報名名單
+                  </a> 
+                  <a class="btn-repeat" th:href="@{/activity/front/repeatHostActivity(id=${activity.activityId})}">
+                    再次舉辦
+                  </a> 
+                  <a class="btn-chat" th:href="@{/activity/front/chat(activityId=${activity.activityId}, from='host')}">
+                    聊天室
+                  </a>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-						<td>
-							<div class="action">
-								<a class="btn-detail"
-									th:href="@{/activity/front/detail(id=${activity.activityId}, from='host')}">
-									詳情 </a> <a class="btn-edit"
-									th:href="@{/activity/front/updateHostActivity(id=${activity.activityId})}">
-									修改 </a> <a class="btn-member"
-									th:href="@{/activity/front/memberList(activityId=${activity.activityId})}">
-									報名名單 </a> <a class="btn-repeat"
-									th:href="@{/activity/front/repeatHostActivity(id=${activity.activityId})}">
-									再次舉辦 </a> <a class="btn-chat"
-									th:href="@{/activity/front/chat(activityId=${activity.activityId}, from='host')}">
-									聊天室 </a>
-							</div>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-
-	</div>
+  </div>
 
 </body>
 </html>
