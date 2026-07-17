@@ -115,6 +115,7 @@ public class VenueFrontOrderController {
 		venueOrderVO.setCreatedAt(LocalDateTime.now());
 		venueOrderVO.setOrderStatus((byte) 0);
 		venueOrderVO.setPayoutAmount((byte) 0);
+		venueOrderVO.setRefundStatus((byte) 2);
 
 		try {
 			// 呼叫 Service，這步會啟動悲觀鎖並把字串改成 '3'
