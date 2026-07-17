@@ -77,7 +77,7 @@ public class MemberFrontControllerAyaka {
 	    MemberVO memberVO = memberService.getOneMember(memberId);
 	    ServiceVO serviceList = serviceService.getOneService(memberId);
 	    ActivityVO activityList = activityService.getOneActivity(memberId);
-	    List<VenueVO> venueList = venueService.getVenuesByMember(memberId);
+	    List<VenueVO> venueList = venueService.getActiveByMember(memberId);
 	    List<MemberReviewDTO> reviews = myReviewService.getReviewsByMemberId(memberId);
 	    model.addAttribute("reviews", reviews);
 	    
