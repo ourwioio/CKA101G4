@@ -133,7 +133,7 @@ public class VenueReportController {
 		NotificationVO notificationVO = new NotificationVO();
 		notificationVO.setMember(venueVO.getMember());
 		notificationVO.setTitle("場地遭檢舉通知");
-		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + "　已遭檢舉，請重新修改您的資料再進行審核，謝謝");
+		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + " 已遭檢舉，請重新修改您的資料再進行審核，謝謝");
 		notificationVO.setNotificationType((byte) 2);
 		notificationService.addNotification(notificationVO);
 
@@ -141,7 +141,7 @@ public class VenueReportController {
 		NotificationVO reporterNotification = new NotificationVO();
 		reporterNotification.setMember(venueOrderVO.getMember());
 		reporterNotification.setTitle("場地檢舉成立通知");
-		reporterNotification.setContent("先生/小姐您好，您對場地：" + venueVO.getVenueName() + "　的檢舉經審核後成立，該場地已下架並退回待審核，感謝您的回報");
+		reporterNotification.setContent("先生/小姐您好，您對場地：" + venueVO.getVenueName() + " 的檢舉經審核後成立，該場地已下架並退回待審核，感謝您的回報");
 		reporterNotification.setNotificationType((byte) 2);
 		notificationService.addNotification(reporterNotification);
 
@@ -169,7 +169,7 @@ public class VenueReportController {
 		NotificationVO reporterNotification = new NotificationVO();
 		reporterNotification.setMember(venueOrderVO.getMember());
 		reporterNotification.setTitle("場地檢舉未成立通知");
-		reporterNotification.setContent("先生/小姐您好，您對場地：" + venueVO.getVenueName() + "　的檢舉經審核後不成立，該場地維持原狀態，感謝您的回報");
+		reporterNotification.setContent("先生/小姐您好，您對場地：" + venueVO.getVenueName() + " 的檢舉經審核後不成立，該場地維持原狀態，感謝您的回報");
 		reporterNotification.setNotificationType((byte) 2);
 		notificationService.addNotification(reporterNotification);
 

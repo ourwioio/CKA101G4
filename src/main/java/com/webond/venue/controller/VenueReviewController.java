@@ -168,7 +168,7 @@ public class VenueReviewController {
 		NotificationVO notificationVO = new NotificationVO();
 		notificationVO.setMember(venueVO.getMember());
 		notificationVO.setTitle("場地審核通過通知");
-		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + "　審核已通過，謝謝");
+		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + " 審核已通過，謝謝");
 		notificationVO.setNotificationType((byte) 2);
 		notificationService.addNotification(notificationVO);
 
@@ -196,7 +196,7 @@ public class VenueReviewController {
 		NotificationVO notificationVO = new NotificationVO();
 		notificationVO.setMember(venueVO.getMember());
 		notificationVO.setTitle("場地審核未通過通知");
-		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + "　審核未通過，請重新修改上傳資料，謝謝");
+		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + " 審核未通過，請重新修改上傳資料，謝謝");
 		notificationVO.setNotificationType((byte) 2);
 		notificationService.addNotification(notificationVO);
 
