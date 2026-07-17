@@ -28,7 +28,7 @@ public class VenueService {
 
 	@Autowired
 	VenueRepository repository;
-	
+
 	@Autowired
 	VenueSlotRepository venueSlotRepository;
 
@@ -146,6 +146,10 @@ public class VenueService {
 		return repository.findByMember_MemberId(memberId);
 	}
 
+	public List<VenueVO> getActiveByMember(Integer memberId) {
+		return repository.findByVenueStatusAndMember_MemberId((byte) 1, memberId);
+	}
+
 	@Transactional
 	public void toggleVenueStatus(Integer venueId) {
 		VenueVO venue = repository.findById(venueId).orElse(null);
@@ -250,7 +254,7 @@ public class VenueService {
 
 		repository.save(existingVenue);
 	}
-	
+
 	// 排程器用讓場地都有15天可以讓人預約
 	@Transactional
 	public void generateNextDaySlotsForAllVenues() {
@@ -264,8 +268,7 @@ public class VenueService {
 
 			for (LocalDate date = startDate; !date.isAfter(targetDate); date = date.plusDays(1)) {
 				int dayOfWeek = date.getDayOfWeek().getValue() - 1;
-				String slotStatus = (venue.getOpenDays().charAt(dayOfWeek) == '1')
-						? venue.getAvailableHours()
+				String slotStatus = (venue.getOpenDays().charAt(dayOfWeek) == '1') ? venue.getAvailableHours()
 						: closedHours;
 
 				VenueSlotVO slotVO = new VenueSlotVO();
