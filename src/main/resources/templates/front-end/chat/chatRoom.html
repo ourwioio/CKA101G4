@@ -1,14 +1,422 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>雙欄私訊聊天室</title>
     <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-    <link rel="stylesheet" th:href="@{/css/front-end/chat/chatRoom.css}">
+    <!-- 保留你原有的 chatRoom.css 連結，若想完全改由本頁 style 掌控，可直接參考下方樣式 -->
+<!--     <link rel="stylesheet" th:href="@{/css/front-end/chat/chatRoom.css}"> -->
     <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+
+:root {
+	--color-bg: #F7F3EC;
+	--color-surface: #FFFFFF;
+	--color-surface-soft: #FFFDF8;
+	--color-ink: #17140F;
+	--color-ink-soft: #726A5F;
+	--color-border: #ECE4D6;
+	--color-yellow: #FFE59A;
+	--color-yellow-deep: #FFC94D;
+	--color-pink: #FFB5C1;
+	--color-blue: #A9D3FF;
+	--font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+	--font-body: 'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+	--radius-lg: 26px;
+	--radius-md: 16px;
+	--radius-full: 999px;
+	--shadow-sm: 0 3px 10px rgba(23, 20, 15, .06);
+	--shadow-md: 0 14px 34px rgba(23, 20, 15, .10);
+}
+
+* { box-sizing: border-box; }
+
+body {
+	margin: 0;
+	padding: 0;
+	height: 100vh;
+	height: 100dvh;
+	overflow: hidden;
+	background: var(--color-bg);
+	color: var(--color-ink);
+	font-family: var(--font-body);
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* 頂部當前登入者提示列 - 與下方容器無縫接軌 */
+.user-info-bar {
+	max-width: 1100px;
+	margin: 115px auto 0;
+	padding: 14px 28px;
+	font-size: 13.5px;
+	font-weight: 800;
+	color: var(--color-ink-soft);
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-bottom: none;
+	border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+	box-shadow: var(--shadow-sm);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.user-info-bar span {
+	color: var(--color-ink);
+	background: var(--color-yellow);
+	padding: 2px 12px;
+	border-radius: var(--radius-full);
+	font-size: 13px;
+	border: 1.5px solid #F3D36C;
+}
+
+/* 雙欄主容器 */
+.chat-container {
+	display: flex;
+	max-width: 1100px;
+	height: calc(100dvh - 245px);
+	margin: 0 auto 60px;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+	overflow: hidden;
+}
+
+/* ==========================================
+   【左欄：真實會員清單】- 已縮小外框、消除滾動條
+   ========================================== */
+.left-sidebar {
+	width: 200px; /* 大幅縮小寬度（原為 280px） */
+	min-width: 180px; /* 調整最小寬度限制（原為 250px） */
+	background: var(--color-surface-soft);
+	border-right: 1px solid var(--color-border);
+	display: flex;
+	flex-direction: column;
+	padding: 20px 14px; /* 稍微縮小內距，讓視覺更緊湊 */
+	overflow: hidden; /* 確保主容器絕對不出現任何溢出滾動條 */
+}
+
+.left-sidebar h3 {
+	margin: 0 0 16px;
+	color: var(--color-ink);
+	font-family: var(--font-display);
+	font-size: 16px; /* 標題字型稍微縮小 */
+	font-weight: 800;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.left-sidebar h3::before {
+	content: '';
+	display: inline-block;
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--color-yellow-deep);
+}
+
+.contact-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	overflow-y: auto; /* 只有當聯絡人高度「超出上下範圍」時，才出現上下滾動條 */
+	overflow-x: hidden; /* 🌟 徹底消除左右水平滾動條 */
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.contact-item {
+	margin: 0;
+}
+
+/* 聯絡人按鈕超連結 - 已縮小尺寸 */
+.contact-link {
+	display: block;
+	padding: 8px 12px; /* 縮小上下與左右內距（原為 12px 16px） */
+	border: 1.5px solid transparent;
+	border-radius: var(--radius-md);
+	color: var(--color-ink-soft);
+	text-decoration: none;
+	font-size: 13.5px; /* 字型微調小一點點 */
+	font-weight: 800;
+	transition: all .2s ease;
+}
+
+.contact-link:hover {
+	color: var(--color-ink);
+	background: var(--color-surface);
+	border-color: var(--color-border);
+}
+
+/* 當前選中的聊天對象 */
+.contact-link.active-chat {
+	color: var(--color-ink);
+	background: var(--color-yellow);
+	border-color: #F3D36C;
+	box-shadow: var(--shadow-sm);
+}
+
+/* ==========================================
+   【右欄：對話視窗】
+   ========================================== */
+.right-chatbox {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	background: var(--color-surface);
+}
+
+/* 對話視窗頂部標題 */
+.chat-header {
+	padding: 10px 5px;
+	border-bottom: 1px solid var(--color-border);
+	background: var(--color-surface);
+}
+
+.chat-header h3 {
+	margin: 0;
+	color: var(--color-ink);
+	font-family: var(--font-display);
+	font-size: 14px;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.chat-header h3::before {
+	content: '';
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--color-pink);
+}
+
+/* 訊息顯示滾動區 */
+.messages-display {
+	flex: 1;
+	min-height: 0;
+	padding: 28px;
+	overflow-y: auto;
+	background: var(--color-surface-soft);
+	scrollbar-width: thin;
+	scrollbar-color: var(--color-border) transparent;
+}
+
+.messages-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+/* 系統狀態提示樣式 */
+.system-status {
+	align-self: center;
+	margin: 8px 0;
+	padding: 6px 16px;
+	background: var(--color-surface);
+	border: 1.5px dashed var(--color-border);
+	border-radius: var(--radius-full);
+	color: var(--color-ink-soft);
+	font-size: 12px;
+	font-weight: 800;
+	letter-spacing: 0.5px;
+}
+
+/* 對話框基礎設定 (對接 JS 的 .me 與 .friend) */
+.messages-list li {
+	max-width: min(72%, 560px);
+	padding: 13px 16px;
+	border: 1px solid var(--color-border);
+	background: var(--color-surface);
+	box-shadow: var(--shadow-sm);
+	font-size: 14px;
+	font-weight: 500;
+	line-height: 1.6;
+	overflow-wrap: anywhere;
+	white-space: pre-wrap;
+}
+
+/* 對方的訊息樣式 */
+.messages-list li.friend {
+	align-self: flex-start;
+	border-radius: 8px 20px 20px 20px;
+	color: var(--color-ink);
+}
+
+/* 我的訊息樣式 */
+.messages-list li.me {
+	align-self: flex-end;
+	border-color: #F3D36C;
+	border-radius: 20px 8px 20px 20px;
+	background: var(--color-yellow);
+	color: var(--color-ink);
+}
+
+/* 內部動態生成已讀/未讀字樣 */
+.messages-list li.me span {
+	font-weight: 800 !important;
+	font-size: 10px;
+	vertical-align: bottom;
+}
+
+/* 底部輸入與發送功能 */
+.chat-input-area {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 18px 28px;
+	border-top: 1px solid var(--color-border);
+	background: var(--color-surface);
+}
+
+.chat-input-area input[type="text"] {
+	flex: 1;
+	height: 44px;
+	padding: 10px 16px;
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-md);
+	outline: none;
+	background: var(--color-surface-soft);
+	color: var(--color-ink);
+	font-family: var(--font-body);
+	font-size: 14px;
+	font-weight: 500;
+	transition: border-color .15s ease, background .15s ease;
+}
+
+.chat-input-area input[type="text"]:focus {
+	border-color: var(--color-yellow-deep);
+	background: var(--color-surface);
+}
+
+.chat-input-area input[type="text"]:disabled {
+	background: var(--color-bg);
+	cursor: not-allowed;
+	opacity: 0.7;
+}
+
+.chat-input-area button {
+	min-width: 92px;
+	height: 44px;
+	padding: 0 22px;
+	border: none;
+	border-radius: var(--radius-full);
+	background: var(--color-ink);
+	box-shadow: var(--shadow-sm);
+	color: #ffffff;
+	font-family: var(--font-body);
+	font-size: 14px;
+	font-weight: 800;
+	cursor: pointer;
+	transition: transform .18s ease, background .15s ease, box-shadow .18s ease, color .15s ease;
+}
+
+.chat-input-area button:hover:not(:disabled) {
+	transform: translateY(-2px);
+	background: var(--color-yellow-deep);
+	box-shadow: var(--shadow-md);
+	color: var(--color-ink);
+}
+
+.chat-input-area button:disabled {
+	background: var(--color-border);
+	color: var(--color-ink-soft);
+	cursor: not-allowed;
+	box-shadow: none;
+}
+
+/* ==========================================
+   【響應式手機版佈局】
+   ========================================== */
+@media (max-width: 760px) {
+	.user-info-bar {
+		margin: 80px 16px 0;
+		border-radius: 20px 20px 0 0;
+		padding: 10px 20px;
+	}
+
+	.chat-container {
+		flex-direction: column;
+		height: calc(100dvh - 165px);
+		margin: 0 16px 32px;
+		border-radius: 0 0 20px 20px;
+	}
+
+	/* 手機版：左側聯絡人轉成頂部水平橫向滑動區 */
+	.left-sidebar {
+		width: 100%;
+		min-width: 100%;
+		max-height: 110px;
+		padding: 10px;
+		border-right: none;
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.left-sidebar h3 {
+		font-size: 14px;
+		margin-bottom: 6px;
+	}
+
+	.contact-list {
+		flex-direction: row;
+		overflow-x: auto;
+		gap: 8px;
+		padding-bottom: 4px;
+	}
+
+	.contact-link {
+		padding: 6px ;
+		font-size: 13px;
+		white-space: nowrap;
+	}
+
+	.contact-link:hover {
+		transform: none;
+	}
+
+	/* 手機版：右側訊息區縮放 */
+	.right-chatbox {
+		flex: 1;
+		min-height: 0;
+	}
+
+	.chat-header {
+		padding: 16px 20px;
+	}
+
+	.chat-header h3 {
+		font-size: 17px;
+	}
+
+	.messages-display {
+		padding: 20px 16px;
+	}
+
+	.messages-list li {
+		max-width: 86%;
+	}
+
+	.chat-input-area {
+		padding: 14px 16px;
+	}
+}
+</style>
 </head>
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
 
+<!-- 完美保留你原有的 connect 機制 -->
 <body onload="connect();">
 
 	<!-- 上方人員狀態提示 -->
@@ -24,10 +432,7 @@
 
 		<!-- 【左欄：真實會員清單】 -->
 		<div class="left-sidebar">
-<!-- 			<a th:href="@{/member/chatButton}" class="back-btn">⬅ 返回私訊列表</a> -->
 			<h3>選擇聯絡人</h3>
-			<hr style="border: 0; border-top: 1px solid #e9ecef; margin-bottom: 10px;">
-			
 			<ul class="contact-list">
 				<li th:each="mem : ${memList}" class="contact-item">
 					<!-- 利用動態 class 決定是否套用 active-chat 樣式 -->
@@ -108,7 +513,6 @@
 				if ("history" === jsonObj.type) {
 					messagesArea.innerHTML = '<ul id="area" class="messages-list"></ul>';
 					const messages = JSON.parse(jsonObj.message);
-					
 					
 					for (let i = 0; i < messages.length; i++) {
 						const historyData = JSON.parse(messages[i]);
