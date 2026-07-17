@@ -771,7 +771,7 @@
               <img th:src="@{/activity/front/image(id=${activity.activityId})}" alt="活動圖片">
             </div>
             <div class="item-card__body">
-              <span th:if="${activity.activityStatus == 0}" class="status-badge status-badge--ongoing">進行中</span>
+              <span th:if="${activity.activityStatus == 0}" class="status-badge status-badge--ongoing">上架中</span>
               <span th:if="${activity.activityStatus == 1}" class="status-badge status-badge--delayed">延期</span>
 
               <h3 class="item-card__title" th:text="${activity.activityTitle}">活動名稱</h3>
