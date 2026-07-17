@@ -725,7 +725,7 @@
 
     <!-- ========== 活動區塊 ========== -->
     <section class="section">
-      <h2 class="section-title">舉辦活動</h2>
+      <h2 class="section-title">舉辦活動紀錄</h2>
       <div class="card-grid" id="activityGrid">
         <div th:each="activity : ${activityListData}" class="item-card">
           <a th:href="@{/activity/front/detail(id=${activity.activityId})}">
@@ -734,12 +734,9 @@
             </div>
             <div class="item-card__body item-card__body--status">
               
-              <!-- 活動狀態 Badge -->
-              <span th:switch="${activity.activityStatus}">
-                <span th:case="0" class="status-badge status-badge--ongoing">正常舉行</span>
-                <span th:case="1" class="status-badge status-badge--delayed">延期</span>
-                <span th:case="2" class="status-badge status-badge--cancel">取消</span>
-              </span>
+              <span class="status-badge"
+                    th:classappend="${activityDisplayStatusMap[activity.activityId] == '已取消' ? 'status-badge--cancel' : (activityDisplayStatusMap[activity.activityId] == '延期' ? 'status-badge--delayed' : 'status-badge--ongoing')}"
+                    th:text="${activityDisplayStatusMap[activity.activityId]}">活動狀態</span>
 
               <h3 class="item-card__title" th:text="${activity.activityTitle}">活動名稱</h3>
               <div class="item-card__desc" th:text="${activity.activityDescription}">活動描述</div>
@@ -750,17 +747,37 @@
                   th:text="${#temporals.format(activity.startTime, 'yyyy-MM-dd')+' ~ '+#temporals.format(activity.endTime, 'yyyy-MM-dd')}">活動時間</span>
                 <span class="item-card__detail-btn">查看詳情 →</span>
               </div>
+
+              <div class="hosted-review-list"
+                   th:with="activityReviews=${activityReviewMap[activity.activityId]}">
+                <div class="hosted-review-empty" th:if="${#lists.isEmpty(activityReviews)}">
+                  此活動目前尚無評價
+                </div>
+                <div class="hosted-review-item" th:each="review : ${activityReviews}">
+                  <div class="hosted-review-head">
+                    <span class="hosted-review-stars">
+                      <th:block th:if="${review.buyerRateSeller != null and review.buyerRateSeller > 0}"
+                                th:each="i : ${#numbers.sequence(1, review.buyerRateSeller)}">★</th:block>
+                      <span th:text="${review.buyerRateSeller == null ? '-' : review.buyerRateSeller + ' / 5'}">5 / 5</span>
+                    </span>
+                    <span th:text="${review.buyerReviewedAt == null ? '' : #temporals.format(review.buyerReviewedAt, 'yyyy-MM-dd')}">
+                      評價日期
+                    </span>
+                  </div>
+                  <p class="hosted-review-comment" th:text="${review.buyerReviewComment}">評價內容</p>
+                </div>
+              </div>
             </div>
           </a>
         </div>
 
         <!-- 沒有資料時顯示 -->
-        <div class="no-items" th:if="${activityListData == null}">
+        <div class="no-items" th:if="${#lists.isEmpty(activityListData)}">
           目前尚無舉辦活動
         </div>
       </div>
 
-      <div class="pagination" id="activityPagination" th:if="${activityListData != null}">
+      <div class="pagination" id="activityPagination" th:if="${!#lists.isEmpty(activityListData)}">
         <button onclick="changePage('activity', -1)" id="activityPrevBtn">上一頁</button>
         <span class="page-info" id="activityPageInfo">1 / 1</span>
         <button onclick="changePage('activity', 1)" id="activityNextBtn">下一頁</button>
