@@ -1,369 +1,821 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+
 <head>
-<meta charset="UTF-8">
-<title>活動列表</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>活動列表</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-  <link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
-<style>
-body {
-	margin: 0;
-	background: #f8fafc;
-	font-family: "Microsoft JhengHei", sans-serif;
+  <style>
+/* ==========================================================
+   Webond 活動列表頁 — 圓潤角色風 (cream / ink / pastel blobs)
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+
+:root{
+  --color-bg:            #F7F3EC;
+  --color-surface:       #FFFFFF;
+  --color-surface-soft:  #FFFDF8;
+  --color-ink:           #17140F;
+  --color-ink-soft:      #726A5F;
+  --color-border:        #ECE4D6;
+
+  --color-yellow:       #FFE59A;
+  --color-yellow-deep:  #FFC94D;
+  --color-pink:         #FFB5C1;
+  --color-green:        #B7E1D1;
+  --color-blue:         #A9D3FF;
+  --color-red:          #FF5271;
+
+  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+
+  --nav-height: 76px;
 }
 
+*{ box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { font-family: var(--font-display); margin: 0; }
+a { text-decoration: none; color: inherit; }
+
+/* ==========================================================
+   頂部大標頭區
+   ========================================================== */
 .header {
-	max-width: 1200px;
-	margin: 40px auto 24px;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+  max-width: 1200px;
+  margin: calc(var(--nav-height) + 40px) auto 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  padding: 0 20px;
 }
 
 .header h1 {
-	color: #0f172a;
-	margin-bottom: 8px;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-ink);
+  position: relative;
+  padding-left: 18px;
+  margin-bottom: 6px;
+}
+.header h1::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--color-yellow-deep);
 }
 
 .member {
-	color: #475569;
-	font-weight: bold;
+  font-size: 13.5px;
+  color: var(--color-ink-soft);
+  font-weight: 700;
 }
 
+/* 提示警告框：極簡無邊框、無立體陰影、字重 400 */
 .login-note {
-	color: #92400e;
-	margin-top: 6px;
-	font-weight: bold;
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 400;
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
+/* ==========================================================
+   藥丸型捷徑按鈕 (頂部右側)
+   ========================================================== */
 .back-btn {
-	background: #64748b;
-	color: white;
-	text-decoration: none;
-	padding: 10px 18px;
-	border-radius: 8px;
-	font-weight: bold;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-border);
+  font-weight: 800;
+  font-size: 13.5px;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
-
 .back-btn:hover {
-	background: #475569;
+  transform: translateY(-2px);
+  border-color: var(--color-ink);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface-soft);
 }
 
+/* ==========================================================
+   Q 萌搜尋面板 (Search Panel)
+   ========================================================== */
 .search-panel {
-	max-width: 1200px;
-	margin: 0 auto 25px;
-	background: white;
-	border-radius: 12px;
-	padding: 20px;
-	box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
 }
 
 .search-form {
-	display: grid;
-	grid-template-columns: 2fr 1fr 1fr 1fr auto auto;
-	gap: 12px;
-	align-items: end;
+  display: grid;
+  grid-template-columns: 2.2fr 1fr 1fr 1.1fr auto auto;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .form-group label {
-	display: block;
-	margin-bottom: 6px;
-	font-weight: bold;
-	color: #334155;
-	font-size: 14px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--color-ink);
+  padding-left: 4px;
 }
 
 .form-control {
-	width: 100%;
-	box-sizing: border-box;
-	padding: 10px 12px;
-	border: 1px solid #cbd5e1;
-	border-radius: 8px;
-	font-size: 15px;
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  background: var(--color-surface-soft);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color .15s ease, background .15s ease;
+}
+.form-control:focus {
+  border-color: var(--color-yellow-deep);
+  background: var(--color-surface);
 }
 
+/* ==========================================================
+   🌟 完美還原：自訂 Q 萌下拉選單 CSS
+   ========================================================== */
+.custom-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* 下拉選單觸發按鈕 */
+.custom-select-trigger {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  background: var(--color-surface-soft);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  padding-right: 38px; /* 為箭頭留白 */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: border-color .15s ease, background .15s ease;
+  position: relative;
+  user-select: none;
+}
+
+.custom-select-trigger:hover {
+  border-color: var(--color-ink-soft);
+}
+
+.custom-select-trigger.active {
+  border-color: var(--color-yellow-deep);
+  background: var(--color-surface);
+}
+
+/* 粗線條微胖小箭頭（展開時旋轉 180 度） */
+.custom-select-trigger .trigger-arrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2317140F' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transition: transform .22s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+.custom-select-trigger.active .trigger-arrow {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+/* 🌟 下拉選項彈出選單（完全還原截圖的 24px 大圓角與陰影效果） */
+.custom-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 24px; /* 🌟 截圖同款 24px 大圓角 */
+  box-shadow: var(--shadow-md); /* 舒適的擴散柔和陰影 */
+  padding: 12px;
+  z-index: 100;
+  max-height: 280px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* 捲軸美化 */
+.custom-dropdown-menu::-webkit-scrollbar {
+	display: none;
+}
+.custom-dropdown-menu::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
+}
+
+.custom-dropdown-menu.show {
+  display: block;
+}
+
+/* 下拉選項 */
+.custom-option {
+  padding: 12px 16px;
+  border-radius: var(--radius-md); /* 16px */
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+  user-select: none;
+}
+
+/* Hover 滑過時：溫和奶油黃底，字體變深 */
+.custom-option:hover {
+  background: var(--color-surface-soft);
+  color: var(--color-ink);
+}
+
+/* 選中狀態：精緻暖黃色 */
+.custom-option.selected {
+  background: var(--color-yellow);
+  color: var(--color-ink);
+}
+
+/* ==========================================================
+   勾選框與按鈕
+   ========================================================== */
 .checkbox-group {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	height: 42px;
-	font-weight: bold;
-	color: #334155;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--color-ink);
+  cursor: pointer;
+  padding: 12px 10px;
+  user-select: none;
+}
+.checkbox-group input[type="checkbox"] {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--color-yellow-deep);
+  cursor: pointer;
 }
 
-.btn-search,
-.btn-reset {
-	border: 0;
-	border-radius: 8px;
-	padding: 11px 18px;
-	font-weight: bold;
-	text-decoration: none;
-	cursor: pointer;
-	white-space: nowrap;
+.btn-search, .btn-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 14px;
+  padding: 11px 22px;
+  border-radius: var(--radius-full);
+  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
+  cursor: pointer;
+  border: none;
 }
 
 .btn-search {
-	background: #2563eb;
-	color: white;
+  background: var(--color-ink);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
 }
-
 .btn-search:hover {
-	background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-yellow-deep);
+  color: var(--color-ink);
 }
 
 .btn-reset {
-	background: #e2e8f0;
-	color: #334155;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-border);
+}
+.btn-reset:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-ink);
 }
 
+/* 筆數統計 */
 .result-info {
-	max-width: 1200px;
-	margin: 0 auto 18px;
-	color: #64748b;
-	font-weight: bold;
+  max-width: 1200px;
+  margin: 0 auto 16px;
+  padding: 0 20px;
+  font-size: 13.5px;
+  color: var(--color-ink-soft);
+  font-weight: 800;
 }
 
+/* ==========================================================
+   活動卡片網格 (Card Grid)
+   ========================================================== */
 .container {
-	max-width: 1200px;
-	margin: auto;
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-	gap: 25px;
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 20px 60px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 28px;
 }
 
+/* 1. 卡片主體：新增 position: relative 鎖定點擊範圍 */
 .card {
-	background: white;
-	border-radius: 15px;
-	padding: 25px;
-	box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
-	transition: .25s;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform .22s cubic-bezier(0.175, 0.885, 0.32, 1.1), box-shadow .22s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative; /* 🌟 關鍵新增：作為點擊範圍鋪滿的基準點 */
 }
 
+/* 2. 查看詳情按鈕：利用 ::after 鋪滿整張卡片 */
+.btn-detail {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  background: var(--color-ink);
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 13.5px;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
+}
+
+/* 🌟 鋪滿魔法：把按鈕的點擊隱形範圍放大到整張 .card */
+.btn-detail::after {
+  content: "";
+  position: absolute;
+  inset: 0;        /* 鋪滿上下左右，完全貼齊 .card */
+  z-index: 1;      /* 確保點擊層浮在最上方 */
+  cursor: pointer; /* 讓整張卡片滑過去都顯示小手手 👆 */
+}
+
+/* 3. 連動動畫：只要滑鼠進入卡片範圍，按鈕就自動產生 Hover 視覺回饋 */
+.card:hover .btn-detail {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-yellow-deep);
+  color: var(--color-ink);
+}
 .card:hover {
-	transform: translateY(-5px);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 頂滿卡片大圖 */
+.activity-image {
+  width: 100%;
+  aspect-ratio: 16/10;
+  object-fit: cover;
+  border-radius: 0;
+  background: var(--color-surface-soft);
+  border: none;
+  display: block;
+}
+
+/* 卡片文字包裹區 */
+.card__body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .card h2 {
-	margin-top: 0;
-	color: #0f172a;
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--color-ink);
+  line-height: 1.4;
+  margin-bottom: 12px;
 }
 
-.activity-image {
-	width: 100%;
-	aspect-ratio: 16/9;
-	object-fit: cover;
-	border-radius: 10px;
-	margin-bottom: 16px;
-	background: #e2e8f0;
-}
-
+/* 極簡無邊框徽章 */
 .registration-status {
-	display: inline-block;
-	background: #e0f2fe;
-	color: #075985;
-	padding: 6px 12px;
-	border-radius: 999px;
-	font-size: 13px;
-	font-weight: bold;
-	margin-bottom: 12px;
+  position: absolute;      /* 🌟 關鍵：改為絕對定位 */
+  top: 16px;               /* 距離卡片頂部 16px */
+  right: 16px;             /* 距離卡片右側 16px */
+  z-index: 2;              /* 確保徽章乖乖飄在圖片的最上層 */
+  pointer-events: none;    /* 🌟 專業細節：讓點擊穿透徽章，點擊它依然能順暢觸發卡片跳轉 */
+
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-blue);
+  color: var(--color-ink);
+  padding: 5px 14px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  
+  /* ❌ 已移除原本的 margin-bottom 與 align-self，改絕對定位後不再需要它們 */
 }
 
 .price {
-	color: #16a34a;
-	font-size: 22px;
-	font-weight: bold;
-	margin: 15px 0;
+  font-family: var(--font-display);
+  color: var(--color-ink);
+  font-size: 21px;
+  font-weight: 800;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.price::before {
+  content: 'NT$';
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--color-ink-soft);
+  margin-top: 4px;
 }
 
 .meta {
-	color: #475569;
-	font-size: 14px;
-	line-height: 1.8;
-	margin-bottom: 12px;
+  border-top: 1px dashed var(--color-border);
+  padding-top: 14px;
+  color: var(--color-ink-soft);
+  font-size: 13px;
+  line-height: 1.7;
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+.meta div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+.meta span {
+  color: var(--color-ink);
+  font-weight: 700;
 }
 
 .desc {
-	color: #64748b;
-	line-height: 1.8;
-	min-height: 90px;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  line-height: 1.7;
+  min-height: 66px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 20px;
+  font-weight: 500;
 }
 
 .btn-detail {
-	display: inline-block;
-	margin-top: 15px;
-	background: #2563eb;
-	color: white;
-	text-decoration: none;
-	padding: 10px 18px;
-	border-radius: 8px;
-	font-weight: bold;
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  background: var(--color-ink);
+  color: #fff;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 13.5px;
+  padding: 10px 20px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
 }
-
 .btn-detail:hover {
-	background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-yellow-deep);
+  color: var(--color-ink);
 }
 
 .empty {
-	max-width: 1200px;
-	margin: auto;
-	background: white;
-	border-radius: 12px;
-	padding: 45px;
-	text-align: center;
-	color: #94a3b8;
-	font-size: 18px;
-	box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
+  max-width: 1200px;
+  margin: 0 auto 60px;
+  background: var(--color-surface-soft);
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 54px 24px;
+  text-align: center;
+  color: var(--color-ink-soft);
+  font-size: 15px;
+  font-weight: 800;
+  box-shadow: var(--shadow-sm);
 }
 
-@media (max-width: 900px) {
-	.search-form {
-		grid-template-columns: 1fr 1fr;
-	}
+/* ==========================================================
+   RWD
+   ========================================================== */
+@media (max-width: 980px) {
+  .search-form {
+    grid-template-columns: 1.5fr 1fr 1fr;
+  }
 }
 
-@media (max-width: 600px) {
-	.header {
-		display: block;
-		margin: 24px 16px;
-	}
-
-	.header > div:last-child {
-		margin-top: 18px;
-		flex-wrap: wrap;
-	}
-
-	.search-panel,
-	.result-info,
-	.container,
-	.empty {
-		margin-left: 16px;
-		margin-right: 16px;
-	}
-
-	.search-form {
-		grid-template-columns: 1fr;
-	}
+@media (max-width: 760px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: calc(var(--nav-height) + 20px);
+  }
+  .header div[style*="display: flex"] {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+  .back-btn { width: 100%; text-align: center; }
+  .search-panel { padding: 18px; }
+  .search-form {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .checkbox-group { padding: 6px 0; }
+  .btn-search, .btn-reset { width: 100%; }
 }
-</style>
-
+  </style>
+  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 </head>
 
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
+
 <body>
 
-	<div class="header">
-		<div>
-			<h1>活動列表</h1>
-			<div class="member">
-				目前登入：<span th:text="${loginMemberName}"></span>
-			</div>
-			<div th:unless="${isLoginMember}" class="login-note">
-				未登入只能瀏覽活動，登入後才能報名。
-			</div>
-		</div>
+  <!-- ========== 頂部大標頭 ========== -->
+  <div class="header">
+    <div>
+      <h1>活動列表</h1>
+    </div>
 
-		<div style="display: flex; gap: 12px;">
-			<a th:href="${isLoginMember} ? @{/activity/front/myOrder} : @{/member/login}" class="back-btn">我的報名</a>
-			<a th:href="${isLoginMember} ? @{/activity/front/myHostActivity} : @{/member/login}" class="back-btn">我舉辦的活動</a>
-			<a th:href="@{/}" class="back-btn">返回平台首頁</a>
-		</div>
-	</div>
+    <div style="display: flex; gap: 12px;">
+      <a th:href="${isLoginMember} ? @{/activity/front/myOrder} : @{/member/login}" class="back-btn">報名列表</a>
+      <a th:href="${isLoginMember} ? @{/activity/front/myHostActivity} : @{/member/login}" class="back-btn">舉辦活動</a>
+      
+    </div>
+  </div>
 
-	<div class="search-panel">
-		<form class="search-form" th:action="@{/activity/front/list}" method="get">
-			<div class="form-group">
-				<label>關鍵字</label>
-				<input class="form-control" type="text" name="keyword"
-					placeholder="搜尋活動名稱或內容" th:value="${keyword}">
-			</div>
+  <!-- ========== 搜尋篩選控制面板 (已全面改造為 100% 自訂下拉選單) ========== -->
+  <div class="search-panel">
+    <form class="search-form" th:action="@{/activity/front/list}" method="get">
+      
+      <!-- 1. 關鍵字 -->
+      <div class="form-group">
+        <label>活動搜尋</label>
+        <input class="form-control" type="text" name="keyword"
+               placeholder="輸入關鍵字..." th:value="${keyword}">
+      </div>
 
-			<div class="form-group">
-				<label>活動類別</label>
-				<select class="form-control" name="typeId">
-					<option value="">全部類別</option>
-					<option th:each="type : ${typeListData}"
-						th:value="${type.activityTypeId}"
-						th:selected="${selectedTypeId != null and selectedTypeId == type.activityTypeId}"
-						th:text="${type.activityTypeName}"></option>
-				</select>
-			</div>
+      <!-- 2. 活動類別 (自訂下拉式選單) -->
+      <div class="form-group">
+        <label>活動類別</label>
+        <div class="custom-select-wrapper">
+          <input type="hidden" name="typeId" th:value="${selectedTypeId != null ? selectedTypeId : ''}">
+          <div class="custom-select-trigger">
+            <span class="trigger-text">全部類別</span>
+            <span class="trigger-arrow"></span>
+          </div>
+          <div class="custom-dropdown-menu">
+            <div class="custom-option" data-value="">全部類別</div>
+            <div class="custom-option" th:each="type : ${typeListData}"
+                 th:data-value="${type.activityTypeId}"
+                 th:text="${type.activityTypeName}">類別</div>
+          </div>
+        </div>
+      </div>
 
-			<div class="form-group">
-				<label>活動狀態</label>
-				<select class="form-control" name="status">
-					<option value="">全部狀態</option>
-					<option value="0" th:selected="${selectedStatus != null and selectedStatus == 0}">正常</option>
-					<option value="1" th:selected="${selectedStatus != null and selectedStatus == 1}">延期</option>
-					<option value="2" th:selected="${selectedStatus != null and selectedStatus == 2}">取消</option>
-				</select>
-			</div>
+      <!-- 3. 活動狀態 (自訂下拉式選單) -->
+      <div class="form-group">
+        <label>活動狀態</label>
+        <div class="custom-select-wrapper">
+          <input type="hidden" name="status" th:value="${selectedStatus != null ? selectedStatus : ''}">
+          <div class="custom-select-trigger">
+            <span class="trigger-text">全部狀態</span>
+            <span class="trigger-arrow"></span>
+          </div>
+          <div class="custom-dropdown-menu">
+            <div class="custom-option" data-value="">全部狀態</div>
+            <div class="custom-option" data-value="0">正常舉行</div>
+            <div class="custom-option" data-value="1">活動延期</div>
+            <div class="custom-option" data-value="2">活動取消</div>
+          </div>
+        </div>
+      </div>
 
-			<div class="form-group">
-				<label>排序</label>
-				<select class="form-control" name="sort">
-					<option value="" th:selected="${sort == null or sort == ''}">最新建立</option>
-					<option value="priceAsc" th:selected="${sort == 'priceAsc'}">價格低到高</option>
-					<option value="priceDesc" th:selected="${sort == 'priceDesc'}">價格高到低</option>
-					<option value="endTimeAsc" th:selected="${sort == 'endTimeAsc'}">活動時間近到遠</option>
-				</select>
-			</div>
+      <!-- 4. 排列順序 (自訂下拉式選單) -->
+      <div class="form-group">
+        <label>排列順序</label>
+        <div class="custom-select-wrapper">
+          <input type="hidden" name="sort" th:value="${sort != null ? sort : ''}">
+          <div class="custom-select-trigger">
+            <span class="trigger-text">最新建立優先</span>
+            <span class="trigger-arrow"></span>
+          </div>
+          <div class="custom-dropdown-menu">
+            <div class="custom-option" data-value="">最新建立優先</div>
+            <div class="custom-option" data-value="priceAsc">價格：低到高</div>
+            <div class="custom-option" data-value="priceDesc">價格：高到低</div>
+            <div class="custom-option" data-value="endTimeAsc">活動時間：近到遠</div>
+          </div>
+        </div>
+      </div>
 
-			<label class="checkbox-group">
-				<input type="checkbox" name="onlyAvailable" value="true"
-					th:checked="${onlyAvailable}">
-				未額滿
-			</label>
+      <!-- 5. 勾選框 -->
+      <label class="checkbox-group">
+        <input type="checkbox" name="onlyAvailable" value="true" th:checked="${onlyAvailable}">
+        篩選未額滿活動
+      </label>
 
-			<div style="display: flex; gap: 8px;">
-				<button type="submit" class="btn-search">搜尋</button>
-				<a th:href="@{/activity/front/list}" class="btn-reset">清除</a>
-			</div>
-		</form>
-	</div>
+      <!-- 6. 按鈕列 -->
+      <div style="display: flex; gap: 8px;">
+        <button type="submit" class="btn-search">進行搜尋</button>
+        <a th:href="@{/activity/front/list}" class="btn-reset">重置清除</a>
+      </div>
+    </form>
+  </div>
 
-	<div class="result-info">
-		共 <span th:text="${#lists.size(activityListData)}">0</span> 筆活動
-	</div>
+  <!-- ========== 筆數統計 ========== -->
+  <div class="result-info">
+    共找到 <span th:text="${#lists.size(activityListData)}">0</span> 筆活動
+  </div>
 
-	<div class="empty" th:if="${#lists.isEmpty(activityListData)}">
-		目前沒有符合條件的活動
-	</div>
+  <!-- ========== 空狀態 ========== -->
+  <div class="empty" th:if="${#lists.isEmpty(activityListData)}">
+    目前沒有找到符合篩選條件的揪團活動
+  </div>
 
-	<div class="container" th:unless="${#lists.isEmpty(activityListData)}">
-		<div class="card" th:each="activity : ${activityListData}">
-			<img class="activity-image"
-				th:src="@{/activity/front/image(id=${activity.activityId})}"
-				alt="活動圖片">
-			<h2 th:text="${activity.activityTitle}">活動名稱</h2>
-			<span class="registration-status"
-				th:text="${registrationStatusMap[activity.activityId]}">報名中</span>
+  <!-- ========== 卡片網格 ========== -->
+  <div class="container" th:unless="${#lists.isEmpty(activityListData)}">
+  <div class="card" th:each="activity : ${activityListData}">
+    <a th:href="@{/activity/front/detail(id=${activity.activityId})}">
+    <img class="activity-image" th:src="@{/activity/front/image(id=${activity.activityId})}" alt="活動圖片">
+    
+    <div class="card__body">
+      <h2 th:text="${activity.activityTitle}">活動名稱</h2>
+      <span class="registration-status" th:text="${registrationStatusMap[activity.activityId]}">報名中</span>
 
-			<div class="price">
-				NT$ <span th:text="${activity.activityPrice}"></span>
-			</div>
+      <div class="price">
+        <span th:text="${activity.activityPrice}">0</span>
+      </div>
 
-			<div class="meta">
-				<div>
-					人數：<span th:text="${activity.attendeesCount ?: 0}"></span>
-					/
-					<span th:text="${activity.maxParticipants}"></span>
-				</div>
-				<div>
-					截止：<span
-						th:text="${#temporals.format(activity.registrationDeadline, 'yyyy-MM-dd HH:mm')}"></span>
-				</div>
-			</div>
+      <div class="meta">
+        <div>
+          <span>目前報名人數</span>
+          <span><span th:text="${activity.attendeesCount ?: 0}">0</span> / <span th:text="${activity.maxParticipants}">0</span> 人</span>
+        </div>
+        <div>
+          <span>報名截止時間</span>
+          <span th:text="${#temporals.format(activity.registrationDeadline, 'yyyy-MM-dd HH:mm')}">--</span>
+        </div>
+      </div>
 
-			<div class="desc" th:text="${activity.activityDescription}"></div>
+      <div class="desc" th:text="${activity.activityDescription}"></div>
 
-			<a class="btn-detail"
-				th:href="@{/activity/front/detail(id=${activity.activityId})}">
-				查看詳情
-			</a>
-		</div>
-	</div>
+      <!-- 只要這裡保留 <a> 標籤，鋪滿魔法 (::after) 就會自動生效，點整張卡片任何地方都能順利跳轉囉！ -->
+      <a class="btn-detail" th:href="@{/activity/front/detail(id=${activity.activityId})}">
+        查看詳情
+      </a>
+    </div>
+    </a>
+  </div>
+</div>
+
+  <!-- ==========================================================
+       🌟 核心 JavaScript：模擬下拉式選單交互與數據同步
+       ========================================================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const selectWrappers = document.querySelectorAll('.custom-select-wrapper');
+      
+      selectWrappers.forEach(wrapper => {
+        const trigger = wrapper.querySelector('.custom-select-trigger');
+        const menu = wrapper.querySelector('.custom-dropdown-menu');
+        const hiddenInput = wrapper.querySelector('input[type="hidden"]');
+        const options = wrapper.querySelectorAll('.custom-option');
+        const triggerText = trigger.querySelector('.trigger-text');
+        
+        // 1. 初始化設定：根據後端傳來的 hidden input 預設值，選取對應項目並顯示文字
+        const defaultValue = hiddenInput.value;
+        let hasActiveSelection = false;
+
+        options.forEach(option => {
+          if (option.getAttribute('data-value') === defaultValue) {
+            option.classList.add('selected');
+            triggerText.textContent = option.textContent;
+            hasActiveSelection = true;
+          } else {
+            option.classList.remove('selected');
+          }
+        });
+
+        // 如果沒有匹配到任何後端值，預設選取第一個選項（通常是「全部」）
+        if (!hasActiveSelection && options.length > 0) {
+          options[0].classList.add('selected');
+          triggerText.textContent = options[0].textContent;
+        }
+        
+        // 2. 開關點擊事件
+        trigger.addEventListener('click', function(e) {
+          e.stopPropagation();
+          
+          // 關閉頁面中其他已打開的選單
+          document.querySelectorAll('.custom-dropdown-menu').forEach(otherMenu => {
+            if (otherMenu !== menu) otherMenu.classList.remove('show');
+          });
+          document.querySelectorAll('.custom-select-trigger').forEach(otherTrigger => {
+            if (otherTrigger !== trigger) otherTrigger.classList.remove('active');
+          });
+          
+          menu.classList.toggle('show');
+          trigger.classList.toggle('active');
+        });
+        
+        // 3. 選項點擊事件
+        options.forEach(option => {
+          option.addEventListener('click', function(e) {
+            e.stopPropagation();
+            
+            const selectedValue = this.getAttribute('data-value');
+            const selectedText = this.textContent;
+            
+            // 同步寫回 hidden input，確保 Form 提交時拿到正確資料
+            hiddenInput.value = selectedValue;
+            triggerText.textContent = selectedText;
+            
+            // 切換 Active 狀態
+            options.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            
+            // 關閉面板
+            menu.classList.remove('show');
+            trigger.classList.remove('active');
+          });
+        });
+      });
+      
+      // 4. 點選頁面空白處時，自動收合所有下拉選單
+      document.addEventListener('click', function() {
+        document.querySelectorAll('.custom-dropdown-menu').forEach(menu => menu.classList.remove('show'));
+        document.querySelectorAll('.custom-select-trigger').forEach(trigger => trigger.classList.remove('active'));
+      });
+    });
+  </script>
 
 </body>
 </html>

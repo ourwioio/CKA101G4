@@ -1,134 +1,285 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+
 <head>
-<meta charset="UTF-8">
-<title>活動報名申請</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>活動報名申請</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
-<style>
+  <style>
+/* ==========================================================
+   Webond 活動報名申請頁 — 圓潤角色風 (cream / ink / pastel blobs)
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+
+:root{
+  --color-bg:            #F7F3EC;
+  --color-surface:       #FFFFFF;
+  --color-surface-soft:  #FFFDF8;
+  --color-ink:           #17140F;
+  --color-ink-soft:      #726A5F;
+  --color-border:        #ECE4D6;
+
+  --color-yellow:       #FFE59A;
+  --color-yellow-deep:  #FFC94D;
+  --color-pink:         #FFB5C1;
+  --color-green:        #B7E1D1;
+  --color-blue:         #A9D3FF;
+  --color-red:          #FF5271;
+
+  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+
+  --nav-height: 76px;
+}
+
+*{ box-sizing: border-box; }
+
 body {
-	background: #f8fafc;
-	font-family: "Microsoft JhengHei", sans-serif;
-	margin: 0;
-	padding: 40px;
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding: 40px 20px;
 }
 
+/* ==========================================================
+   版面容器
+   ========================================================== */
+.container {
+  max-width: 720px; /* 報名申請表單適合舒適的集中寬度 */
+  margin: 0 auto;
+  padding-top: var(--nav-height);
+}
+
+/* ==========================================================
+   Q 萌報名申請大卡片
+   ========================================================== */
 .card {
-	max-width: 800px;
-	margin: auto;
-	background: white;
-	border-radius: 15px;
-	padding: 35px;
-	box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 40px;
 }
 
-h2 {
-	margin-top: 0;
-	color: #0f172a;
+/* 帶有小黃豆點綴的標題 */
+.section-title {
+  font-size: 22px;
+  font-weight: 800;
+  position: relative;
+  padding-left: 18px;
+  margin-top: 0;
+  margin-bottom: 32px;
+  font-family: var(--font-display);
+  color: var(--color-ink);
+}
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--color-yellow-deep);
 }
 
+/* 表單單元與 Label */
 .form-group {
-	margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
 }
 
-label {
-	display: block;
-	font-weight: bold;
-	margin-bottom: 8px;
-	color: #334155;
+.form-group label {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--color-ink);
+  padding-left: 4px;
 }
 
+/* 輸入框控制項 */
 .form-control {
-	width: 100%;
-	padding: 12px;
-	border: 1px solid #cbd5e1;
-	border-radius: 8px;
-	box-sizing: border-box;
-	font-size: 15px;
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--color-ink);
+  background: var(--color-surface-soft);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+  outline: none;
 }
 
-.readonly {
-	background: #f1f5f9;
+.form-control:focus {
+  border-color: var(--color-yellow-deep);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
 }
 
+textarea.form-control {
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.7;
+}
+
+/* 🌟 精緻沙色唯讀欄位 (Readonly) 樣式 */
+.form-control.readonly {
+  background: #ECE4D6; /* 穩重的沙色軟灰 */
+  border-color: var(--color-border);
+  color: var(--color-ink-soft);
+  cursor: not-allowed;
+  font-weight: 700; /* 加粗讓唯讀資訊依然清晰 */
+}
+
+.form-control.readonly:focus {
+  border-color: var(--color-border);
+  background: #ECE4D6;
+  box-shadow: none;
+}
+
+/* ==========================================================
+   藥丸型操作按鈕底列
+   ========================================================== */
 .btn-area {
-	display: flex;
-	justify-content: flex-end;
-	gap: 12px;
-	margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 36px;
+  padding-top: 24px;
+  border-top: 1px dashed var(--color-border);
 }
 
-.btn-back {
-	background: #64748b;
-	color: white;
-	text-decoration: none;
-	padding: 12px 22px;
-	border-radius: 8px;
-	font-weight: bold;
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 14.5px;
+  padding: 11px 26px;
+  border-radius: var(--radius-full);
+  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
+  text-decoration: none;
 }
 
+/* 送出申請：沉穩深黑 */
 .btn-submit {
-	background: #2563eb;
-	color: white;
-	border: none;
-	padding: 12px 24px;
-	border-radius: 8px;
-	cursor: pointer;
-	font-weight: bold;
+  background: var(--color-ink);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
 }
-</style>
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-yellow-deep);
+  color: var(--color-ink);
+}
 
+/* 返回列表：大圓角奶油框 */
+.btn-back {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+.btn-back:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-ink);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface-soft);
+}
+
+/* ==========================================================
+   RWD 響應式佈局
+   ========================================================== */
+@media (max-width: 520px) {
+  .card { padding: 28px 20px; }
+  .btn-area { flex-direction: column-reverse; gap: 10px; }
+  .btn { width: 100%; }
+}
+  </style>
+  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 </head>
 
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
+
 <body>
 
-	<div class="card">
-		<h2>活動報名申請</h2>
+  <div class="container">
+    <div class="card">
+      
+      <!-- 帶有黃點定位的 Q 萌標題 -->
+      <h2 class="section-title">活動報名申請</h2>
 
-		<form th:action="@{/activity/front/order/save}"
-			th:object="${activityOrderVO}" method="post">
+      <form th:action="@{/activity/front/order/save}" th:object="${activityOrderVO}" method="post">
 
-			<input type="hidden" th:field="*{activityId}">
-			<input type="hidden" th:field="*{buyerMemberId}">
-			<input type="hidden" th:field="*{activityPrice}">
-			<input type="hidden" th:field="*{totalAmount}">
-			<input type="hidden" th:field="*{orderStatus}">
-			<input type="hidden" th:field="*{activityPaymentMethod}">
+        <!-- 完全保留原有的 Thymeleaf 隱藏數據繫結欄位 -->
+        <input type="hidden" th:field="*{activityId}">
+        <input type="hidden" th:field="*{buyerMemberId}">
+        <input type="hidden" th:field="*{activityPrice}">
+        <input type="hidden" th:field="*{totalAmount}">
+        <input type="hidden" th:field="*{orderStatus}">
+        <input type="hidden" th:field="*{activityPaymentMethod}">
 
-			<div class="form-group">
-				<label>活動名稱</label>
-				<input class="form-control readonly" th:value="${activityVO.activityTitle}" readonly>
-			</div>
+        <!-- 活動名稱 (唯讀) -->
+        <div class="form-group">
+          <label>活動名稱</label>
+          <input class="form-control readonly" th:value="${activityVO.activityTitle}" readonly>
+        </div>
 
-			<div class="form-group">
-				<label>報名會員</label>
-				<input class="form-control readonly" th:value="${loginMemberName}" readonly>
-			</div>
+        <!-- 報名會員 (唯讀) -->
+        <div class="form-group">
+          <label>報名會員</label>
+          <input class="form-control readonly" th:value="${loginMemberName}" readonly>
+        </div>
 
-			<div class="form-group">
-				<label>活動價格</label>
-				<input class="form-control readonly" th:value="${activityVO.activityPrice}" readonly>
-			</div>
+        <!-- 活動價格 (唯讀) -->
+        <div class="form-group">
+          <label>活動價格 (NT$)</label>
+          <input class="form-control readonly" th:value="${activityVO.activityPrice}" readonly>
+        </div>
 
-			<div class="form-group">
-				<label>報名人數</label>
-				<input type="number" min="1" th:field="*{bookingCount}" class="form-control">
-			</div>
+        <!-- 報名人數 -->
+        <div class="form-group">
+          <label>報名人數</label>
+          <input type="number" min="1" th:field="*{bookingCount}" class="form-control" placeholder="請輸入您要報名的人數">
+        </div>
 
-			<div class="form-group">
-				<label>備註</label>
-				<textarea class="form-control" rows="4" th:field="*{orderNote}"></textarea>
-			</div>
+        <!-- 備註欄 -->
+        <div class="form-group">
+          <label>備註與特殊需求</label>
+          <textarea class="form-control" rows="4" th:field="*{orderNote}" placeholder="如果有任何想對主辦人說的話或特殊需求，可以寫在這裡喔！"></textarea>
+        </div>
 
-			<div class="btn-area">
-				<a th:href="@{/activity/front/list}" class="btn-back">返回列表</a>
-				<button type="submit" class="btn-submit">送出申請</button>
-			</div>
-		</form>
-	</div>
+        <!-- 按鈕操作底列 -->
+        <div class="btn-area">
+          <a th:href="@{/activity/front/list}" class="btn btn-back">返回列表</a>
+          <button type="submit" class="btn btn-submit">送出申請</button>
+        </div>
+        
+      </form>
+    </div>
+  </div>
 
 </body>
 </html>

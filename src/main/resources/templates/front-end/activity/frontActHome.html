@@ -1,310 +1,619 @@
 <!DOCTYPE html>
+
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
+
 <meta charset="UTF-8">
+
 <title>活動前台</title>
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-  <link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
-  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+
+<link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
+
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+
+
 
 <style>
+
 body {
-	margin: 0;
-	padding: 40px;
-	background: #f8fafc;
-	font-family: "Microsoft JhengHei", sans-serif;
-	color: #1e293b;
+
+margin: 0;
+
+padding: 40px;
+
+background: #f8fafc;
+
+font-family: "Microsoft JhengHei", sans-serif;
+
+color: #1e293b;
+
 }
+
+
 
 .header {
-	max-width: 1100px;
-	margin: auto;
-	text-align: center;
-	margin-bottom: 28px;
+
+max-width: 1100px;
+
+margin: auto;
+
+text-align: center;
+
+margin-bottom: 28px;
+
 }
+
+
 
 .header h1 {
-	font-size: 2.2rem;
-	margin-bottom: 10px;
-	color: #0f172a;
+
+font-size: 2.2rem;
+
+margin-bottom: 10px;
+
+color: #0f172a;
+
 }
+
+
 
 .header p {
-	color: #64748b;
-	font-size: 1.05rem;
+
+color: #64748b;
+
+font-size: 1.05rem;
+
 }
+
+
 
 .login-panel {
-	max-width: 1100px;
-	margin: 0 auto 32px;
-	background: white;
-	border: 1px solid #e2e8f0;
-	border-radius: 12px;
-	padding: 18px 20px;
-	box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	gap: 16px;
+
+max-width: 1100px;
+
+margin: 0 auto 32px;
+
+background: white;
+
+border: 1px solid #e2e8f0;
+
+border-radius: 12px;
+
+padding: 18px 20px;
+
+box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
+
+display: flex;
+
+justify-content: space-between;
+
+align-items: center;
+
+gap: 16px;
+
 }
+
+
 
 .login-panel strong {
-	color: #0f172a;
+
+color: #0f172a;
+
 }
+
+
 
 .login-form {
-	display: flex;
-	align-items: center;
-	gap: 10px;
+
+display: flex;
+
+align-items: center;
+
+gap: 10px;
+
 }
+
+
 
 .login-form select {
-	min-width: 220px;
-	padding: 10px 12px;
-	border: 1px solid #cbd5e1;
-	border-radius: 8px;
-	font-size: 15px;
+
+min-width: 220px;
+
+padding: 10px 12px;
+
+border: 1px solid #cbd5e1;
+
+border-radius: 8px;
+
+font-size: 15px;
+
 }
+
+
 
 .login-form button {
-	background: #2563eb;
-	color: white;
-	border: 0;
-	border-radius: 8px;
-	padding: 10px 18px;
-	font-weight: bold;
-	cursor: pointer;
+
+background: #2563eb;
+
+color: white;
+
+border: 0;
+
+border-radius: 8px;
+
+padding: 10px 18px;
+
+font-weight: bold;
+
+cursor: pointer;
+
 }
+
+
 
 .login-form button:hover {
-	background: #1d4ed8;
+
+background: #1d4ed8;
+
 }
+
+
 
 .sync-form button {
-	background: #0f766e;
-	color: white;
-	border: 0;
-	border-radius: 8px;
-	padding: 10px 18px;
-	font-weight: bold;
-	cursor: pointer;
+
+background: #0f766e;
+
+color: white;
+
+border: 0;
+
+border-radius: 8px;
+
+padding: 10px 18px;
+
+font-weight: bold;
+
+cursor: pointer;
+
 }
+
+
 
 .sync-form button:hover {
-	background: #115e59;
+
+background: #115e59;
+
 }
+
+
 
 .success {
-	max-width: 1100px;
-	margin: 0 auto 20px;
-	background: #dcfce7;
-	color: #166534;
-	border: 1px solid #bbf7d0;
-	border-radius: 10px;
-	padding: 14px 18px;
-	font-weight: bold;
+
+max-width: 1100px;
+
+margin: 0 auto 20px;
+
+background: #dcfce7;
+
+color: #166534;
+
+border: 1px solid #bbf7d0;
+
+border-radius: 10px;
+
+padding: 14px 18px;
+
+font-weight: bold;
+
 }
+
+
 
 .warning {
-	max-width: 1100px;
-	margin: 0 auto 20px;
-	background: #fef3c7;
-	color: #92400e;
-	border: 1px solid #fde68a;
-	border-radius: 10px;
-	padding: 14px 18px;
-	font-weight: bold;
+
+max-width: 1100px;
+
+margin: 0 auto 20px;
+
+background: #fef3c7;
+
+color: #92400e;
+
+border: 1px solid #fde68a;
+
+border-radius: 10px;
+
+padding: 14px 18px;
+
+font-weight: bold;
+
 }
+
+
 
 .card-container {
-	max-width: 1100px;
-	margin: auto;
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-	gap: 30px;
+
+max-width: 1100px;
+
+margin: auto;
+
+display: grid;
+
+grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+
+gap: 30px;
+
 }
+
+
 
 .card {
-	background: #fff;
-	border-radius: 15px;
-	padding: 35px;
-	text-align: center;
-	border: 1px solid #e2e8f0;
-	box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
-	transition: .25s;
+
+background: #fff;
+
+border-radius: 15px;
+
+padding: 35px;
+
+text-align: center;
+
+border: 1px solid #e2e8f0;
+
+box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
+
+transition: .25s;
+
 }
+
+
 
 .card:hover {
-	transform: translateY(-6px);
-	box-shadow: 0 10px 20px rgba(0, 0, 0, .15);
+
+transform: translateY(-6px);
+
+box-shadow: 0 10px 20px rgba(0, 0, 0, .15);
+
 }
+
+
 
 .icon {
-	font-size: 58px;
-	margin-bottom: 15px;
+
+font-size: 58px;
+
+margin-bottom: 15px;
+
 }
+
+
 
 .card h2 {
-	margin: 10px 0;
-	color: #0f172a;
+
+margin: 10px 0;
+
+color: #0f172a;
+
 }
+
+
 
 .card p {
-	color: #64748b;
-	line-height: 1.7;
-	min-height: 65px;
+
+color: #64748b;
+
+line-height: 1.7;
+
+min-height: 65px;
+
 }
+
+
 
 .btn {
-	display: inline-block;
-	margin-top: 20px;
-	padding: 12px 26px;
-	border-radius: 8px;
-	color: white;
-	text-decoration: none;
-	font-weight: bold;
+
+display: inline-block;
+
+margin-top: 20px;
+
+padding: 12px 26px;
+
+border-radius: 8px;
+
+color: white;
+
+text-decoration: none;
+
+font-weight: bold;
+
 }
+
+
 
 .disabled {
-	background: #94a3b8;
-	cursor: not-allowed;
+
+background: #94a3b8;
+
+cursor: not-allowed;
+
 }
+
+
 
 .list {
-	background: #3b82f6;
+
+background: #3b82f6;
+
 }
+
+
 
 .list:hover {
-	background: #2563eb;
+
+background: #2563eb;
+
 }
+
+
 
 .my {
-	background: #10b981;
+
+background: #10b981;
+
 }
+
+
 
 .my:hover {
-	background: #059669;
+
+background: #059669;
+
 }
+
+
 
 .host {
-	background: #8b5cf6;
+
+background: #8b5cf6;
+
 }
+
+
 
 .host:hover {
-	background: #7c3aed;
+
+background: #7c3aed;
+
 }
+
+
 
 .back {
-	background: #64748b;
+
+background: #64748b;
+
 }
+
+
 
 .back:hover {
-	background: #475569;
+
+background: #475569;
+
 }
+
+
 
 @media (max-width: 700px) {
-	.login-panel,
-	.login-form {
-		display: block;
-	}
 
-	.login-form select,
-	.login-form button {
-		width: 100%;
-		margin-top: 10px;
-	}
+.login-panel,
+
+.login-form {
+
+display: block;
+
 }
+
+
+
+.login-form select,
+
+.login-form button {
+
+width: 100%;
+
+margin-top: 10px;
+
+}
+
+}
+
 </style>
+
+
 
 </head>
 
+
+
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
+
 <body>
 
-	<div class="header">
-		<h1>活動前台</h1>
-		<p>
-			目前狀態：<span th:text="${loginMemberName}">未登入</span>
-			<span th:if="${isLoginMember}">（會員編號 <span th:text="${loginMemberId}">1</span>）</span>
-		</p>
-	</div>
 
-	<div th:if="${param.loginRequired}" class="warning">
-		請先登入會員，才能使用報名、付款、主辦活動或聊天室功能。
-	</div>
 
-	<div th:if="${param.chatDenied}" class="warning">
-		只有主辦人或已付款會員可以進入活動聊天室。
-	</div>
+<div class="header">
 
-	<div th:if="${param.syncSuccess}" class="success">
-		已依有效報名訂單重新同步活動報名人數。
-	</div>
+<h1>活動前台</h1>
 
-	<div class="login-panel">
-		<div>
-			<strong>測試登入會員</strong>
-			<div>預設未登入；登入後才可以報名、付款、主辦活動與進入聊天室。</div>
-		</div>
+<p>
 
-		<form class="login-form" th:action="@{/activity/front/fakeLogin}" method="post">
-			<select name="memberId">
-				<option value="" th:selected="${!isLoginMember}">未登入</option>
-				<option th:each="memberId : ${memberListData}"
-					th:value="${memberId}"
-					th:selected="${memberId == loginMemberId}"
-					th:text="|會員${memberId}|">
-				</option>
-			</select>
-			<button type="submit">切換</button>
-		</form>
-	</div>
+目前狀態：<span th:text="${loginMemberName}">未登入</span>
 
-	<div class="login-panel" th:if="${isLoginMember}">
-		<div>
-			<strong>同步活動報名人數</strong>
-			<div>用有效訂單重新計算每個活動的人數，適合整理假資料時使用。</div>
-		</div>
+<span th:if="${isLoginMember}">（會員編號 <span th:text="${loginMemberId}">1</span>）</span>
 
-		<form class="sync-form" th:action="@{/activity/front/syncAttendees}" method="post">
-			<button type="submit">同步人數</button>
-		</form>
-	</div>
+</p>
 
-	<div class="card-container">
+</div>
 
-		<div class="card">
-			<div class="icon">A</div>
-			<h2>活動列表</h2>
-			<p>瀏覽目前活動，查看活動詳情並進行報名。</p>
-			<a th:href="@{/activity/front/list}" class="btn list">查看活動</a>
-		</div>
 
-		<div class="card">
-			<div class="icon">O</div>
-			<h2>我的報名</h2>
-			<p>查看目前測試登入會員已報名的活動訂單。</p>
-			<a th:if="${isLoginMember}" th:href="@{/activity/front/myOrder}" class="btn my">查看我的報名</a>
-			<span th:unless="${isLoginMember}" class="btn disabled">請先登入</span>
-		</div>
 
-		<div class="card">
-			<div class="icon">H</div>
-			<h2>主辦活動</h2>
-			<p>新增主辦活動，或查看目前測試登入會員舉辦的活動。</p>
-			<a th:if="${isLoginMember}" th:href="@{/activity/front/addHostActivity}" class="btn host">新增活動</a>
-			<a th:if="${isLoginMember}" th:href="@{/activity/front/myHostActivity}" class="btn host">我的主辦活動</a>
-			<span th:unless="${isLoginMember}" class="btn disabled">請先登入</span>
-		</div>
+<div th:if="${param.loginRequired}" class="warning">
 
-		<div class="card">
-			<div class="icon">B</div>
-			<h2>回活動入口</h2>
-			<p>回到活動系統入口，切換前台或後台管理頁。</p>
-			<a th:href="@{/activity/home}" class="btn back">回入口</a>
-		</div>
+請先登入會員，才能使用報名、付款、主辦活動或聊天室功能。
 
-	</div>
+</div>
+
+
+
+<div th:if="${param.chatDenied}" class="warning">
+
+只有主辦人或已付款會員可以進入活動聊天室。
+
+</div>
+
+
+
+<div th:if="${param.syncSuccess}" class="success">
+
+已依有效報名訂單重新同步活動報名人數。
+
+</div>
+
+
+
+<div class="login-panel">
+
+<div>
+
+<strong>測試登入會員</strong>
+
+<div>預設未登入；登入後才可以報名、付款、主辦活動與進入聊天室。</div>
+
+</div>
+
+
+
+<form class="login-form" th:action="@{/activity/front/fakeLogin}" method="post">
+
+<select name="memberId">
+
+<option value="" th:selected="${!isLoginMember}">未登入</option>
+
+<option th:each="memberId : ${memberListData}"
+
+th:value="${memberId}"
+
+th:selected="${memberId == loginMemberId}"
+
+th:text="|會員${memberId}|">
+
+</option>
+
+</select>
+
+<button type="submit">切換</button>
+
+</form>
+
+</div>
+
+
+
+<div class="login-panel" th:if="${isLoginMember}">
+
+<div>
+
+<strong>同步活動報名人數</strong>
+
+<div>用有效訂單重新計算每個活動的人數，適合整理假資料時使用。</div>
+
+</div>
+
+
+
+<form class="sync-form" th:action="@{/activity/front/syncAttendees}" method="post">
+
+<button type="submit">同步人數</button>
+
+</form>
+
+</div>
+
+
+
+<div class="card-container">
+
+
+
+<div class="card">
+
+<div class="icon">A</div>
+
+<h2>活動列表</h2>
+
+<p>瀏覽目前活動，查看活動詳情並進行報名。</p>
+
+<a th:href="@{/activity/front/list}" class="btn list">查看活動</a>
+
+</div>
+
+
+
+<div class="card">
+
+<div class="icon">O</div>
+
+<h2>我的報名</h2>
+
+<p>查看目前測試登入會員已報名的活動訂單。</p>
+
+<a th:if="${isLoginMember}" th:href="@{/activity/front/myOrder}" class="btn my">查看我的報名</a>
+
+<span th:unless="${isLoginMember}" class="btn disabled">請先登入</span>
+
+</div>
+
+
+
+<div class="card">
+
+<div class="icon">H</div>
+
+<h2>主辦活動</h2>
+
+<p>新增主辦活動，或查看目前測試登入會員舉辦的活動。</p>
+
+<a th:if="${isLoginMember}" th:href="@{/activity/front/addHostActivity}" class="btn host">新增活動</a>
+
+<a th:if="${isLoginMember}" th:href="@{/activity/front/myHostActivity}" class="btn host">我的主辦活動</a>
+
+<span th:unless="${isLoginMember}" class="btn disabled">請先登入</span>
+
+</div>
+
+
+
+<div class="card">
+
+<div class="icon">B</div>
+
+<h2>回活動入口</h2>
+
+<p>回到活動系統入口，切換前台或後台管理頁。</p>
+
+<a th:href="@{/activity/home}" class="btn back">回入口</a>
+
+</div>
+
+
+
+</div>
+
+
 
 </body>
+
 </html>

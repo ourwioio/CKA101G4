@@ -1,399 +1,686 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-<meta charset="UTF-8">
-<title>活動詳情</title>
-<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-<link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
-<link rel="stylesheet" th:href="@{/css/front-end/activity/actReview.css}">
-<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
-<script th:src="@{/js/front-end/activity/actReview.js}"></script>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 
-<style>
-body {
-	margin: 0;
-	background: #f8fafc;
-	font-family: "Microsoft JhengHei", sans-serif;
-	padding: 40px;
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>活動詳情</title>
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <style>
+/* ==========================================================
+   Webond 活動詳情頁 — 圓潤角色風 (cream / ink / pastel blobs)
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+
+:root{
+  --color-bg:            #F7F3EC;
+  --color-surface:       #FFFFFF;
+  --color-surface-soft:  #FFFDF8;
+  --color-ink:           #17140F;
+  --color-ink-soft:      #726A5F;
+  --color-border:        #ECE4D6;
+
+  --color-yellow:       #FFE59A;
+  --color-yellow-deep:  #FFC94D;
+  --color-pink:         #FFB5C1;
+  --color-green:        #B7E1D1;
+  --color-blue:         #A9D3FF;
+  --color-red:          #FF5271;
+
+  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+
+  --nav-height: 76px;
 }
 
+*{ box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding: 40px 20px;
+}
+
+h1,h2,h3,h4{ font-family: var(--font-display); margin:0; }
+a{ text-decoration: none; color: inherit; }
+
+/* ==========================================================
+   詳情大卡片主體 (絕對定位用於右上角檢舉按鈕)
+   ========================================================== */
 .card {
-	max-width: 900px;
-	margin: auto;
-	background: white;
-	border-radius: 16px;
-	padding: 35px 45px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+  max-width: 900px;
+  margin: auto;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  position: relative;/* 為右上角留出空間 */
+  overflow: hidden;
+}
+
+.card__body {
+  padding: 40px 45px 45px 45px; /* 上、右、下、左 */
+}
+
+/* ==========================================================
+   頂部活動大圖與標題
+   ========================================================== */
+.activity-image {
+  width: 100%;
+  max-height: 600px;
+  object-fit: cover;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-soft);
 }
 
 .header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	border-bottom: 1px solid #e2e8f0;
-	padding-bottom: 20px;
-	margin-bottom: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px dashed var(--color-border);
+  padding-bottom: 20px;
+  margin-bottom: 28px;
+  gap: 16px;
 }
 
 h1 {
-	color: #0f172a;
-	margin: 0;
-}
-
-.activity-image {
-	width: 100%;
-	max-height: 420px;
-	object-fit: cover;
-	border-radius: 12px;
-	margin-bottom: 24px;
-	background: #e2e8f0;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-ink);
+  margin: 0;
+  line-height: 1.3;
 }
 
 .member {
-	color: #64748b;
-	font-weight: bold;
+  font-size: 13.5px;
+  color: var(--color-ink-soft);
+  font-weight: 700;
+  white-space: nowrap;
 }
 
+/* ==========================================================
+   狀態標章（帶有活潑粗黑邊與立體小黑影）
+   ========================================================== */
+/* 1. 左側標題與徽章的排列容器 */
+.header__left {
+  display: flex;
+  align-items: center; /* 關鍵：讓徽章與標題文字水平垂直置中對齊 */
+  gap: 16px;          /* 標題與徽章之間的間距 */
+  flex-wrap: wrap;    /* 避免手機版標題過長時擠壓變形 */
+}
+
+/* 2. 修正徽章樣式（覆蓋並移除原本的下邊距） */
 .registration-status {
-	display: inline-block;
-	background: #e0f2fe;
-	color: #075985;
-	padding: 8px 14px;
-	border-radius: 999px;
-	font-weight: bold;
-	margin-bottom: 18px;
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-blue);
+  color: var(--color-ink);
+  padding: 5px 16px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-bottom: 0; /* ❌ 移除原本的 28px 下邊距，確保完美垂直置中 */
+}
+
+/* ==========================================================
+   動態錯誤與警告提示框 (仿 FB 藥丸大膠囊)
+   ========================================================== */
+.alert-error, .alert-warning {
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .alert-error {
-	background: #fee2e2;
-	color: #b91c1c;
-	padding: 14px 18px;
-	border-radius: 8px;
-	margin-bottom: 20px;
-	font-weight: bold;
-	border: 1px solid #fecaca;
+  background: var(--color-pink);
+  color: var(--color-ink);
 }
 
 .alert-warning {
-	background: #fef3c7;
-	color: #92400e;
-	padding: 14px 18px;
-	border-radius: 8px;
-	margin-bottom: 20px;
-	font-weight: bold;
-	border: 1px solid #fde68a;
+  background: var(--color-yellow);
+  color: var(--color-ink);
+}
+
+/* ==========================================================
+   高級網格看板 (Info Grid) — 擺脫冗長純文字
+   ========================================================== */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
 }
 
 .info {
-	margin: 18px 0;
-	font-size: 17px;
-	color: #334155;
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  font-size: 14.5px;
+  color: var(--color-ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+/* 讓合併後的報名時間跨足兩格滿版 */
+.info.info--full-width {
+  grid-column: span 2;
+}
+
+/* 價格特殊放大突顯 */
+.info.price-highlight {
+  grid-column: span 2;
+  background: var(--color-yellow);
+  border-color: var(--color-ink);
+  border-width: 1.5px;
+}
+.info.price-highlight .label {
+  font-size: 16px;
+}
+.info.price-highlight .value {
+  font-size: 20px;
+  font-family: var(--font-display);
 }
 
 .label {
-	font-weight: bold;
-	color: #0f172a;
+  font-weight: 800;
+  color: var(--color-ink);
 }
 
+.value {
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+/* 活動描述沉浸框 */
 .desc {
-	margin-top: 20px;
-	padding: 20px;
-	background: #f8fafc;
-	border-radius: 12px;
-	line-height: 1.8;
-	color: #475569;
+  margin-top: 24px;
+  padding: 24px;
+  background: var(--color-surface-soft);
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  line-height: 1.8;
+  font-size: 14.5px;
+  color: var(--color-ink);
+  font-weight: 500;
 }
 
+/* ==========================================================
+   操作按鈕底列
+   ========================================================== */
 .actions {
-	margin-top: 30px;
-	display: flex;
-	justify-content: flex-end;
-	gap: 12px;
+  margin-top: 36px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
-.btn-back {
-	background: #64748b;
-	color: white;
-	text-decoration: none;
-	padding: 12px 22px;
-	border-radius: 8px;
-	font-weight: bold;
+.btn-back, .btn-order, .btn-review {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 14.5px;
+  padding: 11px 24px;
+  border-radius: var(--radius-full);
+  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
+  cursor: pointer;
+  border: none;
 }
 
+/* 立即報名：沉穩深黑 */
 .btn-order {
-	background: #2563eb;
-	color: white;
-	text-decoration: none;
-	padding: 12px 24px;
-	border-radius: 8px;
-	font-weight: bold;
+  background: var(--color-ink);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
 }
-
 .btn-order:hover {
-	background: #1d4ed8;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-yellow-deep);
+  color: var(--color-ink);
 }
 
-.btn-report {
-	background: #dc2626;
-	color: white;
-	text-decoration: none;
-	border: 0;
-	padding: 12px 24px;
-	border-radius: 8px;
-	font-weight: bold;
-	cursor: pointer;
+/* 返回列表：大圓角奶油框 */
+.btn-back {
+  background: var(--color-surface);
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+.btn-back:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-ink);
+  box-shadow: var(--shadow-md);
 }
 
-.btn-report:hover {
-	background: #b91c1c;
-}
-
+/* 瀏覽評價：紫色膠囊 */
 .btn-review {
-	background: #7c3aed;
-	color: white;
-	text-decoration: none;
-	padding: 12px 24px;
-	border-radius: 8px;
-	font-weight: bold;
+  background: var(--color-blue);
+  color: var(--color-ink);
+  border: 1.5px solid var(--color-ink);
+  box-shadow: 2px 2px 0px var(--color-ink);
 }
-
 .btn-review:hover {
-	background: #6d28d9;
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0px var(--color-ink);
 }
 
+/* 右上角細緻檢舉按鈕 (紅底60%透明、紅字、細小藥丸) */
+.btn-report {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: rgba(255, 77, 79, 0.6) !important;
+  color: #8c0000 !important;
+  font-size: 12px !important;
+  padding: 6px 14px !important;
+  border-radius: var(--radius-full) !important;
+  font-weight: 800 !important;
+  border: 1.5px solid rgba(255, 77, 79, 0.2) !important;
+  box-shadow: none !important;
+  transition: transform .15s ease, background .15s ease !important;
+}
+.btn-report:hover {
+  transform: translateY(-2px) !important;
+  background: rgba(255, 77, 79, 0.75) !important;
+}
+
+/* ==========================================================
+   活動評價區區塊 (切換鍵與卡片重塑)
+   ========================================================== */
 .review-section {
-	margin-top: 30px;
-	padding: 22px;
-	background: #f8fafc;
-	border-radius: 12px;
-	border: 1px solid #e2e8f0;
+  margin-top: 42px;
+  padding: 32px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
-.review-section h2 {
-	margin: 0 0 16px 0;
-	color: #0f172a;
+.review-header-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.review-header-inline h2 {
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--color-ink);
 }
 
+/* 滿星黃、空星沙色 */
+.star { font-size: 18px; margin-right: 2px; }
+.star.filled { color: var(--color-yellow-deep); }
+.star.empty { color: var(--color-border); }
+
+.review-inline-score {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-ink);
+}
+.review-count-badge {
+  font-size: 14px;
+  color: var(--color-ink-soft);
+  font-weight: 700;
+}
+
+/* 膠囊藥丸形星等切換鍵 Tabs */
+.review-filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+.review-filter-tabs button.filter-btn {
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 13px;
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+.review-filter-tabs button.filter-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-ink);
+}
+.review-filter-tabs button.filter-btn.active {
+  background: var(--color-ink);
+  color: #fff;
+  border-color: var(--color-ink);
+}
+
+/* 時間排序立體按鈕 */
+.sort-btn {
+  margin-left: auto;
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 12.5px;
+  padding: 7px 16px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-ink);
+  box-shadow: 2px 2px 0px var(--color-ink);
+  cursor: pointer;
+}
+.sort-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 3px 3px 0px var(--color-ink);
+}
+
+/* 評論卡片重塑 */
+.review-scroll-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 .review-card {
-	background: white;
-	border: 1px solid #e2e8f0;
-	border-radius: 10px;
-	padding: 16px;
-	margin-top: 12px;
+  background: var(--color-surface-soft);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  display: flex;
+  gap: 18px;
+  box-shadow: var(--shadow-sm);
+  transition: transform .15s ease;
+  align-items: flex-start;
 }
+.review-card:hover { transform: translateY(-2px); }
+
+/* 頭像圓潤化 */
+.avatar-container {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--color-surface);
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+.avatar-img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-badge {
+  width: 100%; height: 100%;
+  background: var(--color-green);
+  color: var(--color-ink);
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+
+.review-card-right { flex: 1; }
 
 .review-meta {
-	display: flex;
-	justify-content: space-between;
-	gap: 12px;
-	color: #64748b;
-	font-weight: bold;
-	margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+.reviewer-id { font-weight: 800; color: var(--color-ink); }
+.review-date { color: var(--color-ink-soft); font-weight: 500; }
+
+.review-rating-stars {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.rating-text-score {
+  font-size: 12px;
+  color: var(--color-ink-soft);
+  font-weight: 700;
+  margin-left: 4px;
 }
 
-.review-rating {
-	color: #7c3aed;
-	font-weight: bold;
-	margin-bottom: 8px;
+.review-text-content {
+  font-size: 14px;
+  color: var(--color-ink);
+  line-height: 1.6;
+  font-weight: 500;
 }
 
 .review-empty {
-	color: #64748b;
-	font-weight: bold;
+  padding: 36px 20px;
+  text-align: center;
+  color: var(--color-ink-soft);
+  font-weight: 800;
+  background: var(--color-surface-soft);
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-md);
 }
 
-</style>
+/* ==========================================================
+   RWD
+   ========================================================== */
+@media (max-width: 760px) {
+  .card { padding: 24px; padding-top: 64px; }
+  .header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .info-grid { grid-template-columns: 1fr; }
+  .info.price-highlight { grid-column: span 1; }
+  .actions { flex-direction: column-reverse; }
+  .btn-back, .btn-order, .btn-review { width: 100%; }
+  .sort-btn { margin-left: 0; width: 100%; text-align: center; }
+  .review-card { flex-direction: column; gap: 12px; }
+}
+  </style>
+  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+  <script th:src="@{/js/front-end/activity/actReview.js}"></script>
 </head>
 
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
+
 <body>
 
-	<div class="card">
+  <div class="container">
+    <div class="card">
 
-		<img class="activity-image"
-			th:src="@{/activity/front/image(id=${activityVO.activityId})}"
-			alt="活動圖片">
+      <!-- 右上角細緻檢舉按鈕 -->
+      <a class="btn-report"
+         th:href="${isLoginMember} ? @{/activity/report(activityId=${activityVO.activityId})} : @{/member/login}"
+         th:title="${isLoginMember} ? '檢舉此活動' : '請先登入後再檢舉活動'">檢舉活動</a>
 
-		<div class="header">
-			<h1 th:text="${activityVO.activityTitle}">活動名稱</h1>
+      <!-- 活動頂部圖片 -->
+      <img class="activity-image" th:src="@{/activity/front/image(id=${activityVO.activityId})}" alt="活動圖片">
+	<div class="card__body">
+      <!-- 標頭資訊 -->
+      <div class="header">
+        <!-- 新增左側包裝容器，讓標題與狀態徽章貼在一起並垂直置中 -->
+        <div class="header__left">
+          <h1 th:text="${activityVO.activityTitle}">活動名稱</h1>
+          <!-- 報名狀態徽章（移到這裡，與標題水平並排） -->
+          <div class="registration-status" th:text="${registrationStatusText}">報名中</div>
+        </div>
 
-			<div class="member">
-				目前狀態： <span th:text="${loginMemberName}">未登入</span>
-			</div>
-		</div>
+      </div>
 
-		<div th:if="${showLoginPrompt}" class="alert-warning">
-			未登入只能瀏覽活動詳情，請先登入會員後再報名。</div>
+      <!-- 動態提示橫幅 (仿 FB 質感膠囊) -->
+      <div th:if="${showLoginPrompt}" class="alert-warning">
+         未登入只能瀏覽活動詳情，請先登入會員後再進行活動報名。
+      </div>
 
-		<div th:if="${fullMessage}" class="alert-error">
-			<span th:text="${fullMessage}"></span>
-		</div>
+      <div th:if="${fullMessage}" class="alert-error">
+         <span th:text="${fullMessage}"></span>
+      </div>
 
-		<div th:if="${duplicateMessage}" class="alert-error">
-			<span th:text="${duplicateMessage}"></span>
-		</div>
+      <div th:if="${duplicateMessage}" class="alert-error">
+         <span th:text="${duplicateMessage}"></span>
+      </div>
 
-		<div th:if="${ownerMessage}" class="alert-error">
-			<span th:text="${ownerMessage}"></span>
-		</div>
+      <div th:if="${ownerMessage}" class="alert-error">
+         <span th:text="${ownerMessage}"></span>
+      </div>
 
-		<div th:if="${closedMessage}" class="alert-error">
-			<span th:text="${closedMessage}"></span>
-		</div>
-
-		<div class="registration-status" th:text="${registrationStatusText}">報名中</div>
-
-		<div class="info">
-			<span class="label">主辦會員編號：</span> <span
-				th:text="${activityVO.memberId}">1</span>
-		</div>
-
-		<div class="info">
-			<span class="label">活動價格：</span> NT$ <span
-				th:text="${activityVO.activityPrice}">0</span>
-		</div>
-
-		<div class="info">
-			<span class="label">最低成團人數：</span> <span
-				th:text="${activityVO.minParticipants}">1</span>
-		</div>
-
-		<div class="info">
-			<span class="label">最高人數限制：</span> <span
-				th:text="${activityVO.maxParticipants}">10</span>
-		</div>
-
-		<div class="info">
-			<span class="label">目前報名人數：</span> <span
-				th:text="${activityVO.attendeesCount}">0</span> / <span
-				th:text="${activityVO.maxParticipants}">10</span>
-		</div>
-
-		<div class="info">
-			<span class="label">報名開始：</span> <span
-				th:text="${#temporals.format(activityVO.registrationStartTime, 'yyyy-MM-dd HH:mm')}"></span>
-		</div>
-
-		<div class="info">
-			<span class="label">報名截止：</span> <span
-				th:text="${#temporals.format(activityVO.registrationDeadline, 'yyyy-MM-dd HH:mm')}"></span>
-		</div>
-
-		<div class="info">
-			<span class="label">活動開始時間：</span> <span
-				th:text="${#temporals.format(activityVO.startTime, 'yyyy-MM-dd HH:mm')}"></span>
-		</div>
-
-		<div class="info">
-			<span class="label">活動結束時間：</span> <span
-				th:text="${#temporals.format(activityVO.endTime, 'yyyy-MM-dd HH:mm')}"></span>
-		</div>
-
-		<div class="desc" th:text="${activityVO.activityDescription}">
-			活動描述</div>
-
-		<div class="actions">
-			<a class="btn-report"
-				th:href="${isLoginMember} ? @{/activity/report(activityId=${activityVO.activityId})} : @{/member/login}"
-				th:title="${isLoginMember} ? '檢舉此活動' : '請先登入後再檢舉活動'">檢舉活動</a> <a
-				th:href="${backUrl}" class="btn-back" th:text="${backText}">返回列表</a>
-			<a th:if="${showOrderButton}"
-				th:href="@{/activity/front/order(activityId=${activityVO.activityId})}"
-				class="btn-order"> 立即報名 </a> <a th:if="${showReviewButton}"
-				href="#activityReviews" class="btn-review">瀏覽評價</a>
-		</div>
+      <div th:if="${closedMessage}" class="alert-error">
+        <span></span> <span th:text="${closedMessage}"></span>
+      </div>
 
 
+      <!-- 高級網格看板 (Info Grid) -->
+      <div class="info-grid">
+        
+        <!-- 價格突顯盒 -->
+        <div class="info price-highlight">
+          <span class="label">活動價格</span>
+          <span class="value">NT$ <span th:text="${activityVO.activityPrice}">0</span></span>
+        </div>
 
-		<div id="activityReviews" class="review-section"
-			th:if="${showReviewButton}">
+        <div class="info">
+          <span class="label">主辦會員編號</span>
+          <span class="value" th:text="${activityVO.memberId}">1</span>
+        </div>
 
-			<div class="review-sticky-header">
-				<div class="review-header-inline"
-					th:with="avgInt=${(averageScore ?: 5.0).intValue()}">
-					<div class="large-stars">
-						<span th:each="i : ${#numbers.sequence(1, avgInt)}"
-							class="star filled">★</span> <span th:if="${avgInt < 5}"
-							th:each="i : ${#numbers.sequence(1, 5 - avgInt)}"
-							class="star empty">★</span>
-					</div>
-					<span class="review-inline-score"
-						th:text="${#numbers.formatDecimal(averageScore ?: 5.0, 1, 1)}">5.0</span>
-					<h2>的活動評價</h2>
-					<span class="review-count-badge"
-						th:text="|(${#lists.size(reviewListData)})|">(0)</span>
-				</div>
+        <div class="info">
+          <span class="label">目前報名進度</span>
+          <span class="value"><span th:text="${activityVO.attendeesCount}">0</span> / <span th:text="${activityVO.maxParticipants}">10</span> 人</span>
+        </div>
 
-				<div class="review-filter-tabs"
-					th:if="${!#lists.isEmpty(reviewListData)}">
-					<button type="button" class="filter-btn active"
-						onclick="filterReviews('all')">全部</button>
-					<button type="button" class="filter-btn"
-						onclick="filterReviews('5')">5 星</button>
-					<button type="button" class="filter-btn"
-						onclick="filterReviews('4')">4 星</button>
-					<button type="button" class="filter-btn"
-						onclick="filterReviews('3')">3 星</button>
-					<button type="button" class="filter-btn"
-						onclick="filterReviews('2')">2 星</button>
-					<button type="button" class="filter-btn"
-						onclick="filterReviews('1')">1 星</button>
+        <div class="info">
+          <span class="label">最低成團人數</span>
+          <span class="value"><span th:text="${activityVO.minParticipants}">1</span> 人</span>
+        </div>
 
-					<button type="button" id="sortTimeBtn" class="sort-btn"
-						data-sort="desc" onclick="toggleTimeSort()">⏳ 最新優先</button>
-				</div>
-			</div>
+        <div class="info">
+          <span class="label">最高人數限制</span>
+          <span class="value"><span th:text="${activityVO.maxParticipants}">10</span> 人</span>
+        </div>
 
-			<div class="review-scroll-body" id="reviewScrollBody">
-				<div th:if="${#lists.isEmpty(reviewListData)}" class="review-empty">
-					目前尚無會員評價。</div>
+        <div class="info info--full-width">
+          <span class="label">報名開始時間</span>
+          <span class="value" th:text="${#temporals.format(activityVO.registrationStartTime, 'yyyy-MM-dd HH:mm')} + ' ～ ' + ${#temporals.format(activityVO.registrationDeadline, 'yyyy-MM-dd HH:mm')}"></span>
+        </div>
 
-				<div th:each="review : ${reviewListData}" class="review-card"
-					th:data-stars="${review.buyerRateSeller}"
-					th:data-time="${review.buyerReviewedAt != null ? #temporals.format(review.buyerReviewedAt, 'yyyyMMddHHmm') : '0'}">
+        <div class="info info--full-width">
+          <span class="label">活動開始時間</span>
+          <span class="value" th:text="${#temporals.format(activityVO.startTime, 'yyyy-MM-dd HH:mm')} + ' ～ ' + ${#temporals.format(activityVO.endTime, 'yyyy-MM-dd HH:mm')}"></span>
+        </div>
 
-					<div class="avatar-container">
+        
 
-						<img th:if="${review.buyerMemberId != null}"
-							th:src="|https://dicebear.com{review.buyerMemberId}|" alt="會員頭像"
-							class="avatar-img">
+      </div>
 
-						<div th:unless="${review.buyerMemberId != null}"
-							class="avatar-badge">M</div>
+      <!-- 活動詳細描述 -->
+      <div class="desc" th:text="${activityVO.activityDescription}">活動描述</div>
 
-					</div>
+      <!-- 底部按鈕操作列 -->
+      <div class="actions">
+        <a th:href="${backUrl}" class="btn-back" th:text="${backText}">返回列表</a>
+        
+        <a th:if="${showReviewButton}" href="#activityReviews" class="btn-review">瀏覽評價</a>
+        
+        <a th:if="${showOrderButton}" th:href="@{/activity/front/order(activityId=${activityVO.activityId})}" class="btn-order">
+          立即報名
+        </a>
+      </div>
 
-					<div class="review-card-right">
-						<div class="review-meta">
-							<span class="reviewer-id" th:text="|會員 ${review.buyerMemberId}|">會員
-								ID</span> <span class="review-date"
-								th:if="${review.buyerReviewedAt != null}"
-								th:text="${#temporals.format(review.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}">評價時間</span>
-						</div>
+      <!-- ==========================================================
+           活動評價互動區塊 (僅在 showReviewButton 成立時顯示)
+           ========================================================== -->
+      <div id="activityReviews" class="review-section" th:if="${showReviewButton}">
 
-						<div class="review-rating-stars">
-							<span th:if="${review.buyerRateSeller > 0}"
-								th:each="i : ${#numbers.sequence(1, review.buyerRateSeller)}"
-								class="star filled">★</span> <span
-								th:if="${review.buyerRateSeller < 5}"
-								th:each="i : ${#numbers.sequence(1, 5 - review.buyerRateSeller)}"
-								class="star empty">★</span> <span class="rating-text-score"
-								th:text="|(${review.buyerRateSeller} / 5)|"></span>
-						</div>
+        <!-- 頂部星星平均統計頭部 -->
+        <div class="review-sticky-header">
+          <div class="review-header-inline" th:with="avgInt=${(averageScore ?: 5.0).intValue()}">
+            <div class="large-stars">
+              <span th:each="i : ${#numbers.sequence(1, avgInt)}" class="star filled">★</span>
+              <span th:if="${avgInt < 5}" th:each="i : ${#numbers.sequence(1, 5 - avgInt)}" class="star empty">★</span>
+            </div>
+            <span class="review-inline-score" th:text="${#numbers.formatDecimal(averageScore ?: 5.0, 1, 1)}">5.0</span>
+            <h2>的活動評價</h2>
+            <span class="review-count-badge" th:text="|(${#lists.size(reviewListData)})|">(0)</span>
+          </div>
 
-						<div class="review-text-content"
-							th:text="${review.buyerReviewComment}">評價內容</div>
-					</div>
-				</div>
+          <!-- 星等分類篩選藥丸 Tabs 鍵組 -->
+          <div class="review-filter-tabs" th:if="${!#lists.isEmpty(reviewListData)}">
+            <button type="button" class="filter-btn active" onclick="filterReviews('all')">全部評價</button>
+            <button type="button" class="filter-btn" onclick="filterReviews('5')">5 星</button>
+            <button type="button" class="filter-btn" onclick="filterReviews('4')">4 星</button>
+            <button type="button" class="filter-btn" onclick="filterReviews('3')">3 星</button>
+            <button type="button" class="filter-btn" onclick="filterReviews('2')">2 星</button>
+            <button type="button" class="filter-btn" onclick="filterReviews('1')">1 星</button>
 
-				<div id="filterEmptyMsg" class="review-empty" style="display: none;">
-					⚠️ 沒有這個星等的評價。</div>
-			</div>
-		</div>
+            <!-- 排序按鈕 -->
+            <button type="button" id="sortTimeBtn" class="sort-btn" data-sort="desc" onclick="toggleTimeSort()">⏳ 最新優先</button>
+          </div>
+        </div>
 
-	</div>
+        <!-- 評價捲軸列表主體 -->
+        <div class="review-scroll-body" id="reviewScrollBody">
+          
+          <div th:if="${#lists.isEmpty(reviewListData)}" class="review-empty">
+            目前此活動尚無任何會員留下評價。
+          </div>
 
+          <!-- 評價卡片迴圈結構 -->
+          <div th:each="review : ${reviewListData}" class="review-card"
+               th:data-stars="${review.buyerRateSeller}"
+               th:data-time="${review.buyerReviewedAt != null ? #temporals.format(review.buyerReviewedAt, 'yyyyMMddHHmm') : '0'}">
 
+            <!-- 左側頭像處理 -->
+            <div class="avatar-container">
+              <img th:if="${review.buyerMemberId != null}" th:src="|https://dicebear.com{review.buyerMemberId}|" alt="會員頭像" class="avatar-img">
+              <div th:unless="${review.buyerMemberId != null}" class="avatar-badge">M</div>
+            </div>
+
+            <!-- 右側評論核心資訊 -->
+            <div class="review-card-right">
+              <div class="review-meta">
+                <span class="reviewer-id" th:text="|會員 ${review.buyerMemberId}|">會員 ID</span>
+                <span class="review-date" th:if="${review.buyerReviewedAt != null}"
+                      th:text="${#temporals.format(review.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}">評價時間</span>
+              </div>
+
+              <!-- 亮黃色填充評分星級 -->
+              <div class="review-rating-stars">
+                <span th:if="${review.buyerRateSeller > 0}" th:each="i : ${#numbers.sequence(1, review.buyerRateSeller)}" class="star filled">★</span>
+                <span th:if="${review.buyerRateSeller < 5}" th:each="i : ${#numbers.sequence(1, 5 - review.buyerRateSeller)}" class="star empty">★</span>
+                <span class="rating-text-score" th:text="|(${review.buyerRateSeller} / 5)|"></span>
+              </div>
+
+              <!-- 評價純文字內容 -->
+              <div class="review-text-content" th:text="${review.buyerReviewComment}">評價內容</div>
+            </div>
+            
+          </div>
+
+          <!-- 無符合星等時的 JS 提示 -->
+          <div id="filterEmptyMsg" class="review-empty" style="display: none;">
+            目前沒有此星等篩選條件下的活動評價。
+          </div>
+         
+        </div>
+      </div>
+ </div>
+    </div>
+  </div>
 
 </body>
 </html>
