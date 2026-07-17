@@ -930,7 +930,7 @@ public class FrontActivityController {
 		}
 
 		if (activityVO.getRegistrationDeadline() != null
-				&& Duration.between(now, activityVO.getRegistrationDeadline()).toHours() <= 24) {
+				&& Duration.between(now, activityVO.getRegistrationDeadline()).toHours() <= 168) {
 			return "即將截止";
 		}
 

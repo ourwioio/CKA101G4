@@ -88,28 +88,8 @@ a { text-decoration: none; color: inherit; }
   background: var(--color-yellow-deep);
 }
 
-.member {
-  font-size: 13.5px;
-  color: var(--color-ink-soft);
-  font-weight: 700;
-}
-
-/* 提示警告框：極簡無邊框、無立體陰影、字重 400 */
-.login-note {
-  background: var(--color-yellow);
-  color: var(--color-ink);
-  border-radius: var(--radius-md);
-  padding: 10px 16px;
-  font-size: 13px;
-  font-weight: 400;
-  margin-top: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
 /* ==========================================================
-   藥丸型捷徑按鈕 (頂部右側)
+   藥丸型捷徑按鈕
    ========================================================== */
 .back-btn {
   display: inline-flex;
@@ -133,7 +113,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ==========================================================
-   Q 萌搜尋面板 (Search Panel)
+   搜尋面板
    ========================================================== */
 .search-panel {
   max-width: 1200px;
@@ -183,15 +163,8 @@ a { text-decoration: none; color: inherit; }
   background: var(--color-surface);
 }
 
-/* ==========================================================
-   🌟 完美還原：自訂 Q 萌下拉選單 CSS
-   ========================================================== */
-.custom-select-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-/* 下拉選單觸發按鈕 */
+/* 下拉選單組件 */
+.custom-select-wrapper { position: relative; width: 100%; }
 .custom-select-trigger {
   width: 100%;
   font-family: var(--font-body);
@@ -202,7 +175,7 @@ a { text-decoration: none; color: inherit; }
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 12px 14px;
-  padding-right: 38px; /* 為箭頭留白 */
+  padding-right: 38px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -211,387 +184,231 @@ a { text-decoration: none; color: inherit; }
   position: relative;
   user-select: none;
 }
-
-.custom-select-trigger:hover {
-  border-color: var(--color-ink-soft);
-}
-
-.custom-select-trigger.active {
-  border-color: var(--color-yellow-deep);
-  background: var(--color-surface);
-}
-
-/* 粗線條微胖小箭頭（展開時旋轉 180 度） */
+.custom-select-trigger:hover { border-color: var(--color-ink-soft); }
+.custom-select-trigger.active { border-color: var(--color-yellow-deep); background: var(--color-surface); }
 .custom-select-trigger .trigger-arrow {
-  position: absolute;
-  right: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 15px;
-  height: 15px;
+  position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  width: 15px; height: 15px;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2317140F' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
-  background-size: contain;
-  background-repeat: no-repeat;
+  background-size: contain; background-repeat: no-repeat;
   transition: transform .22s cubic-bezier(0.175, 0.885, 0.32, 1.2);
 }
+.custom-select-trigger.active .trigger-arrow { transform: translateY(-50%) rotate(180deg); }
 
-.custom-select-trigger.active .trigger-arrow {
-  transform: translateY(-50%) rotate(180deg);
-}
-
-/* 🌟 下拉選項彈出選單（完全還原截圖的 24px 大圓角與陰影效果） */
 .custom-dropdown-menu {
-  display: none;
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  right: 0;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 24px; /* 🌟 截圖同款 24px 大圓角 */
-  box-shadow: var(--shadow-md); /* 舒適的擴散柔和陰影 */
-  padding: 12px;
-  z-index: 100;
-  max-height: 280px;
-  overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+  display: none; position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+  background: var(--color-surface); border: 1px solid var(--color-border);
+  border-radius: 24px; box-shadow: var(--shadow-md); padding: 12px; z-index: 100;
+  max-height: 280px; overflow-y: auto; scrollbar-width: none;
 }
-
-/* 捲軸美化 */
-.custom-dropdown-menu::-webkit-scrollbar {
-	display: none;
-}
-.custom-dropdown-menu::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 10px;
-}
-
-.custom-dropdown-menu.show {
-  display: block;
-}
-
-/* 下拉選項 */
+.custom-dropdown-menu::-webkit-scrollbar { display: none; }
+.custom-dropdown-menu.show { display: block; }
 .custom-option {
-  padding: 12px 16px;
-  border-radius: var(--radius-md); /* 16px */
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-ink-soft);
-  cursor: pointer;
-  transition: background .15s ease, color .15s ease;
-  user-select: none;
+  padding: 12px 16px; border-radius: var(--radius-md); font-size: 14px; font-weight: 700;
+  color: var(--color-ink-soft); cursor: pointer; transition: background .15s ease, color .15s ease; user-select: none;
 }
+.custom-option:hover { background: var(--color-surface-soft); color: var(--color-ink); }
+.custom-option.selected { background: var(--color-yellow); color: var(--color-ink); }
 
-/* Hover 滑過時：溫和奶油黃底，字體變深 */
-.custom-option:hover {
-  background: var(--color-surface-soft);
-  color: var(--color-ink);
-}
-
-/* 選中狀態：精緻暖黃色 */
-.custom-option.selected {
-  background: var(--color-yellow);
-  color: var(--color-ink);
-}
-
-/* ==========================================================
-   勾選框與按鈕
-   ========================================================== */
 .checkbox-group {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13.5px;
-  font-weight: 800;
-  color: var(--color-ink);
-  cursor: pointer;
-  padding: 12px 10px;
-  user-select: none;
+  display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 800;
+  color: var(--color-ink); cursor: pointer; padding: 12px 10px; user-select: none;
 }
-.checkbox-group input[type="checkbox"] {
-  width: 17px;
-  height: 17px;
-  accent-color: var(--color-yellow-deep);
-  cursor: pointer;
-}
+.checkbox-group input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--color-yellow-deep); cursor: pointer; }
 
 .btn-search, .btn-reset {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-body);
-  font-weight: 800;
-  font-size: 14px;
-  padding: 11px 22px;
-  border-radius: var(--radius-full);
-  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
-  cursor: pointer;
-  border: none;
+  display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-body);
+  font-weight: 800; font-size: 14px; padding: 11px 22px; border-radius: var(--radius-full);
+  transition: transform .18s ease, box-shadow .18s ease, background .15s ease; cursor: pointer; border: none;
 }
+.btn-search { background: var(--color-ink); color: #fff; box-shadow: var(--shadow-sm); }
+.btn-search:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); background: var(--color-yellow-deep); color: var(--color-ink); }
+.btn-reset { background: var(--color-surface); color: var(--color-ink); border: 1.5px solid var(--color-border); }
+.btn-reset:hover { transform: translateY(-2px); border-color: var(--color-ink); }
 
-.btn-search {
-  background: var(--color-ink);
-  color: #fff;
-  box-shadow: var(--shadow-sm);
-}
-.btn-search:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  background: var(--color-yellow-deep);
-  color: var(--color-ink);
-}
-
-.btn-reset {
-  background: var(--color-surface);
-  color: var(--color-ink);
-  border: 1.5px solid var(--color-border);
-}
-.btn-reset:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-ink);
-}
-
-/* 筆數統計 */
-.result-info {
-  max-width: 1200px;
-  margin: 0 auto 16px;
-  padding: 0 20px;
-  font-size: 13.5px;
-  color: var(--color-ink-soft);
-  font-weight: 800;
-}
+.result-info { max-width: 1200px; margin: 0 auto 16px; padding: 0 20px; font-size: 13.5px; color: var(--color-ink-soft); font-weight: 800; }
 
 /* ==========================================================
-   活動卡片網格 (Card Grid)
+   卡片網格佈局
    ========================================================== */
 .container {
   max-width: 1200px;
   margin: auto;
-  padding: 0 20px 60px;
+  padding: 0 20px 40px;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 28px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  align-items: stretch;
 }
 
-/* 1. 卡片主體：新增 position: relative 鎖定點擊範圍 */
 .card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  transition: transform .22s cubic-bezier(0.175, 0.885, 0.32, 1.1), box-shadow .22s ease;
   overflow: hidden;
+  transition: transform .2s ease, box-shadow .2s ease;
+  display: flex;
+  position: relative; /* 鎖定絕對定位基準 */
+  flex-direction: column;
+  height: 100%;
+}
+.card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); }
+
+.card > a {
   display: flex;
   flex-direction: column;
-  position: relative; /* 🌟 關鍵新增：作為點擊範圍鋪滿的基準點 */
+  flex-grow: 1;
+  text-decoration: none;
+  color: inherit;
 }
 
-/* 2. 查看詳情按鈕：利用 ::after 鋪滿整張卡片 */
-.btn-detail {
-  width: 100%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: auto;
-  background: var(--color-ink);
-  color: #fff;
-  font-family: var(--font-body);
-  font-weight: 800;
-  font-size: 13.5px;
-  padding: 10px 20px;
-  border-radius: var(--radius-full);
-  box-shadow: var(--shadow-sm);
-  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
-}
-
-/* 🌟 鋪滿魔法：把按鈕的點擊隱形範圍放大到整張 .card */
-.btn-detail::after {
-  content: "";
-  position: absolute;
-  inset: 0;        /* 鋪滿上下左右，完全貼齊 .card */
-  z-index: 1;      /* 確保點擊層浮在最上方 */
-  cursor: pointer; /* 讓整張卡片滑過去都顯示小手手 👆 */
-}
-
-/* 3. 連動動畫：只要滑鼠進入卡片範圍，按鈕就自動產生 Hover 視覺回饋 */
-.card:hover .btn-detail {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  background: var(--color-yellow-deep);
-  color: var(--color-ink);
-}
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-md);
-}
-
-/* 頂滿卡片大圖 */
-.activity-image {
+/* 圖片容器 */
+.card__thumb-wrap {
   width: 100%;
   aspect-ratio: 16/10;
+  overflow: hidden;
+  position: relative;
+}
+.activity-image {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  border-radius: 0;
   background: var(--color-surface-soft);
-  border: none;
   display: block;
+  transition: transform .35s ease;
+}
+.card:hover .activity-image { transform: scale(1.04); }
+
+/* 🌟 完美移至整張卡片最右上角的活動狀態徽章 */
+.registration-status {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 3;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  border-radius: 10px;
+  white-space: nowrap;
+  background: var(--color-blue);
+  color: var(--color-ink);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
-/* 卡片文字包裹區 */
 .card__body {
-  padding: 24px;
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex-grow: 1;
+  padding: 20px;
+}
+
+/* 🌟 【區塊一】標體 + 金額：強制鎖定固定高度 */
+.card__header-group {
+  height: 82px; /* 固定高度，確保上下對齊 */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-bottom: 8px;
 }
 
 .card h2 {
-  font-size: 19px;
+  font-size: 15.5px;
   font-weight: 800;
   color: var(--color-ink);
   line-height: 1.4;
-  margin-bottom: 12px;
-}
-
-/* 極簡無邊框徽章 */
-.registration-status {
-  position: absolute;      /* 🌟 關鍵：改為絕對定位 */
-  top: 16px;               /* 距離卡片頂部 16px */
-  right: 16px;             /* 距離卡片右側 16px */
-  z-index: 2;              /* 確保徽章乖乖飄在圖片的最上層 */
-  pointer-events: none;    /* 🌟 專業細節：讓點擊穿透徽章，點擊它依然能順暢觸發卡片跳轉 */
-
-  display: inline-flex;
-  align-items: center;
-  background: var(--color-blue);
-  color: var(--color-ink);
-  padding: 5px 14px;
-  border-radius: var(--radius-full);
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  
-  /* ❌ 已移除原本的 margin-bottom 與 align-self，改絕對定位後不再需要它們 */
+  margin: 0 0 4px 0;
+  text-align: left;
+  /* 限制最多兩行，超出顯示 ... */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .price {
   font-family: var(--font-display);
   color: var(--color-ink);
-  font-size: 21px;
+  font-size: 17px;
   font-weight: 800;
-  margin-bottom: 14px;
+  margin: auto 0 0 0; /* 永遠貼在區塊一的最底端 */
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 3px;
 }
-.price::before {
-  content: 'NT$';
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--color-ink-soft);
-  margin-top: 4px;
-}
+.price::before { content: 'NT$'; font-size: 11px; font-weight: 800; color: var(--color-ink-soft); }
 
+/* 🌟 【區塊二】目前人數 + 截止時間：強制鎖定固定高度 */
 .meta {
   border-top: 1px dashed var(--color-border);
-  padding-top: 14px;
+  padding-top: 10px;
   color: var(--color-ink-soft);
-  font-size: 13px;
-  line-height: 1.7;
-  margin-bottom: 14px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  margin-bottom: 12px;
   font-weight: 600;
+  height: 56px; /* 固定高度，完美防跑版 */
 }
-.meta div {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
-.meta span {
-  color: var(--color-ink);
-  font-weight: 700;
-}
+.meta div { display: flex; justify-content: space-between; margin-bottom: 2px; }
+.meta span { color: var(--color-ink); font-weight: 700; }
 
-.desc {
-  font-size: 13px;
-  color: var(--color-ink-soft);
-  line-height: 1.7;
-  min-height: 66px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  margin-bottom: 20px;
-  font-weight: 500;
-}
-
-.btn-detail {
+/* 查看詳情按鈕 */
+.card__footer {
   width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+.btn-detail {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  margin-top: auto;
-  background: var(--color-ink);
-  color: #fff;
-  font-family: var(--font-body);
+  gap: 6px;
+  font-size: 12.5px;
   font-weight: 800;
-  font-size: 13.5px;
-  padding: 10px 20px;
-  border-radius: var(--radius-full);
-  box-shadow: var(--shadow-sm);
-  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
-}
-.btn-detail:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  background: var(--color-yellow-deep);
   color: var(--color-ink);
+  background: var(--color-yellow);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  transition: background .15s ease, transform .15s ease;
+}
+.card:hover .btn-detail {
+  background: var(--color-yellow-deep);
+  transform: translateX(2px);
 }
 
 .empty {
-  max-width: 1200px;
-  margin: 0 auto 60px;
-  background: var(--color-surface-soft);
-  border: 1.5px dashed var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 54px 24px;
-  text-align: center;
-  color: var(--color-ink-soft);
-  font-size: 15px;
-  font-weight: 800;
-  box-shadow: var(--shadow-sm);
+  max-width: 1200px; margin: 0 auto 60px; background: var(--color-surface-soft);
+  border: 1.5px dashed var(--color-border); border-radius: var(--radius-lg);
+  padding: 54px 24px; text-align: center; color: var(--color-ink-soft); font-size: 15px; font-weight: 800;
 }
 
-/* ==========================================================
-   RWD
-   ========================================================== */
-@media (max-width: 980px) {
-  .search-form {
-    grid-template-columns: 1.5fr 1fr 1fr;
-  }
+/* 分頁控制 */
+.pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 10px auto 60px; }
+.page-btn {
+  display: inline-flex; align-items: center; justify-content: center; background: var(--color-surface);
+  color: var(--color-ink); border: 1.5px solid var(--color-border); padding: 8px 16px; font-size: 13.5px;
+  font-weight: 700; border-radius: var(--radius-full); transition: all 0.2s ease;
 }
+.page-btn:hover:not(.disabled) { background: var(--color-yellow); border-color: var(--color-ink); transform: translateY(-2px); }
+.page-btn.active { background: var(--color-ink); color: #fff; border-color: var(--color-ink); }
+.page-btn.disabled { opacity: 0.4; pointer-events: none; }
 
+/* RWD 響應式 */
+@media (max-width: 1100px) { .container { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 880px)  { .container { grid-template-columns: repeat(2, 1fr); } .search-form { grid-template-columns: 1.5fr 1fr 1fr; } }
 @media (max-width: 760px) {
-  .header {
-    flex-direction: column;
-    align-items: flex-start;
-    margin-top: calc(var(--nav-height) + 20px);
-  }
-  .header div[style*="display: flex"] {
-    flex-direction: column;
-    width: 100%;
-    gap: 10px;
-  }
+  .header { flex-direction: column; align-items: flex-start; margin-top: calc(var(--nav-height) + 20px); }
+  .header div[style*="display: flex"] { flex-direction: column; width: 100%; gap: 10px; }
   .back-btn { width: 100%; text-align: center; }
   .search-panel { padding: 18px; }
-  .search-form {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
+  .search-form { grid-template-columns: 1fr; gap: 14px; }
   .checkbox-group { padding: 6px 0; }
   .btn-search, .btn-reset { width: 100%; }
 }
+@media (max-width: 520px) { .container { grid-template-columns: 1fr; } }
   </style>
-  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 </head>
 
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
@@ -607,11 +424,10 @@ a { text-decoration: none; color: inherit; }
     <div style="display: flex; gap: 12px;">
       <a th:href="${isLoginMember} ? @{/activity/front/myOrder} : @{/member/login}" class="back-btn">報名列表</a>
       <a th:href="${isLoginMember} ? @{/activity/front/myHostActivity} : @{/member/login}" class="back-btn">舉辦活動</a>
-      
     </div>
   </div>
 
-  <!-- ========== 搜尋篩選控制面板 (已全面改造為 100% 自訂下拉選單) ========== -->
+  <!-- ========== 搜尋篩選控制面板 ========== -->
   <div class="search-panel">
     <form class="search-form" th:action="@{/activity/front/list}" method="get">
       
@@ -622,7 +438,7 @@ a { text-decoration: none; color: inherit; }
                placeholder="輸入關鍵字..." th:value="${keyword}">
       </div>
 
-      <!-- 2. 活動類別 (自訂下拉式選單) -->
+      <!-- 2. 活動類別 -->
       <div class="form-group">
         <label>活動類別</label>
         <div class="custom-select-wrapper">
@@ -640,7 +456,7 @@ a { text-decoration: none; color: inherit; }
         </div>
       </div>
 
-      <!-- 3. 活動狀態 (自訂下拉式選單) -->
+      <!-- 3. 活動狀態 -->
       <div class="form-group">
         <label>活動狀態</label>
         <div class="custom-select-wrapper">
@@ -658,7 +474,7 @@ a { text-decoration: none; color: inherit; }
         </div>
       </div>
 
-      <!-- 4. 排列順序 (自訂下拉式選單) -->
+      <!-- 4. 排列順序 -->
       <div class="form-group">
         <label>排列順序</label>
         <div class="custom-select-wrapper">
@@ -700,44 +516,75 @@ a { text-decoration: none; color: inherit; }
     目前沒有找到符合篩選條件的揪團活動
   </div>
 
-  <!-- ========== 卡片網格 ========== -->
+  <!-- ========== 卡片網格 (已套用全新的區塊高度固定邏輯) ========== -->
   <div class="container" th:unless="${#lists.isEmpty(activityListData)}">
-  <div class="card" th:each="activity : ${activityListData}">
-    <a th:href="@{/activity/front/detail(id=${activity.activityId})}">
-    <img class="activity-image" th:src="@{/activity/front/image(id=${activity.activityId})}" alt="活動圖片">
-    
-    <div class="card__body">
-      <h2 th:text="${activity.activityTitle}">活動名稱</h2>
-      <span class="registration-status" th:text="${registrationStatusMap[activity.activityId]}">報名中</span>
-
-      <div class="price">
-        <span th:text="${activity.activityPrice}">0</span>
-      </div>
-
-      <div class="meta">
-        <div>
-          <span>目前報名人數</span>
-          <span><span th:text="${activity.attendeesCount ?: 0}">0</span> / <span th:text="${activity.maxParticipants}">0</span> 人</span>
+    <div class="card" th:each="activity : ${activityListData}">
+      <a th:href="@{/activity/front/detail(id=${activity.activityId})}">
+        
+        <!-- 圖片容器 + 飄浮在右上角的狀態標籤 -->
+        <div class="card__thumb-wrap">
+          <img class="activity-image" th:src="@{/activity/front/image(id=${activity.activityId})}" alt="活動圖片">
+          <span class="registration-status" th:text="${registrationStatusMap[activity.activityId]}">報名中</span>
         </div>
-        <div>
-          <span>報名截止時間</span>
-          <span th:text="${#temporals.format(activity.registrationDeadline, 'yyyy-MM-dd HH:mm')}">--</span>
+        
+        <div class="card__body">
+          
+          <!-- 🌟 區塊一：標題 + 金額 (固定高 82px) -->
+          <div class="card__header-group">
+            <h2 th:text="${activity.activityTitle}">活動名稱</h2>
+            <div class="price">
+              <span th:text="${activity.activityPrice}">0</span>
+            </div>
+          </div>
+
+          <!-- 🌟 區塊二：目前人數 + 截止時間 (固定高 56px) -->
+          <div class="meta">
+            <div>
+              <span>目前報名人數</span>
+              <span>
+              <span th:text="${activity.attendeesCount ?: 0}">0</span> / 
+              <span th:text="${activity.maxParticipants}">0</span> 人</span>
+            </div>
+            <div th:if="${registrationStatusMap[activity.activityId] == '報名中'}">
+              <span>報名截止時間</span>
+              <span th:text="${#temporals.format(activity.registrationDeadline, 'yyyy-MM-dd')}">--</span>
+            </div>
+            <div th:if="${registrationStatusMap[activity.activityId] == '即將截止'}">
+              <span>報名截止時間</span>
+              <span th:text="${#temporals.format(activity.registrationDeadline, 'yyyy-MM-dd')}">--</span>
+            </div>
+            <div th:if="${registrationStatusMap[activity.activityId] == '尚未開放報名'}">
+              <span>報名開始時間</span>
+              <span th:text="${#temporals.format(activity.registrationStartTime, 'yyyy-MM-dd')}">--</span>
+            </div>
+          </div>
+
+          <!-- 查看詳情按鈕 -->
+          <div class="card__footer">
+            <span class="btn-detail">查看詳情 →</span>
+          </div>
         </div>
-      </div>
-
-      <div class="desc" th:text="${activity.activityDescription}"></div>
-
-      <!-- 只要這裡保留 <a> 標籤，鋪滿魔法 (::after) 就會自動生效，點整張卡片任何地方都能順利跳轉囉！ -->
-      <a class="btn-detail" th:href="@{/activity/front/detail(id=${activity.activityId})}">
-        查看詳情
       </a>
     </div>
-    </a>
   </div>
-</div>
+
+  <!-- ========== 膠囊風分頁控制頁碼 ========== -->
+  <div class="pagination" th:if="${totalPages != null and totalPages > 1}">
+    <a class="page-btn" th:classappend="${currentPage == 0} ? 'disabled'" 
+       th:href="@{/activity/front/list(page=${currentPage - 1}, keyword=${keyword}, typeId=${selectedTypeId}, status=${selectedStatus}, sort=${sort}, onlyAvailable=${onlyAvailable})}">‹ 上一頁</a>
+    
+    <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+      <a class="page-btn" th:classappend="${i == currentPage} ? 'active'"
+         th:href="@{/activity/front/list(page=${i}, keyword=${keyword}, typeId=${selectedTypeId}, status=${selectedStatus}, sort=${sort}, onlyAvailable=${onlyAvailable})}"
+         th:text="${i + 1}">1</a>
+    </th:block>
+    
+    <a class="page-btn" th:classappend="${currentPage == totalPages - 1} ? 'disabled'"
+       th:href="@{/activity/front/list(page=${currentPage + 1}, keyword=${keyword}, typeId=${selectedTypeId}, status=${selectedStatus}, sort=${sort}, onlyAvailable=${onlyAvailable})}">下一頁 ›</a>
+  </div>
 
   <!-- ==========================================================
-       🌟 核心 JavaScript：模擬下拉式選單交互與數據同步
+       核心 JavaScript：模擬下拉式選單交互與數據同步
        ========================================================== -->
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -750,7 +597,6 @@ a { text-decoration: none; color: inherit; }
         const options = wrapper.querySelectorAll('.custom-option');
         const triggerText = trigger.querySelector('.trigger-text');
         
-        // 1. 初始化設定：根據後端傳來的 hidden input 預設值，選取對應項目並顯示文字
         const defaultValue = hiddenInput.value;
         let hasActiveSelection = false;
 
@@ -764,52 +610,38 @@ a { text-decoration: none; color: inherit; }
           }
         });
 
-        // 如果沒有匹配到任何後端值，預設選取第一個選項（通常是「全部」）
         if (!hasActiveSelection && options.length > 0) {
           options[0].classList.add('selected');
           triggerText.textContent = options[0].textContent;
         }
         
-        // 2. 開關點擊事件
         trigger.addEventListener('click', function(e) {
           e.stopPropagation();
-          
-          // 關閉頁面中其他已打開的選單
           document.querySelectorAll('.custom-dropdown-menu').forEach(otherMenu => {
             if (otherMenu !== menu) otherMenu.classList.remove('show');
           });
           document.querySelectorAll('.custom-select-trigger').forEach(otherTrigger => {
             if (otherTrigger !== trigger) otherTrigger.classList.remove('active');
           });
-          
           menu.classList.toggle('show');
           trigger.classList.toggle('active');
         });
         
-        // 3. 選項點擊事件
         options.forEach(option => {
           option.addEventListener('click', function(e) {
             e.stopPropagation();
-            
             const selectedValue = this.getAttribute('data-value');
             const selectedText = this.textContent;
-            
-            // 同步寫回 hidden input，確保 Form 提交時拿到正確資料
             hiddenInput.value = selectedValue;
             triggerText.textContent = selectedText;
-            
-            // 切換 Active 狀態
             options.forEach(opt => opt.classList.remove('selected'));
             this.classList.add('selected');
-            
-            // 關閉面板
             menu.classList.remove('show');
             trigger.classList.remove('active');
           });
         });
       });
       
-      // 4. 點選頁面空白處時，自動收合所有下拉選單
       document.addEventListener('click', function() {
         document.querySelectorAll('.custom-dropdown-menu').forEach(menu => menu.classList.remove('show'));
         document.querySelectorAll('.custom-select-trigger').forEach(trigger => trigger.classList.remove('active'));
