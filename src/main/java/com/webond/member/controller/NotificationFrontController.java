@@ -39,7 +39,7 @@ public class NotificationFrontController {
             return "redirect:/member/login";
         }
 
-        List<NotificationVO> notificationList = notificationService.getNotificationByMemberId( loginMember.getMemberId());
+        List<NotificationVO> notificationList = notificationService.getNotificationsByMember( loginMember.getMemberId());
 
         model.addAttribute("notificationVO", notificationList);
 
