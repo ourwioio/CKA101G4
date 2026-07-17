@@ -27,7 +27,35 @@
       <a th:href="@{/front/services}">個人出租</a>
       <a th:href="@{/activity/front/list}">團體活動</a>
       <a th:href="@{/front/venue/listAllVenue}">場地推薦</a>
-      <a th:href="@{/faqs}">系統公告</a>
+
+      <div class="navbar__dropdown">
+
+        <a class="navbar__dropdown-trigger"
+           href="javascript:void(0)"
+           aria-haspopup="true"
+           aria-expanded="false">
+          系統公告
+          <svg class="navbar__dropdown-caret"
+               viewBox="0 0 24 24"
+               fill="none"
+               stroke="currentColor"
+               stroke-width="2.5"
+               stroke-linecap="round"
+               stroke-linejoin="round"
+               aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </a>
+
+        <div class="navbar__dropdown-menu"
+             role="menu">
+          <a th:href="@{/announcements}" role="menuitem">公告</a>
+          <a th:href="@{/specifications}" role="menuitem">平台規範</a>
+          <a th:href="@{/faqs}" role="menuitem">FAQ</a>
+        </div>
+
+      </div>
+
     </nav>
 
     <div class="navbar__actions">

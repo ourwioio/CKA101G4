@@ -1,61 +1,248 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
-    <title>最新公告</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-  <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>最新公告｜Webond</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+          rel="stylesheet">
+
+    <!-- Webond 前台共用 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/css/front-end/service/common.css}">
+
+    <!-- 前台共用 Navbar CSS -->
+    <link rel="stylesheet"
+          th:href="@{/css/front-end/common/navbar.css}">
+
+    <!-- 公告列表專屬 CSS -->
+    <link rel="stylesheet"
+          th:href="@{/css/front-end/bulletin/bulletinList.css}">
 </head>
-<div th:replace="~{front-end/common/navbar :: navbar}"></div>
+
 <body>
-<div class="container py-5">
 
-    <h2 class="mb-4">最新公告</h2>
+<!-- ==========================================================
+     共用固定導覽列
+     ========================================================== -->
+<header th:replace="~{front-end/common/navbar :: navbar}">
+</header>
 
-    <form th:action="@{/announcements}" method="get" class="row g-2 mb-4 align-items-center">
-        <div class="col-auto">
-            <label class="col-form-label">發布日期</label>
-        </div>
-        <div class="col-auto">
-            <input type="date" name="startDate" class="form-control" th:value="${searchStartDate}" />
-        </div>
-        <div class="col-auto">～</div>
-        <div class="col-auto">
-            <input type="date" name="endDate" class="form-control" th:value="${searchEndDate}" />
-        </div>
-        <div class="col-auto">
-            <input type="text" name="keyword" class="form-control" placeholder="搜尋標題、內容或標籤"
-                   th:value="${searchKeyword}" />
-        </div>
-        <div class="col-auto">
-            <button type="submit" class="btn btn-primary">搜尋</button>
-        </div>
-        <div class="col-auto">
-            <a th:href="@{/announcements}" class="btn btn-outline-secondary">清除條件</a>
-        </div>
-    </form>
+<!-- ==========================================================
+     主要內容
+     ========================================================== -->
+<main class="site-main">
 
-    <div class="list-group">
-        <a th:each="bulletin : ${bulletinListData}"
-           th:href="@{/announcements/{id}(id=${bulletin.bulletinId})}"
-           class="list-group-item list-group-item-action">
-            <div class="d-flex justify-content-between align-items-start">
-                <h5 class="mb-1" th:text="${bulletin.title}"></h5>
-                <small class="text-muted" th:text="${bulletin.publishDate}"></small>
+    <!-- ======================================================
+         頁面標題
+         ====================================================== -->
+    <section class="bulletin-heading">
+
+        <div>
+
+            <p class="bulletin-eyebrow">
+                Bulletin
+            </p>
+
+            <h1 class="page-title">
+                最新公告
+            </h1>
+
+            <p class="bulletin-description">
+                查看 Webond 平台的最新消息、活動與系統維護通知。
+            </p>
+
+        </div>
+
+    </section>
+
+    <!-- ======================================================
+         搜尋區
+         ====================================================== -->
+    <section class="panel bulletin-search-panel">
+
+        <div class="bulletin-search-heading">
+
+            <div>
+
+                <h2>
+                    搜尋公告
+                </h2>
+
+                <p>
+                    可依發布日期區間或關鍵字搜尋
+                </p>
+
             </div>
-            <p class="mb-1 text-truncate text-muted" th:text="${bulletin.content}"></p>
-            <small class="text-muted" th:if="${bulletin.tags != null}" th:text="'標籤：' + ${bulletin.tags}"></small>
-            <small class="text-muted d-block"
-                   th:if="${bulletin.updatedAt != null and bulletin.updatedAt.isAfter(bulletin.createdAt)}"
-                   th:text="'最後更新：' + ${#temporals.format(bulletin.updatedAt, 'yyyy-MM-dd')}"></small>
+
+            <a class="bulletin-clear-link"
+               th:href="@{/announcements}">
+                清除搜尋
+            </a>
+
+        </div>
+
+        <form class="bulletin-search-form"
+              th:action="@{/announcements}"
+              method="get">
+
+            <label class="bulletin-search-label"
+                   for="startDate">
+                發布日期
+            </label>
+
+            <input class="form-control"
+                   id="startDate"
+                   type="date"
+                   name="startDate"
+                   th:value="${searchStartDate}">
+
+            <span class="bulletin-search-separator">
+                ～
+            </span>
+
+            <input class="form-control"
+                   id="endDate"
+                   type="date"
+                   name="endDate"
+                   th:value="${searchEndDate}">
+
+            <input class="form-control"
+                   type="text"
+                   name="keyword"
+                   placeholder="搜尋標題、內容或標籤"
+                   th:value="${searchKeyword}">
+
+            <button class="btn bulletin-search-button"
+                    type="submit">
+                搜尋
+            </button>
+
+        </form>
+
+    </section>
+
+    <!-- ======================================================
+         結果標題
+         ====================================================== -->
+    <div class="bulletin-result-heading">
+
+        <h2>
+            公告列表
+        </h2>
+
+        <span class="bulletin-count"
+              th:text="|共 ${#lists.size(bulletinListData)} 筆|">
+            共 0 筆
+        </span>
+
+    </div>
+
+    <!-- ======================================================
+         無資料
+         ====================================================== -->
+    <section class="bulletin-empty-state"
+             th:if="${#lists.isEmpty(bulletinListData)}">
+
+        <div class="bulletin-empty-icon">
+            ✉
+        </div>
+
+        <h3>
+            目前沒有符合條件的公告
+        </h3>
+
+        <p>
+            可以更換搜尋條件，或重新查看全部公告。
+        </p>
+
+        <a class="btn btn-primary"
+           th:href="@{/announcements}">
+            查看全部公告
         </a>
-    </div>
 
-    <div class="text-muted mt-4" th:if="${#lists.isEmpty(bulletinListData)}">
-        目前沒有符合條件的公告。
-    </div>
+    </section>
 
-</div>
+    <!-- ======================================================
+         公告卡片列表
+         ====================================================== -->
+    <section class="bulletin-list"
+             th:if="${!#lists.isEmpty(bulletinListData)}">
+
+        <a class="bulletin-card"
+           th:each="bulletin : ${bulletinListData}"
+           th:href="@{/announcements/{id}(id=${bulletin.bulletinId})}">
+
+            <div class="bulletin-card-inner">
+
+                <div class="bulletin-card-top">
+
+                    <h3 class="bulletin-card-title"
+                        th:text="${bulletin.title}">
+                        公告標題
+                    </h3>
+
+                    <span class="bulletin-card-date"
+                          th:text="${bulletin.publishDate}">
+                        2026-07-01
+                    </span>
+
+                </div>
+
+                <p class="bulletin-card-excerpt"
+                   th:text="${bulletin.content}">
+                    公告內容摘要
+                </p>
+
+                <div class="bulletin-card-footer">
+
+                    <div class="bulletin-tag-list"
+                         th:if="${bulletin.tags != null}">
+
+                        <span class="bulletin-tag"
+                              th:text="${bulletin.tags}">
+                            標籤
+                        </span>
+
+                    </div>
+
+                    <span class="bulletin-card-updated"
+                          th:if="${bulletin.updatedAt != null
+                                   and bulletin.updatedAt.isAfter(bulletin.createdAt)}"
+                          th:text="|最後更新：${#temporals.format(
+                                bulletin.updatedAt,
+                                'yyyy-MM-dd'
+                            )}|">
+                        最後更新：2026-07-01
+                    </span>
+
+                </div>
+
+            </div>
+
+        </a>
+
+    </section>
+
+</main>
+
+<!-- 共用通知 AJAX 輪詢 -->
+<script th:src="@{/js/front-end/common/notificationPolling.js}">
+</script>
+
 </body>
 </html>

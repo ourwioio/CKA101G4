@@ -1,0 +1,341 @@
+/* ==========================================================
+   Webond 系統公告－公告列表
+   搭配：
+   /css/front-end/service/common.css
+   ========================================================== */
+
+/* ==========================================================
+   頁面標題區
+   ========================================================== */
+
+.bulletin-heading {
+    margin-bottom: 26px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.bulletin-eyebrow {
+    margin-bottom: 4px;
+
+    color: var(--color-notice);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.bulletin-description {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+    font-size: 14px;
+}
+
+/* ==========================================================
+   搜尋區
+   ========================================================== */
+
+.bulletin-search-panel {
+    margin-bottom: 24px;
+}
+
+.bulletin-search-heading {
+    margin-bottom: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.bulletin-search-heading h2 {
+    font-size: 20px;
+}
+
+.bulletin-search-heading p {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+    font-size: 13px;
+}
+
+.bulletin-clear-link {
+    flex-shrink: 0;
+
+    color: var(--color-primary-dark);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.bulletin-clear-link:hover {
+    text-decoration: underline;
+}
+
+.bulletin-search-form {
+    display: grid;
+    grid-template-columns:
+        auto minmax(150px, 1fr)
+        auto minmax(150px, 1fr)
+        minmax(200px, 1.4fr)
+        auto;
+
+    align-items: center;
+    gap: 10px;
+}
+
+.bulletin-search-label {
+    flex-shrink: 0;
+
+    color: var(--color-text);
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.bulletin-search-separator {
+    flex-shrink: 0;
+
+    color: var(--color-text-soft);
+    font-size: 13px;
+    text-align: center;
+}
+
+.bulletin-search-button {
+    min-width: 96px;
+
+    border: none;
+
+    background: var(--color-notice);
+    color: #FFFFFF;
+}
+
+.bulletin-search-button:hover {
+    box-shadow:
+        0 10px 24px rgba(255, 92, 141, 0.24);
+}
+
+/* ==========================================================
+   結果標題
+   ========================================================== */
+
+.bulletin-result-heading {
+    margin-bottom: 16px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.bulletin-result-heading h2 {
+    font-size: 22px;
+}
+
+.bulletin-count {
+    flex-shrink: 0;
+
+    padding: 5px 11px;
+
+    border-radius: var(--radius-full);
+
+    background: #FFE6EF;
+    color: var(--color-notice);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* ==========================================================
+   公告卡片列表
+   ========================================================== */
+
+.bulletin-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.bulletin-card {
+    display: block;
+
+    overflow: hidden;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+
+    color: inherit;
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.bulletin-card:hover {
+    transform: translateY(-4px);
+
+    border-color: transparent;
+    box-shadow: var(--shadow-hover);
+}
+
+.bulletin-card-inner {
+    padding: 20px 22px;
+}
+
+.bulletin-card-top {
+    margin-bottom: 8px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.bulletin-card-title {
+    margin: 0;
+
+    color: var(--color-text);
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+.bulletin-card-date {
+    flex-shrink: 0;
+
+    padding: 4px 10px;
+
+    border-radius: var(--radius-full);
+
+    background: var(--color-bg);
+    color: var(--color-text-soft);
+
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.bulletin-card-excerpt {
+    margin-bottom: 10px;
+
+    display: -webkit-box;
+    overflow: hidden;
+
+    color: var(--color-text-soft);
+    font-size: 14px;
+    line-height: 1.7;
+
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.bulletin-card-footer {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+}
+
+.bulletin-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.bulletin-tag {
+    padding: 3px 9px;
+
+    border-radius: var(--radius-full);
+
+    background: #FFF0F5;
+    color: var(--color-notice);
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.bulletin-card-updated {
+    margin-left: auto;
+
+    color: var(--color-text-soft);
+    font-size: 11px;
+}
+
+/* ==========================================================
+   空資料狀態
+   ========================================================== */
+
+.bulletin-empty-state {
+    padding: 50px 20px;
+
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+
+    background: var(--color-surface);
+
+    text-align: center;
+}
+
+.bulletin-empty-icon {
+    margin-bottom: 12px;
+
+    color: var(--color-notice);
+    font-size: 42px;
+}
+
+.bulletin-empty-state h3 {
+    margin-bottom: 5px;
+
+    color: var(--color-text);
+    font-size: 20px;
+}
+
+.bulletin-empty-state p {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+    font-size: 14px;
+}
+
+/* ==========================================================
+   RWD
+   ========================================================== */
+
+@media (max-width: 760px) {
+
+    .bulletin-search-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .bulletin-search-form .bulletin-search-button {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 680px) {
+
+    .bulletin-heading,
+    .bulletin-search-heading,
+    .bulletin-result-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .bulletin-search-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .bulletin-card-top {
+        flex-direction: column;
+    }
+
+    .bulletin-card-updated {
+        margin-left: 0;
+    }
+}

@@ -1,0 +1,123 @@
+/* ==========================================================
+   Webond 系統公告－公告內容
+   搭配：
+   /css/front-end/service/common.css
+   ========================================================== */
+
+.bulletin-detail-page {
+    width: min(800px, calc(100% - 40px));
+
+    margin: 0 auto;
+}
+
+.bulletin-detail-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-bottom: 22px;
+
+    color: var(--color-primary-dark);
+
+    font-size: 14px;
+    font-weight: 700;
+
+    transition:
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.bulletin-detail-back:hover {
+    color: var(--color-notice);
+    transform: translateX(-3px);
+}
+
+.bulletin-detail-header {
+    margin-bottom: 20px;
+}
+
+.bulletin-detail-eyebrow {
+    margin-bottom: 10px;
+
+    display: inline-flex;
+
+    padding: 4px 11px;
+
+    border-radius: var(--radius-full);
+
+    background: #FFE6EF;
+    color: var(--color-notice);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.bulletin-detail-title {
+    margin-bottom: 14px;
+
+    color: var(--color-text);
+
+    font-size: clamp(24px, 3.5vw, 32px);
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.bulletin-detail-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+
+    color: var(--color-text-soft);
+    font-size: 13px;
+}
+
+.bulletin-detail-meta strong {
+    color: var(--color-text);
+}
+
+.bulletin-detail-body {
+    color: var(--color-text);
+
+    font-size: 15px;
+    line-height: 1.9;
+
+    white-space: pre-line;
+}
+
+.bulletin-detail-tags {
+    margin-top: 20px;
+    padding-top: 18px;
+
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    border-top: 1px solid var(--color-border);
+}
+
+.bulletin-detail-tags-label {
+    color: var(--color-text-soft);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.bulletin-tag {
+    padding: 3px 9px;
+
+    border-radius: var(--radius-full);
+
+    background: #FFF0F5;
+    color: var(--color-notice);
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+@media (max-width: 480px) {
+
+    .bulletin-detail-page {
+        width: min(100% - 24px, 800px);
+    }
+}
