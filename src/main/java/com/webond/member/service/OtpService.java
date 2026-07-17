@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class OtpService {
 
-	@Autowired 
+	@Autowired
 	private StringRedisTemplate redisTemplate;
 
 	// 1. 產生 6 位數隨機數字驗證碼
@@ -54,25 +54,26 @@ public class OtpService {
 		return false;
 	}
 
-	// 5. 刪除 OTP 驗證碼（修正：原本是空的 TODO stub，什麼都沒做）
-	public void deleteOtp(String email) {
-		redisTemplate.delete("auth:otp:" + email);
+	public void deleteOtp(String cleanEmail) {
+		String otpKey = "auth:otp:" + cleanEmail;
+		redisTemplate.delete(otpKey);
 	}
 
-	// 6. 驗證成功後，標記此 Email 為「已通過驗證」(給 30 分鐘完成註冊)
-	public void markVerified(String email) {
+	// 5. 標記此 Email 已完成驗證 (供 doRegister 後端把關檢查用，30 分鐘內有效)
+	public void setVerified(String email) {
 		String verifiedKey = "auth:verified:" + email;
 		redisTemplate.opsForValue().set(verifiedKey, "1", 30, TimeUnit.MINUTES);
 	}
 
-	// 7. 檢查此 Email 是否已通過驗證 (供 doRegister 後端把關，防止繞過前端直接註冊)
+	// 6. 檢查此 Email 是否已完成驗證
 	public boolean isVerified(String email) {
 		String verifiedKey = "auth:verified:" + email;
-		return "1".equals(redisTemplate.opsForValue().get(verifiedKey));
+		return Boolean.TRUE.equals(redisTemplate.hasKey(verifiedKey));
 	}
 
-	// 8. 註冊完成後，清除驗證標記
+	// 7. 清除已驗證標記 (註冊成功後呼叫，避免殘留)
 	public void clearVerified(String email) {
-		redisTemplate.delete("auth:verified:" + email);
+		String verifiedKey = "auth:verified:" + email;
+		redisTemplate.delete(verifiedKey);
 	}
 }
