@@ -41,7 +41,11 @@ public class ServiceReportService {
 	
 	//後台
 	public List<ServiceReportVO> getAll(){
-		return repository.findAll();
+		return repository.findAllByOrderByServiceReportIdDesc();
+	}
+	
+	public List<ServiceReportVO> getAllDesc(Integer serviceReportId){
+		return repository.findByServiceReportIdOrderByServiceReportIdDesc(serviceReportId);
 	}
 	
 	public List<ServiceReportVO> getByStatus(Byte status) {

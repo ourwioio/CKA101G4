@@ -1,83 +1,276 @@
 
-    body {
-        font-family: "Microsoft JhengHei", "Segoe UI", sans-serif;
-        background: #f4f5f9;
-        margin: 0;
-        padding: 40px;
-        color: #2d2d3a;
-    }
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        background: #ffffff;
-        border-radius: 12px;
-        padding: 30px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-    }
-    h2 {
-        margin-top: 0;
-        margin-bottom: 24px;
-        color: #4b3f9e;
-    }
-    table.report-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-    }
-    .report-table th {
-        background: #6c5ce7;
-        color: #fff;
-        text-align: left;
-        padding: 12px 10px;
-        white-space: nowrap;
-    }
-    .report-table td {
-        padding: 10px;
-        border-bottom: 1px solid #ececf3;
-        vertical-align: middle;
-    }
-    .report-table tr:hover td {
-        background: #f8f7ff;
-    }
-    .content-cell {
-        max-width: 220px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    .status-badge {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    .status-pending {
-        background: #fff3cd;
-        color: #8a6d00;
-    }
-    .status-approved {
-        background: #d7f5e3;
-        color: #157347;
-    }
-    .status-rejected {
-        background: #fbdada;
-        color: #b42318;
-    }
-    .btn-process {
-        background: #6c5ce7;
-        color: #fff;
-        border: none;
-        padding: 6px 14px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 13px;
-    }
-    .btn-process:hover {
-        background: #5a4bd1;
-    }
-    .empty-msg {
-        text-align: center;
-        color: #999;
-        padding: 30px 0;
-    }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: #2d3436;
+            background: #f5f6fa;
+            font-family: "Noto Sans TC", Arial, sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button, input, select, textarea {
+            font: inherit;
+        }
+
+        /* ==========================================================================
+           外層佈局結構 (比照範例一)
+           ========================================================================== */
+        .wb-admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .wb-admin-content {
+            flex: 1;
+            padding: 24px;
+            background: #f5f6fa;
+            min-width: 0; /* 防止 Table 撐開 RWD 破版 */
+        }
+
+        .page {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+        }
+
+        /* ==========================================================================
+           頁面標題與副標題
+           ========================================================================== */
+        .page-header {
+            margin-bottom: 22px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .page-subtitle {
+            margin: 7px 0 0;
+            color: #69727b;
+            font-size: 14px;
+        }
+
+        /* ==========================================================================
+           篩選狀態按鈕 (Filter Buttons)
+           ========================================================================== */
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 22px;
+        }
+
+        .filter-buttons a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 38px;
+            padding: 8px 16px;
+            background: #ffffff;
+            border: 1px solid #e1e5ea;
+            border-radius: 8px;
+            color: #4f5964;
+            font-size: 13px;
+            font-weight: 800;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        }
+
+        .filter-buttons a:hover {
+            background: #edf0f3;
+            transform: translateY(-1px);
+        }
+
+        /* 啟動狀態的紫色品牌樣式 */
+        .filter-buttons a.active {
+            color: #ffffff;
+            background: #6c5ce7;
+            border-color: #6c5ce7;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
+        }
+
+        /* ==========================================================================
+           共用面板與高質感表格
+           ========================================================================== */
+        .panel {
+            margin-bottom: 22px;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #e1e5ea;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        }
+
+        .panel-header {
+            padding: 17px 20px;
+            border-bottom: 1px solid #e7eaee;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto; /* 確保表格可橫向滑動防止破版 */
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .report-table th {
+            padding: 16px 20px;
+            background: #f8f9fb;
+            color: #4f5964;
+            font-weight: 800;
+            border-bottom: 1px solid #e7eaee;
+            white-space: nowrap;
+        }
+
+        .report-table td {
+            padding: 16px 20px;
+            border-bottom: 1px solid #edf0f3;
+            color: #2d3436;
+            vertical-align: middle;
+        }
+
+        .report-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .report-table tbody tr {
+            transition: background 0.15s ease;
+        }
+
+        .report-table tbody tr:hover {
+            background: #fdfdfd;
+        }
+
+        /* 檢舉內容欄位寬度限制與文字省略 */
+        .content-cell {
+            max-width: 220px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #4f5964;
+        }
+
+        /* ==========================================================================
+           各式狀態標籤 (Pill Badges)
+           ========================================================================== */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 800;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        /* 未審核 0 - 暖陽橘 */
+        .status-badge.status-pending {
+            color: #b45309;
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+        }
+
+        /* 已審核通過 1 - 草本綠 */
+        .status-badge.status-approved {
+            color: #176b45;
+            background: #e8f8ef;
+            border: 1px solid #b7e4ca;
+        }
+
+        /* 已審核未通過 2 - 玫瑰紅 */
+        .status-badge.status-rejected {
+            color: #a12622;
+            background: #fff0ef;
+            border: 1px solid #f3c0bd;
+        }
+
+        /* ==========================================================================
+           操作按鈕 (比照範例一 btn--primary 與 btn-process)
+           ========================================================================== */
+        .btn-process {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 34px;
+            padding: 6px 14px;
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 800;
+            color: #ffffff;
+            background: #6c5ce7;
+            white-space: nowrap;
+            transition: transform 0.15s ease, background 0.15s ease;
+            box-shadow: 0 2px 6px rgba(108, 92, 231, 0.15);
+        }
+
+        .btn-process:hover {
+            background: #5748c8;
+            transform: translateY(-1px);
+        }
+
+        /* ==========================================================================
+           無檢舉紀錄提示
+           ========================================================================== */
+        .empty-msg {
+            padding: 48px 20px;
+            color: #69727b;
+            font-size: 15px;
+            font-weight: 700;
+            text-align: center;
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid #e1e5ea;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        }
+
+        /* ==========================================================================
+           RWD 響應式斷點
+           ========================================================================== */
+        @media (max-width: 900px) {
+            .wb-admin-layout {
+                flex-direction: column;
+            }
+            .wb-admin-content {
+                padding: 16px;
+            }
+            .page-title {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .filter-buttons {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .filter-buttons a {
+                width: 100%;
+            }
+            .btn-process {
+                width: 100%;
+            }
+        }

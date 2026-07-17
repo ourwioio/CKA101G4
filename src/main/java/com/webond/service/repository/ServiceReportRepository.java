@@ -8,8 +8,10 @@ import com.webond.service.model.ServiceReportVO;
 
 public interface ServiceReportRepository  extends JpaRepository<ServiceReportVO, Integer> {
 
- 
+
 	List<ServiceReportVO> findByserviceReportStatus(Byte serviceReportStatus);
+	List<ServiceReportVO> findAllByOrderByServiceReportIdDesc();
+	List<ServiceReportVO> findByServiceReportIdOrderByServiceReportIdDesc(Integer serviceReportId);
 
 
 }

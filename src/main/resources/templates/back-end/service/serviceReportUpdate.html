@@ -1,67 +1,146 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<title>處理服務檢舉</title>
-<link rel="stylesheet" th:href="@{/css/back-end/service/serviceReportUpdate.css}">
-<style>
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>處理服務檢舉</title>
+    <link rel="stylesheet" th:href="@{/css/back-end/service/serviceReportUpdate.css}">
+    <style>
+    </style>
 </head>
 <body>
-<div class="container">
-    <h2>處理服務檢舉</h2>
 
-    <div class="info-block">
-        <div class="info-row">
-            <span class="label">檢舉編號</span>
-            <span th:text="${serviceReportVO.serviceReportId}">1</span>
-        </div>
-        <div class="info-row">
-            <span class="label">服務編號</span>
-            <button><a th:href="@{/front/services/{id}(id=${serviceReportVO.service.serviceId})}" th:text="${serviceReportVO.service != null ? serviceReportVO.service.serviceId : '-'}" target="_blank"></a></button>
-            
-        </div>
-        <div class="info-row">
-            <span class="label">檢舉會員</span>
-            <span th:text="${serviceReportVO.reporterMember != null ? serviceReportVO.reporterMember.memberId : '-'}">1</span>
-        </div>
-        <div class="info-row">
-            <span class="label">檢舉內容</span>
-            <span th:text="${serviceReportVO.serviceReportCom}">檢舉內容...</span>
-        </div>
-        <div class="info-row">
-            <span class="label">檢舉時間</span>
-            <span th:text="${#temporals.format(serviceReportVO.serviceReportTime, 'yyyy-MM-dd HH:mm')}">2026-01-01</span>
-        </div>
-        <div class="info-row" th:if="${serviceReportVO.serviceReportHandleTime != null}">
-            <span class="label">處理時間</span>
-            <span th:text="${#temporals.format(serviceReportVO.serviceReportHandleTime, 'yyyy-MM-dd HH:mm')}">-</span>
-        </div>
+<div class="wb-admin-layout">
+
+    <!-- =========================
+         左側共用 Sidebar
+         ========================= -->
+    <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}">
     </div>
 
-    <p class="error-banner" th:if="${errorMessage != null}" th:text="${errorMessage}">錯誤訊息</p>
+    <!-- =========================
+         右側主要內容區
+         ========================= -->
+    <main class="wb-admin-content">
+        <div class="page">
 
-    <form th:action="@{/serviceReport/update}" th:object="${serviceReportVO}" method="post" class="edit-form">
-        <input type="hidden" th:field="*{serviceReportId}"/>
+            <!-- 頁面標題區 -->
+            <header class="page-header">
+                <h1 class="page-title">處理服務檢舉</h1>
+                <p class="page-subtitle">詳細評估檢舉案件事實，並在此提交最終審核與裁決結果</p>
+            </header>
 
-        <div class="form-group">
-            <label for="status">處理狀態</label>
-            <select id="status" th:field="*{serviceReportStatus}">
-                <option value="0" th:if="${serviceReportVO.serviceReportStatus == 0}">未審核</option>
-                <option value="1">已審核通過</option>
-                <option value="2">已審核未通過</option>
-            </select>
-            <span class="error-msg" th:if="${#fields.hasErrors('serviceReportStatus')}" th:errors="*{serviceReportStatus}"></span>
-            <p class="hint" th:if="${serviceReportVO.serviceReportStatus != 0}">此檢舉已審核過，無法修改審核狀態</p>
+            <!-- 錯誤訊息提示區 -->
+            <div class="message message--error" th:if="${errorMessage != null}" th:text="${errorMessage}">
+                錯誤訊息
+            </div>
+
+            <!-- 區塊一：檢舉詳細資訊 -->
+            <section class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">檢舉案件資料</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="info-grid">
+                        
+                        <div class="info-item">
+                            <span class="info-label">檢舉編號</span>
+                            <span class="info-value info-value--highlight" th:text="${serviceReportVO.serviceReportId}">1</span>
+                        </div>
+
+                        <div class="info-item">
+						    <span class="info-label">服務編號</span>
+						    <div class="info-value">
+						        <!-- 點擊這個大按鈕會在新分頁開啟服務 -->
+						        <a class="btn-large-card" 
+						           th:href="@{/front/services/{id}(id=${serviceReportVO.service.serviceId})}" 
+						           target="_blank">
+						            <span>前往服務頁面 </span>
+						            <span th:text="${serviceReportVO.service != null ? serviceReportVO.service.serviceId : '-'}">1</span>
+						            <span style="margin-left: auto;">↗</span> <!-- 右側小箭頭 -->
+						        </a>
+						    </div>
+						</div>
+
+                        <div class="info-item">
+                            <span class="info-label">檢舉會員</span>
+                            <span class="info-value" th:text="${serviceReportVO.reporterMember != null ? serviceReportVO.reporterMember.memberId : '-'}">1</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">檢舉時間</span>
+                            <span class="info-value" th:text="${#temporals.format(serviceReportVO.serviceReportTime, 'yyyy-MM-dd HH:mm')}">2026-01-01</span>
+                        </div>
+
+                        <!-- 有處理時間才顯示 -->
+                        <div class="info-item full-width" th:if="${serviceReportVO.serviceReportHandleTime != null}">
+                            <span class="info-label">處理時間</span>
+                            <span class="info-value" th:text="${#temporals.format(serviceReportVO.serviceReportHandleTime, 'yyyy-MM-dd HH:mm')}">-</span>
+                        </div>
+
+                        <div class="info-item full-width">
+                            <span class="info-label">檢舉內容說明</span>
+                            <div class="info-content-box" th:text="${serviceReportVO.serviceReportCom}">
+                                檢舉內容...
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- 區塊二：審核狀態處理表單 -->
+            <section class="panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">案件審核裁決</h2>
+                </div>
+                <div class="panel-body">
+                    <form th:action="@{/serviceReport/update}" th:object="${serviceReportVO}" method="post" class="edit-form">
+                        
+                        <!-- 隱藏主鍵欄位 -->
+                        <input type="hidden" th:field="*{serviceReportId}"/>
+
+                        <div class="form-group">
+                            <label for="status">決定處理狀態</label>
+                            
+                            <select id="status" class="form-control" th:field="*{serviceReportStatus}">
+                                <option value="0" th:if="${serviceReportVO.serviceReportStatus == 0}">未審核</option>
+                                <option value="1">已審核通過</option>
+                                <option value="2">已審核未通過</option>
+                            </select>
+
+                            <!-- 表單欄位錯誤提示 -->
+                            <span class="error-msg" th:if="${#fields.hasErrors('serviceReportStatus')}" th:errors="*{serviceReportStatus}"></span>
+                            
+                            <!-- 已審核警示（非0時顯示） -->
+                            <div class="alert-hint" th:if="${serviceReportVO.serviceReportStatus != 0}">
+                                <svg class="alert-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                                </svg>
+                                <span>此檢舉案件已經完成審核，目前狀態不允許再次變更。</span>
+                            </div>
+                        </div>
+
+                        <!-- 按鈕操作區 -->
+                        <div class="form-actions">
+                            <!-- 未審核時才顯示送出按鈕 -->
+                            <button th:if="${serviceReportVO.serviceReportStatus == 0}" type="submit" class="btn btn--primary">
+                                送出處理結果
+                            </button>
+                            <a th:href="@{/serviceReport/listAllServiceReport}" class="btn btn--secondary">
+                                返回列表
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+
         </div>
+    </main>
 
-        
-
-        <div class="form-actions">
-            <button th:if="${serviceReportVO.serviceReportStatus == 0}" type="submit" class="btn-submit">送出處理結果</button>
-            <a th:href="@{/serviceReport/listAllServiceReport}" class="btn-cancel">返回列表</a>
-        </div>
-    </form>
 </div>
+
 </body>
 </html>

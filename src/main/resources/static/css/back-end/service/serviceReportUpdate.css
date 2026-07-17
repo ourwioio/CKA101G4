@@ -1,115 +1,348 @@
 
-    body {
-        font-family: "Microsoft JhengHei", "Segoe UI", sans-serif;
-        background: #f4f5f9;
-        margin: 0;
-        padding: 40px;
-        color: #2d2d3a;
-    }
-    .container {
-        max-width: 640px;
-        margin: 0 auto;
-        background: #ffffff;
-        border-radius: 12px;
-        padding: 30px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-    }
-    h2 {
-        margin-top: 0;
-        margin-bottom: 24px;
-        color: #4b3f9e;
-    }
-    .info-block {
-        background: #f8f7ff;
-        border: 1px solid #e6e2fb;
-        border-radius: 8px;
-        padding: 16px 20px;
-        margin-bottom: 24px;
-    }
-    .info-row {
-        display: flex;
-        padding: 6px 0;
-        font-size: 14px;
-        border-bottom: 1px dashed #e6e2fb;
-    }
-    .info-row:last-child {
-        border-bottom: none;
-    }
-    .info-row .label {
-        width: 100px;
-        color: #6c5ce7;
-        font-weight: 600;
-        flex-shrink: 0;
-    }
-    .edit-form .form-group {
-        margin-bottom: 20px;
-    }
-    .edit-form label {
-        display: block;
-        margin-bottom: 6px;
-        font-weight: 600;
-        font-size: 14px;
-    }
-    .edit-form select,
-    .edit-form input[type="datetime-local"] {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
-    .edit-form select:focus,
-    .edit-form input:focus {
-        outline: none;
-        border-color: #6c5ce7;
-    }
-    .error-msg {
-        display: block;
-        color: #b42318;
-        font-size: 12px;
-        margin-top: 4px;
-    }
-    .error-banner {
-        background: #fbdada;
-        color: #b42318;
-        padding: 10px 14px;
-        border-radius: 6px;
-        font-size: 14px;
-        margin-bottom: 20px;
-    }
-    .hint {
-        font-size: 12px;
-        color: #888;
-        margin: 6px 0 0;
-    }
-    .form-actions {
-        display: flex;
-        gap: 12px;
-        margin-top: 28px;
-    }
-    .btn-submit {
-        background: #6c5ce7;
-        color: #fff;
-        border: none;
-        padding: 10px 22px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-    }
-    .btn-submit:hover {
-        background: #5a4bd1;
-    }
-    .btn-cancel {
-        display: inline-flex;
-        align-items: center;
-        padding: 10px 22px;
-        border-radius: 6px;
-        font-size: 14px;
-        color: #6c5ce7;
-        text-decoration: none;
-        border: 1px solid #6c5ce7;
-    }
-    .btn-cancel:hover {
-        background: #f8f7ff;
-    }
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: #2d3436;
+            background: #f5f6fa;
+            font-family: "Noto Sans TC", Arial, sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button, input, select, textarea {
+            font: inherit;
+        }
+
+        /* ==========================================================================
+           外層佈局結構 (比照範例一與二)
+           ========================================================================== */
+        .wb-admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .wb-admin-content {
+            flex: 1;
+            padding: 24px;
+            background: #f5f6fa;
+            min-width: 0;
+        }
+
+        .page {
+            width: 100%;
+            max-width: 800px; /* 處理頁面設定較窄的精緻寬度，適合專注閱讀 */
+            margin: 0 auto;
+            padding-bottom: 60px;
+        }
+
+        /* ==========================================================================
+           頁面標題與副標題
+           ========================================================================== */
+        .page-header {
+            margin-bottom: 22px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .page-subtitle {
+            margin: 7px 0 0;
+            color: #69727b;
+            font-size: 14px;
+        }
+
+        /* ==========================================================================
+           共用面板樣式 (Panels)
+           ========================================================================== */
+        .panel {
+            margin-bottom: 22px;
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #e1e5ea;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+        }
+
+        .panel-header {
+            padding: 17px 20px;
+            border-bottom: 1px solid #e7eaee;
+        }
+
+        .panel-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .panel-body {
+            padding: 20px;
+        }
+
+        /* ==========================================================================
+           詳細資訊網格 (Info Grid)
+           ========================================================================== */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .info-item.full-width {
+            grid-column: span 2;
+        }
+
+        .info-label {
+            color: #7b838b;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .info-value {
+            font-size: 15px;
+            color: #2d3436;
+            font-weight: 500;
+        }
+
+        .info-value--highlight {
+            font-weight: 800;
+            color: #6c5ce7;
+        }
+
+        /* 檢舉內容精美灰色容器 */
+        .info-content-box {
+            background: #f8f9fb;
+            border: 1px solid #e3e6ea;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #4f5964;
+            min-height: 80px;
+            white-space: pre-wrap;
+        }
+
+        /* 原 button > a 改良後的微連結按鈕 */
+       .btn--link {
+		    display: inline-flex;
+		    align-items: center;
+		    justify-content: center;
+		    background: #efedff; /* 質感淺紫底色 */
+		    border-radius: 6px;
+		    padding: 6px 14px;  /* 精緻內距 */
+		    color: #5a4acb;     /* 品牌紫色文字 */
+		    font-weight: 800;
+		    font-size: 13px;
+		    text-decoration: none;
+		    border: none;
+		    cursor: pointer;
+		    transition: background 0.15s ease, transform 0.1s ease;
+		}
+		
+		.btn--link:hover {
+		    background: #e1ddff; /* 懸停時顏色加深 */
+		    transform: translateY(-1px); /* 輕微浮起動畫 */
+		}
+        .btn--link a {
+            color: #5a4acb;
+            font-weight: 800;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-block;
+            
+		    margin-left: 0;
+		    margin-right: auto;
+        }
+        .btn-large-card {
+	    display: flex;
+	    align-items: center;
+	    width: 100%;             /* 填滿該網格欄位的寬度 */
+	    min-height: 46px;        /* 舒適的大按鈕高度 */
+	    padding: 12px 18px;      /* 內距加大，點擊範圍變大 */
+	    background: #efedff;     /* 質感淺紫底色 */
+	    border: 1px solid #dcd8ff;
+	    border-radius: 8px;      /* 圓角 */
+	    color: #5a4acb;          /* 品牌紫色文字 */
+	    font-weight: 800;
+	    font-size: 14px;
+	    text-decoration: none;
+	    transition: all 0.15s ease-in-out;
+	    box-shadow: 0 2px 6px rgba(108, 92, 231, 0.08); /* 輕微投影 */
+	}
+	
+	.btn-large-card:hover {
+	    background: #e1ddff;     /* 懸停時顏色加深 */
+	    border-color: #c9c2ff;
+	    transform: translateY(-1.5px); /* 浮起感 */
+	    box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15); /* 投影加深 */
+	}
+
+        /* ==========================================================================
+           表單控制元件
+           ========================================================================== */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #4f5964;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .form-control {
+            width: 100%;
+            min-height: 42px;
+            padding: 9px 12px;
+            color: #2d3436;
+            background: #ffffff;
+            border: 1px solid #d9dee5;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .form-control:focus {
+            border-color: #6c5ce7;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+        }
+
+        /* 美化 Select Dropdown 箭頭 */
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234f5964' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+            padding-right: 36px;
+        }
+
+        /* 錯誤驗證提示文字 */
+        .error-msg {
+            display: block;
+            color: #a12622;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        /* 已審核警示 Hint 提示框 */
+        .alert-hint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            padding: 10px 14px;
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            color: #b45309;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* ==========================================================================
+           訊息通知橫幅 (Messages)
+           ========================================================================== */
+        .message {
+            margin-bottom: 22px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .message--error {
+            color: #a12622;
+            background: #fff0ef;
+            border: 1px solid #f3c0bd;
+        }
+
+        /* ==========================================================================
+           按鈕操作區 (Form Actions)
+           ========================================================================== */
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 8px 18px;
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 800;
+            white-space: nowrap;
+            transition: transform 0.15s ease, background 0.15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn--primary {
+            color: #ffffff;
+            background: #6c5ce7;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.15);
+        }
+
+        .btn--primary:hover {
+            background: #5748c8;
+        }
+
+        .btn--secondary {
+            color: #4f5964;
+            background: #edf0f3;
+        }
+
+        .btn--secondary:hover {
+            background: #dfe4e8;
+        }
+
+        /* ==========================================================================
+           RWD 響應式斷點
+           ========================================================================== */
+        @media (max-width: 768px) {
+            .wb-admin-layout {
+                flex-direction: column;
+            }
+            .wb-admin-content {
+                padding: 16px;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+            .info-item.full-width {
+                grid-column: span 1;
+            }
+            .form-actions {
+                flex-direction: column;
+            }
+            .form-actions .btn {
+                width: 100%;
+            }
+        }
