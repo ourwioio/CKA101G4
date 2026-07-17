@@ -305,6 +305,13 @@ button[type="submit"]:hover {
 	font-weight: 500;
 }
 
+/* 🎯 Email 已驗證通過後，鎖定欄位的灰色樣式 */
+.locked-field {
+	background-color: var(--color-border) !important;
+	color: var(--color-ink-soft);
+	cursor: not-allowed;
+}
+
 .login-link {
 	text-align: center;
 	margin-top: 20px;
@@ -567,10 +574,25 @@ button[type="submit"]:hover {
 				const verifyMsg = document.getElementById('verifyMsg');
 				verifyMsg.style.color = '#16a34a';
 				verifyMsg.innerText = '✓ 此 Email 先前已完成驗證，可直接送出表單！';
-				document.getElementById('verifyOtpBtn').disabled = true;
-				document.getElementById('sendOtpBtn').disabled = true;
+				lockEmailVerificationUI();
 			}
 		});
+
+		// 🎯 鎖定 Email 驗證區塊：Email 欄位用 readonly (灰色但仍會隨表單送出)，
+		// 驗證碼欄位跟兩個按鈕用 disabled (灰色且不可互動)
+		function lockEmailVerificationUI() {
+			const emailInput = document.getElementById('email');
+			const otpCodeInput = document.getElementById('otpCode');
+
+			emailInput.readOnly = true;
+			emailInput.classList.add('locked-field');
+
+			otpCodeInput.disabled = true;
+			otpCodeInput.classList.add('locked-field');
+
+			document.getElementById('verifyOtpBtn').disabled = true;
+			document.getElementById('sendOtpBtn').disabled = true;
+		}
 
 		function sendOtp() {
 			const emailInput = document.getElementById('email');
@@ -643,9 +665,7 @@ button[type="submit"]:hover {
 		            verifyMsg.style.color = '#16a34a';
 		            verifyMsg.innerText = '🎉 ' + (res.body.message || 'Email 驗證成功！');
 		            isEmailVerified = true;
-		            
-		            document.getElementById('verifyOtpBtn').disabled = true;
-		            document.getElementById('sendOtpBtn').disabled = true;
+		            lockEmailVerificationUI();
 		        } else {
 		            verifyMsg.style.color = '#b91c1c';
 		            verifyMsg.innerText = '❌ ' + (res.body.message || '驗證碼錯誤或已過期！');
