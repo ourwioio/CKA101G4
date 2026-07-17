@@ -1,134 +1,257 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>活動聊天室</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+
+:root {
+	--color-bg: #F7F3EC;
+	--color-surface: #FFFFFF;
+	--color-surface-soft: #FFFDF8;
+	--color-ink: #17140F;
+	--color-ink-soft: #726A5F;
+	--color-border: #ECE4D6;
+	--color-yellow: #FFE59A;
+	--color-yellow-deep: #FFC94D;
+	--color-pink: #FFB5C1;
+	--color-blue: #A9D3FF;
+	--font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+	--font-body: 'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+	--radius-lg: 26px;
+	--radius-md: 16px;
+	--radius-full: 999px;
+	--shadow-sm: 0 3px 10px rgba(23, 20, 15, .06);
+	--shadow-md: 0 14px 34px rgba(23, 20, 15, .10);
+}
+
+* { box-sizing: border-box; }
+
 body {
 	margin: 0;
-	padding: 40px;
-	background: #f8fafc;
-	font-family: "Microsoft JhengHei", sans-serif;
-	color: #0f172a;
+	padding: 0;
+	height: 100vh;
+	height: 100dvh;
+	overflow: hidden;
+	background: var(--color-bg);
+	color: var(--color-ink);
+	font-family: var(--font-body);
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
 }
 
 .chat-page {
+	display: flex;
+	flex-direction: column;
 	max-width: 900px;
-	margin: auto;
-	background: white;
-	border-radius: 14px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+	height: calc(100dvh - 164px);
+	margin: 115px auto 60px;
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
 	overflow: hidden;
 }
 
 .chat-header {
-	padding: 22px 28px;
-	border-bottom: 1px solid #e2e8f0;
 	display: flex;
 	justify-content: space-between;
 	gap: 16px;
-	align-items: center;
+	align-items: flex-end;
+	padding: 24px 28px;
+	border-bottom: 1px solid var(--color-border);
 }
 
 .chat-header h1 {
+	position: relative;
 	margin: 0;
-	font-size: 24px;
+	padding-left: 18px;
+	color: var(--color-ink);
+	font-family: var(--font-display);
+	font-size: 26px;
+	font-weight: 800;
+	line-height: 1.4;
 }
 
-.chat-header p {
-	margin: 8px 0 0;
-	color: #64748b;
-	font-weight: bold;
+.chat-header h1::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 50%;
+	width: 9px;
+	height: 9px;
+	transform: translateY(-50%);
+	border-radius: 50%;
+	background: var(--color-yellow-deep);
 }
 
 .btn-back {
-	background: #64748b;
-	color: white;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px 20px;
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-full);
+	background: var(--color-surface);
+	box-shadow: var(--shadow-sm);
+	color: var(--color-ink);
+	font-size: 13.5px;
+	font-weight: 800;
 	text-decoration: none;
-	padding: 10px 16px;
-	border-radius: 8px;
-	font-weight: bold;
 	white-space: nowrap;
+	transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+
+.btn-back:hover {
+	transform: translateY(-2px);
+	border-color: var(--color-ink);
+	box-shadow: var(--shadow-md);
 }
 
 .message-list {
-	padding: 24px 28px;
-	min-height: 360px;
-	max-height: 560px;
+	flex: 1;
+	min-height: 0;
+	padding: 28px;
 	overflow-y: auto;
-	background: #f8fafc;
+	background: var(--color-surface-soft);
+	scrollbar-color: var(--color-border) transparent;
+	scroll-behavior: smooth;
 }
 
 .message {
-	max-width: 70%;
+	max-width: min(72%, 560px);
 	margin-bottom: 16px;
-	padding: 12px 14px;
-	border-radius: 12px;
-	background: white;
-	border: 1px solid #e2e8f0;
+	padding: 13px 16px;
+	border: 1px solid var(--color-border);
+	border-radius: 8px 20px 20px 20px;
+	background: var(--color-surface);
+	box-shadow: var(--shadow-sm);
 }
 
 .message.mine {
 	margin-left: auto;
-	background: #dbeafe;
-	border-color: #bfdbfe;
+	border-color: #F3D36C;
+	border-radius: 20px 8px 20px 20px;
+	background: var(--color-yellow);
 }
 
 .sender {
-	font-size: 13px;
-	color: #475569;
-	font-weight: bold;
 	margin-bottom: 6px;
+	color: var(--color-ink-soft);
+	font-size: 12px;
+	font-weight: 800;
 }
 
 .content {
+	color: var(--color-ink);
+	font-size: 14px;
+	font-weight: 500;
+	overflow-wrap: anywhere;
 	white-space: pre-wrap;
 	line-height: 1.6;
 }
 
 .time {
 	margin-top: 8px;
+	color: var(--color-ink-soft);
 	font-size: 12px;
-	color: #94a3b8;
+	font-variant-numeric: tabular-nums;
 	text-align: right;
 }
 
 .empty {
-	color: #94a3b8;
-	text-align: center;
 	padding: 80px 0;
-	font-weight: bold;
+	color: var(--color-ink-soft);
+	font-size: 15px;
+	font-weight: 800;
+	text-align: center;
 }
 
 .chat-form {
-	padding: 18px 28px;
 	display: flex;
+	align-items: stretch;
 	gap: 12px;
-	border-top: 1px solid #e2e8f0;
+	padding: 18px 28px;
+	border-top: 1px solid var(--color-border);
+	background: var(--color-surface);
 }
 
-.chat-form textarea {
+.chat-form input[type="text"] {
 	flex: 1;
-	min-height: 52px;
-	resize: vertical;
-	border: 1px solid #cbd5e1;
-	border-radius: 8px;
-	padding: 10px 12px;
-	font-family: inherit;
-	font-size: 15px;
+	height: 44px;
+	min-height: 44px;
+	padding: 10px 14px;
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-md);
+	outline: none;
+	background: var(--color-surface-soft);
+	color: var(--color-ink);
+	font-family: var(--font-body);
+	font-size: 14px;
+	font-weight: 500;
+	transition: border-color .15s ease, background .15s ease;
+}
+
+.chat-form input[type="text"]:focus {
+	border-color: var(--color-yellow-deep);
+	background: var(--color-surface);
 }
 
 .chat-form button {
-	background: #2563eb;
-	color: white;
-	border: none;
-	border-radius: 8px;
+	min-width: 92px;
 	padding: 0 22px;
-	font-weight: bold;
+	border: none;
+	border-radius: var(--radius-full);
+	background: var(--color-ink);
+	box-shadow: var(--shadow-sm);
+	color: #fff;
+	font-family: var(--font-body);
+	font-size: 14px;
+	font-weight: 800;
 	cursor: pointer;
+	transition: transform .18s ease, background .15s ease, box-shadow .18s ease, color .15s ease;
+}
+
+.chat-form button:hover {
+	transform: translateY(-2px);
+	background: var(--color-yellow-deep);
+	box-shadow: var(--shadow-md);
+	color: var(--color-ink);
+}
+
+@media (max-width: 760px) {
+	.chat-page {
+		height: calc(100dvh - 112px);
+		margin: 80px 16px 32px;
+		border-radius: 20px;
+	}
+
+	.chat-header {
+		align-items: stretch;
+		flex-direction: column;
+		padding: 20px;
+	}
+
+	.chat-header h1 { font-size: 23px; }
+	.btn-back { width: 100%; }
+
+	.message-list {
+		padding: 20px 16px;
+	}
+
+	.message { max-width: 86%; }
+
+	.chat-form {
+		flex-direction: column;
+		padding: 16px;
+	}
+
+	.chat-form button { min-height: 44px; }
 }
 </style>
 </head>
@@ -138,11 +261,8 @@ body {
 		<div class="chat-header">
 			<div>
 				<h1 th:text="${activityVO.activityTitle}">活動聊天室</h1>
-				<p>
-					目前會員：<span th:text="${loginMemberName}">會員1</span>
-				</p>
 			</div>
-			<a class="btn-back" th:href="${backUrl ?: '/activity/front/list'}">返回上一頁</a>
+			<a class="btn-back" th:href="${backUrl ?: '/activity/front/list'}">返回</a>
 		</div>
 
 		<div class="message-list">
@@ -163,7 +283,7 @@ body {
 		<form class="chat-form" th:action="@{/activity/front/chat/send}" method="post">
 			<input type="hidden" name="activityId" th:value="${activityVO.activityId}">
 			<input type="hidden" name="from" th:value="${from}">
-			<textarea name="content" maxlength="500" placeholder="輸入訊息..." required></textarea>
+			<input type="text" name="content" maxlength="500" placeholder="輸入訊息..." autocomplete="off" required>
 			<button type="submit">送出</button>
 		</form>
 	</div>
