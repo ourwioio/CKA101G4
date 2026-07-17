@@ -1,0 +1,283 @@
+/* ==========================================================
+   Webond 系統公告－平台規範列表
+   搭配：
+   /css/front-end/service/common.css
+   ========================================================== */
+
+/* ==========================================================
+   頁面標題區
+   ========================================================== */
+
+.spec-heading {
+    margin-bottom: 26px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.spec-eyebrow {
+    margin-bottom: 4px;
+
+    color: var(--color-warning);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.spec-description {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+    font-size: 14px;
+}
+
+/* ==========================================================
+   搜尋區
+   ========================================================== */
+
+.spec-search-panel {
+    margin-bottom: 24px;
+}
+
+.spec-search-heading {
+    margin-bottom: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.spec-search-heading h2 {
+    font-size: 20px;
+}
+
+.spec-search-heading p {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+    font-size: 13px;
+}
+
+.spec-clear-link {
+    flex-shrink: 0;
+
+    color: var(--color-primary-dark);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.spec-clear-link:hover {
+    text-decoration: underline;
+}
+
+.spec-search-form {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr) auto;
+
+    gap: 10px;
+}
+
+.spec-search-button {
+    min-width: 96px;
+
+    border: none;
+
+    background: var(--color-warning);
+    color: #FFFFFF;
+}
+
+.spec-search-button:hover {
+    box-shadow:
+        0 10px 24px rgba(217, 131, 36, 0.24);
+}
+
+/* ==========================================================
+   結果標題
+   ========================================================== */
+
+.spec-result-heading {
+    margin-bottom: 16px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.spec-result-heading h2 {
+    font-size: 22px;
+}
+
+.spec-count {
+    flex-shrink: 0;
+
+    padding: 5px 11px;
+
+    border-radius: var(--radius-full);
+
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* ==========================================================
+   規範卡片列表
+   ========================================================== */
+
+.spec-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.spec-card {
+    display: block;
+
+    overflow: hidden;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+
+    color: inherit;
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease;
+}
+
+.spec-card:hover {
+    transform: translateY(-4px);
+
+    border-color: transparent;
+    box-shadow: var(--shadow-hover);
+}
+
+.spec-card-inner {
+    padding: 20px 22px;
+}
+
+.spec-card-top {
+    margin-bottom: 8px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.spec-card-title {
+    margin: 0;
+
+    color: var(--color-text);
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+.spec-card-type {
+    flex-shrink: 0;
+
+    padding: 4px 10px;
+
+    border-radius: var(--radius-full);
+
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.spec-card-excerpt {
+    margin-bottom: 0;
+
+    display: -webkit-box;
+    overflow: hidden;
+
+    color: var(--color-text-soft);
+    font-size: 14px;
+    line-height: 1.7;
+
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.spec-card-updated {
+    margin-top: 10px;
+
+    color: var(--color-text-soft);
+    font-size: 11px;
+}
+
+/* ==========================================================
+   空資料狀態
+   ========================================================== */
+
+.spec-empty-state {
+    padding: 50px 20px;
+
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+
+    background: var(--color-surface);
+
+    text-align: center;
+}
+
+.spec-empty-icon {
+    margin-bottom: 12px;
+
+    color: var(--color-warning);
+    font-size: 42px;
+}
+
+.spec-empty-state h3 {
+    margin-bottom: 5px;
+
+    color: var(--color-text);
+    font-size: 20px;
+}
+
+.spec-empty-state p {
+    margin-bottom: 0;
+
+    color: var(--color-text-soft);
+    font-size: 14px;
+}
+
+/* ==========================================================
+   RWD
+   ========================================================== */
+
+@media (max-width: 680px) {
+
+    .spec-heading,
+    .spec-search-heading,
+    .spec-result-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .spec-search-form {
+        grid-template-columns: 1fr;
+    }
+
+    .spec-search-button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+
+    .spec-card-top {
+        flex-direction: column;
+    }
+}

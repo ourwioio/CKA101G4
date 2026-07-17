@@ -1,0 +1,88 @@
+/* ==========================================================
+   Webond 系統公告－平台規範內容
+   搭配：
+   /css/front-end/service/common.css
+   ========================================================== */
+
+.spec-detail-page {
+    width: min(800px, calc(100% - 40px));
+
+    margin: 0 auto;
+}
+
+.spec-detail-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    margin-bottom: 22px;
+
+    color: var(--color-primary-dark);
+
+    font-size: 14px;
+    font-weight: 700;
+
+    transition:
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.spec-detail-back:hover {
+    color: var(--color-warning);
+    transform: translateX(-3px);
+}
+
+.spec-detail-header {
+    margin-bottom: 20px;
+}
+
+.spec-detail-eyebrow {
+    margin-bottom: 10px;
+
+    display: inline-flex;
+
+    padding: 4px 11px;
+
+    border-radius: var(--radius-full);
+
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.spec-detail-title {
+    margin-bottom: 14px;
+
+    color: var(--color-text);
+
+    font-size: clamp(24px, 3.5vw, 32px);
+    font-weight: 800;
+    line-height: 1.4;
+}
+
+.spec-detail-meta {
+    color: var(--color-text-soft);
+    font-size: 13px;
+}
+
+.spec-detail-body {
+    padding-top: 18px;
+
+    border-top: 1px solid var(--color-border);
+
+    color: var(--color-text);
+
+    font-size: 15px;
+    line-height: 1.9;
+
+    white-space: pre-line;
+}
+
+@media (max-width: 480px) {
+
+    .spec-detail-page {
+        width: min(100% - 24px, 800px);
+    }
+}
