@@ -26,6 +26,36 @@ document.getElementById('reviewModalOverlay').addEventListener('click', function
     if (e.target === this) closeReviewModal();
 });
 
+function openViewReviewModal(btn) {
+    var rating = parseInt(btn.getAttribute('data-rating'), 10) || 0;
+    var comment = btn.getAttribute('data-comment');
+
+    var starsHtml = '';
+    for (var i = 1; i <= 5; i++) {
+        starsHtml += '<span class="' + (i <= rating ? 'filled' : '') + '">★</span>';
+    }
+    document.getElementById('viewReviewStars').innerHTML = starsHtml;
+
+    var commentEl = document.getElementById('viewReviewComment');
+    if (comment && comment !== 'null' && comment.trim() !== '') {
+        commentEl.textContent = comment;
+        commentEl.classList.remove('view-review-empty');
+    } else {
+        commentEl.textContent = '（沒有留下文字評論）';
+        commentEl.classList.add('view-review-empty');
+    }
+
+    document.getElementById('viewReviewModalOverlay').style.display = 'flex';
+}
+
+function closeViewReviewModal() {
+    document.getElementById('viewReviewModalOverlay').style.display = 'none';
+}
+
+document.getElementById('viewReviewModalOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeViewReviewModal();
+});
+
 // 🌟 分頁設定
 const PAGE_SIZE = 3;
 let currentPage = 1;

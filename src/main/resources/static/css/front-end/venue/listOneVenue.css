@@ -113,6 +113,17 @@ img{ max-width: 100%; }
 	border-color: var(--color-yellow-deep);
 }
 
+.provider-btn{
+	display: inline-block;
+	padding: 6px 16px;
+	background: var(--color-yellow-deep);
+	color: #fff;
+	border-radius: var(--radius-full);
+	font-size: 13px;
+	font-weight: 700;
+	text-decoration: none;                  /* 拿掉連結底線 */
+}
+
 .detail-card__desc{
 	font-size: 14px;
 	color: var(--color-ink);

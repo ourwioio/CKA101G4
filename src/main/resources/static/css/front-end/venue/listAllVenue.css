@@ -400,3 +400,15 @@ img{ max-width: 100%; }
 	.search-form__actions .btn-primary,
 	.search-form__actions .btn-clear{ flex: 1; text-align: center; }
 }
+
+.item-card__btn{
+	display: inline-block;
+	font-size: 13px;
+	background: var(--color-yellow-deep);
+	padding: 4px 14px;
+	color: black;
+	font-weight: bold;
+	border-radius: var(--radius-full);
+	margin-left: auto;
+	
+}

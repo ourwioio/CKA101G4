@@ -1,19 +1,79 @@
-.container { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px; }
+/* ==========================================
+   1. 基礎佈局與通用元件 (Layout & General)
+   ========================================== */
+.container { 
+    max-width: 900px; 
+    margin: 0 auto; 
+    padding: 32px 20px 60px; 
+}
 
-.back-link { display: inline-block; margin-bottom: 1rem; font-size: 13.5px; font-weight: 700; color: var(--color-ink-soft); text-decoration: none; transition: color .15s ease; }
-.back-link:hover { color: var(--color-ink); }
+.back-link { 
+    display: inline-block; 
+    margin-bottom: 1rem; 
+    font-size: 13.5px; 
+    font-weight: 700; 
+    color: var(--color-ink-soft); 
+    text-decoration: none; 
+    transition: color .15s ease; 
+}
 
-h1 { font-family: var(--font-display); font-size: 22px; font-weight: 800; color: var(--color-ink); margin-bottom: 1.5rem; }
+.back-link:hover { 
+    color: var(--color-ink); 
+}
 
-.alert{ border-radius: var(--radius-md); padding: 14px 18px; font-size: 13.5px; font-weight: 700; line-height: 1.6; margin-bottom: 20px; }
-.alert-error{ background: #fdecea; color: #c0392b; border: 1px solid #f5c6cb; }
-.alert-success{ background: var(--color-green); color: var(--color-ink); }
+h1 { 
+    font-family: var(--font-display); 
+    font-size: 22px; 
+    font-weight: 800; 
+    color: var(--color-ink); 
+    margin-bottom: 1.5rem; 
+}
 
-.no-orders { background: var(--color-surface); border-radius: var(--radius-lg); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); padding: 3rem; text-align: center; color: var(--color-ink-soft); }
-.btn-browse { display: inline-block; margin-top: 1rem; background: var(--color-ink); color: white; border: none; border-radius: var(--radius-full); padding: 10px 22px; font-size: 14px; font-weight: 700; text-decoration: none; cursor: pointer; transition: background .15s ease, color .15s ease, transform .15s ease; }
-.btn-browse:hover { background: var(--color-yellow-deep); color: var(--color-ink); transform: translateY(-2px); }
 
-.filter-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+/* ==========================================
+   2. 提示與狀態看板 (Alerts & Empty States)
+   ========================================== */
+.alert { 
+    border-radius: var(--radius-md); 
+    padding: 14px 18px; 
+    font-size: 13.5px; 
+    font-weight: 700; 
+    line-height: 1.6; 
+    margin-bottom: 20px; 
+}
+
+.alert-error { 
+    background: #fdecea; 
+    color: #c0392b; 
+    border: 1px solid #f5c6cb; 
+}
+
+.alert-success { 
+    background: var(--color-green); 
+    color: var(--color-ink); 
+}
+
+.no-orders { 
+    background: var(--color-surface); 
+    border-radius: var(--radius-lg); 
+    border: 1px solid var(--color-border); 
+    box-shadow: var(--shadow-sm); 
+    padding: 3rem; 
+    text-align: center; 
+    color: var(--color-ink-soft); 
+}
+
+
+/* ==========================================
+   3. 篩選與分頁工具列 (Filters & Pagination)
+   ========================================== */
+.filter-bar { 
+    display: flex; 
+    gap: 10px; 
+    flex-wrap: wrap; 
+    margin-bottom: 20px; 
+}
+
 .filter-bar select {
     font-family: var(--font-body);
     font-size: 13.5px;
@@ -24,161 +84,11 @@ h1 { font-family: var(--font-display); font-size: 22px; font-weight: 800; color:
     color: var(--color-ink);
     cursor: pointer;
 }
-.filter-bar select:focus { outline: none; border-color: var(--color-yellow-deep); }
 
-.order-card { background: var(--color-surface); border-radius: var(--radius-lg); border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); padding: 1.5rem; margin-bottom: 1rem; transition: box-shadow .2s ease; }
-.order-card:hover { box-shadow: var(--shadow-md); }
-.order-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 10px; margin-bottom: 12px; }
-.order-id { font-size: 14px; font-weight: 800; color: var(--color-ink); }
-.order-date { font-size: 13px; color: var(--color-ink-soft); }
-
-.order-body { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
-.venue-details h2 { font-family: var(--font-display); font-size: 17px; font-weight: 800; color: var(--color-ink); margin-bottom: 6px; }
-.venue-details p { font-size: 13.5px; color: var(--color-ink-soft); margin-bottom: 4px; }
-.venue-details strong { color: var(--color-ink); }
-
-.badge { display: inline-block; padding: 4px 12px; border-radius: var(--radius-full); font-size: 12px; font-weight: 700; margin-right: 5px; margin-bottom: 4px; }
-.badge-payment { background: var(--color-venue); color: var(--color-ink); }
-.badge-status { background: var(--color-surface-soft); color: var(--color-ink-soft); border: 1px solid var(--color-border); }
-
-/* 訂單狀態顏色 */
-.status-pending { background: var(--color-yellow); color: var(--color-ink); }
-.status-paid { background: var(--color-green); color: var(--color-ink); }
-.status-cancel { background: var(--color-surface-soft); color: var(--color-ink-soft); }
-.status-done { background: var(--color-venue); color: var(--color-ink); }
-
-.order-right { text-align: right; }
-.total-amount { font-size: 20px; font-weight: 800; color: var(--color-ink); margin-bottom: 10px; }
-.total-amount .currency { font-size: 13px; font-weight: 700; color: var(--color-ink-soft); }
-
-.order-right .actions {
-    margin-top: 12px;
-    display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-    flex-wrap: wrap;
+.filter-bar select:focus { 
+    outline: none; 
+    border-color: var(--color-yellow-deep); 
 }
-
-.btn-review, .btn-pay {
-    display: inline-block;
-    padding: 7px 18px;
-    background: var(--color-ink);
-    color: white;
-    border: none;
-    border-radius: var(--radius-full);
-    font-size: 13px;
-    font-weight: 700;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background .15s ease, color .15s ease;
-}
-.btn-review:hover, .btn-pay:hover { background: var(--color-yellow-deep); color: var(--color-ink); }
-
-/* 前往付款按鈕（用橘色提醒尚未付款） */
-.btn-pay { background: #f76707; }
-.btn-pay:hover { background: #d9600a; color: #fff; }
-
-.btn-report {
-    display: inline-block;
-    padding: 7px 18px;
-    background: transparent;
-    color: #c0392b;
-    border: 1.5px solid #f1c3bb;
-    border-radius: var(--radius-full);
-    font-size: 13px;
-    font-weight: 700;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background .15s ease, color .15s ease;
-}
-.btn-report:hover { background: #c0392b; color: #fff; border-color: #c0392b; }
-
-/* 已評價的星星顯示（唯讀） */
-.review-display { margin-top: 10px; text-align: right; }
-.review-display .stars-readonly { font-size: 15px; color: #ddd; letter-spacing: 1px; }
-.review-display .stars-readonly .filled { color: #f5a623; }
-.review-display .comment-text { font-size: 12.5px; color: var(--color-ink-soft); margin-top: 4px; max-width: 220px; word-break: break-word; }
-
-/* Modal 遮罩 */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(23, 20, 15, 0.5);
-    z-index: 999;
-    align-items: center;
-    justify-content: center;
-}
-.modal-box {
-    background: var(--color-surface);
-    border-radius: var(--radius-lg);
-    padding: 2rem;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: var(--shadow-md);
-}
-.modal-box h3 { font-family: var(--font-display); font-size: 18px; font-weight: 800; margin-bottom: 1.2rem; color: var(--color-ink); }
-
-/* 星星選擇器 */
-.star-rating {
-    display: inline-flex;
-    flex-direction: row-reverse;
-    justify-content: flex-end;
-    margin-bottom: 1.2rem;
-}
-.star-rating input { display: none; }
-.star-rating label {
-    font-size: 32px;
-    color: #ddd;
-    cursor: pointer;
-    padding: 0 2px;
-    transition: color 0.15s;
-}
-.star-rating input:checked ~ label,
-.star-rating label:hover,
-.star-rating label:hover ~ label {
-    color: #f5a623;
-}
-
-.modal-box textarea {
-    width: 100%;
-    min-height: 90px;
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: 10px 14px;
-    font-size: 14px;
-    font-family: var(--font-body);
-    color: var(--color-ink);
-    resize: vertical;
-    margin-bottom: 1.2rem;
-}
-.modal-box textarea:focus { outline: none; border-color: var(--color-yellow-deep); }
-
-.modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
-.btn-cancel {
-    background: transparent;
-    color: var(--color-ink-soft);
-    border: 1.5px solid var(--color-border);
-    border-radius: var(--radius-full);
-    padding: 8px 20px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: border-color .15s ease, color .15s ease;
-}
-.btn-cancel:hover { border-color: var(--color-ink); color: var(--color-ink); }
-.btn-submit {
-    background: var(--color-ink);
-    color: white;
-    border: none;
-    border-radius: var(--radius-full);
-    padding: 8px 20px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background .15s ease, color .15s ease;
-}
-.btn-submit:hover { background: var(--color-yellow-deep); color: var(--color-ink); }
 
 .pagination {
     display: flex;
@@ -218,12 +128,407 @@ h1 { font-family: var(--font-display); font-size: 22px; font-weight: 800; color:
     cursor: not-allowed;
 }
 
-.btn-danger-submit { background: #c0392b; }
-.btn-danger-submit:hover { background: #a5342a; color: #fff; }
+
+/* ==========================================
+   4. 訂單卡片主體 (Order Card Layout)
+   ========================================== */
+.order-card { 
+    background: var(--color-surface); 
+    border-radius: var(--radius-lg); 
+    border: 1px solid var(--color-border); 
+    box-shadow: var(--shadow-sm); 
+    padding: 1.5rem; 
+    margin-bottom: 1rem; 
+    transition: box-shadow .2s ease; 
+}
+
+.order-card:hover { 
+    box-shadow: var(--shadow-md); 
+}
+
+.order-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 1px solid var(--color-border); 
+    padding-bottom: 10px; 
+    margin-bottom: 12px; 
+}
+
+.order-id { 
+    font-size: 14px; 
+    font-weight: 800; 
+    color: var(--color-ink); 
+}
+
+.order-date { 
+    font-size: 13px; 
+    color: var(--color-ink-soft); 
+}
+
+.order-body {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.venue-details h2 { 
+    font-family: var(--font-display); 
+    font-size: 17px; 
+    font-weight: 800; 
+    color: var(--color-ink); 
+    margin-bottom: 6px; 
+}
+
+.venue-details p { 
+    font-size: 13.5px; 
+    color: var(--color-ink-soft); 
+    margin-bottom: 4px; 
+}
+
+.venue-details strong {
+    color: var(--color-ink);
+}
+
+/* 場地提供者（最後一個 p）與下方徽章排的間距 */
+.venue-details p:last-of-type {
+    margin-top: 10px;
+}
+
+.order-badges {
+    margin-top: 12px;
+}
+
+.order-right {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.total-amount { 
+    font-size: 20px; 
+    font-weight: 800; 
+    color: var(--color-ink); 
+    margin-bottom: 10px; 
+}
+
+.total-amount .currency { 
+    font-size: 13px; 
+    font-weight: 700; 
+    color: var(--color-ink-soft); 
+}
+
+
+/* ==========================================
+   5. 標籤與狀態樣式 (Badges & Order Status)
+   ========================================== */
+.badge { 
+    display: inline-block; 
+    padding: 4px 12px; 
+    border-radius: var(--radius-full); 
+    font-size: 12px; 
+    font-weight: 700; 
+    margin-right: 5px; 
+    margin-bottom: 4px; 
+}
+
+.badge-payment { 
+    background: var(--color-venue); 
+    color: var(--color-ink); 
+}
+
+.badge-status { 
+    background: var(--color-surface-soft); 
+    color: var(--color-ink-soft); 
+    border: 1px solid var(--color-border); 
+}
+
+/* 訂單狀態顏色 */
+.status-pending { 
+    background: var(--color-yellow); 
+    color: var(--color-ink); 
+}
+
+.status-paid { 
+    background: var(--color-green); 
+    color: var(--color-ink); 
+}
+
+.status-cancel { 
+    background: var(--color-surface-soft); 
+    color: var(--color-ink-soft); 
+}
+
+.status-done { 
+    background: var(--color-venue); 
+    color: var(--color-ink); 
+}
+
+
+/* ==========================================
+   6. 按鈕樣式系列 (Buttons)
+   ========================================== */
+.order-right .actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.btn-browse { 
+    display: inline-block; 
+    margin-top: 1rem; 
+    background: var(--color-ink); 
+    color: white; 
+    border: none; 
+    border-radius: var(--radius-full); 
+    padding: 10px 22px; 
+    font-size: 14px; 
+    font-weight: 700; 
+    text-decoration: none; 
+    cursor: pointer; 
+    transition: background .15s ease, color .15s ease, transform .15s ease; 
+}
+
+.btn-browse:hover { 
+    background: var(--color-yellow-deep); 
+    color: var(--color-ink); 
+    transform: translateY(-2px); 
+}
+
+.btn-review, 
+.btn-pay {
+    display: inline-block;
+    padding: 7px 18px;
+    background: var(--color-ink);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+}
+
+.btn-review:hover, 
+.btn-pay:hover { 
+    background: var(--color-yellow-deep); 
+    color: var(--color-ink); 
+}
+
+/* 前往付款按鈕（用橘色提醒尚未付款） */
+.btn-pay { 
+    background: #f76707; 
+}
+
+.btn-pay:hover { 
+    background: #d9600a; 
+    color: #fff; 
+}
+
+.btn-report {
+    display: inline-block;
+    padding: 7px 18px;
+    background: transparent;
+    color: #c0392b;
+    border: 1.5px solid #f1c3bb;
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+}
+
+.btn-report:hover { 
+    background: #c0392b; 
+    color: #fff; 
+    border-color: #c0392b; 
+}
+
+
+/* ==========================================
+   7. 查看評價（彈窗唯讀顯示）
+   ========================================== */
+.btn-view-review {
+    display: inline-block;
+    padding: 7px 18px;
+    background: transparent;
+    color: var(--color-ink);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease;
+}
+
+.btn-view-review:hover {
+    border-color: var(--color-yellow-deep);
+    color: var(--color-yellow-deep);
+}
+
+.view-review-stars {
+    font-size: 26px;
+    color: #ddd;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+}
+
+.view-review-stars .filled {
+    color: #f5a623;
+}
+
+.view-review-comment {
+    font-size: 14px;
+    color: var(--color-ink);
+    line-height: 1.7;
+    background: var(--color-surface-soft);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    margin-bottom: 1.2rem;
+    word-break: break-word;
+    white-space: pre-line;
+}
+
+.view-review-comment.view-review-empty {
+    color: var(--color-ink-soft);
+    font-style: italic;
+}
+
+
+/* ==========================================
+   8. 互動彈窗與評分輸入 (Modal & Star Rating Input)
+   ========================================== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(23, 20, 15, 0.5);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-box {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: var(--shadow-md);
+}
+
+.modal-box h3 { 
+    font-family: var(--font-display); 
+    font-size: 18px; 
+    font-weight: 800; 
+    margin-bottom: 1.2rem; 
+    color: var(--color-ink); 
+}
 
 .cancel-label {
     display: block;
     margin-bottom: 8px;
     font-size: 14px;
     color: var(--color-ink-soft);
+}
+
+/* 星星選擇器 */
+.star-rating {
+    display: inline-flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    margin-bottom: 1.2rem;
+}
+
+.star-rating input { 
+    display: none; 
+}
+
+.star-rating label {
+    font-size: 32px;
+    color: #ddd;
+    cursor: pointer;
+    padding: 0 2px;
+    transition: color 0.15s;
+}
+
+.star-rating input:checked ~ label,
+.star-rating label:hover,
+.star-rating label:hover ~ label {
+    color: #f5a623;
+}
+
+.modal-box textarea {
+    width: 100%;
+    min-height: 90px;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: var(--font-body);
+    color: var(--color-ink);
+    resize: vertical;
+    margin-bottom: 1.2rem;
+}
+
+.modal-box textarea:focus { 
+    outline: none; 
+    border-color: var(--color-yellow-deep); 
+}
+
+.modal-actions { 
+    display: flex; 
+    justify-content: flex-end; 
+    gap: 8px; 
+}
+
+.btn-cancel {
+    background: transparent;
+    color: var(--color-ink-soft);
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-full);
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease;
+}
+
+.btn-cancel:hover { 
+    border-color: var(--color-ink); 
+    color: var(--color-ink); 
+}
+
+.btn-submit {
+    background: var(--color-ink);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+}
+
+.btn-submit:hover { 
+    background: var(--color-yellow-deep); 
+    color: var(--color-ink); 
+}
+
+.btn-danger-submit { 
+    background: #c0392b; 
+}
+
+.btn-danger-submit:hover { 
+    background: #a5342a; 
+    color: #fff; 
 }
