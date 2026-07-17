@@ -16,5 +16,6 @@ public class VenueSlotScheduler {
 //	@Scheduled(fixedRate = 60000)  // 測試用
 	public void generateNextDaySlots() {
 		venueService.generateNextDaySlotsForAllVenues();
+		venueService.deletePastSlots();
 	}
 }
