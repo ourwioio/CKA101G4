@@ -45,7 +45,7 @@ public class EmailService {
             message.setSubject("【Webond 平台】會員註冊信箱驗證碼");
             message.setText("親愛的會員您好：\n\n"
                           + "您的註冊驗證碼為：[" + otpCode + "]\n\n"
-                          + "該驗證碼將於 5 分鐘後失效，請勿將驗證碼提供給他人。\n"
+                          + "該驗證碼將於 10 分鐘後失效，請勿將驗證碼提供給他人。\n"
                           + "若您未進行此操作，請忽略此郵件。");
 
             // 寄出信件
@@ -54,6 +54,40 @@ public class EmailService {
 
         } catch (Exception e) {
             // 🟢 3. 捕獲 SMTP 限制或網路錯誤，輸出警告，測試依然可以繼續
+            System.err.println("⚠️ SMTP 郵件發送失敗 (請使用上方 Console 顯示的驗證碼進行測試)");
+            log.warn("SMTP 發送失敗原因: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * 🟢 新增：發送忘記密碼驗證碼郵件
+     */
+    @Async
+    public void sendForgotPasswordOtpEmail(String toEmail, String otpCode) {
+        if (toEmail == null || toEmail.isBlank()) {
+            return;
+        }
+
+        String cleanEmail = toEmail.trim();
+
+        System.out.println("==========================================");
+        System.out.println("🔥 【忘記密碼驗證碼發送】目標 Email: " + cleanEmail);
+        System.out.println("🔑 【忘記密碼驗證碼發送】OTP 驗證碼: " + otpCode);
+        System.out.println("==========================================");
+
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(cleanEmail);
+            message.setSubject("【Webond 平台】重設密碼驗證碼");
+            message.setText("親愛的會員您好：\n\n"
+                          + "您的重設密碼驗證碼為：[" + otpCode + "]\n\n"
+                          + "該驗證碼將於 5 分鐘後失效，請勿將驗證碼提供給他人。\n"
+                          + "若您未進行此操作，請忽略此郵件，您的密碼不會被更動。");
+
+            mailSender.send(message);
+            log.info("忘記密碼驗證碼已成功寄送至: {}", cleanEmail);
+
+        } catch (Exception e) {
             System.err.println("⚠️ SMTP 郵件發送失敗 (請使用上方 Console 顯示的驗證碼進行測試)");
             log.warn("SMTP 發送失敗原因: {}", e.getMessage());
         }

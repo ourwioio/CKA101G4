@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.webond.member.model.MemberVO;
+import com.webond.member.service.EmailService;
 import com.webond.member.service.MemberServiceLoie;
 import com.webond.member.service.OtpService;
 import com.webond.member.service.RedisService;
@@ -41,8 +42,8 @@ public class MemberControllerLoie {
 	private PasswordEncoder passwordEncoder;
 	@Autowired
 	private OtpService otpService;
-	
-	
+	@Autowired
+	private EmailService emailService;
 
 	@GetMapping("/register")
 	public String registerPage(Model model) {
@@ -144,8 +145,8 @@ public class MemberControllerLoie {
 		String otpCode = String.format("%06d", new Random().nextInt(900000) + 100000);
 		// 存入 Redis (5 分鐘有效，60 秒冷卻)
 		redisService.saveForgotOtp(email, otpCode);
-		// TODO: 呼叫 MailService 寄出信件
-		System.out.println("【重設密碼測試】發送驗證碼至 " + email + " 驗證碼為：" + otpCode);
+		// 🟢 修正：原本只印在主控台，現在真正寄出驗證信
+		emailService.sendForgotPasswordOtpEmail(email.trim(), otpCode);
 		result.put("success", true);
 		result.put("message", "驗證碼已寄至您的信箱，請於 5 分鐘內輸入！");
 		return result;
@@ -197,6 +198,7 @@ public class MemberControllerLoie {
 		redirectAttributes.addFlashAttribute("successMsg", "密碼重設成功，請使用新密碼登入！");
 		return "redirect:/member/login";
 	}
+
 	// 依帳號狀態產生對應的封鎖訊息（登入、忘記密碼共用邏輯保持一致）
 	private String buildAccountStatusMessage(Byte status) {
 		if (status == 0) {
@@ -208,7 +210,6 @@ public class MemberControllerLoie {
 		}
 		return "此帳號目前無法使用忘記密碼功能！";
 	}
-	
 
 	// =========================================================================
 	// 📝 API 2：註冊表單送出（對齊前端個別欄位下方顯示錯誤提示）
@@ -431,6 +432,5 @@ public class MemberControllerLoie {
 			return Base64.getEncoder().encodeToString(imageBytes);
 		}
 		return "";
-		
 	}
 }
