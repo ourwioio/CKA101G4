@@ -653,11 +653,10 @@
                                 2026-07-15 14:30
                             </td>
 
-                            <td th:text="${#temporals.format(
-                                    spec.updatedAt,
-                                    'yyyy-MM-dd HH:mm'
-                            )}">
-                                2026-07-15 14:30
+                            <td th:text="${spec.updatedAt != null
+                                    ? #temporals.format(spec.updatedAt, 'yyyy-MM-dd HH:mm')
+                                    : '-'}">
+                                -
                             </td>
 
                             <td>
