@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -31,10 +32,10 @@ public class BulletinController {
 
 	@Autowired
 	private BulletinService bulletinSvc;
-	
-    @Autowired
-    private EmployeeRepository employeeRepository;
-	
+
+	@Autowired
+	private EmployeeRepository employeeRepository;
+
 	/*
 	 * This method will serve as addBulletin.html handler.
 	 */
@@ -54,7 +55,8 @@ public class BulletinController {
 	}
 
 	/*
-	 * This method will be called on addBulletin.html form submission, handling POST request It also validates the user input
+	 * This method will be called on addBulletin.html form submission, handling POST
+	 * request It also validates the user input
 	 */
 	@PostMapping("insert")
 	public String insert(@Valid BulletinVO bulletinVO, BindingResult result, ModelMap model, HttpSession session) {
@@ -82,10 +84,12 @@ public class BulletinController {
 	}
 
 	/*
-	 * This method will be called on listAllBulletin.html form submission, handling POST request
+	 * This method will be called on listAllBulletin.html form submission, handling
+	 * POST request
 	 */
 	@PostMapping("getOne_For_Update")
-	public String getOne_For_Update(@RequestParam("bulletinId") String bulletinId, ModelMap model, HttpSession session) {
+	public String getOne_For_Update(@RequestParam("bulletinId") String bulletinId, ModelMap model,
+			HttpSession session) {
 
 		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
 		if (loginEmp == null) {
@@ -105,10 +109,13 @@ public class BulletinController {
 	}
 
 	/*
-	 * This method will be called on update_emp_input.html form submission, handling POST request It also validates the user input
+	 * This method will be called on update_emp_input.html form submission, handling
+	 * POST request It also validates the user input
 	 */
+	// ★ 修改處 2：方法簽章尾端加入 RedirectAttributes redirectAttrs
 	@PostMapping("update")
-	public String update(@Valid BulletinVO bulletinVO, BindingResult result, ModelMap model, HttpSession session) {
+	public String update(@Valid BulletinVO bulletinVO, BindingResult result, ModelMap model, HttpSession session,
+			RedirectAttributes redirectAttrs) {
 
 		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
 		if (loginEmp == null) {
@@ -128,29 +135,30 @@ public class BulletinController {
 		bulletinSvc.updateBulletin(bulletinVO);
 
 		/*************************** 3.修改完成,準備轉交(Send the Success view) **************/
-		model.addAttribute("success", "- (修改成功)");
-		bulletinVO = bulletinSvc.getOneBulletin(bulletinVO.getBulletinId());
-		model.addAttribute("bulletinVO", bulletinVO);
-		return "back-end/bulletin/listOneBulletin"; // 修改成功後轉交listOneBulletin.html
+		// ★ 用 redirect，避免同一個 Session 的一級快取回傳被 merge 覆蓋成 null 的
+		// createdAt / updatedAt；redirect 後重新查詢才會拿到 DB 的最新時間
+		redirectAttrs.addFlashAttribute("success", "- (修改成功)");
+		return "redirect:/admin/platform/bulletin/viewOne?bulletinId=" + bulletinVO.getBulletinId();
 	}
-	
+
 	/*
-	 * This method will be called on listAllEmp.html form submission, handling POST request
+	 * This method will be called on listAllEmp.html form submission, handling POST
+	 * request
 	 */
 	@PostMapping("delete")
 	public String delete(@RequestParam("bulletinId") Integer bulletinId, ModelMap model) {
-		
+
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
 		/*************************** 2.開始刪除資料 *****************************************/
 		bulletinSvc.deleteBulletin(bulletinId);
-		
+
 		/*************************** 3.刪除完成,準備轉交(Send the Success view) **************/
 		List<BulletinVO> list = bulletinSvc.getAll();
 		model.addAttribute("bulletinListData", list);
 		model.addAttribute("success", "- (刪除成功)");
 		return "back-end/bulletin/listAllBulletin"; // 刪除完成後轉交listAllBulletin.html
 	}
-	
+
 	// ===== 查詢全部 =====
 	@GetMapping("listAllBulletin")
 	public String listAllBulletin(ModelMap model, HttpSession session) {
@@ -175,63 +183,56 @@ public class BulletinController {
 
 	// ===== 複合查詢：狀態 + （標題或標籤關鍵字）+ 發布日期區間，任意組合 =====
 	@PostMapping("search")
-	public String search(
-	        @RequestParam(value = "status", required = false) Byte status,
-	        @RequestParam(value = "keyword", required = false) String keyword,
-	        @RequestParam(value = "startDate", required = false)
-	        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-	        @RequestParam(value = "endDate", required = false)
-	        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-	        ModelMap model) {
+	public String search(@RequestParam(value = "status", required = false) Byte status,
+			@RequestParam(value = "keyword", required = false) String keyword,
+			@RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+			@RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+			ModelMap model) {
 
-	    boolean hasKeyword = keyword != null && !keyword.isBlank();
-	    boolean hasDateRange = startDate != null && endDate != null;
+		boolean hasKeyword = keyword != null && !keyword.isBlank();
+		boolean hasDateRange = startDate != null && endDate != null;
 
-	    // 1. 先用「範圍最明確」的條件從資料庫撈出基礎清單
-	    List<BulletinVO> list = hasDateRange
-	            ? bulletinSvc.getByPublishDateBetween(startDate, endDate)
-	            : bulletinSvc.getAll();
+		// 1. 先用「範圍最明確」的條件從資料庫撈出基礎清單
+		List<BulletinVO> list = hasDateRange ? bulletinSvc.getByPublishDateBetween(startDate, endDate)
+				: bulletinSvc.getAll();
 
-	    // 2. 依狀態進一步篩選
-	    if (status != null) {
-	        list = list.stream()
-	                .filter(bulletin -> status.equals(bulletin.getStatus()))
-	                .toList();
-	    }
+		// 2. 依狀態進一步篩選
+		if (status != null) {
+			list = list.stream().filter(bulletin -> status.equals(bulletin.getStatus())).toList();
+		}
 
-	    // 3. 依關鍵字篩選：標題「或」標籤有包含到即算符合
-	    if (hasKeyword) {
-	        list = list.stream()
-	                .filter(bulletin ->
-	                        (bulletin.getTitle() != null && bulletin.getTitle().contains(keyword)) ||
-	                        (bulletin.getTags() != null && bulletin.getTags().contains(keyword)) ||
-	                        (bulletin.getContent() != null && bulletin.getContent().contains(keyword))
-	                )
-	                .toList();
-	    }
+		// 3. 依關鍵字篩選：標題「或」標籤有包含到即算符合
+		if (hasKeyword) {
+			list = list.stream()
+					.filter(bulletin -> (bulletin.getTitle() != null && bulletin.getTitle().contains(keyword))
+							|| (bulletin.getTags() != null && bulletin.getTags().contains(keyword))
+							|| (bulletin.getContent() != null && bulletin.getContent().contains(keyword)))
+					.toList();
+		}
 
-	    model.addAttribute("bulletinListData", list);
+		model.addAttribute("bulletinListData", list);
 
-	    // 搜尋條件也放回 model，讓表單能回填顯示
-	    model.addAttribute("searchStatus", status);
-	    model.addAttribute("searchKeyword", keyword);
-	    model.addAttribute("searchStartDate", startDate);
-	    model.addAttribute("searchEndDate", endDate);
-	    return "back-end/bulletin/listAllBulletin";
+		// 搜尋條件也放回 model，讓表單能回填顯示
+		model.addAttribute("searchStatus", status);
+		model.addAttribute("searchKeyword", keyword);
+		model.addAttribute("searchStartDate", startDate);
+		model.addAttribute("searchEndDate", endDate);
+		return "back-end/bulletin/listAllBulletin";
 	}
-	
+
 	// ===== 查看單筆內容（唯讀，不可修改） =====
-	@PostMapping("viewOne")
+	// 改為同時支援 GET/POST （列表頁的 form 走 POST，update 成功後的 redirect 走 GET）
+	@RequestMapping(value = "viewOne", method = { RequestMethod.GET, RequestMethod.POST })
 	public String viewOne(@RequestParam("bulletinId") Integer bulletinId, ModelMap model) {
-	    BulletinVO bulletinVO = bulletinSvc.getOneBulletin(bulletinId);
-	    model.addAttribute("bulletinVO", bulletinVO);
-	    return "back-end/bulletin/listOneBulletin";
+		BulletinVO bulletinVO = bulletinSvc.getOneBulletin(bulletinId);
+		model.addAttribute("bulletinVO", bulletinVO);
+		return "back-end/bulletin/listOneBulletin";
 	}
-	
+
 	// ===== 提供「員工編號 → 姓名」對照表，給列表頁/單筆顯示頁查詢用 =====
-    @ModelAttribute("employeeNameMap")
-    protected Map<Integer, String> referenceEmployeeNameMap() {
-        return employeeRepository.findAll().stream()
-                .collect(Collectors.toMap(EmployeeVO::getEmployeeId, EmployeeVO::getEmpName));
-    }
+	@ModelAttribute("employeeNameMap")
+	protected Map<Integer, String> referenceEmployeeNameMap() {
+		return employeeRepository.findAll().stream()
+				.collect(Collectors.toMap(EmployeeVO::getEmployeeId, EmployeeVO::getEmpName));
+	}
 }

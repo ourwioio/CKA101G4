@@ -1,444 +1,379 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      lang="zh-TW">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>公告內容</title>
+<title>公告內容</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<style>
+* {
+	box-sizing: border-box;
+}
 
-        body {
-            margin: 0;
-            color: #2d3436;
-            background: #f5f6fa;
-            font-family:
-                    "Noto Sans TC",
-                    Arial,
-                    sans-serif;
-        }
+body {
+	margin: 0;
+	color: #2d3436;
+	background: #f5f6fa;
+	font-family: "Noto Sans TC", Arial, sans-serif;
+}
 
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
+a {
+	color: inherit;
+	text-decoration: none;
+}
 
-        .page {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto;
-            padding-bottom: 60px;
-        }
+.page {
+	width: 100%;
+	max-width: 900px;
+	margin: 0 auto;
+	padding-bottom: 60px;
+}
 
-        /* =========================
+/* =========================
            頁面標題
            ========================= */
+.page-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin-bottom: 22px;
+}
 
-        .page-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 22px;
-        }
+.page-title {
+	margin: 0;
+	font-size: 28px;
+	font-weight: 800;
+}
 
-        .page-title {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 800;
-        }
+.back-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 40px;
+	padding: 8px 15px;
+	color: #ffffff;
+	background: #343a40;
+	border-radius: 7px;
+	font-size: 13px;
+	font-weight: 800;
+	transition: background 0.15s ease, transform 0.15s ease;
+}
 
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 40px;
-            padding: 8px 15px;
-            color: #ffffff;
-            background: #343a40;
-            border-radius: 7px;
-            font-size: 13px;
-            font-weight: 800;
-            transition:
-                    background 0.15s ease,
-                    transform 0.15s ease;
-        }
+.back-link:hover {
+	background: #111111;
+	transform: translateY(-1px);
+}
 
-        .back-link:hover {
-            background: #111111;
-            transform: translateY(-1px);
-        }
-
-        /* =========================
+/* =========================
            訊息
            ========================= */
+.message {
+	margin-bottom: 18px;
+	padding: 14px 16px;
+	border-radius: 10px;
+	font-weight: 700;
+}
 
-        .message {
-            margin-bottom: 18px;
-            padding: 14px 16px;
-            border-radius: 10px;
-            font-weight: 700;
-        }
+.message--success {
+	color: #176b45;
+	background: #e8f8ef;
+	border: 1px solid #b7e4ca;
+}
 
-        .message--success {
-            color: #176b45;
-            background: #e8f8ef;
-            border: 1px solid #b7e4ca;
-        }
-
-        /* =========================
+/* =========================
            狀態標籤
            ========================= */
+.badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 78px;
+	padding: 6px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 800;
+	white-space: nowrap;
+}
 
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 78px;
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 800;
-            white-space: nowrap;
-        }
+.badge--draft {
+	color: #475569;
+	background: #e2e8f0;
+}
 
-        .badge--draft {
-            color: #475569;
-            background: #e2e8f0;
-        }
+.badge--published {
+	color: #166534;
+	background: #dcfce7;
+}
 
-        .badge--published {
-            color: #166534;
-            background: #dcfce7;
-        }
-
-        /* =========================
+/* =========================
            公告詳情卡片
            ========================= */
+.detail-card {
+	overflow: hidden;
+	background: #ffffff;
+	border: 1px solid #e1e5ea;
+	border-radius: 14px;
+	box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
 
-        .detail-card {
-            overflow: hidden;
-            background: #ffffff;
-            border: 1px solid #e1e5ea;
-            border-radius: 14px;
-            box-shadow:
-                    0 5px 20px
-                    rgba(0, 0, 0, 0.05);
-        }
+.detail-header {
+	padding: 24px;
+	color: #ffffff;
+	background: linear-gradient(135deg, #6c5ce7, #8c7ae6);
+}
 
-        .detail-header {
-            padding: 24px;
-            color: #ffffff;
-            background:
-                    linear-gradient(
-                            135deg,
-                            #6c5ce7,
-                            #8c7ae6
-                    );
-        }
+.detail-number {
+	margin-bottom: 8px;
+	font-size: 13px;
+	opacity: 0.86;
+}
 
-        .detail-number {
-            margin-bottom: 8px;
-            font-size: 13px;
-            opacity: 0.86;
-        }
+.detail-title {
+	margin: 0;
+	font-size: 26px;
+	font-weight: 800;
+	word-break: break-word;
+}
 
-        .detail-title {
-            margin: 0;
-            font-size: 26px;
-            font-weight: 800;
-            word-break: break-word;
-        }
+.detail-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+	margin-top: 12px;
+	font-size: 13px;
+	opacity: 0.92;
+}
 
-        .detail-meta {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-            margin-top: 12px;
-            font-size: 13px;
-            opacity: 0.92;
-        }
+.detail-body {
+	padding: 24px;
+}
 
-        .detail-body {
-            padding: 24px;
-        }
+.detail-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0;
+	margin-bottom: 24px;
+	overflow: hidden;
+	border: 1px solid #e3e7eb;
+	border-radius: 10px;
+}
 
-        .detail-grid {
-            display: grid;
-            grid-template-columns:
-                    repeat(2, minmax(0, 1fr));
-            gap: 0;
-            margin-bottom: 24px;
-            overflow: hidden;
-            border: 1px solid #e3e7eb;
-            border-radius: 10px;
-        }
+.detail-item {
+	min-height: 66px;
+	padding: 14px 16px;
+	border-bottom: 1px solid #e8ebee;
+}
 
-        .detail-item {
-            min-height: 66px;
-            padding: 14px 16px;
-            border-bottom: 1px solid #e8ebee;
-        }
+.detail-item:nth-child(odd) {
+	border-right: 1px solid #e8ebee;
+}
 
-        .detail-item:nth-child(odd) {
-            border-right: 1px solid #e8ebee;
-        }
+.detail-label {
+	margin-bottom: 6px;
+	color: #7b838b;
+	font-size: 12px;
+	font-weight: 700;
+}
 
-        .detail-label {
-            margin-bottom: 6px;
-            color: #7b838b;
-            font-size: 12px;
-            font-weight: 700;
-        }
+.detail-value {
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.6;
+	word-break: break-word;
+}
 
-        .detail-value {
-            font-size: 14px;
-            font-weight: 700;
-            line-height: 1.6;
-            word-break: break-word;
-        }
+.section-title {
+	margin: 0 0 14px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #e7eaee;
+	font-size: 18px;
+}
 
-        .section-title {
-            margin: 0 0 14px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #e7eaee;
-            font-size: 18px;
-        }
+.description-panel {
+	padding: 18px;
+	line-height: 1.8;
+	background: #f8f9fb;
+	border: 1px solid #e5e8ec;
+	border-radius: 10px;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
 
-        .description-panel {
-            padding: 18px;
-            line-height: 1.8;
-            background: #f8f9fb;
-            border: 1px solid #e5e8ec;
-            border-radius: 10px;
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        /* =========================
+/* =========================
            RWD
            ========================= */
-
-        @media (max-width: 700px) {
-
-            .detail-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .detail-item:nth-child(odd) {
-                border-right: 0;
-            }
-
-            .page-header {
-                align-items: stretch;
-                flex-direction: column;
-            }
-
-            .back-link {
-                text-align: center;
-            }
-        }
-    </style>
+@media ( max-width : 700px) {
+	.detail-grid {
+		grid-template-columns: 1fr;
+	}
+	.detail-item:nth-child(odd) {
+		border-right: 0;
+	}
+	.page-header {
+		align-items: stretch;
+		flex-direction: column;
+	}
+	.back-link {
+		text-align: center;
+	}
+}
+</style>
 </head>
 
 <body>
 
-<div class="wb-admin-layout">
+	<div class="wb-admin-layout">
 
-    <!-- =========================
+		<!-- =========================
          左側共用 Sidebar
          ========================= -->
 
-    <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}">
-    </div>
+		<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}">
+		</div>
 
-    <!-- =========================
+		<!-- =========================
          右側公告內容
          ========================= -->
 
-    <main class="wb-admin-content">
+		<main class="wb-admin-content">
 
-        <div class="page">
+			<div class="page">
 
-            <!-- =========================
+				<!-- =========================
                  頁面標題
                  ========================= -->
 
-            <header class="page-header">
+				<header class="page-header">
 
-                <h1 class="page-title">
-                    公告內容
-                </h1>
+					<h1 class="page-title">公告內容</h1>
 
-                <a class="back-link"
-                   th:href="@{/admin/platform/bulletin/listAllBulletin}">
-                    ← 返回公告管理
-                </a>
+					<a class="back-link"
+						th:href="@{/admin/platform/bulletin/listAllBulletin}"> ←
+						返回公告管理 </a>
 
-            </header>
+				</header>
 
-            <!-- =========================
+				<!-- =========================
                  成功訊息
                  ========================= -->
 
-            <div class="message message--success"
-                 th:if="${success != null}"
-                 th:text="${success}">
-                操作成功
-            </div>
+				<div class="message message--success" th:if="${success != null}"
+					th:text="${success}">操作成功</div>
 
-            <!-- =========================
+				<!-- =========================
                  公告詳情
                  ========================= -->
 
-            <article class="detail-card">
+				<article class="detail-card">
 
-                <header class="detail-header">
+					<header class="detail-header">
 
-                    <div class="detail-number">
+						<div class="detail-number">
 
-                        公告編號 #
+							公告編號 # <span th:text="${bulletinVO.bulletinId}"> 1 </span>
 
-                        <span th:text="${bulletinVO.bulletinId}">
-                            1
-                        </span>
+						</div>
 
-                    </div>
+						<h2 class="detail-title" th:text="${bulletinVO.title}">公告標題</h2>
 
-                    <h2 class="detail-title"
-                        th:text="${bulletinVO.title}">
-                        公告標題
-                    </h2>
+						<div class="detail-meta">
 
-                    <div class="detail-meta">
+							<span class="badge badge--published"
+								th:if="${bulletinVO.status == 1}"> 已發布 </span> <span
+								class="badge badge--draft" th:if="${bulletinVO.status == 0}">
+								草稿 </span> <span th:if="${bulletinVO.publishDate != null}">
+								發布日期： <span th:text="${bulletinVO.publishDate}">
+									2026-07-15 </span>
+							</span>
 
-                        <span class="badge badge--published"
-                              th:if="${bulletinVO.status == 1}">
-                            已發布
-                        </span>
+						</div>
 
-                        <span class="badge badge--draft"
-                              th:if="${bulletinVO.status == 0}">
-                            草稿
-                        </span>
+					</header>
 
-                        <span th:if="${bulletinVO.publishDate != null}">
-                            發布日期：
-                            <span th:text="${bulletinVO.publishDate}">
-                                2026-07-15
-                            </span>
-                        </span>
+					<div class="detail-body">
 
-                    </div>
-
-                </header>
-
-                <div class="detail-body">
-
-                    <!-- =====================
+						<!-- =====================
                          基本資料
                          ===================== -->
 
-                    <h3 class="section-title">
-                        基本資料
-                    </h3>
+						<h3 class="section-title">基本資料</h3>
 
-                    <section class="detail-grid">
+						<section class="detail-grid">
 
-                        <div class="detail-item">
+							<div class="detail-item">
 
-                            <div class="detail-label">
-                                標籤
-                            </div>
+								<div class="detail-label">標籤</div>
 
-                            <div class="detail-value"
-                                 th:text="${bulletinVO.tags != null
+								<div class="detail-value"
+									th:text="${bulletinVO.tags != null
                                           and !#strings.isEmpty(bulletinVO.tags)
                                           ? bulletinVO.tags
                                           : '未設定'}">
-                                標籤
-                            </div>
+									標籤</div>
 
-                        </div>
+							</div>
 
-                        <div class="detail-item">
+							<div class="detail-item">
 
-                            <div class="detail-label">
-                                負責員工
-                            </div>
+								<div class="detail-label">負責員工</div>
 
-                            <div class="detail-value"
-                                 th:text="${bulletinVO.employeeId} + ' - ' + ${employeeNameMap.get(bulletinVO.employeeId)}">
-                                1001 - 員工
-                            </div>
+								<div class="detail-value"
+									th:text="${bulletinVO.employeeId} + ' - ' + ${employeeNameMap.get(bulletinVO.employeeId)}">
+									1001 - 員工</div>
 
-                        </div>
+							</div>
 
-                        <div class="detail-item">
+							<div class="detail-item">
 
-                            <div class="detail-label">
-                                建立時間
-                            </div>
+								<div class="detail-label">建立時間</div>
 
-                            <div class="detail-value"
-                                 th:text="${#temporals.format(
-                                         bulletinVO.createdAt,
-                                         'yyyy-MM-dd HH:mm:ss'
-                                 )}">
-                                2026-07-15 14:30:00
-                            </div>
+								<div class="detail-value"
+									th:text="${bulletinVO.createdAt != null
+								              ? #temporals.format(bulletinVO.createdAt, 'yyyy-MM-dd HH:mm:ss')
+								              : '-'}">
+									-
+								</div>
 
-                        </div>
+							</div>
 
-                        <div class="detail-item">
+							<div class="detail-item">
 
-                            <div class="detail-label">
-                                更新時間
-                            </div>
+								<div class="detail-label">更新時間</div>
 
-                            <div class="detail-value"
-                                 th:text="${#temporals.format(
-                                         bulletinVO.updatedAt,
-                                         'yyyy-MM-dd HH:mm:ss'
-                                 )}">
-                                2026-07-15 14:30:00
-                            </div>
+								<div class="detail-value"
+									th:text="${bulletinVO.updatedAt != null
+                                          ? #temporals.format(bulletinVO.updatedAt, 'yyyy-MM-dd HH:mm:ss')
+                                          : '尚未更新'}">
+									尚未更新</div>
 
-                        </div>
+							</div>
 
-                    </section>
+						</section>
 
-                    <!-- =====================
+						<!-- =====================
                          公告內容
                          ===================== -->
 
-                    <h3 class="section-title">
-                        公告內容
-                    </h3>
+						<h3 class="section-title">公告內容</h3>
 
-                    <div class="description-panel"
-                         th:text="${bulletinVO.content}">
-                        公告內容
-                    </div>
+						<div class="description-panel" th:text="${bulletinVO.content}">
+							公告內容</div>
 
-                </div>
+					</div>
 
-            </article>
+				</article>
 
-        </div>
+			</div>
 
-    </main>
+		</main>
 
-</div>
+	</div>
 
 </body>
 </html>
