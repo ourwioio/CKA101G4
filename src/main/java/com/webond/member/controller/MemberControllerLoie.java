@@ -264,6 +264,7 @@ public class MemberControllerLoie {
 			model.addAttribute("tempIdFrontImage", encodeToBase641(idFrontBytes));
 			model.addAttribute("tempIdBackImage", encodeToBase641(idBackBytes));
 			model.addAttribute("tempFaceImage", encodeToBase641(faceImageBytes));
+			model.addAttribute("emailAlreadyVerified", cleanEmail != null && otpService.isVerified(cleanEmail));
 			return "front-end/member/register";
 		}
 		try {

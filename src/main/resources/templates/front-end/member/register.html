@@ -555,10 +555,22 @@ button[type="submit"]:hover {
 		</div>
 	</div>
 
-	<script>
+	<script th:inline="javascript">
 		let cooldownSeconds = 0;
 		let timer = null;
-		let isEmailVerified = false;
+		// 🎯 修正：若 Redis 裡這個 Email 早已驗證過（例如其他欄位錯誤導致重新整理回這頁），
+		// 後端會透過 emailAlreadyVerified 旗標告知前端，不用強迫使用者重新核對驗證碼
+		let isEmailVerified = /*[[${emailAlreadyVerified != null ? emailAlreadyVerified : false}]]*/ false;
+
+		document.addEventListener('DOMContentLoaded', function () {
+			if (isEmailVerified) {
+				const verifyMsg = document.getElementById('verifyMsg');
+				verifyMsg.style.color = '#16a34a';
+				verifyMsg.innerText = '✓ 此 Email 先前已完成驗證，可直接送出表單！';
+				document.getElementById('verifyOtpBtn').disabled = true;
+				document.getElementById('sendOtpBtn').disabled = true;
+			}
+		});
 
 		function sendOtp() {
 			const emailInput = document.getElementById('email');

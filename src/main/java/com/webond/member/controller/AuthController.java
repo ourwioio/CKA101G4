@@ -27,7 +27,7 @@ public class AuthController {
     
  // 🟢 手動宣告 log 物件 (紅線保證立刻消失)
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
- 
+
     // =========================================================================
     // 1. 發送 Email 驗證碼 API
     // =========================================================================
@@ -85,8 +85,8 @@ public class AuthController {
             // 🟢 4. 驗證成功後立即刪除 Redis 中的驗證碼，防止二次重用
             otpService.deleteOtp(cleanEmail);
 
-            // 🟢 5. 標記此 Email 已通過驗證，供 doRegister 後端把關使用（防止繞過前端直接註冊）
-            otpService.markVerified(cleanEmail);
+            // 🎯 修正：標記此 Email 已完成驗證，doRegister 後端把關才能真正通過
+            otpService.setVerified(cleanEmail);
 
             return ResponseEntity.ok(Map.of("success", true, "message", "驗證成功！"));
         } else {
