@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.webond.activity.model.ActivityService;
+import com.webond.activity.model.ActivityOrderService;
+import com.webond.activity.model.ActivityOrderVO;
 import com.webond.activity.model.ActivityVO;
 import com.webond.member.dto.ChangePasswordDTO;
 import com.webond.member.dto.ProfileUpdateDTO;
@@ -54,6 +56,9 @@ public class MemberFrontControllerAyaka {
 	
 	@Autowired
 	ActivityService activityService;
+
+	@Autowired
+	ActivityOrderService activityOrderService;
 	
 	@Autowired
 	VenueService venueService;
@@ -119,15 +124,28 @@ public class MemberFrontControllerAyaka {
 		
 		MemberVO memberVO = memberService.getOneMember(memberId);
 	    ServiceVO serviceList = serviceService.getOneService(memberId);
-	    ActivityVO activityList = activityService.getOneActivity(memberId);
+	    List<ActivityVO> activityList = activityService.getActivitiesByMemberId(memberId);
 	    List<VenueVO> venueList = venueService.getVenuesByMember(memberId);
 	    List<MemberReviewDTO> reviews = myReviewService.getReviewsByMemberId(memberId);
+	    List<ActivityOrderVO> completedActivityOrders = activityOrderService.getOrdersByBuyerMemberId(memberId)
+	            .stream()
+	            .filter(order -> Byte.valueOf((byte) 4).equals(order.getOrderStatus()))
+	            .toList();
+	    Map<Integer, ActivityVO> completedActivityMap = new HashMap<>();
+	    for (ActivityOrderVO order : completedActivityOrders) {
+	        ActivityVO activityVO = activityService.getOneActivity(order.getActivityId());
+	        if (activityVO != null) {
+	            completedActivityMap.put(order.getActivityId(), activityVO);
+	        }
+	    }
 	    model.addAttribute("reviews", reviews);
 	    
 	    model.addAttribute("memberVO", memberVO);
 	    model.addAttribute("serviceListData", serviceList);
 	    model.addAttribute("activityListData", activityList);
 	    model.addAttribute("venueListData", venueList);
+	    model.addAttribute("completedActivityOrders", completedActivityOrders);
+	    model.addAttribute("completedActivityMap", completedActivityMap);
 	    
 		return "front-end/member/myProfile";
 	}
