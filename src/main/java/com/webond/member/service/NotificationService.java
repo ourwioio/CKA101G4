@@ -70,11 +70,6 @@ public class NotificationService {
         return notificationVO;
     }
 
-    public List<NotificationVO> getNotificationByMemberId(Integer memberId) {
-
-        return repository
-                .findByMember_MemberId(memberId);
-    }
 
     public List<NotificationVO> getNotificationByEmployeeId(Integer employeeId) {
 
@@ -82,9 +77,14 @@ public class NotificationService {
                 .findByEmployee_EmployeeId(employeeId);
     }
 
+    public List<NotificationVO> getNotificationsByMember(Integer memberId) {
+        return repository.findByMember_MemberIdOrderByNotificationIdDesc(memberId);
+    }
+    
     public List<NotificationVO> getAll() {
         return repository.findAll();
     }
+    
 
     public void markNotificationAsRead(Integer notificationId) {
 
@@ -104,10 +104,7 @@ public class NotificationService {
         }
 
         return repository
-                .countByMember_MemberIdAndIsRead(
-                    memberId,
-                    0
-                );
+                .countByMember_MemberIdAndIsRead( memberId, 0);
     }
     
     
