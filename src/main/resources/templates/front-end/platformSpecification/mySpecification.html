@@ -4,13 +4,196 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>平台規範｜Webond</title>
+
+    <!-- Google Fonts -->
+<!--     <link rel="preconnect" href="https://fonts.googleapis.com"> -->
+<!--     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <!-- Webond 前台共用 CSS -->
+<!--     <link rel="stylesheet" th:href="@{/css/front-end/service/common.css}"> -->
+    <!-- 前台共用 Navbar CSS -->
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <!-- 平台規範列表專屬 CSS -->
+    <link rel="stylesheet" th:href="@{/css/front-end/platformSpecification/specList.css}">
+
+    <style>
+    </style>
+</head>
+
+<body>
+
+<header th:replace="~{front-end/common/navbar :: navbar}"></header>
+
+<main class="site-main">
+
+    <!-- ========== 頁面標題 ========== -->
+    <section class="spec-heading">
+        <div>
+<!--             <p class="spec-eyebrow">Platform Specification</p> -->
+            <h1 class="page-title">平台規範</h1>
+            <p class="spec-description">使用 Webond 前，請詳閱平台規範以保障自身與其他會員的權益。</p>
+        </div>
+    </section>
+
+    <!-- ========== 搜尋區 (全面改造為自訂下拉選單) ========== -->
+    <section class="panel spec-search-panel">
+        <div class="spec-search-heading">
+            <div>
+                <h2>搜尋規範</h2>
+                <p>可依規範類型或關鍵字搜尋</p>
+            </div>
+            <a class="spec-clear-link" th:href="@{/specifications}">清除搜尋</a>
+        </div>
+
+        <form class="spec-search-form" th:action="@{/specifications}" method="get">
+
+            <!-- 規範類型 (自訂模擬選單結構) -->
+            <div class="form-group">
+              <label>規範類型</label>
+              <div class="custom-select-wrapper">
+                <input type="hidden" name="specType" th:value="${searchSpecType != null ? searchSpecType : ''}">
+                <div class="custom-select-trigger">
+                  <span class="trigger-text">全部類型</span>
+                  <span class="trigger-arrow"></span>
+                </div>
+                <div class="custom-dropdown-menu">
+                  <div class="custom-option" data-value="">全部類型</div>
+                  <div class="custom-option" th:each="entry : ${specTypeListData}"
+                       th:value="${entry.key}"
+                       th:th:data-value="${entry.key}"
+                       th:text="${entry.value}">類型</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 關鍵字搜尋 -->
+            <div class="form-group">
+                <label>關鍵字搜尋</label>
+                <input class="form-control" type="text" name="keyword" placeholder="搜尋標題或內容" th:value="${searchKeyword}">
+            </div>
+
+            <button class="btn spec-search-button" type="submit">搜尋</button>
+        </form>
+    </section>
+
+    <!-- ========== 結果標題 ========== -->
+    <div class="spec-result-heading">
+        <h2>規範列表</h2>
+        <span class="spec-count" th:text="|共 ${#lists.size(specListData)} 筆|">共 0 筆</span>
+    </div>
+
+    <!-- ========== 無資料狀態 ========== -->
+    <section class="spec-empty-state" th:if="${#lists.isEmpty(specListData)}">
+        <div class="spec-empty-icon">☰</div>
+        <h3>目前沒有符合條件的規範</h3>
+        <p>可以更換搜尋條件，或重新查看全部規範。</p>
+        <a class="btn btn-primary" th:href="@{/specifications}">查看全部規範</a>
+    </section>
+
+    <!-- ========== 規範卡片網格列表 ========== -->
+    <section class="spec-list" th:if="${!#lists.isEmpty(specListData)}">
+        <a class="spec-card" th:each="spec : ${specListData}" th:href="@{/specifications/{id}(id=${spec.specId})}">
+            <div class="spec-card-inner">
+                <div class="spec-card-top">
+                    <h3 class="spec-card-title" th:text="${spec.title}">規範標題</h3>
+                    <span class="spec-card-type" th:text="${specTypeListData.get(spec.specType)}">規範類型</span>
+                </div>
+                <p class="spec-card-excerpt" th:text="${spec.description}">規範內容摘要</p>
+                <p class="spec-card-updated"
+                   th:if="${spec.updatedAt != null and spec.createdAt != null and spec.updatedAt.isAfter(spec.createdAt)}"
+                   th:text="|最後更新：${#temporals.format(spec.updatedAt, 'yyyy-MM-dd')}|">
+                    最後更新：2026-07-01
+                </p>
+            </div>
+        </a>
+    </section>
+</main>
+
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+
+<!-- ==========================================================
+     🌟 核心 JavaScript：控制 平台規範 自訂選單的資料讀取與同步
+     ========================================================== -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const selectWrappers = document.querySelectorAll('.custom-select-wrapper');
+    
+    selectWrappers.forEach(wrapper => {
+      const trigger = wrapper.querySelector('.custom-select-trigger');
+      const menu = wrapper.querySelector('.custom-dropdown-menu');
+      const hiddenInput = wrapper.querySelector('input[type="hidden"]');
+      const options = wrapper.querySelectorAll('.custom-option');
+      const triggerText = trigger.querySelector('.trigger-text');
+      
+      // 1. 初始化資料同步
+      const defaultValue = hiddenInput.value;
+      let hasActiveSelection = false;
+
+      options.forEach(option => {
+        if (option.getAttribute('data-value') === defaultValue) {
+          option.classList.add('selected');
+          triggerText.textContent = option.textContent;
+          hasActiveSelection = true;
+        } else {
+          option.classList.remove('selected');
+        }
+      });
+
+      if (!hasActiveSelection && options.length > 0) {
+        options[0].classList.add('selected');
+        triggerText.textContent = options[0].textContent;
+      }
+      
+      // 2. 面板開關
+      trigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        menu.classList.toggle('show');
+        trigger.classList.toggle('active');
+      });
+      
+      // 3. 選項點擊寫回
+      options.forEach(option => {
+        option.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const selectedValue = this.getAttribute('data-value');
+          const selectedText = this.textContent;
+          hiddenInput.value = selectedValue;
+          triggerText.textContent = selectedText;
+          options.forEach(opt => opt.classList.remove('selected'));
+          this.classList.add('selected');
+          menu.classList.remove('show');
+          trigger.classList.remove('active');
+        });
+      });
+    });
+    
+    // 空白處點擊收合
+    document.addEventListener('click', function() {
+      document.querySelectorAll('.custom-dropdown-menu').forEach(menu => menu.classList.remove('show'));
+      document.querySelectorAll('.custom-select-trigger').forEach(trigger => trigger.classList.remove('active'));
+    });
+  });
+</script>
+
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
     <title>平台規範｜Webond</title>
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts 
     <link rel="preconnect"
           href="https://fonts.googleapis.com">
 
@@ -21,35 +204,36 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
           rel="stylesheet">
 
-    <!-- Webond 前台共用 CSS -->
+    <!-- Webond 前台共用 CSS 
     <link rel="stylesheet"
           th:href="@{/css/front-end/service/common.css}">
 
-    <!-- 前台共用 Navbar CSS -->
+    <!-- 前台共用 Navbar CSS 
     <link rel="stylesheet"
           th:href="@{/css/front-end/common/navbar.css}">
 
-    <!-- 平台規範列表專屬 CSS -->
+    <!-- 平台規範列表專屬 CSS 
     <link rel="stylesheet"
           th:href="@{/css/front-end/platformSpecification/specList.css}">
 </head>
-
+ -->
+ <!--
 <body>
 
-<!-- ==========================================================
+ ==========================================================
      共用固定導覽列
-     ========================================================== -->
+     ========================================================== 
 <header th:replace="~{front-end/common/navbar :: navbar}">
 </header>
 
-<!-- ==========================================================
+ ==========================================================
      主要內容
-     ========================================================== -->
+     ========================================================== 
 <main class="site-main">
 
-    <!-- ======================================================
+   ======================================================
          頁面標題
-         ====================================================== -->
+         ====================================================== 
     <section class="spec-heading">
 
         <div>
@@ -69,10 +253,10 @@
         </div>
 
     </section>
-
+-->
     <!-- ======================================================
          搜尋區
-         ====================================================== -->
+         ====================================================== 
     <section class="panel spec-search-panel">
 
         <div class="spec-search-heading">
@@ -131,10 +315,10 @@
         </form>
 
     </section>
-
+-->
     <!-- ======================================================
          結果標題
-         ====================================================== -->
+         ======================================================
     <div class="spec-result-heading">
 
         <h2>
@@ -147,10 +331,10 @@
         </span>
 
     </div>
-
+ -->
     <!-- ======================================================
          無資料
-         ====================================================== -->
+         ====================================================== 
     <section class="spec-empty-state"
              th:if="${#lists.isEmpty(specListData)}">
 
@@ -172,10 +356,10 @@
         </a>
 
     </section>
-
+-->
     <!-- ======================================================
          規範卡片列表
-         ====================================================== -->
+         ====================================================== 
     <section class="spec-list"
              th:if="${!#lists.isEmpty(specListData)}">
 
@@ -222,10 +406,11 @@
     </section>
 
 </main>
-
-<!-- 共用通知 AJAX 輪詢 -->
+-->
+<!-- 共用通知 AJAX 輪詢 
 <script th:src="@{/js/front-end/common/notificationPolling.js}">
 </script>
 
 </body>
 </html>
+-->

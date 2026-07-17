@@ -4,36 +4,29 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title th:text="|${bulletinVO.title}｜Webond|">
         公告內容｜Webond
     </title>
 
     <!-- Google Fonts -->
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-          rel="stylesheet">
+<!--     <link rel="preconnect" href="https://fonts.googleapis.com"> -->
+<!--     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <!-- Webond 前台共用 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/service/common.css}">
-
+<!--     <link rel="stylesheet" th:href="@{/css/front-end/service/common.css}"> -->
     <!-- 前台共用 Navbar CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/common/navbar.css}">
-
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
     <!-- 公告內容專屬 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/bulletin/bulletinDetail.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/bulletin/bulletinDetail.css}">
+
+    <style>
+/* ==========================================================
+   Webond 公告詳情頁 — 圓潤角色風與完美閱讀比例
+   ========================================================== */
+    </style>
 </head>
 
 <body>
@@ -47,6 +40,107 @@
 <!-- ==========================================================
      主要內容
      ========================================================== -->
+<main class="site-main bulletin-detail-page">
+
+    <!-- 回公告列表按鈕 (已套用精算膠囊風) -->
+    <a class="bulletin-detail-back" th:href="@{/announcements}">
+        ← 回公告列表
+    </a>
+
+    <!-- 詳情大卡片面板 -->
+    <article class="panel">
+
+        <div class="bulletin-detail-header">
+            <p class="bulletin-detail-eyebrow">公告</p>
+            
+            <h1 class="bulletin-detail-title" th:text="${bulletinVO.title}">
+                公告標題
+            </h1>
+
+            <p class="bulletin-detail-meta">
+                發布日期：
+                <strong th:text="${bulletinVO.publishDate}">2026-07-01</strong>
+
+                <span th:if="${bulletinVO.updatedAt != null and bulletinVO.updatedAt.isAfter(bulletinVO.createdAt)}">
+                    （最後更新：
+                    <strong th:text="${#temporals.format(bulletinVO.updatedAt, 'yyyy-MM-dd')}">2026-07-01</strong>
+                    ）
+                </span>
+            </p>
+        </div>
+
+        <!-- 公告內文主體 (已綁定自動換行與行高黃金比例) -->
+        <p class="bulletin-detail-body" th:text="${bulletinVO.content}">
+            公告內容
+        </p>
+
+        <!-- 底部吊牌標籤 -->
+        <div class="bulletin-detail-tags" th:if="${bulletinVO.tags != null}">
+            <span class="bulletin-detail-tags-label">標籤：</span>
+            <span class="bulletin-tag" th:text="${bulletinVO.tags}">標籤</span>
+        </div>
+
+    </article>
+
+</main>
+
+<!-- 共用通知 AJAX 輪詢 -->
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+
+</body>
+</html>
+
+<!--
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title th:text="|${bulletinVO.title}｜Webond|">
+        公告內容｜Webond
+    </title>
+
+    Google Fonts
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+          rel="stylesheet">
+
+    Webond 前台共用 CSS
+    <link rel="stylesheet"
+          th:href="@{/css/front-end/service/common.css}">
+
+    前台共用 Navbar CSS
+    <link rel="stylesheet"
+          th:href="@{/css/front-end/common/navbar.css}">
+
+    公告內容專屬 CSS
+    <link rel="stylesheet"
+          th:href="@{/css/front-end/bulletin/bulletinDetail.css}">
+</head>
+
+<body>
+
+<!-- ==========================================================
+     共用固定導覽列
+     ========================================================== -->
+<!-- <header th:replace="~{front-end/common/navbar :: navbar}"> -->
+<!-- </header> -->
+
+<!-- ==========================================================
+     主要內容
+     ========================================================== -->
+<!-- 
 <main class="site-main bulletin-detail-page">
 
     <a class="bulletin-detail-back"
@@ -74,16 +168,16 @@
                 <strong th:text="${bulletinVO.publishDate}">
                     2026-07-01
                 </strong>
-
-                <span th:if="${bulletinVO.updatedAt != null
-                               and bulletinVO.updatedAt.isAfter(bulletinVO.createdAt)}">
-
+ -->
+ <!--                <span th:if="${bulletinVO.updatedAt != null
+                               and bulletinVO.updatedAt.isAfter(bulletinVO.createdAt)}"> -->
+<!-- 
                     （最後更新：
 
                     <strong th:text="${#temporals.format(
-                                bulletinVO.updatedAt,
-                                'yyyy-MM-dd'
-                            )}">
+                                bulletinVO.updatedAt, -->
+<!--                                 'yyyy-MM-dd' -->
+<!--                             )}"> 
                         2026-07-01
                     </strong>
 
@@ -116,11 +210,11 @@
 
     </article>
 
-</main>
+</main>-->
 
-<!-- 共用通知 AJAX 輪詢 -->
+<!-- 共用通知 AJAX 輪詢 
 <script th:src="@{/js/front-end/common/notificationPolling.js}">
-</script>
+ </script> 
 
 </body>
-</html>
+</html> -->

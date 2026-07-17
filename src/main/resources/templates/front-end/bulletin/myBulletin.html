@@ -4,34 +4,22 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>最新公告｜Webond</title>
 
     <!-- Google Fonts -->
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-          rel="stylesheet">
+<!--     <link rel="preconnect" href="https://fonts.googleapis.com"> -->
+<!--     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <!-- Webond 前台共用 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/service/common.css}">
-
+<!--     <link rel="stylesheet" th:href="@{/css/front-end/service/common.css}"> -->
     <!-- 前台共用 Navbar CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/common/navbar.css}">
-
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
     <!-- 公告列表專屬 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/bulletin/bulletinList.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/bulletin/bulletinList.css}">
+
+    <style></style>
 </head>
 
 <body>
@@ -51,23 +39,10 @@
          頁面標題
          ====================================================== -->
     <section class="bulletin-heading">
-
         <div>
-
-            <p class="bulletin-eyebrow">
-                Bulletin
-            </p>
-
-            <h1 class="page-title">
-                最新公告
-            </h1>
-
-            <p class="bulletin-description">
-                查看 Webond 平台的最新消息、活動與系統維護通知。
-            </p>
-
+            <h1 class="page-title">最新公告</h1>
+            <p class="bulletin-description">查看 Webond 平台的最新消息、活動與系統維護通知。</p>
         </div>
-
     </section>
 
     <!-- ======================================================
@@ -76,62 +51,23 @@
     <section class="panel bulletin-search-panel">
 
         <div class="bulletin-search-heading">
-
             <div>
-
-                <h2>
-                    搜尋公告
-                </h2>
-
-                <p>
-                    可依發布日期區間或關鍵字搜尋
-                </p>
-
+                <h2>搜尋公告</h2>
+                <p>可依發布日期區間或關鍵字搜尋</p>
             </div>
-
-            <a class="bulletin-clear-link"
-               th:href="@{/announcements}">
-                清除搜尋
-            </a>
-
+            <a class="bulletin-clear-link" th:href="@{/announcements}">清除搜尋</a>
         </div>
 
-        <form class="bulletin-search-form"
-              th:action="@{/announcements}"
-              method="get">
+        <form class="bulletin-search-form" th:action="@{/announcements}" method="get">
+            <label class="bulletin-search-label" for="startDate">發布日期</label>
 
-            <label class="bulletin-search-label"
-                   for="startDate">
-                發布日期
-            </label>
+            <input class="form-control" id="startDate" type="date" name="startDate" th:value="${searchStartDate}">
+            <span class="bulletin-search-separator">～</span>
+            <input class="form-control" id="endDate" type="date" name="endDate" th:value="${searchEndDate}">
 
-            <input class="form-control"
-                   id="startDate"
-                   type="date"
-                   name="startDate"
-                   th:value="${searchStartDate}">
+            <input class="form-control" type="text" name="keyword" placeholder="搜尋標題、內容或標籤" th:value="${searchKeyword}">
 
-            <span class="bulletin-search-separator">
-                ～
-            </span>
-
-            <input class="form-control"
-                   id="endDate"
-                   type="date"
-                   name="endDate"
-                   th:value="${searchEndDate}">
-
-            <input class="form-control"
-                   type="text"
-                   name="keyword"
-                   placeholder="搜尋標題、內容或標籤"
-                   th:value="${searchKeyword}">
-
-            <button class="btn bulletin-search-button"
-                    type="submit">
-                搜尋
-            </button>
-
+            <button class="btn bulletin-search-button" type="submit">搜尋</button>
         </form>
 
     </section>
@@ -140,109 +76,57 @@
          結果標題
          ====================================================== -->
     <div class="bulletin-result-heading">
-
-        <h2>
-            公告列表
-        </h2>
-
-        <span class="bulletin-count"
-              th:text="|共 ${#lists.size(bulletinListData)} 筆|">
-            共 0 筆
-        </span>
-
+        <h2>公告列表</h2>
+        <span class="bulletin-count" th:text="|共 ${#lists.size(bulletinListData)} 筆|">共 0 筆</span>
     </div>
 
     <!-- ======================================================
-         無資料
+         無資料空狀態
          ====================================================== -->
-    <section class="bulletin-empty-state"
-             th:if="${#lists.isEmpty(bulletinListData)}">
-
-        <div class="bulletin-empty-icon">
-            ✉
-        </div>
-
-        <h3>
-            目前沒有符合條件的公告
-        </h3>
-
-        <p>
-            可以更換搜尋條件，或重新查看全部公告。
-        </p>
-
-        <a class="btn btn-primary"
-           th:href="@{/announcements}">
-            查看全部公告
-        </a>
-
+    <section class="bulletin-empty-state" th:if="${#lists.isEmpty(bulletinListData)}">
+        <div class="bulletin-empty-icon">✉</div>
+        <h3>目前沒有符合條件的公告</h3>
+        <p>可以更換搜尋條件，或重新查看全部公告。</p>
+        <a class="btn btn-primary" th:href="@{/announcements}">查看全部公告</a>
     </section>
 
     <!-- ======================================================
-         公告卡片列表
+         公告卡片列表 (比例優化與高度對齊版)
          ====================================================== -->
-    <section class="bulletin-list"
-             th:if="${!#lists.isEmpty(bulletinListData)}">
-
-        <a class="bulletin-card"
-           th:each="bulletin : ${bulletinListData}"
-           th:href="@{/announcements/{id}(id=${bulletin.bulletinId})}">
-
+    <section class="bulletin-list" th:if="${!#lists.isEmpty(bulletinListData)}">
+        <a class="bulletin-card" th:each="bulletin : ${bulletinListData}" th:href="@{/announcements/{id}(id=${bulletin.bulletinId})}">
             <div class="bulletin-card-inner">
 
+                <!-- 標題與日期區 -->
                 <div class="bulletin-card-top">
-
-                    <h3 class="bulletin-card-title"
-                        th:text="${bulletin.title}">
-                        公告標題
-                    </h3>
-
-                    <span class="bulletin-card-date"
-                          th:text="${bulletin.publishDate}">
-                        2026-07-01
-                    </span>
-
+                    <h3 class="bulletin-card-title" th:text="${bulletin.title}">公告標題</h3>
+                    <span class="bulletin-card-date" th:text="${bulletin.publishDate}">2026-07-01</span>
                 </div>
 
-                <p class="bulletin-card-excerpt"
-                   th:text="${bulletin.content}">
-                    公告內容摘要
-                </p>
+                <!-- 內文摘要 -->
+                <p class="bulletin-card-excerpt" th:text="${bulletin.content}">公告內容摘要</p>
 
+                <!-- 底部標籤與最後更新時間 -->
                 <div class="bulletin-card-footer">
-
-                    <div class="bulletin-tag-list"
-                         th:if="${bulletin.tags != null}">
-
-                        <span class="bulletin-tag"
-                              th:text="${bulletin.tags}">
-                            標籤
-                        </span>
-
+                    <div class="bulletin-tag-list" th:if="${bulletin.tags != null}">
+                        <span class="bulletin-tag" th:text="${bulletin.tags}">標籤</span>
                     </div>
 
                     <span class="bulletin-card-updated"
-                          th:if="${bulletin.updatedAt != null
-                                   and bulletin.updatedAt.isAfter(bulletin.createdAt)}"
-                          th:text="|最後更新：${#temporals.format(
-                                bulletin.updatedAt,
-                                'yyyy-MM-dd'
-                            )}|">
+                          th:if="${bulletin.updatedAt != null and bulletin.updatedAt.isAfter(bulletin.createdAt)}"
+                          th:text="|最後更新：${#temporals.format(bulletin.updatedAt, 'yyyy-MM-dd')}|">
                         最後更新：2026-07-01
                     </span>
-
                 </div>
 
             </div>
-
         </a>
-
     </section>
 
 </main>
 
 <!-- 共用通知 AJAX 輪詢 -->
-<script th:src="@{/js/front-end/common/notificationPolling.js}">
-</script>
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
 </body>
 </html>

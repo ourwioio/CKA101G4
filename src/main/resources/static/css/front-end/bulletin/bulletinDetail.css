@@ -1,123 +1,300 @@
+
+:root {
+  --color-bg:            #F7F3EC;
+  --color-surface:       #FFFFFF;
+  --color-surface-soft:  #FFFDF8;
+  --color-ink:           #17140F;
+  --color-ink-soft:      #726A5F;
+  --color-border:        #ECE4D6;
+
+  --color-yellow:       #FFE59A;
+  --color-yellow-deep:  #FFC94D;
+  --color-pink:         #FFB5C1;
+  --color-green:        #B7E1D1;
+  --color-blue:         #A9D3FF;
+
+  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+
+  --nav-height: 76px;
+}
+
+*{ box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 頁面主要容器與呼吸留白 */
+main.site-main.bulletin-detail-page {
+  max-width: 860px; /* ⚖️ 詳情頁黃金閱讀寬度，過寬會造成眼球橫移疲勞 */
+  margin: calc(var(--nav-height) + 36px) auto 60px;
+  padding: 0 20px;
+}
+
+a { text-decoration: none; color: inherit; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; }
+
+/* ==========================================================
+   藥丸風「回公告列表」按鈕
+   ========================================================== */
+.bulletin-detail-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  color: var(--color-ink-soft);
+  border: 1.5px solid var(--color-border);
+  font-weight: 800;
+  font-size: 13.5px;
+  padding: 10px 22px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, color .15s ease;
+}
+.bulletin-detail-back:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface-soft);
+}
+
+/* ==========================================================
+   詳情白底大面板容器
+   ========================================================== */
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 42px 46px; /* ⚖️ 寬裕的留白，營造高級的雜誌閱讀質感 */
+  box-shadow: var(--shadow-sm);
+}
+
+/* ==========================================================
+   上半部標題資訊區
+   ========================================================== */
+.bulletin-detail-header {
+  border-bottom: 1.5px dashed var(--color-border); /* 角色風經典虛線 */
+  padding-bottom: 22px;
+  margin-bottom: 26px;
+}
+.bulletin-detail-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-blue);
+  color: var(--color-ink);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 12px;
+  border-radius: 10px;
+  letter-spacing: 1px;
+  margin: 0 0 12px 0;
+}
+.bulletin-detail-title {
+  font-size: 26px; /* ⚖️ 標題大字重比例 */
+  font-weight: 800;
+  color: var(--color-ink);
+  line-height: 1.4;
+  margin-bottom: 12px;
+  text-align: left;
+}
+.bulletin-detail-meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  font-weight: 500;
+  text-align: left;
+}
+.bulletin-detail-meta strong {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+/* ==========================================================
+   下半部公告主內文（核心比例精算區）
+   ========================================================== */
+.bulletin-detail-body {
+  font-size: 15.5px; /* ⚖️ 完美還原平台內文比例 */
+  color: var(--color-ink);
+  line-height: 1.8; /* ⚖️ 足夠寬鬆的行高，大幅度提升長文閱讀體驗 */
+  font-weight: 500;
+  text-align: justify; /* 兩端對齊，排版更整齊 */
+  margin: 0 0 32px 0;
+  /* 🌟 專業防跑版：允許保留後端傳過來的分段、空格、換行符 */
+  white-space: pre-wrap; 
+  word-break: break-word;
+}
+
+/* ==========================================================
+   底部吊牌標籤區
+   ========================================================== */
+.bulletin-detail-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px dashed var(--color-border);
+  padding-top: 20px;
+}
+.bulletin-detail-tags-label {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--color-ink-soft);
+}
+.bulletin-tag {
+  display: inline-flex;
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  box-shadow: 0 2px 6px rgba(23, 20, 15, 0.03);
+}
+
+/* ==========================================================
+   RWD 手機端體驗優化
+   ========================================================== */
+@media (max-width: 768px) {
+  main.site-main.bulletin-detail-page { margin-top: calc(var(--nav-height) + 20px); }
+  .panel { padding: 30px 24px; } /* 縮小襯距防止小螢幕被擠壓 */
+  .bulletin-detail-title { font-size: 22px; }
+  .bulletin-detail-body { font-size: 15px; }
+}
+
 /* ==========================================================
    Webond 系統公告－公告內容
    搭配：
    /css/front-end/service/common.css
    ========================================================== */
 
-.bulletin-detail-page {
-    width: min(800px, calc(100% - 40px));
+/* .bulletin-detail-page { */
+/*     width: min(800px, calc(100% - 40px)); */
 
-    margin: 0 auto;
-}
+/*     margin: 0 auto; */
+/* } */
 
-.bulletin-detail-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
+/* .bulletin-detail-back { */
+/*     display: inline-flex; */
+/*     align-items: center; */
+/*     gap: 7px; */
 
-    margin-bottom: 22px;
+/*     margin-bottom: 22px; */
 
-    color: var(--color-primary-dark);
+/*     color: var(--color-primary-dark); */
 
-    font-size: 14px;
-    font-weight: 700;
+/*     font-size: 14px; */
+/*     font-weight: 700; */
 
-    transition:
-        color 0.15s ease,
-        transform 0.15s ease;
-}
+/*     transition: */
+/*         color 0.15s ease, */
+/*         transform 0.15s ease; */
+/* } */
 
-.bulletin-detail-back:hover {
-    color: var(--color-notice);
-    transform: translateX(-3px);
-}
+/* .bulletin-detail-back:hover { */
+/*     color: var(--color-notice); */
+/*     transform: translateX(-3px); */
+/* } */
 
-.bulletin-detail-header {
-    margin-bottom: 20px;
-}
+/* .bulletin-detail-header { */
+/*     margin-bottom: 20px; */
+/* } */
 
-.bulletin-detail-eyebrow {
-    margin-bottom: 10px;
+/* .bulletin-detail-eyebrow { */
+/*     margin-bottom: 10px; */
 
-    display: inline-flex;
+/*     display: inline-flex; */
 
-    padding: 4px 11px;
+/*     padding: 4px 11px; */
 
-    border-radius: var(--radius-full);
+/*     border-radius: var(--radius-full); */
 
-    background: #FFE6EF;
-    color: var(--color-notice);
+/*     background: #FFE6EF; */
+/*     color: var(--color-notice); */
 
-    font-size: 12px;
-    font-weight: 700;
-}
+/*     font-size: 12px; */
+/*     font-weight: 700; */
+/* } */
 
-.bulletin-detail-title {
-    margin-bottom: 14px;
+/* .bulletin-detail-title { */
+/*     margin-bottom: 14px; */
 
-    color: var(--color-text);
+/*     color: var(--color-text); */
 
-    font-size: clamp(24px, 3.5vw, 32px);
-    font-weight: 800;
-    line-height: 1.4;
-}
+/*     font-size: clamp(24px, 3.5vw, 32px); */
+/*     font-weight: 800; */
+/*     line-height: 1.4; */
+/* } */
 
-.bulletin-detail-meta {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px 10px;
+/* .bulletin-detail-meta { */
+/*     display: flex; */
+/*     align-items: center; */
+/*     flex-wrap: wrap; */
+/*     gap: 6px 10px; */
 
-    color: var(--color-text-soft);
-    font-size: 13px;
-}
+/*     color: var(--color-text-soft); */
+/*     font-size: 13px; */
+/* } */
 
-.bulletin-detail-meta strong {
-    color: var(--color-text);
-}
+/* .bulletin-detail-meta strong { */
+/*     color: var(--color-text); */
+/* } */
 
-.bulletin-detail-body {
-    color: var(--color-text);
+/* .bulletin-detail-body { */
+/*     color: var(--color-text); */
 
-    font-size: 15px;
-    line-height: 1.9;
+/*     font-size: 15px; */
+/*     line-height: 1.9; */
 
-    white-space: pre-line;
-}
+/*     white-space: pre-line; */
+/* } */
 
-.bulletin-detail-tags {
-    margin-top: 20px;
-    padding-top: 18px;
+/* .bulletin-detail-tags { */
+/*     margin-top: 20px; */
+/*     padding-top: 18px; */
 
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
+/*     display: flex; */
+/*     align-items: center; */
+/*     flex-wrap: wrap; */
+/*     gap: 8px; */
 
-    border-top: 1px solid var(--color-border);
-}
+/*     border-top: 1px solid var(--color-border); */
+/* } */
 
-.bulletin-detail-tags-label {
-    color: var(--color-text-soft);
-    font-size: 12px;
-    font-weight: 700;
-}
+/* .bulletin-detail-tags-label { */
+/*     color: var(--color-text-soft); */
+/*     font-size: 12px; */
+/*     font-weight: 700; */
+/* } */
 
-.bulletin-tag {
-    padding: 3px 9px;
+/* .bulletin-tag { */
+/*     padding: 3px 9px; */
 
-    border-radius: var(--radius-full);
+/*     border-radius: var(--radius-full); */
 
-    background: #FFF0F5;
-    color: var(--color-notice);
+/*     background: #FFF0F5; */
+/*     color: var(--color-notice); */
 
-    font-size: 11px;
-    font-weight: 700;
-}
+/*     font-size: 11px; */
+/*     font-weight: 700; */
+/* } */
 
-@media (max-width: 480px) {
+/* @media (max-width: 480px) { */
 
-    .bulletin-detail-page {
-        width: min(100% - 24px, 800px);
-    }
-}
+/*     .bulletin-detail-page { */
+/*         width: min(100% - 24px, 800px); */
+/*     } */
+/* } */

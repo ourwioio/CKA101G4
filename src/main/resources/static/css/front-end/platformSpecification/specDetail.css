@@ -1,8 +1,162 @@
+
+/* ==========================================================
+   Webond 平台規範詳情頁 — 完美導入公告與常見問題級排版
+   ========================================================== */
+:root {
+  --color-bg:            #F7F3EC;
+  --color-surface:       #FFFFFF;
+  --color-surface-soft:  #FFFDF8;
+  --color-ink:           #17140F;
+  --color-ink-soft:      #726A5F;
+  --color-border:        #ECE4D6;
+
+  --color-yellow:       #FFE59A;
+  --color-yellow-deep:  #FFC94D;
+  --color-pink:         #FFB5C1;
+  --color-green:        #B7E1D1;
+  --color-blue:         #A9D3FF;
+
+  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+
+  --nav-height: 76px;
+}
+
+*{ box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ⚖️ 詳情頁黃金閱讀寬度，放寬內顯阻尼防止眼球過度橫移疲勞 */
+main.site-main.spec-detail-page {
+  max-width: 860px;
+  margin: calc(var(--nav-height) + 36px) auto 60px;
+  padding: 0 20px;
+}
+
+a { text-decoration: none; color: inherit; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; }
+
+/* ==========================================================
+   膠囊風「回平台規範列表」按鈕
+   ========================================================== */
+.spec-detail-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  color: var(--color-ink-soft);
+  border: 1.5px solid var(--color-border);
+  font-weight: 800;
+  font-size: 13.5px;
+  padding: 10px 22px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, color .15s ease;
+}
+.spec-detail-back:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface-soft);
+}
+
+/* ==========================================================
+   詳情大卡片面板
+   ========================================================== */
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 42px 46px; /* 寬裕的留白阻尼，營造紙本雜誌的舒壓包裹感 */
+  box-shadow: var(--shadow-sm);
+}
+
+/* ==========================================================
+   上半部標頭資訊區
+   ========================================================== */
+.spec-detail-header {
+  border-bottom: 1.5px dashed var(--color-border); /* 角色風經典虛線分界 */
+  padding-bottom: 22px;
+  margin-bottom: 26px;
+}
+.spec-detail-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-blue);
+  color: var(--color-ink);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 12px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+  margin: 0 0 14px 0;
+}
+.spec-detail-title {
+  font-size: 26px; /* 大標字重比例 */
+  font-weight: 800;
+  color: var(--color-ink);
+  line-height: 1.4;
+  margin-bottom: 12px;
+  text-align: left;
+}
+.spec-detail-meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  font-weight: 500;
+  text-align: left;
+}
+.spec-detail-meta strong {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+/* ==========================================================
+   下半部法規主內文（細緻閱讀行高與防爆版設定）
+   ========================================================== */
+.spec-detail-body {
+  font-size: 15.5px; /* 對齊平台統一的內文字級 */
+  color: var(--color-ink);
+  line-height: 1.8; /* 放鬆的長文行高阻尼 */
+  font-weight: 500;
+  text-align: justify;
+  margin: 0;
+  /* 🌟 專業防跑版：完美留存後端資料庫傳入的分段與換行符 */
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ==========================================================
+   RWD 行動裝置排版優化
+   ========================================================== */
+@media (max-width: 768px) {
+  main.site-main.spec-detail-page { margin-top: calc(var(--nav-height) + 20px); }
+  .panel { padding: 30px 24px; } /* 縮減襯距防擠壓爆版 */
+  .spec-detail-title { font-size: 22px; }
+  .spec-detail-body { font-size: 15px; }
+}
+
 /* ==========================================================
    Webond 系統公告－平台規範內容
    搭配：
    /css/front-end/service/common.css
-   ========================================================== */
+   ========================================================== 
 
 .spec-detail-page {
     width: min(800px, calc(100% - 40px));
@@ -85,4 +239,4 @@
     .spec-detail-page {
         width: min(100% - 24px, 800px);
     }
-}
+}*/

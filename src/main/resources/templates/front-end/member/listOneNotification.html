@@ -211,7 +211,13 @@
       <!-- 標頭區：大標題置左，通知類型徽章在右 -->
       <div class="notify-card__header">
         <h1 class="notify-card__title" th:text="*{title}">通知標題</h1>
-        <span class="notify-badge" th:text="*{notificationType}">通知類型</span>
+		<span class="notify-badge" th:switch="*{notificationType}">
+		    <th:block th:case="0">訂單</th:block>
+		    <th:block th:case="1">評價</th:block>
+		    <th:block th:case="2">系統</th:block>
+		    <th:block th:case="3">聊天室</th:block>
+		    <th:block th:case="*">未知類型</th:block>
+		</span>
       </div>
 
       <!-- 內容區 -->
