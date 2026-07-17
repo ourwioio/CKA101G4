@@ -260,6 +260,7 @@ public class MemberControllerLoie {
 
 		if (result.hasErrors() || hasImageError) {
 			model.addAttribute("memberVO", memberVO);
+			model.addAttribute("rawPassword", rawPassword);
 			model.addAttribute("tempMemberPic", encodeToBase641(memberPicBytes));
 			model.addAttribute("tempIdFrontImage", encodeToBase641(idFrontBytes));
 			model.addAttribute("tempIdBackImage", encodeToBase641(idBackBytes));
