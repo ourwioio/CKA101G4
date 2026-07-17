@@ -68,15 +68,14 @@ public class ServiceReportController {
 	public String listAllServiceReport(
 	        @RequestParam(required = false) Byte status,
 	        ModelMap model,HttpSession session) {
-        Integer loginEmployeeId =
-                getLoginEmployeeId(session);
+        Integer loginEmployeeId = getLoginEmployeeId(session);
 	  
 		List<ServiceReportVO> list;
 		
-	    if (status == null) {
-	        list = serviceReportService.getAll();
+		if (status == null) {
+	        list = serviceReportService.getAll(); 
 	    } else {
-	        list = serviceReportService.getByStatus(status);
+	        list = serviceReportService.getByStatus(status); 
 	    }
 	    
 		model.addAttribute("serviceReportListData", list);
