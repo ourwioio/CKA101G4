@@ -44,7 +44,7 @@
 *{ box-sizing: border-box; }
 
 body {
-  margin: 0;
+  margin: 100px auto;
   font-family: var(--font-body);
   background: var(--color-bg);
   color: var(--color-ink);
@@ -553,10 +553,11 @@ h1 {
           <span class="value">NT$ <span th:text="${activityVO.activityPrice}">0</span></span>
         </div>
 
-        <div class="info">
-          <span class="label">主辦會員編號</span>
-          <span class="value" th:text="${activityVO.memberId}">1</span>
-        </div>
+	        <a  class="info" style="background: var(--color-yellow-deep)" th:href="@{/front/memberPage/oneMember(memberId=${session.memberVO.memberId})}">
+	          <span class="label">主辦會員編號</span>
+	          <span class="value" style="color: var(--color-surface-soft)" th:text="${activityVO.memberId}">1</span>
+          </a>
+        
 
         <div class="info">
           <span class="label">目前報名進度</span>
@@ -588,7 +589,10 @@ h1 {
       </div>
 
       <!-- 活動詳細描述 -->
-      <div class="desc" th:text="${activityVO.activityDescription}">活動描述</div>
+      <div class="desc">
+          <span class="label">活動描述</span><br>
+      	<span th:text="${activityVO.activityDescription}"></span>
+      </div>
 
       <!-- 底部按鈕操作列 -->
       <div class="actions">
