@@ -4,36 +4,26 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title th:text="|${faqVO.question}｜Webond|">
         常見問題內容｜Webond
     </title>
 
     <!-- Google Fonts -->
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-          rel="stylesheet">
+<!--     <link rel="preconnect" href="https://fonts.googleapis.com"> -->
+<!--     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <!-- Webond 前台共用 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/service/common.css}">
-
+<!--     <link rel="stylesheet" th:href="@{/css/front-end/service/common.css}"> -->
     <!-- 前台共用 Navbar CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/common/navbar.css}">
-
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
     <!-- FAQ 內容專屬 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/faq/faqDetail.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/faq/faqDetail.css}">
+
+    <style>
+    </style>
 </head>
 
 <body>
@@ -47,6 +37,101 @@
 <!-- ==========================================================
      主要內容
      ========================================================== -->
+<main class="site-main faq-detail-page">
+
+    <!-- 回常見問題列表 (已套用精算膠囊風) -->
+    <a class="faq-detail-back" th:href="@{/faqs}">
+        ← 回常見問題列表
+    </a>
+
+    <!-- 詳情大卡片面板 -->
+    <article class="panel">
+
+        <div class="faq-detail-header">
+            <!-- 動態擷取後端類型文字 -->
+            <p class="faq-detail-eyebrow" th:text="${faqTypeListData.get(faqVO.faqType)}">
+                問題類型
+            </p>
+
+            <h2 class="faq-detail-title">
+                <!-- 精緻 Q 字樣小方塊 -->
+                <span class="faq-detail-title-mark">Q</span>
+                <span th:text="${faqVO.question}">問題內容</span>
+            </h2>
+
+            <!-- 最後更新時間提示欄 -->
+            <p class="faq-detail-meta"
+               th:if="${faqVO.updatedAt != null and faqVO.createdAt != null and faqVO.updatedAt.isAfter(faqVO.createdAt)}">
+                最後更新：
+                <strong th:text="${#temporals.format(faqVO.updatedAt, 'yyyy-MM-dd')}">2026-07-01</strong>
+            </p>
+        </div>
+
+        <!-- 答案內文主體 (已綁定自動換行防跑版與行高黃金比例) -->
+        <p class="faq-detail-body" th:text="${faqVO.answer}">
+            答案內容
+        </p>
+
+    </article>
+
+</main>
+
+<!-- 共用通知 AJAX 輪詢 -->
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+
+</body>
+</html>
+
+<!--<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title th:text="|${faqVO.question}｜Webond|">
+        常見問題內容｜Webond
+    </title>
+
+     Google Fonts -->
+    <!-- <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+          rel="stylesheet">
+
+    Webond 前台共用 CSS -->
+    <!--<link rel="stylesheet"
+          th:href="@{/css/front-end/service/common.css}">
+
+     前台共用 Navbar CSS 
+    <link rel="stylesheet"
+          th:href="@{/css/front-end/common/navbar.css}">
+
+    <!-- FAQ 內容專屬 CSS
+    <link rel="stylesheet"
+          th:href="@{/css/front-end/faq/faqDetail.css}">
+</head>
+
+<body>
+-->
+<!-- ==========================================================
+     共用固定導覽列
+     ========================================================== 
+<header th:replace="~{front-end/common/navbar :: navbar}">
+</header>
+
+ ==========================================================
+     主要內容
+     ========================================================== -->
+     <!--
 <main class="site-main faq-detail-page">
 
     <a class="faq-detail-back"
@@ -102,9 +187,10 @@
 
 </main>
 
-<!-- 共用通知 AJAX 輪詢 -->
+ 共用通知 AJAX 輪詢 
 <script th:src="@{/js/front-end/common/notificationPolling.js}">
 </script>
 
 </body>
 </html>
+-->

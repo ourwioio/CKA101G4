@@ -1,8 +1,187 @@
+
+/* ==========================================================
+   Webond 常見問題詳情頁 — 圓潤比例與黃金閱讀行高
+   ========================================================== */
+:root {
+  --color-bg:            #F7F3EC;
+  --color-surface:       #FFFFFF;
+  --color-surface-soft:  #FFFDF8;
+  --color-ink:           #17140F;
+  --color-ink-soft:      #726A5F;
+  --color-border:        #ECE4D6;
+
+  --color-yellow:       #FFE59A;
+  --color-yellow-deep:  #FFC94D;
+  --color-pink:         #FFB5C1;
+  --color-green:        #B7E1D1;
+  --color-blue:         #A9D3FF;
+
+  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+
+  --nav-height: 76px;
+}
+
+*{ box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 詳情頁核心黃金寬度限制，避免視線橫移過長 */
+main.site-main.faq-detail-page {
+  max-width: 860px;
+  margin: calc(var(--nav-height) + 36px) auto 60px;
+  padding: 0 20px;
+}
+
+a { text-decoration: none; color: inherit; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; }
+
+/* ==========================================================
+   膠囊風「回常見問題列表」按鈕
+   ========================================================== */
+.faq-detail-back {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface);
+  color: var(--color-ink-soft);
+  border: 1.5px solid var(--color-border);
+  font-weight: 800;
+  font-size: 13.5px;
+  padding: 10px 22px;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, color .15s ease;
+}
+.faq-detail-back:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface-soft);
+}
+
+/* ==========================================================
+   內頁主要白底卡片面板
+   ========================================================== */
+.panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 42px 46px; /* 寬裕留白阻尼 */
+  box-shadow: var(--shadow-sm);
+}
+
+/* ==========================================================
+   上半部問題與 Meta 資訊區
+   ========================================================== */
+.faq-detail-header {
+  border-bottom: 1.5px dashed var(--color-border); /* 經典虛線分界 */
+  padding-bottom: 22px;
+  margin-bottom: 26px;
+}
+
+/* 懸浮吊牌樣式類型標籤 */
+.faq-detail-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-blue);
+  color: var(--color-ink);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 12px;
+  border-radius: 10px;
+  letter-spacing: 0.5px;
+  margin: 0 0 14px 0;
+}
+
+/* 標題對齊優化：防多行文字歪斜 */
+.faq-detail-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-ink);
+  line-height: 1.4;
+  margin: 0 0 12px 0;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* Q 字樣方形小方塊 */
+.faq-detail-title-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-yellow-deep);
+  color: var(--color-ink);
+  font-size: 14px;
+  font-weight: 800;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  margin-top: 4px; /* 對齊大文字第一行行高基線 */
+  flex-shrink: 0;
+}
+
+/* 更新時間 */
+.faq-detail-meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  font-weight: 500;
+  text-align: left;
+}
+.faq-detail-meta strong {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+/* ==========================================================
+   下半部答案主內文（文字間距舒適化）
+   ========================================================== */
+.faq-detail-body {
+  font-size: 15.5px; /* 與公告內文級距完全對齊 */
+  color: var(--color-ink);
+  line-height: 1.8; /* 放鬆的行高，適合多文字長篇閱讀 */
+  font-weight: 500;
+  text-align: justify;
+  margin: 0;
+  /* 🌟 防破壞性跑版：完美保留後端換行與段落符號 */
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ==========================================================
+   RWD 手機與平板適配
+   ========================================================== */
+@media (max-width: 768px) {
+  main.site-main.faq-detail-page { margin-top: calc(var(--nav-height) + 20px); }
+  .panel { padding: 30px 24px; }
+  .faq-detail-title { font-size: 20px; }
+  .faq-detail-body { font-size: 15px; }
+}
+
 /* ==========================================================
    Webond 系統公告－常見問題內容
    搭配：
    /css/front-end/service/common.css
-   ========================================================== */
+   ========================================================== 
 
 .faq-detail-page {
     width: min(800px, calc(100% - 40px));
@@ -96,3 +275,4 @@
         width: min(100% - 24px, 800px);
     }
 }
+*/

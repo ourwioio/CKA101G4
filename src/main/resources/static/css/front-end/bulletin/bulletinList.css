@@ -1,3 +1,367 @@
+
+:root {
+  --color-bg:            #F7F3EC;
+  --color-surface:       #FFFFFF;
+  --color-surface-soft:  #FFFDF8;
+  --color-ink:           #17140F;
+  --color-ink-soft:      #726A5F;
+  --color-border:        #ECE4D6;
+
+  --color-yellow:       #FFE59A;
+  --color-yellow-deep:  #FFC94D;
+  --color-pink:         #FFB5C1;
+  --color-green:        #B7E1D1;
+  --color-blue:         #A9D3FF;
+
+  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+
+  --nav-height: 76px;
+}
+
+*{ box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+main.site-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 20px 60px;
+}
+
+h1, h2, h3, h4 { font-family: var(--font-display); margin: 0; }
+a { text-decoration: none; color: inherit; }
+
+/* ==========================================================
+   頂部大標頭區
+   ========================================================== */
+.bulletin-heading {
+  margin: calc(var(--nav-height) + 20px) auto 24px;
+  padding: 0 4px;
+}
+.page-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-ink);
+  position: relative;
+  padding-left: 18px;
+  line-height: 1.3;
+  margin: 0 0 6px 0;
+}
+.page-title::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--color-yellow-deep);
+}
+.bulletin-description {
+  margin: 0;
+  color: var(--color-ink-soft);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ==========================================================
+   搜尋面板區
+   ========================================================== */
+.bulletin-search-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 32px;
+}
+.bulletin-search-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  border-bottom: 1.5px dashed var(--color-border);
+  padding-bottom: 14px;
+}
+.bulletin-search-heading h2 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-ink);
+  margin-bottom: 4px;
+}
+.bulletin-search-heading p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  font-weight: 500;
+}
+.bulletin-clear-link {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-surface-soft);
+  color: var(--color-ink-soft);
+  border: 1.5px solid var(--color-border);
+  font-weight: 800;
+  font-size: 13px;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  transition: all .15s ease;
+}
+.bulletin-clear-link:hover {
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+  background: var(--color-surface);
+}
+
+/* 搜尋表單五欄緊湊排列 */
+.bulletin-search-form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.bulletin-search-label {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--color-ink);
+  white-space: nowrap;
+  padding-left: 2px;
+}
+.bulletin-search-separator {
+  color: var(--color-ink-soft);
+  font-weight: 700;
+  padding: 0 2px;
+}
+
+/* 輸入框美化與高度對齊 */
+.bulletin-search-form .form-control {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  background: var(--color-surface-soft);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 11px 14px;
+  outline: none;
+  transition: border-color .15s ease, background .15s ease;
+  height: 44px;
+}
+.bulletin-search-form .form-control:focus {
+  border-color: var(--color-yellow-deep);
+  background: var(--color-surface);
+}
+.bulletin-search-form input[type="date"] { width: 155px; }
+.bulletin-search-form input[type="text"] { flex: 1; min-width: 200px; }
+
+/* 搜尋送出按鈕 */
+.bulletin-search-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 14px;
+  height: 44px;
+  padding: 0 24px;
+  background: var(--color-ink);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
+}
+.bulletin-search-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-yellow-deep);
+  color: var(--color-ink);
+}
+
+/* ==========================================================
+   列表統計小標頭
+   ========================================================== */
+.bulletin-result-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+.bulletin-result-heading h2 {
+  font-size: 21px;
+  font-weight: 800;
+}
+.bulletin-count {
+  font-size: 13.5px;
+  color: var(--color-ink-soft);
+  font-weight: 800;
+}
+
+/* ==========================================================
+   三欄式公告卡片網格 (精細固定高度與比例)
+   ========================================================== */
+.bulletin-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.bulletin-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform .22s cubic-bezier(0.175, 0.885, 0.32, 1.1), box-shadow .22s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.bulletin-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-md);
+}
+
+.bulletin-card-inner {
+  padding: 22px; /* 精準調整卡片內部留白間距 */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex-grow: 1;
+}
+
+/* 標題與日期 */
+.bulletin-card-top {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+.bulletin-card-title {
+  font-size: 16px; /* ⚖️ 調整為 Webond 平台統一的卡片標題字體比例 */
+  font-weight: 800;
+  color: var(--color-ink);
+  line-height: 1.4;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 45px; /* 強制標題高度對齊 */
+}
+.bulletin-card-date {
+  font-size: 12.5px;
+  color: var(--color-ink-soft);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  text-align: left;
+}
+
+/* 摘要內文 */
+.bulletin-card-excerpt {
+  margin: 0 0 14px 0;
+  font-size: 13.5px; /* ⚖️ 調整內文比例，增強易讀性 */
+  color: var(--color-ink-soft);
+  line-height: 1.6;
+  font-weight: 500;
+  text-align: left;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 64px; /* 強制摘要高度對齊 */
+}
+
+/* 底部虛線分界與吊牌標籤 */
+.bulletin-card-footer {
+  border-top: 1px dashed var(--color-border);
+  padding-top: 12px;
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.bulletin-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.bulletin-tag {
+  display: inline-flex;
+  background: var(--color-yellow);
+  color: var(--color-ink);
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+}
+.bulletin-card-updated {
+  font-size: 11.5px;
+  color: var(--color-ink-soft);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ==========================================================
+   無資料空狀態美化
+   ========================================================== */
+.bulletin-empty-state {
+  background: var(--color-surface-soft);
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 54px 24px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+.bulletin-empty-icon {
+  font-size: 30px;
+  width: 56px; height: 56px;
+  background: var(--color-border);
+  color: var(--color-ink-soft);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 14px;
+}
+.bulletin-empty-state h3 { font-size: 18px; font-weight: 800; color: var(--color-ink); margin: 0 0 8px 0; }
+.bulletin-empty-state p { font-size: 14px; color: var(--color-ink-soft); margin: 0 0 18px 0; font-weight: 500; }
+.bulletin-empty-state .btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-body);
+  font-weight: 800; font-size: 14px; padding: 10px 24px; background: var(--color-ink); color: #fff;
+  border-radius: var(--radius-full); box-shadow: var(--shadow-sm); transition: all .15s ease;
+}
+.bulletin-empty-state .btn-primary:hover {
+  transform: translateY(-2px); background: var(--color-yellow-deep); color: var(--color-ink); box-shadow: var(--shadow-md);
+}
+
+/* ==========================================================
+   RWD 響應式佈局
+   ========================================================== */
+@media (max-width: 992px) { .bulletin-list { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) {
+  .bulletin-search-form { flex-direction: column; align-items: stretch; gap: 14px; }
+  .bulletin-search-form input[type="date"],
+  .bulletin-search-form input[type="text"],
+  .bulletin-search-button { width: 100%; }
+  .bulletin-search-separator { text-align: center; margin: -4px 0; }
+  .bulletin-search-heading { align-items: center; }
+}
+@media (max-width: 540px) { .bulletin-list { grid-template-columns: 1fr; } .page-title { font-size: 26px; } }
+    
 /* ==========================================================
    Webond 系統公告－公告列表
    搭配：
@@ -8,7 +372,7 @@
    頁面標題區
    ========================================================== */
 
-.bulletin-heading {
+/*.bulletin-heading {
     margin-bottom: 26px;
 
     display: flex;
@@ -30,12 +394,12 @@
 
     color: var(--color-text-soft);
     font-size: 14px;
-}
+} */
 
 /* ==========================================================
    搜尋區
    ========================================================== */
-
+/*
 .bulletin-search-panel {
     margin-bottom: 24px;
 }
@@ -114,11 +478,11 @@
     box-shadow:
         0 10px 24px rgba(255, 92, 141, 0.24);
 }
-
+*/
 /* ==========================================================
    結果標題
    ========================================================== */
-
+/*
 .bulletin-result-heading {
     margin-bottom: 16px;
 
@@ -145,11 +509,11 @@
     font-size: 12px;
     font-weight: 700;
 }
-
+*/
 /* ==========================================================
    公告卡片列表
    ========================================================== */
-
+/*
 .bulletin-list {
     display: flex;
     flex-direction: column;
@@ -263,11 +627,11 @@
     color: var(--color-text-soft);
     font-size: 11px;
 }
-
+*/
 /* ==========================================================
    空資料狀態
    ========================================================== */
-
+/*
 .bulletin-empty-state {
     padding: 50px 20px;
 
@@ -299,11 +663,11 @@
     color: var(--color-text-soft);
     font-size: 14px;
 }
-
+*/
 /* ==========================================================
    RWD
    ========================================================== */
-
+/*
 @media (max-width: 760px) {
 
     .bulletin-search-form {
@@ -339,3 +703,4 @@
         margin-left: 0;
     }
 }
+*/
