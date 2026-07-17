@@ -1,6 +1,5 @@
 package com.webond.member.filter;
 
-
 import java.io.IOException;
 
 import org.springframework.stereotype.Component;
@@ -11,67 +10,83 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-	
-	
 
-	@Component
-	public class LoginFilter extends OncePerRequestFilter {
-		
-	    /**
-	     * shouldNotFilter 提供了一個乾淨的方式來排除不需要過濾的路徑
-	     * 返回 true 代表「跳過過濾器」，返回 false 代表「執行過濾」
-	     */
-		@Override
-		protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-		    String uri = request.getRequestURI();
-		    
-		    // 💡 關鍵修改：將後台檢舉管理路徑直接加入排除清單，讓 Filter 直接跳過這些路徑的檢查
-		    if (uri.contains("/backend/memberreport/")) {
-		        return true;
-		    }
+/**
+ * 登入門禁 Filter（會員模組專用）
+ *
+ * 權責劃分：
+ * - /admin/** 由 AdminSecurityConfig（Spring Security）保護，本 Filter 不碰
+ * - 本 Filter 只保護下面兩類清單內的網址，清單外一律放行，
+ *   避免誤擋其他組員的公開頁面
+ *
+ * 運作流程：
+ * 1. shouldNotFilter()：不在保護清單內的網址回傳 true（跳過檢查）
+ * 2. doFilterInternal()：依網址類型檢查對應的登入身分
+ *    - 會員頁面 → session.account（handleLogin 登入成功時寫入）
+ *    - 員工後台 → session.employeeVO（AdminLoginSuccessHandler 寫入）
+ * 3. 未登入 → 把原網址存入 session.location（登入後跳回用），導向對應登入頁
+ */
+@Component
+public class LoginFilter extends OncePerRequestFilter {
 
-		    // 1. 老師原本的排除
-		    if (uri.endsWith("/login.html") || uri.endsWith("/login")) {
-		        return true;
-		    }
-		    
-		    // 2. 您原有的會員登入/註冊排除
-		    if (uri.contains("/member/login") || uri.contains("/member/logincontroller") || uri.contains("/member/register") || uri.contains("/member/doRegister")) {
-		        return true;
-		    }
-		    
-		    // 3. 老師原本的受保護範圍
-		    boolean isTeacherProtected = uri.contains("/protected1") || uri.contains("/protected2");
-		    
-		    // 4. 您其他的受保護範圍 (注意這裡移除了 /memberreport/，因為上面已經排除過了)
-		    boolean isMyProtected = uri.contains("/member/listAllMember") || uri.contains("/member/reviewKyc");
-
-		    // 🎯 只要符合保護範圍，就返回 false（代表要執行檢查）
-		    return !(isTeacherProtected || isMyProtected);
-		}
-
-	    @Override
-	    protected void doFilterInternal(HttpServletRequest request, 
-	                                    HttpServletResponse response, 
-	                                    FilterChain filterChain) throws ServletException, IOException {
-	    	
-	        String uri = request.getServletPath();
-	        HttpSession session = request.getSession();
-
-	        // 1. 檢查使用者是否登入過 (不管是老師的 User 還是你的 Member 登入成功，都會有這個 attribute)
-	        Object account = session.getAttribute("account");
-
-	        // --- account如果為 null，代表此user未登入過  ---
-	        if (account == null) {
-	            // session存入當前路徑，以便登入後跳轉回此路徑
-	            session.setAttribute("location", uri);
-	            // 重定(導)向到登入頁 (這邊統一導向老師的或你的。假設都導向你的會員登入：/member/login)
-	            response.sendRedirect(request.getContextPath() + "/member/login"); 
-	        } else {
-	            // 已登入，繼續下一個過濾器或 Controller
-	            filterChain.doFilter(request, response);
-	        }
-	    }
+	/** A. 需要「會員」登入的頁面 */
+	private boolean isMemberProtected(String uri) {
+		return uri.contains("/member/memberSelect_page")
+				|| uri.contains("/front/memberPage/my")
+				|| uri.contains("/front/memberPage/edit")
+				|| uri.contains("/front/memberPage/update")
+				|| uri.contains("/front/memberPage/changePassword")
+				|| uri.contains("/front/memberPage/deletePic")
+				|| uri.contains("/front/memberPage/delete")
+				|| uri.contains("/front/notification/")
+				|| uri.contains("/backend/memberreport/addReport");
 	}
 
+	/** B. 需要「員工」登入的後台頁面（不在 /admin/** 底下，Spring Security 管不到） */
+	private boolean isEmployeeProtected(String uri) {
+		return uri.contains("/member/back-end/memberList")
+				|| uri.contains("/member/back-end/toggleStatus")
+				|| uri.contains("/member/back-end/displayImage")
+				|| uri.contains("/backend/memberreport/manageReport")
+				|| uri.contains("/backend/memberreport/updateReportStatus");
+	}
 
+	/**
+	 * 回傳 true = 跳過檢查（公開）；false = 執行檢查。
+	 * 策略：黑名單制——只檢查上面兩份清單，其餘（登入/註冊/OTP/忘記密碼、
+	 * 首頁、靜態資源、他人公開頁面/頭像、其他組員的頁面）全部放行
+	 */
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		String uri = request.getRequestURI();
+		return !(isMemberProtected(uri) || isEmployeeProtected(uri));
+	}
+
+	@Override
+	protected void doFilterInternal(HttpServletRequest request,
+									HttpServletResponse response,
+									FilterChain filterChain) throws ServletException, IOException {
+
+		String uri = request.getServletPath();
+		HttpSession session = request.getSession();
+
+		if (isEmployeeProtected(uri)) {
+			// 員工後台：檢查員工登入身分（同學的 AdminLoginSuccessHandler 寫入）
+			if (session.getAttribute("employeeVO") == null) {
+				session.setAttribute("location", uri);
+				response.sendRedirect(request.getContextPath() + "/admin/login");
+				return;
+			}
+		} else {
+			// 會員頁面：檢查會員登入身分（handleLogin 寫入）
+			if (session.getAttribute("account") == null) {
+				session.setAttribute("location", uri);
+				response.sendRedirect(request.getContextPath() + "/member/login");
+				return;
+			}
+		}
+
+		// 已登入，放行給 Controller
+		filterChain.doFilter(request, response);
+	}
+}
