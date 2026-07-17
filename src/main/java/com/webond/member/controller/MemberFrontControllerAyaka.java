@@ -3,6 +3,7 @@ package com.webond.member.controller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLConnection;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +60,7 @@ public class MemberFrontControllerAyaka {
 
 	@Autowired
 	ActivityOrderService activityOrderService;
-	
+
 	@Autowired
 	VenueService venueService;
 	
@@ -81,9 +82,9 @@ public class MemberFrontControllerAyaka {
 	    
 	    MemberVO memberVO = memberService.getOneMember(memberId);
 	    ServiceVO serviceList = serviceService.getOneService(memberId);
-	    ActivityVO activityList = activityService.getOneActivity(memberId);
 	    List<VenueVO> venueList = venueService.getActiveByMember(memberId);
 	    List<MemberReviewDTO> reviews = myReviewService.getReviewsByMemberId(memberId);
+	    addHostedActivityData(model, memberId);
 	    model.addAttribute("reviews", reviews);
 	    
 	    // 為每個 venue 載入圖片
@@ -96,7 +97,6 @@ public class MemberFrontControllerAyaka {
 	    
 	    model.addAttribute("memberVO", memberVO);
 	    model.addAttribute("serviceListData", serviceList);
-	    model.addAttribute("activityListData", activityList);
 	    model.addAttribute("venueListData", venueList);
 
 //	    if (venueId != null) {
@@ -124,30 +124,41 @@ public class MemberFrontControllerAyaka {
 		
 		MemberVO memberVO = memberService.getOneMember(memberId);
 	    ServiceVO serviceList = serviceService.getOneService(memberId);
-	    List<ActivityVO> activityList = activityService.getActivitiesByMemberId(memberId);
 	    List<VenueVO> venueList = venueService.getActiveByMember(memberId);
 	    List<MemberReviewDTO> reviews = myReviewService.getReviewsByMemberId(memberId);
-	    List<ActivityOrderVO> completedActivityOrders = activityOrderService.getOrdersByBuyerMemberId(memberId)
-	            .stream()
-	            .filter(order -> Byte.valueOf((byte) 4).equals(order.getOrderStatus()))
-	            .toList();
-	    Map<Integer, ActivityVO> completedActivityMap = new HashMap<>();
-	    for (ActivityOrderVO order : completedActivityOrders) {
-	        ActivityVO activityVO = activityService.getOneActivity(order.getActivityId());
-	        if (activityVO != null) {
-	            completedActivityMap.put(order.getActivityId(), activityVO);
-	        }
-	    }
+	    addHostedActivityData(model, memberId);
 	    model.addAttribute("reviews", reviews);
 	    
 	    model.addAttribute("memberVO", memberVO);
 	    model.addAttribute("serviceListData", serviceList);
-	    model.addAttribute("activityListData", activityList);
 	    model.addAttribute("venueListData", venueList);
-	    model.addAttribute("completedActivityOrders", completedActivityOrders);
-	    model.addAttribute("completedActivityMap", completedActivityMap);
 	    
 		return "front-end/member/myProfile";
+	}
+
+	private void addHostedActivityData(ModelMap model, Integer memberId) {
+		LocalDateTime now = LocalDateTime.now();
+		List<ActivityVO> hostedActivities = activityService.getActivitiesByMemberId(memberId);
+
+		Map<Integer, List<ActivityOrderVO>> activityReviewMap = new HashMap<>();
+		Map<Integer, String> activityDisplayStatusMap = new HashMap<>();
+		for (ActivityVO activity : hostedActivities) {
+			activityReviewMap.put(activity.getActivityId(),
+					activityOrderService.getReviewedOrdersByActivityId(activity.getActivityId()));
+			if (activity.getActivityStatus() != null && activity.getActivityStatus() == 2) {
+				activityDisplayStatusMap.put(activity.getActivityId(), "已取消");
+			} else if (activity.getEndTime() != null && !activity.getEndTime().isAfter(now)) {
+				activityDisplayStatusMap.put(activity.getActivityId(), "已完成");
+			} else if (activity.getActivityStatus() != null && activity.getActivityStatus() == 1) {
+				activityDisplayStatusMap.put(activity.getActivityId(), "延期");
+			} else {
+				activityDisplayStatusMap.put(activity.getActivityId(), "進行中");
+			}
+		}
+
+		model.addAttribute("activityListData", hostedActivities);
+		model.addAttribute("activityReviewMap", activityReviewMap);
+		model.addAttribute("activityDisplayStatusMap", activityDisplayStatusMap);
 	}
 		
 	
