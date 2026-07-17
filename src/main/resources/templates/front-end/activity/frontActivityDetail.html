@@ -598,7 +598,7 @@ h1 {
 				</div>
 
 				<!-- 動態提示橫幅 (仿 FB 質感膠囊) -->
-				<div th:if="${showLoginPrompt}" class="alert-warning">
+				<div th:if="${showLoginPrompt}" class="alert-error">
 					未登入只能瀏覽活動詳情，請先登入會員後再進行活動報名。</div>
 
 				<div th:if="${fullMessage}" class="alert-error">
@@ -635,7 +635,7 @@ h1 {
 						th:href="@{/front/memberPage/oneMember(memberId=${activityVO.memberId})}">
 						<span class="label">主辦會員編號</span> <span class="value"
 						style="color: var(--color-surface-soft)"
-						th:text="${activityVO.memberId}"> 1 </span>
+						th:text="${activityVO.memberId} + '  ↗'"> 1 </span>
 					</a>
 
 
@@ -686,103 +686,98 @@ h1 {
 				</div>
 
 				<!-- ==========================================================
-           活動評價互動區塊 (僅在 showReviewButton 成立時顯示)
-           ========================================================== -->
-				<div id="activityReviews" class="review-section" >
-
-					<!-- 頂部星星平均統計頭部 -->
-					<div class="review-sticky-header">
-						<div class="review-header-inline"
-							th:with="avgInt=${(averageScore ?: 5.0).intValue()}">
-							<div class="large-stars">
-								<span th:each="i : ${#numbers.sequence(1, avgInt)}"
-									class="star filled">★</span> <span th:if="${avgInt < 5}"
-									th:each="i : ${#numbers.sequence(1, 5 - avgInt)}"
-									class="star empty">★</span>
+           				活動評價互動區塊 (僅在 showReviewButton 成立時顯示)
+           		========================================================== -->
+					<div id="activityReviews" class="review-section" th:if="${reviewListData != null && !#lists.isEmpty(reviewListData)}">
+	
+						<!-- 頂部星星平均統計頭部 -->
+						<div class="review-sticky-header">
+							<div class="review-header-inline" th:with="avgInt=${(averageScore ?: 5.0).intValue()}">
+								<div class="large-stars">
+									<span th:each="i : ${#numbers.sequence(1, avgInt)}" class="star filled">★</span> 
+									<span th:if="${avgInt < 5}" th:each="i : ${#numbers.sequence(1, 5 - avgInt)}" class="star empty">★</span>
+								</div>
+								<span class="review-inline-score" th:text="${#numbers.formatDecimal(averageScore ?: 5.0, 1, 1)}">5.0</span>
+								<h2>的活動評價</h2>
+								<span class="review-count-badge" th:text="|(${#lists.size(reviewListData)})|">(0)</span>
 							</div>
-							<span class="review-inline-score"
-								th:text="${#numbers.formatDecimal(averageScore ?: 5.0, 1, 1)}">5.0</span>
-							<h2>的活動評價</h2>
-							<span class="review-count-badge"
-								th:text="|(${#lists.size(reviewListData)})|">(0)</span>
+	
+							<!-- 星等分類篩選藥丸 Tabs 鍵組 -->
+							<div class="review-filter-tabs"
+								th:if="${!#lists.isEmpty(reviewListData)}">
+								<button type="button" class="filter-btn active"
+									onclick="filterReviews('all')">全部評價</button>
+								<button type="button" class="filter-btn"
+									onclick="filterReviews('5')">5 星</button>
+								<button type="button" class="filter-btn"
+									onclick="filterReviews('4')">4 星</button>
+								<button type="button" class="filter-btn"
+									onclick="filterReviews('3')">3 星</button>
+								<button type="button" class="filter-btn"
+									onclick="filterReviews('2')">2 星</button>
+								<button type="button" class="filter-btn"
+									onclick="filterReviews('1')">1 星</button>
+	
+								<!-- 排序按鈕 -->
+								<button type="button" id="sortTimeBtn" class="sort-btn"
+									data-sort="desc" onclick="toggleTimeSort()">最新優先</button>
+							</div>
 						</div>
-
-						<!-- 星等分類篩選藥丸 Tabs 鍵組 -->
-						<div class="review-filter-tabs"
-							th:if="${!#lists.isEmpty(reviewListData)}">
-							<button type="button" class="filter-btn active"
-								onclick="filterReviews('all')">全部評價</button>
-							<button type="button" class="filter-btn"
-								onclick="filterReviews('5')">5 星</button>
-							<button type="button" class="filter-btn"
-								onclick="filterReviews('4')">4 星</button>
-							<button type="button" class="filter-btn"
-								onclick="filterReviews('3')">3 星</button>
-							<button type="button" class="filter-btn"
-								onclick="filterReviews('2')">2 星</button>
-							<button type="button" class="filter-btn"
-								onclick="filterReviews('1')">1 星</button>
-
-							<!-- 排序按鈕 -->
-							<button type="button" id="sortTimeBtn" class="sort-btn"
-								data-sort="desc" onclick="toggleTimeSort()">最新優先</button>
+	
+						<!-- 評價捲軸列表主體 -->
+						<div class="review-scroll-body" id="reviewScrollBody">
+	
+							<div th:if="${#lists.isEmpty(reviewListData)}"
+								class="review-empty">目前此活動尚無任何會員留下評價。</div>
+	
+							<!-- 評價卡片迴圈結構 -->
+							<div th:each="review : ${reviewListData}" class="review-card"
+								th:data-stars="${review.buyerRateSeller}"
+								th:data-time="${review.buyerReviewedAt != null ? #temporals.format(review.buyerReviewedAt, 'yyyyMMddHHmm') : '0'}">
+	
+								<!-- 左側頭像處理 -->
+								<div class="avatar-container">
+								    <img th:if="${review.buyerMemberId != null}"
+								         th:src="@{'/front/memberPage/pic/' + ${review.buyerMemberId}}"
+								         th:onerror="'this.src=\'' + @{/images/member/file.jpeg} + '\''"
+								         alt="會員頭像" class="avatar-img">
+								    <div th:unless="${review.buyerMemberId != null}"
+								         class="avatar-badge">M</div>
+								</div>
+	
+								<!-- 右側評論核心資訊 -->
+								<div class="review-card-right">
+									<div class="review-meta">
+										<span class="reviewer-id"
+											th:text="|會員 ${review.buyerMemberId}|">會員 ID</span> <span
+											class="review-date" th:if="${review.buyerReviewedAt != null}"
+											th:text="${#temporals.format(review.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}">評價時間</span>
+									</div>
+	
+									<!-- 亮黃色填充評分星級 -->
+									<div class="review-rating-stars">
+										<span th:if="${review.buyerRateSeller > 0}"
+											th:each="i : ${#numbers.sequence(1, review.buyerRateSeller)}"
+											class="star filled">★</span> <span
+											th:if="${review.buyerRateSeller < 5}"
+											th:each="i : ${#numbers.sequence(1, 5 - review.buyerRateSeller)}"
+											class="star empty">★</span> <span class="rating-text-score"
+											th:text="|(${review.buyerRateSeller} / 5)|"></span>
+									</div>
+	
+									<!-- 評價純文字內容 -->
+									<div class="review-text-content"
+										th:text="${review.buyerReviewComment}">評價內容</div>
+								</div>
+	
+							</div>
+	
+							<!-- 無符合星等時的 JS 提示 -->
+							<div id="filterEmptyMsg" class="review-empty"
+								style="display: none;">目前沒有此星等篩選條件下的活動評價。</div>
+	
 						</div>
 					</div>
-
-					<!-- 評價捲軸列表主體 -->
-					<div class="review-scroll-body" id="reviewScrollBody">
-
-						<div th:if="${#lists.isEmpty(reviewListData)}"
-							class="review-empty">目前此活動尚無任何會員留下評價。</div>
-
-						<!-- 評價卡片迴圈結構 -->
-						<div th:each="review : ${reviewListData}" class="review-card"
-							th:data-stars="${review.buyerRateSeller}"
-							th:data-time="${review.buyerReviewedAt != null ? #temporals.format(review.buyerReviewedAt, 'yyyyMMddHHmm') : '0'}">
-
-							<!-- 左側頭像處理 -->
-							<div class="avatar-container">
-							
-								<img th:if="${review.buyerMemberId != null}"
-									th:src="|https://dicebear.com{review.buyerMemberId}|"
-									alt="會員頭像" class="avatar-img">
-								<div th:unless="${review.buyerMemberId != null}"
-									class="avatar-badge">M</div>
-							</div>
-
-							<!-- 右側評論核心資訊 -->
-							<div class="review-card-right">
-								<div class="review-meta">
-									<span class="reviewer-id"
-										th:text="|會員 ${review.buyerMemberId}|">會員 ID</span> <span
-										class="review-date" th:if="${review.buyerReviewedAt != null}"
-										th:text="${#temporals.format(review.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}">評價時間</span>
-								</div>
-
-								<!-- 亮黃色填充評分星級 -->
-								<div class="review-rating-stars">
-									<span th:if="${review.buyerRateSeller > 0}"
-										th:each="i : ${#numbers.sequence(1, review.buyerRateSeller)}"
-										class="star filled">★</span> <span
-										th:if="${review.buyerRateSeller < 5}"
-										th:each="i : ${#numbers.sequence(1, 5 - review.buyerRateSeller)}"
-										class="star empty">★</span> <span class="rating-text-score"
-										th:text="|(${review.buyerRateSeller} / 5)|"></span>
-								</div>
-
-								<!-- 評價純文字內容 -->
-								<div class="review-text-content"
-									th:text="${review.buyerReviewComment}">評價內容</div>
-							</div>
-
-						</div>
-
-						<!-- 無符合星等時的 JS 提示 -->
-						<div id="filterEmptyMsg" class="review-empty"
-							style="display: none;">目前沒有此星等篩選條件下的活動評價。</div>
-
-					</div>
-				</div>
 			</div>
 		</div>
 	</div>

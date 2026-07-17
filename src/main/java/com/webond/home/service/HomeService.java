@@ -1,9 +1,12 @@
 package com.webond.home.service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,46 @@ public class HomeService {
 
     @Autowired
     private VenueService venueService;
+    
+    //act controller private 
+    private Map<Integer, String> buildRegistrationStatusMap(List<ActivityVO> activityList) {
+        Map<Integer, String> statusMap = new HashMap<>();
+        for (ActivityVO activityVO : activityList) {
+            statusMap.put(activityVO.getActivityId(), getRegistrationStatusText(activityVO));
+        }
+        return statusMap;
+    }
+
+    private String getRegistrationStatusText(ActivityVO activityVO) {
+        if (activityVO == null) {
+            return "活動不存在";
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        if (activityVO.getEndTime() != null && now.isAfter(activityVO.getEndTime())) {
+            return "活動已結束";
+        }
+
+        if (activityVO.getRegistrationStartTime() != null && now.isBefore(activityVO.getRegistrationStartTime())) {
+            return "尚未開放報名";
+        }
+
+        if (activityVO.getRegistrationDeadline() != null && now.isAfter(activityVO.getRegistrationDeadline())) {
+            return "報名已截止";
+        }
+
+        if (activityVO.getRegistrationDeadline() != null
+                && Duration.between(now, activityVO.getRegistrationDeadline()).toHours() <= 168) {
+            return "即將截止";
+        }
+
+        return "報名中";
+    }
+    
+    // for controller    
+    public Map<Integer, String> getRegistrationStatusMap(List<ActivityVO> activityList) {
+        return buildRegistrationStatusMap(activityList);
+    }
 
 
     // =========================================================
@@ -52,50 +95,32 @@ public class HomeService {
     // 隨機推薦團體活動
     //
     // 條件：
-    // 1. 活動狀態為 0
-    // 2. 活動尚未結束
-    // 3. 報名尚未截止
-    // 4. 每次重新整理隨機取指定筆數
+    // 1. 即將截止
+    // 2. 報名中
     // =========================================================
 
     public List<ActivityVO> getEndingSoonActivities(int count) {
-
-        LocalDateTime now =
-                LocalDateTime.now();
 
         List<ActivityVO> availableActivities =
                 activityService.getAll()
                         .stream()
 
-                        // 活動狀態 0：可顯示／正常舉行
+                        // 活動狀態 0 或 1：可顯示／正常舉行 或 延期
                         .filter(activity ->
                                 activity.getActivityStatus() != null
-                                && activity.getActivityStatus()
-                                           .byteValue() == 0 
-                                ||activity.getActivityStatus()
-                                           .byteValue() == 1
+                                && (activity.getActivityStatus().byteValue() == 0
+                                    || activity.getActivityStatus().byteValue() == 1)
                         )
 
-                        // 活動尚未結束
-                        .filter(activity ->
-                                activity.getEndTime() != null
-                                && activity.getEndTime()
-                                           .isAfter(now)
-                        )
-
-                        // 報名尚未截止
-                        .filter(activity ->
-                                activity.getRegistrationDeadline() != null
-                                && activity.getRegistrationDeadline()
-                                           .isAfter(now)
-                        )
+                        // 只抓「報名中」或「即將截止」的活動
+                        .filter(activity -> {
+                            String status = getRegistrationStatusText(activity);
+                            return "報名中".equals(status) || "即將截止".equals(status);
+                        })
 
                         .toList();
 
-        return pickRandomItems(
-                availableActivities,
-                count
-        );
+        return pickRandomItems(availableActivities,count);
     }
 
 
