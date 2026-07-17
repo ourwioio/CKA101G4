@@ -48,7 +48,7 @@ public class MemberBackControllerLoie {
 		return "back-end/member/memberList";
 	}
 
-	@PostMapping("/admin/members/back-end/toggleStatus")
+	@PostMapping("/back-end/toggleStatus")
 	public String toggleStatus(@RequestParam("memberId") Integer memberId, @RequestParam("newStatus") Byte newStatus,
 			RedirectAttributes redirectAttributes) {
 		MemberVO memberVO = memberService.getOneMember(memberId);
