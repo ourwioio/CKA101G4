@@ -1,24 +1,170 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+
 <head>
-    <meta charset="UTF-8">
-    <title>檢舉提交成功</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>檢舉提交成功</title>
+  
+  <style>
+/* ==========================================================
+   Webond 提交成功頁 — 圓潤角色風 (cream / ink / pastel blobs)
+   ========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+
+:root{
+  --color-bg:            #F7F3EC;
+  --color-surface:       #FFFFFF;
+  --color-surface-soft:  #FFFDF8;
+  --color-ink:           #17140F;
+  --color-ink-soft:      #726A5F;
+  --color-border:        #ECE4D6;
+
+  --color-yellow:       #FFE59A;
+  --color-yellow-deep:  #FFC94D;
+  --color-pink:         #FFB5C1;
+  --color-green:        #B7E1D1;
+  --color-blue:         #A9D3FF;
+  --color-red:          #FF5271;
+
+  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+}
+
+*{ box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================
+   成功提示大卡片
+   ========================================================== */
+.success-card {
+  background: var(--color-surface);
+  padding: 48px 40px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 馬卡龍綠大圓圈 */
+.success-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: var(--color-green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.success-icon {
+  width: 38px;
+  height: 38px;
+  color: var(--color-ink);
+}
+
+.success-card h1 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+/* 🌟 套用 450 柔和字重與霧沙墨灰文字 */
+.success-desc {
+  color: var(--color-ink-soft);
+  font-weight: 450;
+  font-size: 14.5px;
+  line-height: 1.8;
+  margin: 0;
+}
+
+/* ==========================================================
+   Q 彈藥丸按鈕
+   ========================================================== */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-weight: 800;
+  font-size: 14.5px;
+  padding: 12px 32px;
+  border-radius: var(--radius-full);
+  background: var(--color-ink);
+  color: #fff;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
+  margin-top: 12px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-yellow-deep);
+  color: var(--color-ink);
+}
+
+@media (max-width: 480px) {
+  .success-card {
+    padding: 36px 24px;
+  }
+}
+  </style>
 </head>
+
 <body>
 
-    <div style="margin: 50px; text-align: center; font-family: Arial, sans-serif;">
-        <h1 style="color: #4CAF50;">✓ 檢舉提交成功</h1>
-        
-        <p>我們已收到您的檢舉，管理員將會儘速審查該活動內容。</p>
-        <p>感謝您協助維護平台的優質環境！</p>
-        
-        <br><br>
-        
-        <a th:href="@{/activity/front/list}" 
-           style="display: inline-block; padding: 10px 20px; background-color: #2196F3; color: white; text-decoration: none; border-radius: 4px;">
-            返回活動列表
-        </a>
+  <div class="success-card">
+    <!-- 馬卡龍綠圓圈與 Q 萌大勾勾 -->
+    <div class="success-icon-wrap">
+      <svg class="success-icon" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+      </svg>
     </div>
 
+    <h1>檢舉提交成功</h1>
+    
+    <div class="success-desc">
+      <p style="margin: 0 0 8px 0;">我們已收到您的檢舉，管理員將會儘速審查該活動內容。</p>
+      <p style="margin: 0;">感謝您協助維護平台的優質環境！</p>
+    </div>
+    
+    <a th:href="@{/activity/front/list}" class="btn-primary">
+      返回列表
+    </a>
+  </div>
+
 </body>
+
 </html>
