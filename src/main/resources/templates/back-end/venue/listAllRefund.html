@@ -76,7 +76,10 @@
                 <tbody>
                     <th:block th:each="venueOrderVO : ${allRefundData}">
                         <tr>
-                            <td th:text="${venueOrderVO.venueOrderId}"></td>
+                            <td>
+                                <a th:href="@{/admin/venue/venueOrder/getOneVenueOrder(venueOrderId=${venueOrderVO.venueOrderId})}"
+                                   th:text="${venueOrderVO.venueOrderId}"></a>
+                            </td>
                             <td th:text="${#temporals.format(venueOrderVO.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
                             <td th:text="${venueOrderVO.totalAmount} + '元'"></td>
                             <td th:switch="${venueOrderVO.orderStatus}">

@@ -74,7 +74,6 @@ public class VenueOrderService {
 	
 	public List<VenueOrderVO> getMyAllReservations(Integer memberId){
 		List<VenueOrderVO> list = new ArrayList<>(repository.findPaidOrdersByVenueOwner(memberId, (byte) 1));
-	    list.addAll(repository.findPaidOrdersByVenueOwner(memberId, (byte) 4));
 		return list;
 	}
 	public List<VenueOrderVO> getMyAllCompletedBookings(Integer memberId){

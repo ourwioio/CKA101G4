@@ -18,8 +18,18 @@
 
 <main class="myvenue-page">
 
+	<div class="status-filter" th:if="${not #lists.isEmpty(venueListData)}">
+		<label for="statusFilter">場地狀態</label>
+		<select id="statusFilter" onchange="filterMyVenues()">
+			<option value="all">全部</option>
+			<option value="1">上架</option>
+			<option value="0">下架</option>
+			<option value="2">審核中</option>
+		</select>
+	</div>
+
 	<section class="card-grid" th:if="${not #lists.isEmpty(venueListData)}">
-		<div class="item-card" th:each="venue : ${venueListData}">
+		<div class="item-card" th:each="venue : ${venueListData}" th:attr="data-status=${venue.venueStatus}">
 			<a th:href="@{/front/venue/getOneMyVenue(venueId=${venue.venueId})}" class="item-card__link">
 
 				<div class="item-card__thumb-wrap">
@@ -70,5 +80,14 @@
 </main>
 
 <script th:src="@{/js/front-end/venue/addressShorten.js}"></script>
+<script>
+	function filterMyVenues() {
+		const selected = document.getElementById('statusFilter').value;
+		document.querySelectorAll('.item-card').forEach(function (card) {
+			const matches = selected === 'all' || card.dataset.status === selected;
+			card.style.display = matches ? '' : 'none';
+		});
+	}
+</script>
 </body>
 </html>
