@@ -71,7 +71,7 @@
 				  		   th:text="${order.venueVO.member.realName}"></a>
                     </p>
 
-                    <div>
+                    <div class="order-badges">
                         <!-- 付款方式：信用卡／銀行轉帳 -->
                         <span class="badge badge-payment"
                               th:text="${order.paymentMethod == 0} ? '信用卡' : '銀行轉帳'">
@@ -101,17 +101,6 @@
                         <th:block th:text="${order.totalAmount}"></th:block>
                     </div>
 
-                    <!-- 已評價：顯示星星＋留言 -->
-                    <div class="review-display" th:if="${order.venueRating != null}">
-                        <span class="stars-readonly">
-                            <span th:each="i : ${#numbers.sequence(1,5)}"
-                                  th:text="'★'"
-                                  th:class="${i <= order.venueRating} ? 'filled' : ''"></span>
-                        </span>
-                        <p class="comment-text" th:if="${order.venueComment != null and !order.venueComment.isEmpty()}"
-                           th:text="${order.venueComment}"></p>
-                    </div>
-
                     <div class="actions">
 
                         <!-- 🌟 待付款：導去付款頁 -->
@@ -127,15 +116,19 @@
 
                         <!-- 🌟 已付款或已完成：可評價、可檢舉 -->
                         <th:block th:if="${order.orderStatus == 3}">
-						    <button type="button" class="btn-review"
-						            th:if="${order.venueRating == null}"
-						            th:attr="data-order-id=${order.venueOrderId}"
-						            onclick="openReviewModal(this)">評價場地</button>
+	                         <a th:if="${reportedOrderIds == null or !reportedOrderIds.contains(order.venueOrderId)}"
+							       th:href="@{/venueReports/addVenueReport(venueOrderId=${order.venueOrderId})}" class="btn-report">檢舉</a>
+							    <span class="badge status-cancel" th:if="${reportedOrderIds != null and reportedOrderIds.contains(order.venueOrderId)}">已檢舉</span>
+							    <button type="button" class="btn-review"
+							            th:if="${order.venueRating == null}"
+							            th:attr="data-order-id=${order.venueOrderId}"
+							            onclick="openReviewModal(this)">評價場地</button>
 						
-						    <a th:if="${reportedOrderIds == null or !reportedOrderIds.contains(order.venueOrderId)}"
-						       th:href="@{/venueReports/addVenueReport(venueOrderId=${order.venueOrderId})}" class="btn-report">檢舉</a>
-						    <span class="badge status-cancel" th:if="${reportedOrderIds != null and reportedOrderIds.contains(order.venueOrderId)}">已檢舉</span>
-						    <span class="badge status-done" th:if="${order.venueRating != null}">已評價</span>
+						   
+						    <button type="button" class="btn-view-review"
+						            th:if="${order.venueRating != null}"
+						            th:attr="data-rating=${order.venueRating}, data-comment=${order.venueComment}"
+						            onclick="openViewReviewModal(this)">查看評價</button>
 						</th:block>
 			        </div>
                 </div>
@@ -187,6 +180,20 @@
                 <button type="submit" class="btn-submit btn-danger-submit">確認取消訂單</button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- 查看評價 Modal -->
+<div class="modal-overlay" id="viewReviewModalOverlay">
+    <div class="modal-box">
+        <h3>我的評價</h3>
+
+        <div class="view-review-stars" id="viewReviewStars"></div>
+        <p class="view-review-comment" id="viewReviewComment"></p>
+
+        <div class="modal-actions">
+            <button type="button" class="btn-cancel" onclick="closeViewReviewModal()">關閉</button>
+        </div>
     </div>
 </div>
 
