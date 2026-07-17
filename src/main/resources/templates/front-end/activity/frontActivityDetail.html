@@ -416,14 +416,11 @@ h1 {
 	font-size: 12.5px;
 	padding: 7px 16px;
 	border-radius: var(--radius-full);
-	border: 1.5px solid var(--color-ink);
-	box-shadow: 2px 2px 0px var(--color-ink);
 	cursor: pointer;
 }
 
 .sort-btn:hover {
 	transform: translateY(-2px);
-	box-shadow: 3px 3px 0px var(--color-ink);
 }
 
 /* 評論卡片重塑 */
@@ -691,8 +688,7 @@ h1 {
 				<!-- ==========================================================
            活動評價互動區塊 (僅在 showReviewButton 成立時顯示)
            ========================================================== -->
-				<div id="activityReviews" class="review-section"
-					th:if="${showReviewButton}">
+				<div id="activityReviews" class="review-section" >
 
 					<!-- 頂部星星平均統計頭部 -->
 					<div class="review-sticky-header">
@@ -729,7 +725,7 @@ h1 {
 
 							<!-- 排序按鈕 -->
 							<button type="button" id="sortTimeBtn" class="sort-btn"
-								data-sort="desc" onclick="toggleTimeSort()">⏳ 最新優先</button>
+								data-sort="desc" onclick="toggleTimeSort()">最新優先</button>
 						</div>
 					</div>
 
@@ -746,6 +742,7 @@ h1 {
 
 							<!-- 左側頭像處理 -->
 							<div class="avatar-container">
+							
 								<img th:if="${review.buyerMemberId != null}"
 									th:src="|https://dicebear.com{review.buyerMemberId}|"
 									alt="會員頭像" class="avatar-img">
