@@ -747,26 +747,6 @@
                   th:text="${#temporals.format(activity.startTime, 'yyyy-MM-dd')+' ~ '+#temporals.format(activity.endTime, 'yyyy-MM-dd')}">活動時間</span>
                 <span class="item-card__detail-btn">查看詳情 →</span>
               </div>
-
-              <div class="hosted-review-list"
-                   th:with="activityReviews=${activityReviewMap[activity.activityId]}">
-                <div class="hosted-review-empty" th:if="${#lists.isEmpty(activityReviews)}">
-                  此活動目前尚無評價
-                </div>
-                <div class="hosted-review-item" th:each="review : ${activityReviews}">
-                  <div class="hosted-review-head">
-                    <span class="hosted-review-stars">
-                      <th:block th:if="${review.buyerRateSeller != null and review.buyerRateSeller > 0}"
-                                th:each="i : ${#numbers.sequence(1, review.buyerRateSeller)}">★</th:block>
-                      <span th:text="${review.buyerRateSeller == null ? '-' : review.buyerRateSeller + ' / 5'}">5 / 5</span>
-                    </span>
-                    <span th:text="${review.buyerReviewedAt == null ? '' : #temporals.format(review.buyerReviewedAt, 'yyyy-MM-dd')}">
-                      評價日期
-                    </span>
-                  </div>
-                  <p class="hosted-review-comment" th:text="${review.buyerReviewComment}">評價內容</p>
-                </div>
-              </div>
             </div>
           </a>
         </div>
