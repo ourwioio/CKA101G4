@@ -41,7 +41,12 @@ public class MemberReportController {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	// =========================================================================
-	// 🔑 【私有權限檢查工具方法】 (免登入測試版)
+	// 🔑 【私有權限檢查工具方法】
+	// 🎯 說明：manageReport / updateReportStatus 已搬到 /admin/members/** 底下，
+	// 由 AdminSecurityConfig 的 .requestMatchers("/admin/members/**").hasAuthority("會員管理")
+	// 負責登入與權限把關，這兩支不再呼叫本方法。
+	// listAllReport 仍留在 /backend/memberreport/**（前台可看的列表頁），
+	// 這裡的呼叫只是用來決定畫面上要不要顯示「管理員限定」的按鈕，不是安全機制。
 	// =========================================================================
 	private boolean hasPermissionFive(HttpSession session) {
 		return true;
@@ -49,17 +54,14 @@ public class MemberReportController {
 
 	// =========================================================================
 	// 🟢 【後台功能 1】審核中心主頁
+	// 🎯 已在 /admin/members/** 底下，Spring Security 已做登入 + 權限雙重檢查，
+	// 故拿掉原本的 hasPermissionFive() 手動判斷
 	// =========================================================================
 	@GetMapping("/admin/members/backend/memberreport/manageReport")
 	public String manageReport(
 			@RequestParam(value = "reportId", required = false) Integer reportId,
 			@RequestParam(value = "activeTab", defaultValue = "all") String activeTab,
 			HttpSession session, ModelMap model) {
-
-		if (!hasPermissionFive(session)) {
-			model.addAttribute("errorMsg", "權限不足！此頁面僅限高級審核主管存取。");
-			return "front-end/member/memberreport/error_page";
-		}
 
 		List<MemberReportVO> list = reportSvc.getAll();
 		model.addAttribute("memberReportListData", list);
@@ -106,7 +108,7 @@ public class MemberReportController {
 			@RequestParam("reportId") Integer reportId,
 			@RequestParam(value = "index", defaultValue = "0") Integer index,
 			HttpServletResponse response) {
-		
+
 		try (ServletOutputStream out = response.getOutputStream()) {
 			MemberReportVO memberReportVO = reportSvc.getOneMemberReport(reportId);
 			if (memberReportVO != null && memberReportVO.getEvidence() != null) {
@@ -118,7 +120,7 @@ public class MemberReportController {
 					List<String> base64List = objectMapper.readValue(dataStr, List.class);
 					if (index >= 0 && index < base64List.size()) {
 						String base64Image = base64List.get(index);
-						
+
 						// 解析 Content-Type (例如 data:image/png;base64,...)
 						if (base64Image.contains(",")) {
 							String mimeType = base64Image.substring(5, base64Image.indexOf(";"));
@@ -143,29 +145,24 @@ public class MemberReportController {
 
 	// =========================================================================
 	// 🛡️ 【防呆 GET 路由】防止 F5 重複提交
+	// 🎯 已搬到 /admin/members/** 底下
 	// =========================================================================
-	@GetMapping("/backend/memberreport/updateReportStatus")
+	@GetMapping("/admin/members/backend/memberreport/updateReportStatus")
 	public String handleGetUpdateReportStatus() {
 		return "redirect:/admin/members/backend/memberreport/manageReport";
 	}
 
 	// =========================================================================
 	// 🟢 【後台功能 4】審核提交
+	// 🎯 已搬到 /admin/members/** 底下，Spring Security 已做登入 + 「會員管理」
+	// 權限雙重檢查，故拿掉原本的 hasPermissionFive() 手動判斷
 	// =========================================================================
-	@PostMapping("/backend/memberreport/updateReportStatus")
+	@PostMapping("/admin/members/backend/memberreport/updateReportStatus")
 	public String updateReportStatus(@RequestParam("reportId") Integer reportId,
-			@RequestParam("reportStatus") Integer reportStatus,
-			@RequestParam("employeeId") String employeeIdStr,
+			@RequestParam("reportStatus") Integer reportStatus, @RequestParam("employeeId") String employeeIdStr,
 			@RequestParam(value = "violationPoints", required = false) String violationPointsStr,
-			@RequestParam(value = "adminNote", required = false) String adminNote,
-			HttpSession session,
-			RedirectAttributes redirectAttributes,
-			ModelMap model) {
-
-		if (!hasPermissionFive(session)) {
-			model.addAttribute("errorMsg", "權限不足！只有審核主管可以提交審核結果.");
-			return "front-end/member/memberreport/error_page";
-		}
+			@RequestParam(value = "adminNote", required = false) String adminNote, HttpSession session,
+			RedirectAttributes redirectAttributes, ModelMap model) {
 
 		List<String> errorMsgs = new LinkedList<>();
 
@@ -209,7 +206,8 @@ public class MemberReportController {
 		try {
 			reportSvc.jombackProcessReport(reportId, employeeId, reportStatus, adminNote, violationPoints);
 			// 🎯 修正：成立是狀態 2，不是 1
-			String statusText = (Integer.valueOf(2).equals(reportStatus)) ? "審核成立 (扣除 " + violationPoints + " 點)" : "審核駁回";
+			String statusText = (Integer.valueOf(2).equals(reportStatus)) ? "審核成立 (扣除 " + violationPoints + " 點)"
+					: "審核駁回";
 			redirectAttributes.addFlashAttribute("successMsg", "案號 #" + reportId + " 已成功處理為【" + statusText + "】！");
 		} catch (Exception e) {
 			errorMsgs.add("資料庫更新失敗：" + e.getMessage());
@@ -221,7 +219,8 @@ public class MemberReportController {
 			return "back-end/member/manageReport";
 		}
 
-		return "redirect:/admin/members/backend/memberreport/manageReport?reportId=" + reportId + "&activeTab=" + reportStatus;
+		return "redirect:/admin/members/backend/memberreport/manageReport?reportId=" + reportId + "&activeTab="
+				+ reportStatus;
 	}
 
 	// =========================================================================
@@ -245,12 +244,8 @@ public class MemberReportController {
 	// 🟢 【前台功能 2】送出檢舉案資料驗證 (支援多圖轉 JSON 陣列存入原始 Blob 欄位)
 	// =========================================================================
 	@PostMapping("/backend/memberreport/addReport")
-	public String addReport(
-			@Valid @ModelAttribute("addMemberReportDTO") AddMemberReportDTO dto,
-			BindingResult result,
-			HttpSession session,
-			RedirectAttributes redirectAttributes,
-			ModelMap model) {
+	public String addReport(@Valid @ModelAttribute("addMemberReportDTO") AddMemberReportDTO dto, BindingResult result,
+			HttpSession session, RedirectAttributes redirectAttributes, ModelMap model) {
 
 		// 🔒 一律以登入者本人的會員編號覆蓋表單送出值，避免竄改成別人的編號冒名檢舉
 		MemberVO memberVO = (MemberVO) session.getAttribute("memberVO");
@@ -289,7 +284,7 @@ public class MemberReportController {
 		// 3. 驗證完全通過，將多張圖片轉為 Base64 JSON 陣列
 		try {
 			List<String> base64ImageList = new ArrayList<>();
-			
+
 			for (MultipartFile file : files) {
 				if (!file.isEmpty()) {
 					String contentType = file.getContentType();
@@ -303,13 +298,8 @@ public class MemberReportController {
 			String jsonImageArrayStr = objectMapper.writeValueAsString(base64ImageList);
 			byte[] evidence = jsonImageArrayStr.getBytes(StandardCharsets.UTF_8);
 
-			reportSvc.addMemberReport(
-				dto.getReporterId(), 
-				dto.getReportedId(), 
-				dto.getReportCategory(), 
-				dto.getReportContent(), 
-				evidence
-			);
+			reportSvc.addMemberReport(dto.getReporterId(), dto.getReportedId(), dto.getReportCategory(),
+					dto.getReportContent(), evidence);
 
 			redirectAttributes.addFlashAttribute("successMsg", "檢舉案已成功送出，管理員將儘速進行審核！");
 			return "redirect:/backend/memberreport/addReport";
@@ -320,49 +310,4 @@ public class MemberReportController {
 		}
 	}
 
-	// =========================================================================
-	// 🟢 其他輔助頁面進入點
-	// =========================================================================
-//	@GetMapping("/backend/memberreport/select_page")
-//	public String select_page(HttpSession session, ModelMap model) {
-//		List<MemberReportVO> list = reportSvc.getAll();
-//		model.addAttribute("memberReportListData", list);
-//		model.addAttribute("isManager", hasPermissionFive(session));
-//		return "front-end/member/memberreport/select_page";
-//	}
-//
-//	@PostMapping("/backend/memberreport/getOne_For_Display")
-//	public String getOne_For_Display(@RequestParam(value = "reportId", required = false) String str,
-//			HttpSession session, ModelMap model) {
-//		List<String> errorMsgs = new LinkedList<>();
-//		model.addAttribute("errorMsgs", errorMsgs);
-//		if (str == null || (str.trim()).length() == 0) {
-//			errorMsgs.add("請輸入檢舉案號");
-//		}
-//		if (!errorMsgs.isEmpty()) {
-//			return "front-end/member/memberreport/select_page";
-//		}
-//
-//		Integer reportId = null;
-//		try {
-//			reportId = Integer.valueOf(str.trim());
-//		} catch (Exception e) {
-//			errorMsgs.add("檢舉案號格式不正確，請輸入數字");
-//		}
-//		if (!errorMsgs.isEmpty()) {
-//			return "front-end/member/memberreport/select_page";
-//		}
-//
-//		MemberReportVO memberReportVO = reportSvc.getOneMemberReport(reportId);
-//		if (memberReportVO == null) {
-//			errorMsgs.add("查無此案號資料");
-//		}
-//		if (!errorMsgs.isEmpty()) {
-//			return "front-end/member/memberreport/select_page";
-//		}
-//
-//		model.addAttribute("isManager", hasPermissionFive(session));
-//		model.addAttribute("memberReportVO", memberReportVO);
-//		return "front-end/member/memberreport/listOneReport";
-//	}
 }
