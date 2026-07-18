@@ -77,17 +77,62 @@ h1 {
 .filter-bar select {
     font-family: var(--font-body);
     font-size: 13.5px;
-    padding: 9px 14px;
+    padding: 9px 30px 9px 14px;
     border: 1.5px solid var(--color-border);
     border-radius: var(--radius-md);
     background: var(--color-surface);
     color: var(--color-ink);
     cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2317140F' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
 }
 
-.filter-bar select:focus { 
-    outline: none; 
-    border-color: var(--color-yellow-deep); 
+.filter-bar select:focus {
+    outline: none;
+    border-color: var(--color-yellow-deep);
+}
+
+.filter-bar select, .filter-bar select::picker(select) {
+    appearance: base-select;      /* 啟用可自訂模式 */
+}
+
+.filter-bar select::picker-icon { display: none; }
+
+/* 彈出的清單本體 */
+.filter-bar select::picker(select) {
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-md);
+    padding: 6px;
+    position-area: block-end;
+    position-try-fallbacks: none;
+    margin-top: 4px;
+}
+
+/* 每個選項 */
+.filter-bar option {
+    padding: 8px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+/* 滑鼠停在上面的選項 */
+.filter-bar option:hover {
+    background: var(--color-yellow-deep);
+    color: var(--color-ink);
+}
+/* 目前被選中的那項 */
+.filter-bar option:checked {
+    background: var(--color-yellow-deep);
+    color: #fff;
+}
+/* 鍵盤方向鍵選項 */
+.filter-bar option:focus {
+    background: var(--color-yellow-deep);
+    color: var(--color-ink);
 }
 
 .pagination {
