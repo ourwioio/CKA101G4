@@ -20,6 +20,9 @@ public class MemberServiceLoie {
 	@Autowired
 	private MemberRepository repository;
 
+	@Autowired
+	private MemberDeactivationCoordinator memberDeactivationCoordinator;
+
 	// =========================================================================
 	// 🔐 1. 登入功能：從資料庫查詢登入的使用者
 	// =========================================================================
@@ -167,7 +170,11 @@ public class MemberServiceLoie {
 				System.out.println("==== 🚨 [系統自動化防禦] 會員 ID: " + dbMember.getMemberId() + " 檢舉點數已達 " + currentPoints + " 點，自動執行停權 (Status=3)！ ====");
 			}
 
-			repository.saveAndFlush(dbMember);
+			MemberVO updatedMember = repository.saveAndFlush(dbMember);
+
+			// 後台手動停權／註銷與本類別的檢舉點數自動停權，都會經過本方法。
+			// 在同一交易中通知協調器；狀態不是 2 或 3 時，協調器會直接忽略。
+			memberDeactivationCoordinator.handleDisabledMember(updatedMember);
 		}
 	}
 

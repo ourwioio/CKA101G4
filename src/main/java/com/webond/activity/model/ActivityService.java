@@ -11,14 +11,18 @@ import com.webond.activity.repository.ActivityRepository;
 import jakarta.persistence.criteria.Predicate;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.time.LocalDateTime;
 
 @Service
 public class ActivityService {
 
 	private static final boolean ENFORCE_REGISTRATION_TIME = false;
+	private static final Byte ACTIVITY_STATUS_CANCELLED = 2;
+	private static final String DISABLED_MEMBER_CANCELLATION_REASON = "會員停權或註銷，系統取消活動及訂單";
 
 	@Autowired
 	private ActivityRepository repository;
@@ -134,6 +138,37 @@ public class ActivityService {
 
 	public List<ActivityVO> getActivitiesByMemberId(Integer memberId) {
 		return repository.findByMemberId(memberId);
+	}
+
+	/**
+	 * Activity-module integration point for member suspension or account
+	 * cancellation. Ended activities and completed orders are deliberately kept
+	 * so that history and reviews remain available.
+	 */
+	@Transactional
+	public void cancelActivitiesAndOrdersByDisabledMember(Integer memberId) {
+		if (memberId == null) {
+			return;
+		}
+
+		LocalDateTime now = LocalDateTime.now();
+		Set<Integer> affectedActivityIds = new HashSet<>();
+		List<ActivityVO> hostedActivities = repository.findByMemberIdAndEndTimeAfter(memberId, now);
+
+		for (ActivityVO activityVO : hostedActivities) {
+			Integer activityId = activityVO.getActivityId();
+			activityVO.setActivityStatus(ACTIVITY_STATUS_CANCELLED);
+			affectedActivityIds.add(activityId);
+			activityOrderSvc.cancelOrdersByActivity(activityId, DISABLED_MEMBER_CANCELLATION_REASON);
+		}
+		repository.saveAll(hostedActivities);
+
+		affectedActivityIds.addAll(activityOrderSvc.cancelOrdersByDisabledBuyer(
+				memberId, now, DISABLED_MEMBER_CANCELLATION_REASON));
+
+		for (Integer activityId : affectedActivityIds) {
+			syncAttendeesFromOrders(activityId);
+		}
 	}
 
 	// 報名成功後增加已報名人數

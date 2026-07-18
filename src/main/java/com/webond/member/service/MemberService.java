@@ -36,6 +36,9 @@ public class MemberService {
 
     @Autowired
     private ActivityService activityService;
+
+	@Autowired
+	private MemberDeactivationCoordinator memberDeactivationCoordinator;
     
     public String getNickname(Integer memberId) {
         if (memberId == null) {
@@ -151,11 +154,16 @@ public class MemberService {
 		repository.save(member);
 	}
 	
+	@Transactional
 	public void updateAccountStatus(Integer memberId, Byte status) {
 	    MemberVO member = repository.findById(memberId)
 	            .orElseThrow(() -> new RuntimeException("查無此會員"));
 	    member.setAccountStatus(status);
-	    repository.save(member);
+	    MemberVO updatedMember = repository.save(member);
+
+	    // 會員自行註銷原本就會經過本方法；狀態儲存成功後再通知跨模組協調器。
+	    // 協調器只接受狀態 2（註銷）或 3（停權），其他狀態不會執行任何連動。
+	    memberDeactivationCoordinator.handleDisabledMember(updatedMember);
 	}
 	
 	

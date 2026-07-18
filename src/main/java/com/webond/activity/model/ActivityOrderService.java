@@ -1,8 +1,10 @@
 package com.webond.activity.model;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -24,6 +26,8 @@ public class ActivityOrderService {
 	private static final Byte REFUND_STATUS_REQUESTED = 1;
 	private static final Byte REFUND_STATUS_DONE = 2;
 	private static final int PAYMENT_TIMEOUT_SECONDS = 60;
+	private static final List<Byte> CANCELLABLE_ORDER_STATUSES = List.of(
+			ORDER_STATUS_ACTIVE, ORDER_STATUS_PENDING_REVIEW, ORDER_STATUS_PENDING_PAYMENT);
 
 	@Autowired
 	private ActivityOrderRepository orderRepo;
@@ -87,6 +91,44 @@ public class ActivityOrderService {
 
 	public List<ActivityOrderVO> getReviewedOrdersByActivityId(Integer activityId) {
 		return orderRepo.findByActivityIdAndBuyerReviewCommentIsNotNullOrderByBuyerReviewedAtDesc(activityId);
+	}
+
+	/**
+	 * Cancels all unfinished orders for an activity cancelled by the system.
+	 * Paid orders enter the refund workflow; unpaid orders are simply cancelled.
+	 */
+	public int cancelOrdersByActivity(Integer activityId, String reason) {
+		if (activityId == null) {
+			return 0;
+		}
+
+		List<ActivityOrderVO> orders = orderRepo.findByActivityIdAndOrderStatusIn(
+				activityId, CANCELLABLE_ORDER_STATUSES);
+		for (ActivityOrderVO orderVO : orders) {
+			applySystemCancellation(orderVO, reason);
+		}
+		orderRepo.saveAll(orders);
+		return orders.size();
+	}
+
+	/**
+	 * Cancels a disabled member's unfinished registrations for activities that
+	 * have not ended. The affected activity IDs are returned for attendee sync.
+	 */
+	public Set<Integer> cancelOrdersByDisabledBuyer(Integer buyerMemberId, LocalDateTime now, String reason) {
+		Set<Integer> affectedActivityIds = new HashSet<>();
+		if (buyerMemberId == null || now == null) {
+			return affectedActivityIds;
+		}
+
+		List<ActivityOrderVO> orders = orderRepo.findActiveOrdersByBuyerMemberId(
+				buyerMemberId, CANCELLABLE_ORDER_STATUSES, now);
+		for (ActivityOrderVO orderVO : orders) {
+			applySystemCancellation(orderVO, reason);
+			affectedActivityIds.add(orderVO.getActivityId());
+		}
+		orderRepo.saveAll(orders);
+		return affectedActivityIds;
 	}
 
 	public ActivityOrderVO cancelOrder(Integer activityOrderId, Integer buyerMemberId) {
@@ -349,6 +391,28 @@ public class ActivityOrderService {
 
 	private boolean isFreeOrder(ActivityOrderVO orderVO) {
 		return orderVO == null || orderVO.getTotalAmount() == null || orderVO.getTotalAmount() <= 0;
+	}
+
+	private void applySystemCancellation(ActivityOrderVO orderVO, String reason) {
+		boolean paidOrder = ORDER_STATUS_ACTIVE.equals(orderVO.getOrderStatus());
+		orderVO.setOrderStatus(ORDER_STATUS_CANCELLED);
+
+		if (paidOrder && !isFreeOrder(orderVO)) {
+			orderVO.setRefundStatus(REFUND_STATUS_REQUESTED);
+			orderVO.setRefundReason(normalizeReason(reason, "系統取消已付款活動，申請全額退款"));
+			return;
+		}
+
+		orderVO.setRefundStatus(REFUND_STATUS_NONE);
+		if (paidOrder) {
+			orderVO.setRefundReason(normalizeReason(reason, "0元訂單取消，無需退款"));
+		} else {
+			orderVO.setRefundReason(normalizeReason(reason, "訂單尚未付款，系統直接取消"));
+		}
+	}
+
+	private String normalizeReason(String reason, String fallback) {
+		return reason == null || reason.trim().isEmpty() ? fallback : reason.trim();
 	}
 
 	private void applyDefaultRefundStatus(ActivityOrderVO orderVO) {
