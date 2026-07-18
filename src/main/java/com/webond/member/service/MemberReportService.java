@@ -22,6 +22,9 @@ public class MemberReportService {
 	@Autowired
 	private MemberRepository memberRepository; 
 
+	@Autowired
+	private MemberDeactivationCoordinator memberDeactivationCoordinator;
+
 	// =========================================================================
 	// 【業務邏輯 1】會員送出新檢舉案 (前台網頁呼叫)
 	// =========================================================================
@@ -100,6 +103,10 @@ public class MemberReportService {
 						
 						// 🎯 使用 saveAndFlush 強制立刻寫入資料庫
 						MemberVO updatedMember = memberRepository.saveAndFlush(actualMember);
+
+						// 此檢舉流程直接操作 MemberRepository，不會經過 MemberServiceLoie，
+						// 因此在這裡補上同一個協調入口；未滿 5 點時狀態不是 3，協調器會忽略。
+						memberDeactivationCoordinator.handleDisabledMember(updatedMember);
 						
 						// 重新塞回 Report 物件，維持永續上下文一致
 						memberReportVO.setReported(updatedMember);
