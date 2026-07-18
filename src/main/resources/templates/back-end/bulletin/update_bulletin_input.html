@@ -320,7 +320,8 @@
 
                     <form th:action="@{/admin/platform/bulletin/update}"
                           th:object="${bulletinVO}"
-                          method="post">
+                          method="post"
+                          enctype="multipart/form-data">
 
                         <!-- 主鍵要一併送回去，否則 Service 存檔時會變成新增一筆 -->
                         <input type="hidden"
@@ -378,6 +379,30 @@
                                  th:if="${#fields.hasErrors('tags')}"
                                  th:errors="*{tags}">
                             </div>
+
+                        </div>
+
+                        <div class="form-group">
+
+                            <label for="upImg">
+                                圖片
+                            </label>
+
+                            <div id="imgPreviewWrap"
+                                 th:style="${bulletinVO.image != null} ? 'margin-bottom: 10px;' : 'margin-bottom: 10px; display: none;'">
+
+                                <img id="imgPreview"
+                                     th:src="${bulletinVO.image != null} ? @{/admin/platform/bulletin/image/{id}(id=${bulletinVO.bulletinId}, v=${bulletinVO.updatedAt} ?: ${bulletinVO.createdAt})} : ''"
+                                     alt="圖片預覽"
+                                     style="max-width: 220px; border-radius: 8px; display: block;">
+
+                            </div>
+
+                            <input id="upImg"
+                                   class="form-control"
+                                   type="file"
+                                   name="upImg"
+                                   accept="image/*">
 
                         </div>
 
@@ -466,6 +491,19 @@
     </main>
 
 </div>
+
+<script>
+    document.getElementById('upImg').addEventListener('change', function (e) {
+        var file = e.target.files[0];
+        if (!file) {
+            return;
+        }
+        var preview = document.getElementById('imgPreview');
+        var wrap = document.getElementById('imgPreviewWrap');
+        preview.src = URL.createObjectURL(file);
+        wrap.style.display = 'block';
+    });
+</script>
 
 </body>
 </html>

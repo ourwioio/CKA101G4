@@ -49,6 +49,9 @@ public class BulletinVO implements java.io.Serializable {
 	@Size(max = 50, message = "標籤：長度不能超過 {max} 個字元")
 	private String tags;
 
+	@Column(name = "BULLETIN_IMAGE", columnDefinition = "longblob")
+	private byte[] image;
+
 	public BulletinVO() {
 		super();
 	}
@@ -123,5 +126,13 @@ public class BulletinVO implements java.io.Serializable {
 
 	public void setTags(String tags) {
 		this.tags = tags;
+	}
+
+	public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
 	}
 }

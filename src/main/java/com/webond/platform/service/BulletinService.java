@@ -30,15 +30,34 @@ public class BulletinService {
 	/**
 	 * 修改公告：若該筆已經是發布狀態，強制維持發布，
 	 * 不允許透過修改表單把狀態改回草稿（即使前端被繞過送出 status=0 也一樣擋下）。
+	 * 直接修改資料庫查回來、由 JPA 追蹤中的實體再存檔，
+	 * 避免將表單帶入的一份新物件 merge 回去時，byte[] 圖片欄位可能沒有被正確視為已變更。
 	 */
 	@Transactional
 	public void updateBulletin(BulletinVO bulletinVO) {
 		BulletinVO existingBulletin = getOneBulletin(bulletinVO.getBulletinId());
-		if (existingBulletin != null && existingBulletin.getStatus() == STATUS_PUBLISHED) {
-			bulletinVO.setStatus(STATUS_PUBLISHED);
-			bulletinVO.setPublishDate(existingBulletin.getPublishDate()); // 發布日期也一併鎖定，避免被覆蓋成 null
+		if (existingBulletin == null) {
+			return;
 		}
-		repository.save(bulletinVO);
+
+		existingBulletin.setTitle(bulletinVO.getTitle());
+		existingBulletin.setContent(bulletinVO.getContent());
+		existingBulletin.setTags(bulletinVO.getTags());
+		existingBulletin.setEmployeeId(bulletinVO.getEmployeeId());
+
+		if (existingBulletin.getStatus() == STATUS_PUBLISHED) {
+			// 已發布過，狀態與發布日期都鎖定，不允許被表單覆蓋
+			existingBulletin.setStatus(STATUS_PUBLISHED);
+		} else {
+			existingBulletin.setStatus(bulletinVO.getStatus());
+		}
+
+		// 有重新上傳圖片才覆蓋，沒有的話維持原本的圖片
+		if (bulletinVO.getImage() != null) {
+			existingBulletin.setImage(bulletinVO.getImage());
+		}
+
+		repository.save(existingBulletin);
 	}
 	
 	// ===== 刪除 =====

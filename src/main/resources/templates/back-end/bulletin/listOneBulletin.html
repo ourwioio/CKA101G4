@@ -357,6 +357,19 @@ a {
 						</section>
 
 						<!-- =====================
+                         公告圖片
+                         ===================== -->
+
+						<div th:if="${bulletinVO.image != null}" style="margin-bottom: 24px;">
+
+							<h3 class="section-title">公告圖片</h3>
+
+							<img th:src="@{/admin/platform/bulletin/image/{id}(id=${bulletinVO.bulletinId}, v=${bulletinVO.updatedAt} ?: ${bulletinVO.createdAt})}"
+								alt="公告圖片" style="max-width: 100%; border-radius: 10px; display: block;">
+
+						</div>
+
+						<!-- =====================
                          公告內容
                          ===================== -->
 

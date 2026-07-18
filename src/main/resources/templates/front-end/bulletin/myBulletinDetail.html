@@ -69,6 +69,12 @@
             </p>
         </div>
 
+        <!-- 公告圖片 -->
+        <img th:if="${bulletinVO.image != null}"
+             th:src="@{/announcements/{id}/image(id=${bulletinVO.bulletinId}, v=${bulletinVO.updatedAt} ?: ${bulletinVO.createdAt})}"
+             alt="公告圖片"
+             style="max-width:360px; width:100%; border-radius:10px; display:block; margin-bottom:20px;">
+
         <!-- 公告內文主體 (已綁定自動換行與行高黃金比例) -->
         <p class="bulletin-detail-body" th:text="${bulletinVO.content}">
             公告內容
