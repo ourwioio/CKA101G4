@@ -13,106 +13,61 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.employee.model.EmployeeVO;
 import com.webond.service.model.ServiceVO;
+import com.webond.service.service.ServiceImageImportService;
+import com.webond.service.service.ServiceImageImportService.ImportResult;
 import com.webond.service.service.ServiceService;
 
 import jakarta.servlet.http.HttpSession;
-
-import com.webond.service.service.ServiceImageImportService;
-import com.webond.service.service.ServiceImageImportService.ImportResult;
 
 @Controller
 @RequestMapping("/admin/services")
 public class AdminServiceController {
 
-    // =========================================================
-    // 路徑設定
-    // =========================================================
+    public static final String BASE_PATH = "/admin/services";
 
-    public static final String BASE_PATH =
-            "/admin/services";
-
-    // =========================================================
-    // Session 設定
-    // =========================================================
-
-    private static final String EMPLOYEE_SESSION_KEY =
-            "employeeVO";
-
-    private static final int DEFAULT_FAKE_EMPLOYEE_ID =
-            1001;
-
-    // =========================================================
-    // Service
-    // =========================================================
+    private static final String EMPLOYEE_SESSION_KEY = "employeeVO";
+    private static final int DEFAULT_FAKE_EMPLOYEE_ID = 1001;
 
     private final ServiceService serviceSvc;
-    private final ServiceImageImportService
-    serviceImageImportService;
+    private final ServiceImageImportService serviceImageImportService;
 
     public AdminServiceController(
             ServiceService serviceSvc,
             ServiceImageImportService serviceImageImportService) {
 
         this.serviceSvc = serviceSvc;
-
-        this.serviceImageImportService =
-                serviceImageImportService;
+        this.serviceImageImportService = serviceImageImportService;
     }
 
-    // =========================================================
-    // 後台服務列表
-    //
-    // GET /admin/services
-    // =========================================================
     @GetMapping("/home")
-    public String showServiceAdminHome() {
+    public String showServiceAdminHome(HttpSession session) {
+
+        if (getLoginEmployeeId(session) == null) {
+            return redirectToFakeLogin();
+        }
 
         return "back-end/service/adminServiceHome";
     }
+
     @GetMapping
     public String listAllServices(
             HttpSession session,
             Model model) {
 
-        Integer loginEmployeeId =
-                getLoginEmployeeId(session);
+        EmployeeVO employeeVO = getLoginEmployeeVO(session);
 
-        // 測試階段：沒有員工 Session 時，自動導向假登入
-        if (loginEmployeeId == null) {
-            return "redirect:"
-                    + BASE_PATH
-                    + "/fake-login";
+        if (employeeVO == null) {
+            return redirectToFakeLogin();
         }
 
-        List<ServiceVO> serviceList =
-                serviceSvc.getAll();
+        List<ServiceVO> serviceList = serviceSvc.getAll();
 
-        model.addAttribute(
-                "serviceList",
-                serviceList
-        );
-
-        model.addAttribute(
-                "loginEmployeeId",
-                loginEmployeeId
-        );
-
-        model.addAttribute(
-                "loginEmployeeVO",
-                getLoginEmployeeVO(session)
-        );
+        model.addAttribute("serviceList", serviceList);
+        model.addAttribute("loginEmployeeId", employeeVO.getEmployeeId());
+        model.addAttribute("loginEmployeeVO", employeeVO);
 
         return "back-end/service/adminServiceList";
     }
-
-    // =========================================================
-    // 後台查看單一服務詳情
-    //
-    // GET /admin/services/{serviceId}
-    //
-    // 使用 \d+ 限制 serviceId 必須是數字，
-    // 避免與 /orders、/fake-login 等固定路徑衝突。
-    // =========================================================
 
     @GetMapping("/{serviceId:\\d+}")
     public String getServiceDetail(
@@ -121,57 +76,25 @@ public class AdminServiceController {
             Model model,
             RedirectAttributes redirectAttributes) {
 
-        Integer loginEmployeeId =
-                getLoginEmployeeId(session);
+        EmployeeVO employeeVO = getLoginEmployeeVO(session);
 
-        if (loginEmployeeId == null) {
-            return "redirect:"
-                    + BASE_PATH
-                    + "/fake-login";
+        if (employeeVO == null) {
+            return redirectToFakeLogin();
         }
 
-        ServiceVO serviceVO =
-                serviceSvc.getOneService(serviceId);
+        ServiceVO serviceVO = serviceSvc.getOneService(serviceId);
 
         if (serviceVO == null) {
-
-            redirectAttributes.addFlashAttribute(
-                    "errorMsg",
-                    "查無此服務"
-            );
-
-            return "redirect:" + BASE_PATH;
+            redirectAttributes.addFlashAttribute("errorMsg", "查無此服務");
+            return redirectToServiceList();
         }
 
-        model.addAttribute(
-                "serviceVO",
-                serviceVO
-        );
-
-        model.addAttribute(
-                "loginEmployeeId",
-                loginEmployeeId
-        );
-
-        model.addAttribute(
-                "loginEmployeeVO",
-                getLoginEmployeeVO(session)
-        );
+        model.addAttribute("serviceVO", serviceVO);
+        model.addAttribute("loginEmployeeId", employeeVO.getEmployeeId());
+        model.addAttribute("loginEmployeeVO", employeeVO);
 
         return "back-end/service/adminServiceDetail";
     }
-
-    // =========================================================
-    // 後台平台停用服務
-    //
-    // POST /admin/services/{serviceId}/disable
-    //
-    // 服務狀態：
-    // 0：會員下架
-    // 1：上架中
-    // 2：已封存
-    // 3：平台停用
-    // =========================================================
 
     @PostMapping("/{serviceId:\\d+}/disable")
     public String disableService(
@@ -179,45 +102,26 @@ public class AdminServiceController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        Integer loginEmployeeId =
-                getLoginEmployeeId(session);
-
-        if (loginEmployeeId == null) {
-            return "redirect:"
-                    + BASE_PATH
-                    + "/fake-login";
+        if (getLoginEmployeeId(session) == null) {
+            return redirectToFakeLogin();
         }
 
         try {
-
             serviceSvc.disableByAdmin(serviceId);
-
             redirectAttributes.addFlashAttribute(
                     "successMsg",
-                    "服務 #"
-                            + serviceId
-                            + " 已由平台停用"
+                    "服務 #" + serviceId + " 已由平台停用"
             );
 
         } catch (IllegalArgumentException e) {
-
             redirectAttributes.addFlashAttribute(
                     "errorMsg",
                     e.getMessage()
             );
         }
 
-        return "redirect:" + BASE_PATH;
+        return redirectToServiceList();
     }
-
-    // =========================================================
-    // 後台恢復平台停用的服務
-    //
-    // POST /admin/services/{serviceId}/restore
-    //
-    // 狀態變更：
-    // 3 平台停用 → 1 上架中
-    // =========================================================
 
     @PostMapping("/{serviceId:\\d+}/restore")
     public String restoreService(
@@ -225,71 +129,93 @@ public class AdminServiceController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        Integer loginEmployeeId =
-                getLoginEmployeeId(session);
-
-        if (loginEmployeeId == null) {
-            return "redirect:"
-                    + BASE_PATH
-                    + "/fake-login";
+        if (getLoginEmployeeId(session) == null) {
+            return redirectToFakeLogin();
         }
 
         try {
-
             serviceSvc.restoreByAdmin(serviceId);
-
             redirectAttributes.addFlashAttribute(
                     "successMsg",
-                    "服務 #"
-                            + serviceId
-                            + " 已恢復上架"
+                    "服務 #" + serviceId + " 已恢復上架"
             );
 
         } catch (IllegalArgumentException e) {
-
             redirectAttributes.addFlashAttribute(
                     "errorMsg",
                     e.getMessage()
             );
         }
 
-        return "redirect:" + BASE_PATH;
+        return redirectToServiceList();
     }
 
-    // =========================================================
-    // 測試用員工假登入
-    //
-    // GET /admin/services/fake-login
-    // GET /admin/services/fake-login?employeeId=1001
-    // =========================================================
-
-    @GetMapping("/fake-login")
-    public String fakeLogin(
-            @RequestParam(required = false)
-            Integer employeeId,
+    @PostMapping("/import-images")
+    public String importServiceImages(
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        if (employeeId == null) {
-            employeeId = DEFAULT_FAKE_EMPLOYEE_ID;
+        if (getLoginEmployeeId(session) == null) {
+            return redirectToFakeLogin();
         }
 
-        if (employeeId <= 0) {
+        try {
+            ImportResult result =
+                    serviceImageImportService.importServiceImages();
 
+            if (result.getFailureCount() == 0) {
+                redirectAttributes.addFlashAttribute(
+                        "successMsg",
+                        "服務圖片匯入完成，共成功匯入 "
+                                + result.getSuccessCount()
+                                + " 張圖片"
+                );
+            } else {
+                redirectAttributes.addFlashAttribute(
+                        "errorMsg",
+                        "圖片匯入完成：成功 "
+                                + result.getSuccessCount()
+                                + " 張，失敗 "
+                                + result.getFailureCount()
+                                + " 張。"
+                                + result.getFailureMessage()
+                );
+            }
+
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute(
+                    "errorMsg",
+                    "圖片匯入失敗：" + e.getMessage()
+            );
+        }
+
+        return "redirect:" + "/admin/services" + "/home";
+    }
+
+    // 以下是假登入功能，正式登入整合完成後可以移除
+
+    @GetMapping("/fake-login")
+    public String fakeLogin(
+            @RequestParam(required = false) Integer employeeId,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        int fakeEmployeeId =
+                employeeId == null
+                        ? DEFAULT_FAKE_EMPLOYEE_ID
+                        : employeeId;
+
+        if (fakeEmployeeId <= 0) {
             redirectAttributes.addFlashAttribute(
                     "errorMsg",
                     "員工編號不正確"
             );
 
-            return "redirect:" + BASE_PATH;
+            return redirectToServiceList();
         }
 
-        EmployeeVO employeeVO =
-                new EmployeeVO();
-
-        employeeVO.setEmployeeId(
-                employeeId
-        );
+        EmployeeVO employeeVO = new EmployeeVO();
+        employeeVO.setEmployeeId(fakeEmployeeId);
 
         session.setAttribute(
                 EMPLOYEE_SESSION_KEY,
@@ -298,50 +224,31 @@ public class AdminServiceController {
 
         redirectAttributes.addFlashAttribute(
                 "successMsg",
-                "已假登入員工 #" + employeeId
+                "已假登入員工 #" + fakeEmployeeId
         );
 
-        return "redirect:" + BASE_PATH;
+        return redirectToServiceList();
     }
-
-    // =========================================================
-    // 測試用員工假登出
-    //
-    // GET /admin/services/fake-logout
-    // =========================================================
 
     @GetMapping("/fake-logout")
     public String fakeLogout(
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        session.removeAttribute(
-                EMPLOYEE_SESSION_KEY
-        );
+        session.removeAttribute(EMPLOYEE_SESSION_KEY);
 
         redirectAttributes.addFlashAttribute(
                 "successMsg",
                 "員工 Session 已清除"
         );
 
-        /*
-         * 回到服務列表後，因為 Session 已清除，
-         * listAllServices() 會再次導向假登入。
-         */
-        return "redirect:" + BASE_PATH;
+        return redirectToServiceList();
     }
 
-    // =========================================================
-    // 共用：取得 Session 中的 EmployeeVO
-    // =========================================================
-
-    private EmployeeVO getLoginEmployeeVO(
-            HttpSession session) {
+    private EmployeeVO getLoginEmployeeVO(HttpSession session) {
 
         Object sessionObject =
-                session.getAttribute(
-                        EMPLOYEE_SESSION_KEY
-                );
+                session.getAttribute(EMPLOYEE_SESSION_KEY);
 
         if (sessionObject instanceof EmployeeVO employeeVO) {
             return employeeVO;
@@ -350,79 +257,20 @@ public class AdminServiceController {
         return null;
     }
 
-    // =========================================================
-    // 共用：取得登入員工編號
-    // =========================================================
+    private Integer getLoginEmployeeId(HttpSession session) {
 
-    private Integer getLoginEmployeeId(
-            HttpSession session) {
+        EmployeeVO employeeVO = getLoginEmployeeVO(session);
 
-        EmployeeVO employeeVO =
-                getLoginEmployeeVO(session);
-
-        if (employeeVO == null) {
-            return null;
-        }
-
-        return employeeVO.getEmployeeId();
+        return employeeVO == null
+                ? null
+                : employeeVO.getEmployeeId();
     }
-    
- // =========================================================
- // 後台手動匯入服務圖片
- //
- // POST /admin/services/import-images
- // =========================================================
 
- @PostMapping("/import-images")
- public String importServiceImages(
-         HttpSession session,
-         RedirectAttributes redirectAttributes) {
+    private String redirectToServiceList() {
+        return "redirect:" + "/admin/services";
+    }
 
-     Integer loginEmployeeId =
-             getLoginEmployeeId(session);
-
-     if (loginEmployeeId == null) {
-         return "redirect:"
-                 + BASE_PATH
-                 + "/fake-login";
-     }
-
-     try {
-         ImportResult result =
-                 serviceImageImportService
-                         .importServiceImages();
-
-         if (result.getFailureCount() == 0) {
-
-             redirectAttributes.addFlashAttribute(
-                     "successMsg",
-                     "服務圖片匯入完成，共成功匯入 "
-                     + result.getSuccessCount()
-                     + " 張圖片"
-             );
-
-         } else {
-
-             redirectAttributes.addFlashAttribute(
-                     "errorMsg",
-                     "圖片匯入完成：成功 "
-                     + result.getSuccessCount()
-                     + " 張，失敗 "
-                     + result.getFailureCount()
-                     + " 張。"
-                     + result.getFailureMessage()
-             );
-         }
-
-     } catch (RuntimeException e) {
-
-         redirectAttributes.addFlashAttribute(
-                 "errorMsg",
-                 "圖片匯入失敗："
-                 + e.getMessage()
-         );
-     }
-
-     return "redirect:" + BASE_PATH + "/home";
- }
+    private String redirectToFakeLogin() {
+        return "redirect:" + "/admin/services" + "/fake-login";
+    }
 }
