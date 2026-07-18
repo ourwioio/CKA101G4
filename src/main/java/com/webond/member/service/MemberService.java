@@ -37,6 +37,14 @@ public class MemberService {
     @Autowired
     private ActivityService activityService;
     
+    public String getNickname(Integer memberId) {
+        if (memberId == null) {
+            return "未知會員";
+        }
+        String nickname = repository.findNicknameById(memberId);
+        return (nickname != null) ? nickname : "未知會員";
+    }
+    
     
 
     //act controller private 

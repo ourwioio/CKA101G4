@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.member.model.MemberVO;
+import com.webond.service.model.ServiceOrderVO;
 import com.webond.service.model.ServiceSlotVO;
 import com.webond.service.model.ServiceTypeVO;
 import com.webond.service.model.ServiceVO;
@@ -111,7 +112,10 @@ public class PublicServiceController {
                         .getPublicFutureSlotsByServiceId(
                                 serviceId
                         );
-
+        
+        List<ServiceOrderVO> reviewListData = serviceOrderSvc.getReviewsByServiceId(serviceId);
+        Double avgRating = serviceOrderSvc.getAverageRating(serviceId);
+        
         model.addAttribute(
                 "serviceVO",
                 serviceVO
@@ -121,6 +125,9 @@ public class PublicServiceController {
                 "serviceSlotList",
                 serviceSlotList
         );
+		
+		model.addAttribute("reviewListData", reviewListData);
+		model.addAttribute("avgRating", avgRating);
 
         return "front-end/service/serviceDetail";
     }

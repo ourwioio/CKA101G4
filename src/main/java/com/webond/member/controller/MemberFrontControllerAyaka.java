@@ -328,7 +328,7 @@ public class MemberFrontControllerAyaka {
 	        return ResponseEntity.badRequest().body(result);
 	    }
 
-	    memberService.updateAccountStatus(memberId, (byte)3); // 3 = 停權
+	    memberService.updateAccountStatus(memberId, (byte)2); // 3 = 停權
 	    session.invalidate(); // 登出
 
 	    result.put("success", true);

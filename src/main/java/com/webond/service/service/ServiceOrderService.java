@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,24 @@ import com.webond.service.repository.ServiceSlotRepository;
 @Service
 @Transactional
 public class ServiceOrderService {
+
+    @Autowired
+    private ServiceOrderRepository serviceOrderRepository;
+	
+	//評價查詢
+	 public List<ServiceOrderVO> getReviewsByServiceId(Integer serviceId) {
+	        return serviceOrderRepository
+	            .findByServiceIdAndBuyerRateSellerIsNotNullOrderByBuyerReviewedAtDesc(serviceId);
+	    }
+
+	 public Double getAverageRating(Integer serviceId) {
+		 	List<ServiceOrderVO> list = getReviewsByServiceId(serviceId);
+	        if (list.isEmpty()) return 0.0;
+	        return list.stream()
+	                .mapToInt(ServiceOrderVO::getBuyerRateSeller)
+	                .average()
+	                .orElse(0.0);
+	 }
 
 	// =========================================================
 	// 訂單狀態
