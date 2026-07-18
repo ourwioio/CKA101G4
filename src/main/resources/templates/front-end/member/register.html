@@ -312,6 +312,127 @@ button[type="submit"]:hover {
 	cursor: not-allowed;
 }
 
+/* 📷 智慧臉部輔助拍照面板 */
+.face-toolbar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 8px;
+	flex-wrap: wrap;
+}
+
+.btn-open-cam {
+	padding: 10px 18px;
+	background: var(--color-ink);
+	color: #fff;
+	border: none;
+	border-radius: var(--radius-full);
+	font-size: 13px;
+	font-weight: 700;
+	font-family: inherit;
+	cursor: pointer;
+	transition: transform 0.15s ease;
+}
+
+.btn-open-cam:hover {
+	transform: translateY(-2px);
+}
+
+.face-or {
+	font-size: 12px;
+	color: var(--color-ink-soft);
+}
+
+.camera-panel {
+	margin-top: 10px;
+	padding: 14px;
+	background: var(--color-surface-soft);
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-md);
+}
+
+.camera-wrap {
+	position: relative;
+	width: 100%;
+	border-radius: var(--radius-md);
+	overflow: hidden;
+	background: #000;
+}
+
+.camera-wrap video {
+	display: block;
+	width: 100%;
+	transform: scaleX(-1); /* 自拍鏡像，比較直覺 */
+}
+
+.camera-wrap canvas {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.face-status {
+	font-size: 13px;
+	font-weight: 700;
+	margin-top: 10px;
+	color: var(--color-ink-soft);
+}
+
+.face-status.ok {
+	color: #15803d;
+}
+
+.face-status.err {
+	color: #be123c;
+}
+
+.face-status.warn {
+	color: #b45309;
+}
+
+.face-hint {
+	font-size: 12px;
+	color: var(--color-ink-soft);
+	margin-top: 4px;
+}
+
+.camera-btn-row {
+	display: flex;
+	gap: 10px;
+	margin-top: 12px;
+}
+
+.btn-capture {
+	flex: 1;
+	padding: 12px;
+	background: #15803d;
+	color: #fff;
+	border: none;
+	border-radius: var(--radius-full);
+	font-weight: 800;
+	font-family: var(--font-display);
+	font-size: 14px;
+	cursor: pointer;
+}
+
+.btn-capture:disabled {
+	background: #b8b0a2;
+	cursor: not-allowed;
+}
+
+.btn-close-cam {
+	padding: 12px 18px;
+	background: transparent;
+	color: var(--color-ink-soft);
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-full);
+	font-weight: 700;
+	font-size: 13px;
+	font-family: inherit;
+	cursor: pointer;
+}
+
 .login-link {
 	text-align: center;
 	margin-top: 20px;
@@ -422,9 +543,15 @@ button[type="submit"]:hover {
 
 				<div class="form-group">
 					<label for="memberPicFile">個人大頭貼</label> <input type="file"
-						id="memberPicFile" name="memberPicFile" accept="image/*">
+						id="memberPicFile" name="memberPicFile" accept="image/*"
+						onchange="previewUpload(this, 'memberPicPreviewImg', 'memberPicPreviewBox')">
 					<input type="hidden" name="tempMemberPic"
 						th:value="${tempMemberPic}">
+					<div class="img-preview-container" id="memberPicPreviewBox"
+						style="display: none;">
+						<span>✓ 已選擇的大頭貼預覽：</span><br> <img class="img-preview"
+							id="memberPicPreviewImg" alt="大頭貼預覽">
+					</div>
 					<div class="img-preview-container"
 						th:if="${tempMemberPic != null and !tempMemberPic.isEmpty()}">
 						<span>✓ 已暫存先前選擇的照片：</span><br> <img class="img-preview"
@@ -462,9 +589,15 @@ button[type="submit"]:hover {
 
 				<div class="form-group">
 					<label for="idFrontImageFile">身分證正面照片 *</label> <input type="file"
-						id="idFrontImageFile" name="idFrontImageFile" accept="image/*">
+						id="idFrontImageFile" name="idFrontImageFile" accept="image/*"
+						onchange="previewUpload(this, 'idFrontPreviewImg', 'idFrontPreviewBox')">
 					<input type="hidden" id="tempIdFrontImage" name="tempIdFrontImage"
 						th:value="${tempIdFrontImage}">
+					<div class="img-preview-container" id="idFrontPreviewBox"
+						style="display: none;">
+						<span>✓ 已選擇的身分證正面預覽：</span><br> <img class="img-preview"
+							id="idFrontPreviewImg" alt="身分證正面預覽">
+					</div>
 					<div class="img-preview-container"
 						th:if="${tempIdFrontImage != null and !tempIdFrontImage.isEmpty()}">
 						<span>✓ 已暫存身分證正面照片：</span><br> <img class="img-preview"
@@ -477,9 +610,15 @@ button[type="submit"]:hover {
 
 				<div class="form-group">
 					<label for="idBackImageFile">身分證反面照片 *</label> <input type="file"
-						id="idBackImageFile" name="idBackImageFile" accept="image/*">
+						id="idBackImageFile" name="idBackImageFile" accept="image/*"
+						onchange="previewUpload(this, 'idBackPreviewImg', 'idBackPreviewBox')">
 					<input type="hidden" id="tempIdBackImage" name="tempIdBackImage"
 						th:value="${tempIdBackImage}">
+					<div class="img-preview-container" id="idBackPreviewBox"
+						style="display: none;">
+						<span>✓ 已選擇的身分證反面預覽：</span><br> <img class="img-preview"
+							id="idBackPreviewImg" alt="身分證反面預覽">
+					</div>
 					<div class="img-preview-container"
 						th:if="${tempIdBackImage != null and !tempIdBackImage.isEmpty()}">
 						<span>✓ 已暫存身分證反面照片：</span><br> <img class="img-preview"
@@ -491,10 +630,52 @@ button[type="submit"]:hover {
 				</div>
 
 				<div class="form-group full-width">
-					<label for="faceImageFile">自拍人臉照片 *</label> <input type="file"
-						id="faceImageFile" name="faceImageFile" accept="image/*">
+					<label>自拍人臉照片 *</label>
+
+					<div class="face-toolbar">
+						<button type="button" class="btn-open-cam" id="openCameraBtn"
+							onclick="openCamera()">📷 開啟鏡頭拍照（智慧臉部偵測）</button>
+					</div>
+
+					<!-- 🔒 檔案上傳為備援方案：預設隱藏，只有鏡頭無法啟動時才顯示 -->
+					<div id="faceUploadFallback" style="display: none;">
+						<div class="face-or" style="margin-bottom: 6px;">⚠️
+							您的裝置無法使用鏡頭，請改用檔案上傳自拍照：</div>
+						<input type="file" id="faceImageFile" name="faceImageFile"
+							accept="image/*" onchange="onFaceFilePicked()">
+					</div>
 					<input type="hidden" id="tempFaceImage" name="tempFaceImage"
 						th:value="${tempFaceImage}">
+
+					<!-- 📷 鏡頭面板：MediaPipe 可用時顯示特徵點與檢核，不可用時自動降級為一般拍照 -->
+					<div class="camera-panel" id="cameraPanel" style="display: none;">
+						<div class="camera-wrap">
+							<video id="camVideo" autoplay playsinline muted></video>
+							<canvas id="camOverlay"></canvas>
+						</div>
+						<div class="face-status" id="faceStatus">⏳ 鏡頭啟動中...</div>
+						<div class="face-hint">通過條件：畫面中僅一張臉，依畫面指示完成「向左轉頭 → 向右轉頭 →
+							眨眼三下」活體驗證；拍照時臉部高度需佔畫面 1/2、歪頭不超過 15 度。</div>
+						<div class="camera-btn-row">
+							<button type="button" class="btn-capture" id="captureBtn"
+								onclick="capturePhoto()" disabled>📸 拍下這張照片</button>
+							<button type="button" class="btn-close-cam"
+								onclick="closeCamera()">✕ 關閉鏡頭</button>
+						</div>
+					</div>
+
+					<div class="img-preview-container" id="faceCapturedBox"
+						style="display: none;">
+						<span>✓ 已拍攝人臉照片（將隨表單存入資料庫）：</span><br> <img
+							class="img-preview" id="faceCapturedImg" alt="拍攝預覽">
+					</div>
+
+					<div class="img-preview-container" id="faceUploadPreviewBox"
+						style="display: none;">
+						<span>✓ 已選擇的人臉照片預覽：</span><br> <img class="img-preview"
+							id="faceUploadPreviewImg" alt="人臉照片預覽">
+					</div>
+
 					<div class="img-preview-container"
 						th:if="${tempFaceImage != null and !tempFaceImage.isEmpty()}">
 						<span>✓ 已暫存先前上傳的人臉照片：</span><br> <img class="img-preview"
@@ -594,6 +775,363 @@ button[type="submit"]:hover {
 			document.getElementById('sendOtpBtn').disabled = true;
 		}
 
+		// =====================================================================
+		// 📷 智慧臉部輔助拍照（MediaPipe FaceLandmarker + 三步驟活體挑戰）
+		// 活體驗證流程：向左轉頭 → 回正 → 向右轉頭 → 回正 → 眨眼三下，
+		// 全部依序完成才算通過（比單純眨眼更難用照片/影片翻拍騙過）。
+		// 拍照瞬間另需：畫面僅一張臉、臉部高度 ≥ 50%、歪頭 ≤ 15 度。
+		// 三層降級策略：
+		//   1. 鏡頭 + MediaPipe 特徵點檢核 + 活體挑戰，全過才能拍
+		//   2. 鏡頭可用但 MediaPipe 載入失敗 → 一般拍照模式（拍照鈕直接可按）
+		//   3. 鏡頭開不了（未授權/無攝影機）→ 才顯示備援的檔案上傳欄位
+		// 拍到的照片會塞進 tempFaceImage 隱藏欄位，後端 doRegister 原本就會
+		// 把它解碼存進資料庫的 faceImage BLOB，完全不用改後端。
+		// =====================================================================
+		let camStream = null;
+		let faceLandmarker = null;
+		let detectRafId = null;
+		let facePassed = false;      // 姿勢 + 活體全部通過
+		let mpMode = false;
+		let lastVideoTime = -1;
+		// 🎭 三步驟活體挑戰狀態機
+		// 0=請向左轉頭 1=請回正 2=請向右轉頭 3=請回正 4=請眨眼三下
+		// 5=顯示「驗證成功」提示（停留幾秒） 6=進入拍照流程
+		let livenessStep = 0;
+		let eyesClosed = false;      // 目前是否處於閉眼狀態（偵測「閉→開」才算一次眨眼）
+		let blinkCount = 0;          // 步驟 4 已完成的眨眼次數（需滿 3 次）
+		let celebrationUntil = 0;    // 「驗證成功」提示顯示到什麼時間點才切入拍照流程
+		let faceLostFrames = 0;      // 連續偵測不到臉的幀數，太久就整組重置
+
+		// 鏡頭無法使用時，顯示備援的檔案上傳欄位
+		function showFaceUploadFallback() {
+			document.getElementById('faceUploadFallback').style.display = 'block';
+		}
+
+		async function openCamera() {
+			const panel = document.getElementById('cameraPanel');
+			const statusEl = document.getElementById('faceStatus');
+			panel.style.display = 'block';
+			statusEl.className = 'face-status';
+			statusEl.innerText = '⏳ 鏡頭啟動中，請允許瀏覽器使用攝影機...';
+			document.getElementById('captureBtn').disabled = true;
+			facePassed = false;
+			livenessStep = 0;       // 每次重開鏡頭都要重新做整組活體挑戰
+			eyesClosed = false;
+			blinkCount = 0;
+			faceLostFrames = 0;
+
+			// 第 3 層防線：連 getUserMedia API 都沒有（太舊的瀏覽器 / 非 https）
+			// → 顯示備援的檔案上傳欄位
+			if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+				statusEl.className = 'face-status err';
+				statusEl.innerText = '❌ 此瀏覽器不支援鏡頭拍照，請改用下方「選擇檔案」上傳照片。';
+				showFaceUploadFallback();
+				return;
+			}
+
+			// 1. 開啟鏡頭
+			try {
+				camStream = await navigator.mediaDevices.getUserMedia({
+					video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+					audio: false
+				});
+			} catch (e) {
+				statusEl.className = 'face-status err';
+				statusEl.innerText = '❌ 無法開啟鏡頭（未授權或沒有攝影機），請改用下方「選擇檔案」上傳照片。';
+				showFaceUploadFallback();
+				return;
+			}
+
+			const video = document.getElementById('camVideo');
+			video.srcObject = camStream;
+			await new Promise(resolve => { video.onloadedmetadata = resolve; });
+			await video.play();
+
+			const overlay = document.getElementById('camOverlay');
+			overlay.width = video.videoWidth;
+			overlay.height = video.videoHeight;
+
+			// 2. 載入 MediaPipe（第 2 層防線：失敗就降級為一般拍照模式）
+			try {
+				if (!faceLandmarker) {
+					statusEl.innerText = '⏳ 臉部偵測模型載入中...';
+					const vision = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14');
+					const fileset = await vision.FilesetResolver.forVisionTasks(
+						'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+					// 改用 FaceLandmarker：除了臉部位置，還會回傳 52 組 blendshapes
+					// （含 eyeBlinkLeft / eyeBlinkRight），才能做眨眼活體偵測
+					faceLandmarker = await vision.FaceLandmarker.createFromOptions(fileset, {
+						baseOptions: {
+							modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task'
+						},
+						runningMode: 'VIDEO',
+						numFaces: 2,                 // 偵測到第 2 張臉才能做「多人臉拒絕」
+						outputFaceBlendshapes: true  // 開啟 blendshapes（眨眼偵測用）
+					});
+				}
+				mpMode = true;
+				lastVideoTime = -1;
+				detectLoop();
+			} catch (e) {
+				console.warn('MediaPipe 載入失敗，改用一般拍照模式：', e);
+				mpMode = false;
+				facePassed = true;
+				document.getElementById('captureBtn').disabled = false;
+				statusEl.className = 'face-status warn';
+				statusEl.innerText = '⚠️ 此裝置或網路不支援智慧臉部偵測，已改為一般拍照模式，請自行對準鏡頭拍照。';
+				const ctx = overlay.getContext('2d');
+				ctx.clearRect(0, 0, overlay.width, overlay.height);
+				drawGuide(ctx, overlay.width, overlay.height);
+			}
+		}
+
+		// 每一幀跑臉部偵測 + 畫特徵點 + 檢核通過條件（含多人臉拒絕與三步驟活體挑戰）
+		function detectLoop() {
+			const video = document.getElementById('camVideo');
+			if (!camStream || !video.srcObject || !mpMode) return;
+
+			const overlay = document.getElementById('camOverlay');
+			const ctx = overlay.getContext('2d');
+			const W = overlay.width, H = overlay.height;
+
+			if (video.currentTime !== lastVideoTime) {
+				lastVideoTime = video.currentTime;
+				const result = faceLandmarker.detectForVideo(video, performance.now());
+
+				ctx.clearRect(0, 0, W, H);
+				drawGuide(ctx, W, H);
+
+				const statusEl = document.getElementById('faceStatus');
+				const captureBtn = document.getElementById('captureBtn');
+				const faces = result.faceLandmarks || [];
+
+				if (faces.length === 0) {
+					// 連續太多幀沒臉 → 整組活體挑戰重置，避免「做完挑戰後換成照片」
+					faceLostFrames++;
+					if (faceLostFrames > 30) {
+						livenessStep = 0;
+						eyesClosed = false;
+						blinkCount = 0;
+					}
+					facePassed = false;
+					statusEl.className = 'face-status err';
+					statusEl.innerText = '❌ 未偵測到臉部，請正對鏡頭。';
+				} else if (faces.length > 1) {
+					// 🚫 多人臉拒絕：合照/背後有人都擋下
+					faceLostFrames = 0;
+					facePassed = false;
+					statusEl.className = 'face-status err';
+					statusEl.innerText = '❌ 畫面中偵測到多張臉，請確認只有您本人入鏡！';
+				} else {
+					faceLostFrames = 0;
+					const lm = faces[0];   // 478 個特徵點，座標正規化 0~1
+
+					// 臉部高度：額頂(10) 到 下巴(152) 的垂直距離佔畫面比例
+					const heightPct = Math.round((lm[152].y - lm[10].y) * 100);
+					// 歪頭角度：左右眼外角 (33、263) 連線的斜率
+					const dx = (lm[263].x - lm[33].x) * W;
+					const dy = (lm[263].y - lm[33].y) * H;
+					const tiltDeg = Math.atan2(dy, dx) * 180 / Math.PI;
+
+					// 🧭 轉頭方向：鼻尖(1) 相對左右臉頰邊緣(234、454) 的水平位置比例。
+					// 這裡換算成「鏡像後」的比例，跟使用者照鏡子的方向一致：
+					// 約 0.5 = 正面；< 0.35 = 頭轉向（螢幕）左邊；> 0.65 = 轉向右邊
+					const faceWidth = (lm[454].x - lm[234].x) || 0.000001;
+					const noseRatio = 1 - ((lm[1].x - lm[234].x) / faceWidth);
+					const isCentered = noseRatio > 0.42 && noseRatio < 0.58;
+
+					drawLandmarks(ctx, W, H, lm);
+
+					// 👁️ 眨眼偵測：blendshapes 的 eyeBlinkLeft/Right 分數
+					// 兩眼都 > 0.5 視為閉眼；之後兩眼都 < 0.25 視為張開 → 完成一次眨眼
+					if (result.faceBlendshapes && result.faceBlendshapes.length > 0) {
+						const cats = result.faceBlendshapes[0].categories;
+						const blinkL = (cats.find(c => c.categoryName === 'eyeBlinkLeft') || {}).score || 0;
+						const blinkR = (cats.find(c => c.categoryName === 'eyeBlinkRight') || {}).score || 0;
+						if (!eyesClosed && blinkL > 0.5 && blinkR > 0.5) {
+							eyesClosed = true;
+						} else if (eyesClosed && blinkL < 0.25 && blinkR < 0.25) {
+							eyesClosed = false;
+							if (livenessStep === 4) {
+								blinkCount++;                         // 累計眨眼次數
+								if (blinkCount >= 3) {
+									livenessStep = 5;                  // 眨滿三下 → 顯示成功提示
+									celebrationUntil = Date.now() + 1500; // 提示停留 1.5 秒
+								}
+							}
+						}
+					}
+
+					// 🎭 活體挑戰狀態機推進：向左轉 → 回正 → 向右轉 → 回正 → 眨眼三下
+					if (livenessStep === 0 && noseRatio < 0.35) {
+						livenessStep = 1;
+					} else if (livenessStep === 1 && isCentered) {
+						livenessStep = 2;
+					} else if (livenessStep === 2 && noseRatio > 0.65) {
+						livenessStep = 3;
+					} else if (livenessStep === 3 && isCentered) {
+						livenessStep = 4;
+					}
+
+					// 依目前挑戰進度顯示指示；全部完成後才檢查拍照姿勢
+					if (livenessStep === 0) {
+						facePassed = false;
+						statusEl.className = 'face-status warn';
+						statusEl.innerText = '🙂 活體驗證 步驟 1/3：請將頭「向左」慢慢轉...';
+					} else if (livenessStep === 1) {
+						facePassed = false;
+						statusEl.className = 'face-status warn';
+						statusEl.innerText = '↩️ 很好！請將頭轉回正面';
+					} else if (livenessStep === 2) {
+						facePassed = false;
+						statusEl.className = 'face-status warn';
+						statusEl.innerText = '🙂 活體驗證 步驟 2/3：請將頭「向右」慢慢轉...';
+					} else if (livenessStep === 3) {
+						facePassed = false;
+						statusEl.className = 'face-status warn';
+						statusEl.innerText = '↩️ 很好！請將頭轉回正面';
+					} else if (livenessStep === 4) {
+						facePassed = false;
+						statusEl.className = 'face-status warn';
+						statusEl.innerText = '👁️ 活體驗證 步驟 3/3：請眨眼三下（已完成 ' + blinkCount + '/3）...';
+					} else if (livenessStep === 5) {
+						// 🎉 成功提示過場：先讓使用者看到「驗證成功」，停留幾秒才進拍照流程
+						facePassed = false;
+						statusEl.className = 'face-status ok';
+						statusEl.innerText = '🎉 活體驗證成功！即將進入拍照流程，請稍候...';
+						if (Date.now() >= celebrationUntil) {
+							livenessStep = 6;
+						}
+					} else if (heightPct < 50) {
+						facePassed = false;
+						statusEl.className = 'face-status err';
+						statusEl.innerText = '❌ 臉部太小（目前 ' + heightPct + '%），請再靠近鏡頭一點！';
+					} else if (Math.abs(tiltDeg) > 15) {
+						facePassed = false;
+						statusEl.className = 'face-status err';
+						statusEl.innerText = '❌ 頭歪了（目前 ' + tiltDeg.toFixed(1) + ' 度），請把頭擺正！';
+					} else {
+						facePassed = true;
+						statusEl.className = 'face-status ok';
+						statusEl.innerText = '📸 拍照流程：臉部高度 ' + heightPct + '% / 歪頭角度 ' + tiltDeg.toFixed(1) + ' 度，請按下方「拍下這張照片」！';
+					}
+				}
+				captureBtn.disabled = !facePassed;
+			}
+			detectRafId = requestAnimationFrame(detectLoop);
+		}
+
+		// 虛線圓形取景輔助框
+		function drawGuide(ctx, W, H) {
+			ctx.save();
+			ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+			ctx.setLineDash([6, 6]);
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.arc(W / 2, H / 2, Math.min(W, H) * 0.38, 0, Math.PI * 2);
+			ctx.stroke();
+			ctx.restore();
+		}
+
+		// 綠色特徵點：左眼—右眼連線、鼻子、下唇
+		// FaceLandmarker 特徵點索引：468/473 = 左右虹膜中心、1 = 鼻尖、17 = 下唇
+		// （影像用 CSS 鏡像顯示，所以繪圖時 x 座標要左右翻轉才會對得上）
+		function drawLandmarks(ctx, W, H, lm) {
+			const mirror = i => ({ x: W - lm[i].x * W, y: lm[i].y * H });
+			const e0 = mirror(468), e1 = mirror(473);
+			const nose = mirror(1), mouth = mirror(17);
+			const eyeL = (e0.x <= e1.x) ? e0 : e1;   // 螢幕上偏左的標「左眼」
+			const eyeR = (e0.x <= e1.x) ? e1 : e0;
+
+			ctx.strokeStyle = '#22c55e';
+			ctx.lineWidth = 2;
+			ctx.beginPath();
+			ctx.moveTo(eyeL.x, eyeL.y);
+			ctx.lineTo(eyeR.x, eyeR.y);
+			ctx.stroke();
+
+			ctx.fillStyle = '#22c55e';
+			ctx.font = 'bold 14px "Noto Sans TC", sans-serif';
+			drawDot(ctx, eyeL); ctx.fillText('左眼', eyeL.x - 30, eyeL.y - 8);
+			drawDot(ctx, eyeR); ctx.fillText('右眼', eyeR.x + 8, eyeR.y - 8);
+			drawDot(ctx, nose); ctx.fillText('鼻子', nose.x + 8, nose.y - 6);
+			drawDot(ctx, mouth); ctx.fillText('下唇', mouth.x + 8, mouth.y + 4);
+		}
+
+		function drawDot(ctx, p) {
+			ctx.beginPath();
+			ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+			ctx.fill();
+		}
+
+		// 拍照：把當前影格轉成 base64 塞進 tempFaceImage，後端會直接存進資料庫
+		function capturePhoto() {
+			const video = document.getElementById('camVideo');
+			if (!video.videoWidth) return;
+
+			const cvs = document.createElement('canvas');
+			cvs.width = video.videoWidth;
+			cvs.height = video.videoHeight;
+			cvs.getContext('2d').drawImage(video, 0, 0);
+			const dataUrl = cvs.toDataURL('image/jpeg', 0.85);
+
+			document.getElementById('tempFaceImage').value = dataUrl;
+			document.getElementById('faceImageFile').value = '';   // 拍照優先，清掉檔案選擇
+			document.getElementById('faceUploadPreviewBox').style.display = 'none';
+
+			document.getElementById('faceCapturedImg').src = dataUrl;
+			document.getElementById('faceCapturedBox').style.display = 'block';
+
+			closeCamera();
+		}
+
+		function closeCamera() {
+			if (detectRafId) {
+				cancelAnimationFrame(detectRafId);
+				detectRafId = null;
+			}
+			if (camStream) {
+				camStream.getTracks().forEach(t => t.stop());
+				camStream = null;
+			}
+			const video = document.getElementById('camVideo');
+			if (video) video.srcObject = null;
+			document.getElementById('cameraPanel').style.display = 'none';
+		}
+
+		// =====================================================================
+		// 🖼️ 通用即時預覽：選好檔案立刻在欄位下方顯示縮圖
+		// =====================================================================
+		function previewUpload(input, imgId, boxId) {
+			const box = document.getElementById(boxId);
+			const img = document.getElementById(imgId);
+			if (!input.files || input.files.length === 0) {
+				box.style.display = 'none';
+				return;
+			}
+			const file = input.files[0];
+			if (!file.type.startsWith('image/')) {
+				box.style.display = 'none';
+				return;
+			}
+			// 用 createObjectURL 即時預覽，載入完成後釋放記憶體
+			const objectUrl = URL.createObjectURL(file);
+			img.onload = () => URL.revokeObjectURL(objectUrl);
+			img.src = objectUrl;
+			box.style.display = 'block';
+		}
+
+		// 使用者改用檔案上傳時：清掉拍照結果，避免兩邊互相蓋，並顯示上傳預覽
+		function onFaceFilePicked() {
+			const f = document.getElementById('faceImageFile');
+			if (f.files.length > 0) {
+				document.getElementById('tempFaceImage').value = '';
+				document.getElementById('faceCapturedBox').style.display = 'none';
+				closeCamera();
+			}
+			previewUpload(f, 'faceUploadPreviewImg', 'faceUploadPreviewBox');
+		}
+
 		function sendOtp() {
 			const emailInput = document.getElementById('email');
 			const email = emailInput.value.trim();
@@ -681,7 +1219,7 @@ button[type="submit"]:hover {
 		function startCooldown(seconds) {
 			cooldownSeconds = seconds;
 			const sendBtn = document.getElementById('sendOtpBtn');
-			
+
 			clearInterval(timer);
 			timer = setInterval(() => {
 				if (cooldownSeconds > 0) {
@@ -702,11 +1240,11 @@ button[type="submit"]:hover {
 				return false;
 			}
 
-			// 人臉照片檢查：需上傳檔案，或已有先前驗證失敗回填的暫存照片
+			// 人臉照片檢查：鏡頭拍照(tempFaceImage) 或 備援檔案上傳，兩者擇一即可
 			const faceFile = document.getElementById('faceImageFile');
 			const tempFace = document.getElementById('tempFaceImage');
 			if (faceFile.files.length === 0 && (!tempFace.value || tempFace.value.trim() === '')) {
-				alert('請上傳自拍人臉照片！');
+				alert('請點擊「開啟鏡頭拍照」完成活體驗證並拍照！');
 				return false;
 			}
 			return true;
