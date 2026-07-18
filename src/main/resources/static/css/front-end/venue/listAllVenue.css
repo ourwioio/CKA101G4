@@ -155,8 +155,7 @@ img{ max-width: 100%; }
 	color: var(--color-ink-soft);
 }
 
-.field input,
-.field select {
+.field input {
 	font-family: var(--font-body);
 	font-size: 14px;
 	padding: 10px 14px;
@@ -166,10 +165,71 @@ img{ max-width: 100%; }
 	color: var(--color-ink);
 	width: 100%;
 }
-.field input:focus,
+.field input:focus {
+	outline: none;
+	border-color: var(--color-yellow-deep);
+}
+
+.field select {
+	font-family: var(--font-body);
+	font-size: 14px;
+	padding: 10px 14px;
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-md);
+	background: var(--color-surface-soft);
+	color: var(--color-ink);
+	width: 100%;
+	outline: none;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2317140F' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 12px center;
+	background-size: 16px;
+	padding-right: 30px;
+}
 .field select:focus {
 	outline: none;
 	border-color: var(--color-yellow-deep);
+}
+
+.field select, .field select::picker(select) {
+	appearance: base-select;      /* 啟用可自訂模式 */
+}
+
+.field select::picker-icon { display: none; }
+
+/* 彈出的清單本體 */
+.field select::picker(select) {
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-md);
+	background: var(--color-surface);
+	box-shadow: var(--shadow-md);
+	padding: 6px;
+	position-area: block-end;
+	position-try-fallbacks: none;
+	margin-top: 4px;
+}
+
+/* 每個選項 */
+.field option {
+	padding: 8px 14px;
+	border-radius: 10px;
+	cursor: pointer;
+}
+/* 滑鼠停在上面的選項 */
+.field option:hover {
+	background: var(--color-yellow-deep);
+	color: var(--color-ink);
+}
+/* 目前被選中的那項 */
+.field option:checked {
+	background: var(--color-yellow-deep);
+	color: #fff;
+}
+/* 鍵盤方向鍵選項 */
+.field option:focus {
+	background: var(--color-yellow-deep);
+	color: var(--color-ink);
 }
 
 .field__range {
