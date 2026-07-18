@@ -175,8 +175,9 @@ public class VenueReportService {
 		return venueOrderRepository.findById(venueOrderId).orElse(null);
 	}
 
-	// ===== 複合查詢：處理狀態 + 檢舉內容關鍵字 + 檢舉時間區間，任意組合 =====
-	public List<VenueReportVO> search(Byte reportStatus, String keyword, LocalDate startDate, LocalDate endDate) {
+	// ===== 複合查詢：處理狀態 + 檢舉內容關鍵字 + 場地名稱 + 檢舉時間區間，任意組合 =====
+	public List<VenueReportVO> search(Byte reportStatus, String keyword, String venueName, LocalDate startDate,
+			LocalDate endDate) {
 
 		List<VenueReportVO> list;
 
@@ -198,6 +199,26 @@ public class VenueReportService {
 					&& report.getSerReportCom().toLowerCase().contains(lowerKeyword)).toList();
 		}
 
+		if (venueName != null && !venueName.trim().isEmpty()) {
+			String lowerName = venueName.trim().toLowerCase();
+			list = list.stream().filter(report -> {
+				VenueOrderVO order = venueOrderRepository.findById(report.getVenueOrderId()).orElse(null);
+				return order != null && order.getVenueVO() != null && order.getVenueVO().getVenueName() != null
+						&& order.getVenueVO().getVenueName().toLowerCase().contains(lowerName);
+			}).toList();
+		}
+
 		return list;
+	}
+
+	// ===== 提供「檢舉編號 → 場地名稱」對照表，給列表頁顯示用 =====
+	public Map<Integer, String> getVenueNameMap(List<VenueReportVO> list) {
+		Map<Integer, String> map = new LinkedHashMap<>();
+		for (VenueReportVO report : list) {
+			VenueOrderVO order = venueOrderRepository.findById(report.getVenueOrderId()).orElse(null);
+			String name = (order != null && order.getVenueVO() != null) ? order.getVenueVO().getVenueName() : "-";
+			map.put(report.getVenueReportId(), name);
+		}
+		return map;
 	}
 }

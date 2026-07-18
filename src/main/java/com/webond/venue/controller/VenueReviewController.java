@@ -203,10 +203,11 @@ public class VenueReviewController {
 		return "redirect:/admin/venue/venueReview/listAllVenueReview";
 	}
 
-	// ===== 複合查詢：狀態 + 場地編號 + 員工編號，任意組合 =====
+	// ===== 複合查詢：狀態 + 場地編號 + 場地名稱 + 員工編號，任意組合 =====
 	@PostMapping("search")
 	public String search(@RequestParam(value = "reviewStatus", required = false) Byte reviewStatus,
 			@RequestParam(value = "venueId", required = false) Integer venueId,
+			@RequestParam(value = "venueName", required = false) String venueName,
 			@RequestParam(value = "employeeId", required = false) Integer employeeId, ModelMap model) {
 
 		List<VenueReviewVO> list = venueReviewSvc.getAll();
@@ -219,6 +220,14 @@ public class VenueReviewController {
 			list = list.stream().filter(vr -> venueId.equals(vr.getVenueId())).toList();
 		}
 
+		if (venueName != null && !venueName.trim().isEmpty()) {
+			String lowerName = venueName.trim().toLowerCase();
+			list = list.stream().filter(vr -> {
+				VenueVO v = venueService.getOneVenue(vr.getVenueId());
+				return v != null && v.getVenueName() != null && v.getVenueName().toLowerCase().contains(lowerName);
+			}).toList();
+		}
+
 		if (employeeId != null) {
 			list = list.stream().filter(vr -> employeeId.equals(vr.getEmployeeId())).toList();
 		}
@@ -226,6 +235,7 @@ public class VenueReviewController {
 		model.addAttribute("venueReviewListData", list);
 		model.addAttribute("searchReviewStatus", reviewStatus);
 		model.addAttribute("searchVenueId", venueId);
+		model.addAttribute("searchVenueName", venueName);
 		model.addAttribute("searchEmployeeId", employeeId);
 		return "back-end/venueReview/listAllVenueReview";
 	}
@@ -241,5 +251,12 @@ public class VenueReviewController {
 	protected Map<Integer, String> referenceEmployeeNameMap() {
 		return employeeRepository.findAll().stream()
 				.collect(Collectors.toMap(EmployeeVO::getEmployeeId, EmployeeVO::getEmpName));
+	}
+
+	// ===== 提供「場地編號 → 場地名稱」對照表，給列表頁顯示用 =====
+	@ModelAttribute("venueNameMap")
+	protected Map<Integer, String> referenceVenueNameMap() {
+		return venueService.getAll().stream()
+				.collect(Collectors.toMap(VenueVO::getVenueId, VenueVO::getVenueName));
 	}
 }
