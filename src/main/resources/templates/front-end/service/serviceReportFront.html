@@ -1,30 +1,122 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>檢舉服務</title>
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
 <style>
+    /* ==========================================================
+       Webond 檢舉彈窗面板 — 圓潤角色風風格融合
+       ========================================================== */
+    @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+
+    :root {
+        --color-bg:            #F7F3EC;
+        --color-surface:       #FFFFFF;
+        --color-surface-soft:  #FFFDF8;
+        --color-ink:           #17140F;
+        --color-ink-soft:      #726A5F;
+        --color-border:        #ECE4D6;
+
+        --color-yellow:       #FFE59A;
+        --color-yellow-deep:  #FFC94D;
+        --color-pink:         #FFB5C1;
+        --color-green:         #B7E1D1;
+        --color-blue:         #A9D3FF;
+        --color-red:          #FF5271;
+
+        --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+        --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+        --radius-lg: 26px;
+        --radius-md: 16px;
+        --radius-full: 999px;
+
+        --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+        --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: var(--font-body);
+        background: var(--color-bg);
+        color: var(--color-ink);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        padding: 40px 20px;
+    }
+
+    h1, h2, h3, h4 { font-family: var(--font-display); margin: 0; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ==========================================================
+       詳情大卡片主體 (設定 relative 以便讓打叉按鈕絕對定位在右上角)
+       ========================================================== */
     .report-card {
         max-width: 480px;
         margin: 60px auto;
-        padding: 32px 36px;
-        background: #ffffff;
-        border-radius: 16px;
-        box-shadow: 0 8px 24px rgba(75, 0, 130, 0.08);
-        border: 1px solid #ece9f7;
-        font-family: "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+        padding: 36px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--color-border);
+        position: relative; /* 鎖定絕對定位基準線 */
     }
 
+    /* 🌟 右上角精緻打叉按鈕 */
+    .btn-close {
+        position: absolute;
+        top: 24px;
+        right: 24px;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--color-surface-soft);
+        border: 1.5px solid var(--color-border);
+        border-radius: 50%;
+        color: var(--color-ink-soft);
+        font-size: 13px;
+        font-weight: 800;
+        transition: all 0.18s ease;
+        cursor: pointer;
+    }
+
+    .btn-close:hover {
+        background: var(--color-pink);
+        color: var(--color-red);
+        border-color: var(--color-red);
+        transform: scale(1.05);
+    }
+
+    /* 卡片標題 */
     .report-card h3 {
         margin: 0 0 24px;
         font-size: 20px;
-        font-weight: 700;
-        color: #3f2b7a;
-        padding-bottom: 12px;
-        border-bottom: 2px solid #6c4fd3;
-        display: inline-block;
+        font-weight: 800;
+        color: var(--color-ink);
+        position: relative;
+        padding-left: 14px;
+    }
+    
+    .report-card h3::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 50%;
+        transform: translateY(-50%);
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--color-yellow-deep);
     }
 
+    /* 表單元件 */
     .report-form .form-group {
         margin-bottom: 20px;
     }
@@ -32,65 +124,83 @@
     .report-form label {
         display: block;
         margin-bottom: 8px;
-        font-size: 14px;
-        font-weight: 600;
-        color: #4b3b8a;
+        font-size: 13.5px;
+        font-weight: 800;
+        color: var(--color-ink);
     }
 
     .report-form textarea {
         width: 100%;
         box-sizing: border-box;
-        padding: 12px 14px;
+        padding: 12px 16px;
         font-size: 14px;
         line-height: 1.6;
-        color: #333;
-        border: 1px solid #d8d3f0;
-        border-radius: 10px;
-        resize: vertical;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        font-family: inherit;
+        color: var(--color-ink);
+        background: var(--color-surface-soft);
+        border: 1.5px solid var(--color-border);
+        border-radius: var(--radius-md);
+        resize: none; 
+	    overflow-y: auto;
+	    scrollbar-width: none;     
+	    -ms-overflow-style: none;
+        transition: all 0.15s ease;
+        font-family: var(--font-body);
+        outline: none;
     }
+    
+    .report-form textarea::-webkit-scrollbar {
+	    display: none;
+	}
 
     .report-form textarea:focus {
-        outline: none;
-        border-color: #6c4fd3;
-        box-shadow: 0 0 0 3px rgba(108, 79, 211, 0.15);
+        border-color: var(--color-yellow-deep);
+        background: var(--color-surface);
     }
 
+    /* 錯誤欄位紅字提示 */
     .error-text {
         display: block;
         margin-top: 6px;
         font-size: 12px;
-        color: #e53935;
+        color: var(--color-red);
+        font-weight: 700;
     }
 
+    /* 送出檢舉：經典沉穩黑膠囊 */
     .report-submit-btn {
         width: 100%;
         padding: 12px;
-        font-size: 15px;
-        font-weight: 700;
+        font-size: 14.5px;
+        font-weight: 800;
         color: #fff;
-        background: linear-gradient(135deg, #7c5cf0, #5a3fc0);
+        background: var(--color-ink);
         border: none;
-        border-radius: 10px;
+        border-radius: var(--radius-full);
         cursor: pointer;
-        transition: opacity 0.2s ease, transform 0.1s ease;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.18s ease;
+        font-family: var(--font-body);
     }
 
     .report-submit-btn:hover {
-        opacity: 0.92;
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        background: var(--color-yellow-deep);
+        color: var(--color-ink);
     }
 
     .report-submit-btn:active {
-        transform: scale(0.98);
+        transform: translateY(0) scale(0.98);
     }
 
-    /* 成功彈窗 */
+    /* ==========================================================
+       成功狀態彈窗 (預備整合樣式)
+       ========================================================== */
     .success-modal-mask {
         display: none;
         position: fixed;
         inset: 0;
-        background: rgba(20, 10, 50, 0.35);
+        background: rgba(23, 20, 15, 0.4);
         align-items: center;
         justify-content: center;
         z-index: 999;
@@ -101,17 +211,18 @@
     }
 
     .success-modal {
-        background: #fff;
-        border-radius: 14px;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
         padding: 32px 28px;
-        width: 300px;
+        width: 320px;
         text-align: center;
-        box-shadow: 0 12px 32px rgba(0,0,0,0.2);
-        animation: popIn 0.25s ease;
+        box-shadow: var(--shadow-md);
+        animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.15);
     }
 
     @keyframes popIn {
-        from { transform: scale(0.85); opacity: 0; }
+        from { transform: scale(0.9); opacity: 0; }
         to { transform: scale(1); opacity: 1; }
     }
 
@@ -120,9 +231,9 @@
         height: 48px;
         margin: 0 auto 16px;
         border-radius: 50%;
-        background: #6c4fd3;
+        background: var(--color-ink);
         color: #fff;
-        font-size: 26px;
+        font-size: 22px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -131,38 +242,49 @@
     .success-modal p {
         margin: 0 0 20px;
         font-size: 15px;
-        color: #333;
-        font-weight: 600;
+        color: var(--color-ink);
+        font-weight: 700;
     }
 
     .success-modal button {
         padding: 8px 24px;
         border: none;
-        border-radius: 8px;
-        background: #6c4fd3;
-        color: #fff;
-        font-weight: 600;
+        border-radius: var(--radius-full);
+        background: var(--color-yellow);
+        color: var(--color-ink);
+        font-weight: 800;
+        font-size: 13.5px;
         cursor: pointer;
+        transition: all 0.15s ease;
+        border: 1.5px solid var(--color-ink);
+    }
+    
+    .success-modal button:hover {
+        background: var(--color-yellow-deep);
+        transform: translateY(-1px);
     }
 </style>
 </head>
 <body>
+
 <div class="report-card">
+    <!-- 🌟 打叉按鈕完美套用右上角絕對定位 class -->
+    <a class="btn-close" th:href="@{/front/services}">✖</a>
+    
     <h3>檢舉訂單</h3>
-	<a th:href="@{/front/services}">✖</a>
+    
     <form class="report-form" th:action="@{/front/serviceReport/insert}" th:object="${serviceReportVO}" method="post">
         <input type="hidden" name="serviceId" th:value="${serviceId}" />
+        
         <div class="form-group">
             <label>檢舉內容</label>
             <textarea th:field="*{serviceReportCom}" maxlength="500" rows="5" placeholder="請輸入檢舉內容..."></textarea>
-            <span class="error-text" th:if="${#fields.hasErrors('serviceReportCom')}"
-                  th:errors="*{serviceReportCom}"></span>
+            <span class="error-text" th:if="${#fields.hasErrors('serviceReportCom')}" th:errors="*{serviceReportCom}"></span>
         </div>
 
         <button type="submit" class="report-submit-btn">送出檢舉</button>
     </form>
 </div>
-
 
 </body>
 </html>

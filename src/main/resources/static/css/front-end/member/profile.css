@@ -1,544 +1,541 @@
 
-@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
-
-:root{
-  --color-bg:            #F7F3EC;
-  --color-surface:       #FFFFFF;
-  --color-surface-soft:  #FFFDF8;
-  --color-ink:           #17140F;
-  --color-ink-soft:      #726A5F;
-  --color-border:        #ECE4D6;
-
-  --color-yellow:       #FFE59A;
-  --color-yellow-deep:  #FFC94D;
-  --color-pink:         #FFB5C1;
-  --color-green:        #B7E1D1;
-  --color-blue:         #A9D3FF;
-
-  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
-  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
-
-  --radius-lg: 26px;
-  --radius-md: 16px;
-  --radius-full: 999px;
-
-  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
-  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
-
-  --nav-height: 76px;
-}
-
-*{ box-sizing: border-box; }
-
-body{
-  margin:0;
-  font-family: var(--font-body);
-  background: var(--color-bg);
-  color: var(--color-ink);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
-
-h1,h2,h3,h4{ font-family: var(--font-display); margin:0; }
-img{ max-width:100%; }
-
-/* ==========================================================
-   版面容器 (避開 navbar)
-   ========================================================== */
-.container{
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: calc(var(--nav-height) + 40px) 20px 60px;
-}
-
-/* ==========================================================
-   頭部檔案卡
-   ========================================================== */
-.profile-header{
-  display: flex;
-  align-items: center;
-  gap: 36px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  padding: 42px 36px;
-  margin-bottom: 24px;
-  position: relative;
-}
-
-.profile-avatar{ flex-shrink: 0; }
-.avatar-img{
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 3px solid var(--color-surface);
-  box-shadow: var(--shadow-md);
-  background: var(--color-surface-soft);
-}
-
-.profile-info{ flex: 1; }
-
-/* 名字與身分標章 Flex 對齊 */
-.member-name-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.member-name{
-  font-size: 26px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-.member-status {
-  display: inline-flex;
-}
-
-/* 活潑的小尺寸身分標章 (微粗黑邊 Neo-brutalism 陰影) */
-.status-badge-mini{
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: var(--radius-full);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-.status-badge-mini a {
-  color: inherit;
-  text-decoration: none;
-}
-.status-badge-mini.status0 { background: var(--color-yellow); }      /* 未認證 */
-.status-badge-mini.status1 { background: var(--color-green); }       /* 已認證 */
-.status-badge-mini.status3 { background: var(--color-pink); }        /* 停權 */
-.status-badge-mini.status4 { background: var(--color-yellow-deep); } /* 限制參加活動 */
-
-.member-contact{
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 10px;
-}
-.contact-item{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13.5px;
-  color: var(--color-ink-soft);
-}
-.contact-icon{ font-size: 15px; }
-
-/* ==========================================================
-   操作按鈕（個人專屬：編輯 / 登出）
-   ========================================================== */
-.action-buttons{ 
-  display: flex; 
-  gap: 12px; 
-  margin-top: 20px;
-  flex-wrap: wrap;
-}
-
-.btn{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  font-family: var(--font-body);
-  font-weight: 800;
-  font-size: 14px;
-  padding: 10px 22px;
-  border-radius: var(--radius-full);
-  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
-}
-/* 編輯資料：深黑底 */
-.btn-primary{
-  background: var(--color-ink);
-  color: #fff;
-  box-shadow: var(--shadow-sm);
-}
-.btn-primary:hover{ transform: translateY(-2px); box-shadow: var(--shadow-md); background: var(--color-yellow-deep); color: var(--color-ink); }
-
-/* 登出：奶油白框 */
-.btn-edit{
-  background: var(--color-surface);
-  color: var(--color-ink);
-  border: 1.5px solid var(--color-border);
-}
-.btn-edit:hover{ transform: translateY(-2px); border-color: var(--color-ink); }
-
-/* ==========================================================
-   通用區塊卡片
-   ========================================================== */
-.section{
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  padding: 32px 36px;
-  margin-bottom: 24px;
-}
-
-.section-title{
-  font-size: 20px;
-  font-weight: 800;
-  position: relative;
-  padding-left: 18px;
-  margin-bottom: 24px;
-}
-.section-title::before{
-  content:'';
-  position: absolute;
-  left:0; top:50%;
-  transform: translateY(-50%);
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  background: var(--color-yellow-deep);
-}
-
-.intro-text{
-  color: var(--color-ink-soft);
-  font-size: 14.5px;
-  line-height: 1.9;
-}
-
-/* ==========================================================
-   評分統計
-   ========================================================== */
-.rating-stats{
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-}
-
-.stat-card{
-  border-radius: var(--radius-md);
-  padding: 20px 16px;
-  text-align: center;
-  transition: transform .2s ease;
-  border: 1px solid var(--color-border);
-}
-.stat-card:hover{ transform: translateY(-4px); }
-.stat-card.service{  background: var(--color-pink); }
-.stat-card.servicer{ background: var(--color-blue); }
-.stat-card.activity{ background: var(--color-green); }
-.stat-card.hold{      background: var(--color-yellow); }
-
-.stat-label{
-  font-size: 12.5px;
-  font-weight: 800;
-  color: var(--color-ink);
-  opacity: .8;
-  margin-bottom: 8px;
-}
-.stat-number{
-  font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 800;
-  color: var(--color-ink);
-}
-.stat-detail{
-  margin-top: 4px;
-  font-size: 12px;
-  color: var(--color-ink);
-  opacity: .7;
-  font-weight: 500;
-}
-
-/* ==========================================================
-   最近評論區 (全新的膠囊藥丸 Tabs 與對話卡片)
-   ========================================================== */
-.review-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 24px;
-}
-.review-tabs button, .review-tabs .tab-btn {
-  border: 1.5px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-ink);
-  font-family: var(--font-body);
-  font-weight: 800;
-  font-size: 13px;
-  padding: 8px 18px;
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: transform .15s ease, background .15s ease, border-color .15s ease;
-}
-.review-tabs button:hover, .review-tabs .tab-btn:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-ink);
-}
-.review-tabs button.active, .review-tabs .tab-btn.active {
-  background: var(--color-ink);
-  color: #fff;
-  border-color: var(--color-ink);
-}
-
-.reviews-container {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.review-item {
-  background: var(--color-surface-soft);
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 18px 22px;
-  position: relative;
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transition: transform .15s ease;
-}
-.review-item:hover {
-  transform: translateY(-2px);
-}
-.review-item p {
-  margin: 0;
-  font-size: 14.5px;
-  color: var(--color-ink);
-  font-weight: 500;
-  line-height: 1.6;
-}
-
-.review-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 12.5px;
-  border-top: 1px dashed var(--color-border);
-  padding-top: 10px;
-  margin-top: 4px;
-}
-.review-stars {
-  color: var(--color-yellow-deep);
-  font-weight: 800;
-  font-size: 13px;
-}
-.review-date {
-  color: var(--color-ink-soft);
-}
-.review-badge {
-  font-size: 11px;
-  font-weight: 800;
-  padding: 3px 10px;
-  border-radius: 6px;
-  border: 1.2px solid var(--color-ink);
-}
-/* 卡片身份色彩配對 */
-.review-badge.role-seller { background: var(--color-blue); }
-.review-badge.role-buyer { background: var(--color-pink); }
-.review-badge.role-host { background: var(--color-green); }
-.review-badge.role-venue { background: var(--color-yellow); }
-
-.no-reviews{
-  padding: 40px 20px;
-  text-align: center;
-  color: var(--color-ink-soft);
-  background: var(--color-surface-soft);
-  border: 1.5px dashed var(--color-border);
-  border-radius: var(--radius-lg);
-}
-
-/* ==========================================================
-   RWD 卡片排版 (完全套用首頁與上一個風格)
-   ========================================================== */
-.card-grid{
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 20px;
-  align-items: stretch;
-}
-
-.item-card{
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  transition: transform .2s ease, box-shadow .2s ease;
-  display: flex;
-  position: relative;
-  flex-direction: column;
-  height: 100%;
-}
-.item-card:hover{ transform: translateY(-6px); box-shadow: var(--shadow-md); }
-
-.item-card > a{
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  text-decoration: none;
-  color: inherit;
-}
-
-.item-card__thumb-wrap{
-  width: 100%;
-  height: 160px;
-  overflow: hidden;
-  background: var(--color-surface-soft);
-}
-.item-card__thumb-wrap img{
-  width: 100%; height: 100%;
-  object-fit: cover; display: block;
-  transition: transform .35s ease;
-}
-.item-card:hover .item-card__thumb-wrap img{ transform: scale(1.06); }
-
-.item-card__body{
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  padding: 16px;
-}
-
-/* 帶有定位狀態徽章的卡片主體 */
-.item-card__body--status{
-  padding-top: 36px;
-}
-
-.item-card__title{
-  font-size: 15px;
-  font-weight: 800;
-  text-align: left;
-  margin-bottom: 6px;
-  margin-top: 0;
-  line-height: 1.4;
-}
-
-.item-card__desc{
-  margin-top: 0;
-  margin-bottom: 8px;
-  font-size: 13px;
-  color: var(--color-ink-soft);
-  font-weight: 400;
-  text-align: left;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.item-card__price{
-  display: block;
-  text-align: left;
-  font-weight: 800;
-  font-size: 14px;
-  color: var(--color-ink);
-  margin: auto 0 8px;
-}
-
-/* 卡片底部 */
-.item-card__footer{
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: auto;
-  padding-top: 12px;
-  border-top: 1px dashed var(--color-border);
-}
-
-.item-card__date{
-  font-size: 12px;
-  color: var(--color-ink-soft);
-}
-
-.item-card__detail-btn{
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 800;
-  color: var(--color-ink);
-  background: var(--color-yellow);
-  padding: 4px 12px;
-  border-radius: var(--radius-full);
-  white-space: nowrap;
-  transition: background .15s ease, transform .15s ease;
-}
-.item-card:hover .item-card__detail-btn{
-  background: var(--color-yellow-deep);
-  transform: translateX(2px);
-}
-
-/* 狀態徽章 */
-.status-badge {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  font-size: 10.5px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  padding: 4px 10px;
-  border-radius: 8px;
-  white-space: nowrap;
-  z-index: 2;
-}
-.status-badge--ongoing{ background: var(--color-green); color: var(--color-ink); }
-.status-badge--delayed{ background: var(--color-yellow-deep); color: var(--color-ink); }
-.status-badge--cancel{  background: var(--color-pink); color: var(--color-ink); }
-
-.no-items{
-  grid-column: 1 / -1;
-  padding: 46px 20px;
-  text-align: center;
-  color: var(--color-ink-soft);
-  background: var(--color-surface-soft);
-  border: 1.5px dashed var(--color-border);
-  border-radius: var(--radius-lg);
-}
-
-/* ==========================================================
-   分頁
-   ========================================================== */
-.pagination{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 26px;
-}
-.pagination button{
-  border: none;
-  cursor: pointer;
-  font-family: var(--font-body);
-  font-weight: 800;
-  font-size: 13px;
-  padding: 8px 18px;
-  border-radius: var(--radius-full);
-  background: var(--color-ink);
-  color: #fff;
-  transition: transform .15s ease, background .15s ease;
-}
-.pagination button:hover{ transform: translateY(-2px); background: var(--color-yellow-deep); color: var(--color-ink); }
-.pagination button:disabled{ opacity: .4; cursor: not-allowed; transform: none; }
-
-.page-info{
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--color-ink-soft);
-}
-
-/* ==========================================================
-   RWD
-   ========================================================== */
-@media (max-width: 760px){
-  .profile-header{ flex-direction: column; text-align: center; padding-top: 40px; }
-  .member-name-container { justify-content: center; }
-  .member-contact { align-items: center; }
-  .action-buttons { justify-content: center; }
-  .rating-stats{ grid-template-columns: repeat(2, 1fr); }
-  .card-grid{ grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); }
-  .review-tabs { justify-content: center; }
-}
+		
+		@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+		
+		:root{
+		  --color-bg:            #F7F3EC;
+		  --color-surface:       #FFFFFF;
+		  --color-surface-soft:  #FFFDF8;
+		  --color-ink:           #17140F;
+		  --color-ink-soft:      #726A5F;
+		  --color-border:        #ECE4D6;
+		
+		  --color-yellow:       #FFE59A;
+		  --color-yellow-deep:  #FFC94D;
+		  --color-pink:         #FFB5C1;
+		  --color-green:        #B7E1D1;
+		  --color-blue:         #A9D3FF;
+		
+		  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+		  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+		
+		  --radius-lg: 26px;
+		  --radius-md: 16px;
+		  --radius-full: 999px;
+		
+		  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+		  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+		
+		  --nav-height: 76px;
+		}
+		
+		*{ box-sizing: border-box; }
+		
+		body{
+		  margin:0;
+		  font-family: var(--font-body);
+		  background: var(--color-bg);
+		  color: var(--color-ink);
+		  line-height: 1.6;
+		  -webkit-font-smoothing: antialiased;
+		}
+		
+		h1,h2,h3,h4{ font-family: var(--font-display); margin:0; }
+		img{ max-width:100%; }
+		
+		/* ==========================================================
+		   版面容器
+		   ========================================================== */
+		.container{
+		  max-width: 1100px;
+		  margin: 0 auto;
+		  padding: calc(var(--nav-height) + 40px) 20px 60px;
+		}
+		
+		/* ==========================================================
+		   頭部檔案卡
+		   ========================================================== */
+		.profile-header{
+		  position: relative; /* 確保檢舉按鈕能定位在右上方 */
+		  display: flex;
+		  align-items: center;
+		  gap: 36px;
+		  background: var(--color-surface);
+		  border: 1px solid var(--color-border);
+		  border-radius: var(--radius-lg);
+		  box-shadow: var(--shadow-sm);
+		  padding: 42px 36px;
+		  margin-bottom: 24px;
+		}
+		
+		.profile-avatar{ flex-shrink: 0; }
+		.avatar-img{
+		  width: 120px;
+		  height: 120px;
+		  object-fit: cover;
+		  border-radius: 50%;
+		  border: 3px solid var(--color-surface);
+		  box-shadow: var(--shadow-md);
+		  background: var(--color-surface-soft);
+		}
+		
+		.profile-info{ flex: 1; }
+		
+		/* 名字與身份標章 Flex 排列 */
+		.member-name-container {
+		  display: flex;
+		  align-items: center;
+		  gap: 12px;
+		  flex-wrap: wrap;
+		}
+		
+		.member-name{
+		  font-size: 26px;
+		  font-weight: 800;
+		  letter-spacing: 0.5px;
+		}
+		
+		/* 活潑的小尺寸身分標章（帶有 Neo-brutalism 的活潑小黑邊） */
+		.status-badge-mini{
+		  display: inline-flex;
+		  align-items: center;
+		  padding: 4px 10px;
+		  border-radius: var(--radius-full);
+		  font-size: 11px;
+		  font-weight: 800;
+		  letter-spacing: 0.5px;
+		}
+		.status-badge-mini.status0 { background: var(--color-yellow); color: var(--color-ink); }      /* 未認證 */
+		.status-badge-mini.status1 { background: var(--color-green); color: var(--color-ink); }       /* 已認證 */
+		.status-badge-mini.status3 { background: var(--color-pink); color: var(--color-ink); }        /* 停權 */
+		.status-badge-mini.status4 { background: var(--color-yellow-deep); color: var(--color-ink); } /* 限制參加活動 */
+		
+		.member-contact{
+		  display: flex;
+		  flex-direction: column;
+		  gap: 6px;
+		  margin-top: 10px;
+		}
+		.contact-item{
+		  display: flex;
+		  align-items: center;
+		  gap: 8px;
+		  font-size: 13.5px;
+		  color: var(--color-ink-soft);
+		}
+		.contact-icon{ font-size: 15px; }
+		
+		/* ==========================================================
+		   操作按鈕（傳送訊息 / 檢舉）
+		   ========================================================== */
+		.action-buttons{ display: flex; gap: 12px; }
+		
+		.btn{
+		  display: inline-flex;
+		  align-items: center;
+		  gap: 8px;
+		  border: none;
+		  cursor: pointer;
+		  font-family: var(--font-body);
+		  font-weight: 800;
+		  font-size: 14px;
+		  padding: 10px 22px;
+		  border-radius: var(--radius-full);
+		  transition: transform .18s ease, box-shadow .18s ease, background .15s ease;
+		}
+		.btn-primary{
+		  background: var(--color-ink);
+		  color: #fff;
+		  box-shadow: var(--shadow-sm);
+		}
+		.btn-primary:hover{ transform: translateY(-2px); box-shadow: var(--shadow-md); background: var(--color-yellow-deep); color: var(--color-ink); }
+		
+		/* 右上角細緻檢舉按鈕 (紅底60%透明、紅字) */
+		.btn-report {
+		  position: absolute;
+		  top: 24px;
+		  right: 24px;
+		  background: rgba(255, 77, 79, 0.6) !important;
+		  color: #8c0000 !important;
+		  font-size: 12px !important;
+		  padding: 6px 14px !important;
+		  border-radius: var(--radius-full) !important;
+		  font-weight: 800 !important;
+		  border: 1.5px solid rgba(255, 77, 79, 0.2) !important;
+		  box-shadow: none !important;
+		  transition: transform .15s ease, background .15s ease !important;
+		}
+		.btn-report:hover {
+		  color: white;
+		  background: rgba(255, 77, 79, 0.75) !important;
+		}
+		
+		/* ==========================================================
+		   通用區塊卡片
+		   ========================================================== */
+		.section{
+		  background: var(--color-surface);
+		  border: 1px solid var(--color-border);
+		  border-radius: var(--radius-lg);
+		  box-shadow: var(--shadow-sm);
+		  padding: 32px 36px;
+		  margin-bottom: 24px;
+		}
+		
+		.section-title{
+		  font-size: 20px;
+		  font-weight: 800;
+		  position: relative;
+		  padding-left: 18px;
+		  margin-bottom: 24px;
+		}
+		.section-title::before{
+		  content:'';
+		  position: absolute;
+		  left:0; top:50%;
+		  transform: translateY(-50%);
+		  width: 10px; height: 10px;
+		  border-radius: 50%;
+		  background: var(--color-yellow-deep);
+		}
+		
+		.intro-text{
+		  color: var(--color-ink-soft);
+		  font-size: 14.5px;
+		  line-height: 1.9;
+		}
+		
+		/* ==========================================================
+		   評分統計
+		   ========================================================== */
+		.rating-stats{
+		  display: grid;
+		  grid-template-columns: repeat(4, 1fr);
+		  gap: 16px;
+		}
+		
+		.stat-card{
+		  border-radius: var(--radius-md);
+		  padding: 20px 16px;
+		  text-align: center;
+		  transition: transform .2s ease;
+		  border: 1px solid var(--color-border);
+		}
+		.stat-card:hover{ transform: translateY(-4px); }
+		.stat-card.service{  background: var(--color-pink); }
+		.stat-card.servicer{ background: var(--color-blue); }
+		.stat-card.activity{ background: var(--color-green); }
+		.stat-card.hold{      background: var(--color-yellow); }
+		
+		.stat-label{
+		  font-size: 12.5px;
+		  font-weight: 800;
+		  color: var(--color-ink);
+		  opacity: .8;
+		  margin-bottom: 8px;
+		}
+		.stat-number{
+		  font-family: var(--font-display);
+		  font-size: 22px;
+		  font-weight: 800;
+		  color: var(--color-ink);
+		}
+		.stat-detail{
+		  margin-top: 4px;
+		  font-size: 12px;
+		  color: var(--color-ink);
+		  opacity: .7;
+		  font-weight: 500;
+		}
+		
+		/* ==========================================================
+		   最近評論區 (全新的膠囊藥丸 Tabs 與對話卡片)
+		   ========================================================== */
+		.review-tabs {
+		  display: flex;
+		  flex-wrap: wrap;
+		  gap: 10px;
+		  margin-bottom: 24px;
+		}
+		.review-tabs button, .review-tabs .tab-btn {
+		  border: 1.5px solid var(--color-border);
+		  background: var(--color-surface);
+		  color: var(--color-ink);
+		  font-family: var(--font-body);
+		  font-weight: 800;
+		  font-size: 13px;
+		  padding: 8px 18px;
+		  border-radius: var(--radius-full);
+		  cursor: pointer;
+		  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+		}
+		.review-tabs button:hover, .review-tabs .tab-btn:hover {
+		  transform: translateY(-2px);
+		  border-color: var(--color-ink);
+		}
+		.review-tabs button.active, .review-tabs .tab-btn.active {
+		  background: var(--color-ink);
+		  color: #fff;
+		  border-color: var(--color-ink);
+		}
+		
+		.reviews-container {
+		  display: flex;
+		  flex-direction: column;
+		  gap: 14px;
+		}
+		.review-item {
+		  background: var(--color-surface-soft);
+		  border: 1.5px solid var(--color-border);
+		  border-radius: var(--radius-md);
+		  padding: 18px 22px;
+		  position: relative;
+		  box-shadow: var(--shadow-sm);
+		  display: flex;
+		  flex-direction: column;
+		  gap: 8px;
+		  transition: transform .15s ease;
+		}
+		.review-item:hover {
+		  transform: translateY(-2px);
+		}
+		.review-item p {
+		  margin: 0;
+		  font-size: 14.5px;
+		  color: var(--color-ink);
+		  font-weight: 500;
+		  line-height: 1.6;
+		}
+		
+		.review-meta {
+		  display: flex;
+		  align-items: center;
+		  justify-content: space-between;
+		  flex-wrap: wrap;
+		  gap: 8px;
+		  font-size: 12.5px;
+		  border-top: 1px dashed var(--color-border);
+		  padding-top: 10px;
+		  margin-top: 4px;
+		}
+		.review-stars {
+		  color: var(--color-yellow-deep);
+		  font-weight: 800;
+		  font-size: 13px;
+		}
+		.review-date {
+		  color: var(--color-ink-soft);
+		}
+		.review-badge {
+		  font-size: 11px;
+		  font-weight: 800;
+		  padding: 3px 10px;
+		  border-radius: 6px;
+		}
+		/* 卡片身份色彩配對 */
+		.review-badge.role-seller { background: var(--color-blue); }
+		.review-badge.role-buyer { background: var(--color-pink); }
+		.review-badge.role-host { background: var(--color-green); }
+		.review-badge.role-venue { background: var(--color-yellow); }
+		
+		.no-reviews{
+		  padding: 40px 20px;
+		  text-align: center;
+		  color: var(--color-ink-soft);
+		  background: var(--color-surface-soft);
+		  border: 1.5px dashed var(--color-border);
+		  border-radius: var(--radius-lg);
+		}
+		
+		/* ==========================================================
+		   全新 RWD 卡片排版 (完全套用首頁 item-card)
+		   ========================================================== */
+		.card-grid{
+		  display: grid;
+		  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+		  gap: 20px;
+		  align-items: stretch;
+		}
+		
+		.item-card{
+		  background: var(--color-surface);
+		  border: 1px solid var(--color-border);
+		  border-radius: var(--radius-lg);
+		  box-shadow: var(--shadow-sm);
+		  overflow: hidden;
+		  transition: transform .2s ease, box-shadow .2s ease;
+		  display: flex;
+		  position: relative;
+		  flex-direction: column;
+		  height: 100%;
+		}
+		.item-card:hover{ transform: translateY(-6px); box-shadow: var(--shadow-md); }
+		
+		.item-card > a{
+		  display: flex;
+		  flex-direction: column;
+		  flex-grow: 1;
+		  text-decoration: none;
+		  color: inherit;
+		}
+		
+		.item-card__thumb-wrap{
+		  width: 100%;
+		  height: 160px;
+		  overflow: hidden;
+		  background: var(--color-surface-soft);
+		}
+		.item-card__thumb-wrap img{
+		  width: 100%; height: 100%;
+		  object-fit: cover; display: block;
+		  transition: transform .35s ease;
+		}
+		.item-card:hover .item-card__thumb-wrap img{ transform: scale(1.06); }
+		
+		.item-card__body{
+		  display: flex;
+		  flex-direction: column;
+		  flex-grow: 1;
+		  padding: 16px;
+		}
+		
+		/* 帶有活動狀態徽章的 Body 需要多上方內距 */
+		.item-card__body--status{
+		  padding-top: 36px;
+		}
+		
+		.item-card__title{
+		  font-size: 15px;
+		  font-weight: 800;
+		  text-align: left;
+		  margin-bottom: 6px;
+		  margin-top: 0;
+		  line-height: 1.4;
+		}
+		
+		.item-card__desc{
+		  margin-top: 0;
+		  margin-bottom: 8px;
+		  font-size: 13px;
+		  color: var(--color-ink-soft);
+		  font-weight: 400;
+		  text-align: left;
+		  display: -webkit-box;
+		  -webkit-line-clamp: 2;
+		  -webkit-box-orient: vertical;
+		  overflow: hidden;
+		}
+		
+		.item-card__price{
+		  display: block;
+		  text-align: left;
+		  font-weight: 800;
+		  font-size: 14px;
+		  color: var(--color-ink);
+		  margin: auto 0 8px; 
+		}
+		
+		/* 卡片底部 (包含時間/查看詳情按鈕) */
+		.item-card__footer{
+		  width: 100%;
+		  display: flex;
+		  justify-content: space-between;
+		  align-items: center;
+		  margin-top: auto;
+		  padding-top: 12px;
+		  border-top: 1px dashed var(--color-border);
+		}
+		
+		.item-card__date{
+		  font-size: 12px;
+		  color: var(--color-ink-soft);
+		}
+		
+		.item-card__detail-btn{
+		  display: inline-flex;
+		  align-items: center;
+		  gap: 6px;
+		  font-size: 12px;
+		  font-weight: 800;
+		  color: var(--color-ink);
+		  background: var(--color-yellow);
+		  padding: 4px 12px;
+		  border-radius: var(--radius-full);
+		  white-space: nowrap;
+		  transition: background .15s ease, transform .15s ease;
+		}
+		.item-card:hover .item-card__detail-btn{
+		  background: var(--color-yellow-deep);
+		  transform: translateX(2px);
+		}
+		
+		/* 活動 / 場地卡片上的定位徽章 */
+		.status-badge {
+		  position: absolute;
+		  top: 12px;
+		  right: 12px;
+		  font-size: 10.5px;
+		  font-weight: 800;
+		  letter-spacing: 0.5px;
+		  padding: 4px 10px;
+		  border-radius: 8px;
+		  white-space: nowrap;
+		  z-index: 2;
+		}
+		.status-badge--cancel{  background: var(--color-pink); color: var(--color-ink); }
+		.status-badge--ongoing{ background: var(--color-green); color: var(--color-ink); }
+		.status-badge--delayed{ background: var(--color-yellow-deep); color: var(--color-ink); }
+		
+		.no-items{
+		  grid-column: 1 / -1;
+		  padding: 46px 20px;
+		  text-align: center;
+		  color: var(--color-ink-soft);
+		  background: var(--color-surface-soft);
+		  border: 1.5px dashed var(--color-border);
+		  border-radius: var(--radius-lg);
+		}
+		
+		/* ==========================================================
+		   分頁按鈕
+		   ========================================================== */
+		.pagination{
+		  display: flex;
+		  align-items: center;
+		  justify-content: center;
+		  gap: 16px;
+		  margin-top: 26px;
+		}
+		.pagination button{
+		  border: none;
+		  cursor: pointer;
+		  font-family: var(--font-body);
+		  font-weight: 800;
+		  font-size: 13px;
+		  padding: 8px 18px;
+		  border-radius: var(--radius-full);
+		  background: var(--color-ink);
+		  color: #fff;
+		  transition: transform .15s ease, background .15s ease;
+		}
+		.pagination button:hover{ transform: translateY(-2px); background: var(--color-yellow-deep); color: var(--color-ink); }
+		.pagination button:disabled{ opacity: .4; cursor: not-allowed; transform: none; }
+		
+		.page-info{
+		  font-size: 13px;
+		  font-weight: 800;
+		  color: var(--color-ink-soft);
+		}
+		
+		/* ==========================================================
+		   RWD
+		   ========================================================== */
+		@media (max-width: 760px){
+		  .profile-header{ flex-direction: column; text-align: center; padding-top: 64px; }
+		  .member-name-container { justify-content: center; }
+		  .member-contact { align-items: center; }
+		  .action-buttons { justify-content: center; }
+		  .rating-stats{ grid-template-columns: repeat(2, 1fr); }
+		  .card-grid{ grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); }
+		  .btn-report { top: 16px; right: 16px; }
+		}

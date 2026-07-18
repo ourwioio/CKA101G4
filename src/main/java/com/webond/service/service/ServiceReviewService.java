@@ -68,6 +68,8 @@ public class ServiceReviewService {
 				throw new IllegalArgumentException("已評價過此訂單");
 			}
 			serviceReviewRepository.submitBuyerReview(orderId, dto.getRate(), dto.getComment(), now);
+			memberRepository.addServicerRating(order.getSellerMemberId(), java.math.BigDecimal.valueOf(dto.getRate())); // 新增
+
  
 			// 通知賣方：買方已完成評價
 			notifyReviewSubmitted(order.getSellerMemberId());
@@ -82,6 +84,8 @@ public class ServiceReviewService {
 				throw new IllegalArgumentException("已評價過此訂單");
 			}
 			serviceReviewRepository.submitsellerReview(orderId, dto.getRate(), dto.getComment(), now);
+			memberRepository.addServiceRating(order.getBuyerMemberId(), java.math.BigDecimal.valueOf(dto.getRate())); // 新增
+
  
 			// 通知買方：賣方已完成評價
 			notifyReviewSubmitted(order.getBuyerMemberId());

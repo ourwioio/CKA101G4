@@ -8,10 +8,342 @@
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/member/profileEdit.css}">
   <style>
-/* ==========================================================
-   Webond 會員個人檔案頁 — 圓潤角色風 (cream / ink / pastel blobs)
-   ========================================================== */
-
+	/* ==========================================================
+	   Webond 會員個人檔案頁 — 圓潤角色風 (cream / ink / pastel blobs)
+	   ========================================================== */
+	@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+	
+	:root{
+	  --color-bg:            #F7F3EC;
+	  --color-surface:       #FFFFFF;
+	  --color-surface-soft:  #FFFDF8;
+	  --color-ink:           #17140F;
+	  --color-ink-soft:      #726A5F;
+	  --color-border:        #ECE4D6;
+	
+	  --color-yellow:       #FFE59A;
+	  --color-yellow-deep:  #FFC94D;
+	  --color-pink:         #FFB5C1;
+	  --color-green:        #B7E1D1;
+	  --color-blue:         #A9D3FF;
+	
+	  --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+	  --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+	
+	  --radius-lg: 26px;
+	  --radius-md: 16px;
+	  --radius-full: 999px;
+	
+	  --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+	  --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+	
+	  --nav-height: 76px;
+	}
+	
+	*{ box-sizing: border-box; }
+	
+	body{
+	  margin:0;
+	  font-family: var(--font-body);
+	  background: var(--color-bg);
+	  color: var(--color-ink);
+	  line-height: 1.6;
+	  -webkit-font-smoothing: antialiased;
+	}
+	
+	h1,h2,h3,h4{ font-family: var(--font-display); margin:0; }
+	img{ max-width:100%; }
+	
+	/* ==========================================================
+	   版面基本容器
+	   ========================================================== */
+	.container{
+	  max-width: 1100px;
+	  margin: 0 auto;
+	  padding: calc(var(--nav-height) + 40px) 20px 60px;
+	}
+	
+	/* ==========================================================
+	   頭部檔案卡與通訊資料
+	   ========================================================== */
+	.profile-header{
+	  display: flex;
+	  align-items: center;
+	  gap: 36px;
+	  background: var(--color-surface);
+	  border: 1px solid var(--color-border);
+	  border-radius: var(--radius-lg);
+	  box-shadow: var(--shadow-sm);
+	  padding: 42px 36px;
+	  margin-bottom: 24px;
+	}
+	
+	.profile-avatar{ flex-shrink: 0; }
+	.avatar-img{
+	  width: 120px;
+	  height: 120px;
+	  object-fit: cover;
+	  border-radius: 50%;
+	  border: 3px solid var(--color-surface);
+	  box-shadow: var(--shadow-md);
+	  background: var(--color-surface-soft);
+	}
+	
+	.profile-info{ flex: 1; }
+	
+	.member-name-container {
+	  display: flex;
+	  align-items: center;
+	  gap: 12px;
+	  flex-wrap: wrap;
+	}
+	
+	.member-name{
+	  font-size: 26px;
+	  font-weight: 800;
+	  letter-spacing: 0.5px;
+	}
+	
+	.member-status {
+	  display: inline-flex;
+	  align-items: center;
+	}
+	
+	.status-badge-mini{
+	  display: inline-flex;
+	  align-items: center;
+	  padding: 4px 12px;
+	  border-radius: var(--radius-full);
+	  font-size: 11px;
+	  font-weight: 800;
+	  letter-spacing: 0.5px;
+	}
+	.status-badge-mini.status0 { background: var(--color-pink); color: var(--color-ink); }
+	.status-badge-mini.status1 { background: var(--color-green); color: var(--color-ink); }
+	.status-badge-mini.status3 { background: var(--color-ink); color: #fff; }
+	.status-badge-mini.status4 { background: var(--color-yellow-deep); color: var(--color-ink); }
+	
+	.member-contact{
+	  display: flex;
+	  flex-direction: column;
+	  gap: 6px;
+	  margin-top: 12px;
+	}
+	.contact-item{
+	  display: flex;
+	  align-items: center;
+	  gap: 8px;
+	  font-size: 13.5px;
+	  color: var(--color-ink-soft);
+	  font-weight: 500;
+	}
+	
+	/* ==========================================================
+	   動作按鈕（大膠囊設計組）
+	   ========================================================== */
+	.action-buttons{ display: flex; gap: 12px; margin-top: 20px; }
+	
+	.btn{
+	  display: inline-flex;
+	  align-items: center;
+	  justify-content: center;
+	  gap: 8px;
+	  border: none;
+	  cursor: pointer;
+	  font-family: var(--font-body);
+	  font-weight: 800;
+	  font-size: 13.5px;
+	  padding: 10px 24px;
+	  border-radius: var(--radius-full);
+	  transition: transform .18s ease, box-shadow .18s ease, background .15s ease, border-color .15s ease;
+	  text-decoration: none;
+	}
+	/* 編輯資料：黑色高亮膠囊 */
+	.btn-primary{
+	  background: var(--color-ink);
+	  color: #fff;
+	  box-shadow: var(--shadow-sm);
+	}
+	.btn-primary:hover{ 
+	  transform: translateY(-2px); 
+	  box-shadow: var(--shadow-md); 
+	  background: var(--color-yellow-deep); 
+	  color: var(--color-ink); 
+	}
+	/* 登出按鈕：優雅邊框奶油白 */
+	.btn-edit {
+	  background: var(--color-surface);
+	  color: var(--color-ink);
+	  border: 1.5px solid var(--color-border);
+	  box-shadow: var(--shadow-sm);
+	}
+	.btn-edit:hover {
+	  transform: translateY(-2px);
+	  border-color: var(--color-ink);
+	  box-shadow: var(--shadow-md);
+	  background: var(--color-surface-soft);
+	}
+	
+	/* ==========================================================
+	   通用基礎區塊卡片
+	   ========================================================== */
+	.section{
+	  background: var(--color-surface);
+	  border: 1px solid var(--color-border);
+	  border-radius: var(--radius-lg);
+	  box-shadow: var(--shadow-sm);
+	  padding: 32px 36px;
+	  margin-bottom: 24px;
+	}
+	
+	.section-title{
+	  font-size: 20px;
+	  font-weight: 800;
+	  position: relative;
+	  padding-left: 18px;
+	  margin-bottom: 24px;
+	}
+	.section-title::before{
+	  content:''; position: absolute; left:0; top:50%; transform: translateY(-50%);
+	  width: 10px; height: 10px; border-radius: 50%; background: var(--color-yellow-deep);
+	}
+	
+	.intro-text{
+	  color: var(--color-ink-soft);
+	  font-size: 14.5px;
+	  line-height: 1.9;
+	  font-weight: 500;
+	}
+	
+	/* ==========================================================
+	   🌟 評分統計 (完美切換為 3 欄式極致尺寸)
+	   ========================================================== */
+	.rating-stats{
+	  display: grid;
+	  grid-template-columns: repeat(3, 1fr); /* 🚀 強制設定為完美 3 欄 */
+	  gap: 20px;
+	}
+	
+	.stat-card{
+	  border-radius: var(--radius-md);
+	  padding: 24px 18px; /* 🚀 優化上下高度增強氣勢 */
+	  text-align: center;
+	  transition: transform .2s ease, box-shadow .2s ease;
+	  border: 1.5px solid var(--color-border);
+	  box-shadow: var(--shadow-sm);
+	}
+	.stat-card:hover{ 
+	  transform: translateY(-4px); 
+	  box-shadow: var(--shadow-md); 
+	}
+	.stat-card.service{  background: var(--color-pink); }
+	.stat-card.servicer{ background: var(--color-blue); }
+	.stat-card.hold{     background: var(--color-yellow); }
+	
+	.stat-label{
+	  font-size: 13px;
+	  font-weight: 800;
+	  color: var(--color-ink);
+	  opacity: .9;
+	  margin-bottom: 10px;
+	}
+	.stat-number{
+	  font-family: var(--font-display);
+	  font-size: 24px; /* 🚀 數字顯眼放大 */
+	  font-weight: 800;
+	  color: var(--color-ink);
+	  line-height: 1.2;
+	}
+	.stat-detail{
+	  margin-top: 6px;
+	  font-size: 12.5px;
+	  color: var(--color-ink);
+	  opacity: .75;
+	  font-weight: 700;
+	}
+	
+	/* ==========================================================
+	   最近評論、卡片網格與分頁元件
+	   ========================================================== */
+	.review-tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+	.review-tabs .tab-btn {
+	  border: 1.5px solid var(--color-border); background: var(--color-surface); color: var(--color-ink);
+	  font-family: var(--font-body); font-weight: 800; font-size: 13px; padding: 8px 18px;
+	  border-radius: var(--radius-full); cursor: pointer; transition: all .15s ease;
+	}
+	.review-tabs .tab-btn:hover { transform: translateY(-2px); border-color: var(--color-ink); }
+	.review-tabs .tab-btn.active { background: var(--color-ink); color: #fff; border-color: var(--color-ink); }
+	
+	.reviews-container { display: flex; flex-direction: column; gap: 14px; }
+	.review-item {
+	  background: var(--color-surface-soft); border: 1.5px solid var(--color-border); border-radius: var(--radius-md);
+	  padding: 18px 22px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; gap: 8px; transition: transform .15s ease;
+	}
+	.review-item:hover { transform: translateY(-2px); }
+	.review-item p { margin: 0; font-size: 14.5px; color: var(--color-ink); font-weight: 500; }
+	.review-meta {
+	  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+	  font-size: 12.5px; border-top: 1px dashed var(--color-border); padding-top: 10px;
+	}
+	.review-stars { color: var(--color-yellow-deep); font-weight: 800; }
+	.review-badge { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px; }
+	.review-badge.role-seller { background: var(--color-blue); }
+	.review-badge.role-buyer { background: var(--color-pink); }
+	.review-badge.role-host { background: var(--color-green); }
+	.review-badge.role-venue { background: var(--color-yellow); }
+	.no-reviews {
+	  padding: 40px 20px; text-align: center; color: var(--color-ink-soft);
+	  background: var(--color-surface-soft); border: 1.5px dashed var(--color-border); border-radius: var(--radius-lg);
+	}
+	
+	.card-grid{ display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 20px; }
+	.item-card{
+	  background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+	  box-shadow: var(--shadow-sm); overflow: hidden; transition: all .2s ease; display: flex; position: relative; flex-direction: column; height: 100%;
+	}
+	.item-card:hover{ transform: translateY(-6px); box-shadow: var(--shadow-md); }
+	.item-card > a{ display: flex; flex-direction: column; flex-grow: 1; }
+	.item-card__thumb-wrap{ width: 100%; height: 160px; overflow: hidden; background: var(--color-surface-soft); }
+	.item-card__thumb-wrap img{ width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+	.item-card:hover .item-card__thumb-wrap img{ transform: scale(1.06); }
+	.item-card__body{ display: flex; flex-direction: column; flex-grow: 1; padding: 16px; }
+	.item-card__body--status{ padding-top: 36px; }
+	.item-card__title{ font-size: 15px; font-weight: 800; margin-bottom: 6px; margin-top: 0; }
+	.item-card__desc{
+	  margin-bottom: 8px; font-size: 13px; color: var(--color-ink-soft); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+	}
+	.item-card__price{ font-weight: 800; font-size: 14px; color: var(--color-ink); margin: auto 0 8px; }
+	.item-card__footer{ width: 100%; display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 12px; border-top: 1px dashed var(--color-border); }
+	.item-card__date{ font-size: 12px; color: var(--color-ink-soft); }
+	.item-card__detail-btn{ font-size: 12px; font-weight: 800; background: var(--color-yellow); padding: 4px 12px; border-radius: var(--radius-full); transition: all .15s ease; }
+	.item-card:hover .item-card__detail-btn{ background: var(--color-yellow-deep); transform: translateX(2px); }
+	
+	.status-badge { position: absolute; top: 12px; right: 12px; font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 8px; z-index: 2; }
+	.status-badge--cancel{  background: var(--color-pink); color: var(--color-ink); }
+	.status-badge--ongoing{ background: var(--color-green); color: var(--color-ink); }
+	.status-badge--delayed{ background: var(--color-yellow-deep); color: var(--color-ink); }
+	.no-items{ grid-column: 1 / -1; padding: 46px 20px; text-align: center; color: var(--color-ink-soft); background: var(--color-surface-soft); border: 1.5px dashed var(--color-border); border-radius: var(--radius-lg); }
+	
+	.pagination{ display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 26px; }
+	.pagination button{ border: none; cursor: pointer; font-family: var(--font-body); font-weight: 800; font-size: 13px; padding: 8px 18px; border-radius: var(--radius-full); background: var(--color-ink); color: #fff; transition: all .15s ease; }
+	.pagination button:hover{ transform: translateY(-2px); background: var(--color-yellow-deep); color: var(--color-ink); }
+	.pagination button:disabled{ opacity: .4; cursor: not-allowed; transform: none; }
+	.page-info{ font-size: 13px; font-weight: 800; color: var(--color-ink-soft); }
+	
+	/* ==========================================================
+	   RWD 斷點設定
+	   ========================================================== */
+	@media (max-width: 760px){
+	  .profile-header{ flex-direction: column; text-align: center; padding-top: 64px; }
+	  .member-name-container { justify-content: center; }
+	  .member-contact { align-items: center; }
+	  .action-buttons { justify-content: center; }
+	  
+	  /* 🚀 手機端防擠壓：三欄自動重塑為單欄滿版 */
+	  .rating-stats{ grid-template-columns: 1fr; gap: 14px; }
+	  
+	  .card-grid{ grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); }
+	}
   </style>
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 </head>
@@ -77,7 +409,7 @@
       <p class="intro-text" th:text="${memberVO.memberIntro}"></p>
     </div>
 
-    <!-- ========== 評分統計卡片 ========== -->
+    <!-- ========== 評分統計卡片 (全新完工 3 欄式設計) ========== -->
     <div class="section">
       <h2 class="section-title">評分統計</h2>
       <div class="rating-stats">
@@ -94,14 +426,7 @@
           <div class="stat-number" th:text="${memberVO.servicerAvgRate} + ' / 5.0'"></div>
           <div class="stat-detail" th:text="'共 ' + ${memberVO.servicerRateCount} + ' 次評價'"></div>
         </div>
-
-        <!-- 參加活動評分 -->
-        <div class="stat-card activity">
-          <div class="stat-label">參加活動評分</div>
-          <div class="stat-number" th:text="${memberVO.actAvgRate} + ' / 5.0'"> </div>
-          <div class="stat-detail" th:text="'共 ' + ${memberVO.actRateCount} + ' 次評價'"></div>
-        </div>
-
+        
         <!-- 舉辦活動評分 -->
         <div class="stat-card hold">
           <div class="stat-label">舉辦活動評分</div>
@@ -131,13 +456,11 @@
           <div class="review-meta">
             <div>
               <span class="review-stars">
-				<!-- 根據評分數字，動態重複顯示對應數量的實心星星 -->
 				<th:block th:if="${review.rating != null and review.rating > 0}" 
 				          th:each="i : ${#numbers.sequence(1, review.rating)}">★</th:block>
 			  </span>
               <span class="review-date" style="margin-left: 10px;" th:text="${#temporals.format(review.reviewedAt, 'yyyy-MM-dd')}">2026-07-17</span>
             </div>
-            <!-- 角色與標籤顏色樣式匹配 -->
             <span class="review-badge" 
                   th:classappend="${review.role == 'AS_SERVICE_SELLER' or review.role == 'AS_SELLER' ? 'role-seller' : 
                                  (review.role == 'AS_SERVICE_BUYER' or review.role == 'AS_BUYER' ? 'role-buyer' :
@@ -149,7 +472,7 @@
         </div>
       </div>
 	
-      <!-- 評論專屬分頁按鈕 (超過五筆自動顯示) -->
+      <!-- 評論專屬分頁按鈕 -->
       <div class="pagination" id="reviewPagination" th:if="${!reviews.isEmpty()}">
         <button type="button" onclick="changeReviewPage(-1)" id="reviewPrevBtn">上一頁</button>
         <span class="page-info" id="reviewPageInfo">1 / 1</span>
@@ -186,7 +509,6 @@
         </div>
       </div>
 
-      <!-- 分頁按鈕 -->
       <div class="pagination" id="servicePagination" th:if="${serviceListData != null}">
         <button onclick="changePage('service', -1)" id="servicePrevBtn">上一頁</button>
         <span class="page-info" id="servicePageInfo">1 / 1</span>
@@ -205,8 +527,6 @@
             </div>
             <div class="item-card__body item-card__body--status">
               
-<!--               <span class="status-badge" th:text="${registrationStatusMap[activity.activityId]}">活動狀態</span> -->
-
               	<span class="status-badge"
 				      th:classappend="${
 				          registrationStatusMap[activity.activityId] == '即將截止'} ? 'status-badge--delayed' :
@@ -258,7 +578,6 @@
 
             <div class="item-card__body item-card__body--status">
               
-              <!-- 防彈級 String 比對解決方案（下架與上架） -->
               <span th:switch="${#strings.toString(venue.venueStatus)}">
                 <span th:case="0" class="status-badge status-badge--cancel">已下架</span>
                 <span th:case="1" class="status-badge status-badge--ongoing">上架中</span>
@@ -293,8 +612,6 @@
   </div>
   
   <script th:src="@{/js/front-end/member/profile.js}"></script>
-  <script>
-  </script>
 </body>
 
 </html>
