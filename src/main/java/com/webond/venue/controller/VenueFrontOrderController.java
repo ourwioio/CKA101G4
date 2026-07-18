@@ -90,8 +90,8 @@ public class VenueFrontOrderController {
 			result.rejectValue("bookDate", "error.venueOrderDTO", "無法預約過去的日期");
 		} else if (venueOrderDTO.getBookDate() != null && venueOrderDTO.getBookDate().isEqual(today)
 				&& venueOrderDTO.getStartHour() != null
-				&& venueOrderDTO.getStartHour() < LocalDateTime.now().getHour()) {
-			result.rejectValue("startHour", "error.venueOrderDTO", "無法預約今天已經過去的時段");
+				&& venueOrderDTO.getStartHour() <= LocalDateTime.now().getHour()) {
+			result.rejectValue("startHour", "error.venueOrderDTO", "今天只能預約現在時間的下一個小時之後的時段");
 		}
 
 		if (result.hasErrors()) {
