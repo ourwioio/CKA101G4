@@ -263,6 +263,12 @@ public class VenueFrontController {
 	    VenueVO venueVO = venueService.getOneVenue(venueId);
 	    model.addAttribute("venueVO", venueVO);
 
+	    MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+	    boolean isOwner = loginMember != null && venueVO.getMember().getMemberId().equals(loginMember.getMemberId());
+	    if (isOwner) {
+	        return "front-end/venue/update_venue_input";
+	    }
+	    
 	    List<VenueOrderVO> reviewList = venueOrderService.getReviewsByVenue(venueId);
 	    model.addAttribute("reviewList", reviewList);
 
