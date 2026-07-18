@@ -93,8 +93,16 @@ public class MemberControllerLoie {
 			}
 			session.setAttribute("memberVO", memberVO);
 			session.setAttribute("account", memberVO.getEmail());
+
+			// 🎯 修正：location 用過即丟，避免殘留到下一次登入
 			String location = (String) session.getAttribute("location");
-			return "redirect:" + (location != null ? location : "/");
+			session.removeAttribute("location");
+
+			// 🎯 修正：JSON API 網址（如通知輪詢 unread-count）不能當登入後的跳轉目標
+			if (location == null || location.contains("/unread-count") || location.contains("/api/")) {
+				location = "/";
+			}
+			return "redirect:" + location;
 		} else {
 			model.addAttribute("email", email);
 			model.addAttribute("errorMsgs", "您的帳號或密碼無效！");
