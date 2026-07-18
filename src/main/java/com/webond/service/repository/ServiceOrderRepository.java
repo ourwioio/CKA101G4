@@ -10,6 +10,9 @@ import com.webond.service.model.ServiceOrderVO;
 
 public interface ServiceOrderRepository
         extends JpaRepository<ServiceOrderVO, Integer> {
+	
+	//查詢給賣家的評價
+	List<ServiceOrderVO> findByServiceIdAndBuyerRateSellerIsNotNullOrderByBuyerReviewedAtDesc(Integer serviceId);
 
     // =========================================================
     // 前台：買家／賣家訂單

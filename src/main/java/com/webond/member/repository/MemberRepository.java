@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.webond.member.model.MemberVO;
@@ -19,4 +21,7 @@ public interface MemberRepository extends JpaRepository<MemberVO, Integer> {
 
 	// 3. 關鍵字模糊搜尋：Email、真實姓名、手機 (給 searchMembers 效能優化使用)
 	List<MemberVO> findByEmailContainingOrRealNameContainingOrPhoneContaining(String email, String realName, String phone);
+	
+    @Query("select m.nickname from MemberVO m where m.memberId = :memberId")
+    String findNicknameById(@Param("memberId") Integer memberId);
 }

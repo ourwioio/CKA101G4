@@ -4,36 +4,423 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title th:text="|${serviceVO.serviceName}｜Webond|">
-        一對一服務詳情
-    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="|${serviceVO.serviceName}｜Webond|">一對一服務詳情</title>
 
     <!-- Google Fonts -->
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-          rel="stylesheet">
+<!--     <link rel="preconnect" href="https://fonts.googleapis.com"> -->
+<!--     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <!-- Service 前台共用 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/service/common.css}">
-
+<!--     <link rel="stylesheet" th:href="@{/css/front-end/service/common.css}"> -->
     <!-- 前台共用 Navbar CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/common/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <!-- 服務詳情頁專專屬 CSS -->
+<!--     <link rel="stylesheet" th:href="@{/css/front-end/service/serviceDetail.css}"> -->
 
-    <!-- 服務詳情頁專屬 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/service/serviceDetail.css}">
+    <style>
+        /* ==========================================================
+           Webond 一對一服務詳情頁 — 圓潤角色風風格融合
+           ========================================================== */
+        :root {
+            --color-bg:            #F7F3EC;
+            --color-surface:       #FFFFFF;
+            --color-surface-soft:  #FFFDF8;
+            --color-ink:           #17140F;
+            --color-ink-soft:      #726A5F;
+            --color-border:        #ECE4D6;
+
+            --color-yellow:       #FFE59A;
+            --color-yellow-deep:  #FFC94D;
+            --color-pink:         #FFB5C1;
+            --color-green:        #B7E1D1;
+            --color-blue:         #A9D3FF;
+            --color-red:          #FF5271;
+
+            --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+            --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+            --radius-lg: 26px;
+            --radius-md: 16px;
+            --radius-full: 999px;
+
+            --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+            --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+
+            --nav-height: 76px;
+        }
+
+        body {
+            margin: 0;
+            font-family: var(--font-body);
+            background: var(--color-bg);
+            color: var(--color-ink);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            padding: 40px 0;
+        }
+
+        h1, h2, h3, h4 { font-family: var(--font-display); margin: 0; }
+        a { text-decoration: none; color: inherit; }
+
+        .site-main {
+            max-width: 1200px;
+            margin: calc(var(--nav-height) + 20px) auto 60px;
+            padding: 0 20px;
+        }
+        
+        a {
+		  text-decoration: none;
+		}
+
+        /* 頂部狀態列 */
+        .service-detail-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .service-detail-back {
+            display: inline-flex;
+            align-items: center;
+            color: var(--color-ink);
+            font-weight: 600;
+            font-size: 12px;
+            padding: 10px 20px;
+            transition: all .18s ease;
+        }
+        .service-detail-back:hover {
+            color: var(--color-yellow-deep);
+        }
+
+        .service-detail-login-status {
+            display: flex;
+            gap: 12px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-surface);
+            color: var(--color-ink);
+            border: 1.5px solid var(--color-border);
+            font-weight: 800;
+            font-size: 13.5px;
+            padding: 10px 20px;
+            border-radius: var(--radius-full);
+            box-shadow: var(--shadow-sm);
+            transition: all .18s ease;
+        }
+        .back-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--color-ink);
+            background: var(--color-surface-soft);
+        }
+
+        /* 提示框 */
+        .alert {
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 14.5px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+        .alert-success { background: var(--color-green); color: var(--color-ink); }
+        .alert-error { background: var(--color-pink); color: var(--color-ink); }
+
+        /* 主佈局設定 */
+        .service-detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 32px;
+            align-items: flex-start;
+        }
+
+        .panel {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 36px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        /* 封面圖片 */
+        .service-detail-image-wrap {
+            width: 100%;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--color-border);
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+            aspect-ratio: 16/9;
+        }
+        .service-detail-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* 右上角細緻檢舉按鈕 */
+        .service-report-button {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(255, 77, 79, 0.15);
+            color: #8c0000;
+            font-size: 12px;
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            font-weight: 800;
+            border: 1.5px solid rgba(255, 77, 79, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all .15s ease;
+        }
+        .service-report-button:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 77, 79, 0.25);
+        }
+        .service-report-button svg { width: 14px; height: 14px; }
+
+        /* 標頭內容 */
+        .service-detail-meta {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            align-items: center;
+        }
+        .service-detail-type {
+            background: var(--color-blue);
+            color: var(--color-ink);
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .service-detail-id {
+            font-size: 12.5px;
+            color: var(--color-ink-soft);
+            font-weight: 700;
+        }
+
+        .service-detail-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--color-ink);
+            margin: 0 0 12px 0;
+            line-height: 1.3;
+        }
+
+        .service-detail-location, .service-detail-place {
+            font-size: 14px;
+            color: var(--color-ink-soft);
+            font-weight: 600;
+            margin: 0 0 4px 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .service-detail-location-dot::before { content: '📍'; }
+
+        /* 區塊標題 */
+        .service-detail-section-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--color-ink);
+            margin-bottom: 16px;
+            position: relative;
+            padding-left: 14px;
+        }
+        .service-detail-section-title::before {
+            content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            width: 6px; height: 6px; border-radius: 50%; background: var(--color-yellow-deep);
+        }
+
+        .service-detail-description {
+            font-size: 14.5px;
+            line-height: 1.8;
+            color: var(--color-ink);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        /* ==========================================================
+           高級網格看板 (Info Grid)
+           ========================================================== */
+        .service-detail-info-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        .service-detail-info-item {
+            background: var(--color-surface-soft);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .service-detail-info-item-1 {
+            background: var(--color-yellow-deep);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 14px 18px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .service-detail-info-item-1:hover{
+            background: var(--color-yellow);        
+        }
+        .service-detail-info-item a,.service-detail-info-item-1 a { display: flex; width: 100%; justify-content: space-between; align-items: center; }
+        .service-detail-info-label { font-weight: 800; color: var(--color-ink); margin: 0; }
+        .service-detail-info-value, .service-provider-link { font-weight: 600; color: var(--color-ink-soft); margin: 0; }
+        .service-provider-link { color: var(--color-ink); font-weight: 800; text-decoration: none; }
+
+        /* ==========================================================
+           右側預約面板區
+           ========================================================== */
+        .service-price-box {
+            background: var(--color-yellow);
+            border: 1.5px solid var(--color-ink);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            gap: 4px;
+        }
+        .service-price-currency, .service-price-unit { font-size: 13px; font-weight: 800; color: var(--color-ink); }
+        .service-price-amount { font-size: 26px; font-weight: 800; font-family: var(--font-display); }
+
+        .service-slot-title { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
+        .service-slot-subtitle { font-size: 12.5px; color: var(--color-ink-soft); margin: 0 0 16px 0; font-weight: 500; }
+        .service-slot-empty {
+            text-align: center; padding: 32px 16px; font-size: 14px; font-weight: 700;
+            color: var(--color-ink-soft); background: var(--color-surface-soft);
+            border: 1.5px dashed var(--color-border); border-radius: var(--radius-md);
+        }
+
+        .service-slot-list { display: flex; flex-direction: column; gap: 12px; }
+        .service-slot-item {
+            border: 1.5px solid var(--color-border); border-radius: var(--radius-md);
+            padding: 16px; background: var(--color-surface-soft); transition: all 0.2s ease;
+        }
+        .service-slot-item--available { border-color: var(--color-border); background: #fff; }
+        .service-slot-item--locked { border-color: var(--color-yellow-deep); background: var(--color-surface-soft); }
+        .service-slot-item--booked { opacity: 0.75; }
+
+        .service-slot-summary { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .service-slot-date { font-size: 12px; font-weight: 800; color: var(--color-ink-soft); }
+        .service-slot-hour { font-size: 14.5px; font-weight: 800; color: var(--color-ink); }
+        .service-slot-status { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px; }
+        .service-slot-status.available { background: var(--color-green); color: var(--color-ink); }
+        .service-slot-status.locked { background: var(--color-yellow); color: var(--color-ink); }
+        .service-slot-status.booked { background: var(--color-border); color: var(--color-ink-soft); }
+
+        .service-slot-message { font-size: 12.5px; color: var(--color-ink-soft); font-weight: 600; margin: 4px 0; }
+        .service-slot-lock-time { font-size: 11px; color: var(--color-red); font-weight: 700; margin: 0; }
+
+        /* 按鈕系統 */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-body);
+            font-weight: 800; font-size: 13.5px; padding: 8px 18px; border-radius: var(--radius-full);
+            transition: all .15s ease; cursor: pointer; border: none; width: 100%;
+        }
+        .service-booking-toggle { background: var(--color-ink); color: #fff; box-shadow: var(--shadow-sm); }
+        .service-booking-toggle:hover { background: var(--color-yellow-deep); color: var(--color-ink); transform: translateY(-2px); }
+        .service-booking-disabled { background: var(--color-border); color: var(--color-ink-soft); cursor: not-allowed; }
+
+        /* 預約表單 */
+        .service-booking-form { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--color-border); }
+        .form-label { font-size: 13px; font-weight: 800; display: block; margin-bottom: 6px; }
+        .service-booking-note { width: 100%; min-height: 80px; resize: none; }
+        .form-help { font-size: 11px; color: var(--color-ink-soft); margin: 4px 0 12px 0; font-weight: 500; }
+        .service-booking-form-actions { display: flex; gap: 8px; }
+        .service-booking-submit { background: var(--color-ink); color: #fff; }
+        .service-booking-submit:hover { background: var(--color-green); color: var(--color-ink); }
+        .btn-secondary { background: var(--color-surface); border: 1.5px solid var(--color-border); color: var(--color-ink); }
+
+        /* ==========================================================
+           活動評價區區塊 (完全融合對齊)
+           ========================================================== */
+        .review-section {
+            grid-column: span 2; margin-top: 24px; padding: 36px;
+            background: var(--color-surface); border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+        }
+        .review-header-inline { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .review-header-inline h2 { font-size: 19px; font-weight: 800; color: var(--color-ink); }
+        .star { font-size: 18px; margin-right: 2px; }
+        .star.filled { color: var(--color-yellow-deep); }
+        .star.empty { color: var(--color-border); }
+        .review-inline-score { font-family: var(--font-display); font-size: 24px; font-weight: 800; }
+        .review-count-badge { font-size: 14px; color: var(--color-ink-soft); font-weight: 700; }
+
+        .review-filter-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; align-items: center; }
+        .review-filter-tabs button.filter-btn {
+            border: 1.5px solid var(--color-border); background: var(--color-surface); color: var(--color-ink);
+            font-family: var(--font-body); font-weight: 800; font-size: 13px; padding: 7px 16px;
+            border-radius: var(--radius-full); cursor: pointer; transition: all .15s ease;
+        }
+        .review-filter-tabs button.filter-btn:hover { transform: translateY(-2px); border-color: var(--color-ink); }
+        .review-filter-tabs button.filter-btn.active { background: var(--color-ink); color: #fff; border-color: var(--color-ink); }
+        .sort-btn { margin-left: auto; background: var(--color-yellow); color: var(--color-ink); font-family: var(--font-body); font-weight: 800; font-size: 12.5px; padding: 7px 16px; border-radius: var(--radius-full); cursor: pointer; border: none; }
+        .sort-btn:hover { transform: translateY(-2px); }
+
+        .review-scroll-body { display: flex; flex-direction: column; gap: 16px; }
+        .review-card {
+            background: var(--color-surface-soft); border: 1.5px solid var(--color-border);
+            border-radius: var(--radius-md); padding: 20px; display: flex; gap: 18px; box-shadow: var(--shadow-sm); transition: transform .15s ease; align-items: flex-start;
+        }
+        .review-card:hover { transform: translateY(-2px); }
+        .avatar-container { width: 48px; height: 48px; border-radius: 50%; overflow: hidden; border: 2px solid var(--color-surface); box-shadow: var(--shadow-sm); flex-shrink: 0; }
+        .avatar-img { width: 100%; height: 100%; object-fit: cover; }
+        .avatar-badge { width: 100%; height: 100%; background: var(--color-green); color: var(--color-ink); font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .review-card-right { flex: 1; }
+        .review-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; font-size: 13px; }
+        .reviewer-id { font-weight: 800; color: var(--color-ink); }
+        .review-date { color: var(--color-ink-soft); font-weight: 500; }
+        .review-rating-stars { margin-bottom: 8px; display: flex; align-items: center; gap: 4px; }
+        .rating-text-score { font-size: 12px; color: var(--color-ink-soft); font-weight: 700; margin-left: 4px; }
+        .review-text-content { font-size: 14px; color: var(--color-ink); line-height: 1.6; font-weight: 500; }
+        .review-empty { padding: 36px 20px; text-align: center; color: var(--color-ink-soft); font-weight: 800; background: var(--color-surface-soft); border: 1.5px dashed var(--color-border); border-radius: var(--radius-md); }
+
+        /* 精美膠囊分頁按鈕控制 */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 32px auto 10px; }
+        .page-btn {
+            display: inline-flex; align-items: center; justify-content: center; background: var(--color-surface);
+            color: var(--color-ink); border: 1.5px solid var(--color-border); padding: 8px 16px; font-size: 13px;
+            font-weight: 700; border-radius: var(--radius-full); transition: all 0.2s ease; cursor: pointer;
+        }
+        .page-btn:hover:not(.disabled) { background: var(--color-yellow); border-color: var(--color-ink); transform: translateY(-2px); }
+        .page-btn.active { background: var(--color-ink); color: #fff; border-color: var(--color-ink); }
+        .page-btn.disabled { opacity: 0.4; pointer-events: none; }
+
+        /* RWD 響應式 */
+        @media (max-width: 992px) {
+            .service-detail-layout { grid-template-columns: 1fr; }
+            .review-section { grid-column: span 1; }
+        }
+        @media (max-width: 768px) {
+            .service-detail-info-list { grid-template-columns: 1fr; }
+            .review-header-inline { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .sort-btn { margin-left: 0; width: 100%; text-align: center; }
+            .review-card { flex-direction: column; gap: 12px; }
+        }
+    </style>
 </head>
 
 <body>
@@ -52,8 +439,7 @@
     <!-- 返回與登入狀態 -->
     <div class="service-detail-topbar">
 
-        <a class="service-detail-back"
-           th:href="@{/front/services}">
+        <a class="service-detail-back" th:href="@{/front/services}">
             ← 回服務列表
         </a>
 
@@ -61,48 +447,45 @@
 
             <!-- 已登入 -->
             <span th:if="${session.memberVO != null}">
+            	 <a class="back-btn" th:href="@{/member/service-orders/buyer}">
+                    我的預約
+                </a>
+            </span>
+            <span th:if="${session.memberVO != null}">
 
-                目前會員：
+<!--                 目前會員： -->
 
-                <strong th:text="${session.memberVO.memberId}">
-                    1
-                </strong>
+<!--                 <strong th:text="${session.memberVO.memberId}"> -->
+<!--                     1 -->
+<!--                 </strong> -->
 
-                ｜
+<!--                 ｜ -->
 
-                <a th:href="@{/member/services}">
+                <a class="back-btn" th:href="@{/member/services}">
                     我的服務
                 </a>
 
             </span>
 
             <!-- 未登入 -->
-            <span th:if="${session.memberVO == null}">
+<!--             <span th:if="${session.memberVO == null}"> -->
 
-                尚未登入 ｜
+<!--                 尚未登入 ｜ -->
 
-                <a th:href="@{/member/login}">
-                    前往登入
-                </a>
+<!--                 <a th:href="@{/member/login}"> -->
+<!--                     前往登入 -->
+<!--                 </a> -->
 
-            </span>
+<!--             </span> -->
 
         </div>
     </div>
 
     <!-- 成功訊息 -->
-    <div class="alert alert-success"
-         th:if="${successMsg != null}"
-         th:text="${successMsg}">
-        操作成功
-    </div>
+    <div class="alert alert-success" th:if="${successMsg != null}" th:text="${successMsg}">操作成功</div>
 
     <!-- 錯誤訊息 -->
-    <div class="alert alert-error"
-         th:if="${errorMsg != null}"
-         th:text="${errorMsg}">
-        操作失敗
-    </div>
+    <div class="alert alert-error" th:if="${errorMsg != null}" th:text="${errorMsg}">操作失敗</div>
 
     <!-- ======================================================
          左側內容 + 右側預約
@@ -116,556 +499,329 @@
 
             <!-- 服務封面 -->
             <div class="service-detail-image-wrap">
-
                 <img class="service-detail-image"
-                     th:src="@{/front/services/image/{serviceId}(
-                         serviceId=${serviceVO.serviceId}
-                     )}"
+                     th:src="@{/front/services/image/{serviceId}(serviceId=${serviceVO.serviceId})}"
                      th:onerror="this.onerror=null; this.src='/images/activity/default-activity.jpg';"
                      alt="服務圖片">
-
             </div>
 
-            <!-- ==================================================
-                 服務主標題
-                 ================================================== -->
+            <!-- 服務主標題面板 -->
             <section class="panel service-detail-header">
 
                 <!-- 上方：服務類型、編號、檢舉按鈕 -->
                 <div class="service-detail-header-row">
-
                     <div class="service-detail-meta">
-
-                        <span class="service-detail-type"
-                              th:text="${serviceVO.serviceType != null
-                                  ? serviceVO.serviceType.typeName
-                                  : '無服務類型'}">
+                        <span class="service-detail-type" th:text="${serviceVO.serviceType != null ? serviceVO.serviceType.typeName : '無服務類型'}">
                             服務類型
                         </span>
-
-                        <span class="service-detail-id"
-                              th:text="|服務編號 #${serviceVO.serviceId}|">
-                            服務編號 #1
-                        </span>
-
+<!--                         <span class="service-detail-id" th:text="|服務編號 #${serviceVO.serviceId}|"> -->
+<!--                             服務編號 #1 -->
+<!--                         </span> -->
                     </div>
 
                     <!-- 已登入：進入服務檢舉表單 -->
-                    <a class="service-report-button"
-                       th:if="${session.memberVO != null}"
-                       th:href="@{/front/serviceReport/add(
-                           serviceId=${serviceVO.serviceId}
-                       )}"
-                       title="檢舉此服務">
-
-                        <svg viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2"
-                             stroke-linecap="round"
-                             stroke-linejoin="round"
-                             aria-hidden="true">
-
+                    <a class="service-report-button" th:if="${session.memberVO != null}" th:href="@{/front/serviceReport/add(serviceId=${serviceVO.serviceId})}" title="檢舉此服務">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M4 21V4"></path>
                             <path d="M4 5h12l-2 4 2 4H4"></path>
-
                         </svg>
-
-                        <span>
-                            檢舉此服務
-                        </span>
-
+                        <span>檢舉此服務</span>
                     </a>
 
                     <!-- 未登入：導向正式登入頁 -->
-                    <a class="service-report-button"
-                       th:if="${session.memberVO == null}"
-                       th:href="@{/member/login}"
-                       title="登入後才能檢舉服務">
-
-                        <svg viewBox="0 0 24 24"
-                             fill="none"
-                             stroke="currentColor"
-                             stroke-width="2"
-                             stroke-linecap="round"
-                             stroke-linejoin="round"
-                             aria-hidden="true">
-
+                    <a class="service-report-button" th:if="${session.memberVO == null}" th:href="@{/member/login}" title="登入後才能檢舉服務">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M4 21V4"></path>
                             <path d="M4 5h12l-2 4 2 4H4"></path>
-
                         </svg>
-
-                        <span>
-                            檢舉此服務
-                        </span>
-
+                        <span>檢舉此服務</span>
                     </a>
-
                 </div>
 
                 <!-- 服務名稱 -->
-                <h1 class="service-detail-title"
-                    th:text="${serviceVO.serviceName}">
-                    河堤散步陪伴
-                </h1>
+                <h1 class="service-detail-title" th:text="${serviceVO.serviceName}">河堤散步陪伴</h1>
 
                 <!-- 縣市與行政區 -->
-                <p class="service-detail-location"
-                   th:if="${serviceVO.serviceCity != null
-                       or serviceVO.serviceDistrict != null}">
-
-                    <span class="service-detail-location-dot">
-                    </span>
-
-                    <span th:text="|${serviceVO.serviceCity ?: ''}
-                        ${serviceVO.serviceDistrict ?: ''}|">
+                <p class="service-detail-location" th:if="${serviceVO.serviceCity != null or serviceVO.serviceDistrict != null}">
+<!--                     <span class="service-detail-location-dot"></span> -->
+                    <span th:text="|${serviceVO.serviceCity ?: ''} ${serviceVO.serviceDistrict ?: ''}|">
                         桃園市 八德區
                     </span>
-
                 </p>
 
                 <!-- 地點說明 -->
-                <p class="service-detail-place"
-                   th:if="${serviceVO.serviceLocation != null
-                       and !#strings.isEmpty(serviceVO.serviceLocation)}"
-                   th:text="${serviceVO.serviceLocation}">
+                <p class="service-detail-place" th:if="${serviceVO.serviceLocation != null and !#strings.isEmpty(serviceVO.serviceLocation)}" th:text="${serviceVO.serviceLocation}">
                     八德埤塘自然生態公園附近
                 </p>
 
             </section>
 
-            <!-- ==================================================
-                 服務說明
-                 ================================================== -->
+            <!-- 服務說明 -->
             <section class="panel service-detail-section">
-
-                <h2 class="service-detail-section-title">
-                    服務內容
-                </h2>
-
-                <p class="service-detail-description"
-                   th:text="${serviceVO.description}">
-                    服務內容說明
-                </p>
-
+                <h2 class="service-detail-section-title">服務內容</h2>
+                <p class="service-detail-description" th:text="${serviceVO.description}">服務內容說明</p>
             </section>
 
-            <!-- ==================================================
-                 服務基本資訊
-                 ================================================== -->
+            <!-- 服務基本資訊 (全面重組升級為 Info Grid) -->
             <section class="panel service-detail-section">
-
-                <h2 class="service-detail-section-title">
-                    服務資訊
-                </h2>
-
+                <h2 class="service-detail-section-title">服務資訊</h2>
                 <div class="service-detail-info-list">
 
                     <!-- 服務類型 -->
                     <div class="service-detail-info-item">
-
-                        <p class="service-detail-info-label">
-                            服務類型
-                        </p>
-
-                        <p class="service-detail-info-value"
-                           th:text="${serviceVO.serviceType != null
-                               ? serviceVO.serviceType.typeName
-                               : '無服務類型'}">
-                            散步陪伴
-                        </p>
-
+                        <p class="service-detail-info-label">服務類型</p>
+                        <p class="service-detail-info-value" th:text="${serviceVO.serviceType != null ? serviceVO.serviceType.typeName : '無服務類型'}">散步陪伴</p>
                     </div>
 
                     <!-- 每小時費率 -->
                     <div class="service-detail-info-item">
-
-                        <p class="service-detail-info-label">
-                            每小時費率
-                        </p>
-
-                        <p class="service-detail-info-value">
-
-                            NT$
-
-                            <span th:text="${serviceVO.hourlyRate}">
-                                500
-                            </span>
-
-                            / 小時
-
-                        </p>
-
+                        <p class="service-detail-info-label">每小時費率</p>
+                        <p class="service-detail-info-value">NT$ <span th:text="${serviceVO.hourlyRate}">500</span> / 小時</p>
                     </div>
 
                     <!-- 服務縣市 -->
-                    <div class="service-detail-info-item"
-                         th:if="${serviceVO.serviceCity != null}">
-
-                        <p class="service-detail-info-label">
-                            服務縣市
-                        </p>
-
-                        <p class="service-detail-info-value"
-                           th:text="${serviceVO.serviceCity}">
-                            桃園市
-                        </p>
-
+                    <div class="service-detail-info-item" th:if="${serviceVO.serviceCity != null}">
+                        <p class="service-detail-info-label">服務縣市</p>
+                        <p class="service-detail-info-value" th:text="${serviceVO.serviceCity}">桃園市</p>
                     </div>
 
                     <!-- 服務行政區 -->
-                    <div class="service-detail-info-item"
-                         th:if="${serviceVO.serviceDistrict != null}">
-
-                        <p class="service-detail-info-label">
-                            服務行政區
-                        </p>
-
-                        <p class="service-detail-info-value"
-                           th:text="${serviceVO.serviceDistrict}">
-                            八德區
-                        </p>
-
+                    <div class="service-detail-info-item" th:if="${serviceVO.serviceDistrict != null}">
+                        <p class="service-detail-info-label">服務行政區</p>
+                        <p class="service-detail-info-value" th:text="${serviceVO.serviceDistrict}">八德區</p>
                     </div>
 
                     <!-- 服務提供者：可點擊 -->
-                    <div class="service-detail-info-item">
-
-                        <p class="service-detail-info-label">
-                            服務提供者
-                        </p>
-
-                        <a class="service-provider-link"
-                           th:href="@{/front/memberPage/oneMember(
-                               memberId=${serviceVO.memberId}
-                           )}"
-                           th:text="|會員 #${serviceVO.memberId}|">
-                            會員 #1
-                        </a>
-
+                    <div class="service-detail-info-item-1">
+                        <a th:href="@{/front/memberPage/oneMember(memberId=${serviceVO.memberId})}">
+                            <p class="service-detail-info-label">服務提供者</p>
+                            <span class="service-provider-link" th:text="${@memberService.getNickname(serviceVO.memberId)}">會員 #1</span>
+                        </a>	
                     </div>
 
                     <!-- 建立時間 -->
                     <div class="service-detail-info-item">
-
-                        <p class="service-detail-info-label">
-                            建立時間
-                        </p>
-
-                        <p class="service-detail-info-value"
-                           th:text="${serviceVO.createdAt != null
-                               ? #temporals.format(
-                                   serviceVO.createdAt,
-                                   'yyyy-MM-dd HH:mm'
-                               )
-                               : '-'}">
-                            2026-07-13 14:00
-                        </p>
-
+                        <p class="service-detail-info-label">建立時間</p>
+                        <p class="service-detail-info-value" th:text="${serviceVO.createdAt != null ? #temporals.format(serviceVO.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">2026-07-13 14:00</p>
                     </div>
 
                 </div>
             </section>
 
-            <!-- ==================================================
-                 服務提供者
-                 整個區塊可點擊
-                 ================================================== -->
-            <section class="panel service-detail-section">
-
-                <h2 class="service-detail-section-title">
-                    服務提供者
-                </h2>
-
-                <a class="service-provider-box service-provider-box-link"
-                   th:href="@{/front/memberPage/oneMember(
-                       memberId=${serviceVO.memberId}
-                   )}">
-
-                    <div class="service-provider-avatar"
-                         th:text="${serviceVO.memberId}">
-                        1
-                    </div>
-
-                    <div class="service-provider-info">
-
-                        <p class="service-provider-label">
-                            提供者會員編號
-                        </p>
-
-                        <p class="service-provider-value"
-                           th:text="|會員 #${serviceVO.memberId}|">
-                            會員 #1
-                        </p>
-
-                    </div>
-
-                </a>
-
-            </section>
+            <!-- 服務提供者原始備用註解欄位 -->
+<!--             <section class="panel service-detail-section"> -->
+<!--                 <h2 class="service-detail-section-title"> -->
+<!--                     服務提供者 -->
+<!--                 </h2> -->
+<!--                 <a class="service-provider-box service-provider-box-link" -->
+<!--                    th:href="@{/front/memberPage/oneMember( -->
+<!--                        memberId=${serviceVO.memberId} -->
+<!--                    )}"> -->
+<!--                     <div class="service-provider-avatar" -->
+<!--                          th:text="${serviceVO.memberId}"> -->
+<!--                         1 -->
+<!--                     </div> -->
+<!--                     <div class="service-provider-info"> -->
+<!--                         <p class="service-provider-label"> -->
+<!--                             提供者會員編號 -->
+<!--                         </p> -->
+<!--                         <p class="service-provider-value" -->
+<!--                            th:text="|會員 #${serviceVO.memberId}|"> -->
+<!--                             會員 #1 -->
+<!--                         </p> -->
+<!--                     </div> -->
+<!--                 </a> -->
+<!--             </section> -->
 
         </section>
 
         <!-- ==================================================
-             右側時段與預約
+             右側時段與預約面板
              ================================================== -->
         <aside class="panel service-booking-panel">
 
-            <!-- 價格 -->
+            <!-- 頂部獨立亮點價格盒 -->
             <div class="service-price-box">
-
-                <span class="service-price-currency">
-                    NT$
-                </span>
-
-                <strong class="service-price-amount"
-                        th:text="${serviceVO.hourlyRate}">
-                    500
-                </strong>
-
-                <span class="service-price-unit">
-                    / 小時
-                </span>
-
+                <span class="service-price-currency">NT$</span>
+                <strong class="service-price-amount" th:text="${serviceVO.hourlyRate}">500</strong>
+                <span class="service-price-unit">/ 小時</span>
             </div>
 
-            <h2 class="service-slot-title">
-                服務時段
-            </h2>
-
-            <p class="service-slot-subtitle">
-                僅顯示尚未開始的服務時段，只有「可預約」狀態能送出申請。
-            </p>
+            <h2 class="service-slot-title">服務時段</h2>
+            <p class="service-slot-subtitle">僅顯示尚未開始的服務時段，只有「可預約」狀態能送出申請。</p>
 
             <!-- 沒有任何時段 -->
-            <div class="service-slot-empty"
-                 th:if="${#lists.isEmpty(serviceSlotList)}">
+            <div class="service-slot-empty" th:if="${#lists.isEmpty(serviceSlotList)}">
                 目前沒有可預約的未來時段
             </div>
 
-            <!-- 全部時段 -->
-            <div class="service-slot-list"
-                 th:if="${!#lists.isEmpty(serviceSlotList)}">
-
+            <!-- 全部時段清單 -->
+            <div class="service-slot-list" th:if="${!#lists.isEmpty(serviceSlotList)}">
                 <article class="service-slot-item"
                          th:each="slot : ${serviceSlotList}"
                          th:id="|service-slot-${slot.serviceSlotId}|"
-                         th:classappend="${slot.slotStatus == 0
-                             ? ' service-slot-item--available'
-                             : (slot.slotStatus == 1
-                                 ? ' service-slot-item--locked'
-                                 : ' service-slot-item--booked')}"
-                         th:attr="
-                             data-slot-id=${slot.serviceSlotId},
-                             data-slot-status=${slot.slotStatus}
-                         ">
+                         th:classappend="${slot.slotStatus == 0 ? ' service-slot-item--available' : (slot.slotStatus == 1 ? ' service-slot-item--locked' : ' service-slot-item--booked')}"
+                         th:attr="data-slot-id=${slot.serviceSlotId}, data-slot-status=${slot.slotStatus}">
 
-                    <!-- 時間與狀態 -->
+                    <!-- 時間與狀態摘要 -->
                     <div class="service-slot-summary">
-
                         <div class="service-slot-time">
-
-                            <div class="service-slot-date"
-                                 th:text="${#temporals.format(
-                                     slot.startTime,
-                                     'yyyy-MM-dd'
-                                 )}">
-                                2026-08-01
-                            </div>
-
+                            <div class="service-slot-date" th:text="${#temporals.format(slot.startTime, 'yyyy-MM-dd')}">2026-08-01</div>
                             <div class="service-slot-hour">
-
-                                <span th:text="${#temporals.format(
-                                    slot.startTime,
-                                    'HH:mm'
-                                )}">
-                                    14:00
-                                </span>
-
-                                <span class="service-slot-separator">
-                                    ～
-                                </span>
-
-                                <span th:text="${#temporals.format(
-                                    slot.endTime,
-                                    'HH:mm'
-                                )}">
-                                    16:00
-                                </span>
-
+                                <span th:text="${#temporals.format(slot.startTime, 'HH:mm')}">14:00</span>
+                                <span class="service-slot-separator">～</span>
+                                <span th:text="${#temporals.format(slot.endTime, 'HH:mm')}">16:00</span>
                             </div>
-
                         </div>
-
-                        <!-- WebSocket 收到訊息後更新狀態 -->
                         <span class="service-slot-status js-slot-status"
-                              th:classappend="${slot.slotStatus == 0
-                                  ? ' available'
-                                  : (slot.slotStatus == 1
-                                      ? ' locked'
-                                      : ' booked')}"
-                              th:text="${slot.slotStatus == 0
-                                  ? '可預約'
-                                  : (slot.slotStatus == 1
-                                      ? '暫時鎖定'
-                                      : (slot.slotStatus == 2
-                                          ? '已預約'
-                                          : '無法預約'))}">
+                              th:classappend="${slot.slotStatus == 0 ? ' available' : (slot.slotStatus == 1 ? ' locked' : ' booked')}"
+                              th:text="${slot.slotStatus == 0 ? '可預約' : (slot.slotStatus == 1 ? '暫時鎖定' : (slot.slotStatus == 2 ? '已預約' : '無法預約'))}">
                             可預約
                         </span>
-
                     </div>
 
-                    <!-- ==================================================
-                         可預約狀態
-                         ================================================== -->
-                    <div class="js-slot-state js-slot-available-content"
-                         th:attr="hidden=${slot.slotStatus != 0
-                             ? 'hidden'
-                             : null}">
-
+                    <!-- 可預約細部表單操作 -->
+                    <div class="js-slot-state js-slot-available-content" th:attr="hidden=${slot.slotStatus != 0 ? 'hidden' : null}">
                         <div class="service-slot-action">
-
                             <!-- 已登入且不是自己的服務 -->
-                            <button class="btn service-booking-toggle"
-                                    type="button"
-                                    th:if="${session.memberVO != null
-                                        and session.memberVO.memberId
-                                            != serviceVO.memberId}"
+                            <button class="btn service-booking-toggle" type="button"
+                                    th:if="${session.memberVO != null and session.memberVO.memberId != serviceVO.memberId}"
                                     th:attr="data-target=|booking-form-${slot.serviceSlotId}|">
                                 我要預約
                             </button>
-
                             <!-- 已登入且是自己的服務 -->
-                            <button class="btn service-booking-disabled"
-                                    type="button"
-                                    disabled
-                                    th:if="${session.memberVO != null
-                                        and session.memberVO.memberId
-                                            == serviceVO.memberId}">
+                            <button class="btn service-booking-disabled" type="button" disabled
+                                    th:if="${session.memberVO != null and session.memberVO.memberId == serviceVO.memberId}">
                                 這是你的服務
                             </button>
-
                             <!-- 未登入：導向正式登入頁 -->
-                            <a class="btn service-booking-toggle"
-                               th:if="${session.memberVO == null}"
-                               th:href="@{/member/login}">
+                            <a class="btn service-booking-toggle" th:if="${session.memberVO == null}" th:href="@{/member/login}">
                                 登入後預約
                             </a>
-
                         </div>
 
-                        <!-- 點擊「我要預約」後展開 -->
-                        <form class="service-booking-form"
-                              th:id="|booking-form-${slot.serviceSlotId}|"
-                              th:if="${session.memberVO != null
-                                  and session.memberVO.memberId
-                                      != serviceVO.memberId}"
-                              th:action="@{/front/services/{serviceId}/slots/{serviceSlotId}/request(
-                                  serviceId=${serviceVO.serviceId},
-                                  serviceSlotId=${slot.serviceSlotId}
-                              )}"
-                              method="post"
-                              hidden>
-
-                            <!-- Spring Security CSRF -->
-                            <input type="hidden"
-                                   th:if="${_csrf != null}"
-                                   th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}">
-
+                        <!-- 點擊點開預約表單 -->
+                        <form class="service-booking-form" th:id="|booking-form-${slot.serviceSlotId}|"
+                              th:if="${session.memberVO != null and session.memberVO.memberId != serviceVO.memberId}"
+                              th:action="@{/front/services/{serviceId}/slots/{serviceSlotId}/request(serviceId=${serviceVO.serviceId}, serviceSlotId=${slot.serviceSlotId})}"
+                              method="post" hidden>
+                            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                             <div class="form-group">
-
-                                <label class="form-label"
-                                       th:for="|buyerRequestNote-${slot.serviceSlotId}|">
-                                    預約需求
-                                </label>
-
-                                <textarea class="form-control service-booking-note"
-                                          th:id="|buyerRequestNote-${slot.serviceSlotId}|"
-                                          name="buyerRequestNote"
-                                          maxlength="500"
-                                          placeholder="可填寫需求、注意事項或希望的服務方式"></textarea>
-
-                                <p class="form-help">
-                                    最多 500 個字，也可以留空。
-                                </p>
-
+                                <label class="form-label" th:for="|buyerRequestNote-${slot.serviceSlotId}|">預約需求</label>
+                                <textarea class="form-control service-booking-note" th:id="|buyerRequestNote-${slot.serviceSlotId}|" name="buyerRequestNote" maxlength="500" placeholder="可填寫需求、注意事項或希望的服務方式"></textarea>
+                                <p class="form-help">最多 500 個字，也可以留空。</p>
                             </div>
-
                             <div class="service-booking-form-actions">
-
-                                <button class="btn service-booking-submit"
-                                        type="submit">
-                                    送出預約申請
-                                </button>
-
-                                <button class="btn btn-secondary service-booking-cancel"
-                                        type="button"
-                                        th:attr="data-target=|booking-form-${slot.serviceSlotId}|">
-                                    取消
-                                </button>
-
+                                <button class="btn service-booking-submit" type="submit">送出預約申請</button>
+                                <button class="btn btn-secondary service-booking-cancel" type="button" th:attr="data-target=|booking-form-${slot.serviceSlotId}|">取消</button>
                             </div>
-
                         </form>
-
                     </div>
 
-                    <!-- ==================================================
-                         暫時鎖定狀態
-                         ================================================== -->
-                    <div class="js-slot-state js-slot-locked-content"
-                         th:attr="hidden=${slot.slotStatus != 1
-                             ? 'hidden'
-                             : null}">
-
-                        <p class="service-slot-message">
-                            此時段目前正由其他會員進行預約，暫時無法操作。
-                        </p>
-
-                        <p class="service-slot-lock-time js-slot-lock-time"
-                           th:if="${slot.lockExpiresAt != null}"
-                           th:text="|鎖定期限：${#temporals.format(
-                               slot.lockExpiresAt,
-                               'yyyy-MM-dd HH:mm:ss'
-                           )}|">
+                    <!-- 暫時鎖定狀態 -->
+                    <div class="js-slot-state js-slot-locked-content" th:attr="hidden=${slot.slotStatus != 1 ? 'hidden' : null}">
+                        <p class="service-slot-message">此時段目前正由其他會員進行預約，暫時無法操作。</p>
+                        <p class="service-slot-lock-time js-slot-lock-time" th:if="${slot.lockExpiresAt != null}" th:text="|鎖定期限：${#temporals.format(slot.lockExpiresAt, 'yyyy-MM-dd HH:mm:ss')}|">
                             鎖定期限：2026-08-01 14:00:30
                         </p>
-
                     </div>
 
-                    <!-- ==================================================
-                         已預約／其他不可用狀態
-                         ================================================== -->
-                    <div class="js-slot-state js-slot-booked-content"
-                         th:attr="hidden=${slot.slotStatus == 0
-                             or slot.slotStatus == 1
-                                 ? 'hidden'
-                                 : null}">
-
-                        <p class="service-slot-message js-slot-booked-message"
-                           th:text="${slot.slotStatus == 2
-                               ? '此時段已經完成預約，無法再次選擇。'
-                               : '此時段目前無法預約。'}">
+                    <!-- 已預約／不可用狀態 -->
+                    <div class="js-slot-state js-slot-booked-content" th:attr="hidden=${slot.slotStatus == 0 or slot.slotStatus == 1 ? 'hidden' : null}">
+                        <p class="service-slot-message js-slot-booked-message" th:text="${slot.slotStatus == 2 ? '此時段已經完成預約，無法再次選擇。' : '此時段目前無法預約。'}">
                             此時段已經完成預約，無法再次選擇。
                         </p>
-
                     </div>
-
                 </article>
+            </div>
+        </aside>
 
+        <!-- ==========================================================
+                互動評價專屬底欄區塊 (完全對齊範例架構，帶有分頁控制)
+             ========================================================== -->
+        <section id="serviceReviews" class="panel review-section" th:if="${reviewListData != null}">
+            
+            <!-- 評分平均數據展示頭部 -->
+            <div class="review-sticky-header">
+                <div class="review-header-inline">
+                    <h2>服務評價與回饋</h2>
+                    <span class="review-count-badge" th:text="|(${#lists.size(reviewListData)})|">(0)</span>
+                </div>
+
+                <!-- 星等藥丸 Tabs 切換與排序按鈕 -->
+                <div class="review-filter-tabs" th:if="${!#lists.isEmpty(reviewListData)}">
+                    <button type="button" class="filter-btn active" onclick="filterReviews('all')">全部評價</button>
+                    <button type="button" class="filter-btn" onclick="filterReviews('5')">5 星</button>
+                    <button type="button" class="filter-btn" onclick="filterReviews('4')">4 星</button>
+                    <button type="button" class="filter-btn" onclick="filterReviews('3')">3 星</button>
+                    <button type="button" class="filter-btn" onclick="filterReviews('2')">2 星</button>
+                    <button type="button" class="filter-btn" onclick="filterReviews('1')">1 星</button>
+                    <button type="button" id="sortTimeBtn" class="sort-btn" data-sort="desc" onclick="toggleTimeSort()">最新優先</button>
+                </div>
             </div>
 
-        </aside>
+            <!-- 評價列表滾動主體 -->
+            <div class="review-scroll-body" id="reviewScrollBody">
+            
+                <div th:if="${#lists.isEmpty(reviewListData)}" class="review-empty">目前此服務尚無任何會員留下評價。</div>
+            
+                <!-- 評價卡片迭代結構 -->
+                <div th:each="order : ${reviewListData}" class="review-card"
+                     th:data-stars="${order.buyerRateSeller}"
+                     th:data-time="${order.buyerReviewedAt != null ? #temporals.format(order.buyerReviewedAt, 'yyyyMMddHHmm') : '0'}">
+            
+                    <!-- 左側精緻圓頭像 -->
+                    <div class="avatar-container">
+                        <img th:if="${order.buyerMemberId != null}"
+                             th:src="@{'/front/memberPage/pic/' + ${order.buyerMemberId}}"
+                             th:onerror="'this.src=\'' + @{/images/member/file.jpeg} + '\''"
+                             alt="會員頭像" class="avatar-img">
+                        <div th:unless="${order.buyerMemberId != null}" class="avatar-badge">M</div>
+                    </div>
+            
+                    <!-- 右側評論主要內容 -->
+                    <div class="review-card-right">
+                        <div class="review-meta">
+                            <span class="reviewer-id" th:text="|會員 ${order.buyerMemberId}|">會員 ID</span>
+                            <span class="review-date" th:if="${order.buyerReviewedAt != null}"
+                                  th:text="${#temporals.format(order.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}">評價時間</span>
+                        </div>
+            
+                        <!-- 亮黃星星渲染 -->
+                        <div class="review-rating-stars">
+                            <span th:if="${order.buyerRateSeller > 0}"
+                                  th:each="i : ${#numbers.sequence(1, order.buyerRateSeller)}"
+                                  class="star filled">★</span>
+                            <span th:if="${order.buyerRateSeller < 5}"
+                                  th:each="i : ${#numbers.sequence(1, 5 - order.buyerRateSeller)}"
+                                  class="star empty">★</span>
+                            <span class="rating-text-score" th:text="|(${order.buyerRateSeller} / 5)|"></span>
+                        </div>
+            
+                        <div class="review-text-content" th:text="${order.buyerReviewComment}">評價內容</div>
+                    </div>
+                </div>
+            
+                <!-- 空狀態提示 -->
+                <div id="filterEmptyMsg" class="review-empty" style="display: none;">目前沒有此星等篩選條件下的服務評價。</div>
+            </div>
+
+            <!-- 🌟 全新融入的膠囊風評價分頁控制組 (有分頁效果) -->
+            <div class="pagination" th:if="${totalReviewPages != null and totalReviewPages > 1}">
+                <a class="page-btn disabled">‹ 上一頁</a>
+                <a class="page-btn active">1</a>
+                <a class="page-btn">2</a>
+                <a class="page-btn">下一頁 ›</a>
+            </div>
+
+        </section>
 
     </div>
 
 </main>
 
 <!-- ==========================================================
-     WebSocket 頁面資料
+     WebSocket 與分頁頁面數據欄位
      ========================================================== -->
 <div id="serviceDetailPageData"
      th:attr="
@@ -677,19 +833,88 @@
 </div>
 
 <!-- SockJS -->
-<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js">
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
 <!-- STOMP -->
-<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js">
-</script>
-
-<!-- 服務詳情頁 JS：預約表單、時段 WebSocket -->
-<script th:src="@{/js/front-end/service/serviceDetail.js}">
-</script>
-
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<!-- 服務詳情頁 JS -->
+<script th:src="@{/js/front-end/service/serviceDetail.js}"></script>
 <!-- 共用通知 AJAX 輪詢 -->
-<script th:src="@{/js/front-end/common/notificationPolling.js}">
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+
+<script>
+/**
+ * 🌟 星等分類篩選器
+ * @param {string} stars - 可傳入 'all', '5', '4', '3', '2', '1'
+ */
+function filterReviews(stars) {
+    // 1. 切換按鈕的 active 樣式
+    const tabs = document.querySelectorAll('.review-filter-tabs .filter-btn');
+    tabs.forEach(btn => {
+        if (btn.id === 'sortTimeBtn') return; // 排除時間排序按鈕
+        
+        if (stars === 'all' && btn.textContent.includes('全部')) {
+            btn.classList.add('active');
+        } else if (btn.textContent.includes(stars + ' 星')) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+
+    // 2. 執行卡片顯隱篩選
+    const cards = document.querySelectorAll('#reviewScrollBody .review-card');
+    let hasVisibleCard = false;
+
+    cards.forEach(card => {
+        const cardStars = card.getAttribute('data-stars');
+        // 如果是全部，或者卡片星等符合篩選條件就顯示
+        if (stars === 'all' || cardStars === stars) {
+            card.style.display = 'flex';
+            hasVisibleCard = true;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    // 3. 處理「該星等無評價」的提示訊息
+    const emptyMsg = document.getElementById('filterEmptyMsg');
+    if (emptyMsg) {
+        emptyMsg.style.display = hasVisibleCard ? 'none' : 'block';
+    }
+}
+
+/**
+ * 🌟 時間排序切換（最新優先 ↔ 最舊優先）
+ */
+function toggleTimeSort() {
+    const btn = document.getElementById('sortTimeBtn');
+    if (!btn) return;
+
+    const currentSort = btn.getAttribute('data-sort'); // 取得當前排序狀態 (desc 或 asc)
+    const newSort = currentSort === 'desc' ? 'asc' : 'desc';
+    
+    // 更新按鈕屬性與文字
+    btn.setAttribute('data-sort', newSort);
+    btn.textContent = newSort === 'desc' ? '最新優先' : '最舊優先';
+
+    const container = document.getElementById('reviewScrollBody');
+    // 將 review-card 轉成陣列以利排序
+    const cards = Array.from(container.querySelectorAll('.review-card'));
+
+    // 依據 data-time (格式如：202607182321) 進行數字大小排序
+    cards.sort((a, b) => {
+        const timeA = parseInt(a.getAttribute('data-time') || '0', 10);
+        const timeB = parseInt(b.getAttribute('data-time') || '0', 10);
+        return newSort === 'desc' ? timeB - timeA : timeA - timeB;
+    });
+
+    // 重新依序將排序後的卡片塞回 DOM 容器中
+    cards.forEach(card => container.appendChild(card));
+    
+    // 確保「無資料提示元件」永遠被擠在容器的最底部
+    const emptyMsg = document.getElementById('filterEmptyMsg');
+    if (emptyMsg) container.appendChild(emptyMsg);
+}
 </script>
 
 </body>
