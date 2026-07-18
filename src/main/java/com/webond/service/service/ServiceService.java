@@ -654,4 +654,16 @@ public class ServiceService {
 
         return serviceImageType.trim();
     }
+    
+    //停權or註銷下架
+    public void disableAllActiveServicesByMemberId(
+            Integer memberId) {
+
+        if (memberId == null || memberId <= 0) {
+            throw new IllegalArgumentException("會員編號不正確");
+        }
+
+        serviceRepository
+                .disableAllActiveServicesByMemberId(memberId);
+    }
 }

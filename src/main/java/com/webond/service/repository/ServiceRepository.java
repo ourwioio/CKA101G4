@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.webond.service.model.ServiceVO;
 
@@ -109,4 +111,16 @@ public interface ServiceRepository extends JpaRepository<ServiceVO, Integer> {
            where s.serviceId = :serviceId
            """)
     ServiceVO findOneWithServiceType(Integer serviceId);
+    
+    //一次下架所有服務
+    @Modifying
+    @Query("""
+           update ServiceVO s
+           set s.status = 3
+           where s.memberId = :memberId
+           and s.status = 1
+           """)
+    int disableAllActiveServicesByMemberId(
+            @Param("memberId") Integer memberId
+    );
 }
