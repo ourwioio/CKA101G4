@@ -1,5 +1,9 @@
 package com.webond.platform.controller;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URLConnection;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -7,15 +11,20 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.employee.model.EmployeeVO;
@@ -59,7 +68,8 @@ public class BulletinController {
 	 * request It also validates the user input
 	 */
 	@PostMapping("insert")
-	public String insert(@Valid BulletinVO bulletinVO, BindingResult result, ModelMap model, HttpSession session) {
+	public String insert(@Valid BulletinVO bulletinVO, BindingResult result, ModelMap model, HttpSession session,
+			@RequestParam(value = "upImg", required = false) MultipartFile upImg) throws IOException {
 
 		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
 		if (loginEmp == null) {
@@ -73,6 +83,10 @@ public class BulletinController {
 		if (result.hasErrors()) {
 			model.addAttribute("loginEmp", loginEmp);
 			return "back-end/bulletin/addBulletin";
+		}
+
+		if (upImg != null && !upImg.isEmpty()) {
+			bulletinVO.setImage(upImg.getBytes());
 		}
 
 		/*************************** 2.開始新增資料 *****************************************/
@@ -112,10 +126,11 @@ public class BulletinController {
 	 * This method will be called on update_emp_input.html form submission, handling
 	 * POST request It also validates the user input
 	 */
-	// ★ 修改處 2：方法簽章尾端加入 RedirectAttributes redirectAttrs
+	// 方法簽章尾端加入 RedirectAttributes redirectAttrs
 	@PostMapping("update")
 	public String update(@Valid BulletinVO bulletinVO, BindingResult result, ModelMap model, HttpSession session,
-			RedirectAttributes redirectAttrs) {
+			RedirectAttributes redirectAttrs,
+			@RequestParam(value = "upImg", required = false) MultipartFile upImg) throws IOException {
 
 		EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
 		if (loginEmp == null) {
@@ -129,6 +144,10 @@ public class BulletinController {
 		if (result.hasErrors()) {
 			model.addAttribute("loginEmp", loginEmp);
 			return "back-end/bulletin/update_bulletin_input";
+		}
+
+		if (upImg != null && !upImg.isEmpty()) {
+			bulletinVO.setImage(upImg.getBytes());
 		}
 
 		/*************************** 2.開始修改資料 *****************************************/
@@ -234,5 +253,34 @@ public class BulletinController {
 	protected Map<Integer, String> referenceEmployeeNameMap() {
 		return employeeRepository.findAll().stream()
 				.collect(Collectors.toMap(EmployeeVO::getEmployeeId, EmployeeVO::getEmpName));
+	}
+
+	// ===== 後台：取得公告圖片（草稿/已發布皆可查看，供管理者預覽用） =====
+	@GetMapping("image/{bulletinId}")
+	@ResponseBody
+	public ResponseEntity<byte[]> getImage(@PathVariable Integer bulletinId) {
+
+		BulletinVO bulletinVO = bulletinSvc.getOneBulletin(bulletinId);
+		if (bulletinVO == null || bulletinVO.getImage() == null || bulletinVO.getImage().length == 0) {
+			return ResponseEntity.notFound().build();
+		}
+
+		byte[] imgBytes = bulletinVO.getImage();
+		String imgType = "image/jpeg";
+
+		try {
+			imgType = URLConnection
+					.guessContentTypeFromStream(new BufferedInputStream(new ByteArrayInputStream(imgBytes)));
+			if (imgType == null) {
+				imgType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+			}
+		} catch (Exception e) {
+			// 圖片格式偵測失敗，維持預設 image/jpeg
+		}
+
+		return ResponseEntity.ok()
+				.contentType(MediaType.parseMediaType(imgType))
+				.header("Cache-Control", "max-age=3600")
+				.body(imgBytes);
 	}
 }
