@@ -200,3 +200,89 @@ img{ max-width: 100%; }
 	.detail-card__book-row{ flex-direction: column; align-items: stretch; }
 	.btn-book{ text-align: center; }
 }
+
+/* ---------- 評價區 ---------- */
+.review-section{ margin-top: 40px; }
+.review-section .section-title{
+	font-family: var(--font-display);
+	font-size: 20px;
+	font-weight: 800;
+	margin: 0 0 16px;
+}
+
+.rating-summary{ margin-bottom: 20px; }
+
+.review-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 16px;
+}
+
+.review-card {
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm);
+	padding: 16px 18px;
+}
+
+.review-header {
+	display: flex;
+	justify-content: space-between;
+	font-size: 13px;
+	color: var(--color-ink-soft);
+	margin-bottom: 8px;
+}
+.reviewer-name{ font-weight: 700; color: var(--color-ink); }
+
+.review-comment {
+	margin-top: 10px;
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: var(--color-ink);
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	min-height: 65px;
+}
+.review-empty {
+	color: var(--color-ink-soft);
+	font-style: italic;
+}
+
+/* ---------- 星星（含半星） ---------- */
+.stars-readonly span {
+	font-size: 15px;
+	color: #ddd;
+}
+.stars-readonly span.filled { color: #f5a623; }
+.stars-readonly span.half {
+	background: linear-gradient(90deg, #f5a623 50%, #ddd 50%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+.stars-readonly .rating-count {
+	font-size: 13px;
+	color: var(--color-ink-soft);
+	margin-left: 4px;
+}
+
+/* ---------- 空狀態 ---------- */
+.empty-state {
+	padding: 40px 20px;
+	text-align: center;
+	color: var(--color-ink-soft);
+	background: var(--color-surface-soft);
+	border: 1.5px dashed var(--color-border);
+	border-radius: var(--radius-lg);
+}
+.empty-state .blob {
+	width: 48px;
+	height: 48px;
+	margin: 0 auto 12px;
+	border-radius: 46% 54% 62% 38% / 46% 42% 58% 54%;
+	background: var(--color-border);
+}

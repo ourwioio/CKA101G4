@@ -274,6 +274,9 @@ public class VenueFrontController {
 		VenueVO venueVO = venueService.getOneVenue(venueId);
 		model.addAttribute("venueVO", venueVO);
 
+		List<VenueOrderVO> reviewList = venueOrderService.getReviewsByVenue(venueId);
+		model.addAttribute("reviewList", reviewList);
+
 		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 		boolean isOwner = loginMember != null && venueVO.getMember().getMemberId().equals(loginMember.getMemberId());
 
