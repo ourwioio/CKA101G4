@@ -11,6 +11,7 @@ import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.webond.member.model.MemberVO;
 import com.webond.venue.model.VenueImagesVO;
 import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueSlotVO;
@@ -307,6 +308,14 @@ public class VenueService {
 				slotVO.setSlotStatus(slotStatus);
 				venueSlotRepository.save(slotVO);
 			}
+		}
+	}
+	
+	public void removeVenue(MemberVO memberVO) {
+		List<VenueVO> list = getActiveByMember(memberVO.getMemberId());
+		for (VenueVO venueVO : list) {
+			venueVO.setVenueStatus((byte) 0);
+			updateVenue(venueVO);
 		}
 	}
 

@@ -8,12 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.webond.member.model.MemberReportVO;
 import com.webond.member.model.MemberVO;
 import com.webond.member.model.NotificationVO;
-import com.webond.member.repository.MemberReportRepository;
 import com.webond.member.repository.MemberRepository;
 import com.webond.member.service.MemberService;
+import com.webond.member.service.MemberServiceLoie;
 import com.webond.member.service.NotificationService;
 import com.webond.service.model.ServiceReportVO;
 import com.webond.service.model.ServiceVO;
@@ -37,7 +36,9 @@ public class ServiceReportService {
     
     @Autowired
     private MemberService memberService;
-
+    
+    @Autowired
+    MemberServiceLoie memberServiceLoie;
 	
 	//後台
 	public List<ServiceReportVO> getAll(){
@@ -104,12 +105,15 @@ public class ServiceReportService {
 				int currentPoints = memberVO.getReportPoints() != null ? memberVO.getReportPoints() : 0;
 				memberVO.setReportPoints(currentPoints + 1);
 				memberRepository.save(memberVO);
+				
+				
 			}
 	        
-	        
-	        
-	        
-	        
+			// 修改會員狀態
+			Integer memberReportPoint = memberVO.getReportPoints();
+			if (memberReportPoint >= 5) {
+				memberServiceLoie.updateMember(memberVO);
+			}
 		}
 	}
 	
