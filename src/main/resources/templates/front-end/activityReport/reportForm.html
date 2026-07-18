@@ -148,6 +148,9 @@ label {
   transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
 }
 
+
+
+
 .form-control:focus {
   border-color: var(--color-yellow-deep);
   background: var(--color-surface);
@@ -155,9 +158,14 @@ label {
 }
 
 textarea.form-control {
-  min-height: 120px;
-  resize: vertical;
-  line-height: 1.6;
+  resize: none; 
+  overflow-y: auto;
+  scrollbar-width: none;     
+  -ms-overflow-style: none;
+}
+
+textarea.form-control::-webkit-scrollbar {
+  display: none;
 }
 
 input[type="file"].form-control {

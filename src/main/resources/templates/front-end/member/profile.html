@@ -105,7 +105,7 @@
 		  letter-spacing: 0.5px;
 		}
 		
-		/* 活潑的小尺寸身分標章（帶有 Neo-brutalism 的活潑小黑邊） */
+		/* 活潑的小尺寸身分標章 */
 		.status-badge-mini{
 		  display: inline-flex;
 		  align-items: center;
@@ -160,7 +160,7 @@
 		}
 		.btn-primary:hover{ transform: translateY(-2px); box-shadow: var(--shadow-md); background: var(--color-yellow-deep); color: var(--color-ink); }
 		
-		/* 右上角細緻檢舉按鈕 (紅底60%透明、紅字) */
+		/* 右上角細緻檢舉按鈕 */
 		.btn-report {
 		  position: absolute;
 		  top: 24px;
@@ -216,50 +216,54 @@
 		}
 		
 		/* ==========================================================
-		   評分統計
+		   🌟 評分統計 (已精準修正為完美 3 欄與黃金尺寸)
 		   ========================================================== */
 		.rating-stats{
 		  display: grid;
-		  grid-template-columns: repeat(4, 1fr);
-		  gap: 16px;
+		  grid-template-columns: repeat(3, 1fr); /* 🚀 正式改為 3 欄滿版 */
+		  gap: 20px; /* 稍微放大間距，排版更舒展 */
 		}
 		
 		.stat-card{
 		  border-radius: var(--radius-md);
-		  padding: 20px 16px;
+		  padding: 24px 18px; /* 🚀 優化上下內距，讓卡片更有高度與大氣感 */
 		  text-align: center;
-		  transition: transform .2s ease;
-		  border: 1px solid var(--color-border);
+		  transition: transform .2s ease, box-shadow .2s ease;
+		  border: 1.5px solid var(--color-border);
+		  box-shadow: var(--shadow-sm);
 		}
-		.stat-card:hover{ transform: translateY(-4px); }
+		.stat-card:hover{ 
+		  transform: translateY(-4px); 
+		  box-shadow: var(--shadow-md);
+		}
 		.stat-card.service{  background: var(--color-pink); }
 		.stat-card.servicer{ background: var(--color-blue); }
-		.stat-card.activity{ background: var(--color-green); }
 		.stat-card.hold{      background: var(--color-yellow); }
 		
 		.stat-label{
-		  font-size: 12.5px;
+		  font-size: 13px;
 		  font-weight: 800;
 		  color: var(--color-ink);
-		  opacity: .8;
-		  margin-bottom: 8px;
+		  opacity: .9;
+		  margin-bottom: 10px;
 		}
 		.stat-number{
 		  font-family: var(--font-display);
-		  font-size: 22px;
+		  font-size: 24px; /* 🚀 放大分數文字，強化核心數據視覺 */
 		  font-weight: 800;
 		  color: var(--color-ink);
+		  line-height: 1.2;
 		}
 		.stat-detail{
-		  margin-top: 4px;
-		  font-size: 12px;
+		  margin-top: 6px;
+		  font-size: 12.5px;
 		  color: var(--color-ink);
-		  opacity: .7;
-		  font-weight: 500;
+		  opacity: .75;
+		  font-weight: 700; /* 加粗增強細節字體可讀性 */
 		}
 		
 		/* ==========================================================
-		   最近評論區 (全新的膠囊藥丸 Tabs 與對話卡片)
+		   最近評論區
 		   ========================================================== */
 		.review-tabs {
 		  display: flex;
@@ -358,7 +362,7 @@
 		}
 		
 		/* ==========================================================
-		   全新 RWD 卡片排版 (完全套用首頁 item-card)
+		   全新 RWD 卡片排版
 		   ========================================================== */
 		.card-grid{
 		  display: grid;
@@ -409,7 +413,6 @@
 		  padding: 16px;
 		}
 		
-		/* 帶有活動狀態徽章的 Body 需要多上方內距 */
 		.item-card__body--status{
 		  padding-top: 36px;
 		}
@@ -445,7 +448,6 @@
 		  margin: auto 0 8px; 
 		}
 		
-		/* 卡片底部 (包含時間/查看詳情按鈕) */
 		.item-card__footer{
 		  width: 100%;
 		  display: flex;
@@ -479,7 +481,6 @@
 		  transform: translateX(2px);
 		}
 		
-		/* 活動 / 場地卡片上的定位徽章 */
 		.status-badge {
 		  position: absolute;
 		  top: 12px;
@@ -545,7 +546,10 @@
 		  .member-name-container { justify-content: center; }
 		  .member-contact { align-items: center; }
 		  .action-buttons { justify-content: center; }
-		  .rating-stats{ grid-template-columns: repeat(2, 1fr); }
+		  
+		  /* 🚀 手機版防擠壓跑版：評分統計改為精緻的單欄直列滿版 */
+		  .rating-stats{ grid-template-columns: 1fr; gap: 14px; }
+		  
 		  .card-grid{ grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); }
 		  .btn-report { top: 16px; right: 16px; }
 		}
@@ -558,7 +562,7 @@
     <!-- ========== 頭部檔案 ========== -->
     <div class="profile-header">
       
-      <!-- 檢舉帳號 (右上方紅底透明紅字、小尺寸) -->
+      <!-- 檢舉帳號 -->
       <button class="btn btn-report" th:if="${session.memberVO != null}" th:onclick="|window.location.href='@{/backend/memberreport/addReport}'|">
         檢舉帳號
       </button>
@@ -575,6 +579,7 @@
           
           <span class="status-badge-mini status0" th:if="${memberVO.accountStatus == 0}">未認證</span>
           <span class="status-badge-mini status1" th:if="${memberVO.accountStatus == 1}">已認證</span>
+          <span class="status-badge-mini status3" th:if="${memberVO.accountStatus == 2}">已註銷</span>
           <span class="status-badge-mini status3" th:if="${memberVO.accountStatus == 3}">停權</span>
           <span class="status-badge-mini status4" th:if="${memberVO.accountStatus == 4}">限制活動</span>
         </div>
@@ -601,7 +606,7 @@
       <p class="intro-text" th:text="${memberVO.memberIntro}"></p>
     </div>
 
-    <!-- ========== 評分統計卡片 ========== -->
+    <!-- ========== 評分統計卡片 (完美 3 欄自適應) ========== -->
     <div class="section">
       <h2 class="section-title">評分統計</h2>
       <div class="rating-stats">
@@ -619,13 +624,6 @@
           <div class="stat-detail" th:text="'共 ' + ${memberVO.servicerRateCount} + ' 次評價'"></div>
         </div>
 
-        <!-- 參加活動評分 -->
-        <div class="stat-card activity">
-          <div class="stat-label">參加活動評分</div>
-          <div class="stat-number" th:text="${memberVO.actAvgRate} + ' / 5.0'"> </div>
-          <div class="stat-detail" th:text="'共 ' + ${memberVO.actRateCount} + ' 次評價'"></div>
-        </div>
-
         <!-- 舉辦活動評分 -->
         <div class="stat-card hold">
           <div class="stat-label">舉辦活動評分</div>
@@ -637,7 +635,6 @@
     </div>
 
     <!-- ========== 最近評論 ========== -->
-    
     <div class="section">
       <h2 class="section-title">最近評論</h2>
 
@@ -657,25 +654,23 @@
           <div class="review-meta">
             <div>
               <span class="review-stars">
-				  <!-- 根據評分數字，動態重複顯示對應數量的實心星星 -->
 				  <th:block th:if="${review.rating != null and review.rating > 0}" 
 				            th:each="i : ${#numbers.sequence(1, review.rating)}">★</th:block>
 				</span>
               <span class="review-date" style="margin-left: 10px;" th:text="${#temporals.format(review.reviewedAt, 'yyyy-MM-dd')}">2026-07-17</span>
             </div>
-            <!-- 角色與標籤顏色樣式匹配 -->
             <span class="review-badge" 
                   th:classappend="${review.role == 'AS_SERVICE_SELLER' or review.role == 'AS_SELLER' ? 'role-seller' : 
-                                 (review.role == 'AS_SERVICE_BUYER' or review.role == 'AS_BUYER' ? 'role-buyer' :
-                                 (review.role == 'AS_ACTIVITY_HOST' ? 'role-host' : 'role-venue'))}"
+                                   (review.role == 'AS_SERVICE_BUYER' or review.role == 'AS_BUYER' ? 'role-buyer' :
+                                   (review.role == 'AS_ACTIVITY_HOST' ? 'role-host' : 'role-venue'))}"
                   th:text="${review.role == 'AS_SERVICE_SELLER' or review.role == 'AS_SELLER'} ? '服務賣家' : 
-                          (${review.role == 'AS_SERVICE_BUYER' or review.role == 'AS_BUYER'} ? '服務買家' :
-                          (${review.role == 'AS_ACTIVITY_HOST'} ? '活動主辦' : '場地提供'))">角色</span>
+                           (${review.role == 'AS_SERVICE_BUYER' or review.role == 'AS_BUYER'} ? '服務買家' :
+                           (${review.role == 'AS_ACTIVITY_HOST'} ? '活動主辦' : '場地提供'))">角色</span>
           </div>
         </div>
       </div>
 	
-      <!-- 評論專屬分頁按鈕 (超過五筆自動顯示) -->
+      <!-- 評論專屬分頁按鈕 -->
       <div class="pagination" id="reviewPagination" th:if="${!reviews.isEmpty()}">
         <button type="button" onclick="changeReviewPage(-1)" id="reviewPrevBtn">上一頁</button>
         <span class="page-info" id="reviewPageInfo">1 / 1</span>
@@ -708,13 +703,11 @@
           </a>
         </div>
 
-        <!-- 沒有資料時顯示 -->
         <div class="no-items" th:if="${serviceListData == null}">
           目前尚無上架服務
         </div>
       </div>
 
-      <!-- 分頁按鈕 -->
       <div class="pagination" id="servicePagination" th:if="${serviceListData != null}">
         <button onclick="changePage('service', -1)" id="servicePrevBtn">上一頁</button>
         <span class="page-info" id="servicePageInfo">1 / 1</span>
@@ -733,14 +726,9 @@
             </div>
             <div class="item-card__body item-card__body--status">
               
-<!--               <span class="status-badge" -->
-<!--                     th:classappend="${activityDisplayStatusMap[activity.activityId] == '已取消' ? 'status-badge--cancel' : (activityDisplayStatusMap[activity.activityId] == '延期' ? 'status-badge--delayed' : 'status-badge--ongoing')}" -->
-<!--                     th:text="${activityDisplayStatusMap[activity.activityId]}">活動狀態</span> -->
-              
-             
-              	<span th:if="${registrationStatusMap[activity.activityId]} == '即將截止'"
-		      	class="status-badge status-badge--delayed"
-		      	th:text="${registrationStatusMap[activity.activityId]}">即將截止</span>
+				<span th:if="${registrationStatusMap[activity.activityId]} == '即將截止'"
+				      class="status-badge status-badge--delayed"
+				      th:text="${registrationStatusMap[activity.activityId]}">即將截止</span>
 		
 				<span th:if="${registrationStatusMap[activity.activityId]} == '報名中'"
 				      class="status-badge status-badge--ongoing"
@@ -757,7 +745,7 @@
 				<span th:if="${registrationStatusMap[activity.activityId]} == '活動已結束'"
 				      class="status-badge status-badge--cancel"
 				      th:text="${registrationStatusMap[activity.activityId]}">活動已結束</span>
-             
+              
               <h3 class="item-card__title" th:text="${activity.activityTitle}">活動名稱</h3>
               <span class="item-card__price">NT$ <span th:text="${activity.activityPrice}">0</span></span>
               
@@ -770,7 +758,6 @@
           </a>
         </div>
 
-        <!-- 沒有資料時顯示 -->
         <div class="no-items" th:if="${#lists.isEmpty(activityListData)}">
           目前尚無舉辦活動
         </div>
@@ -791,19 +778,16 @@
           <a th:href="@{/front/venue/getOneVenue(venueId=${venue.venueId})}">
             
             <div class="item-card__thumb-wrap">
-              <!-- 只顯示第一張圖 -->
               <img th:if="${venue.coverImage != null}"
                 th:src="@{/front/venue/getImage(imagesId=${venue.coverImage.imagesId})}"
                 alt="場地圖片" th:onerror="this.src='/images/default-venue.jpeg'" />
 
-              <!-- 如果沒圖片用預設 -->
               <img th:if="${venue.coverImage == null || venue.venueImages == null || venue.venueImages.isEmpty()}" 
                 src="/images/default-venue.jpeg" alt="暫無圖片" />
             </div>
 
             <div class="item-card__body item-card__body--status">
               
-              <!-- 上下架狀態 Badge -->
               <span th:switch ="${venue.venueStatus}">
                 <span th:case="0" class="status-badge status-badge--cancel">已下架</span>
                 <span th:case="1" class="status-badge status-badge--ongoing">上架中</span>
@@ -823,7 +807,6 @@
         </div>
       </div>
 
-      <!-- 沒有資料時顯示 -->
       <div>
         <div class="no-items" th:if="${#lists.isEmpty(venueListData)}">
           目前尚無場地提供
@@ -839,9 +822,6 @@
   </div>
 
   <script th:src="@{/js/front-end/member/profile.js}"></script>
-  <script>
-    
-  </script>
 </body>
 
 </html>

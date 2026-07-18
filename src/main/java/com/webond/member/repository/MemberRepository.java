@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,4 +25,25 @@ public interface MemberRepository extends JpaRepository<MemberVO, Integer> {
 	
     @Query("select m.nickname from MemberVO m where m.memberId = :memberId")
     String findNicknameById(@Param("memberId") Integer memberId);
+    
+    @Modifying
+    @Query("UPDATE MemberVO m SET " +
+           "m.servicerRateSum = COALESCE(m.servicerRateSum, 0) + :rate, " +
+           "m.servicerRateCount = COALESCE(m.servicerRateCount, 0) + 1 " +
+           "WHERE m.memberId = :memberId")
+    int addServicerRating(@Param("memberId") Integer memberId, @Param("rate") java.math.BigDecimal rate);
+
+    @Modifying
+    @Query("UPDATE MemberVO m SET " +
+           "m.serviceRateSum = COALESCE(m.serviceRateSum, 0) + :rate, " +
+           "m.serviceRateCount = COALESCE(m.serviceRateCount, 0) + 1 " +
+           "WHERE m.memberId = :memberId")
+    int addServiceRating(@Param("memberId") Integer memberId, @Param("rate") java.math.BigDecimal rate);
+    
+    @Modifying
+    @Query("UPDATE MemberVO m SET " +
+           "m.holdactRateSum = COALESCE(m.holdactRateSum, 0) + :rate, " +
+           "m.holdactRateCount = COALESCE(m.holdactRateCount, 0) + 1 " +
+           "WHERE m.memberId = :memberId")
+    int addHoldactRating(@Param("memberId") Integer memberId, @Param("rate") java.math.BigDecimal rate);
 }

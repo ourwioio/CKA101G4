@@ -1,140 +1,452 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>訂單評價</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>訂單評價｜Webond</title>
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <style>
+        /* ==========================================================
+           Webond 訂單評價頁 — 圓潤角色風 (cream / ink / pastel blobs)
+           ========================================================== */
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+
+        :root {
+            --color-bg:            #F7F3EC;
+            --color-surface:       #FFFFFF;
+            --color-surface-soft:  #FFFDF8;
+            --color-ink:           #17140F;
+            --color-ink-soft:      #726A5F;
+            --color-border:        #ECE4D6;
+
+            --color-yellow:       #FFE59A;
+            --color-yellow-deep:  #FFC94D;
+            --color-pink:         #FFB5C1;
+            --color-green:         #B7E1D1;
+            --color-blue:         #A9D3FF;
+            --color-red:          #FF5271;
+
+            --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+            --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+            --radius-lg: 26px;
+            --radius-md: 16px;
+            --radius-full: 999px;
+
+            --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+            --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+            --nav-height: 76px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: var(--font-body);
+            background: var(--color-bg);
+            color: var(--color-ink);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            padding: calc(var(--nav-height) + 40px) 20px 60px;
+        }
+
+        h2, h3, h4 { font-family: var(--font-display); margin: 0; }
+        a { text-decoration: none; color: inherit; }
+
+        .container {
+            max-width: 680px;
+            margin: auto;
+        }
+
+        /* 主資訊大卡片 */
+        .card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 40px;
+            margin-bottom: 24px;
+        }
+
+        /* 標題樣式 */
+        .page-title {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--color-ink);
+            margin-bottom: 24px;
+            position: relative;
+            padding-left: 16px;
+        }
+        .page-title::before {
+            content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            width: 7px; height: 7px; border-radius: 50%; background: var(--color-yellow-deep);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--color-ink);
+            margin: 28px 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px dashed var(--color-border);
+        }
+
+        /* 錯誤提示橫幅 */
+        .alert-error {
+            background: var(--color-pink);
+            color: var(--color-ink);
+            border-radius: var(--radius-md);
+            padding: 14px 20px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* 高級網格看板 */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .info {
+            background: var(--color-surface-soft);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .info.info--full-width { grid-column: span 2; }
+        .info .label { font-weight: 800; color: var(--color-ink); }
+        .info .value { font-weight: 600; color: var(--color-ink-soft); text-align: right; }
+
+        /* 表單控組 */
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-label {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--color-ink);
+            padding-left: 4px;
+        }
+        .form-control {
+            width: 100%;
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-ink);
+            background: var(--color-surface-soft);
+            border: 1.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            outline: none;
+            transition: all .15s ease;
+        }
+        .form-control:focus {
+            border-color: var(--color-yellow-deep);
+            background: var(--color-surface);
+        }
+
+        /* 尺寸完全固定文字域 */
+        textarea.form-control {
+            resize: none;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        textarea.form-control::-webkit-scrollbar { display: none; }
+
+        /* ==========================================================
+           🌟 全新打造：Google Map 質感互動星等樣式
+           ========================================================== */
+        .google-star-rating {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 0;
+            user-select: none;
+        }
+        .google-star-node {
+            font-size: 32px; /* 放大星等尺寸，點擊更具象、好操作 */
+            color: var(--color-border); /* 預設淡灰色/沙色 */
+            cursor: pointer;
+            transition: transform 0.1s ease, color 0.1s ease;
+        }
+        /* 懸浮放大回饋 */
+/*         .google-star-node:hover { */
+/*             transform: scale(1.15); */
+/*         } */
+        /* 被選中或懸浮點亮的滿星狀態 */
+        .google-star-node.filled {
+            color: var(--color-yellow-deep);
+        }
+
+        /* 按鈕系統 */
+        .btn-submit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            font-family: var(--font-body);
+            font-weight: 800;
+            font-size: 15px;
+            padding: 13px;
+            background: var(--color-ink);
+            color: #ffffff;
+            border: none;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all .18s ease;
+            margin-top: 8px;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            background: var(--color-yellow-deep);
+            color: var(--color-ink);
+        }
+        .btn-submit:active { transform: translateY(0) scale(0.98); }
+
+        /* 已完成評價面板 */
+        .review-completed-box {
+            background: var(--color-surface-soft);
+            border: 1.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+        .review-completed-box h3 {
+            font-size: 15.5px;
+            font-weight: 800;
+            color: var(--color-ink);
+            margin-bottom: 12px;
+            display: inline-block;
+            background: var(--color-blue);
+            padding: 4px 14px;
+            border-radius: 8px;
+        }
+        .review-completed-box p { margin: 6px 0; font-size: 14px; font-weight: 600; color: var(--color-ink-soft); }
+        .review-completed-box p strong { color: var(--color-ink); font-weight: 800; }
+        .review-none-text { font-size: 14px; color: var(--color-ink-soft); font-weight: 600; font-style: italic; padding: 10px 4px; }
+
+        @media (max-width: 520px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .info.info--full-width { grid-column: span 1; }
+            .card { padding: 24px; }
+        }
+    </style>
 </head>
+
 <body>
 
-<div th:if="${errorMessage}" style="color:red;">
-    <p th:text="${errorMessage}"></p>
-</div>
+<div class="container">
 
-<h2>訂單評價</h2>
-
-<table>
-    <tr>
-        <td>服務名稱</td>
-        <td th:text="${order.serviceNameSnapshot}"></td>
-    </tr>
-    <tr>
-        <td>服務類型</td>
-        <td th:text="${order.serviceTypeNameSnapshot}"></td>
-    </tr>
-    <tr>
-        <td>服務時段</td>
-        <td>
-            <span th:text="${#temporals.format(order.slotStartTimeSnapshot, 'yyyy-MM-dd HH:mm')}"></span>
-            ~
-            <span th:text="${#temporals.format(order.slotEndTimeSnapshot, 'HH:mm')}"></span>
-        </td>
-    </tr>
-    <tr>
-        <td>訂單編號</td>
-        <td th:text="${order.serviceOrderId}"></td>
-    </tr>
-</table>
-
-<hr>
-
-<!-- 買方視角：評賣家 -->
-<div th:if="${isbuyer}">
-
-    <div th:if="${order.buyerReviewedAt != null}">
-        <h3>你已完成評價</h3>
-        <p>評分：<span th:text="${order.buyerRateSeller}"></span> / 5</p>
-        <p>評論：<span th:text="${order.buyerReviewComment}"></span></p>
-        <p>評價時間：<span th:text="${#temporals.format(order.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+    <!-- 錯誤訊息提示區塊 -->
+    <div th:if="${errorMessage}" class="alert-error">
+        <span th:text="${errorMessage}"></span>
     </div>
 
-    <form th:if="${order.buyerReviewedAt == null}"
-          th:action="@{/orderReview/submit}"
-          th:object="${serviceReviewDTO}"
-          method="post">
+    <div class="card">
+        <h2 class="page-title">訂單評價</h2>
 
-        <input type="hidden" th:field="*{orderId}" th:value="${order.serviceOrderId}" />
-
-        <label>給賣家的評分</label>
-        <select th:field="*{rate}">
-            <option value="">請選擇</option>
-            <option value="5">5 - 非常滿意</option>
-            <option value="4">4 - 滿意</option>
-            <option value="3">3 - 普通</option>
-            <option value="2">2 - 不滿意</option>
-            <option value="1">1 - 非常不滿意</option>
-        </select>
-
-        <div>
-            <label>評論內容</label>
-            <textarea th:field="*{comment}" maxlength="500" rows="4"></textarea>
+        <!-- 高級網格看板 -->
+        <div class="info-grid">
+            <div class="info">
+                <span class="label">服務名稱</span>
+                <span class="value" th:text="${order.serviceNameSnapshot}"></span>
+            </div>
+            <div class="info">
+                <span class="label">服務類型</span>
+                <span class="value" th:text="${order.serviceTypeNameSnapshot}"></span>
+            </div>
+            <div class="info info--full-width">
+                <span class="label">服務時段</span>
+                <span class="value">
+                    <span th:text="${#temporals.format(order.slotStartTimeSnapshot, 'yyyy-MM-dd HH:mm')}"></span>
+                    ～
+                    <span th:text="${#temporals.format(order.slotEndTimeSnapshot, 'HH:mm')}"></span>
+                </span>
+            </div>
+            <div class="info info--full-width">
+                <span class="label">訂單編號</span>
+                <span class="value" th:text="${order.serviceOrderId}"></span>
+            </div>
         </div>
 
-        <button type="submit">送出評價</button>
-    </form>
+        <!-- ==================================================
+             買方視角分支
+             ================================================== -->
+        <div th:if="${isbuyer}">
 
-    <hr>
+            <h3 class="section-title">我的評價回饋</h3>
 
-    <!-- 對方（賣方）對我的評價 -->
-    <h3>賣家對你的評價</h3>
-    <div th:if="${order.sellerReviewedAt != null}">
-        <p>評分：<span th:text="${order.sellerRateBuyer}"></span> / 5</p>
-        <p>評論：<span th:text="${order.sellerReviewComment}"></span></p>
-        <p>評價時間：<span th:text="${#temporals.format(order.sellerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
-    </div>
-    <div th:if="${order.sellerReviewedAt == null}">
-        <p>賣家尚未評價</p>
-    </div>
-</div>
+            <!-- 買家已評狀態 -->
+            <div th:if="${order.buyerReviewedAt != null}" class="review-completed-box">
+                <h3>你已完成評價</h3>
+                <p>給予評分：<strong><span th:text="${order.buyerRateSeller}"></span> / 5 星</strong></p>
+                <p>心得評論：<span th:text="${order.buyerReviewComment}"></span></p>
+                <p>評價時間：<span th:text="${#temporals.format(order.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+            </div>
 
-<!-- 賣方視角：評買家 -->
-<div th:unless="${isbuyer}">
+            <!-- 買家未評表單 -->
+            <form th:if="${order.buyerReviewedAt == null}"
+                  th:action="@{/orderReview/submit}"
+                  th:object="${serviceReviewDTO}"
+                  method="post">
 
-    <div th:if="${order.sellerReviewedAt != null}">
-        <h3>你已完成評價</h3>
-        <p>評分：<span th:text="${order.sellerRateBuyer}"></span> / 5</p>
-        <p>評論：<span th:text="${order.sellerReviewComment}"></span></p>
-        <p>評價時間：<span th:text="${#temporals.format(order.sellerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
-    </div>
+                <input type="hidden" th:field="*{orderId}" th:value="${order.serviceOrderId}" />
 
-    <form th:if="${order.sellerReviewedAt == null}"
-          th:action="@{/orderReview/submit}"
-          th:object="${serviceReviewDTO}"
-          method="post">
+                <div class="form-group">
+                    <label class="form-label">給賣家的評分</label>
+                    <!-- 🌟 升級：隱藏欄位無縫接軌 Thymeleaf 數據模型 -->
+                    <input type="hidden" th:field="*{rate}" class="js-real-rating-input" value="" />
+                    
+                    <!-- 🌟 升級：Google Maps 互動星等列 -->
+                    <div class="google-star-rating">
+                        <span class="google-star-node" data-score="1">★</span>
+                        <span class="google-star-node" data-score="2">★</span>
+                        <span class="google-star-node" data-score="3">★</span>
+                        <span class="google-star-node" data-score="4">★</span>
+                        <span class="google-star-node" data-score="5">★</span>
+                    </div>
+                </div>
 
-        <input type="hidden" th:field="*{orderId}" />
+                <div class="form-group">
+                    <label class="form-label">評論內容</label>
+                    <textarea class="form-control" th:field="*{comment}" maxlength="500" rows="4" placeholder="請分享您的真實體驗感受（限 500 字）"></textarea>
+                </div>
 
-        <label>給買家的評分</label>
-        <select th:field="*{rate}">
-            <option value="">請選擇</option>
-            <option value="5">5 - 非常滿意</option>
-            <option value="4">4 - 滿意</option>
-            <option value="3">3 - 普通</option>
-            <option value="2">2 - 不滿意</option>
-            <option value="1">1 - 非常不滿意</option>
-        </select>
+                <button type="submit" class="btn-submit">送出評價</button>
+            </form>
 
-        <div>
-            <label>評論內容</label>
-            <textarea th:field="*{comment}" maxlength="500" rows="4"></textarea>
+            <h3 class="section-title">賣家對你的評價</h3>
+            
+            <div th:if="${order.sellerReviewedAt != null}" class="review-completed-box" style="border-color: var(--color-yellow);">
+                <p>對方評分：<strong><span th:text="${order.sellerRateBuyer}"></span> / 5 星</strong></p>
+                <p>對方評論：<span th:text="${order.sellerReviewComment}"></span></p>
+                <p>評價時間：<span th:text="${#temporals.format(order.sellerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+            </div>
+            <div th:if="${order.sellerReviewedAt == null}">
+                <p class="review-none-text">賣家目前尚未留下評價</p>
+            </div>
         </div>
 
-        <button type="submit">送出評價</button>
+        <!-- ==================================================
+             賣方視角分支
+             ================================================== -->
+        <div th:unless="${isbuyer}">
 
-    </form>
+            <h3 class="section-title">我的評價回饋</h3>
 
-    <hr>
+            <!-- 賣家已評狀態 -->
+            <div th:if="${order.sellerReviewedAt != null}" class="review-completed-box">
+                <h3>你已完成評價</h3>
+                <p>給予評分：<strong><span th:text="${order.sellerRateBuyer}"></span> / 5 星</strong></p>
+                <p>心得評論：<span th:text="${order.sellerReviewComment}"></span></p>
+                <p>評價時間：<span th:text="${#temporals.format(order.sellerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+            </div>
 
-    <!-- 對方（買方）對我的評價 -->
-    <h3>買家對你的評價</h3>
-    <div th:if="${order.buyerReviewedAt != null}">
-        <p>評分：<span th:text="${order.buyerRateSeller}"></span> / 5</p>
-        <p>評論：<span th:text="${order.buyerReviewComment}"></span></p>
-        <p>評價時間：<span th:text="${#temporals.format(order.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
-    </div>
-    <div th:if="${order.buyerReviewedAt == null}">
-        <p>買家尚未評價</p>
+            <!-- 賣家未評表單 -->
+            <form th:if="${order.sellerReviewedAt == null}"
+                  th:action="@{/orderReview/submit}"
+                  th:object="${serviceReviewDTO}"
+                  method="post">
+
+                <input type="hidden" th:field="*{orderId}" />
+
+                <div class="form-group">
+                    <label class="form-label">給買家的評分</label>
+                    <!-- 🌟 升級：隱藏欄位無縫接軌 Thymeleaf 數據模型 -->
+                    <input type="hidden" th:field="*{rate}" class="js-real-rating-input" value="" />
+                    
+                    <!-- 🌟 升級：Google Maps 互動星等列 -->
+                    <div class="google-star-rating">
+                        <span class="google-star-node" data-score="1">★</span>
+                        <span class="google-star-node" data-score="2">★</span>
+                        <span class="google-star-node" data-score="3">★</span>
+                        <span class="google-star-node" data-score="4">★</span>
+                        <span class="google-star-node" data-score="5">★</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">評論內容</label>
+                    <textarea class="form-control" th:field="*{comment}" maxlength="500" rows="4" placeholder="請填寫對本次預約客人的評價（限 500 字）"></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit">送出評價</button>
+            </form>
+
+            <h3 class="section-title">買家對你的評價</h3>
+            
+            <div th:if="${order.buyerReviewedAt != null}" class="review-completed-box" style="border-color: var(--color-yellow);">
+                <p>對方評分：<strong><span th:text="${order.buyerRateSeller}"></span> / 5 星</strong></p>
+                <p>對方評論：<span th:text="${order.buyerReviewComment}"></span></p>
+                <p>評價時間：<span th:text="${#temporals.format(order.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
+            </div>
+            <div th:if="${order.buyerReviewedAt == null}">
+                <p class="review-none-text">⏳ 買家目前尚未留下評價</p>
+            </div>
+        </div>
+
     </div>
 </div>
+
+<!-- ==========================================================
+     核心 JavaScript：精準模擬 Google Map 評分交互效果
+     ========================================================== -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ratingContainer = document.querySelector('.google-star-rating');
+        if (!ratingContainer) return; // 防呆：如果兩個都已評價，頁面無表單則不執行
+
+        const stars = ratingContainer.querySelectorAll('.google-star-node');
+        const hiddenInput = document.querySelector('.js-real-rating-input');
+
+        // 輔助函式：點亮到指定的星等
+        function lightUpStars(score) {
+            stars.forEach(star => {
+                const starScore = parseInt(star.getAttribute('data-score'), 10);
+                if (starScore <= score) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            });
+        }
+
+        stars.forEach(star => {
+            // 1. 滑鼠移入：暫時點亮到當前懸浮的星星
+            star.addEventListener('mouseenter', function() {
+                const currentHoverScore = parseInt(this.getAttribute('data-score'), 10);
+                lightUpStars(currentHoverScore);
+            });
+
+            // 2. 滑鼠移出：還原回「目前真正被點擊選中」的分數狀態
+            star.addEventListener('mouseleave', function() {
+                const currentSelectedScore = parseInt(hiddenInput.value, 10) || 0;
+                lightUpStars(currentSelectedScore);
+            });
+
+            // 3. 點擊星星：真正鎖定分數，並同步更新給隱藏的 Thymeleaf input
+            star.addEventListener('click', function() {
+                const selectedScore = this.getAttribute('data-score');
+                hiddenInput.value = selectedScore; // 同步給後端表單
+                lightUpStars(parseInt(selectedScore, 10));
+            });
+        });
+    });
+</script>
 
 </body>
 </html>
