@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.webond.member.model.MemberVO;
 import com.webond.member.repository.MemberRepository;
+import com.webond.member.service.MemberServiceLoie;
 import com.webond.venue.model.VenueOrderVO;
 import com.webond.venue.model.VenueReportVO;
 import com.webond.venue.model.VenueVO;
@@ -54,6 +55,9 @@ public class VenueReportService {
 
 	@Autowired
 	private MemberRepository memberRepository;
+	
+	@Autowired
+	MemberServiceLoie memberServiceLoie;
 
 	@Autowired
 	private VenueReviewService venueReviewService;
@@ -139,6 +143,12 @@ public class VenueReportService {
 		// ④ 場地狀態改為待審核
 		venueVO.setVenueStatus(VENUE_STATUS_PENDING);
 		venueRepository.save(venueVO);
+		
+		// 修改會員狀態
+		Integer memberReportPoint = provider.getReportPoints();
+		if (memberReportPoint >= 5) {
+			memberServiceLoie.updateMember(provider);
+		}
 	}
 
 	// ===== 後台：檢舉不成立，場地與會員皆不受影響 =====
