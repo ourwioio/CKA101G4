@@ -4,9 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.CacheControl;
@@ -28,9 +30,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.webond.activity.model.ActivityService;
 import com.webond.activity.model.ActivityOrderService;
 import com.webond.activity.model.ActivityOrderVO;
+import com.webond.activity.model.ActivityService;
 import com.webond.activity.model.ActivityVO;
 import com.webond.member.dto.ChangePasswordDTO;
 import com.webond.member.dto.ProfileUpdateDTO;
@@ -71,38 +73,48 @@ public class MemberFrontControllerAyaka {
     private BCryptPasswordEncoder passwordEncoder;
 	
 	
-	
-	
-	
+	private static final Map<String, Integer> STATUS_PRIORITY = Map.of(
+	        "即將截止", 0,
+	        "報名中", 1,
+	        "尚未開放報名", 2,
+	        "報名已截止", 3,
+	        "活動已結束", 4,
+	        "活動不存在", 5
+	);
+
+
 	//會員頁面
 	@GetMapping("oneMember")
 	public String getOneMember(@RequestParam("memberId") Integer memberId,
 	        @RequestParam(value = "venueId", required = false) Integer venueId,
 	        ModelMap model) {
-	    
+
 	    MemberVO memberVO = memberService.getOneMember(memberId);
 	    ServiceVO serviceList = serviceService.getOneService(memberId);
 	    List<VenueVO> venueList = venueService.getActiveByMember(memberId);
 	    List<MemberReviewDTO> reviews = myReviewService.getReviewsByMemberId(memberId);
 	    addHostedActivityData(model, memberId);
 	    model.addAttribute("reviews", reviews);
-	    
-	    // 為每個 venue 載入圖片
-//	    if (venueList != null) {
-//	        for (VenueVO v : venueList) {
-//	            Set<VenueImagesVO> imgs = venueService.getImagesByVenue(v.getVenueId());
-//	            v.setVenueImages(imgs);
-//	        }
-//	    }
-	    
+
+	    List<ActivityVO> activityList = activityService.getAll();
+	    Map<Integer, String> registrationStatusMap = memberService.getRegistrationStatusMap(activityList);
+
+	    // 依優先順序排序活動清單
+	    List<ActivityVO> sortedActivityList = activityList.stream()
+	            .sorted(Comparator.comparingInt(activityVO ->
+	                    STATUS_PRIORITY.getOrDefault(
+	                            registrationStatusMap.get(activityVO.getActivityId()),
+	                            99
+	                    )
+	            ))
+	            .collect(Collectors.toList());
+
+	    model.addAttribute("registrationStatusMap", registrationStatusMap);
+	    model.addAttribute("activityListData", sortedActivityList); // 給 Thymeleaf 用排序後的清單
+
 	    model.addAttribute("memberVO", memberVO);
 	    model.addAttribute("serviceListData", serviceList);
 	    model.addAttribute("venueListData", venueList);
-
-//	    if (venueId != null) {
-//	        Set<VenueImagesVO> venueImgList = venueService.getImagesByVenue(venueId);
-//	        model.addAttribute("venueImagesData", venueImgList);
-//	    }
 
 	    return "front-end/member/profile";
 	}
@@ -129,9 +141,30 @@ public class MemberFrontControllerAyaka {
 	    addHostedActivityData(model, memberId);
 	    model.addAttribute("reviews", reviews);
 	    
+
+
+	    List<ActivityVO> activityList = activityService.getAll();
+	    Map<Integer, String> registrationStatusMap = memberService.getRegistrationStatusMap(activityList);
+
+	    // 依優先順序排序活動清單
+	    List<ActivityVO> sortedActivityList = activityList.stream()
+	            .sorted(Comparator.comparingInt(activityVO ->
+	                    STATUS_PRIORITY.getOrDefault(
+	                            registrationStatusMap.get(activityVO.getActivityId()),
+	                            99
+	                    )
+	            ))
+	            .collect(Collectors.toList());
+
+	    model.addAttribute("registrationStatusMap", registrationStatusMap);
+	    model.addAttribute("activityDataList", sortedActivityList); // 給 Thymeleaf 用排序後的清單
+	    
 	    model.addAttribute("memberVO", memberVO);
 	    model.addAttribute("serviceListData", serviceList);
 	    model.addAttribute("venueListData", venueList);
+		
+
+	    
 	    
 		return "front-end/member/myProfile";
 	}

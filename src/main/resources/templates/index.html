@@ -771,8 +771,8 @@
               <img th:src="@{/activity/front/image(id=${activity.activityId})}" alt="活動圖片">
             </div>
             <div class="item-card__body">
-              <span  th:if="${registrationStatusMap[activity.activityId] == '報名中'}" class="status-badge status-badge--ongoing">上架中</span>
-              <span  th:if="${registrationStatusMap[activity.activityId] == '即將截止'}" class="status-badge status-badge--ongoing">上架中</span>
+              <span  th:if="${registrationStatusMap[activity.activityId] == '報名中'}" class="status-badge status-badge--ongoing">報名中</span>
+              <span  th:if="${registrationStatusMap[activity.activityId] == '即將截止'}" class="status-badge status-badge--ongoing">報名中</span>
    
 
               <h3 class="item-card__title" th:text="${activity.activityTitle}">活動名稱</h3>

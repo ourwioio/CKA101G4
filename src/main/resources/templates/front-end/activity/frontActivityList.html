@@ -518,13 +518,31 @@ a { text-decoration: none; color: inherit; }
 
   <!-- ========== 卡片網格 (已套用全新的區塊高度固定邏輯) ========== -->
   <div class="container" th:unless="${#lists.isEmpty(activityListData)}">
-    <div class="card" th:each="activity : ${activityListData}">
+    <div class="card" th:each="activity : ${activityListData}"  th:if="${registrationStatusMap[activity.activityId]} != '活動已結束'">
       <a th:href="@{/activity/front/detail(id=${activity.activityId})}">
         
         <!-- 圖片容器 + 飄浮在右上角的狀態標籤 -->
         <div class="card__thumb-wrap">
           <img class="activity-image" th:src="@{/activity/front/image(id=${activity.activityId})}" alt="活動圖片">
-          <span class="registration-status" th:text="${registrationStatusMap[activity.activityId]}">報名中</span>
+<!--           <span class="registration-status" th:text="${registrationStatusMap[activity.activityId]}">報名中</span> -->
+          
+              	<span th:if="${registrationStatusMap[activity.activityId]} == '即將截止'"
+		      	class="registration-status"
+		      	th:text="${registrationStatusMap[activity.activityId]}">即將截止</span>
+		
+				<span th:if="${registrationStatusMap[activity.activityId]} == '報名中'"
+				      class="registration-status"
+				      th:text="${registrationStatusMap[activity.activityId]}">報名中</span>
+				
+				<span th:if="${registrationStatusMap[activity.activityId]} == '尚未開放報名'"
+				      class="registration-status"
+				      th:text="${registrationStatusMap[activity.activityId]}">尚未開始報名</span>
+				
+				<span th:if="${registrationStatusMap[activity.activityId]} == '報名已截止'"
+				      class="registration-status"
+				      th:text="${registrationStatusMap[activity.activityId]}">報名已截止</span>
+				
+             
         </div>
         
         <div class="card__body">
