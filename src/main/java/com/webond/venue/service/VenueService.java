@@ -253,6 +253,36 @@ public class VenueService {
 		}
 
 		repository.save(existingVenue);
+
+		// 開放日/營業時段可能被改了，未來的時段紀錄要跟著重新計算
+		refreshFutureSlots(existingVenue);
+	}
+
+	// 場地開放日/營業時段有異動時，重新計算「未來」時段的開放狀態；
+	// 已經被預約(1)或正在付款中(3)的小時維持不動，避免把成立的訂單弄壞
+	@Transactional
+	public void refreshFutureSlots(VenueVO venue) {
+		LocalDate today = LocalDate.now();
+		List<VenueSlotVO> futureSlots = venueSlotRepository
+				.findByVenueVO_VenueIdAndSlotDateGreaterThanEqual(venue.getVenueId(), today);
+		String closedHours = "2".repeat(24);
+
+		for (VenueSlotVO slot : futureSlots) {
+			int dayOfWeek = slot.getSlotDate().getDayOfWeek().getValue() - 1;
+			String newPattern = (venue.getOpenDays().charAt(dayOfWeek) == '1') ? venue.getAvailableHours()
+					: closedHours;
+
+			StringBuilder merged = new StringBuilder(slot.getSlotStatus());
+			for (int h = 0; h < 24; h++) {
+				char current = merged.charAt(h);
+				if (current == '1' || current == '3') {
+					continue; // 已預約或付款中，保留不動
+				}
+				merged.setCharAt(h, newPattern.charAt(h));
+			}
+			slot.setSlotStatus(merged.toString());
+			venueSlotRepository.save(slot);
+		}
 	}
 
 	// 排程器用讓場地都有15天可以讓人預約

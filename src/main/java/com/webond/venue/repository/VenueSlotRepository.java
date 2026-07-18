@@ -1,6 +1,7 @@
 package com.webond.venue.repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,4 +24,6 @@ public interface VenueSlotRepository extends JpaRepository<VenueSlotVO, Integer>
 	LocalDate findMaxSlotDateByVenueId(@Param("venueId") Integer venueId);
 
 	void deleteBySlotDateBefore(LocalDate date);
+
+	List<VenueSlotVO> findByVenueVO_VenueIdAndSlotDateGreaterThanEqual(Integer venueId, LocalDate date);
 }
