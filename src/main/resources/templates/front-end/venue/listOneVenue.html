@@ -79,10 +79,13 @@
 
 		<div class="rating-summary">
 			<span class="stars-readonly"
-			      th:with="hasRating=${venueVO.ratingCount != null and venueVO.ratingCount > 0}, r=${hasRating ? T(java.lang.Math).round(venueVO.averageRating * 2) / 2.0 : 0}">
+			      th:with="hasRating=${venueVO.ratingCount != null and venueVO.ratingCount > 0},
+			               preciseAvg=${hasRating ? T(java.lang.Math).round(venueVO.averageRating * 10) / 10.0 : 0},
+			               starR=${hasRating ? T(java.lang.Math).round(venueVO.averageRating * 2) / 2.0 : 0}">
+				<span class="rating-count" th:text="${preciseAvg}"></span>
 				<span th:each="i : ${#numbers.sequence(1,5)}"
 				      th:text="'★'"
-				      th:classappend="${r >= i} ? 'filled' : (${r >= i - 0.5} ? 'half' : '')"></span>
+				      th:classappend="${starR >= i} ? 'filled' : (${starR >= i - 0.5} ? 'half' : '')"></span>
 				<span class="rating-count" th:text="${hasRating} ? '（共 ' + ${venueVO.ratingCount} + ' 則評價）' : '（共 ' + ${venueVO.ratingCount} + ' 則評價）'"></span>
 			</span>
 		</div>

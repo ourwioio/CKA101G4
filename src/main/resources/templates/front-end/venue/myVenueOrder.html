@@ -148,7 +148,7 @@
 
 <!-- 評價 Modal -->
 <div class="modal-overlay" id="reviewModalOverlay">
-    <div class="modal-box">
+    <div class="modal-box modal-box--review">
         <h3>評價這個場地</h3>
         <form th:action="@{/front/venueOrder/updateReview}" method="post">
             <input type="hidden" name="venueOrderId" id="reviewOrderId" />
@@ -161,7 +161,9 @@
                 <input type="radio" id="star1" name="venueRating" value="1"><label for="star1">★</label>
             </div>
 
-            <textarea name="venueComment" id="reviewComment" placeholder="留下你對這個場地的感想..."></textarea>
+            <textarea name="venueComment" id="reviewComment" placeholder="留下你對這個場地的感想..." maxlength="50"
+                      oninput="updateReviewCommentCounter()"></textarea>
+            <p class="comment-counter" id="reviewCommentCounter">還可以輸入 50 字</p>
 
             <div class="modal-actions">
                 <button type="button" class="btn-cancel" onclick="closeReviewModal()">取消</button>

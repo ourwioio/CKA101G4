@@ -5,6 +5,7 @@ function openReviewModal(btn) {
 
     document.getElementById('reviewOrderId').value = orderId;
     document.getElementById('reviewComment').value = (comment === 'null') ? '' : comment;
+    updateReviewCommentCounter();
 
     document.querySelectorAll('input[name="venueRating"]').forEach(function (el) {
         el.checked = false;
@@ -18,9 +19,46 @@ function openReviewModal(btn) {
     document.getElementById('reviewModalOverlay').style.display = 'flex';
 }
 
+function updateReviewCommentCounter() {
+    var textarea = document.getElementById('reviewComment');
+    var max = parseInt(textarea.getAttribute('maxlength'), 10);
+    var remaining = max - textarea.value.length;
+    document.getElementById('reviewCommentCounter').textContent = '還可以輸入 ' + remaining + ' 字';
+}
+
 function closeReviewModal() {
     document.getElementById('reviewModalOverlay').style.display = 'none';
 }
+
+// 評價留言真的擋住不能超過 3 行（不只是視覺上限）
+var REVIEW_COMMENT_MAX_LINES = 3;
+
+document.getElementById('reviewComment').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+        var lineCount = this.value.split('\n').length;
+        if (lineCount >= REVIEW_COMMENT_MAX_LINES) {
+            e.preventDefault();
+        }
+    }
+});
+
+document.getElementById('reviewComment').addEventListener('paste', function (e) {
+    var textarea = this;
+    var currentLines = textarea.value.split('\n').length;
+    var remainingLines = REVIEW_COMMENT_MAX_LINES - currentLines;
+
+    e.preventDefault();
+    if (remainingLines <= 0) return; // 已經滿 3 行，貼上的內容整個不接受
+
+    var pasteText = (e.clipboardData || window.clipboardData).getData('text');
+    var allowedText = pasteText.split('\n').slice(0, remainingLines + 1).join('\n');
+
+    var start = textarea.selectionStart;
+    var end = textarea.selectionEnd;
+    var newValue = textarea.value.slice(0, start) + allowedText + textarea.value.slice(end);
+    textarea.value = newValue.slice(0, textarea.maxLength);
+    updateReviewCommentCounter();
+});
 
 document.getElementById('reviewModalOverlay').addEventListener('click', function (e) {
     if (e.target === this) closeReviewModal();
