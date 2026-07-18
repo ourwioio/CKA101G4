@@ -49,7 +49,17 @@ function updateStartHourOptions() {
 
     if (!selectedSlotStatus) return;
 
+    // 如果選的是今天，只能約現在這個小時「之後」的時段
+    const selectedDate = document.getElementById('selectedSlotDate').value;
+    const now = new Date();
+    const todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    const isToday = selectedDate === todayStr;
+    const currentHour = now.getHours();
+
     for (let h = 0; h < 24; h++) {
+        if (isToday && h <= currentHour) {
+            continue;
+        }
         if (selectedSlotStatus[h] === '0') {
             let opt = document.createElement('option');
             opt.value = h;
