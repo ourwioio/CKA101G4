@@ -262,6 +262,16 @@ a {
 								th:text="${venueVO.member != null and venueVO.member.reportPoints != null}
                           ? ${venueVO.member.reportPoints} : 0"></div>
 						</div>
+						<div class="info-group">
+							<div class="info-label">提供者聯絡電話</div>
+							<div class="info-value"
+								th:text="${venueVO.member != null && venueVO.member.phone != null ? venueVO.member.phone : '-'}"></div>
+						</div>
+						<div class="info-group">
+							<div class="info-label">提供者聯絡信箱</div>
+							<div class="info-value"
+								th:text="${venueVO.member != null && venueVO.member.email != null ? venueVO.member.email : '-'}"></div>
+						</div>
 						<div class="info-group full-width">
 							<div class="info-label">場地目前狀態</div>
 							<div>

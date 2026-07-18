@@ -70,26 +70,31 @@ public class VenueReportController {
 
 		List<VenueReportVO> list = venueReportSvc.getAll();
 		model.addAttribute("venueReportListData", list);
+		model.addAttribute("venueNameMap", venueReportSvc.getVenueNameMap(list));
 		model.addAttribute("searchStatus", null);
 		model.addAttribute("searchKeyword", null);
+		model.addAttribute("searchVenueName", null);
 		model.addAttribute("searchStartDate", null);
 		model.addAttribute("searchEndDate", null);
 		return "back-end/venueReport/listAllVenueReport";
 	}
 
-	// ===== 複合查詢：處理狀態 + 檢舉內容關鍵字 + 檢舉時間區間 =====
+	// ===== 複合查詢：處理狀態 + 檢舉內容關鍵字 + 場地名稱 + 檢舉時間區間 =====
 	@GetMapping("search")
 	public String search(@RequestParam(value = "reportStatus", required = false) Byte reportStatus,
 			@RequestParam(value = "keyword", required = false) String keyword,
+			@RequestParam(value = "venueName", required = false) String venueName,
 			@RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
 			@RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
 			ModelMap model) {
 
-		List<VenueReportVO> list = venueReportSvc.search(reportStatus, keyword, startDate, endDate);
+		List<VenueReportVO> list = venueReportSvc.search(reportStatus, keyword, venueName, startDate, endDate);
 
 		model.addAttribute("venueReportListData", list);
+		model.addAttribute("venueNameMap", venueReportSvc.getVenueNameMap(list));
 		model.addAttribute("searchStatus", reportStatus);
 		model.addAttribute("searchKeyword", keyword);
+		model.addAttribute("searchVenueName", venueName);
 		model.addAttribute("searchStartDate", startDate);
 		model.addAttribute("searchEndDate", endDate);
 		return "back-end/venueReport/listAllVenueReport";

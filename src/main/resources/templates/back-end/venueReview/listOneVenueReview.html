@@ -257,7 +257,7 @@ select:focus, textarea:focus {
 						</div>
 					</div>
 
-					<div class="section-title">場地提供者資訊</div>
+					<div class="section-title">場地資訊</div>
 					<div class="info-grid">
 						<div class="info-group">
 							<div class="info-label">場地名稱</div>
@@ -301,6 +301,25 @@ select:focus, textarea:focus {
 							<div class="info-label">每日營業時段</div>
 							<div class="info-value"
 								th:text="${startH} + ':00 至 ' + ${endH} + ':00'"></div>
+						</div>
+					</div>
+
+					<div class="section-title">場地提供者資訊</div>
+					<div class="info-grid">
+						<div class="info-group">
+							<div class="info-label">提供者姓名</div>
+							<div class="info-value"
+								th:text="${venueVO.member != null ? venueVO.member.nickname : '-'}"></div>
+						</div>
+						<div class="info-group">
+							<div class="info-label">聯絡電話</div>
+							<div class="info-value"
+								th:text="${venueVO.member != null && venueVO.member.phone != null ? venueVO.member.phone : '-'}"></div>
+						</div>
+						<div class="info-group full-width">
+							<div class="info-label">聯絡信箱</div>
+							<div class="info-value"
+								th:text="${venueVO.member != null && venueVO.member.email != null ? venueVO.member.email : '-'}"></div>
 						</div>
 					</div>
 

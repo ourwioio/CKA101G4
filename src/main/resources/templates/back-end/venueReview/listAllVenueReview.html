@@ -33,7 +33,9 @@
 				<option value="2"
 					th:selected="${searchReviewStatus != null && searchReviewStatus == 2}">審核未通過</option>
 			</select> <input type="number" name="venueId" placeholder="場地編號"
-				th:value="${searchVenueId}" style="width: 120px;" /> <select
+				th:value="${searchVenueId}" style="width: 120px;" /> <input
+				type="text" name="venueName" placeholder="場地名稱"
+				th:value="${searchVenueName}" style="width: 140px;" /> <select
 				name="employeeId">
 				<option value="">-- 全部審核員工 --</option>
 				<option th:each="emp : ${employeeListData}"
@@ -51,6 +53,7 @@
 					<tr>
 						<th>審核編號</th>
 						<th>場地編號</th>
+						<th>場地名稱</th>
 						<th>審核狀態</th>
 						<th>負責員工</th>
 						<th>審核備註</th>
@@ -62,8 +65,9 @@
 					<tr th:each="venueReview : ${venueReviewListData}">
 						<td th:text="${venueReview.venueReviewId}"></td>
 						<td th:text="${venueReview.venueId}"></td>
+						<td th:text="${venueNameMap.get(venueReview.venueId)}"></td>
 						<td><span th:switch="${venueReview.reviewStatus}"> <span
-								th:case="0" class="btn-toggle btn-toggle-down"
+								th:case="0" class="btn-toggle btn-toggle-pending"
 								style="pointer-events: none;">審核中</span> <span th:case="1"
 								class="btn-toggle btn-toggle-up" style="pointer-events: none;">審核通過</span>
 								<span th:case="2" class="btn-toggle btn-toggle-down"
