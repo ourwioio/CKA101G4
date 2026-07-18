@@ -62,6 +62,19 @@ public class LoginFilter extends OncePerRequestFilter {
 		return !(isMemberProtected(uri) || isEmployeeProtected(uri));
 	}
 
+	/**
+	 * 🎯 新增：判斷是否為 AJAX / JSON API 請求（例如通知輪詢 unread-count）。
+	 * 這類請求未登入時：
+	 * 1. 不能把網址存進 session.location（否則登入後會被導去 JSON API 頁面）
+	 * 2. 不該回 302 導向登入頁（fetch 會拿到登入頁 HTML 解析失敗），直接回 401 即可
+	 */
+	private boolean isAjaxRequest(HttpServletRequest request) {
+		String accept = request.getHeader("Accept");
+		String requestedWith = request.getHeader("X-Requested-With");
+		return (accept != null && accept.contains("application/json"))
+				|| "XMLHttpRequest".equals(requestedWith);
+	}
+
 	@Override
 	protected void doFilterInternal(HttpServletRequest request,
 									HttpServletResponse response,
@@ -73,6 +86,11 @@ public class LoginFilter extends OncePerRequestFilter {
 		if (isEmployeeProtected(uri)) {
 			// 員工後台：檢查員工登入身分（同學的 AdminLoginSuccessHandler 寫入）
 			if (session.getAttribute("employeeVO") == null) {
+				// 🎯 新增：AJAX 請求未登入直接回 401，不寫 location、不導向
+				if (isAjaxRequest(request)) {
+					response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+					return;
+				}
 				session.setAttribute("location", uri);
 				response.sendRedirect(request.getContextPath() + "/admin/login");
 				return;
@@ -80,6 +98,12 @@ public class LoginFilter extends OncePerRequestFilter {
 		} else {
 			// 會員頁面：檢查會員登入身分（handleLogin 寫入）
 			if (session.getAttribute("account") == null) {
+				// 🎯 新增：AJAX 輪詢（如 /front/notification/unread-count）未登入時
+				// 直接回 401，且「不寫入 location」，避免污染登入後的跳轉目標
+				if (isAjaxRequest(request)) {
+					response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+					return;
+				}
 				session.setAttribute("location", uri);
 				response.sendRedirect(request.getContextPath() + "/member/login");
 				return;
