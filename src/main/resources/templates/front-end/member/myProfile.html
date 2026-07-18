@@ -172,7 +172,6 @@
             </div>
             <div class="item-card__body">
               <h3 class="item-card__title" th:text="${service.serviceName}">服務名稱</h3>
-              <div class="item-card__desc" th:text="${service.description}">服務描述</div>
               <span class="item-card__price">NT$ <span th:text="${service.hourlyRate}">500</span></span>
               <div class="item-card__footer">
                 <span class="item-card__date" th:text="${#temporals.format(service.createdAt, 'yyyy-MM-dd')}">建立日期</span>
@@ -206,12 +205,18 @@
             </div>
             <div class="item-card__body item-card__body--status">
               
-              <span class="status-badge"
-                    th:classappend="${activityDisplayStatusMap[activity.activityId] == '已取消' ? 'status-badge--cancel' : (activityDisplayStatusMap[activity.activityId] == '延期' ? 'status-badge--delayed' : 'status-badge--ongoing')}"
-                    th:text="${activityDisplayStatusMap[activity.activityId]}">活動狀態</span>
+<!--               <span class="status-badge" th:text="${registrationStatusMap[activity.activityId]}">活動狀態</span> -->
+
+              	<span class="status-badge"
+				      th:classappend="${
+				          registrationStatusMap[activity.activityId] == '即將截止'} ? 'status-badge--delayed' :
+				          (${registrationStatusMap[activity.activityId]} == '報名中' ? 'status-badge--ongoing' : 'status-badge--cancel')"
+				      th:text="${registrationStatusMap[activity.activityId]}">
+				    活動狀態
+				</span>
+             
 
               <h3 class="item-card__title" th:text="${activity.activityTitle}">活動名稱</h3>
-              <div class="item-card__desc" th:text="${activity.activityDescription}">活動描述</div>
               <span class="item-card__price">NT$ <span th:text="${activity.activityPrice}">0</span></span>
               
               <div class="item-card__footer">

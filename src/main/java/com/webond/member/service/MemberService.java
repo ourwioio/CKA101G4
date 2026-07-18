@@ -1,15 +1,20 @@
 package com.webond.member.service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.json.JsonWriter.Member;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.webond.activity.model.ActivityService;
+import com.webond.activity.model.ActivityVO;
 import com.webond.member.model.MemberVO;
 import com.webond.member.model.NotificationVO;
 import com.webond.member.repository.MemberRepository;
@@ -28,6 +33,54 @@ public class MemberService {
 	
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ActivityService activityService;
+    
+    
+
+    //act controller private 
+    private Map<Integer, String> buildRegistrationStatusMap(List<ActivityVO> activityList) {
+        Map<Integer, String> statusMap = new HashMap<>();
+        for (ActivityVO activityVO : activityList) {
+            statusMap.put(activityVO.getActivityId(), getRegistrationStatusText(activityVO));
+        }
+        return statusMap;
+    }
+
+    private String getRegistrationStatusText(ActivityVO activityVO) {
+        if (activityVO == null) {
+            return "活動不存在";
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        if (activityVO.getEndTime() != null && now.isAfter(activityVO.getEndTime())) {
+            return "活動已結束";
+        }
+
+        if (activityVO.getRegistrationStartTime() != null && now.isBefore(activityVO.getRegistrationStartTime())) {
+            return "尚未開放報名";
+        }
+
+        if (activityVO.getRegistrationDeadline() != null && now.isAfter(activityVO.getRegistrationDeadline())) {
+            return "報名已截止";
+        }
+
+        if (activityVO.getRegistrationDeadline() != null
+                && Duration.between(now, activityVO.getRegistrationDeadline()).toHours() <= 168) {
+            return "即將截止";
+        }
+
+        return "報名中";
+    }
+    
+    // for controller    
+    public Map<Integer, String> getRegistrationStatusMap(List<ActivityVO> activityList) {
+        return buildRegistrationStatusMap(activityList);
+    }
+
+    
+    
 	
 	public void addMember(MemberVO memberVO) {
 		repository.save(memberVO);
