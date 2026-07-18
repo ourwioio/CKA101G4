@@ -436,7 +436,15 @@ h1 {
     padding: 2rem;
     width: 90%;
     max-width: 400px;
+    max-height: 85vh;
+    overflow-y: auto;
     box-shadow: var(--shadow-md);
+}
+
+/* 評價場地的彈窗放大一點 */
+.modal-box--review {
+    max-width: 480px;
+    padding: 2.4rem;
 }
 
 .modal-box h3 { 
@@ -482,20 +490,29 @@ h1 {
 
 .modal-box textarea {
     width: 100%;
-    min-height: 90px;
+    height: 80px;       /* 14px 字體 × 1.5 行高 × 3 行 = 63px，剛好卡三行 */
+    line-height: 1.5;
     border: 1.5px solid var(--color-border);
     border-radius: var(--radius-md);
     padding: 10px 14px;
     font-size: 14px;
     font-family: var(--font-body);
     color: var(--color-ink);
-    resize: vertical;
-    margin-bottom: 1.2rem;
+    resize: none;
+    overflow-y: auto;
+    margin-bottom: 6px;
 }
 
-.modal-box textarea:focus { 
-    outline: none; 
-    border-color: var(--color-yellow-deep); 
+.modal-box textarea:focus {
+    outline: none;
+    border-color: var(--color-yellow-deep);
+}
+
+.comment-counter {
+    font-size: 12px;
+    color: var(--color-ink-soft);
+    text-align: right;
+    margin: 0 0 1.2rem;
 }
 
 .modal-actions { 

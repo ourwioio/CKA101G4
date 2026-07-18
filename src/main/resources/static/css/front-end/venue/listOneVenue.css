@@ -226,6 +226,12 @@ img{ max-width: 100%; }
 	font-size: 13.5px;
 	line-height: 1.6;
 	color: var(--color-ink);
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	min-height: 65px;
 }
 .review-empty {
 	color: var(--color-ink-soft);
