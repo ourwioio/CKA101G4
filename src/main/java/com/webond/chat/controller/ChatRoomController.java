@@ -26,33 +26,7 @@ public class ChatRoomController {
 	@Autowired
 	private ChatService chatSvc; 
 	
-// 測試私訊按鈕
-	@GetMapping("/chatButton")
-	public String chatButton(HttpSession session, Model model) {
-		
-		MemberVO loginUser = (MemberVO) session.getAttribute("memberVO");
-		if(loginUser == null) {
-			return "redirect:/member/login";
-		}
-		
-		String loginName = loginUser.getRealName();
-		
-		
-		List<MemberVO> allMembers = memberSvc.getALL();
-		
-		List<MemberVO> otherMembers = new ArrayList<>();
-		if(allMembers != null) {
-			for (MemberVO mem : allMembers) {
-				if(loginUser != null && !mem.getMemberId().equals(loginUser.getMemberId())) {
-					otherMembers.add(mem);
-				}
-			}
-		}
-		model.addAttribute("otherMembers", otherMembers);
-		model.addAttribute("currentUserName", loginName);
-		
-		return "front-end/chat/chatButton";
-	}
+
 
 	
 	@GetMapping("/chat")
@@ -119,5 +93,9 @@ public class ChatRoomController {
 		
 		
 	}
+	
+	
+
+	
 
 }

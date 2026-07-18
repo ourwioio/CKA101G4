@@ -1,0 +1,731 @@
+<div th:fragment="chatWidget" th:if="${session.memberVO != null}">
+
+	<!-- 右下角懸浮聊天室組件 -->
+	<div class="chat-widget-container">
+
+		<!-- A. 聊天室收合時的圓形按鈕 -->
+		<button type="button" class="chat-trigger-btn" id="chatTriggerBtn"
+			onclick="toggleChatWindow()">
+			<span class="chat-icon">💬</span> <span class="chat-badge"
+				id="chatUnreadBadge" style="display: none;">0</span>
+		</button>
+
+		<!-- B. 聊天室主視窗：擴充為雙欄版面 -->
+		<div class="chat-window-split chat-hidden" id="chatWindow"
+			data-receiver-id="">
+
+			<!-- 【左側欄】：聊天對象與歷史訊息名單 -->
+			<!-- 找到 【左側欄】 的部分，修改成以下這樣乾淨的結構 -->
+			<div class="chat-sidebar-left">
+				<div class="sidebar-header-title">
+					<span>聊天訊息</span>
+				</div>
+				<!-- 聯絡人名單容器：正式清空！後續完全交由 JS 或後端動態塞入 -->
+				<div class="chat-contact-list-box" id="chatContactList">
+					<!-- 線上客服已正式摘除，這裡現在是一片乾淨的空白 -->
+				</div>
+			</div>
+
+			<!-- 【右側欄】：主要對話與輸入視窗 -->
+			<div class="chat-main-right">
+
+				<!-- 1. 視窗標頭 -->
+				<div class="chat-header">
+					<div class="chat-user-info">
+						<div class="chat-avatar-status" id="chatAvatar">M</div>
+						<span class="chat-username" id="chatUsername">請選擇聯絡人</span>
+					</div>
+					<!-- 關閉按鈕 -->
+					<button type="button" class="chat-close-btn"
+						onclick="toggleChatWindow()">&times;</button>
+				</div>
+
+				<!-- 2. 訊息對話滾動內容區 -->
+				<div class="chat-messages-body" id="chatMessagesBody">
+					<div class="chat-system-msg" id="chatSystemMsg">歡迎來到線上即時會員聊天室！</div>
+				</div>
+
+				<!-- 3. 底部打字輸入區 -->
+				<div class="chat-input-footer">
+					<input type="text" id="chatInputField" placeholder="請輸入訊息..."
+						onkeydown="if(event.key==='Enter') sendChatMessage()">
+					<button type="button" class="chat-send-btn"
+						onclick="sendChatMessage()">
+						<svg viewBox="0 0 24 24" width="20" height="20"
+							fill="currentColor">
+							<path d="M2 21l21-9L2 3v7l15 2-15 2z" />
+						</svg>
+					</button>
+				</div>
+
+			</div>
+
+		</div>
+	</div>
+
+	<!-- WebSocket 前端控制腳本 (排版與語法修正版) -->
+	<script th:inline="javascript">
+	 // ==========================================
+    // 0. 全域變數定義
+    // ==========================================
+    let webSocket = null;
+    const currentMemberId = /*[[${session.memberVO.memberId}]]*/ null;
+    
+    const urlTargetToId = /*[[${targetToId}]]*/ null; 
+    
+    // ==========================================
+    // 1. 頁面初始化與自動連線機制
+    // ==========================================
+document.addEventListener("DOMContentLoaded", function() {
+            if (currentMemberId) {
+                initWebSocket(); // 1. 啟動 WebSocket 連線
+                
+                // 2. 💡 核心修正：撈取聯絡人清單，並在撈取成功後檢查是否需要自動開啟私聊
+                loadChatContactsAndCheckAutoOpen(); 
+            }
+        });
+    
+    // ==========================================
+    // 2. 外部觸發 API (例如：點擊別人個人檔案的「私聊按鈕」)
+    // ==========================================
+     document.addEventListener("DOMContentLoaded", function() {
+            if (currentMemberId) {
+                initWebSocket(); // 1. 啟動 WebSocket 連線
+                
+                // 2. 💡 核心修正：撈取聯絡人清單，並在撈取成功後檢查是否需要自動開啟私聊
+                loadChatContactsAndCheckAutoOpen(); 
+            }
+        });
+    
+    // ==========================================
+    // 2. 外部觸發 API (例如：點擊別人個人檔案的「私聊按鈕」)
+    // ==========================================
+        function openPrivateChat(receiverId, receiverName) {
+    const chatWin = document.getElementById('chatWindow');
+    const triggerBtn = document.getElementById('chatTriggerBtn');
+    const messagesBody = document.getElementById('chatMessagesBody');
+    const listContainer = document.getElementById('chatContactList');
+
+    if (!chatWin) return;
+
+    chatWin.classList.remove('chat-hidden');
+    if (triggerBtn) {
+        triggerBtn.style.transform = 'scale(0)';
+        setTimeout(() => { triggerBtn.style.display = 'none'; }, 200);
+    }
+
+    chatWin.dataset.receiverId = receiverId; 
+    document.getElementById('chatUsername').innerText = receiverName;
+    document.getElementById('chatAvatar').innerText = receiverName ? receiverName.charAt(0) : 'M';
+
+    let activeItem = document.getElementById(`contact-item-${receiverId}`);
+    
+    if (!activeItem && listContainer) {
+        if (listContainer.querySelector('.chat-system-msg')) {
+            listContainer.innerHTML = '';
+        }
+
+        const newFriendHtml = `
+            <div class="contact-item-row active" id="contact-item-${receiverId}">
+                <div class="contact-avatar-circle">${receiverName.charAt(0)}</div>
+                <div class="contact-text-meta">
+                    <div class="contact-name-row">
+                        <span class="c-name">${receiverName}</span>
+                        <span class="c-time">剛剛</span>
+                    </div>
+                    <div class="contact-msg-badge-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <span class="c-last-msg" style="flex: 1; text-align: left;">新對話...</span>
+                        <span class="c-unread-badge" style="display: none !important;">0</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        listContainer.insertAdjacentHTML('afterbegin', newFriendHtml);
+        
+        activeItem = document.getElementById(`contact-item-${receiverId}`);
+        activeItem.onclick = function() { openPrivateChat(receiverId, receiverName); };
+    }
+
+    document.querySelectorAll('.contact-item-row').forEach(el => el.classList.remove('active'));
+    if (activeItem) {
+        activeItem.classList.add('active');
+        
+        const pBadge = activeItem.querySelector('.c-unread-badge');
+        if (pBadge) {
+            pBadge.innerText = '0';          
+            pBadge.style.setProperty('display', 'none', 'important'); 
+        }
+    }
+
+    initWebSocket();
+
+    messagesBody.innerHTML = `<div class="chat-system-msg">正在同步歷史訊息...</div>`;
+
+    waitForConnection(() => {
+        const historyPayload = {
+            type: "history",
+            senderId: Number(currentMemberId),
+            receiverId: Number(receiverId),
+            message: "",
+            msgRead: 0
+        };
+        webSocket.send(JSON.stringify(historyPayload));
+        
+        // 💡 企業級優化：只要打開對話框，無條件對該 receiverId 觸發已讀通知，確保 DB 狀態同步
+        sendReadNotification(receiverId);
+    });
+}
+
+    
+     // ==========================================
+     // 3. WebSocket 初始化與核心訊息分流
+     // ==========================================
+     function initWebSocket() {
+         if (!currentMemberId) return;
+         if (webSocket !== null && webSocket.readyState === WebSocket.OPEN) return;
+         
+         const wsUrl = `ws://${window.location.host}/FriendWS/${currentMemberId}`;
+         webSocket = new WebSocket(wsUrl);
+
+         webSocket.onmessage = function(event) {
+             const msgData = JSON.parse(event.data);
+             const chatWin = document.getElementById('chatWindow');
+             const messagesBody = document.getElementById('chatMessagesBody');
+             
+             // 💡 修正：如果 dataset 裡不存在或為空，就老老實實拿到 null，防止比對出錯
+             const activeReceiverId = (chatWin && chatWin.dataset.receiverId) ? chatWin.dataset.receiverId : null;
+
+             // ----------------------------------------------------
+             // 🅰️ 情況 A：載入歷史紀錄 (type = "history")
+             // ----------------------------------------------------
+             if (msgData.type === "history") {
+            	if (messagesBody) messagesBody.innerHTML = ''; 
+                
+                // 💡 完美對接後端：優先讀取後端重構後扁平化的 historyList 欄位
+                let historyList = msgData.historyList;
+                
+                // 防呆：如果未來後端某些特殊場景仍放 message 欄位，才進行相容解析
+                if (!historyList && msgData.message) {
+                    historyList = (typeof msgData.message === 'string') ? JSON.parse(msgData.message) : msgData.message;
+                }
+            
+	            if (historyList && historyList.length > 0) {
+	            	historyList.forEach(msgObj => {
+	            	    const isObject = typeof msgObj === 'object';
+	            	    const finalMsg = isObject ? msgObj : JSON.parse(msgObj);
+	            	    const direction = (Number(finalMsg.senderId) === Number(currentMemberId)) ? 'outgoing' : 'incoming';
+	            	    
+	            	    appendMessage(finalMsg.message, direction, finalMsg.msgRead, finalMsg.lastTime);
+	            	});
+        	    } else {
+            	    // 只有在「全新朋友、完全沒聊過天」時，才顯示歡迎詞
+                    if (messagesBody) messagesBody.innerHTML = `<div class="chat-system-msg">暫無歷史訊息，開始聊聊吧！</div>`;
+           	    }
+            
+            	scrollToBottom(); 
+            	return; 
+        	}
+
+             // ----------------------------------------------------
+             // 🅱️ 情況 B：收到即時新訊息 (type = "chat")
+             // ----------------------------------------------------
+             if (msgData.type === "chat") {
+                 const listContainer = document.getElementById('chatContactList'); 
+                 
+                 const isChatOpen = chatWin && !chatWin.classList.contains('chat-hidden');
+                 const isMyOwnMessage = Number(msgData.senderId) === Number(currentMemberId);
+                 const isFromCurrentPartner = activeReceiverId && String(msgData.senderId) === String(activeReceiverId);
+                 
+                 // 決定要移動與更新哪一個聯絡人的節點
+                 const targetIdForMove = isMyOwnMessage ? msgData.receiverId : msgData.senderId;
+                 const targetRow = document.getElementById(`contact-item-${targetIdForMove}`);
+                 
+                 // 1. 動態更新左側清單欄位與順序
+                 if (targetRow) {
+                     // A. 更新左側最新一則訊息字樣
+                     const lastMsgEl = targetRow.querySelector('.c-last-msg');
+                     if (lastMsgEl) {
+                         lastMsgEl.innerText = msgData.message.length > 10 ? msgData.message.substring(0, 10) + "..." : msgData.message;
+                     }
+                     
+                     // B. 即時更新左側顯示時間 
+                     const now = new Date();
+                     const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                     const timeEl = targetRow.querySelector('.c-time');
+                     if (timeEl) timeEl.innerText = timeStr;
+                     
+                     // C. 【秒衝第一名】收到任何訊息，立刻將該聯絡人移動到名單最上方第一個
+                     if (listContainer && listContainer.firstChild !== targetRow) {
+                         listContainer.insertBefore(targetRow, listContainer.firstChild);
+                     }
+                 } else {
+                     // 如果左側完全找不到這個人（全新陌生人突然傳訊息來），才觸發全面重撈名單並動態生成節點
+                     loadChatContactsAndCheckAutoOpen(); 
+                     // 💡 資深工程師提示：雖然重撈了名單，但這則當下的即時訊息也需要幫他渲染到畫面上，這裡直接呼叫上屏
+                     if (isChatOpen && isFromCurrentPartner) {
+                         appendMessage(msgData.message, 'incoming', 0);
+                         sendReadNotification(activeReceiverId);
+                     }
+                     return; 
+                 }
+
+                 // 2. 決定右側畫面渲染與左側聯絡人小紅點顯示邏輯
+                 if (isChatOpen && isFromCurrentPartner) {
+                     // 情況 1：視窗開著，且我正在跟他聊天 -> 靠左上屏，並通知後端我已讀了他
+                     appendMessage(msgData.message, 'incoming', 0);
+                     sendReadNotification(activeReceiverId);
+                     
+                     // 防呆：既然正在跟他聊，確保左側該項目的未讀數維持 0 且隱藏
+                     const badgeEl = targetRow.querySelector('.c-unread-badge');
+                     if (badgeEl) {
+                         badgeEl.innerText = '0';
+                         badgeEl.style.setProperty('display', 'none', 'important');
+                     }
+                 } else if (isMyOwnMessage) {
+                     // 情況 2：我自己發出的訊息副本 -> 畫面強制靠右上屏，且顯示「未讀 (0)」
+                     appendMessage(msgData.message, 'outgoing', 0);
+                 } else {
+                     // 情況 3：別人在背景傳訊息來，或是你把整個聊天視窗「縮小收合」時收到新訊息！
+                     const badgeEl = targetRow.querySelector('.c-unread-badge');
+                     if (badgeEl) {
+                         let currentUnread = parseInt(badgeEl.innerText) || 0;
+                         currentUnread++; // 數字累加 1
+                         
+                         badgeEl.innerText = currentUnread; 
+                         badgeEl.style.setProperty('display', 'flex', 'important'); // 強制點亮小紅點
+                     }
+                     
+                     // 同步讓右下角懸浮按鈕上的大總數計數氣泡加 1
+                     const globalBadge = document.getElementById('chatUnreadBadge');
+                     if (globalBadge) {
+                         let currentGlobalCount = parseInt(globalBadge.innerText) || 0;
+                         currentGlobalCount++;
+                         updateGlobalUnreadBadge();
+                     }
+                 }
+                 return;
+             }
+
+             // ----------------------------------------------------
+             // 🅲 情況 C：對方已讀了我的訊息 (type = "read")
+             // ----------------------------------------------------
+             if (msgData.type === "read") {
+                 // 💡 只有發送已讀的人是當前對話目標時，才把右側對話窗的未讀字眼集體刷成已讀
+                 if (activeReceiverId && String(msgData.senderId) === String(activeReceiverId)) {
+                     document.querySelectorAll('.msg-status-meta.status-unread').forEach(el => {
+                         el.classList.remove('status-unread');
+                         el.classList.add('status-read');
+                         el.innerText = '已讀'; 
+                     });
+                 }
+             }
+         }; // webSocket.onmessage 結束
+     } // initWebSocket 結束
+
+
+    // ==========================================
+    // 4. 視窗控制開關
+    // ==========================================
+function toggleChatWindow() {
+    const chatWin = document.getElementById('chatWindow');
+    const triggerBtn = document.getElementById('chatTriggerBtn');
+    const messagesBody = document.getElementById('chatMessagesBody');
+
+    if (!chatWin || !triggerBtn) return;
+
+    const isClosing = chatWin.classList.toggle('chat-hidden');
+
+    if (!isClosing) {
+        // 【🅰️ 開啟聊天室】
+        triggerBtn.style.transform = 'scale(0)'; 
+        setTimeout(() => { triggerBtn.style.display = 'none'; }, 200);
+        
+        // 打開視窗，圓形按鈕大紅點立刻隱藏
+        updateGlobalUnreadBadge(); 
+        
+        // 💡 優化：不使用字串 "NONE"，直接設為空字串或清除，讓 initWebSocket 的 null 判斷更精準
+        chatWin.dataset.receiverId = ""; 
+        
+        const usernameEl = document.getElementById('chatUsername');
+        const avatarEl = document.getElementById('chatAvatar');
+        
+        if (usernameEl) usernameEl.innerText = "請選擇聯絡人"; 
+        if (avatarEl) avatarEl.innerText = "M"; 
+        
+        document.querySelectorAll('.contact-item-row').forEach(el => el.classList.remove('active'));
+        
+        if (messagesBody) {
+            messagesBody.innerHTML = `<div class="chat-system-msg">歡迎來到線上即時會員聊天室！請選擇聯絡人開始對話。</div>`;
+        }
+
+        loadChatContactsAndCheckAutoOpen(); 
+        initWebSocket();
+    } else {
+        // 【🅱️ 關閉聊天室】
+        triggerBtn.style.display = 'flex';
+        setTimeout(() => { triggerBtn.style.transform = 'scale(1)'; }, 50);
+        
+        // 🚀【核心修正】：不需要在這邊自己寫迴圈去算數字了！
+        // 直接呼叫升級後的工具，它會一秒算好最精準的數字並讓大紅點亮起來！
+        updateGlobalUnreadBadge();
+    }
+}
+
+
+
+
+        
+//==========================================
+//5. 非同步撈取歷史聯絡人名單 (強效點亮小紅點版)
+//==========================================
+function loadChatContactsAndCheckAutoOpen() {
+const listContainer = document.getElementById('chatContactList');
+if (!listContainer) return;
+
+const chatWin = document.getElementById('chatWindow');
+// 獲取當前綁定的對話目標 ID (空狀態時為空字串 "")
+const activeReceiverId = chatWin ? chatWin.dataset.receiverId : null;
+const activeUsername = document.getElementById('chatUsername') ? document.getElementById('chatUsername').innerText : '';
+
+fetch('/api/chat/contacts')
+   .then(response => {
+       if (!response.ok) throw new Error("名單撈取失敗");
+       return response.json();
+   })
+   .then(contacts => {
+       listContainer.innerHTML = ''; 
+
+       let hasCurrentActiveInList = false;
+       let totalGlobalUnread = 0; // 用於統計整站總未讀數
+
+       if (contacts && contacts.length > 0) {
+           contacts.forEach(c => {
+               if (activeReceiverId && String(c.userId) === String(activeReceiverId)) {
+                   hasCurrentActiveInList = true;
+               }
+
+               // 🚀 頂級嚴格判定：只有當 activeReceiverId 跟目前這個人的 ID 完全一致時，未讀數才強制歸零。
+               // 💡 優化：空狀態下 activeReceiverId 是空字串，這裡會忠實顯現後端回傳的 c.unreadCount！
+               const isCurrentPartner = activeReceiverId && (String(activeReceiverId) === String(c.userId));
+               
+               const actualUnread = isCurrentPartner ? 0 : Number(c.unreadCount || 0);
+               totalGlobalUnread += actualUnread;
+
+               const row = document.createElement('div');
+               // 根據是否為當前聊天對象決定高亮淡藍底色
+               row.className = `contact-item-row ${isCurrentPartner ? 'active' : ''}`;
+               row.id = `contact-item-${c.userId}`;
+               row.onclick = function() { openPrivateChat(c.userId, c.username); };
+
+               // 🚀 核心強力射線：只要未讀數大於 0，強制覆蓋所有 CSS 設定，顯示 flex 小紅點
+               const badgeStyle = (actualUnread > 0) ? 'display: flex !important;' : 'display: none !important;';
+
+               row.innerHTML = `
+                   <div class="contact-avatar-circle">${c.username.charAt(0)}</div>
+                   <div class="contact-text-meta">
+                       <div class="contact-name-row">
+                           <span class="c-name">${c.username}</span>
+                           <span class="c-time">${c.lastTime || ''}</span>
+                       </div>
+                       <div class="contact-msg-badge-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                           <span class="c-last-msg" style="flex: 1; text-align: left;">${c.lastMsg || ''}</span>
+                           <!-- 💡 確保這裡 class 叫 c-unread-badge 且套用樣式 -->
+                           <span class="c-unread-badge" style="${badgeStyle}">${actualUnread}</span>
+                       </div>
+                   </div>
+               `;
+               listContainer.appendChild(row);
+           });
+       }
+
+       // 💡 優化：將非同步撈取算出來的最新總未讀數傳入，讓全域未讀更新更即時
+       updateGlobalUnreadBadge(totalGlobalUnread);
+
+       // 💡 新朋友防呆：配合上一輪重構，將 "NONE" 判斷改為更安全的空字串檢查
+       if (activeReceiverId && activeReceiverId !== "" && !hasCurrentActiveInList && activeUsername && activeUsername !== "請選擇聯絡人") {
+           const row = document.createElement('div');
+           row.className = 'contact-item-row active';
+           row.id = `contact-item-${activeReceiverId}`;
+           row.onclick = function() { openPrivateChat(activeReceiverId, activeUsername); };
+           row.innerHTML = `
+               <div class="contact-avatar-circle">${activeUsername.charAt(0)}</div>
+               <div class="contact-text-meta">
+                   <div class="contact-name-row">
+                       <span class="c-name">${activeUsername}</span>
+                       <span class="c-time">剛剛</span>
+                   </div>
+                   <div class="contact-msg-badge-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                       <span class="c-last-msg" style="flex: 1; text-align: left;">新對話...</span>
+                       <span class="c-unread-badge" style="display: none !important;">0</span>
+                   </div>
+               </div>
+           `;
+           listContainer.insertBefore(row, listContainer.firstChild);
+       }
+
+       if (listContainer.children.length === 0) {
+           listContainer.innerHTML = '<div class="chat-system-msg" style="padding: 20px;">尚無聊天紀錄</div>';
+       }
+   })
+   .catch(err => {
+       console.error("[Chat] 前端載入名單崩潰:", err);
+   });
+}
+
+
+
+
+
+
+
+//==========================================
+// 6. 發送與已讀控制
+// ==========================================
+
+// 發送即時訊息 (已移除多餘的 readPayload)
+function sendChatMessage() {
+	 const input = document.getElementById('chatInputField');
+     if (!input) return; // 💡 防禦性檢查
+     const content = input.value.trim();
+     const receiverId = document.getElementById('chatWindow').dataset.receiverId;
+     const listContainer = document.getElementById('chatContactList'); // 💡 獲取左側名單容器
+     
+     if (!content || !receiverId) return;
+     
+     if (webSocket && webSocket.readyState === WebSocket.OPEN) {
+         const payload = {
+             type: "chat",
+             senderId: Number(currentMemberId),
+             receiverId: Number(receiverId),
+             message: content, 
+             msgRead: 0        
+         };
+         webSocket.send(JSON.stringify(payload));
+         
+         // 💡 核心優化：發言成功的當下，立刻找出左側對應的人
+         const partnerRow = document.getElementById(`contact-item-${receiverId}`);
+         if (partnerRow) {
+             // A. 更新最後一則訊息內文
+             const lastMsgEl = partnerRow.querySelector('.c-last-msg');
+             if (lastMsgEl) {
+                 lastMsgEl.innerText = content.length > 10 ? content.substring(0, 10) + "..." : content;
+             }
+             
+             // 💡 體驗優化：自己發言成功，左側清單的時間同步更新為當下時間
+             const timeEl = partnerRow.querySelector('.c-time');
+             if (timeEl) {
+                 const now = new Date();
+                 timeEl.innerText = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+             }
+             
+             // B. 🚀【秒衝第一名】將這個人的 HTML 節點，直接移到名單容器的最上方第一個！
+             if (listContainer && listContainer.firstChild !== partnerRow) {
+                 listContainer.insertBefore(partnerRow, listContainer.firstChild);
+             }
+         }
+     }
+     input.value = ''; // 清空輸入框
+ }
+    
+    
+//發送已讀回條給後端
+function sendReadNotification(partnerId) {
+    // 💡 優化：移除 "NONE" 判斷，改為更健壯的空值與空字串防禦檢查
+    if (!partnerId || String(partnerId).trim() === "" || !webSocket || webSocket.readyState !== WebSocket.OPEN) return;
+    
+    // 💡 關鍵校準：根據你的後端 Handler 解析習慣，完美配置前後端欄位對接
+    const readPayload = {
+        type: "read",
+        senderId: Number(currentMemberId),  // 這裡對接後端 Handler 的 chatMessage.getSenderId() (自己)
+        receiverId: Number(partnerId)       // 這裡對接後端 Handler 的 chatMessage.getReceiverId() (對方)
+    };
+    webSocket.send(JSON.stringify(readPayload));
+}
+
+     
+function waitForConnection(callback, attempts = 0) {
+    // 💡 頂級防禦：如果嘗試超過 30 次 (約 3 秒) 依然無法建立連線，主動拋出日誌中斷，防範無效無限遞迴
+    if (attempts > 30) {
+        console.warn("[Chat WS Warning] 連線逾時，無法發送請求。");
+        return;
+    }
+
+    if (webSocket && webSocket.readyState === WebSocket.OPEN) {
+        callback();
+    } else {
+        setTimeout(() => { 
+            // 💡 每次遞迴時將計數器累加 1
+            waitForConnection(callback, attempts + 1); 
+        }, 100);
+    }
+}
+
+
+        
+//==========================================
+// 7. 💡 修正與安全防禦優化後的畫面渲染組件
+// ==========================================
+   function appendMessage(text, direction, msgRead, timeStr) {
+       const container = document.getElementById('chatMessagesBody');
+       if (!container) return;
+
+       const row = document.createElement('div');
+       
+       // 1. 💡 完美防禦：如果沒帶入歷史時間，才預設抓瀏覽器當下時間（用於自己剛發出去的即時新訊息）
+       if (!timeStr) {
+           const now = new Date();
+           timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+       }
+
+       // 2. 處理發送訊息的已讀/未讀狀態標籤
+       let readStatusHtml = '';
+       if (direction === 'outgoing') {
+           if (Number(msgRead) === 1) {
+               readStatusHtml = `<span class="msg-status-meta status-read">已讀</span>`;
+           } else {
+               // 💡 注意：這裡 className 記得跟你 initWebSocket 的 .msg-status-meta.status-unread 對齊，方便已讀時一秒刷平
+               readStatusHtml = `<span class="msg-status-meta status-unread">未讀</span>`;
+           }
+       }
+
+       // 3. 先將文字進行 HTML 轉義，防止 XSS 注入攻擊
+       const safeText = escapeHtml(text);
+
+       // 4. 分流渲染：依據 direction 決定 HTML 的左右排列順序
+       if (direction === 'outgoing') {
+           row.className = 'msg-row msg-outgoing';
+           row.style.cssText = "display: flex !important; width: fit-content !important; margin-left: auto !important; margin-right: 0 !important; align-items: flex-end !important; margin-bottom: 12px; gap: 4px;";
+           
+           // 💡 修正：直接把結構攤平寫進去，不透過外部變數拼接，徹底杜絕 ${metaBoxHtml} 找不到的問題！
+           row.innerHTML = `
+               <div class="msg-meta-box">
+                   <span class="msg-status-meta msg-time-text">${timeStr}</span>
+                   ${readStatusHtml}
+               </div>
+               <div class="msg-bubble">${safeText}</div>
+           `;
+       } else {
+           row.className = 'msg-row msg-incoming';
+           row.style.cssText = "display: flex !important; width: fit-content !important; margin-right: auto !important; margin-left: 0 !important; align-items: flex-end !important; margin-bottom: 12px; gap: 4px;";
+           
+           row.innerHTML = `
+               <div class="msg-bubble">${safeText}</div>
+               <div class="msg-meta-box">
+                   <span class="msg-status-meta msg-time-text">${timeStr}</span>
+                   ${readStatusHtml}
+               </div>
+           `;
+       }
+
+       container.appendChild(row);
+       scrollToBottom();
+   }
+
+
+
+   function scrollToBottom() {
+       const body = document.getElementById('chatMessagesBody');
+       if (body) body.scrollTop = body.scrollHeight;
+       
+       // 💡 頂級細節：確保在 DOM 完全重繪後，滾動條完美滑落到底部
+       window.requestAnimationFrame(() => {
+           if (body) body.scrollTop = body.scrollHeight;
+       });
+   }
+
+   function waitForConnection(callback, attempts = 0) {
+       // 💡 頂級防禦：防範伺服器斷線時前端陷入無限遞迴死循環
+       if (attempts > 30) {
+           console.warn("[Chat WS Warning] 連線逾時，無法發送請求。");
+           return;
+       }
+
+   	if (webSocket && webSocket.readyState === WebSocket.OPEN) {
+   		callback();
+       } else {
+           setTimeout(() => { 
+               waitForConnection(callback, attempts + 1); 
+           }, 100);
+       }
+   }
+   
+   function escapeHtml(string) {
+       return String(string).replace(/[&<>"']/g, function (s) {
+           return { 
+               '&': '&amp;', 
+               '<': '&lt;', 
+               '>': '&gt;', 
+               '"': '&quot;', 
+               "'": '&#39;' // 💡 修正：修復原本的語法錯誤，改用標準的 HTML 實體編碼
+           }[s];
+       });
+   }
+
+        
+        
+   function handlePrivateChatButtonClick(buttonElement) {
+       const receiverId = buttonElement.dataset.id;
+       const receiverName = buttonElement.dataset.name;
+       
+       if (receiverId && receiverName) {
+           // 💡 體驗優化：檢查目前聊天視窗是否為隱藏狀態 (chat-hidden)
+           const chatWin = document.getElementById('chatWindow');
+           if (chatWin && chatWin.classList.contains('chat-hidden')) {
+               // 如果原本是關閉的，直接呼叫你寫好的控制開關，確保懸浮按鈕動畫完美同步縮小隱藏
+               toggleChatWindow(); 
+           }
+           
+           // 執行聊天室切換與歷史訊息同步
+           openPrivateChat(receiverId, receiverName);
+       } else {
+           console.error("❌ 無法取得目標會員資料");
+       }
+   }
+
+        
+// ==========================================
+   // 💡 新增：統一更新右下角圓形按鈕總未讀數的小工具
+   // ==========================================
+function updateGlobalUnreadBadge(forcedCount) {
+  const globalBadge = document.getElementById('chatUnreadBadge');
+  const chatWin = document.getElementById('chatWindow');
+  if (!globalBadge || !chatWin) return;
+
+  const isChatOpen = !chatWin.classList.contains('chat-hidden');
+
+  // 💡 鐵律：如果聊天視窗目前正大開著，右下角的懸浮總未讀紅點一律隱藏
+  if (isChatOpen) {
+      globalBadge.style.setProperty('display', 'none', 'important');
+      return;
+  }
+
+  let realUnreadSum = 0;
+
+  // 💡 優化：如果呼叫時已經有明確傳入統計好的總數 (例如非同步名單傳進來的數字)
+  if (typeof forcedCount === 'number') {
+      realUnreadSum = forcedCount;
+  } else {
+      // 否則，才老老實實遍歷所有聯絡人的小紅點進行動態加總
+      document.querySelectorAll('.c-unread-badge').forEach(badgeEl => {
+          const isVisible = badgeEl.style.display !== 'none' && badgeEl.style.visibility !== 'hidden';
+          const count = parseInt(badgeEl.innerText) || 0;
+          
+          if (isVisible && count > 0) {
+              realUnreadSum += count;
+          }
+      });
+  }
+
+  // 依據最終統計出的總未讀數，決定大紅點的亮滅
+  if (realUnreadSum > 0) {
+      globalBadge.innerText = realUnreadSum;
+      globalBadge.style.setProperty('display', 'flex', 'important'); 
+  } else {
+      globalBadge.innerText = '0';
+      globalBadge.style.setProperty('display', 'none', 'important'); 
+  }
+}
+
+     
+	</script>
+</div>
