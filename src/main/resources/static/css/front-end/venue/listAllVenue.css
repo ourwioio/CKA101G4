@@ -178,7 +178,8 @@ img{ max-width: 100%; }
 	border-radius: var(--radius-md);
 	background: var(--color-surface-soft);
 	color: var(--color-ink);
-	width: 100%;
+/* 	width: 100%; */
+	width: 100px;
 	outline: none;
 	appearance: none;
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2317140F' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
@@ -471,4 +472,9 @@ img{ max-width: 100%; }
 	border-radius: var(--radius-full);
 	margin-left: auto;
 	
+}
+
+.search-form__grid {
+	grid-template-columns: 1.4fr 1.4fr 0.8fr 1.4fr 1.4fr;
+	/* 場地名稱  地址關鍵字  場地類型  容納人數  每小時費用 */
 }

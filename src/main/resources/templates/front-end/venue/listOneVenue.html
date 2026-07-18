@@ -41,16 +41,18 @@
 			<h1 class="detail-card__title" th:text="${venueVO.venueName}"></h1>
 			<p class="detail-card__addr" th:text="${venueVO.address}"></p>
 
-			<div class="detail-card__tags">
-				<span class="tag">容納 <span th:text="${venueVO.capacity}"></span> 人</span>
-				<span class="tag">NT$ <span th:text="${venueVO.hourlyRate}"></span> / 小時</span>
-			</div>
-
 			<div class="detail-card__provider">
 				場地提供者：
 				<a class="provider-btn" th:href="@{/front/memberPage/oneMember(memberId=${venueVO.member.memberId})}"
 				   th:text="${venueVO.member.realName}"></a>
 			</div>
+
+			<div class="detail-card__tags">
+				<span class="tag">容納 <span th:text="${venueVO.capacity}"></span> 人</span>
+				<span class="tag">NT$ <span th:text="${venueVO.hourlyRate}"></span> / 小時</span>
+			</div>
+
+			
 			
 			<div class="detail-card__section">
 				<div class="section-label">每週開放日</div>
