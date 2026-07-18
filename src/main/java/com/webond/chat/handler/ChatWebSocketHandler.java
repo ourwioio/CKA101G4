@@ -1,5 +1,7 @@
 package com.webond.chat.handler;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,132 +19,119 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 @Component
-public class ChatWebSocketHandler extends TextWebSocketHandler{
-	
+public class ChatWebSocketHandler extends TextWebSocketHandler {
+
 	private final Map<Integer, WebSocketSession> sessionsMap = new ConcurrentHashMap<>();
-	
+
 	private final ObjectMapper objectMapper;
 	private final ChatService chatSvc;
+
 	public ChatWebSocketHandler(ObjectMapper objectMapper, ChatService chatSvc) {
 		this.objectMapper = objectMapper;
 		this.chatSvc = chatSvc;
 	}
-	
-	
+
 // === 當連線成功 === //
 	@Override
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		Integer memberId = getMemberId(session);
+
+		session.getAttributes().put("MEMBER_ID", memberId);
 		sessionsMap.put(memberId, session);
-		
-		System.out.println("會員連線成功，編號: " + memberId + " (Session ID: " + session.getId() + ")");
+
 	}
-	
+
 // === 處理收到的訊息 === //	
 	@Override
 	protected void handleTextMessage(WebSocketSession userSession, TextMessage message) throws Exception {
 		String payload = message.getPayload();
-		
-		//解析前端傳入的JSON
+
+		// 解析前端傳入的JSON
 		ChatMessageDTO chatMessage = objectMapper.readValue(payload, ChatMessageDTO.class);
-	
+
 		Integer senderId = chatMessage.getSenderId();
 		Integer receiverId = chatMessage.getReceiverId();
-		
+
 		// 獲取歷史訊息紀錄(type = history)
-		if("history".equals(chatMessage.getType())) {
-			List<String> historyData = chatSvc.getHistoryMsg(String.valueOf(senderId), String.valueOf(receiverId));
-			String historyMsg = objectMapper.writeValueAsString(historyData);
-			
-			ChatMessageDTO cmHistory = new ChatMessageDTO("history", senderId, receiverId, historyMsg);
-			if(userSession.isOpen()) {
-				userSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(cmHistory)));
+		if ("history".equals(chatMessage.getType())) {
+		    List<String> historyJsonList = chatSvc.getHistoryMsg(String.valueOf(senderId), String.valueOf(receiverId));
+
+		    List<ChatMessageDTO> historyDtos = new ArrayList<>();
+		    for (String json : historyJsonList) {
+		        historyDtos.add(objectMapper.readValue(json, ChatMessageDTO.class));
+		    }
+
+		    Map<String, Object> historyResponse = new HashMap<>();
+		    historyResponse.put("type", "history");
+		    historyResponse.put("senderId", senderId);
+		    historyResponse.put("receiverId", receiverId);
+		    historyResponse.put("historyList", historyDtos); // 🚀 完美把陣列塞進去，前端直接用 msgData.historyList 就能讀取
+
+		    if (userSession.isOpen()) {
+		        userSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(historyResponse)));
+		    }
+
+		    return;
+		}
+
+		// 發送即時私訊(type = "chat")
+		if ("chat".equals(chatMessage.getType())) {
+			WebSocketSession receiverSession = sessionsMap.get(receiverId);
+			boolean isReceiverOnline = (receiverSession != null && receiverSession.isOpen());
+
+			chatMessage.setMsgRead(0);
+			String cleanJsonMessage = objectMapper.writeValueAsString(chatMessage);
+
+			if (isReceiverOnline) {
+				receiverSession.sendMessage(new TextMessage(cleanJsonMessage));
 			}
-			
-			WebSocketSession friendSession = sessionsMap.get(receiverId);
-			if (friendSession != null && friendSession.isOpen()) {
-				
-				ObjectNode readNotice = objectMapper.createObjectNode();
-	            readNotice.put("type", "read");
-	            readNotice.put("senderId", String.valueOf(senderId));
-				
-				friendSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(readNotice)));
+
+			if (userSession.isOpen()) {
+				userSession.sendMessage(new TextMessage(cleanJsonMessage));
 			}
-			
+
+			chatSvc.saveChatMessage(String.valueOf(senderId), String.valueOf(receiverId), cleanJsonMessage, false);
 			return;
 		}
-		// 發送即時私訊(type = chat)
-		if("chat".equals(chatMessage.getType())) {
-			
-			chatMessage.setMsgRead(0);
-			String cleanJson = objectMapper.writeValueAsString(chatMessage);
-			
-			// 傳發給接收者
-			WebSocketSession receiverSession = sessionsMap.get(receiverId);
-			if(receiverSession != null && receiverSession.isOpen()) {
-				receiverSession.sendMessage(new TextMessage(cleanJson));
-			}
-			
-			// 同步回傳給發送者
-			if(userSession.isOpen()) {
-				userSession.sendMessage(new TextMessage(cleanJson));
-			}
-			
-			//儲存對話紀錄
-			chatSvc.saveChatMessage(String.valueOf(senderId), String.valueOf(receiverId), cleanJson);
-		
-		}
-		
-		if("read".equals(chatMessage.getType())) {
-			chatSvc.readChatMessage(String.valueOf(senderId), String.valueOf(receiverId));
-		
-			WebSocketSession originalSenderSession = sessionsMap.get(senderId);
-			if(originalSenderSession != null && originalSenderSession.isOpen()) {
-				
+
+		if ("read".equals(chatMessage.getType())) {
+			chatSvc.readChatMessage(String.valueOf(receiverId), String.valueOf(senderId));
+
+			WebSocketSession originalSenderSession = sessionsMap.get(receiverId);
+
+			if (originalSenderSession != null && originalSenderSession.isOpen()) {
 				ObjectNode readNotice = objectMapper.createObjectNode();
-				
 				readNotice.put("type", "read");
-		        readNotice.put("senderId", String.valueOf(receiverId));
-		        
-				String readJson = objectMapper.writeValueAsString(readNotice);
-				originalSenderSession.sendMessage(new TextMessage(readJson));
+				readNotice.put("senderId", String.valueOf(senderId)); // 告訴對方是誰點開了已讀
+
+				originalSenderSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(readNotice)));
 			}
+			return;
 		}
-		
+
 	}
-	
-	
 
 	@Override
 	public void handleTransportError(WebSocketSession session, Throwable e) throws Exception {
 		System.out.println("Error: " + e);
 	}
-	
-	
+
 //=== 當連線關閉時 ===//	
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-		Integer memberIdClose = null;
-		//根據session移除對應的會員編號key
-		for (Map.Entry<Integer, WebSocketSession> entry : sessionsMap.entrySet()) {
-			if(entry.getValue() != null && entry.getValue().equals(session)) {
-				memberIdClose = entry.getKey();
-				sessionsMap.remove(memberIdClose);
-				break;
-			}
+		Integer memberIdClose = (Integer) session.getAttributes().get("MEMBER_ID");
+
+		if (memberIdClose != null) {
+			sessionsMap.remove(memberIdClose);
 		}
-	
+
 	}
-	
+
 // === 從連線URI取出memberId === //
 	private Integer getMemberId(WebSocketSession session) {
 		String path = session.getUri().getPath();
-		String idStr = path.substring(path.lastIndexOf('/')+1);
+		String idStr = path.substring(path.lastIndexOf('/') + 1);
 		return Integer.valueOf(idStr);
 	}
-	
-	
-	
-	
 
 }

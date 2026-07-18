@@ -1,0 +1,266 @@
+/* ==========================================================================
+   FB 漸層按鈕 + 雙欄即時聊天室 完美整合樣式表
+   ========================================================================== */
+
+/* 1. 全域懸浮固定容器：永遠在最上層、右下角 */
+.chat-widget-container {
+    position: fixed !important;
+    bottom: 25px !important;
+    right: 25px !important;
+    z-index: 99999 !important;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* 2. 收合時的圓形發光按鈕 (保留 FB 美麗藍色漸層) */
+.chat-trigger-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0084ff, #00c6ff); 
+    color: white;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 132, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+}
+.chat-trigger-btn:hover {
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 132, 255, 0.4);
+}
+.chat-icon { font-size: 26px; }
+
+/* 未讀數字紅點 */
+.chat-badge {
+    position: absolute; top: -2px; right: -2px;
+    background-color: #ef4444; color: white;
+    font-size: 11px; font-weight: 800;
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #ffffff;
+}
+
+/* ==========================================================================
+   核心：雙欄主視窗佈局 (修正原本因語法錯誤變扁的問題)
+   ========================================================================== */
+.chat-window-split {
+    width: 680px !important;  /* 充足寬度 */
+    height: 500px !important; /* 固定高度，不再扁塌 */
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12), 0 8px 10px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    display: flex !important; /* 啟用 Flex 讓名單與對話左右並排 */
+    overflow: hidden;
+    animation: popupChat 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes popupChat {
+    from { transform: translateY(40px) scale(0.85); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* ==========================================================================
+   【左側欄】：聯絡人名單區樣式
+   ========================================================================== */
+.chat-sidebar-left {
+    width: 240px !important;
+    background: #ffffff;
+    border-right: 1px solid #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+.sidebar-header-title {
+    padding: 15px;
+    border-bottom: 1px solid #f1f5f9;
+    font-weight: bold;
+    color: #1e293b;
+    font-size: 15px;
+}
+.chat-contact-list-box {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* 左側每一列聯絡人項目 */
+.contact-item-row {
+    display: flex; padding: 12px; border-bottom: 1px solid #f8fafc;
+    cursor: pointer; transition: background 0.2s; align-items: center;
+}
+.contact-item-row:hover { background: #f1f5f9; }
+.contact-item-row.active { background: #e0f2fe; } /* 當前選中者高亮淡藍底色 */
+
+.contact-avatar-circle {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, #0084ff, #00c6ff); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; margin-right: 10px; flex-shrink: 0;
+}
+.contact-text-meta { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.contact-name-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;}
+.c-name { font-size: 13px; font-weight: 600; color: #1e293b; }
+.c-time { font-size: 10px; color: #94a3b8; }
+.c-last-msg { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+
+/* ==========================================================================
+   【右側欄】：主要對話與打字區樣式
+   ========================================================================== */
+.chat-main-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #f8fafc; /* 右側舒服的淡灰底色 */
+}
+
+/* 視窗頂部標頭 */
+.chat-header {
+    background: #ffffff;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.chat-user-info { display: flex; align-items: center; gap: 10px; }
+
+.chat-avatar-status {
+    width: 32px; height: 32px;
+    background: #0084ff; color: white; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 13px; position: relative;
+}
+/* 綠色線上狀態小圓點 */
+.chat-avatar-status::after {
+    content: ''; position: absolute; bottom: 0; right: 0;
+    width: 8px; height: 8px; background-color: #22c55e;
+    border-radius: 50%; border: 2px solid #ffffff;
+}
+.chat-username { font-size: 14px; font-weight: 700; color: #1e293b; }
+
+.chat-close-btn {
+    background: transparent; border: none; font-size: 24px;
+    color: #94a3b8; cursor: pointer; line-height: 1;
+}
+.chat-close-btn:hover { color: #475569; }
+
+/* 訊息對話滾動主體 */
+.chat-messages-body {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.chat-system-msg {
+    text-align: center; font-size: 11px; color: #94a3b8;
+    margin: 8px 0; font-weight: 500;
+}
+
+/* 訊息氣泡對齊線 */
+.msg-row { display: flex; width: 100%; }
+.msg-incoming { justify-content: flex-start; } /* 他人訊息靠左 */
+.msg-outgoing { justify-content: flex-end; }   /* 自己訊息靠右 */
+
+.msg-bubble {
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.4;
+    word-break: break-all;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* 經典氣泡色澤 (傳入訊息灰底、發出訊息 FB 經典藍) */
+.msg-incoming .msg-bubble { background-color: #ffffff; color: #1e293b; border: 1px solid #e2e8f0; }
+.msg-outgoing .msg-bubble { background-color: #0084ff; color: #ffffff; }
+
+/* 底部打字輸入區 */
+.chat-input-footer {
+    padding: 12px 16px;
+    background: #ffffff;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.chat-input-footer input {
+    flex: 1; border: none; background-color: #f1f5f9;
+    padding: 10px 14px; border-radius: 20px; font-size: 14px;
+    outline: none; color: #334155;
+}
+
+.chat-send-btn {
+    background: transparent; color: #0084ff; border: none;
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; transition: transform 0.15s;
+}
+.chat-send-btn:hover { transform: scale(1.1); color: #0066d6; }
+
+
+.chat-hidden {
+    display: none !important;
+}
+/* ==========================================================================
+   時間與已讀未讀狀態 垂直上下排列美化
+   ========================================================================== */
+
+/* 狀態包裹外框：讓時間與已讀上下疊好，並貼緊氣泡底部 */
+.msg-meta-box {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    margin: 0 4px;
+    gap: 2px; /* 時間與已讀之間的微小間距 */
+    flex-shrink: 0;
+}
+
+/* 自己訊息的狀態文字靠右對齊 */
+.msg-outgoing .msg-meta-box {
+    align-items: flex-end !important; 
+}
+
+/* 他人訊息的狀態文字靠左對齊 */
+.msg-incoming .msg-meta-box {
+    align-items: flex-start !important;
+}
+
+/* 基礎狀態文字 */
+.msg-status-meta {
+    font-size: 10px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* 時間文字：優雅的淡灰色 */
+.msg-time-text {
+    color: #94a3b8 !important; 
+}
+
+/* 狀態顏色區隔 */
+.status-unread { color: #0084ff !important; } /* 未讀藍 */
+.status-read { color: #94a3b8 !important; }   /* 已讀灰 */
+
+/* 💡 左側聯絡人清單的未讀紅點氣泡樣式 */
+.c-unread-badge {
+    background-color: #ff4d4f !important; /* 現代感亮紅色 */
+    color: white !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    padding: 0 5px !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-left: 8px !important;
+    box-shadow: 0 2px 4px rgba(255, 77, 79, 0.3) !important;
+}
+
+
