@@ -58,7 +58,7 @@ img{ max-width: 100%; }
 }
 .myvenue-tabs a{
 	position: relative;
-	padding: 4px 6px;
+	padding: 4px 10px;
 	color: var(--color-ink-soft);
 	text-decoration: none;
 	transition: color .15s ease;
@@ -386,4 +386,20 @@ img{ max-width: 100%; }
 }
 @media (max-width: 520px) {
 	.card-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); }
+}
+
+.venueOrderId{
+	display: inline-block;
+/* 	font-size: 12px; */
+	font-weight: 700;
+	padding: 4px 12px;
+	border-radius: var(--radius-full);
+	background: Moccasin;
+	color: var(--color-ink-soft);
+	margin-right: auto;
+	text-decoration: none;
+}
+
+html {
+	scrollbar-width: none;
 }

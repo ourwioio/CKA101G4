@@ -37,7 +37,7 @@
 			</thead>
 			<tbody>
 				<tr th:each="venueOrderVO : ${myAllCompletedlist}">
-					<td ><a th:href="@{/front/venueOrder/getOneReservations(venueOrderId=${venueOrderVO.venueOrderId})}" 
+					<td ><a class="venueOrderId" th:href="@{/front/venueOrder/getOneReservations(venueOrderId=${venueOrderVO.venueOrderId})}" 
 					th:text="${venueOrderVO.venueOrderId}"></a></td>
 					<td th:text="${venueOrderVO.venueVO.venueId}"></td>
 					<td th:text="${venueOrderVO.member.realName}"></td>

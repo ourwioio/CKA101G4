@@ -20,16 +20,8 @@
 <div class="container">
     <a class="back-link" th:href="@{/front/venue/myVenue}">← 返回我的場地</a>
     <h1>我的場地訂單</h1>
-
-    <div class="alert alert-error" th:if="${errorMsg}" th:text="${errorMsg}"></div>
-    <div class="alert alert-success" th:if="${successMsg}" th:text="${successMsg}"></div>
-
-    <div class="no-orders" th:if="${#lists.isEmpty(venueOrderListData)}">
-        <p>目前沒有任何預約訂單紀錄。</p>
-        <a th:href="@{/front/venue/listAllVenue}" class="btn-browse">立即探索場地</a>
-    </div>
-
-	<div class="filter-bar">
+    
+    <div class="filter-bar">
 	    <select id="venueTypeFilter">
 	        <option value="">全部類型</option>
 	        <option th:each="venueTypeVO : ${venueTypeData}" th:text="${venueTypeVO.typeName}"></option>
@@ -40,6 +32,14 @@
 	        <option value="asc">預約日期：舊到新</option>
 	    </select>
 	</div>
+
+    <div class="alert alert-error" th:if="${errorMsg}" th:text="${errorMsg}"></div>
+    <div class="alert alert-success" th:if="${successMsg}" th:text="${successMsg}"></div>
+
+    <div class="no-orders" th:if="${#lists.isEmpty(venueOrderListData)}">
+        <p>目前沒有任何預約訂單紀錄。</p>
+        <a th:href="@{/front/venue/listAllVenue}" class="btn-browse">立即探索場地</a>
+    </div>
 	
     <div th:unless="${#lists.isEmpty(venueOrderListData)}">
     	<div id="orderListContainer">
@@ -67,7 +67,7 @@
                     </p>
                     <p>
                         <strong>場地提供者：</strong>
-						<a class="info-value info-link" th:href="@{/front/memberPage/oneMember(memberId=${order.venueVO.member.memberId})}"
+						<a class="info-value info-link member" th:href="@{/front/memberPage/oneMember(memberId=${order.venueVO.member.memberId})}"
 				  		   th:text="${order.venueVO.member.realName}"></a>
                     </p>
 

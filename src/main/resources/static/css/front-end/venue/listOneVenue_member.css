@@ -11,6 +11,10 @@
 
 *{ box-sizing: border-box; }
 
+html {
+	scrollbar-width: none;
+}
+
 body {
 	font-family: var(--font-body);
 	background: var(--color-bg);
