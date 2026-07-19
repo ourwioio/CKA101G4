@@ -1,876 +1,545 @@
-/* =========================================================
-   賣方訂單頁
-   ========================================================= */
 
-:root {
-    --seller-text: #31302f;
-    --seller-muted: #77716d;
-    --seller-border: #eadfd8;
-    --seller-surface: #ffffff;
-    --seller-soft: #fff9f5;
-    --seller-primary: #e77758;
-    --seller-primary-dark: #cf5f42;
-    --seller-success: #36856a;
-    --seller-warning: #b77b22;
-    --seller-danger: #c95454;
-    --seller-blue: #497ca8;
-    --seller-shadow: 0 16px 40px rgba(91, 67, 54, 0.09);
-}
-
-body {
-    background: #fbf8f5;
-    color: var(--seller-text);
-}
-
-[hidden] {
-    display: none !important;
-}
-
-.seller-order-page {
-    width: min(1180px, calc(100% - 40px));
-    margin: 0 auto;
-    padding-top: 36px;
-    padding-bottom: 70px;
-}
-
-/* =========================================================
-   Header 補充
-   ========================================================= */
-
-.seller-header-link {
-    color: #6f6965;
-    font-size: 14px;
-    font-weight: 700;
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.seller-header-link:hover,
-.seller-header-link.active {
-    color: var(--seller-primary);
-}
-
-/* =========================================================
-   Heading
-   ========================================================= */
-
-.seller-order-heading {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 28px;
-    margin-bottom: 26px;
-}
-
-.seller-order-eyebrow,
-.seller-modal-eyebrow {
-    margin: 0 0 7px;
-    color: var(--seller-primary);
-    font-family: "M PLUS Rounded 1c", sans-serif;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.18em;
-}
-
-.seller-order-heading .page-title {
-    margin: 0;
-    font-family: "M PLUS Rounded 1c", "Noto Sans TC", sans-serif;
-    font-size: clamp(30px, 4vw, 44px);
-    line-height: 1.15;
-}
-
-.seller-order-description {
-    max-width: 650px;
-    margin: 12px 0 0;
-    color: var(--seller-muted);
-    font-size: 15px;
-    line-height: 1.8;
-}
-
-.seller-order-heading-actions {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.seller-order-primary-link,
-.seller-accept-button {
-    border-color: var(--seller-primary);
-    background: var(--seller-primary);
-    color: #ffffff;
-}
-
-.seller-order-primary-link:hover,
-.seller-accept-button:hover {
-    border-color: var(--seller-primary-dark);
-    background: var(--seller-primary-dark);
-}
-
-/* =========================================================
-   Alerts
-   ========================================================= */
-
-.alert {
-    margin-bottom: 18px;
-}
-
-/* =========================================================
-   Summary
-   ========================================================= */
-
-.seller-summary-grid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 14px;
-    margin-bottom: 22px;
-}
-
-.seller-summary-card {
-    min-height: 116px;
-    padding: 20px;
-    border: 1px solid var(--seller-border);
-    border-radius: 18px;
-    background: var(--seller-surface);
-    box-shadow: 0 8px 24px rgba(91, 67, 54, 0.05);
-}
-
-.seller-summary-card span {
-    display: block;
-    color: var(--seller-muted);
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.seller-summary-card strong {
-    display: block;
-    margin-top: 13px;
-    font-family: "M PLUS Rounded 1c", sans-serif;
-    font-size: 30px;
-    line-height: 1;
-}
-
-.seller-summary-card--attention {
-    background: #fff7ed;
-}
-
-.seller-summary-card--payment {
-    background: #f4f8fc;
-}
-
-.seller-summary-card--confirmed {
-    background: #effaf6;
-}
-
-.seller-summary-card--completed {
-    background: #f5f2fb;
-}
-
-/* =========================================================
-   Toolbar
-   ========================================================= */
-
-.seller-order-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    margin-bottom: 20px;
-    padding: 14px 16px;
-    border: 1px solid var(--seller-border);
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.82);
-}
-
-.seller-filter-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.seller-filter-button {
-    min-height: 38px;
-    padding: 8px 14px;
-    border: 1px solid #e6d8cf;
-    border-radius: 999px;
-    background: #ffffff;
-    color: #736c68;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.seller-filter-button:hover,
-.seller-filter-button.active {
-    border-color: var(--seller-primary);
-    background: #fff2ec;
-    color: var(--seller-primary-dark);
-}
-
-.seller-order-sync-note {
-    margin: 0;
-    color: #8a827d;
-    font-size: 13px;
-    white-space: nowrap;
-}
-
-/* =========================================================
-   Empty
-   ========================================================= */
-
-.seller-empty-state {
-    padding: 64px 24px;
-    border: 1px dashed #dfcec2;
-    border-radius: 22px;
-    background: rgba(255, 255, 255, 0.78);
-    text-align: center;
-}
-
-.seller-empty-icon {
-    font-size: 44px;
-    color: var(--seller-primary);
-}
-
-.seller-empty-state h2 {
-    margin: 10px 0 8px;
-}
-
-.seller-empty-state p {
-    margin: 0 0 20px;
-    color: var(--seller-muted);
-}
-
-/* =========================================================
-   Cards
-   ========================================================= */
-
-.seller-order-list {
-    display: grid;
-    gap: 20px;
-}
-
-.seller-order-card {
-    overflow: hidden;
-    border: 1px solid var(--seller-border);
-    border-radius: 22px;
-    background: var(--seller-surface);
-    box-shadow: var(--seller-shadow);
-}
-
-.seller-order-card.is-expired {
-    opacity: 0.82;
-}
-
-.seller-order-card-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 22px;
-    padding: 24px 26px 20px;
-}
-
-.seller-service-meta {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.seller-service-type,
-.seller-order-number {
-    display: inline-flex;
-    align-items: center;
-    min-height: 28px;
-    padding: 5px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 800;
-}
-
-.seller-service-type {
-    background: #fff0e8;
-    color: #cc674b;
-}
-
-.seller-order-number {
-    background: #f5f3f1;
-    color: #7b746f;
-}
-
-.seller-service-identity h2 {
-    margin: 12px 0 7px;
-    font-family: "M PLUS Rounded 1c", "Noto Sans TC", sans-serif;
-    font-size: 24px;
-    line-height: 1.3;
-}
-
-.seller-service-identity p {
-    margin: 0;
-    color: var(--seller-muted);
-    font-size: 14px;
-}
-
-.seller-status-area {
-    display: flex;
-    align-items: flex-end;
-    flex-direction: column;
-    gap: 7px;
-}
-
-.seller-status-badge,
-.seller-sub-status {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 32px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-.seller-status-badge--pending-confirm {
-    background: #fff1de;
-    color: #a66516;
-}
-
-.seller-status-badge--pending-payment {
-    background: #eaf3fb;
-    color: #3f759e;
-}
-
-.seller-status-badge--confirmed {
-    background: #e9f8f2;
-    color: #2d7b61;
-}
-
-.seller-status-badge--completed {
-    background: #eee9f7;
-    color: #655184;
-}
-
-.seller-status-badge--cancelled {
-    background: #f6eaea;
-    color: #a64e4e;
-}
-
-.seller-sub-status {
-    min-height: 26px;
-    padding: 4px 9px;
-    font-size: 12px;
-}
-
-.seller-sub-status--refund-pending,
-.seller-sub-status--payout-pending {
-    background: #fff4d9;
-    color: #9a6b18;
-}
-
-.seller-sub-status--refund-completed,
-.seller-sub-status--payout-completed {
-    background: #e8f5ef;
-    color: #2d765d;
-}
-
-/* =========================================================
-   Summary inside card
-   ========================================================= */
-
-.seller-order-summary {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1.4fr 1fr;
-    border-top: 1px solid #f0e7e1;
-    border-bottom: 1px solid #f0e7e1;
-    background: #fffdfa;
-}
-
-.seller-summary-item {
-    min-width: 0;
-    padding: 18px 22px;
-    border-right: 1px solid #f0e7e1;
-}
-
-.seller-summary-item:last-child {
-    border-right: 0;
-}
-
-.seller-summary-label {
-    display: block;
-    margin-bottom: 7px;
-    color: #8b837e;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.seller-summary-item strong {
-    display: block;
-    overflow-wrap: anywhere;
-    font-size: 15px;
-}
-
-.seller-summary-item small {
-    display: block;
-    margin-top: 5px;
-    color: #8b837e;
-    line-height: 1.5;
-}
-
-/* =========================================================
-   Action panels
-   ========================================================= */
-
-.seller-action-panel {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 28px;
-    padding: 22px 26px;
-}
-
-.seller-action-panel--pending-confirm {
-    align-items: flex-start;
-    background: #fffaf3;
-}
-
-.seller-action-panel--pending-payment {
-    background: #f7fbff;
-}
-
-.seller-action-panel--confirmed {
-    background: #f5fcf9;
-}
-
-.seller-action-panel--completed {
-    background: #faf8fd;
-}
-
-.seller-action-panel--cancelled {
-    background: #fffafa;
-}
-
-.seller-action-copy {
-    flex: 1 1 auto;
-    min-width: 0;
-}
-
-.seller-action-copy h3 {
-    margin: 0 0 7px;
-    font-size: 17px;
-}
-
-.seller-action-copy p {
-    margin: 4px 0;
-    color: #6f6965;
-    font-size: 14px;
-    line-height: 1.7;
-}
-
-.seller-buyer-note {
-    margin-top: 12px !important;
-    padding: 11px 13px;
-    border-left: 3px solid #eda66f;
-    border-radius: 7px;
-    background: #ffffff;
-}
-
-.seller-action-control {
-    flex: 0 1 440px;
-    display: grid;
-    gap: 12px;
-}
-
-.seller-action-control--horizontal {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-}
-
-.seller-countdown-box {
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 14px;
-    min-width: 150px;
-    min-height: 54px;
-    padding: 10px 14px;
-    border: 1px solid #efd3b7;
-    border-radius: 14px;
-    background: #ffffff;
-}
-
-.seller-countdown-box--payment {
-    border-color: #cbdfee;
-}
-
-.seller-countdown-box span {
-    color: #7b746f;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.seller-countdown {
-    font-family: "M PLUS Rounded 1c", monospace;
-    font-size: 21px;
-    color: #c86644;
-}
-
-.seller-countdown-box.is-urgent {
-    animation: sellerPulse 1s ease-in-out infinite;
-    border-color: #d56858;
-    background: #fff3f1;
-}
-
-@keyframes sellerPulse {
-    0%,
-    100% {
-        box-shadow: 0 0 0 0 rgba(213, 104, 88, 0);
-    }
-
-    50% {
-        box-shadow: 0 0 0 5px rgba(213, 104, 88, 0.12);
-    }
-}
-
-.seller-field-label {
-    display: block;
-    margin-bottom: 7px;
-    color: #5f5955;
-    font-size: 13px;
-    font-weight: 800;
-}
-
-.seller-form-control {
-    width: 100%;
-    padding: 11px 13px;
-    border: 1px solid #decfc5;
-    border-radius: 12px;
-    background: #ffffff;
-    color: var(--seller-text);
-    font: inherit;
-    line-height: 1.6;
-    resize: vertical;
-}
-
-.seller-form-control:focus {
-    border-color: var(--seller-primary);
-    outline: 3px solid rgba(231, 119, 88, 0.13);
-}
-
-.seller-action-buttons {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 9px;
-    margin-top: 10px;
-}
-
-.seller-reject-button,
-.seller-cancel-button,
-.seller-reject-confirm,
-.seller-cancel-confirm {
-    border-color: #d4655c;
-    background: #ffffff;
-    color: #bc4c45;
-}
-
-.seller-reject-button:hover,
-.seller-cancel-button:hover,
-.seller-reject-confirm:hover,
-.seller-cancel-confirm:hover {
-    background: #bc4c45;
-    color: #ffffff;
-}
-
-.seller-completed-time,
-.seller-cancelled-refund {
-    display: grid;
-    gap: 5px;
-    color: #6d6763;
-    font-size: 14px;
-    text-align: right;
-}
-
-.seller-refund-waiting {
-    color: #9a6b18;
-    font-weight: 800;
-}
-
-.seller-refund-done {
-    color: #2d765d;
-    font-weight: 800;
-}
-
-/* =========================================================
-   Detail
-   ========================================================= */
-
-.seller-order-detail-toggle-row {
-    border-top: 1px solid #f0e7e1;
-}
-
-.seller-detail-toggle {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 52px;
-    padding: 12px 26px;
-    border: 0;
-    background: #ffffff;
-    color: #625c58;
-    font: inherit;
-    font-size: 14px;
-    font-weight: 800;
-    cursor: pointer;
-}
-
-.seller-detail-toggle:hover {
-    background: #fffaf7;
-}
-
-.seller-detail-toggle-icon {
-    font-size: 20px;
-    transition: transform 0.2s ease;
-}
-
-.seller-detail-toggle[aria-expanded="true"]
-.seller-detail-toggle-icon {
-    transform: rotate(45deg);
-}
-
-.seller-order-details {
-    padding: 22px 26px 26px;
-    border-top: 1px solid #f0e7e1;
-    background: #fcfaf8;
-}
-
-.seller-detail-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
-}
-
-.seller-detail-item {
-    padding: 15px 16px;
-    border: 1px solid #ece2dc;
-    border-radius: 14px;
-    background: #ffffff;
-}
-
-.seller-detail-item > span {
-    display: block;
-    margin-bottom: 7px;
-    color: #8a827d;
-    font-size: 12px;
-    font-weight: 800;
-}
-
-.seller-detail-item p {
-    margin: 0;
-    color: #55504d;
-    line-height: 1.7;
-    overflow-wrap: anywhere;
-}
-
-/* =========================================================
-   Modal
-   ========================================================= */
-
-body.seller-modal-open {
-    overflow: hidden;
-}
-
-.seller-modal {
-    position: fixed;
-    inset: 0;
-    z-index: 1100;
-    display: grid;
-    place-items: center;
-    padding: 20px;
-    background: rgba(44, 38, 34, 0.46);
-}
-
-.seller-modal-dialog {
-    position: relative;
-    width: min(520px, 100%);
-    max-height: calc(100vh - 40px);
-    overflow-y: auto;
-    padding: 28px;
-    border-radius: 22px;
-    background: #ffffff;
-    box-shadow: 0 26px 70px rgba(52, 37, 29, 0.24);
-}
-
-.seller-modal-dialog h2 {
-    margin: 0 0 9px;
-    font-family: "M PLUS Rounded 1c", "Noto Sans TC", sans-serif;
-}
-
-.seller-modal-dialog > p:not(.seller-modal-eyebrow) {
-    margin: 0 0 20px;
-    color: #77706c;
-    line-height: 1.7;
-}
-
-.seller-modal-close {
-    position: absolute;
-    top: 14px;
-    right: 16px;
-    width: 36px;
-    height: 36px;
-    border: 0;
-    border-radius: 50%;
-    background: #f6f1ee;
-    color: #6e6762;
-    font-size: 24px;
-    cursor: pointer;
-}
-
-.seller-modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 18px;
-}
-
-.seller-cancel-warning {
-    margin: 0 0 16px;
-    padding: 12px 14px;
-    border: 1px solid #f0c3b9;
-    border-radius: 12px;
-    background: #fff4f1;
-    color: #a84d42;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1.7;
-}
-
-/* =========================================================
-   Responsive
-   ========================================================= */
-
-@media (max-width: 980px) {
-
-    .seller-summary-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .seller-order-summary {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .seller-summary-item:nth-child(2) {
-        border-right: 0;
-    }
-
-    .seller-summary-item:nth-child(-n + 2) {
-        border-bottom: 1px solid #f0e7e1;
-    }
-
-    .seller-action-panel {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .seller-action-control {
-        flex-basis: auto;
-    }
-
-    .seller-action-control--horizontal {
-        justify-content: flex-start;
-    }
-}
-
-@media (max-width: 760px) {
-
-    .seller-order-page {
-        width: min(100% - 24px, 1180px);
-        padding-top: 24px;
-    }
-
-    .seller-order-heading {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .seller-order-toolbar {
-        align-items: flex-start;
-        flex-direction: column;
-    }
-
-    .seller-order-sync-note {
-        white-space: normal;
-    }
-
-    .seller-summary-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .seller-order-card-top {
-        flex-direction: column;
-    }
-
-    .seller-status-area {
-        align-items: flex-start;
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-
-    .seller-detail-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .seller-header-link {
-        display: none;
-    }
-}
-
-@media (max-width: 560px) {
-
-    .seller-summary-grid,
-    .seller-order-summary {
-        grid-template-columns: 1fr;
-    }
-
-    .seller-summary-item {
-        border-right: 0;
-        border-bottom: 1px solid #f0e7e1;
-    }
-
-    .seller-summary-item:last-child {
-        border-bottom: 0;
-    }
-
-    .seller-order-card-top,
-    .seller-action-panel,
-    .seller-order-details {
-        padding-left: 18px;
-        padding-right: 18px;
-    }
-
-    .seller-detail-toggle {
-        padding-left: 18px;
-        padding-right: 18px;
-    }
-
-    .seller-action-control--horizontal,
-    .seller-action-buttons,
-    .seller-modal-actions {
-        align-items: stretch;
-        flex-direction: column;
-    }
-
-    .seller-action-control--horizontal .btn,
-    .seller-action-buttons .btn,
-    .seller-modal-actions .btn {
-        width: 100%;
-    }
-
-    .seller-countdown-box {
-        width: 100%;
-    }
-}
+		/* ==========================================================
+		   Webond 收到的預約頁 — 圓潤角色風風格融合與黃色圓點優化
+		   ========================================================== */
+		:root {
+		    --color-bg:            #F7F3EC;
+		    --color-surface:       #FFFFFF;
+		    --color-surface-soft:  #FFFDF8;
+		    --color-ink:           #17140F;
+		    --color-ink-soft:      #726A5F;
+		    --color-border:        #ECE4D6;
+		
+		    --color-yellow:       #FFE59A;
+		    --color-yellow-deep:  #FFC94D;
+		    --color-pink:         #FFB5C1;
+		    --color-green:         #B7E1D1;
+		    --color-blue:         #A9D3FF;
+		    --color-red:          #FF5271;
+		
+		    --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+		    --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+		
+		    --radius-lg: 26px;
+		    --radius-md: 16px;
+		    --radius-full: 999px;
+		
+		    --shadow-sm: 0 4px 12px rgba(23, 20, 15, 0.05);
+		    --shadow-md: 0 16px 36px rgba(23, 20, 15, 0.09);
+		    --nav-height: 76px;
+		}
+		
+		* { box-sizing: border-box; }
+		
+		body {
+		    margin: 0;
+		    font-family: var(--font-body);
+		    background: var(--color-bg);
+		    color: var(--color-ink);
+		    line-height: 1.65;
+		    -webkit-font-smoothing: antialiased;
+		}
+		
+		h1, h2, h3, h4 { 
+			font-family: var(--font-display); 
+			margin: 0; 
+			letter-spacing: -0.01em;
+		}
+		
+		/* 左右主寬度控制 */
+		.seller-order-page {
+		    max-width: 1140px;
+		    margin: 0 auto;
+		    padding: calc(var(--nav-height) + 48px) 24px 80px;
+		}
+		
+		/* ==========================================================
+		   頁面標題區
+		   ========================================================== */
+		.seller-order-heading {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: flex-end;
+		    flex-wrap: wrap;
+		    gap: 24px;
+		    margin-bottom: 36px;
+		}
+		.page-title {
+		    font-size: 28px;
+		    font-weight: 800;
+		    color: var(--color-ink);
+		    margin: 0 0 10px 0;
+		    line-height: 1.2;
+		    
+		    /* 🌟 關鍵修正：讓標題與圓點水平排列，並在整行中「垂直置中」對齊 */
+		    display: inline-flex;
+		    align-items: center;
+		}		
+		.page-title::before {
+		    content: "";
+		    width: 8px;
+		    height: 8px;
+		    background-color: var(--color-yellow-deep);
+		    border-radius: 50%;
+		    margin-right: 8px; /* 微調間距，讓視覺更舒服 */
+		    flex-shrink: 0;    /* 防禦機制：確保圓點絕對不會被文字擠壓到變形 */
+		}
+		.seller-order-description {
+		    font-size: 15px;
+		    color: var(--color-ink-soft);
+		    font-weight: 500;
+		    margin: 0;
+		}
+		.seller-order-heading-actions {
+		    display: flex;
+		    gap: 12px;
+		}
+		
+		/* ==========================================================
+		   通用膠囊按鈕系統
+		   ========================================================== */
+		.btn {
+		    display: inline-flex;
+		    align-items: center;
+		    justify-content: center;
+		    font-family: var(--font-body);
+		    font-weight: 800;
+		    font-size: 14.5px;
+		    padding: 12px 28px;
+		    border-radius: var(--radius-full);
+		    border: none;
+		    cursor: pointer;
+		    text-decoration: none;
+		    transition: transform .18s ease, box-shadow .18s ease, background .15s ease, border-color .15s ease;
+		}
+		/* 主按鈕：經典黑膠囊 */
+		.seller-order-primary-link, .seller-accept-button, .seller-reject-confirm, .seller-cancel-confirm {
+		    background: var(--color-ink);
+		    color: #ffffff;
+		    box-shadow: var(--shadow-sm);
+		}
+		.seller-order-primary-link:hover, .seller-accept-button:hover, .seller-reject-confirm:hover, .seller-cancel-confirm:hover {
+		    transform: translateY(-2px);
+		    box-shadow: var(--shadow-md);
+		    background: var(--color-yellow-deep);
+		    color: var(--color-ink);
+		}
+		/* 次按鈕：精緻淺色圓框 */
+		.btn-secondary, .seller-modal-cancel {
+		    background: var(--color-surface);
+		    color: var(--color-ink);
+		    border: 1.5px solid var(--color-border);
+		    box-shadow: var(--shadow-sm);
+		}
+		.btn-secondary:hover, .seller-modal-cancel:hover {
+		    transform: translateY(-2px);
+		    border-color: var(--color-ink);
+		    background: var(--color-surface-soft);
+		    box-shadow: var(--shadow-md);
+		}
+		/* 拒絕與取消特殊危險按鈕 */
+		.seller-reject-button, .seller-cancel-button {
+		    background: rgba(255, 82, 113, 0.08);
+		    color: var(--color-red);
+		    border: 1.5px solid rgba(255, 82, 113, 0.18);
+		}
+		.seller-reject-button:hover, .seller-cancel-button:hover {
+		    background: var(--color-red);
+		    color: #fff;
+		    transform: translateY(-2px);
+		    box-shadow: var(--shadow-md);
+		}
+		.btn:active { transform: translateY(0) scale(0.98); }
+		
+		/* ==========================================================
+		   訊息提示橫幅
+		   ========================================================== */
+		.alert {
+		    padding: 16px 24px;
+		    border-radius: var(--radius-md);
+		    font-size: 14.5px;
+		    font-weight: 700;
+		    margin-bottom: 28px;
+		    box-shadow: var(--shadow-sm);
+		}
+		.alert-success { background: var(--color-green); color: var(--color-ink); }
+		.alert-error { background: var(--color-pink); color: var(--color-ink); }
+		
+		/* ==========================================================
+		   摘要看板
+		   ========================================================== */
+		.seller-summary-grid {
+		    display: grid;
+		    grid-template-columns: repeat(5, 1fr);
+		    gap: 16px;
+		    margin-bottom: 36px;
+		}
+		.seller-summary-card {
+		    background: var(--color-surface);
+		    border: 1.5px solid var(--color-border);
+		    border-radius: var(--radius-md);
+		    padding: 22px 16px;
+		    text-align: center;
+		    box-shadow: var(--shadow-sm);
+		    transition: transform 0.2s ease, box-shadow 0.2s ease;
+		}
+		.seller-summary-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+		.seller-summary-card span { 
+			display: inline-flex; 
+			align-items: center;
+			justify-content: center;
+			font-size: 13px; 
+			font-weight: 800; 
+			color: var(--color-ink); 
+			opacity: 0.85; 
+			margin-bottom: 8px; 
+		}
+		.seller-summary-card strong { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: var(--color-ink); display: block; }
+		
+		
+		
+		.seller-summary-card--attention { background: var(--color-pink); }
+		.seller-summary-card--payment { background: var(--color-yellow); }
+		.seller-summary-card--confirmed { background: var(--color-green); }
+		.seller-summary-card--completed { background: var(--color-blue); }
+		
+		/* ==========================================================
+		   篩選工具列
+		   ========================================================== */
+		.seller-order-toolbar {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    flex-wrap: wrap;
+		    gap: 16px;
+		    margin-bottom: 32px;
+		    border-bottom: 2px dashed var(--color-border);
+		    padding-bottom: 24px;
+		}
+		.seller-filter-group { display: flex; flex-wrap: wrap; gap: 10px; }
+		.seller-filter-button {
+		    border: 1.5px solid var(--color-border);
+		    background: var(--color-surface);
+		    color: var(--color-ink);
+		    font-family: var(--font-body);
+		    font-weight: 800;
+		    font-size: 14px;
+		    padding: 9px 20px;
+		    border-radius: var(--radius-full);
+		    cursor: pointer;
+		    transition: all .15s ease;
+		}
+		.seller-filter-button:hover { transform: translateY(-2px); border-color: var(--color-ink); }
+		.seller-filter-button.active { background: var(--color-ink); color: #fff; border-color: var(--color-ink); }
+		.seller-order-sync-note { font-size: 13px; color: var(--color-ink-soft); font-weight: 600; margin: 0; font-style: italic; }
+		
+		/* ==========================================================
+		   空狀態
+		   ========================================================== */
+		.seller-empty-state {
+		    text-align: center;
+		    padding: 70px 24px;
+		    background: var(--color-surface-soft);
+		    border: 1.5px dashed var(--color-border);
+		    border-radius: var(--radius-lg);
+		    margin: 40px 0;
+		}
+		.seller-empty-icon { font-size: 52px; color: var(--color-yellow-deep); margin-bottom: 18px; }
+		.seller-empty-state h2 { font-size: 22px; font-weight: 800; color: var(--color-ink); margin-bottom: 10px; }
+		.seller-empty-state p { font-size: 14.5px; color: var(--color-ink-soft); font-weight: 500; margin-bottom: 26px; }
+		
+		/* ==========================================================
+		   訂單卡片列表與核心佈局
+		   ========================================================== */
+		.seller-order-list { display: flex; flex-direction: column; gap: 28px; }
+		.seller-order-card {
+		    background: var(--color-surface);
+		    border: 1.5px solid var(--color-border);
+		    border-radius: var(--radius-lg);
+		    box-shadow: var(--shadow-sm);
+		    padding: 36px;
+		    transition: transform 0.2s ease, box-shadow 0.2s ease;
+		}
+		.seller-order-card:hover { box-shadow: var(--shadow-md); }
+		
+		.seller-order-card-top {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: flex-start;
+		    flex-wrap: wrap;
+		    gap: 20px;
+		    margin-bottom: 24px;
+		}
+		.seller-service-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+		
+		.seller-service-type {
+		    font-size: 11.5px; font-weight: 800; background: var(--color-blue);
+		    color: var(--color-ink); padding: 4px 14px; border-radius: 20px;
+		}
+		.seller-order-number { font-size: 13px; font-weight: 700; color: var(--color-ink-soft); }
+		.seller-order-card-top h2 { font-size: 22px; font-weight: 800; color: var(--color-ink); margin: 0 0 8px 0; line-height: 1.3; }
+		.seller-order-card-top p { margin: 0; font-size: 14px; color: var(--color-ink-soft); font-weight: 500; }
+		.seller-order-card-top strong { color: var(--color-ink); font-weight: 700; }
+		
+		.seller-status-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+		
+		/* 🌟 狀態徽章與優雅的黃色指示圓點組合 */
+		.seller-status-badge {
+		    font-size: 13px; 
+		    font-weight: 800; 
+		    padding: 6px 16px; 
+		    border-radius: 20px;
+		    display: inline-flex;
+		    align-items: center;
+		}
+		.seller-status-badge--pending-confirm::before,
+		.seller-status-badge--pending-payment::before {
+			content: "";
+			display: inline-block;
+			width: 7px;
+			height: 7px;
+			background-color: var(--color-yellow-deep);
+			border-radius: 50%;
+			margin-right: 8px;
+		}
+		
+		.seller-status-badge--pending-confirm { background: var(--color-pink); color: var(--color-ink); }
+		.seller-status-badge--pending-payment { background: var(--color-yellow); color: var(--color-ink); }
+		.seller-status-badge--confirmed { background: var(--color-green); color: var(--color-ink); }
+		.seller-status-badge--completed { background: var(--color-ink); color: #ffffff; }
+		.seller-status-badge--cancelled { background: var(--color-border); color: var(--color-ink-soft); }
+		
+		.seller-sub-status { font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 20px; margin-top: 2px; }
+		.seller-sub-status--refund-pending, .seller-sub-status--payout-pending { background: #FFEAA7; color: #8A6D00; }
+		.seller-sub-status--refund-completed, .seller-sub-status--payout-completed { background: var(--color-green); color: var(--color-ink); }
+		
+		/* ==========================================================
+		   訂單數據網格看板
+		   ========================================================== */
+		.seller-order-summary {
+		    display: grid;
+		    grid-template-columns: repeat(4, 1fr);
+		    gap: 16px;
+		    background: var(--color-surface-soft);
+		    border: 1.5px solid var(--color-border);
+		    border-radius: var(--radius-md);
+		    padding: 20px 24px;
+		    margin-bottom: 24px;
+		}
+		.seller-summary-item { display: flex; flex-direction: column; gap: 6px; }
+		.seller-summary-label { font-size: 12.5px; font-weight: 800; color: var(--color-ink-soft); }
+		.seller-summary-item strong { font-size: 15px; font-weight: 700; color: var(--color-ink); }
+		.seller-summary-item small { font-size: 12.5px; color: var(--color-ink-soft); font-weight: 500; margin-top: 2px; }
+		.seller-amount-item strong { color: var(--color-ink); font-size: 17px; font-weight: 800; }
+		
+		/* ==========================================================
+		   操作區塊面板 (Dashed border 面板)
+		   ========================================================== */
+		.seller-action-panel {
+		    border: 1.5px dashed var(--color-border);
+		    border-radius: var(--radius-md);
+		    padding: 26px;
+		    margin-bottom: 24px;
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: flex-start;
+		    flex-wrap: wrap;
+		    gap: 24px;
+		}
+		.seller-action-copy { flex: 1; min-width: 280px; }
+		.seller-action-copy h3 { font-size: 17px; font-weight: 800; color: var(--color-ink); margin-bottom: 8px; }
+		.seller-action-copy p { font-size: 14px; color: var(--color-ink-soft); font-weight: 500; margin: 0 0 10px 0; }
+		
+		.seller-buyer-note {
+		    background: var(--color-surface); 
+		    border: 1.5px solid var(--color-border);
+		    padding: 12px 16px; 
+		    border-radius: 12px; 
+		    font-size: 13.5px; 
+		    margin-top: 12px;
+		    line-height: 1.6;
+		}
+		
+		.seller-action-control { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 340px; }
+		.seller-action-control--horizontal { flex-direction: row; align-items: center; justify-content: flex-end; max-width: 100%; gap: 16px; }
+		
+		.seller-countdown-box { background: var(--color-surface); padding: 10px 18px; border-radius: 12px; border: 1.5px solid var(--color-border); display: inline-block; text-align: center; }
+		.seller-countdown-box span { display: block; font-size: 11.5px; font-weight: 800; color: var(--color-ink-soft); margin-bottom: 2px; }
+		.seller-countdown { font-family: var(--font-display); font-size: 21px; font-weight: 800; color: var(--color-red); }
+		
+		.seller-accept-form { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+		.seller-field-label { font-size: 13.5px; font-weight: 800; color: var(--color-ink); }
+		
+		.seller-form-control {
+		    width: 100%; font-family: var(--font-body); font-size: 14px; font-weight: 600; padding: 12px 14px;
+		    background: var(--color-surface); border: 1.5px solid var(--color-border); border-radius: 12px; outline: none;
+		    transition: border-color 0.15s ease;
+		}
+		.seller-form-control:focus { border-color: var(--color-yellow-deep); }
+		
+		textarea.seller-form-control {
+		    resize: none;
+		    overflow-y: auto;
+		    scrollbar-width: none;
+		    -ms-overflow-style: none;
+		}
+		textarea.seller-form-control::-webkit-scrollbar { display: none; }
+		
+		.seller-action-buttons { display: flex; gap: 12px; margin-top: 6px; }
+		.seller-action-buttons .btn { flex: 1; }
+		
+		.seller-completed-time, .seller-cancelled-refund { display: inline-flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 700; }
+		.seller-refund-waiting { color: #8A6D00; }
+		.seller-refund-done { color: var(--color-green); }
+		
+		/* 詳情摺疊結構 */
+		.seller-order-detail-toggle-row { border-top: 1.5px solid var(--color-border); padding-top: 16px; text-align: left; }
+		.seller-detail-toggle {
+		    background: transparent; border: none; cursor: pointer; font-family: var(--font-body);
+		    font-weight: 800; font-size: 13.5px; color: var(--color-ink-soft); display: inline-flex; align-items: center; gap: 6px;
+		}
+		.seller-order-details { padding-top: 20px; }
+		.seller-detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+		.seller-detail-item span { display: block; font-size: 12.5px; font-weight: 800; color: var(--color-ink-soft); margin-bottom: 6px; }
+		.seller-detail-item p { margin: 0; font-size: 14px; font-weight: 600; color: var(--color-ink); line-height: 1.6; }
+		
+		/* ==========================================================
+		   彈窗控制系統
+		   ========================================================== */
+		/* ==========================================================
+   Modal 彈窗控制系統（完美統整版 — 修正自動跳出 Bug）
+   ========================================================== */
+		
+		/* 當彈窗開啟時，鎖定後方主網頁背景不隨便捲動 */
+		body.seller-modal-open {
+		    overflow: hidden;
+		}
+		
+		/* 🌟 核心修正：防止 CSS display 屬性覆蓋 HTML [hidden] 屬性的防禦機制 */
+		.seller-modal[hidden] {
+		    display: none !important;
+		}
+		
+		.seller-modal {
+		    position: fixed;
+		    inset: 0;
+		    z-index: 9999; /* 提高層級，確保絕對壓在 Navbar 與所有卡片上方 */
+		    display: grid;
+		    place-items: center;
+		    padding: 20px;
+		    background: rgba(23, 20, 15, 0.46); /* 融合後的溫潤深咖啡黑色遮罩 */
+		    backdrop-filter: blur(4px); /* 精緻的日系毛玻璃背景模糊 */
+		}
+		
+		.seller-modal-dialog {
+		    position: relative;
+		    width: min(520px, 100%); /* 採納新版：在大螢幕鎖定 520px，小螢幕自動 100% 自適應 */
+		    max-height: calc(100vh - 40px); /* 避免內容過長超出手機螢幕 */
+		    overflow-y: auto; /* 超出視窗時自動在彈窗內產生捲動條 */
+		    padding: 36px 32px; /* 重新配比平衡的舒服留白 */
+		    border: 1.5px solid var(--color-border);
+		    border-radius: var(--radius-lg); /* 完美保留 Webond 的 26px 標誌性大圓角 */
+		    background: var(--color-surface);
+		    box-shadow: 0 26px 70px rgba(52, 37, 29, 0.18); /* 厚實飽滿的微甜角色風陰影 */
+		    text-align: center;
+		}
+		
+		/* 圓形精緻關閉按鈕 */
+		.seller-modal-close {
+		    position: absolute;
+		    top: 16px;
+		    right: 18px;
+		    width: 36px;
+		    height: 36px;
+		    border: 0;
+		    border-radius: 50%;
+		    background: #F6F1EE; /* 採納新版：優雅的微米色內凹底色 */
+		    color: var(--color-ink-soft);
+		    font-size: 24px;
+		    cursor: pointer;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    transition: background 0.15s ease, color 0.15s ease;
+		}
+		.seller-modal-close:hover {
+		    background: var(--color-border);
+		    color: var(--color-ink);
+		}
+		
+		.seller-modal-eyebrow { 
+		    font-family: var(--font-display); 
+		    font-size: 11px; 
+		    font-weight: 800; 
+		    letter-spacing: 1.5px; 
+		    color: var(--color-ink-soft); 
+		    margin-bottom: 8px; 
+		}
+		
+		.seller-modal-dialog h2 { 
+		    font-size: 24px; 
+		    font-weight: 800; 
+		    color: var(--color-ink); 
+		    margin: 0 0 10px; 
+		    font-family: var(--font-display);
+		}
+		
+		/* 彈窗內的說明文字級距 */
+		.seller-modal-dialog > p:not(.seller-modal-eyebrow) {
+		    margin: 0 0 20px;
+		    color: var(--color-ink-soft);
+		    font-size: 14.5px;
+		    line-height: 1.65;
+		}
+		
+		.seller-modal-dialog form { 
+		    display: flex; 
+		    flex-direction: column; 
+		    text-align: left; 
+		    gap: 12px; 
+		}
+		
+		/* 按鈕群組：左邊返回鍵較小，右邊確定鍵較寬，黃金比例 1:1.5 */
+		.seller-modal-actions { 
+		    display: grid; 
+		    grid-template-columns: 1fr 1.5fr; 
+		    gap: 12px; 
+		    margin-top: 18px; 
+		}
+		
+		/* 🌟 新版精緻取消警告橫幅（完美融合色調與粗體質感） */
+		.seller-cancel-warning { 
+		    margin: 0 0 18px;
+		    padding: 14px 16px; 
+		    border: 1px solid #F0C3B9;
+		    border-radius: var(--radius-md); 
+		    background: #FFF4F1; 
+		    color: #A84D42; 
+		    font-size: 13.5px; 
+		    font-weight: 700; 
+		    text-align: left; 
+		    line-height: 1.6; 
+		}
+		/* ==========================================================
+		   RWD 響應式佈局平衡
+		   ========================================================== */
+		@media (max-width: 950px) {
+		    .seller-summary-grid { grid-template-columns: repeat(3, 1fr); }
+		    .seller-order-summary { grid-template-columns: repeat(2, 1fr); }
+		}
+		@media (max-width: 768px) {
+		    .seller-order-heading { flex-direction: column; align-items: flex-start; gap: 16px; }
+		    .seller-order-heading-actions { width: 100%; }
+		    .seller-order-heading-actions .btn { flex: 1; }
+		    .seller-action-panel { flex-direction: column; align-items: stretch; gap: 20px; }
+		    .seller-action-control { max-width: 100%; }
+		    .seller-action-control--horizontal { justify-content: flex-start; }
+		    .seller-action-control--horizontal .btn { flex: 1; }
+		    .seller-detail-grid { grid-template-columns: 1fr; gap: 16px; }
+		}
+		@media (max-width: 550px) {
+		    .seller-summary-grid { grid-template-columns: repeat(2, 1fr); }
+		    .seller-order-card { padding: 24px; }
+		    .seller-order-card-top { flex-direction: column; align-items: flex-start; gap: 14px; }
+		    .seller-status-area { align-items: flex-start; }
+		}

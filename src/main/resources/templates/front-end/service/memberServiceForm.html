@@ -4,37 +4,514 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title th:text="${mode == 'add'
-                     ? '新增服務｜Webond'
-                     : '修改服務｜Webond'}">
-        服務表單｜Webond
-    </title>
+    <title th:text="${mode == 'add' ? '新增服務｜Webond' : '修改服務｜Webond'}">服務表單｜Webond</title>
 
     <!-- Google Fonts -->
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
+    <!-- 前台共用 Navbar CSS -->
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
 
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-          rel="stylesheet">
+    <style>
+        /* ==========================================================
+           Webond 統一設計系統
+           ========================================================== */
+        :root {
+            --color-bg:            #F7F3EC;
+            --color-surface:       #FFFFFF;
+            --color-surface-soft:  #FFFDF8;
+            --color-ink:           #17140F;
+            --color-ink-soft:      #726A5F;
+            --color-border:        #ECE4D6;
 
-    <!-- Service 前台共用 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/service/common.css}">
+            --color-yellow:       #FFE59A;
+            --color-yellow-deep:  #FFC94D;
+            --color-pink:         #FFB5C1;
+            --color-green:        #B7E1D1;
+            --color-blue:         #A9D3FF;
+            --color-red:          #FF5271;
 
-<!-- 前台共用 Navbar CSS -->
-<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+            --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+            --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
 
-    <!-- 表單頁專屬 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/service/memberServiceForm.css}">
+            --radius-lg: 26px;
+            --radius-md: 16px;
+            --radius-full: 999px;
+
+            --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+            --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+
+            --nav-height: 76px;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: var(--font-body);
+            background: var(--color-bg);
+            color: var(--color-ink);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4 { font-family: var(--font-display); margin: 0; }
+        a { text-decoration: none; color: inherit; }
+
+        .site-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: calc(var(--nav-height) + 40px) 20px 80px;
+        }
+
+        /* ==========================================================
+           頁面標題區塊
+           ========================================================== */
+        .member-service-form-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        .page-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--color-ink);
+            position: relative;
+            padding-left: 18px;
+            margin-bottom: 6px;
+        }
+        .page-title::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 50%;
+            transform: translateY(-50%);
+            width: 9px; height: 9px;
+            border-radius: 50%;
+            background: var(--color-yellow-deep);
+        }
+        .member-service-form-description {
+            font-size: 13.5px;
+            color: var(--color-ink-soft);
+            font-weight: 800;
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        /* ==========================================================
+           警告訊息樣式
+           ========================================================== */
+        .alert-error {
+            background: #FFF5F6;
+            border: 1.5px solid var(--color-red);
+            color: var(--color-red);
+            padding: 12px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            font-size: 14px;
+            margin-bottom: 24px;
+        }
+
+        /* ==========================================================
+           藥丸型通用按鈕系統
+           ========================================================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-body);
+            font-weight: 800;
+            font-size: 13.5px;
+            padding: 10px 20px;
+            border-radius: var(--radius-full);
+            transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .15s ease;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-secondary {
+            background: var(--color-surface);
+            color: var(--color-ink);
+            border: 1.5px solid var(--color-border);
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            border-color: var(--color-ink);
+            box-shadow: var(--shadow-md);
+            background: var(--color-surface-soft);
+        }
+        .btn-primary {
+            background: var(--color-ink);
+            color: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            background: var(--color-yellow-deep);
+            color: var(--color-ink);
+        }
+
+        /* ==========================================================
+           雙欄主佈局與卡片面板
+           ========================================================== */
+        .member-service-form-layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 24px;
+            align-items: start;
+        }
+        .panel {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        .member-service-form-section-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--color-ink);
+            margin: 0 0 4px 0;
+        }
+        .member-service-form-section-description {
+            font-size: 13px;
+            color: var(--color-ink-soft);
+            font-weight: 600;
+            margin: 0 0 24px 0;
+        }
+
+        /* ==========================================================
+           表單格線與輸入元件
+           ========================================================== */
+        .member-service-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .member-service-form-full {
+            grid-column: span 2;
+        }
+        .member-service-location-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+        .form-group:last-child { margin-bottom: 0; }
+        
+        .form-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--color-ink);
+            padding-left: 4px;
+        }
+        .required-mark { color: var(--color-red); margin-left: 2px; }
+
+        .form-control {
+            width: 100%;
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-ink);
+            background: var(--color-surface-soft);
+            border: 1.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            outline: none;
+            transition: border-color .15s ease, background .15s ease;
+        }
+        .form-control:focus {
+            border-color: var(--color-yellow-deep);
+            background: var(--color-surface);
+        }
+        
+        /* 修正：Textarea 設定為無法調整大小，且完全隱藏滾動條 */
+        textarea.form-control {
+            resize: none;
+            line-height: 1.5;
+            scrollbar-width: none; /* 隱藏 Firefox 滾動條 */
+        }
+        textarea.form-control::-webkit-scrollbar {
+            display: none; /* 隱藏 Chrome, Safari 滾動條 */
+        }
+
+        .form-help { font-size: 12px; color: var(--color-ink-soft); margin: 4px 0 0 4px; font-weight: 600; }
+        .form-error { font-size: 12.5px; color: var(--color-red); margin: 4px 0 0 4px; font-weight: 800; }
+
+        .member-service-character-row { display: flex; justify-content: space-between; align-items: center; }
+        .member-service-character-count { font-size: 12px; color: var(--color-ink-soft); font-weight: 800; margin: 4px 0 0 0; }
+
+        /* 費率包覆器樣式微調 */
+        .member-service-rate-wrap {
+            display: flex;
+            align-items: center;
+            background: var(--color-surface-soft);
+            border: 1.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 0 14px;
+            transition: border-color .15s ease, background .15s ease;
+        }
+        .member-service-rate-wrap:focus-within {
+            border-color: var(--color-yellow-deep);
+            background: var(--color-surface);
+        }
+        .member-service-rate-input {
+            border: none !important;
+            background: transparent !important;
+            padding: 12px 0 !important;
+            outline: none !important;
+            flex-grow: 1;
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-ink);
+        }
+        .member-service-rate-prefix { font-family: var(--font-display); font-size: 14px; font-weight: 800; color: var(--color-ink-soft); margin-right: 6px; }
+        .member-service-rate-unit { font-size: 13px; font-weight: 700; color: var(--color-ink-soft); margin-left: 6px; white-space: nowrap;}
+
+        /* ==========================================================
+           客製化虛擬下拉式選單組件
+           ========================================================== */
+        .custom-select-wrapper { position: relative; width: 100%; }
+        .custom-select-trigger {
+            width: 100%;
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-ink);
+            background: var(--color-surface-soft);
+            border: 1.5px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 12px 14px;
+            padding-right: 38px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: border-color .15s ease, background .15s ease, opacity 0.2s ease;
+            position: relative;
+            user-select: none;
+        }
+        .custom-select-trigger:hover { border-color: var(--color-ink-soft); }
+        .custom-select-trigger.active { border-color: var(--color-yellow-deep); background: var(--color-surface); }
+        .custom-select-trigger .trigger-arrow {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+            width: 15px; height: 15px;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2317140F' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+            background-size: contain; background-repeat: no-repeat;
+            transition: transform .22s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+        }
+        .custom-select-trigger.active .trigger-arrow { transform: translateY(-50%) rotate(180deg); }
+
+        .custom-dropdown-menu {
+            display: none; position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+            background: var(--color-surface); border: 1px solid var(--color-border);
+            border-radius: 24px; box-shadow: var(--shadow-md); padding: 12px; z-index: 100;
+            max-height: 280px; overflow-y: auto; scrollbar-width: none;
+        }
+        .custom-dropdown-menu::-webkit-scrollbar { display: none; }
+        .custom-dropdown-menu.show { display: block; }
+        .custom-option {
+            padding: 12px 16px; border-radius: var(--radius-md); font-size: 14px; font-weight: 700;
+            color: var(--color-ink-soft); cursor: pointer; transition: background .15s ease, color .15s ease; user-select: none;
+        }
+        .custom-option:hover { background: var(--color-surface-soft); color: var(--color-ink); }
+        .custom-option.selected { background: var(--color-yellow); color: var(--color-ink); }
+
+        /* ==========================================================
+           圖片上傳面板外觀 (優化：佈滿框、移除預覽按鈕移至右上角)
+           ========================================================== */
+        .member-service-image-upload {
+            border: 2px dashed var(--color-border);
+            border-radius: var(--radius-lg);
+            background: var(--color-surface-soft);
+            transition: border-color .2s ease;
+            position: relative;
+            cursor: pointer;
+            aspect-ratio: 16 / 9;   /* 指定經典寬螢幕服務封面比例 */
+            min-height: 240px;
+            overflow: hidden;        /* 確保滿版預覽圖裁切不超出圓角 */
+        }
+        .member-service-image-upload:hover { border-color: var(--color-ink-soft); }
+        .member-service-image-input { display: none; }
+        
+        .member-service-image-label {
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .member-service-image-placeholder {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            z-index: 1;
+        }
+        .member-service-image-icon { font-size: 28px; color: var(--color-yellow-deep); font-weight: 800; margin-bottom: 8px; }
+        .member-service-image-title { font-size: 14px; font-weight: 800; color: var(--color-ink); margin: 0 0 4px 0; }
+        .member-service-image-hint { font-size: 12px; color: var(--color-ink-soft); margin: 0; }
+        
+        /* 修正：圖片渲染時鋪滿整個框框 */
+        .member-service-image-preview {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 2; /* 覆蓋在預設文字提示之上 */
+            background: var(--color-surface-soft);
+		    opacity: 0;
+		    transition: opacity .15s ease;
+		    opacity: 0;                     
+		    transition: opacity .15s ease;     
+		    pointer-events: none;  
+        }
+        
+        .member-service-image-preview.is-visible {
+		    opacity: 1;
+    pointer-events: auto;
+		}
+        /* 修正：移除按鈕/取消按鈕絕對定位到右上方 */
+        .member-service-image-remove {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 10; /* 保證在圖片的最上層，以利點擊 */
+            margin-top: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-body);
+            font-weight: 800;
+            font-size: 12.5px;
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            background: var(--color-surface);
+            color: var(--color-red);
+            border: 1.5px solid var(--color-border);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all .15s ease;
+        }
+        .member-service-image-remove:hover {
+            border-color: var(--color-red);
+            background: #FFF5F6;
+            transform: scale(1.03);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* 底端動作欄 */
+        .member-service-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        /* ==========================================================
+           右側卡片預覽區
+           ========================================================== */
+        .member-service-form-sidebar {
+            position: sticky;
+            top: 100px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+        .member-service-form-summary-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--color-ink);
+            margin-bottom: 16px;
+            font-family: var(--font-display);
+        }
+        .member-service-summary-image {
+            width: 100%;
+            aspect-ratio: 16/10;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+            background: var(--color-surface-soft);
+            margin-bottom: 14px;
+        }
+        .member-service-summary-type {
+            align-self: flex-start;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 10px;
+            background: var(--color-blue);
+            color: var(--color-ink);
+            margin-bottom: 8px;
+            white-space: nowrap;
+        }
+        .member-service-summary-name {
+            font-size: 15.5px;
+            font-weight: 800;
+            color: var(--color-ink);
+            line-height: 1.4;
+            margin: 0 0 6px 0;
+        }
+        .member-service-summary-location {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--color-ink);
+            margin: 0 0 2px 0;
+        }
+        .member-service-summary-place {
+            font-size: 12px;
+            color: var(--color-ink-soft);
+            margin: 0 0 12px 0;
+        }
+        .member-service-summary-description {
+            font-size: 12.5px;
+            color: var(--color-ink-soft);
+            line-height: 1.5;
+            margin-bottom: 16px;
+            border-top: 1px dashed var(--color-border);
+            padding-top: 10px;
+        }
+        .member-service-summary-price {
+            font-family: var(--font-display);
+            color: var(--color-ink);
+            font-size: 17px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            margin-top: auto;
+        }
+        .member-service-summary-price::before { content: 'NT$'; font-size: 11px; font-weight: 800; color: var(--color-ink-soft); }
+        .member-service-summary-price strong { font-size: 19px; font-weight: 800; }
+
+        /* 響應式佈局 */
+        @media (max-width: 992px) {
+            .member-service-form-layout { grid-template-columns: 1fr; }
+            .member-service-form-sidebar { position: static; }
+        }
+        @media (max-width: 576px) {
+            .member-service-form-heading { flex-direction: column; align-items: flex-start; gap: 14px; }
+            .member-service-form-back { width: 100%; text-align: center; }
+            .member-service-form-grid, .member-service-location-row { grid-template-columns: 1fr; }
+            .member-service-form-full { grid-column: span 1; }
+        }
+    </style>
 </head>
 
 <body>
@@ -54,28 +531,15 @@
     <section class="member-service-form-heading">
 
         <div>
-
-            <p class="member-service-form-eyebrow"
-               th:text="${mode == 'add'
-                        ? '建立新服務'
-                        : '編輯服務內容'}">
-                建立新服務
-            </p>
-
             <h1 class="page-title"
-                th:text="${mode == 'add'
-                         ? '新增服務'
-                         : '修改服務'}">
+                th:text="${mode == 'add' ? '新增服務' : '修改服務'}">
                 新增服務
             </h1>
 
             <p class="member-service-form-description"
-               th:text="${mode == 'add'
-                        ? '填寫服務內容與地點，建立可供其他會員預約的一對一服務。'
-                        : '更新服務資訊、地點、費率或封面圖片。'}">
+               th:text="${mode == 'add' ? '填寫服務內容與地點，建立可供其他會員預約的一對一服務。' : '更新服務資訊、地點、費率或封面圖片。'}">
                 填寫服務內容與地點。
             </p>
-
         </div>
 
         <a class="btn btn-secondary member-service-form-back"
@@ -96,20 +560,12 @@
          新增／修改表單
          ====================================================== -->
     <form id="memberServiceForm"
-          th:action="${mode == 'add'}
-                     ? @{/member/services/add}
-                     : @{/member/services/{serviceId}/edit(
-                            serviceId=${serviceId}
-                        )}"
+          th:action="${mode == 'add'} ? @{/member/services/add} : @{/member/services/{serviceId}/edit(serviceId=${serviceId})}"
           th:object="${serviceRequest}"
           method="post"
           enctype="multipart/form-data"
           th:attr="data-default-image-url=@{/images/activity/default-activity.jpg},
-                   data-original-image-url=${mode == 'edit'}
-                       ? @{/front/services/image/{serviceId}(
-                              serviceId=${serviceId}
-                          )}
-                       : ''">
+                   data-original-image-url=${mode == 'edit'} ? @{/front/services/image/{serviceId}(serviceId=${serviceId})} : ''">
 
         <!-- Spring Security CSRF -->
         <input type="hidden"
@@ -142,29 +598,30 @@
 
                             <label class="form-label"
                                    for="serviceTypeId">
-
                                 服務類型
-
                                 <span class="required-mark">*</span>
-
                             </label>
 
-                            <select class="form-control"
-                                    id="serviceTypeId"
-                                    th:field="*{serviceTypeId}"
-                                    required>
-
-                                <option value="">
-                                    請選擇服務類型
-                                </option>
-
-                                <option th:each="type : ${serviceTypeList}"
-                                        th:value="${type.svcTypeID}"
-                                        th:text="${type.typeName}">
-                                    服務類型
-                                </option>
-
-                            </select>
+                            <div class="custom-select-wrapper">
+                                <select class="form-control"
+                                        id="serviceTypeId"
+                                        th:field="*{serviceTypeId}"
+                                        required
+                                        style="display: none;">
+                                    <option value="">請選擇服務類型</option>
+                                    <option th:each="type : ${serviceTypeList}"
+                                            th:value="${type.svcTypeID}"
+                                            th:text="${type.typeName}">
+                                        服務類型
+                                    </option>
+                                </select>
+                                
+                                <div class="custom-select-trigger">
+                                    <span class="trigger-text">請選擇服務類型</span>
+                                    <span class="trigger-arrow"></span>
+                                </div>
+                                <div class="custom-dropdown-menu"></div>
+                            </div>
 
                             <p class="form-error"
                                th:if="${#fields.hasErrors('serviceTypeId')}"
@@ -179,11 +636,8 @@
 
                             <label class="form-label"
                                    for="hourlyRate">
-
                                 每小時費率
-
                                 <span class="required-mark">*</span>
-
                             </label>
 
                             <div class="member-service-rate-wrap">
@@ -224,11 +678,8 @@
 
                             <label class="form-label"
                                    for="serviceName">
-
                                 服務名稱
-
                                 <span class="required-mark">*</span>
-
                             </label>
 
                             <input class="form-control"
@@ -246,13 +697,7 @@
                                 </p>
 
                                 <p class="member-service-character-count">
-
-                                    <span id="serviceNameCount">
-                                        0
-                                    </span>
-
-                                    / 100
-
+                                    <span id="serviceNameCount">0</span> / 100
                                 </p>
 
                             </div>
@@ -287,46 +732,47 @@
 
                             <label class="form-label"
                                    for="serviceCity">
-
                                 縣市
-
                                 <span class="required-mark">*</span>
-
                             </label>
 
-                            <select class="form-control"
-                                    id="serviceCity"
-                                    th:field="*{serviceCity}"
-                                    required>
-
-                                <option value="">
-                                    請選擇縣市
-                                </option>
-
-                                <option value="臺北市">臺北市</option>
-                                <option value="新北市">新北市</option>
-                                <option value="桃園市">桃園市</option>
-                                <option value="臺中市">臺中市</option>
-                                <option value="臺南市">臺南市</option>
-                                <option value="高雄市">高雄市</option>
-                                <option value="基隆市">基隆市</option>
-                                <option value="新竹市">新竹市</option>
-                                <option value="嘉義市">嘉義市</option>
-                                <option value="新竹縣">新竹縣</option>
-                                <option value="苗栗縣">苗栗縣</option>
-                                <option value="彰化縣">彰化縣</option>
-                                <option value="南投縣">南投縣</option>
-                                <option value="雲林縣">雲林縣</option>
-                                <option value="嘉義縣">嘉義縣</option>
-                                <option value="屏東縣">屏東縣</option>
-                                <option value="宜蘭縣">宜蘭縣</option>
-                                <option value="花蓮縣">花蓮縣</option>
-                                <option value="臺東縣">臺東縣</option>
-                                <option value="澎湖縣">澎湖縣</option>
-                                <option value="金門縣">金門縣</option>
-                                <option value="連江縣">連江縣</option>
-
-                            </select>
+                            <div class="custom-select-wrapper">
+                                <select class="form-control"
+                                        id="serviceCity"
+                                        th:field="*{serviceCity}"
+                                        required
+                                        style="display: none;">
+                                    <option value="">請選擇縣市</option>
+                                    <option value="臺北市">臺北市</option>
+                                    <option value="新北市">新北市</option>
+                                    <option value="桃園市">桃園市</option>
+                                    <option value="臺中市">臺中市</option>
+                                    <option value="臺南市">臺南市</option>
+                                    <option value="高雄市">高雄市</option>
+                                    <option value="基隆市">基隆市</option>
+                                    <option value="新竹市">新竹市</option>
+                                    <option value="嘉義市">嘉義市</option>
+                                    <option value="新竹縣">新竹縣</option>
+                                    <option value="苗栗縣">苗栗縣</option>
+                                    <option value="彰化縣">彰化縣</option>
+                                    <option value="南投縣">南投縣</option>
+                                    <option value="雲林縣">雲林縣</option>
+                                    <option value="嘉義縣">嘉義縣</option>
+                                    <option value="屏東縣">屏東縣</option>
+                                    <option value="宜蘭縣">宜蘭縣</option>
+                                    <option value="花蓮縣">花蓮縣</option>
+                                    <option value="臺東縣">臺東縣</option>
+                                    <option value="澎湖縣">澎湖縣</option>
+                                    <option value="金門縣">金門縣</option>
+                                    <option value="連江縣">連江縣</option>
+                                </select>
+                                
+                                <div class="custom-select-trigger">
+                                    <span class="trigger-text">請選擇縣市</span>
+                                    <span class="trigger-arrow"></span>
+                                </div>
+                                <div class="custom-dropdown-menu"></div>
+                            </div>
 
                             <p class="form-error"
                                th:if="${#fields.hasErrors('serviceCity')}"
@@ -341,25 +787,27 @@
 
                             <label class="form-label"
                                    for="serviceDistrict">
-
                                 行政區
-
                                 <span class="required-mark">*</span>
-
                             </label>
 
-                            <select class="form-control"
-                                    id="serviceDistrict"
-                                    th:field="*{serviceDistrict}"
-                                    th:attr="data-selected-district=*{serviceDistrict}"
-                                    required
-                                    disabled>
-
-                                <option value="">
-                                    請先選擇縣市
-                                </option>
-
-                            </select>
+                            <div class="custom-select-wrapper">
+                                <select class="form-control"
+                                        id="serviceDistrict"
+                                        th:field="*{serviceDistrict}"
+                                        th:attr="data-selected-district=*{serviceDistrict}"
+                                        required
+                                        disabled
+                                        style="display: none;">
+                                    <option value="">請先選擇縣市</option>
+                                </select>
+                                
+                                <div class="custom-select-trigger">
+                                    <span class="trigger-text">請先選擇縣市</span>
+                                    <span class="trigger-arrow"></span>
+                                </div>
+                                <div class="custom-dropdown-menu"></div>
+                            </div>
 
                             <p class="form-error"
                                th:if="${#fields.hasErrors('serviceDistrict')}"
@@ -376,11 +824,8 @@
 
                         <label class="form-label"
                                for="serviceLocation">
-
                             詳細地點或集合地點
-
                             <span class="required-mark">*</span>
-
                         </label>
 
                         <input class="form-control"
@@ -420,11 +865,8 @@
 
                         <label class="form-label"
                                for="description">
-
                             服務描述
-
                             <span class="required-mark">*</span>
-
                         </label>
 
                         <textarea class="form-control"
@@ -442,13 +884,7 @@
                             </p>
 
                             <p class="member-service-character-count">
-
-                                <span id="descriptionCount">
-                                    0
-                                </span>
-
-                                / 1000
-
+                                <span id="descriptionCount">0</span> / 1000
                             </p>
 
                         </div>
@@ -511,9 +947,7 @@
                         <button class="member-service-image-remove"
                                 id="removeServiceImage"
                                 type="button"
-                                th:text="${mode == 'edit'
-                                         ? '取消新圖片'
-                                         : '移除預覽'}">
+                                th:text="${mode == 'edit' ? '取消新圖片' : '移除預覽'}">
                             移除預覽
                         </button>
 
@@ -534,11 +968,9 @@
                         取消
                     </a>
 
-                    <button class="btn member-service-form-submit"
+                    <button class="btn btn-primary member-service-form-submit"
                             type="submit"
-                            th:text="${mode == 'add'
-                                     ? '建立服務'
-                                     : '儲存修改'}">
+                            th:text="${mode == 'add' ? '建立服務' : '儲存修改'}">
                         建立服務
                     </button>
 
@@ -557,11 +989,7 @@
 
                 <img class="member-service-summary-image"
                      id="summaryImage"
-                     th:src="${mode == 'edit'}
-                             ? @{/front/services/image/{serviceId}(
-                                    serviceId=${serviceId}
-                                )}
-                             : @{/images/activity/default-activity.jpg}"
+                     th:src="${mode == 'edit'} ? @{/front/services/image/{serviceId}(serviceId=${serviceId})} : @{/images/activity/default-activity.jpg}"
                      alt="服務圖片預覽">
 
                 <span class="member-service-summary-type"
@@ -590,15 +1018,8 @@
                 </p>
 
                 <div class="member-service-summary-price">
-
-                    NT$
-
-                    <strong id="summaryHourlyRate">
-                        0
-                    </strong>
-
+                    <strong id="summaryHourlyRate">0</strong>
                     / 小時
-
                 </div>
 
             </aside>
@@ -614,6 +1035,132 @@
 
 <!-- 共用通知 AJAX 輪巡 -->
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+
+<!-- 核心高動態下拉選單同步控制腳本 -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const selectWrappers = document.querySelectorAll('.custom-select-wrapper');
+        
+        selectWrappers.forEach(wrapper => {
+            const nativeSelect = wrapper.querySelector('select');
+            const trigger = wrapper.querySelector('.custom-select-trigger');
+            const triggerText = trigger.querySelector('.trigger-text');
+            const dropdownMenu = wrapper.querySelector('.custom-dropdown-menu');
+
+            function syncMenuWithOptions() {
+                if (nativeSelect.disabled) {
+                    trigger.style.opacity = '0.4';
+                    trigger.style.pointerEvents = 'none';
+                    triggerText.textContent = nativeSelect.options[0] ? nativeSelect.options[0].text : '';
+                    return;
+                } else {
+                    trigger.style.opacity = '1';
+                    trigger.style.pointerEvents = 'auto';
+                }
+
+                dropdownMenu.innerHTML = '';
+                const currentVal = nativeSelect.value;
+                let activeText = '';
+
+                Array.from(nativeSelect.options).forEach(opt => {
+                    const optDiv = document.createElement('div');
+                    optDiv.className = 'custom-option';
+                    optDiv.textContent = opt.text;
+                    optDiv.setAttribute('data-value', opt.value);
+
+                    if (opt.value === currentVal) {
+                        optDiv.classList.add('selected');
+                        activeText = opt.text;
+                    }
+
+                    optDiv.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        nativeSelect.value = this.getAttribute('data-value');
+                        triggerText.textContent = this.textContent;
+                        
+                        dropdownMenu.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+                        this.classList.add('selected');
+                        
+                        dropdownMenu.classList.remove('show');
+                        trigger.classList.remove('active');
+                        
+                        nativeSelect.dispatchEvent(new Event('change'));
+                    });
+
+                    dropdownMenu.appendChild(optDiv);
+                });
+
+                triggerText.textContent = activeText || (nativeSelect.options[0] ? nativeSelect.options[0].text : '');
+            }
+
+            trigger.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (nativeSelect.disabled) return;
+                
+                document.querySelectorAll('.custom-dropdown-menu').forEach(m => {
+                    if (m !== dropdownMenu) m.classList.remove('show');
+                });
+                document.querySelectorAll('.custom-select-trigger').forEach(t => {
+                    if (t !== trigger) t.classList.remove('active');
+                });
+
+                dropdownMenu.classList.toggle('show');
+                trigger.classList.toggle('active');
+            });
+
+            const observer = new MutationObserver(syncMenuWithOptions);
+            observer.observe(nativeSelect, { childList: true, attributes: true, attributeFilter: ['disabled', 'value'] });
+
+            syncMenuWithOptions();
+            nativeSelect.addEventListener('change', syncMenuWithOptions);
+            
+            const fileInput  = document.getElementById('serviceImageFile');
+            const previewImg = document.getElementById('serviceImagePreview');
+            const removeBtn  = document.getElementById('removeServiceImage');
+
+            fileInput.addEventListener('change', function () {
+                const file = this.files[0];
+                if (!file) return;
+
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('圖片不可超過 5MB');
+                    this.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                    previewImg.classList.add('is-visible');
+                };
+                reader.readAsDataURL(file);
+            });
+
+            removeBtn.addEventListener('click', function () {
+                fileInput.value = '';
+                previewImg.src = '';
+                previewImg.classList.remove('is-visible');
+            });
+        });
+
+        document.addEventListener('click', function() {
+            document.querySelectorAll('.custom-dropdown-menu').forEach(m => m.classList.remove('show'));
+            document.querySelectorAll('.custom-select-trigger').forEach(t => t.classList.remove('active'));
+        });
+    });
+    
+    fileInput.addEventListener('change', function () {
+    	  const file = this.files[0];
+    	  if (!file) return;
+
+    	  const reader = new FileReader();
+    	  reader.onload = function (e) {
+    	    previewImg.src = e.target.result;
+    	    previewImg.classList.add('is-visible');   // 顯示預覽，蓋掉 placeholder
+    	  };
+    	  reader.readAsDataURL(file);
+    	});
+</script>
 
 </body>
 </html>

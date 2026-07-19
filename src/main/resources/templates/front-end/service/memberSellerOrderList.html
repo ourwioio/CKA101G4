@@ -1,1131 +1,997 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      lang="zh-TW">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>收到的預約｜Webond</title>
 
     <!-- Google Fonts -->
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-          rel="stylesheet">
-
-    <!-- Service 前台共用 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/service/common.css}">
-
-<!-- 前台共用 Navbar CSS -->
-<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-
+    <!-- 前台共用 Navbar CSS -->
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
     <!-- 賣方訂單頁專屬 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/service/memberSellerOrderList.css}">
+<!--     <link rel="stylesheet" th:href="@{/css/front-end/service/memberSellerOrderList.css}"> -->
+
+    <style>
+		/* ==========================================================
+		   Webond 收到的預約頁 — 圓潤角色風風格融合與黃色圓點優化
+		   ========================================================== */
+		:root {
+		    --color-bg:            #F7F3EC;
+		    --color-surface:       #FFFFFF;
+		    --color-surface-soft:  #FFFDF8;
+		    --color-ink:           #17140F;
+		    --color-ink-soft:      #726A5F;
+		    --color-border:        #ECE4D6;
+		
+		    --color-yellow:       #FFE59A;
+		    --color-yellow-deep:  #FFC94D;
+		    --color-pink:         #FFB5C1;
+		    --color-green:         #B7E1D1;
+		    --color-blue:         #A9D3FF;
+		    --color-red:          #FF5271;
+		
+		    --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+		    --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+		
+		    --radius-lg: 26px;
+		    --radius-md: 16px;
+		    --radius-full: 999px;
+		
+		    --shadow-sm: 0 4px 12px rgba(23, 20, 15, 0.05);
+		    --shadow-md: 0 16px 36px rgba(23, 20, 15, 0.09);
+		    --nav-height: 76px;
+		}
+		
+		* { box-sizing: border-box; }
+		
+		body {
+		    margin: 0;
+		    font-family: var(--font-body);
+		    background: var(--color-bg);
+		    color: var(--color-ink);
+		    line-height: 1.65;
+		    -webkit-font-smoothing: antialiased;
+		}
+		
+		h1, h2, h3, h4 { 
+			font-family: var(--font-display); 
+			margin: 0; 
+			letter-spacing: -0.01em;
+		}
+		
+		/* 左右主寬度控制 */
+		.seller-order-page {
+		    max-width: 1140px;
+		    margin: 0 auto;
+		    padding: calc(var(--nav-height) + 48px) 24px 80px;
+		}
+		
+		/* ==========================================================
+		   頁面標題區
+		   ========================================================== */
+		.seller-order-heading {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: flex-end;
+		    flex-wrap: wrap;
+		    gap: 24px;
+		    margin-bottom: 36px;
+		}
+		.page-title {
+		    font-size: 28px;
+		    font-weight: 800;
+		    color: var(--color-ink);
+		    margin: 0 0 10px 0;
+		    line-height: 1.2;
+		    
+		    /* 🌟 關鍵修正：讓標題與圓點水平排列，並在整行中「垂直置中」對齊 */
+		    display: inline-flex;
+		    align-items: center;
+		}		
+		.page-title::before {
+		    content: "";
+		    width: 8px;
+		    height: 8px;
+		    background-color: var(--color-yellow-deep);
+		    border-radius: 50%;
+		    margin-right: 8px; /* 微調間距，讓視覺更舒服 */
+		    flex-shrink: 0;    /* 防禦機制：確保圓點絕對不會被文字擠壓到變形 */
+		}
+		.seller-order-description {
+		    font-size: 15px;
+		    color: var(--color-ink-soft);
+		    font-weight: 500;
+		    margin: 0;
+		}
+		.seller-order-heading-actions {
+		    display: flex;
+		    gap: 12px;
+		}
+		
+		/* ==========================================================
+		   通用膠囊按鈕系統
+		   ========================================================== */
+		.btn {
+		    display: inline-flex;
+		    align-items: center;
+		    justify-content: center;
+		    font-family: var(--font-body);
+		    font-weight: 800;
+		    font-size: 13.5px;
+		    padding: 10px 20px;
+		    border-radius: var(--radius-full);
+		    border: none;
+		    cursor: pointer;
+		    text-decoration: none;
+		    transition: transform .18s ease, box-shadow .18s ease, background .15s ease, border-color .15s ease;
+		}
+		/* 主按鈕：經典黑膠囊 */
+		.seller-order-primary-link, .seller-accept-button, .seller-reject-confirm, .seller-cancel-confirm {
+		    background: var(--color-ink);
+		    color: #ffffff;
+		    box-shadow: var(--shadow-sm);
+		}
+		.seller-order-primary-link:hover, .seller-accept-button:hover, .seller-reject-confirm:hover, .seller-cancel-confirm:hover {
+		    transform: translateY(-2px);
+		    box-shadow: var(--shadow-md);
+		    background: var(--color-yellow-deep);
+		    color: var(--color-ink);
+		}
+		/* 次按鈕：精緻淺色圓框 */
+		.btn-secondary, .seller-modal-cancel {
+		    background: var(--color-surface);
+		    color: var(--color-ink);
+		    border: 1.5px solid var(--color-border);
+		    box-shadow: var(--shadow-sm);
+		}
+		.btn-secondary:hover, .seller-modal-cancel:hover {
+		    transform: translateY(-2px);
+		    border-color: var(--color-ink);
+		    background: var(--color-surface-soft);
+		    box-shadow: var(--shadow-md);
+		}
+		/* 拒絕與取消特殊危險按鈕 */
+		.seller-reject-button, .seller-cancel-button {
+		    background: rgba(255, 82, 113, 0.08);
+		    color: var(--color-red);
+		    border: 1.5px solid rgba(255, 82, 113, 0.18);
+		}
+		.seller-reject-button:hover, .seller-cancel-button:hover {
+		    background: var(--color-red);
+		    color: #fff;
+		    transform: translateY(-2px);
+		    box-shadow: var(--shadow-md);
+		}
+		.btn:active { transform: translateY(0) scale(0.98); }
+		
+		/* ==========================================================
+		   訊息提示橫幅
+		   ========================================================== */
+		.alert {
+		    padding: 16px 24px;
+		    border-radius: var(--radius-md);
+		    font-size: 14.5px;
+		    font-weight: 700;
+		    margin-bottom: 28px;
+		    box-shadow: var(--shadow-sm);
+		}
+		.alert-success { background: var(--color-green); color: var(--color-ink); }
+		.alert-error { background: var(--color-pink); color: var(--color-ink); }
+		
+		/* ==========================================================
+		   摘要看板
+		   ========================================================== */
+		.seller-summary-grid {
+		    display: grid;
+		    grid-template-columns: repeat(5, 1fr);
+		    gap: 16px;
+		    margin-bottom: 36px;
+		}
+		.seller-summary-card {
+		    background: var(--color-surface);
+		    border: 1.5px solid var(--color-border);
+		    border-radius: var(--radius-md);
+		    padding: 22px 16px;
+		    text-align: center;
+		    box-shadow: var(--shadow-sm);
+		    transition: transform 0.2s ease, box-shadow 0.2s ease;
+		}
+		.seller-summary-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+		.seller-summary-card span { 
+			display: inline-flex; 
+			align-items: center;
+			justify-content: center;
+			font-size: 13px; 
+			font-weight: 800; 
+			color: var(--color-ink); 
+			opacity: 0.85; 
+			margin-bottom: 8px; 
+		}
+		.seller-summary-card strong { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: var(--color-ink); display: block; }
+		
+		
+		
+		.seller-summary-card--attention { background: var(--color-pink); }
+		.seller-summary-card--payment { background: var(--color-yellow); }
+		.seller-summary-card--confirmed { background: var(--color-green); }
+		.seller-summary-card--completed { background: var(--color-blue); }
+		
+		/* ==========================================================
+		   篩選工具列
+		   ========================================================== */
+		.seller-order-toolbar {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: center;
+		    flex-wrap: wrap;
+		    gap: 16px;
+		    margin-bottom: 32px;
+		    border-bottom: 2px dashed var(--color-border);
+		    padding-bottom: 24px;
+		}
+		.seller-filter-group { display: flex; flex-wrap: wrap; gap: 10px; }
+		.seller-filter-button {
+		    border: 1.5px solid var(--color-border);
+		    background: var(--color-surface);
+		    color: var(--color-ink);
+		    font-family: var(--font-body);
+		    font-weight: 800;
+		    font-size: 14px;
+		    padding: 9px 20px;
+		    border-radius: var(--radius-full);
+		    cursor: pointer;
+		    transition: all .15s ease;
+		}
+		.seller-filter-button:hover { transform: translateY(-2px); border-color: var(--color-ink); }
+		.seller-filter-button.active { background: var(--color-ink); color: #fff; border-color: var(--color-ink); }
+		.seller-order-sync-note { font-size: 13px; color: var(--color-ink-soft); font-weight: 600; margin: 0; }
+		
+		/* ==========================================================
+		   空狀態
+		   ========================================================== */
+		.seller-empty-state {
+		    text-align: center;
+		    padding: 70px 24px;
+		    background: var(--color-surface-soft);
+		    border: 1.5px dashed var(--color-border);
+		    border-radius: var(--radius-lg);
+		    margin: 40px 0;
+		}
+		.seller-empty-icon { font-size: 52px; color: var(--color-yellow-deep); margin-bottom: 18px; }
+		.seller-empty-state h2 { font-size: 22px; font-weight: 800; color: var(--color-ink); margin-bottom: 10px; }
+		.seller-empty-state p { font-size: 14.5px; color: var(--color-ink-soft); font-weight: 500; margin-bottom: 26px; }
+		
+		/* ==========================================================
+		   訂單卡片列表與核心佈局
+		   ========================================================== */
+		.seller-order-list { display: flex; flex-direction: column; gap: 28px; }
+		.seller-order-card {
+		    background: var(--color-surface);
+		    border: 1.5px solid var(--color-border);
+		    border-radius: var(--radius-lg);
+		    box-shadow: var(--shadow-sm);
+		    padding: 36px;
+		    transition: transform 0.2s ease, box-shadow 0.2s ease;
+		}
+		.seller-order-card:hover { box-shadow: var(--shadow-md); }
+		
+		.seller-order-card-top {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: flex-start;
+		    flex-wrap: wrap;
+		    gap: 20px;
+		    margin-bottom: 24px;
+		}
+		.seller-service-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+		
+		.seller-service-type {
+		    font-size: 11.5px; font-weight: 800; background: var(--color-blue);
+		    color: var(--color-ink); padding: 4px 14px; border-radius: 20px;
+		}
+		.seller-order-number { font-size: 13px; font-weight: 700; color: var(--color-ink-soft); }
+		.seller-order-card-top h2 { font-size: 22px; font-weight: 800; color: var(--color-ink); margin: 0 0 8px 0; line-height: 1.3; }
+		.seller-order-card-top p { margin: 0; font-size: 14px; color: var(--color-ink-soft); font-weight: 500; }
+		.seller-order-card-top strong { color: var(--color-ink); font-weight: 700; }
+		
+		.seller-status-area { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+		
+		/* 🌟 狀態徽章與優雅的黃色指示圓點組合 */
+		.seller-status-badge {
+		    font-size: 13px; 
+		    font-weight: 800; 
+		    padding: 6px 16px; 
+		    border-radius: 20px;
+		    display: inline-flex;
+		    align-items: center;
+		}
+		.seller-status-badge--pending-confirm::before,
+		.seller-status-badge--pending-payment::before {
+			content: "";
+			display: inline-block;
+			width: 7px;
+			height: 7px;
+			background-color: var(--color-yellow-deep);
+			border-radius: 50%;
+			margin-right: 8px;
+		}
+		
+		.seller-status-badge--pending-confirm { background: var(--color-pink); color: var(--color-ink); }
+		.seller-status-badge--pending-payment { background: var(--color-yellow); color: var(--color-ink); }
+		.seller-status-badge--confirmed { background: var(--color-green); color: var(--color-ink); }
+		.seller-status-badge--completed { background: var(--color-ink); color: #ffffff; }
+		.seller-status-badge--cancelled { background: var(--color-border); color: var(--color-ink-soft); }
+		
+		.seller-sub-status { font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 20px; margin-top: 2px; }
+		.seller-sub-status--refund-pending, .seller-sub-status--payout-pending { background: #FFEAA7; color: #8A6D00; }
+		.seller-sub-status--refund-completed, .seller-sub-status--payout-completed { background: var(--color-green); color: var(--color-ink); }
+		
+		/* ==========================================================
+		   訂單數據網格看板
+		   ========================================================== */
+		.seller-order-summary {
+		    display: grid;
+		    grid-template-columns: repeat(4, 1fr);
+		    gap: 16px;
+		    background: var(--color-surface-soft);
+		    border: 1.5px solid var(--color-border);
+		    border-radius: var(--radius-md);
+		    padding: 20px 24px;
+		    margin-bottom: 24px;
+		}
+		.seller-summary-item { display: flex; flex-direction: column; gap: 6px; }
+		.seller-summary-label { font-size: 12.5px; font-weight: 800; color: var(--color-ink-soft); }
+		.seller-summary-item strong { font-size: 15px; font-weight: 700; color: var(--color-ink); }
+		.seller-summary-item small { font-size: 12.5px; color: var(--color-ink-soft); font-weight: 500; margin-top: 2px; }
+		.seller-amount-item strong { color: var(--color-ink); font-size: 17px; font-weight: 800; }
+		
+		/* ==========================================================
+		   操作區塊面板 (Dashed border 面板)
+		   ========================================================== */
+		.seller-action-panel {
+		    border: 1.5px dashed var(--color-border);
+		    border-radius: var(--radius-md);
+		    padding: 26px;
+		    margin-bottom: 24px;
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: flex-start;
+		    flex-wrap: wrap;
+		    gap: 24px;
+		}
+		.seller-action-copy { flex: 1; min-width: 280px; }
+		.seller-action-copy h3 { font-size: 17px; font-weight: 800; color: var(--color-ink); margin-bottom: 8px; }
+		.seller-action-copy p { font-size: 14px; color: var(--color-ink-soft); font-weight: 500; margin: 0 0 10px 0; }
+		
+		.seller-buyer-note {
+		    background: var(--color-surface); 
+		    border: 1.5px solid var(--color-border);
+		    padding: 12px 16px; 
+		    border-radius: 12px; 
+		    font-size: 13.5px; 
+		    margin-top: 12px;
+		    line-height: 1.6;
+		}
+		
+		.seller-action-control { display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 340px; }
+		.seller-action-control--horizontal { flex-direction: row; align-items: center; justify-content: flex-end; max-width: 100%; gap: 16px; }
+		
+		.seller-countdown-box { background: var(--color-surface); padding: 10px 18px; border-radius: 12px; border: 1.5px solid var(--color-border); display: inline-block; text-align: center; }
+		.seller-countdown-box span { display: block; font-size: 11.5px; font-weight: 800; color: var(--color-ink-soft); margin-bottom: 2px; }
+		.seller-countdown { font-family: var(--font-display); font-size: 21px; font-weight: 800; color: var(--color-red); }
+		
+		.seller-accept-form { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+		.seller-field-label { font-size: 13.5px; font-weight: 800; color: var(--color-ink); }
+		
+		.seller-form-control {
+		    width: 100%; font-family: var(--font-body); font-size: 14px; font-weight: 600; padding: 12px 14px;
+		    background: var(--color-surface); border: 1.5px solid var(--color-border); border-radius: 12px; outline: none;
+		    transition: border-color 0.15s ease;
+		}
+		.seller-form-control:focus { border-color: var(--color-yellow-deep); }
+		
+		textarea.seller-form-control {
+		    resize: none;
+		    overflow-y: auto;
+		    scrollbar-width: none;
+		    -ms-overflow-style: none;
+		}
+		textarea.seller-form-control::-webkit-scrollbar { display: none; }
+		
+		.seller-action-buttons { display: flex; gap: 12px; margin-top: 6px; }
+		.seller-action-buttons .btn { flex: 1; }
+		
+		.seller-completed-time, .seller-cancelled-refund { display: inline-flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 700; }
+		.seller-refund-waiting { color: #8A6D00; }
+		.seller-refund-done { color: var(--color-green); }
+		
+		/* ==========================================================
+		   🌟 特調美學再臨：賣方「訂單詳情」高質感收合美學完美同步
+		   ========================================================== */
+		.seller-order-detail-toggle-row { 
+			border-top: 2px dashed var(--color-border); /* 完美重現日系虛線分隔 */
+			padding-top: 20px; 
+			margin-top: 8px;
+			text-align: left; 
+		}
+		
+		/* 精緻的膠囊小標籤按鈕 */
+		.seller-detail-toggle {
+		    background: var(--color-surface-soft); 
+			border: 1.5px solid var(--color-border); 
+			cursor: pointer; 
+			font-family: var(--font-body);
+		    font-weight: 800; 
+			font-size: 13px; 
+			color: var(--color-ink-soft); 
+			display: inline-flex; 
+			align-items: center; 
+			gap: 8px; 
+			padding: 8px 18px;
+			border-radius: var(--radius-full);
+			box-shadow: var(--shadow-sm);
+			transition: all .2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 微彈性交互小動畫 */
+		}
+		.seller-detail-toggle:hover { 
+			transform: translateY(-2px);
+			background: var(--color-surface);
+			border-color: var(--color-ink);
+			color: var(--color-ink); 
+			box-shadow: var(--shadow-md);
+		}
+		.seller-detail-toggle-icon {
+			font-family: var(--font-display);
+			color: var(--color-yellow-deep); /* 黃色亮點色彩點綴 */
+			font-size: 14px;
+			font-weight: 800;
+		}
+		
+		.seller-order-details { 
+			padding-top: 20px; 
+		}
+		.seller-detail-grid { 
+			display: grid; 
+			grid-template-columns: repeat(2, 1fr); 
+			gap: 16px; 
+		}
+		
+		/* 溫潤小卡片口袋型排版 */
+		.seller-detail-item {
+			background: var(--color-surface-soft);
+			border: 1.5px solid var(--color-border);
+			border-radius: var(--radius-md); /* 延續 Webond 標誌性的 16px 圓角 */
+			padding: 14px 18px;
+			box-shadow: inset 0 2px 4px rgba(23, 20, 15, 0.01); /* 精緻弱內凹陰影 */
+			transition: border-color 0.2s ease, background 0.2s ease;
+		}
+		.seller-detail-item:hover {
+			border-color: var(--color-yellow-deep);
+			background: #ffffff;
+		}
+		.seller-detail-item span { 
+			display: inline-flex; 
+			align-items: center;
+			font-size: 11.5px; 
+			font-weight: 800; 
+			color: var(--color-ink-soft); 
+			margin-bottom: 6px; 
+			letter-spacing: 0.05em;
+			opacity: 0.85;
+		}
+		/* 項目小標題前方加上特製的馬卡龍粉紅指示小圓點 */
+		.seller-detail-item span::before {
+			content: "";
+			display: inline-block;
+			width: 5px;
+			height: 5px;
+			background-color: var(--color-pink);
+			border-radius: 50%;
+			margin-right: 6px;
+			flex-shrink: 0;
+		}
+		.seller-detail-item p { 
+			margin: 0; 
+			font-size: 14px; 
+			font-weight: 600; 
+			color: var(--color-ink); 
+			line-height: 1.6; 
+		}
+		
+		/* ==========================================================
+		   彈窗控制系統
+		   ========================================================== */
+		/* ==========================================================
+		   Modal 彈窗控制系統（完美統整版 — 修正自動跳出 Bug）
+		   ========================================================== */
+		
+		/* 當彈窗開啟時，鎖定後方主網頁背景不隨便捲動 */
+		body.seller-modal-open {
+		    overflow: hidden;
+		}
+		
+		/* 🌟 核心修正：防止 CSS display 屬性覆蓋 HTML [hidden] 屬性的防禦機制 */
+		.seller-modal[hidden] {
+		    display: none !important;
+		}
+		
+		.seller-modal {
+		    position: fixed;
+		    inset: 0;
+		    z-index: 9999; /* 提高層級，確保絕對壓在 Navbar 與所有卡片上方 */
+		    display: grid;
+		    place-items: center;
+		    padding: 20px;
+		    background: rgba(23, 20, 15, 0.46); /* 融合後的溫潤深咖啡黑色遮罩 */
+		    backdrop-filter: blur(4px); /* 精緻的日系毛玻璃背景模糊 */
+		}
+		
+		.seller-modal-dialog {
+		    position: relative;
+		    width: min(520px, 100%); /* 採納新版：在大螢幕鎖定 520px，小螢幕自動 100% 自適應 */
+		    max-height: calc(100vh - 40px); /* 避免內容過長超出手機螢幕 */
+		    overflow-y: auto; /* 超出視窗時自動在彈窗內產生捲動條 */
+		    padding: 36px 32px; /* 重新配比平衡的舒服留白 */
+		    border: 1.5px solid var(--color-border);
+		    border-radius: var(--radius-lg); /* 完美保留 Webond 的 26px 標誌性大圓角 */
+		    background: var(--color-surface);
+		    box-shadow: 0 26px 70px rgba(52, 37, 29, 0.18); /* 厚實飽滿的微甜角色風陰影 */
+		    text-align: center;
+		}
+		
+		/* 圓形精緻關閉按鈕 */
+		.seller-modal-close {
+		    position: absolute;
+		    top: 16px;
+		    right: 18px;
+		    width: 36px;
+		    height: 36px;
+		    border: 0;
+		    border-radius: 50%;
+		    background: #F6F1EE; /* 採納新版：優雅的微米色內凹底色 */
+		    color: var(--color-ink-soft);
+		    font-size: 24px;
+		    cursor: pointer;
+		    display: flex;
+		    align-items: center;
+		    justify-content: center;
+		    transition: background 0.15s ease, color 0.15s ease;
+		}
+		.seller-modal-close:hover {
+		    background: var(--color-border);
+		    color: var(--color-ink);
+		}
+		
+		.seller-modal-eyebrow { 
+		    font-family: var(--font-display); 
+		    font-size: 11px; 
+		    font-weight: 800; 
+		    letter-spacing: 1.5px; 
+		    color: var(--color-ink-soft); 
+		    margin-bottom: 8px; 
+		}
+		
+		.seller-modal-dialog h2 { 
+		    font-size: 24px; 
+		    font-weight: 800; 
+		    color: var(--color-ink); 
+		    margin: 0 0 10px; 
+		    font-family: var(--font-display);
+		}
+		
+		/* 彈窗內的說明文字級距 */
+		.seller-modal-dialog > p:not(.seller-modal-eyebrow) {
+		    margin: 0 0 20px;
+		    color: var(--color-ink-soft);
+		    font-size: 14.5px;
+		    line-height: 1.65;
+		}
+		
+		.seller-modal-dialog form { 
+		    display: flex; 
+		    flex-direction: column; 
+		    text-align: left; 
+		    gap: 12px; 
+		}
+		
+		/* 按鈕群組：左邊返回鍵較小，右邊確定鍵較寬，黃金比例 1:1.5 */
+		.seller-modal-actions { 
+		    display: grid; 
+		    grid-template-columns: 1fr 1.5fr; 
+		    gap: 12px; 
+		    margin-top: 18px; 
+		}
+		
+		/* 🌟 新版精緻取消警告橫幅（完美融合色調與粗體質感） */
+		.seller-cancel-warning { 
+		    margin: 0 0 18px;
+		    padding: 14px 16px; 
+		    border: 1px solid #F0C3B9;
+		    border-radius: var(--radius-md); 
+		    background: #FFF4F1; 
+		    color: #A84D42; 
+		    font-size: 13.5px; 
+		    font-weight: 700; 
+		    text-align: left; 
+		    line-height: 1.6; 
+		}
+		/* ==========================================================
+		   RWD 響應式佈局平衡
+		   ========================================================== */
+		@media (max-width: 950px) {
+		    .seller-summary-grid { grid-template-columns: repeat(3, 1fr); }
+		    .seller-order-summary { grid-template-columns: repeat(2, 1fr); }
+		}
+		@media (max-width: 768px) {
+		    .seller-order-heading { flex-direction: column; align-items: flex-start; gap: 16px; }
+		    .seller-order-heading-actions { width: 100%; }
+		    .seller-order-heading-actions .btn { flex: 1; }
+		    .seller-action-panel { flex-direction: column; align-items: stretch; gap: 20px; }
+		    .seller-action-control { max-width: 100%; }
+		    .seller-action-control--horizontal { justify-content: flex-start; }
+		    .seller-action-control--horizontal .btn { flex: 1; }
+		    .seller-detail-grid { grid-template-columns: 1fr; gap: 16px; }
+		}
+		@media (max-width: 550px) {
+		    .seller-summary-grid { grid-template-columns: repeat(2, 1fr); }
+		    .seller-order-card { padding: 24px; }
+		    .seller-order-card-top { flex-direction: column; align-items: flex-start; gap: 14px; }
+		    .seller-status-area { align-items: flex-start; }
+		}
+    </style>
 </head>
 
 <body>
 
-<!-- ==========================================================
+	<!-- ==========================================================
      共用固定導覽列
      ========================================================== -->
 	<header th:replace="~{front-end/common/navbar :: navbar}">
 	</header>
 
-<!-- ==========================================================
+	<!-- ==========================================================
      主要內容
      ========================================================== -->
-<main class="site-main seller-order-page">
+	<main class="site-main seller-order-page">
 
-    <!-- ======================================================
+		<!-- ======================================================
          頁面標題
          ====================================================== -->
-    <section class="seller-order-heading">
+		<section class="seller-order-heading">
+			<div>
+				<h1 class="page-title">收到的預約</h1>
+				<p class="seller-order-description">處理新的預約申請，並查看付款、成立、退款與撥款狀態。</p>
+			</div>
+			<div class="seller-order-heading-actions">
+				<a class="btn btn-secondary" th:href="@{/member/services}">管理我的服務</a>
+			</div>
+		</section>
 
-        <div>
-
-            <p class="seller-order-eyebrow">
-                SELLER ORDERS
-            </p>
-
-            <h1 class="page-title">
-                收到的預約
-            </h1>
-
-            <p class="seller-order-description">
-                在 3 分鐘內處理新的預約申請，並查看付款、成立、退款與撥款狀態。
-            </p>
-
-        </div>
-
-        <div class="seller-order-heading-actions">
-
-            <a class="btn btn-secondary"
-               th:href="@{/member/services}">
-                管理我的服務
-            </a>
-
-            <a class="btn seller-order-primary-link"
-               th:href="@{/front/services}">
-                查看服務前台
-            </a>
-
-        </div>
-
-    </section>
-
-    <!-- ======================================================
+		<!-- ======================================================
          訊息
          ====================================================== -->
-    <div class="alert alert-success"
-         th:if="${successMsg != null}"
-         th:text="${successMsg}">
-        操作成功
-    </div>
+		<div class="alert alert-success" th:if="${successMsg != null}" th:text="${successMsg}">操作成功</div>
+		<div class="alert alert-error" th:if="${errorMsg != null}" th:text="${errorMsg}">操作失敗</div>
 
-    <div class="alert alert-error"
-         th:if="${errorMsg != null}"
-         th:text="${errorMsg}">
-        操作失敗
-    </div>
-
-    <!-- ======================================================
-         摘要
+		<!-- ======================================================
+         摘要看板
          ====================================================== -->
-    <section class="seller-summary-grid"
-             aria-label="賣方訂單摘要">
+		<section class="seller-summary-grid" aria-label="賣方訂單摘要">
+			<article class="seller-summary-card">
+				<span>全部訂單</span> <strong id="sellerCountAll">0</strong>
+			</article>
+			<article class="seller-summary-card seller-summary-card--attention">
+				<span>待我確認</span> <strong id="sellerCountPendingConfirm">0</strong>
+			</article>
+			<article class="seller-summary-card seller-summary-card--payment">
+				<span>等待買家付款</span> <strong id="sellerCountPendingPayment">0</strong>
+			</article>
+			<article class="seller-summary-card seller-summary-card--confirmed">
+				<span>已成立</span> <strong id="sellerCountConfirmed">0</strong>
+			</article>
+			<article class="seller-summary-card seller-summary-card--completed">
+				<span>已完成</span> <strong id="sellerCountCompleted">0</strong>
+			</article>
+		</section>
 
-        <article class="seller-summary-card">
-
-            <span>
-                全部訂單
-            </span>
-
-            <strong id="sellerCountAll">
-                0
-            </strong>
-
-        </article>
-
-        <article class="seller-summary-card
-                        seller-summary-card--attention">
-
-            <span>
-                待我確認
-            </span>
-
-            <strong id="sellerCountPendingConfirm">
-                0
-            </strong>
-
-        </article>
-
-        <article class="seller-summary-card
-                        seller-summary-card--payment">
-
-            <span>
-                等待買家付款
-            </span>
-
-            <strong id="sellerCountPendingPayment">
-                0
-            </strong>
-
-        </article>
-
-        <article class="seller-summary-card
-                        seller-summary-card--confirmed">
-
-            <span>
-                已成立
-            </span>
-
-            <strong id="sellerCountConfirmed">
-                0
-            </strong>
-
-        </article>
-
-        <article class="seller-summary-card
-                        seller-summary-card--completed">
-
-            <span>
-                已完成
-            </span>
-
-            <strong id="sellerCountCompleted">
-                0
-            </strong>
-
-        </article>
-
-    </section>
-
-    <!-- ======================================================
-         篩選
+		<!-- ======================================================
+         篩選工具列
          ====================================================== -->
-    <section class="seller-order-toolbar"
-             aria-label="訂單狀態篩選">
+		<section class="seller-order-toolbar" aria-label="訂單狀態篩選">
+			<div class="seller-filter-group">
+				<button class="seller-filter-button active" type="button" data-filter="all">全部</button>
+				<button class="seller-filter-button" type="button" data-filter="pending-confirm">待我確認</button>
+				<button class="seller-filter-button" type="button" data-filter="pending-payment">等待付款</button>
+				<button class="seller-filter-button" type="button" data-filter="confirmed">已成立</button>
+				<button class="seller-filter-button" type="button" data-filter="completed">已完成</button>
+				<button class="seller-filter-button" type="button" data-filter="cancelled">已取消</button>
+			</div>
+			<p class="seller-order-sync-note">等待中的訂單會自動檢查最新狀態</p>
+		</section>
 
-        <div class="seller-filter-group">
-
-            <button class="seller-filter-button active"
-                    type="button"
-                    data-filter="all">
-                全部
-            </button>
-
-            <button class="seller-filter-button"
-                    type="button"
-                    data-filter="pending-confirm">
-                待我確認
-            </button>
-
-            <button class="seller-filter-button"
-                    type="button"
-                    data-filter="pending-payment">
-                等待付款
-            </button>
-
-            <button class="seller-filter-button"
-                    type="button"
-                    data-filter="confirmed">
-                已成立
-            </button>
-
-            <button class="seller-filter-button"
-                    type="button"
-                    data-filter="completed">
-                已完成
-            </button>
-
-            <button class="seller-filter-button"
-                    type="button"
-                    data-filter="cancelled">
-                已取消
-            </button>
-
-        </div>
-
-        <p class="seller-order-sync-note">
-            等待中的訂單會自動檢查最新狀態
-        </p>
-
-    </section>
-
-    <!-- ======================================================
-         完全沒有訂單
+		<!-- ======================================================
+         完全沒有訂單狀態
          ====================================================== -->
-    <section class="seller-empty-state"
-             th:if="${orderList == null
-                      or #lists.isEmpty(orderList)}">
+		<section class="seller-empty-state" th:if="${orderList == null or #lists.isEmpty(orderList)}">
+			<div class="seller-empty-icon">⌁</div>
+			<h2>目前還沒有收到預約</h2>
+			<p>會員送出服務時段申請後，訂單會顯示在這裡。</p>
+			<a class="btn seller-order-primary-link" th:href="@{/member/services}">查看我的服務</a>
+		</section>
 
-        <div class="seller-empty-icon">
-            ⌁
-        </div>
+		<!-- 篩選後無資料 -->
+		<section class="seller-empty-state" id="sellerFilterEmptyState" hidden>
+			<h2>沒有符合條件的訂單</h2>
+			<p>請切換其他狀態查看。</p>
+		</section>
 
-        <h2>
-            目前還沒有收到預約
-        </h2>
-
-        <p>
-            會員送出服務時段申請後，訂單會顯示在這裡。
-        </p>
-
-        <a class="btn seller-order-primary-link"
-           th:href="@{/member/services}">
-            查看我的服務
-        </a>
-
-    </section>
-
-    <!-- 篩選後無資料 -->
-    <section class="seller-empty-state"
-             id="sellerFilterEmptyState"
-             hidden>
-
-        <h2>
-            沒有符合條件的訂單
-        </h2>
-
-        <p>
-            請切換其他狀態查看。
-        </p>
-
-    </section>
-
-    <!-- ======================================================
-         訂單列表
+		<!-- ======================================================
+         訂單列表主區塊
          ====================================================== -->
-    <section class="seller-order-list"
-             id="sellerOrderList"
-             th:if="${orderList != null
-                      and !#lists.isEmpty(orderList)}">
-
-        <article class="seller-order-card"
-                 th:each="order : ${orderList}"
-                 th:attr="data-order-id=${order.serviceOrderId},
+		<section class="seller-order-list" id="sellerOrderList" th:if="${orderList != null and !#lists.isEmpty(orderList)}">
+			<article class="seller-order-card" th:each="order : ${orderList}"
+				th:attr="data-order-id=${order.serviceOrderId},
                           data-order-status=${order.orderStatus},
                           data-refund-status=${order.refundStatus},
                           data-payout-status=${order.payoutStatus},
                           data-service-id=${order.serviceId},
                           data-slot-id=${order.serviceSlotId},
-                          data-seller-expires=${order.sellerConfirmExpiresAt != null
-                              ? #temporals.format(
-                                  order.sellerConfirmExpiresAt,
-                                  'yyyy-MM-dd''T''HH:mm:ss'
-                                )
-                              : ''},
-                          data-payment-expires=${order.paymentExpiresAt != null
-                              ? #temporals.format(
-                                  order.paymentExpiresAt,
-                                  'yyyy-MM-dd''T''HH:mm:ss'
-                                )
-                              : ''}">
+                          data-seller-expires=${order.sellerConfirmExpiresAt != null ? #temporals.format(order.sellerConfirmExpiresAt, 'yyyy-MM-dd''T''HH:mm:ss') : ''},
+                          data-payment-expires=${order.paymentExpiresAt != null ? #temporals.format(order.paymentExpiresAt, 'yyyy-MM-dd''T''HH:mm:ss') : ''}">
 
-            <!-- ==================================================
+				<!-- ==================================================
                  卡片標題
                  ================================================== -->
-            <div class="seller-order-card-top">
+				<div class="seller-order-card-top">
+					<div class="seller-service-identity">
+						<div class="seller-service-meta">
+							<span class="seller-service-type" th:text="${order.serviceTypeNameSnapshot != null ? order.serviceTypeNameSnapshot : '服務'}">服務類型</span> 
+							<span class="seller-order-number" th:text="|訂單 #${order.serviceOrderId}|">訂單 #1</span>
+						</div>
+						<h2 th:text="${order.serviceNameSnapshot}">服務名稱</h2>
+						<p>買家會員： <strong th:text="|#${order.buyerMemberId}|">#2</strong></p>
+					</div>
 
-                <div class="seller-service-identity">
+					<div class="seller-status-area">
+						<span class="seller-status-badge seller-status-badge--pending-confirm" th:if="${order.orderStatus == 0}">待賣家確認</span>
+						<span class="seller-status-badge seller-status-badge--pending-payment" th:if="${order.orderStatus == 1}">等待買家付款</span>
+						<span class="seller-status-badge seller-status-badge--confirmed" th:if="${order.orderStatus == 2}">已成立</span>
+						<span class="seller-status-badge seller-status-badge--completed" th:if="${order.orderStatus == 3}">已完成</span>
+						<span class="seller-status-badge seller-status-badge--cancelled" th:if="${order.orderStatus == 4}">已取消</span>
 
-                    <div class="seller-service-meta">
+						<span class="seller-sub-status seller-sub-status--refund-pending" th:if="${order.orderStatus == 4 and order.refundStatus == 1}">待退款</span>
+						<span class="seller-sub-status seller-sub-status--refund-completed" th:if="${order.orderStatus == 4 and order.refundStatus == 2}">已退款</span>
+						<span class="seller-sub-status seller-sub-status--payout-pending" th:if="${order.orderStatus == 3 and order.payoutStatus == 0}">待撥款</span>
+						<span class="seller-sub-status seller-sub-status--payout-completed" th:if="${order.orderStatus == 3 and order.payoutStatus == 1}">已撥款</span>
+					</div>
+				</div>
 
-                        <span class="seller-service-type"
-                              th:text="${order.serviceTypeNameSnapshot != null
-                                       ? order.serviceTypeNameSnapshot
-                                       : '服務'}">
-                            服務類型
-                        </span>
-
-                        <span class="seller-order-number"
-                              th:text="|訂單 #${order.serviceOrderId}|">
-                            訂單 #1
-                        </span>
-
-                    </div>
-
-                    <h2 th:text="${order.serviceNameSnapshot}">
-                        服務名稱
-                    </h2>
-
-                    <p>
-                        買家會員：
-
-                        <strong th:text="|#${order.buyerMemberId}|">
-                            #2
-                        </strong>
-                    </p>
-
-                </div>
-
-                <div class="seller-status-area">
-
-                    <span class="seller-status-badge
-                                 seller-status-badge--pending-confirm"
-                          th:if="${order.orderStatus == 0}">
-                        待賣家確認
-                    </span>
-
-                    <span class="seller-status-badge
-                                 seller-status-badge--pending-payment"
-                          th:if="${order.orderStatus == 1}">
-                        等待買家付款
-                    </span>
-
-                    <span class="seller-status-badge
-                                 seller-status-badge--confirmed"
-                          th:if="${order.orderStatus == 2}">
-                        已成立
-                    </span>
-
-                    <span class="seller-status-badge
-                                 seller-status-badge--completed"
-                          th:if="${order.orderStatus == 3}">
-                        已完成
-                    </span>
-
-                    <span class="seller-status-badge
-                                 seller-status-badge--cancelled"
-                          th:if="${order.orderStatus == 4}">
-                        已取消
-                    </span>
-
-                    <span class="seller-sub-status
-                                 seller-sub-status--refund-pending"
-                          th:if="${order.orderStatus == 4
-                                   and order.refundStatus == 1}">
-                        待退款
-                    </span>
-
-                    <span class="seller-sub-status
-                                 seller-sub-status--refund-completed"
-                          th:if="${order.orderStatus == 4
-                                   and order.refundStatus == 2}">
-                        已退款
-                    </span>
-
-                    <span class="seller-sub-status
-                                 seller-sub-status--payout-pending"
-                          th:if="${order.orderStatus == 3
-                                   and order.payoutStatus == 0}">
-                        待撥款
-                    </span>
-
-                    <span class="seller-sub-status
-                                 seller-sub-status--payout-completed"
-                          th:if="${order.orderStatus == 3
-                                   and order.payoutStatus == 1}">
-                        已撥款
-                    </span>
-
-                </div>
-
-            </div>
-
-            <!-- ==================================================
-                 訂單摘要
+				<!-- ==================================================
+                 訂單摘要網格看板
                  ================================================== -->
-            <div class="seller-order-summary">
+				<div class="seller-order-summary">
+					<div class="seller-summary-item">
+						<span class="seller-summary-label">服務日期</span> 
+						<strong th:text="${order.slotStartTimeSnapshot != null ? #temporals.format(order.slotStartTimeSnapshot, 'yyyy/MM/dd') : '未設定'}">2026/08/10</strong>
+					</div>
+					<div class="seller-summary-item">
+						<span class="seller-summary-label">服務時間</span> 
+						<strong>
+							<span th:text="${order.slotStartTimeSnapshot != null ? #temporals.format(order.slotStartTimeSnapshot, 'HH:mm') : '--:--'}">14:00</span>
+							－
+							<span th:text="${order.slotEndTimeSnapshot != null ? #temporals.format(order.slotEndTimeSnapshot, 'HH:mm') : '--:--'}">16:00</span>
+						</strong>
+					</div>
+					<div class="seller-summary-item seller-location-item">
+						<span class="seller-summary-label">服務地點</span> 
+						<strong>
+							<span th:text="${order.serviceCitySnapshot}">台北市</span>
+							<span th:text="${order.serviceDistrictSnapshot}">大安區</span>
+						</strong> 
+						<small th:text="${order.serviceLocationSnapshot}">大安森林公園附近</small>
+					</div>
+					<div class="seller-summary-item seller-amount-item">
+						<span class="seller-summary-label">訂單金額</span> 
+						<strong th:text="${order.totalAmount != null ? 'NT$ ' + #numbers.formatInteger(order.totalAmount, 1, 'COMMA') : 'NT$ 0'}">NT$ 600</strong> 
+						<small th:text="${order.orderHourlyRate != null ? '每小時 NT$ ' + #numbers.formatInteger(order.orderHourlyRate, 1, 'COMMA') : '每小時 NT$ 0'}">每小時 NT$ 300</small>
+					</div>
+				</div>
 
-                <div class="seller-summary-item">
-
-                    <span class="seller-summary-label">
-                        服務日期
-                    </span>
-
-                    <strong th:text="${order.slotStartTimeSnapshot != null
-                                      ? #temporals.format(
-                                          order.slotStartTimeSnapshot,
-                                          'yyyy/MM/dd'
-                                        )
-                                      : '未設定'}">
-                        2026/08/10
-                    </strong>
-
-                </div>
-
-                <div class="seller-summary-item">
-
-                    <span class="seller-summary-label">
-                        服務時間
-                    </span>
-
-                    <strong>
-
-                        <span th:text="${order.slotStartTimeSnapshot != null
-                                       ? #temporals.format(
-                                           order.slotStartTimeSnapshot,
-                                           'HH:mm'
-                                         )
-                                       : '--:--'}">
-                            14:00
-                        </span>
-
-                        －
-
-                        <span th:text="${order.slotEndTimeSnapshot != null
-                                       ? #temporals.format(
-                                           order.slotEndTimeSnapshot,
-                                           'HH:mm'
-                                         )
-                                       : '--:--'}">
-                            16:00
-                        </span>
-
-                    </strong>
-
-                </div>
-
-                <div class="seller-summary-item seller-location-item">
-
-                    <span class="seller-summary-label">
-                        服務地點
-                    </span>
-
-                    <strong>
-
-                        <span th:text="${order.serviceCitySnapshot}">
-                            台北市
-                        </span>
-
-                        <span th:text="${order.serviceDistrictSnapshot}">
-                            大安區
-                        </span>
-
-                    </strong>
-
-                    <small th:text="${order.serviceLocationSnapshot}">
-                        大安森林公園附近
-                    </small>
-
-                </div>
-
-                <div class="seller-summary-item seller-amount-item">
-
-                    <span class="seller-summary-label">
-                        訂單金額
-                    </span>
-
-                    <strong th:text="${order.totalAmount != null
-                                      ? 'NT$ '
-                                        + #numbers.formatInteger(
-                                            order.totalAmount,
-                                            1,
-                                            'COMMA'
-                                          )
-                                      : 'NT$ 0'}">
-                        NT$ 600
-                    </strong>
-
-                    <small th:text="${order.orderHourlyRate != null
-                                     ? '每小時 NT$ '
-                                       + #numbers.formatInteger(
-                                           order.orderHourlyRate,
-                                           1,
-                                           'COMMA'
-                                         )
-                                     : '每小時 NT$ 0'}">
-                        每小時 NT$ 300
-                    </small>
-
-                </div>
-
-            </div>
-
-            <!-- ==================================================
-                 狀態操作：待賣家確認
+				<!-- ==================================================
+                 狀態操作：待賣家確認 (STATUS = 0)
                  ================================================== -->
-            <section class="seller-action-panel
-                            seller-action-panel--pending-confirm"
-                     th:if="${order.orderStatus == 0}">
+				<section class="seller-action-panel seller-action-panel--pending-confirm" th:if="${order.orderStatus == 0}">
+					<div class="seller-action-copy">
+						<h3>請處理這筆預約申請</h3>
+						<p>接受後，時段會暫時鎖定並等待買家完成付款； 其他相同時段的申請會先保留， 買家付款成功後才會由系統取消。</p>
+						<p class="seller-buyer-note" th:if="${order.buyerRequestNote != null and !#strings.isEmpty(order.buyerRequestNote)}">
+							<strong>買家需求：</strong> <span th:text="${order.buyerRequestNote}">買家需求</span>
+						</p>
+					</div>
+					<div class="seller-action-control">
+						<div class="seller-countdown-box">
+							<span>確認剩餘</span> 
+							<strong class="seller-countdown" data-countdown-type="seller" th:attr="data-expire-at=${order.sellerConfirmExpiresAt != null ? #temporals.format(order.sellerConfirmExpiresAt, 'yyyy-MM-dd''T''HH:mm:ss') : ''}">03:00</strong>
+						</div>
+						<form class="seller-accept-form" th:action="@{/member/service-orders/{orderId}/accept(orderId=${order.serviceOrderId})}" method="post">
+							<input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+							<label class="seller-field-label" th:for="|sellerRequirementNote-${order.serviceOrderId}|">給買家的服務條件或提醒</label>
+							<textarea class="seller-form-control" th:id="|sellerRequirementNote-${order.serviceOrderId}|" name="sellerRequirementNote" rows="3" maxlength="500" placeholder="可填寫集合方式、注意事項或其他提醒，也可以留空"></textarea>
+							<div class="seller-action-buttons">
+								<button class="btn seller-accept-button" type="submit">接受申請</button>
+								<button class="btn seller-reject-button js-open-reject-modal" type="button" th:attr="data-action-url=@{/member/service-orders/{orderId}/reject(orderId=${order.serviceOrderId})}, data-service-name=${order.serviceNameSnapshot}">拒絕申請</button>
+							</div>
+						</form>
+					</div>
+				</section>
 
-                <div class="seller-action-copy">
-
-                    <h3>
-                        請處理這筆預約申請
-                    </h3>
-
-                    <p>
-                        接受後，時段會暫時鎖定 60 秒並等待買家完成付款；
-                        其他相同時段的申請會先保留，
-                        買家付款成功後才會由系統取消。
-                    </p>
-
-                    <p class="seller-buyer-note"
-                       th:if="${order.buyerRequestNote != null
-                                and !#strings.isEmpty(order.buyerRequestNote)}">
-
-                        <strong>
-                            買家需求：
-                        </strong>
-
-                        <span th:text="${order.buyerRequestNote}">
-                            買家需求
-                        </span>
-
-                    </p>
-
-                </div>
-
-                <div class="seller-action-control">
-
-                    <div class="seller-countdown-box">
-
-                        <span>
-                            確認剩餘
-                        </span>
-
-                        <strong class="seller-countdown"
-                                data-countdown-type="seller"
-                                th:attr="data-expire-at=${order.sellerConfirmExpiresAt != null
-                                    ? #temporals.format(
-                                        order.sellerConfirmExpiresAt,
-                                        'yyyy-MM-dd''T''HH:mm:ss'
-                                      )
-                                    : ''}">
-                            03:00
-                        </strong>
-
-                    </div>
-
-                    <form class="seller-accept-form"
-                          th:action="@{/member/service-orders/{orderId}/accept(
-                                       orderId=${order.serviceOrderId}
-                                   )}"
-                          method="post">
-
-                        <input type="hidden"
-                               th:if="${_csrf != null}"
-                               th:name="${_csrf.parameterName}"
-                               th:value="${_csrf.token}">
-
-                        <label class="seller-field-label"
-                               th:for="|sellerRequirementNote-${order.serviceOrderId}|">
-                            給買家的服務條件或提醒
-                        </label>
-
-                        <textarea class="seller-form-control"
-                                  th:id="|sellerRequirementNote-${order.serviceOrderId}|"
-                                  name="sellerRequirementNote"
-                                  rows="3"
-                                  maxlength="500"
-                                  placeholder="可填寫集合方式、注意事項或其他提醒，也可以留空"></textarea>
-
-                        <div class="seller-action-buttons">
-
-                            <button class="btn seller-accept-button"
-                                    type="submit">
-                                接受申請
-                            </button>
-
-                            <button class="btn seller-reject-button
-                                           js-open-reject-modal"
-                                    type="button"
-                                    th:attr="data-action-url=@{/member/service-orders/{orderId}/reject(
-                                                orderId=${order.serviceOrderId}
-                                             )},
-                                             data-service-name=${order.serviceNameSnapshot}">
-                                拒絕申請
-                            </button>
-
-                        </div>
-
-                    </form>
-
-                </div>
-
-            </section>
-
-            <!-- ==================================================
-                 狀態操作：等待買家付款
+				<!-- ==================================================
+                 狀態操作：等待買家付款 (STATUS = 1)
                  ================================================== -->
-            <section class="seller-action-panel
-                            seller-action-panel--pending-payment"
-                     th:if="${order.orderStatus == 1}">
+				<section class="seller-action-panel seller-action-panel--pending-payment" th:if="${order.orderStatus == 1}">
+					<div class="seller-action-copy">
+						<h3>已接受，等待買家付款</h3>
+						<p>此時段目前暫時鎖定。 若買家未在期限內付款，系統會自動取消並釋放時段。</p>
+						<p th:if="${order.sellerRequirementNote != null and !#strings.isEmpty(order.sellerRequirementNote)}">
+							你提供的備註： <strong th:text="${order.sellerRequirementNote}">賣家備註</strong>
+						</p>
+					</div>
+					<div class="seller-action-control seller-action-control--horizontal">
+						<div class="seller-countdown-box seller-countdown-box--payment">
+							<span>付款剩餘</span> 
+							<strong class="seller-countdown" data-countdown-type="payment" th:attr="data-expire-at=${order.paymentExpiresAt != null ? #temporals.format(order.paymentExpiresAt, 'yyyy-MM-dd''T''HH:mm:ss') : ''}">01:00</strong>
+						</div>
+						<button class="btn seller-cancel-button js-open-cancel-modal" type="button" th:attr="data-action-url=@{/member/service-orders/{orderId}/cancel-by-seller(orderId=${order.serviceOrderId})}, data-service-name=${order.serviceNameSnapshot}, data-refund-needed='false'">取消訂單</button>
+					</div>
+				</section>
 
-                <div class="seller-action-copy">
-
-                    <h3>
-                        已接受，等待買家付款
-                    </h3>
-
-                    <p>
-                        此時段目前暫時鎖定。
-                        若買家未在期限內付款，系統會自動取消並釋放時段。
-                    </p>
-
-                    <p th:if="${order.sellerRequirementNote != null
-                               and !#strings.isEmpty(order.sellerRequirementNote)}">
-
-                        你提供的備註：
-
-                        <strong th:text="${order.sellerRequirementNote}">
-                            賣家備註
-                        </strong>
-
-                    </p>
-
-                </div>
-
-                <div class="seller-action-control
-                            seller-action-control--horizontal">
-
-                    <div class="seller-countdown-box
-                                seller-countdown-box--payment">
-
-                        <span>
-                            付款剩餘
-                        </span>
-
-                        <strong class="seller-countdown"
-                                data-countdown-type="payment"
-                                th:attr="data-expire-at=${order.paymentExpiresAt != null
-                                    ? #temporals.format(
-                                        order.paymentExpiresAt,
-                                        'yyyy-MM-dd''T''HH:mm:ss'
-                                      )
-                                    : ''}">
-                            01:00
-                        </strong>
-
-                    </div>
-
-                    <button class="btn seller-cancel-button
-                                   js-open-cancel-modal"
-                            type="button"
-                            th:attr="data-action-url=@{/member/service-orders/{orderId}/cancel-by-seller(
-                                        orderId=${order.serviceOrderId}
-                                     )},
-                                     data-service-name=${order.serviceNameSnapshot},
-                                     data-refund-needed='false'">
-                        取消訂單
-                    </button>
-
-                </div>
-
-            </section>
-
-            <!-- ==================================================
-                 狀態操作：已成立
+				<!-- ==================================================
+                 狀態操作：已成立 (STATUS = 2)
                  ================================================== -->
-            <section class="seller-action-panel
-                            seller-action-panel--confirmed"
-                     th:if="${order.orderStatus == 2}">
+				<section class="seller-action-panel seller-action-panel--confirmed" th:if="${order.orderStatus == 2}">
+					<div class="seller-action-copy">
+						<h3>訂單已成立</h3>
+						<p>買家已完成付款。請依照約定時間與地點提供服務。</p>
+					</div>
+					<div class="seller-action-control seller-action-control--horizontal">
+						<a class="btn btn-secondary" th:href="@{/front/services/{serviceId}(serviceId=${order.serviceId})}">查看服務頁面</a>
+						<button class="btn seller-cancel-button js-open-cancel-modal" type="button" th:attr="data-action-url=@{/member/service-orders/{orderId}/cancel-by-seller(orderId=${order.serviceOrderId})}, data-service-name=${order.serviceNameSnapshot}, data-refund-needed='true'">取消並全額退款</button>
+					</div>
+				</section>
 
-                <div class="seller-action-copy">
-
-                    <h3>
-                        訂單已成立
-                    </h3>
-
-                    <p>
-                        買家已完成付款。請依照約定時間與地點提供服務。
-                    </p>
-
-                </div>
-
-                <div class="seller-action-control
-                            seller-action-control--horizontal">
-
-                    <a class="btn btn-secondary"
-                       th:href="@{/front/services/{serviceId}(
-                                    serviceId=${order.serviceId}
-                                )}">
-                        查看服務頁面
-                    </a>
-
-                    <button class="btn seller-cancel-button
-                                   js-open-cancel-modal"
-                            type="button"
-                            th:attr="data-action-url=@{/member/service-orders/{orderId}/cancel-by-seller(
-                                        orderId=${order.serviceOrderId}
-                                     )},
-                                     data-service-name=${order.serviceNameSnapshot},
-                                     data-refund-needed='true'">
-                        取消並全額退款
-                    </button>
-
-                </div>
-
-            </section>
-
-            <!-- ==================================================
-                 狀態操作：已完成
+				<!-- ==================================================
+                 狀態操作：已完成 (STATUS = 3)
                  ================================================== -->
-            <section class="seller-action-panel
-                            seller-action-panel--completed"
-                     th:if="${order.orderStatus == 3}">
+				<section class="seller-action-panel seller-action-panel--completed" th:if="${order.orderStatus == 3}">
+					<div class="seller-action-copy">
+						<h3>服務已完成</h3>
+						<p th:if="${order.payoutStatus == 0}">訂單正在等待後台撥款。</p>
+						<p th:if="${order.payoutStatus == 1}">後台已完成撥款。</p>
+					</div>
+					<div class="seller-completed-time" th:if="${order.serviceCompletedAt != null}">
+						<a class="btn btn-secondary" th:href="@{/orderReview/write/{orderId}(orderId=${order.serviceOrderId})}">評價</a> 
+						完成時間： <strong th:text="${#temporals.format(order.serviceCompletedAt, 'yyyy-MM-dd HH:mm')}">2026-08-10 18:00</strong>
+					</div>
+				</section>
 
-                <div class="seller-action-copy">
-
-                    <h3>
-                        服務已完成
-                    </h3>
-
-                    <p th:if="${order.payoutStatus == 0}">
-                        訂單正在等待後台撥款。
-                    </p>
-
-                    <p th:if="${order.payoutStatus == 1}">
-                        後台已完成撥款。
-                    </p>
-
-                </div>
-
-                <div class="seller-completed-time"
-                     th:if="${order.serviceCompletedAt != null}">
-                     	<a class="btn btn-secondary"
-                     	th:href="@{/orderReview/write/{orderId}(orderId=${order.serviceOrderId})}">
-                        評價
-                    </a>
-
-                    完成時間：
-
-                    <strong th:text="${#temporals.format(
-                                        order.serviceCompletedAt,
-                                        'yyyy-MM-dd HH:mm'
-                                    )}">
-                        2026-08-10 18:00
-                    </strong>
-
-                </div>
-
-            </section>
-
-            <!-- ==================================================
-                 狀態操作：已取消
+				<!-- ==================================================
+                 狀態操作：已取消 (STATUS = 4)
                  ================================================== -->
-            <section class="seller-action-panel
-                            seller-action-panel--cancelled"
-                     th:if="${order.orderStatus == 4}">
+				<section class="seller-action-panel seller-action-panel--cancelled" th:if="${order.orderStatus == 4}">
+					<div class="seller-action-copy">
+						<h3>訂單已取消</h3>
+						<p th:if="${order.cancelledByRole == 0}">取消方：買家</p>
+						<p th:if="${order.cancelledByRole == 1}">取消方：賣家</p>
+						<p th:if="${order.cancelledByRole == 2}">取消方：後台</p>
+						<p th:if="${order.cancelledByRole == 3}">取消方：系統</p>
+						<p th:if="${order.cancelReason != null and !#strings.isEmpty(order.cancelReason)}">
+							原因： <strong th:text="${order.cancelReason}">取消原因</strong>
+						</p>
+					</div>
+					<div class="seller-cancelled-refund">
+						<span th:if="${order.refundStatus == null or order.refundStatus == 0}">無退款</span>
+						<span class="seller-refund-waiting" th:if="${order.refundStatus == 1}">等待後台退款</span>
+						<span class="seller-refund-done" th:if="${order.refundStatus == 2}">已完成退款</span>
+						<strong th:if="${order.refundAmount != null and order.refundAmount > 0}" th:text="${'NT$ ' + #numbers.formatInteger(order.refundAmount, 1, 'COMMA')}">NT$ 600</strong>
+					</div>
+				</section>
 
-                <div class="seller-action-copy">
-
-                    <h3>
-                        訂單已取消
-                    </h3>
-
-                    <p th:if="${order.cancelledByRole == 0}">
-                        取消方：買家
-                    </p>
-
-                    <p th:if="${order.cancelledByRole == 1}">
-                        取消方：賣家
-                    </p>
-
-                    <p th:if="${order.cancelledByRole == 2}">
-                        取消方：後台
-                    </p>
-
-                    <p th:if="${order.cancelledByRole == 3}">
-                        取消方：系統
-                    </p>
-
-                    <p th:if="${order.cancelReason != null
-                               and !#strings.isEmpty(order.cancelReason)}">
-
-                        原因：
-
-                        <strong th:text="${order.cancelReason}">
-                            取消原因
-                        </strong>
-
-                    </p>
-
-                </div>
-
-                <div class="seller-cancelled-refund">
-
-                    <span th:if="${order.refundStatus == null
-                                  or order.refundStatus == 0}">
-                        無退款
-                    </span>
-
-                    <span class="seller-refund-waiting"
-                          th:if="${order.refundStatus == 1}">
-                        等待後台退款
-                    </span>
-
-                    <span class="seller-refund-done"
-                          th:if="${order.refundStatus == 2}">
-                        已完成退款
-                    </span>
-
-                    <strong th:if="${order.refundAmount != null
-                                   and order.refundAmount > 0}"
-                            th:text="${'NT$ '
-                                      + #numbers.formatInteger(
-                                          order.refundAmount,
-                                          1,
-                                          'COMMA'
-                                        )}">
-                        NT$ 600
-                    </strong>
-
-                </div>
-
-            </section>
-
-            <!-- ==================================================
-                 訂單詳情
+				<!-- ==================================================
+                 訂單詳情摺疊按鈕
                  ================================================== -->
-            <div class="seller-order-detail-toggle-row">
+				<div class="seller-order-detail-toggle-row">
+					<button class="seller-detail-toggle" type="button" aria-expanded="false">
+						<span>查看訂單詳情</span> <span class="seller-detail-toggle-icon">＋</span>
+					</button>
+				</div>
 
-                <button class="seller-detail-toggle"
-                        type="button"
-                        aria-expanded="false">
+				<!-- 摺疊內容區區塊 -->
+				<section class="seller-order-details" hidden>
+					<div class="seller-detail-grid">
+						<div class="seller-detail-item">
+							<span>服務描述</span>
+							<p th:text="${order.serviceDescriptionSnapshot != null and !#strings.isEmpty(order.serviceDescriptionSnapshot) ? order.serviceDescriptionSnapshot : '沒有服務描述'}">服務描述</p>
+						</div>
+						<div class="seller-detail-item">
+							<span>買家需求</span>
+							<p th:text="${order.buyerRequestNote != null and !#strings.isEmpty(order.buyerRequestNote) ? order.buyerRequestNote : '買家未填寫需求'}">買家需求</p>
+						</div>
+						<div class="seller-detail-item">
+							<span>賣家備註</span>
+							<p th:text="${order.sellerRequirementNote != null and !#strings.isEmpty(order.sellerRequirementNote) ? order.sellerRequirementNote : '尚未填寫'}">賣家備註</p>
+						</div>
+						<div class="seller-detail-item">
+							<span>付款方式</span>
+							<p th:if="${order.servicePaymentMethod == null}">尚未付款</p>
+							<p th:if="${order.servicePaymentMethod == 0}">信用卡</p>
+							<p th:if="${order.servicePaymentMethod == 1}">ATM 轉帳</p>
+						</div>
+						<div class="seller-detail-item">
+							<span>建立時間</span>
+							<p th:text="${order.createdAt != null ? #temporals.format(order.createdAt, 'yyyy-MM-dd HH:mm:ss') : '-'}">2026-08-01 10:00:00</p>
+						</div>
+						<div class="seller-detail-item" th:if="${order.cancelledAt != null}">
+							<span>取消時間</span>
+							<p th:text="${#temporals.format(order.cancelledAt, 'yyyy-MM-dd HH:mm:ss')}">2026-08-01 10:01:00</p>
+						</div>
+					</div>
+				</section>
 
-                    <span>
-                        查看訂單詳情
-                    </span>
+			</article>
+		</section>
+	</main>
 
-                    <span class="seller-detail-toggle-icon">
-                        ＋
-                    </span>
-
-                </button>
-
-            </div>
-
-            <section class="seller-order-details"
-                     hidden>
-
-                <div class="seller-detail-grid">
-
-                    <div class="seller-detail-item">
-
-                        <span>
-                            服務描述
-                        </span>
-
-                        <p th:text="${order.serviceDescriptionSnapshot != null
-                                    and !#strings.isEmpty(order.serviceDescriptionSnapshot)
-                                    ? order.serviceDescriptionSnapshot
-                                    : '沒有服務描述'}">
-                            服務描述
-                        </p>
-
-                    </div>
-
-                    <div class="seller-detail-item">
-
-                        <span>
-                            買家需求
-                        </span>
-
-                        <p th:text="${order.buyerRequestNote != null
-                                    and !#strings.isEmpty(order.buyerRequestNote)
-                                    ? order.buyerRequestNote
-                                    : '買家未填寫需求'}">
-                            買家需求
-                        </p>
-
-                    </div>
-
-                    <div class="seller-detail-item">
-
-                        <span>
-                            賣家備註
-                        </span>
-
-                        <p th:text="${order.sellerRequirementNote != null
-                                    and !#strings.isEmpty(order.sellerRequirementNote)
-                                    ? order.sellerRequirementNote
-                                    : '尚未填寫'}">
-                            賣家備註
-                        </p>
-
-                    </div>
-
-                    <div class="seller-detail-item">
-
-                        <span>
-                            付款方式
-                        </span>
-
-                        <p th:if="${order.servicePaymentMethod == null}">
-                            尚未付款
-                        </p>
-
-                        <p th:if="${order.servicePaymentMethod == 0}">
-                            信用卡
-                        </p>
-
-                        <p th:if="${order.servicePaymentMethod == 1}">
-                            ATM 轉帳
-                        </p>
-
-                    </div>
-
-                    <div class="seller-detail-item">
-
-                        <span>
-                            建立時間
-                        </span>
-
-                        <p th:text="${order.createdAt != null
-                                    ? #temporals.format(
-                                        order.createdAt,
-                                        'yyyy-MM-dd HH:mm:ss'
-                                      )
-                                    : '-'}">
-                            2026-08-01 10:00:00
-                        </p>
-
-                    </div>
-
-                    <div class="seller-detail-item"
-                         th:if="${order.cancelledAt != null}">
-
-                        <span>
-                            取消時間
-                        </span>
-
-                        <p th:text="${#temporals.format(
-                                      order.cancelledAt,
-                                      'yyyy-MM-dd HH:mm:ss'
-                                  )}">
-                            2026-08-01 10:01:00
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-        </article>
-
-    </section>
-
-</main>
-
-<!-- ==========================================================
-     拒絕申請彈窗
+	<!-- ==========================================================
+     彈窗模組：拒絕申請彈窗
      ========================================================== -->
-<div class="seller-modal"
-     id="sellerRejectModal"
-     hidden>
+	<div class="seller-modal" id="sellerRejectModal" hidden>
+		<div class="seller-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="sellerRejectModalTitle">
+			<button class="seller-modal-close" type="button" aria-label="關閉">×</button>
+			<p class="seller-modal-eyebrow">REJECT REQUEST</p>
+			<h2 id="sellerRejectModalTitle">拒絕預約申請</h2>
+			<p id="sellerRejectOrderName">你即將拒絕這筆申請。</p>
 
-    <div class="seller-modal-dialog"
-         role="dialog"
-         aria-modal="true"
-         aria-labelledby="sellerRejectModalTitle">
+			<form id="sellerRejectForm" method="post">
+				<input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+				<label class="seller-field-label" for="sellerRejectReason">拒絕原因</label>
+				<textarea class="seller-form-control" id="sellerRejectReason" name="reason" rows="4" maxlength="500" placeholder="可說明目前無法提供服務的原因，也可以留空"></textarea>
+				<div class="seller-modal-actions">
+					<button class="btn btn-secondary seller-modal-cancel" type="button">返回</button>
+					<button class="btn seller-reject-confirm" type="submit">確定拒絕</button>
+				</div>
+			</form>
+		</div>
+	</div>
 
-        <button class="seller-modal-close"
-                type="button"
-                aria-label="關閉">
-            ×
-        </button>
-
-        <p class="seller-modal-eyebrow">
-            REJECT REQUEST
-        </p>
-
-        <h2 id="sellerRejectModalTitle">
-            拒絕預約申請
-        </h2>
-
-        <p id="sellerRejectOrderName">
-            你即將拒絕這筆申請。
-        </p>
-
-        <form id="sellerRejectForm"
-              method="post">
-
-            <input type="hidden"
-                   th:if="${_csrf != null}"
-                   th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}">
-
-            <label class="seller-field-label"
-                   for="sellerRejectReason">
-                拒絕原因
-            </label>
-
-            <textarea class="seller-form-control"
-                      id="sellerRejectReason"
-                      name="reason"
-                      rows="4"
-                      maxlength="500"
-                      placeholder="可說明目前無法提供服務的原因，也可以留空"></textarea>
-
-            <div class="seller-modal-actions">
-
-                <button class="btn btn-secondary
-                               seller-modal-cancel"
-                        type="button">
-                    返回
-                </button>
-
-                <button class="btn seller-reject-confirm"
-                        type="submit">
-                    確定拒絕
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
-<!-- ==========================================================
-     賣家取消訂單彈窗
+	<!-- ==========================================================
+     彈窗模組：賣家取消訂單彈窗
      ========================================================== -->
-<div class="seller-modal"
-     id="sellerCancelModal"
-     hidden>
+	<div class="seller-modal" id="sellerCancelModal" hidden>
+		<div class="seller-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="sellerCancelModalTitle">
+			<button class="seller-modal-close" type="button" aria-label="關閉">×</button>
+			<h2 id="sellerCancelModalTitle">取消訂單</h2>
+			<p id="sellerCancelOrderName">你即將取消這筆訂單。</p>
+			<div class="seller-cancel-warning" id="sellerCancelRefundWarning" hidden>此訂單已付款，取消後會進入「已取消／待退款」，由後台辦理全額退款。</div>
 
-    <div class="seller-modal-dialog"
-         role="dialog"
-         aria-modal="true"
-         aria-labelledby="sellerCancelModalTitle">
+			<form id="sellerCancelForm" method="post">
+				<input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+				<label class="seller-field-label" for="sellerCancelReason">取消原因</label>
+				<textarea class="seller-form-control" id="sellerCancelReason" name="reason" rows="4" maxlength="500" placeholder="請填寫取消原因"></textarea>
+				<div class="seller-modal-actions">
+					<button class="btn btn-secondary seller-modal-cancel" type="button">返回</button>
+					<button class="btn seller-cancel-confirm" type="submit">確定取消</button>
+				</div>
+			</form>
+		</div>
+	</div>
 
-        <button class="seller-modal-close"
-                type="button"
-                aria-label="關閉">
-            ×
-        </button>
-
-        <p class="seller-modal-eyebrow">
-            CANCEL ORDER
-        </p>
-
-        <h2 id="sellerCancelModalTitle">
-            取消訂單
-        </h2>
-
-        <p id="sellerCancelOrderName">
-            你即將取消這筆訂單。
-        </p>
-
-        <div class="seller-cancel-warning"
-             id="sellerCancelRefundWarning"
-             hidden>
-            此訂單已付款，取消後會進入「已取消／待退款」，由後台辦理全額退款。
-        </div>
-
-        <form id="sellerCancelForm"
-              method="post">
-
-            <input type="hidden"
-                   th:if="${_csrf != null}"
-                   th:name="${_csrf.parameterName}"
-                   th:value="${_csrf.token}">
-
-            <label class="seller-field-label"
-                   for="sellerCancelReason">
-                取消原因
-            </label>
-
-            <textarea class="seller-form-control"
-                      id="sellerCancelReason"
-                      name="reason"
-                      rows="4"
-                      maxlength="500"
-                      placeholder="請填寫取消原因"></textarea>
-
-            <div class="seller-modal-actions">
-
-                <button class="btn btn-secondary
-                               seller-modal-cancel"
-                        type="button">
-                    返回
-                </button>
-
-                <button class="btn seller-cancel-confirm"
-                        type="submit">
-                    確定取消
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-
-</div>
-
-<!-- 賣方訂單頁功能 -->
-<script th:src="@{/js/front-end/service/memberSellerOrderList.js}">
-</script>
-
-<!-- 共用通知 AJAX 輪巡 -->
-<script th:src="@{/js/front-end/common/notificationPolling.js}">
-</script>
+	<!-- 腳本引入 -->
+	<!-- 賣方訂單頁功能邏輯 -->
+	<script th:src="@{/js/front-end/service/memberSellerOrderList.js}"></script>
+	<!-- 共用通知 AJAX 輪巡機制 -->
+	<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
 </body>
 </html>

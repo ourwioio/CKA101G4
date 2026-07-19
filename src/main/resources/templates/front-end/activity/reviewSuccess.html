@@ -1,23 +1,147 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <title>檢舉提交成功</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>評論提交成功</title>
+<style>
+    /* ==========================================================
+       Webond 評論提交成功頁 — 圓潤角色風風格融合
+       ========================================================== */
+    @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+
+    :root {
+        --color-bg:            #F7F3EC;
+        --color-surface:       #FFFFFF;
+        --color-surface-soft:  #FFFDF8;
+        --color-ink:           #17140F;
+        --color-ink-soft:      #726A5F;
+        --color-border:        #ECE4D6;
+
+        --color-yellow:       #FFE59A;
+        --color-yellow-deep:  #FFC94D;
+        --color-pink:         #FFB5C1;
+        --color-green:        #B7E1D1;
+        --color-blue:         #A9D3FF;
+        --color-red:          #FF5271;
+
+        --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+        --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+
+        --radius-lg: 26px;
+        --radius-md: 16px;
+        --radius-full: 999px;
+
+        --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+        --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+    }
+
+    body {
+        font-family: var(--font-body);
+        background: var(--color-bg);
+        color: var(--color-ink);
+        -webkit-font-smoothing: antialiased;
+        margin: 0;
+        padding: 40px 20px;
+    }
+
+    /* 成功資訊大卡片外殼 */
+    .success-card {
+        max-width: 420px;
+        margin: 120px auto;
+        padding: 48px 36px;
+        background: var(--color-surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        border: 1px solid var(--color-border);
+        text-align: center;
+    }
+	
+	/* 🌟 核心樣式：與範例完全一致的置中 SVG 打勾大圓圈外殼 */
+	.success-icon-wrap {
+	  width: 80px;
+	  height: 80px;
+	  border-radius: 50%;
+	  background-color: var(--color-ink);
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  margin: 0 auto 20px; /* 上 0、左右自動置中、下 20px 間距 */
+	}
+	
+	/* SVG 打勾符號專屬樣式 */
+	.success-icon {
+	  width: 38px;
+	  height: 38px;
+	  color: var(--color-bg);
+	}
+
+    /* 卡片標題 */
+    .success-card h3 {
+        margin: 0 0 14px;
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--color-ink);
+        font-family: var(--font-display);
+    }
+
+    /* 說明內文 */
+    .success-card p {
+        margin: 0 0 32px;
+        font-size: 14.5px;
+        color: var(--color-ink-soft);
+        line-height: 1.6;
+        font-weight: 600;
+    }
+
+    /* 返回按鈕：升級成 Webond 經典沉穩黑大膠囊按鈕 */
+    .success-card a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 32px;
+        font-size: 14.5px;
+        font-weight: 800;
+        color: #ffffff;
+        background: var(--color-ink);
+        border-radius: var(--radius-full);
+        text-decoration: none;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.15s ease;
+        font-family: var(--font-body);
+    }
+
+    /* 懸浮效果：滑鼠移入時往上微飄並轉為活力深黃色，文字轉墨黑 */
+    .success-card a:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        background: var(--color-yellow-deep);
+        color: var(--color-ink);
+    }
+    
+    /* 點擊按壓微縮反饋 */
+    .success-card a:active {
+        transform: translateY(0) scale(0.98);
+    }
+</style>
 </head>
 <body>
 
-    <div style="margin: 50px; text-align: center; font-family: Arial, sans-serif;">
-        <h1 style="color: #4CAF50;">✓ 評論提交成功</h1>
-        
-        <p>我們已收到您的評論。</p>
-        
-        <br><br>
-        
-        <a th:href="@{/activity/front/myOrder}" 
-           style="display: inline-block; padding: 10px 20px; background-color: #2196F3; color: white; text-decoration: none; border-radius: 4px;">
-            返回我的報名畫面
-        </a>
+<div class="success-card">
+
+    <!-- 🌟 換上你指定的一模一樣的 SVG 向量打勾圓章，完美水平置中 -->
+    <div class="success-icon-wrap">
+      <svg class="success-icon" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+      </svg>
     </div>
+    
+    <h3>評論提交成功</h3>
+    <p>我們已收到您的評論。</p>
+    
+    <!-- 數據完整保留，黑膠囊按鈕化 -->
+    <a th:href="@{/activity/front/myOrder}">返回我的報名畫面</a>
+</div>
 
 </body>
 </html>

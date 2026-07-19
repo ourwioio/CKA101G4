@@ -1,122 +1,240 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
 <meta charset="UTF-8">
-<title>填寫活動評價</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>填寫活動評價｜Webond</title>
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
 <style>
-body {
-	margin: 0;
-	padding: 40px;
-	background: #f8fafc;
-	font-family: "Microsoft JhengHei", sans-serif;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	min-height: 80vh;
-}
+    /* ==========================================================
+       Webond 活動評價頁 — 圓潤角色風 (cream / ink / pastel blobs)
+       ========================================================== */
+    @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
 
-.card {
-	background: white;
-	border-radius: 15px;
-	box-shadow: 0 4px 10px rgba(0, 0, 0, .08);
-	width: 100%;
-	max-width: 550px;
-	overflow: hidden;
-}
+    :root {
+        --color-bg:            #F7F3EC;
+        --color-surface:       #FFFFFF;
+        --color-surface-soft:  #FFFDF8;
+        --color-ink:           #17140F;
+        --color-ink-soft:      #726A5F;
+        --color-border:        #ECE4D6;
 
-.card-header {
-	background: #0f172a; /* 深藍色調，呼叫你原本標題的色彩 */
-	color: white;
-	padding: 20px;
-}
+        --color-yellow:       #FFE59A;
+        --color-yellow-deep:  #FFC94D;
+        --color-pink:         #FFB5C1;
+        --color-green:        #B7E1D1;
+        --color-blue:         #A9D3FF;
+        --color-red:          #FF5271;
 
-.card-header h2 {
-	margin: 0;
-	font-size: 20px;
-}
+        --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+        --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
 
-.card-body {
-	padding: 30px;
-}
+        --radius-lg: 26px;
+        --radius-md: 16px;
+        --radius-full: 999px;
 
-.alert-error {
-	padding: 14px 18px;
-	border-radius: 8px;
-	margin-bottom: 20px;
-	font-weight: bold;
-	background: #fee2e2;
-	color: #991b1b;
-	border: 1px solid #fecaca;
-	font-size: 14px;
-}
+        --shadow-sm: 0 3px 10px rgba(23, 20, 15, 0.06);
+        --shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+        --nav-height: 76px;
+    }
 
-.info-box {
-	background: #e2e8f0;
-	padding: 12px 16px;
-	border-radius: 8px;
-	margin-bottom: 25px;
-	color: #334155;
-	font-size: 15px;
-}
+    * { box-sizing: border-box; }
 
-.form-group {
-	margin-bottom: 20px;
-}
+    body {
+        margin: 0;
+        font-family: var(--font-body);
+        background: var(--color-bg);
+        color: var(--color-ink);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: calc(var(--nav-height)) 20px 40px;
+    }
 
-.form-label {
-	display: block;
-	font-weight: bold;
-	color: #1e293b;
-	margin-bottom: 8px;
-	font-size: 15px;
-}
+    h2, h3, h4 { font-family: var(--font-display); margin: 0; }
 
-.form-select, 
-.form-control {
-	width: 100%;
-	box-sizing: border-box;
-	border: 1px solid #cbd5e1;
-	border-radius: 8px;
-	padding: 12px;
-	font-size: 15px;
-	font-family: inherit;
-	background-color: #fff;
-	color: #0f172a;
-	transition: border-color 0.2s;
-}
+    /* 核心大卡片主體 */
+    .card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        width: 100%;
+        max-width: 550px;
+        overflow: hidden;
+    }
 
-.form-select:focus, 
-.form-control:focus {
-	outline: none;
-	border-color: #6366f1; /* 聚焦時轉為質感紫色 */
-}
+    /* 卡片頭部標題區 */
+    .card-header {
+        padding: 36px 36px 0 36px;
+        background: transparent;
+    }
 
-.form-control {
-	resize: vertical;
-}
+    .card-header h2 {
+        font-size: 24px;
+        font-weight: 800;
+        color: var(--color-ink);
+        position: relative;
+        padding-left: 16px;
+    }
+    
+    /* 經典小圓點點綴 */
+    .card-header h2::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 50%;
+        transform: translateY(-50%);
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        background: var(--color-yellow-deep);
+    }
 
-.btn-submit {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 100%;
-	min-height: 48px;
-	box-sizing: border-box;
-	border: 0;
-	border-radius: 8px;
-	padding: 10px 14px;
-	color: white;
-	font-weight: bold;
-	cursor: pointer;
-	text-align: center;
-	font-size: 16px;
-	background: #7c3aed; /* 採用與你原本 .btn-rating 一致的紫色 */
-	transition: background 0.2s;
-}
+    .card-body {
+        padding: 28px 36px 36px 36px;
+    }
 
-.btn-submit:hover {
-	background: #6d28d9;
-}
+    /* 錯誤提示橫幅 */
+    .alert-error {
+        background: var(--color-pink);
+        color: var(--color-ink);
+        border-radius: var(--radius-md);
+        padding: 14px 20px;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow-sm);
+        border: none;
+    }
+
+    /* 訂單資料沉浸面板 */
+    .info-box {
+        background: var(--color-surface-soft);
+        border: 1px solid var(--color-border);
+        padding: 14px 18px;
+        border-radius: var(--radius-md);
+        margin-bottom: 24px;
+        color: var(--color-ink);
+        font-size: 14.5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .info-box strong {
+        font-weight: 800;
+    }
+    
+    .info-box span {
+        font-weight: 600;
+        color: var(--color-ink-soft);
+    }
+
+    /* 表單欄位群組 */
+    .form-group {
+        margin-bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-label {
+        font-size: 14px;
+        font-weight: 800;
+        color: var(--color-ink);
+        padding-left: 2px;
+    }
+
+    /* 輸入文字域控組 */
+    .form-control {
+        width: 100%;
+        font-family: var(--font-body);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--color-ink);
+        background: var(--color-surface-soft);
+        border: 1.5px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: 14px;
+        outline: none;
+        transition: all 0.15s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--color-yellow-deep);
+        background: var(--color-surface);
+    }
+
+    /* 💡 核心優化：尺寸完全固定、內文超出可捲動、不顯示捲軸條 */
+    textarea.form-control {
+        resize: none;
+        overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    textarea.form-control::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* ==========================================================
+       🌟 核心打造：Google Maps 質感互動星等樣式
+       ========================================================== */
+    .google-star-rating {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 0;
+        user-select: none;
+    }
+    
+    .google-star-node {
+        font-size: 34px; /* 寬大舒適的點擊範圍 */
+        color: var(--color-border); /* 預設灰沙色 */
+        cursor: pointer;
+        transition: transform 0.1s ease, color 0.1s ease;
+    }
+    
+    .google-star-node:hover {
+        transform: scale(1.15);
+    }
+    
+    .google-star-node.filled {
+        color: var(--color-yellow-deep); /* 亮黃色填充 */
+    }
+
+    /* 提交按鈕：經典 Webond 沉穩黑大膠囊 */
+    .btn-submit {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 48px;
+        border: none;
+        border-radius: var(--radius-full);
+        padding: 12px 24px;
+        color: #ffffff;
+        font-weight: 800;
+        cursor: pointer;
+        font-size: 15px;
+        background: var(--color-ink);
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.15s ease;
+        font-family: var(--font-body);
+        margin-top: 10px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+        background: var(--color-yellow-deep);
+        color: var(--color-ink);
+    }
+    
+    .btn-submit:active {
+        transform: translateY(0) scale(0.98);
+    }
 </style>
 </head>
 <body>
@@ -134,7 +252,7 @@ body {
 
 			<!-- 訂單資訊顯示 -->
 			<div class="info-box">
-				<strong>活動訂單編號：</strong> 
+				<strong>活動訂單編號</strong> 
 				<span th:text="${orderData.activityOrderId}"></span>
 			</div>
 
@@ -142,16 +260,22 @@ body {
 			<form th:action="@{/review/submit}" method="post">
 				<input type="hidden" name="orderId" th:value="${orderData.activityOrderId}" />
 
-				<!-- 評分選單 -->
+				<!-- 🌟 升級：完美替代原先 Select 的 Google Maps 互動評分星級組 -->
 				<div class="form-group">
-					<label for="buyerRating" class="form-label">給予本次活動評分</label>
-					<select class="form-select" id="buyerRating" name="buyerRating" required>
-						<option value="5" th:selected="${prevRating == 5}">⭐⭐⭐⭐⭐ 5 分 (非常推薦)</option>
-						<option value="4" th:selected="${prevRating == 4}">⭐⭐⭐⭐ 4 分 (很滿意)</option>
-						<option value="3" th:selected="${prevRating == 3 or prevRating == null}">⭐⭐⭐ 3 分 (普通)</option>
-						<option value="2" th:selected="${prevRating == 2}">⭐⭐ 2 分 (不滿意)</option>
-						<option value="1" th:selected="${prevRating == 1}">⭐ 1 分 (非常差)</option>
-					</select>
+					<label class="form-label">給予本次活動評分</label>
+					
+					<!-- 隱藏輸入框：維持原有的 id 與 name，完美綁定原有後端與 th:value 舊資料回填邏輯 -->
+					<input type="hidden" id="buyerRating" name="buyerRating" class="js-real-rating-input" 
+					       th:value="${prevRating != null ? prevRating : 3}" />
+					
+					<!-- 星等外殼 -->
+					<div class="google-star-rating">
+						<span class="google-star-node" data-score="1">★</span>
+						<span class="google-star-node" data-score="2">★</span>
+						<span class="google-star-node" data-score="3">★</span>
+						<span class="google-star-node" data-score="4">★</span>
+						<span class="google-star-node" data-score="5">★</span>
+					</div>
 				</div>
 
 				<!-- 內文輸入 -->
@@ -167,6 +291,56 @@ body {
 			</form>
 		</div>
 	</div>
+
+<!-- ==========================================================
+     核心 JavaScript：完美接管 Google Map 星級交互反饋
+     ========================================================== */ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ratingContainer = document.querySelector('.google-star-rating');
+        if (!ratingContainer) return;
+
+        const stars = ratingContainer.querySelectorAll('.google-star-node');
+        const hiddenInput = document.getElementById('buyerRating');
+
+        // 輔助函式：點亮到指定的星等
+        function lightUpStars(score) {
+            stars.forEach(star => {
+                const starScore = parseInt(star.getAttribute('data-score'), 10);
+                if (starScore <= score) {
+                    star.classList.add('filled');
+                } else {
+                    star.classList.remove('filled');
+                }
+            });
+        }
+
+        // 🚀 初始化：載入時立刻讀取 input 的值（完美融合歷史選擇或初次預設 3 分）
+        const initialScore = parseInt(hiddenInput.value, 10) || 3;
+        lightUpStars(initialScore);
+
+        stars.forEach(star => {
+            // 1. 滑鼠移入：暫時亮到懸浮的星等
+            star.addEventListener('mouseenter', function() {
+                const currentHoverScore = parseInt(this.getAttribute('data-score'), 10);
+                lightUpStars(currentHoverScore);
+            });
+
+            // 2. 滑鼠移出：還原回當前真正鎖定的分數
+            star.addEventListener('mouseleave', function() {
+                const currentSelectedScore = parseInt(hiddenInput.value, 10) || 0;
+                lightUpStars(currentSelectedScore);
+            });
+
+            // 3. 點擊星星：鎖定數值並寫入表單 input
+            star.addEventListener('click', function() {
+                const selectedScore = this.getAttribute('data-score');
+                hiddenInput.value = selectedScore;
+                lightUpStars(parseInt(selectedScore, 10));
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

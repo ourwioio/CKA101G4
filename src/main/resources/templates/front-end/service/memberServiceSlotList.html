@@ -10,23 +10,653 @@
 	服務時段管理｜Webond</title>
 
 <!-- Google Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
+<!-- <link rel="preconnect" href="https://fonts.googleapis.com"> -->
+<!-- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
 <link
-	href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
+	href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap"
 	rel="stylesheet">
 
 <!-- Service 前台共用 CSS -->
-<link rel="stylesheet" th:href="@{/css/front-end/service/common.css}">
+<!-- <link rel="stylesheet" th:href="@{/css/front-end/service/common.css}"> -->
 
 <!-- 前台共用 Navbar CSS -->
 <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
 
 <!-- 時段管理專屬 CSS -->
-<link rel="stylesheet"
-	th:href="@{/css/front-end/service/memberServiceSlotList.css}">
+<!-- <link rel="stylesheet" th:href="@{/css/front-end/service/memberServiceSlotList.css}"> -->
+
+<style>
+	/* ==========================================================
+	   Webond 服務時段管理頁 — 溫潤奶油與特調角色風美學融合
+	   ========================================================== */
+	:root {
+	    --color-bg:            #F7F3EC;
+	    --color-surface:       #FFFFFF;
+	    --color-surface-soft:  #FFFDF8;
+	    --color-ink:           #17140F;
+	    --color-ink-soft:      #726A5F;
+	    --color-border:        #ECE4D6;
+	
+	    --color-yellow:       #FFE59A;
+	    --color-yellow-deep:  #FFC94D;
+	    --color-pink:         #FFB5C1;
+	    --color-green:         #B7E1D1;
+	    --color-blue:         #A9D3FF;
+	    --color-red:          #FF5271;
+	
+	    --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+	    --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+	
+	    --radius-lg: 26px;
+	    --radius-md: 16px;
+	    --radius-sm: 12px;
+	    --radius-full: 999px;
+	
+	    --shadow-sm: 0 4px 12px rgba(23, 20, 15, 0.05);
+	    --shadow-md: 0 16px 36px rgba(23, 20, 15, 0.09);
+	    --nav-height: 76px;
+		--radius-lg-dropdown: 24px;
+	}
+	
+	* { box-sizing: border-box; }
+	
+	body {
+	    margin: 0;
+	    font-family: var(--font-body);
+	    background: var(--color-bg);
+	    color: var(--color-ink);
+	    line-height: 1.65;
+	    -webkit-font-smoothing: antialiased;
+	}
+	
+	h1, h2, h3, h4 { 
+		font-family: var(--font-display); 
+		margin: 0; 
+		letter-spacing: -0.01em;
+	}
+	
+	/* 核心佈局保護框架 (同步 1140px 黃金總寬度) */
+	.site-main {
+	    max-width: 1140px;
+	    margin: 0 auto;
+	    padding: calc(var(--nav-height) + 40px) 20px 80px;
+	}
+	
+	/* ==========================================================
+	   頁面標題區
+	   ========================================================== */
+	.member-slot-heading {
+	    display: flex;
+	    justify-content: space-between;
+	    align-items: flex-end;
+	    flex-wrap: wrap;
+	    gap: 24px;
+	    margin-bottom: 32px;
+	}
+	.member-slot-eyebrow {
+	    font-family: var(--font-display);
+	    font-size: 12px;
+	    font-weight: 800;
+	    letter-spacing: 1.5px;
+	    color: var(--color-ink-soft);
+	    margin: 0 0 6px 0;
+	}
+	.page-title {
+	    font-size: 28px;
+	    font-weight: 800;
+	    color: var(--color-ink);
+	    margin: 0 0 8px 0;
+	    line-height: 1.2;
+	    display: inline-flex;
+	    align-items: center;
+	}		
+	.page-title::before {
+	    content: "";
+	    width: 8px;
+	    height: 8px;
+	    background-color: var(--color-yellow-deep);
+	    border-radius: 50%;
+	    margin-right: 10px;
+	    flex-shrink: 0;
+	}
+	.member-slot-description {
+	    font-size: 14.5px;
+	    color: var(--color-ink-soft);
+	    font-weight: 500;
+	    margin: 0;
+	}
+	.member-slot-heading-actions {
+	    display: flex;
+	    gap: 12px;
+	}
+	
+	/* ==========================================================
+	   通用膠囊按鈕系統
+	   ========================================================== */
+	.btn {
+	    display: inline-flex;
+	    align-items: center;
+	    justify-content: center;
+	    font-family: var(--font-body);
+	    font-weight: 800;
+	    font-size: 13.5px;
+	    padding: 10px 20px;
+	    border-radius: var(--radius-full);
+	    border: none;
+	    cursor: pointer;
+	    text-decoration: none;
+	    transition: transform .18s ease, box-shadow .18s ease, background .15s ease, border-color .15s ease;
+	}
+	/* 主按鈕：經典黑膠囊 */
+	.member-slot-submit {
+	    background: var(--color-ink);
+	    color: #ffffff;
+	    box-shadow: var(--shadow-sm);
+	    width: 100%;
+	    margin-top: 8px;
+	}
+	.member-slot-submit:hover {
+	    transform: translateY(-2px);
+	    box-shadow: var(--shadow-md);
+	    background: var(--color-yellow-deep);
+	    color: var(--color-ink);
+	}
+	/* 次按鈕：精緻淺色圓框 */
+	.btn-secondary {
+	    background: var(--color-surface);
+	    color: var(--color-ink);
+	    border: 1.5px solid var(--color-border);
+	    box-shadow: var(--shadow-sm);
+	}
+	.btn-secondary:hover {
+	    transform: translateY(-2px);
+	    border-color: var(--color-ink);
+	    background: var(--color-surface-soft);
+	    box-shadow: var(--shadow-md);
+	}
+	/* 危險型按鈕：溫潤粉紅底色 */
+	.btn-danger {
+		background: var(--color-pink);
+		color: var(--color-ink);
+		border: 1.5px solid var(--color-border);
+	}
+	.btn-danger:hover {
+		transform: translateY(-2px);
+		background: var(--color-red);
+		color: #ffffff;
+		border-color: var(--color-red);
+		box-shadow: var(--shadow-md);
+	}
+	.btn:active { transform: translateY(0) scale(0.98); }
+	
+	/* 訊息提示橫幅 */
+	.alert {
+	    padding: 14px 20px;
+	    border-radius: var(--radius-md);
+	    font-size: 14px;
+	    font-weight: 700;
+	    margin-bottom: 24px;
+	    box-shadow: var(--shadow-sm);
+	}
+	.alert-success { background: var(--color-green); color: var(--color-ink); }
+	.alert-error { background: var(--color-pink); color: var(--color-ink); }
+	
+	/* ==========================================================
+	   頂部服務資訊摘要卡面板
+	   ========================================================== */
+	.panel.member-slot-service-panel {
+		background: var(--color-surface);
+		border: 1.5px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		padding: 24px;
+		display: flex;
+		align-items: center;
+		gap: 24px;
+		margin-bottom: 32px;
+		box-shadow: var(--shadow-sm);
+	}
+	.member-slot-service-image {
+		width: 110px;
+		height: 110px;
+		object-fit: cover;
+		border-radius: var(--radius-md);
+		border: 1px solid var(--color-border);
+		background: var(--color-surface-soft);
+	}
+	.member-slot-service-info {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+	.member-slot-service-type {
+		align-self: flex-start;
+		font-size: 11px;
+		font-weight: 800;
+		background: var(--color-blue);
+		color: var(--color-ink);
+		padding: 3px 12px;
+		border-radius: var(--radius-full);
+		margin-bottom: 2px;
+	}
+	.member-slot-service-name {
+		font-size: 22px;
+		font-weight: 800;
+		color: var(--color-ink);
+	}
+	.member-slot-service-location {
+		font-size: 13.5px;
+		color: var(--color-ink-soft);
+		font-weight: 500;
+		margin: 0;
+	}
+	.member-slot-service-price {
+		font-size: 13px;
+		font-weight: 800;
+		color: var(--color-ink-soft);
+		margin: 4px 0 0 0;
+	}
+	.member-slot-service-price strong {
+		font-family: var(--font-display);
+		font-size: 20px;
+		color: var(--color-ink);
+	}
+	
+	/* 服務狀態大膠囊徽章 */
+	.status-badge {
+		font-size: 13px;
+		font-weight: 800;
+		padding: 6px 16px;
+		border-radius: var(--radius-full);
+		border: 1.5px solid var(--color-border);
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.status-badge::before {
+		content: "";
+		width: 6px;
+		height: 6px;
+		border-radius: 50%;
+		display: inline-block;
+	}
+	.status-active { background: var(--color-green); color: var(--color-ink); }
+	.status-active::before { background-color: #2B6A4F; }
+	.status-inactive { background: var(--color-yellow); color: var(--color-ink); }
+	.status-inactive::before { background-color: var(--color-yellow-deep); }
+	.status-disabled { background: var(--color-surface-soft); color: var(--color-ink-soft); }
+	.status-disabled::before { background-color: var(--color-ink-soft); }
+	
+	/* ==========================================================
+	   左右雙欄主版面架構 (左側新增 + 右側列表)
+	   ========================================================== */
+	.member-slot-layout {
+		display: grid;
+		grid-template-columns: 340px 1fr;
+		gap: 32px;
+		align-items: start;
+	}
+	
+	/* ==========================================================
+	   左側：新增時段奶油大口袋面板
+	   ========================================================== */
+	.panel.member-slot-form-panel {
+		background: var(--color-surface);
+		border: 1.5px solid var(--color-border);
+		border-radius: var(--radius-lg);
+		padding: 28px;
+		box-shadow: var(--shadow-sm);
+	}
+	.member-slot-panel-title {
+		font-size: 18px;
+		font-weight: 800;
+		color: var(--color-ink);
+		margin-bottom: 6px;
+	}
+	.member-slot-panel-description {
+		font-size: 13px;
+		color: var(--color-ink-soft);
+		font-weight: 500;
+		margin: 0 0 20px 0;
+	}
+	.member-slot-form-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+	.member-slot-input-row {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 12px;
+	}
+	
+	/* Cozy 元件型輸入表單框 */
+	.form-group { display: flex; flex-direction: column; gap: 6px; }
+	.form-label { font-size: 13.5px; font-weight: 800; color: var(--color-ink); padding-left: 4px; }
+	
+	/* ==========================================================
+	   🌟 記憶整合進化：100% 同步活動列表頁的自訂選單機制美學
+	   ========================================================== */
+	/* 1. 日期與時間元件特調 */
+	/* 讓 input 本身設定為相對定位，作為覆蓋層的基準 */
+	input[type="date"].form-control,
+	input[type="time"].form-control {
+	    position: relative; 
+	    width: 100%;
+	    font-family: var(--font-display);
+	    font-size: 14px;
+	    font-weight: 600;
+	    color: var(--color-ink);
+	    background: var(--color-surface-soft);
+	    border: 1.5px solid var(--color-border);
+	    border-radius: var(--radius-md);
+	    padding: 12px 14px;
+	    outline: none;
+	    transition: border-color .15s ease, background .15s ease;
+	    cursor: pointer;
+	}
+	
+	/* 移除原本的指標樣式，改為全區覆蓋 */
+	input[type="date"].form-control::-webkit-calendar-picker-indicator,
+	input[type="time"].form-control::-webkit-calendar-picker-indicator {
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    margin: 0;
+	    padding: 0;
+	    cursor: pointer;
+	    opacity: 0; /* 關鍵：隱藏 icon，但讓它的點擊範圍擴展至整個 input */
+	}
+	
+	/* 聚焦時的樣式維持 */
+	input[type="date"].form-control:focus,
+	input[type="time"].form-control:focus {
+	    border-color: var(--color-yellow-deep);
+	    background: var(--color-surface);
+	}
+	
+	/* 2. 模擬自訂下拉選單系統組件樣式 (活動頁精神複製) */
+	.custom-select-wrapper { position: relative; width: 100%; }
+	.custom-select-trigger {
+		width: 100%;
+		font-family: var(--font-body);
+		font-size: 14px;
+		font-weight: 600;
+		color: var(--color-ink);
+		background: var(--color-surface-soft);
+		border: 1.5px solid var(--color-border);
+		border-radius: var(--radius-md);
+		padding: 12px 14px;
+		padding-right: 38px;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		transition: border-color .15s ease, background .15s ease;
+		position: relative;
+		user-select: none;
+	}
+	.custom-select-trigger:hover { border-color: var(--color-ink-soft); }
+	.custom-select-trigger.active { border-color: var(--color-yellow-deep); background: var(--color-surface); }
+	.custom-select-trigger .trigger-arrow {
+		position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+		width: 15px; height: 15px;
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2317140F' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+		background-size: contain; background-repeat: no-repeat;
+		transition: transform .22s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+	}
+	.custom-select-trigger.active .trigger-arrow { transform: translateY(-50%) rotate(180deg); }
+	
+	.custom-dropdown-menu {
+		display: none; position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+		background: var(--color-surface); border: 1px solid var(--color-border);
+		border-radius: var(--radius-lg-dropdown); box-shadow: var(--shadow-md); padding: 8px; z-index: 100;
+		max-height: 250px; overflow-y: auto; scrollbar-width: none;
+	}
+	.custom-dropdown-menu::-webkit-scrollbar { display: none; }
+	.custom-dropdown-menu.show { display: block; }
+	.custom-option {
+		padding: 10px 14px; border-radius: var(--radius-md); font-size: 13.5px; font-weight: 700;
+		color: var(--color-ink-soft); cursor: pointer; transition: background .15s ease, color .15s ease; user-select: none;
+		text-align: left;
+	}
+	.custom-option:hover { background: var(--color-surface-soft); color: var(--color-ink); }
+	.custom-option.selected { background: var(--color-yellow); color: var(--color-ink); }
+	
+	.form-help { margin: 0; font-size: 11.5px; color: var(--color-ink-soft); font-weight: 500; line-height: 1.4; }
+	
+	/* 底部警語備註小紙條 */
+	.member-slot-form-notice {
+		margin: 16px 0 0 0;
+		font-size: 12px;
+		color: var(--color-ink-soft);
+		background: var(--color-surface-soft);
+		border: 1px solid var(--color-border);
+		padding: 12px;
+		border-radius: var(--radius-sm);
+		line-height: 1.5;
+		font-weight: 500;
+	}
+	
+	/* ==========================================================
+	   右側：時段列表控制面板
+	   ========================================================== */
+	.member-slot-list-panel {
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+	.member-slot-list-heading {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-end;
+		border-bottom: 2px dashed var(--color-border);
+		padding-bottom: 14px;
+	}
+	.member-slot-list-heading h2 { font-size: 20px; font-weight: 800; color: var(--color-ink); }
+	.member-slot-list-heading p { margin: 4px 0 0 0; font-size: 13.5px; color: var(--color-ink-soft); font-weight: 500; }
+	.member-slot-count { font-size: 13px; font-weight: 800; color: var(--color-ink-soft); background: var(--color-surface); padding: 4px 14px; border-radius: var(--radius-full); border: 1.5px solid var(--color-border); }
+	
+	/* 大膠囊藥丸型 Tabs 篩選列 */
+	.member-slot-filter {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		align-items: center;
+	}
+	.member-slot-filter-button {
+		border: 1.5px solid var(--color-border);
+		background: var(--color-surface);
+		color: var(--color-ink);
+		font-family: var(--font-body);
+		font-weight: 800;
+		font-size: 13.5px;
+		padding: 8px 18px;
+		border-radius: var(--radius-full);
+		cursor: pointer;
+		transition: all .15s ease;
+	}
+	.member-slot-filter-button:hover { transform: translateY(-2px); border-color: var(--color-ink); }
+	.member-slot-filter-button.active { background: var(--color-ink); color: #fff; border-color: var(--color-ink); }
+	
+	/* 特殊清空按鈕：右側獨立突顯 */
+	#openClearAvailableModal {
+		margin-left: auto;
+		background: rgba(255, 82, 113, 0.08);
+		color: var(--color-red);
+		border-color: rgba(255, 82, 113, 0.2);
+	}
+	#openClearAvailableModal:hover {
+		background: var(--color-red);
+		color: #ffffff;
+		border-color: var(--color-red);
+	}
+	
+	/* 空狀態呈現 */
+	.member-slot-empty {
+		text-align: center;
+		padding: 50px 20px;
+		background: var(--color-surface-soft);
+		border: 1.5px dashed var(--color-border);
+		border-radius: var(--radius-lg);
+	}
+	.member-slot-empty-icon { font-size: 36px; color: var(--color-yellow-deep); margin-bottom: 12px; }
+	.member-slot-empty h3 { font-size: 18px; font-weight: 800; color: var(--color-ink); margin-bottom: 6px; }
+	.member-slot-empty p { font-size: 13.5px; color: var(--color-ink-soft); margin: 0; font-weight: 500; }
+	
+	/* ==========================================================
+	   時段卡片口袋流線美學與馬卡龍色系對應
+	   ========================================================== */
+	.member-slot-list {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+	.member-slot-card {
+		background: var(--color-surface);
+		border: 1.5px solid var(--color-border);
+		border-radius: var(--radius-md); /* 16px 標誌性中圓角 */
+		padding: 18px 24px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 20px;
+		box-shadow: var(--shadow-sm);
+		transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+	}
+/* 	.member-slot-card:hover { */
+/* 		transform: translateX(4px); /* 獨特優雅的向右微飄 */ */
+/* 		box-shadow: var(--shadow-md); */
+/* 	} */
+	.member-slot-card-main {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+		flex: 1;
+	}
+	.member-slot-card-top {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+	
+	/* 各項精緻數據文字字級 */
+	.member-slot-date { font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--color-ink); }
+	.member-slot-time { font-family: var(--font-display); font-size: 15px; font-weight: 600; color: var(--color-ink); background: var(--color-surface-soft); padding: 2px 10px;}
+	.member-slot-id { font-size: 12px; font-weight: 700; color: var(--color-ink-soft); opacity: 0.7; }
+	
+	/* 小膠囊狀態指示標籤 */
+	.member-slot-status {
+		font-size: 11.5px;
+		font-weight: 800;
+		padding: 2px 12px;
+		border-radius: var(--radius-full);
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+	}
+	.member-slot-status::before {
+		content: "";
+		width: 5px;
+		height: 5px;
+		border-radius: 50%;
+		display: inline-block;
+	}
+	
+	/* 狀態色調客製化配對 */
+	/* 可預約 */
+	.member-slot-status--available { background: var(--color-green); color: var(--color-ink); }
+	.member-slot-status--available::before { background-color: #2B6A4F; }
+	
+	/* 暫時鎖定 */
+	.member-slot-status--locked { background: var(--color-yellow); color: var(--color-ink); }
+	.member-slot-status--locked::before { background-color: var(--color-yellow-deep); }
+	
+	/* 已預約 */
+	.member-slot-status--booked { background: var(--color-blue); color: var(--color-ink); }
+	.member-slot-status--booked::before { background-color: #4A90E2; }
+	
+	/* 已過期 */
+	.member-slot-status--expired { background: var(--color-border); color: var(--color-ink-soft); }
+	.member-slot-status--expired::before { background-color: var(--color-ink-soft); }
+	
+	/* 卡片第二行 Meta 細節 */
+	.member-slot-card-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+		font-size: 12.5px;
+		font-weight: 600;
+		color: var(--color-ink-soft);
+	}
+	.member-slot-meta-item { display:inline-flex; align-items: center; }
+	.member-slot-lock-expire { color: var(--color-red); font-weight: 700; background: rgba(255, 82, 113, 0.06); padding: 1px 8px; border-radius: 4px; }
+	
+	/* 右側動態刪除按鈕控制 */
+	.member-slot-card-actions { flex-shrink: 0; }
+	.member-slot-delete-button.btn {
+		font-size: 12.5px;
+		padding: 8px 18px;
+		font-weight: 800;
+		background: transparent;
+		border: 1.5px solid var(--color-border);
+		color: var(--color-ink-soft);
+	}
+	.member-slot-delete-button.btn:not([disabled]):hover {
+		background: var(--color-pink);
+		color: var(--color-ink);
+		border-color: var(--color-pink);
+		transform: scale(1.03);
+	}
+	.member-slot-delete-button.btn[disabled] {
+		opacity: 0.4;
+		cursor: not-allowed;
+		background: #F1ECE6;
+		color: #A49B8F;
+	}
+	
+	/* ==========================================================
+	   Modal 安全防禦型彈窗控制系統
+	   ========================================================== */
+	body.member-slot-modal-open { overflow: hidden; }
+	.member-slot-modal[hidden] { display: none !important; }
+	
+	.member-slot-modal {
+	    position: fixed; inset: 0; z-index: 9999;
+	    display: grid; place-items: center; padding: 20px;
+	    background: rgba(23, 20, 15, 0.45); backdrop-filter: blur(4px);
+	}
+	.member-slot-modal-content {
+	    position: relative; width: min(460px, 100%);
+	    padding: 36px 32px; border: 1.5px solid var(--color-border);
+	    border-radius: var(--radius-lg); background: var(--color-surface);
+	    box-shadow: var(--shadow-md); text-align: center;
+	}
+	.member-slot-modal-title { font-size: 22px; font-weight: 800; color: var(--color-ink); margin-bottom: 12px; }
+	.member-slot-modal-text { font-size: 14.5px; color: var(--color-ink-soft); font-weight: 500; margin: 0 0 24px 0; line-height: 1.6; }
+	.member-slot-modal-time { display: block; font-weight: 800; color: var(--color-red); background: rgba(255, 82, 113, 0.06); padding: 6px 12px; border-radius: 8px; margin-top: 8px; }
+	.member-slot-modal-actions { display: grid; grid-template-columns: 1fr 1.3fr; gap: 12px; }
+	.member-slot-modal-actions .btn { width: 100%; }
+	
+	/* ==========================================================
+	   RWD 響應式斷點優化
+	   ========================================================== */
+	@media (max-width: 992px) {
+		.member-slot-layout { grid-template-columns: 1fr; }
+		.panel.member-slot-form-panel { position: static; width: 100%; }
+		#openClearAvailableModal { margin-left: 0; width: 100%; text-align: center; }
+	}
+	@media (max-width: 650px) {
+		.panel.member-slot-service-panel { flex-direction: column; text-align: center; padding: 20px; gap: 16px; }
+		.member-slot-service-info { align-items: center; }
+		.member-slot-card { flex-direction: column; align-items: stretch; padding: 16px; gap: 14px; }
+		.member-slot-card-actions { text-align: right; border-top: 1px dashed var(--color-border); padding-top: 12px; }
+		.member-slot-delete-button.btn { width: 100%; text-align: center; }
+	}
+</style>
 </head>
 
 <body>
@@ -48,8 +678,6 @@
 
 			<div class="member-slot-heading-main">
 
-				<p class="member-slot-eyebrow">服務管理中心</p>
-
 				<h1 class="page-title">時段管理</h1>
 
 				<p class="member-slot-description">新增可預約時段、查看目前狀態，並管理尚未被預約的時段。</p>
@@ -59,11 +687,7 @@
 			<div class="member-slot-heading-actions">
 
 				<a class="btn btn-secondary" th:href="@{/member/services}"> ←
-					回我的服務 </a> <a class="btn btn-secondary"
-					th:href="@{/front/services/{serviceId}(
-                            serviceId=${serviceId}
-                        )}">
-					查看公開頁面 </a>
+					回我的服務 </a> 
 
 			</div>
 
@@ -148,9 +772,7 @@
 					可建立一整段時段，或自動切分成多筆可預約時段。</p>
 
 				<form id="addSlotForm"
-					th:action="@{/member/services/{serviceId}/slots(
-                               serviceId=${serviceId}
-                           )}"
+					th:action="@{/member/services/{serviceId}/slots(serviceId=${serviceId})}"
 					method="post" th:attr="data-max-booking-days=14">
 
 					<input type="hidden" th:if="${_csrf != null}"
@@ -161,9 +783,8 @@
 						<!-- 日期 -->
 						<div class="form-group">
 
-							<label class="form-label" for="slotDate"> 服務日期 </label> <input
-								class="form-control" id="slotDate" name="slotDate" type="date"
-								required>
+							<label class="form-label" for="slotDate"> 服務日期 </label> 
+							<input class="form-control" id="slotDate" name="slotDate" type="date" required>
 
 							<p class="form-help">最遠可新增今天起 14 天內的時段。</p>
 
@@ -174,8 +795,8 @@
 
 							<div class="form-group">
 
-								<label class="form-label" for="startTime"> 開始時間 </label> <input
-									class="form-control" id="startTime" name="startTime"
+								<label class="form-label" for="startTime"> 開始時間 </label> 
+								<input class="form-control" id="startTime" name="startTime"
 									type="time" step="60" required>
 
 								<p class="form-help">第一個時間可選擇任意分鐘。</p>
@@ -197,14 +818,20 @@
 						<!-- 結束日 -->
 						<div class="form-group">
 
-							<label class="form-label" for="endDayOffset"> 結束日期 </label> <select
-								class="form-control" id="endDayOffset" name="endDayOffset">
-
-								<option value="0">同一天</option>
-
-								<option value="1">隔天</option>
-
-							</select>
+							<label class="form-label" for="endDayOffset"> 結束日期 </label>
+							
+							<!-- 升級為精緻自訂選單結構，數據與原 id/name 完美交接至隱藏輸入框 -->
+							<div class="custom-select-wrapper">
+								<input type="hidden" id="endDayOffset" name="endDayOffset" value="0">
+								<div class="custom-select-trigger">
+									<span class="trigger-text">同一天</span>
+									<span class="trigger-arrow"></span>
+								</div>
+								<div class="custom-dropdown-menu">
+									<div class="custom-option" data-value="0">同一天</div>
+									<div class="custom-option" data-value="1">隔天</div>
+								</div>
+							</div>
 
 							<p class="form-help">跨午夜的服務請選擇「隔天」。</p>
 
@@ -213,21 +840,23 @@
 						<!-- 切分方式 -->
 						<div class="form-group">
 
-							<label class="form-label" for="splitMinutes"> 時段切分方式 </label> <select
-								class="form-control" id="splitMinutes" name="splitMinutes"
-								required>
-
-								<option value="0">不切分，整段建立一筆</option>
-
-								<option value="30">每 30 分鐘一筆</option>
-
-								<option value="60">每 1 小時一筆</option>
-
-								<option value="120">每 2 小時一筆</option>
-
-								<option value="180">每 3 小時一筆</option>
-
-							</select>
+							<label class="form-label" for="splitMinutes"> 時段切分方式 </label>
+							
+							<!-- 升級為精緻自訂選單結構，數據與原 id/name 完美交接至隱藏輸入框 -->
+							<div class="custom-select-wrapper">
+								<input type="hidden" id="splitMinutes" name="splitMinutes" value="0">
+								<div class="custom-select-trigger">
+									<span class="trigger-text">不切分，整段建立一筆</span>
+									<span class="trigger-arrow"></span>
+								</div>
+								<div class="custom-dropdown-menu">
+									<div class="custom-option" data-value="0">不切分，整段建立一筆</div>
+									<div class="custom-option" data-value="30">每 30 分鐘一筆</div>
+									<div class="custom-option" data-value="60">每 1 小時一筆</div>
+									<div class="custom-option" data-value="120">每 2 小時一筆</div>
+									<div class="custom-option" data-value="180">每 3 小時一筆</div>
+								</div>
+							</div>
 
 						</div>
 
@@ -450,7 +1079,7 @@
 			<p class="member-slot-modal-text">
 
 				即將刪除： <span class="member-slot-modal-time" id="deleteSlotTime">
-					服務時段 </span> 。已有訂單紀錄時，系統會改為封存。
+					服務時段 </span> <br>已有訂單紀錄時，系統會改為封存。
 			</p>
 
 			<form id="deleteSlotForm" method="post">
@@ -484,7 +1113,7 @@
 			<h2 class="member-slot-modal-title" id="clearAvailableModalTitle">
 				清空全部可預約時段？</h2>
 
-			<p class="member-slot-modal-text">系統會刪除目前服務底下所有「可預約」時段。
+			<p class="member-slot-modal-text">系統會刪除目前服務底下所有「可預約」時段。<br>
 				暫時鎖定與已預約時段不會受到影響。</p>
 
 			<form
@@ -520,6 +1149,76 @@
 
 	<!-- 共用通知 AJAX 輪巡 -->
 	<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+
+	<!-- ==========================================================
+	     核心 JavaScript：模擬下拉式選單交互與數據同步 (與活動列表頁完全同步)
+	     ========================================================== -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const selectWrappers = document.querySelectorAll('.custom-select-wrapper');
+			
+			selectWrappers.forEach(wrapper => {
+				const trigger = wrapper.querySelector('.custom-select-trigger');
+				const menu = wrapper.querySelector('.custom-dropdown-menu');
+				const hiddenInput = wrapper.querySelector('input[type="hidden"]');
+				const options = wrapper.querySelectorAll('.custom-option');
+				const triggerText = trigger.querySelector('.trigger-text');
+				
+				const defaultValue = hiddenInput.value;
+				let hasActiveSelection = false;
+
+				options.forEach(option => {
+					if (option.getAttribute('data-value') === defaultValue) {
+						option.classList.add('selected');
+						triggerText.textContent = option.textContent;
+						hasActiveSelection = true;
+					} else {
+						option.classList.remove('selected');
+					}
+				});
+
+				if (!hasActiveSelection && options.length > 0) {
+					options[0].classList.add('selected');
+					triggerText.textContent = options[0].textContent;
+				}
+				
+				trigger.addEventListener('click', function(e) {
+					e.stopPropagation();
+					document.querySelectorAll('.custom-dropdown-menu').forEach(otherMenu => {
+						if (otherMenu !== menu) otherMenu.classList.remove('show');
+					});
+					document.querySelectorAll('.custom-select-trigger').forEach(otherTrigger => {
+						if (otherTrigger !== trigger) otherTrigger.classList.remove('active');
+					});
+					menu.classList.toggle('show');
+					trigger.classList.toggle('active');
+				});
+				
+				options.forEach(option => {
+					option.addEventListener('click', function(e) {
+						e.stopPropagation();
+						const selectedValue = this.getAttribute('data-value');
+						const selectedText = this.textContent;
+						hiddenInput.value = selectedValue;
+						triggerText.textContent = selectedText;
+						options.forEach(opt => opt.classList.remove('selected'));
+						this.classList.add('selected');
+						menu.classList.remove('show');
+						trigger.classList.remove('active');
+						
+						// 觸發原生 input 事件以利其他程式監聽
+						hiddenInput.dispatchEvent(new Event('input', { bubbles: true }));
+						hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+					});
+				});
+			});
+			
+			document.addEventListener('click', function() {
+				document.querySelectorAll('.custom-dropdown-menu').forEach(menu => menu.classList.remove('show'));
+				document.querySelectorAll('.custom-select-trigger').forEach(trigger => trigger.classList.remove('active'));
+			});
+		});
+	</script>
 
 </body>
 </html>

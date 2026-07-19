@@ -4,33 +4,566 @@
 
 <head>
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的服務｜Webond</title>
 
     <!-- Google Fonts -->
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-          rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <!-- Service 前台共用 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/service/common.css}">
-
-<!-- 前台共用 Navbar CSS -->
-<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-
+    <link rel="stylesheet" th:href="@{/css/front-end/service/common.css}">
+	<!-- 前台共用 Navbar CSS -->
+	<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
     <!-- 我的服務列表專屬 CSS -->
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/service/memberServiceList.css}">
+    <!-- <link rel="stylesheet" th:href="@{/css/front-end/service/memberServiceList.css}"> -->
+
+    <style>
+		/* ==========================================================
+		   Webond 我的服務頁 — 圓潤奶油與角色風核心美學
+		   ========================================================== */
+		:root {
+		    --color-bg:            #F7F3EC;
+		    --color-surface:       #FFFFFF;
+		    --color-surface-soft:  #FFFDF8;
+		    --color-ink:           #17140F;
+		    --color-ink-soft:      #726A5F;
+		    --color-border:        #ECE4D6;
+		
+		    --color-yellow:       #FFE59A;
+		    --color-yellow-deep:  #FFC94D;
+		    --color-pink:         #FFB5C1;
+		    --color-green:         #B7E1D1;
+		    --color-blue:         #A9D3FF;
+		    --color-red:          #FF5271;
+		
+		    --font-display: 'M PLUS Rounded 1c', 'Noto Sans TC', sans-serif;
+		    --font-body:    'Noto Sans TC', 'M PLUS Rounded 1c', sans-serif;
+		
+		    --radius-lg: 26px;
+		    --radius-md: 16px;
+		    --radius-sm: 12px;
+		    --radius-full: 999px;
+		
+		    --shadow-sm: 0 4px 12px rgba(23, 20, 15, 0.05);
+		    --shadow-md: 0 16px 36px rgba(23, 20, 15, 0.09);
+		    --nav-height: 76px;
+		}
+		
+		* { box-sizing: border-box; }
+		
+		body {
+		    margin: 0;
+		    font-family: var(--font-body);
+		    background: var(--color-bg);
+		    color: var(--color-ink);
+		    line-height: 1.65;
+		    -webkit-font-smoothing: antialiased;
+		}
+		
+		h1, h2, h3, h4 { 
+			font-family: var(--font-display); 
+			margin: 0; 
+			letter-spacing: -0.01em;
+		}
+		
+		/* 核心佈局總寬度防禦 (1140px 黃金標準) */
+		.site-main {
+		    max-width: 1140px;
+		    margin: 0 auto;
+		    padding: calc(var(--nav-height) + 48px) 24px 80px;
+		}
+		
+		/* ==========================================================
+		   頁面標題主結構
+		   ========================================================== */
+		.member-service-heading {
+		    display: flex;
+		    justify-content: space-between;
+		    align-items: flex-end;
+		    flex-wrap: wrap;
+		    gap: 24px;
+		    margin-bottom: 28px;
+		}
+		.member-service-eyebrow {
+		    font-family: var(--font-display);
+		    font-size: 12px;
+		    font-weight: 800;
+		    letter-spacing: 1.5px;
+		    color: var(--color-ink-soft);
+		    margin: 0 0 6px 0;
+		}
+		.page-title {
+		    font-size: 28px;
+		    font-weight: 800;
+		    color: var(--color-ink);
+		    margin: 0 0 8px 0;
+		    line-height: 1.2;
+		    display: inline-flex;
+		    align-items: center;
+		}		
+		.page-title::before {
+		    content: "";
+		    width: 8px;
+		    height: 8px;
+		    background-color: var(--color-yellow-deep);
+		    border-radius: 50%;
+		    margin-right: 10px;
+		    flex-shrink: 0;
+		}
+		.member-service-description {
+		    font-size: 14.5px;
+		    color: var(--color-ink-soft);
+		    font-weight: 500;
+		    margin: 0;
+		}
+		.member-service-heading-actions {
+		    display: flex;
+		    gap: 12px;
+		}
+		
+		/* ==========================================================
+		   通用膠囊按鈕系統 (Webond 大大滿足的厚實交互)
+		   ========================================================== */
+		.btn {
+		    display: inline-flex;
+		    align-items: center;
+		    justify-content: center;
+		    font-family: var(--font-body);
+		    font-weight: 800;
+		    font-size: 13.5px;
+		    padding: 10px 20	px;
+		    border-radius: var(--radius-full);
+		    border: none;
+		    cursor: pointer;
+		    text-decoration: none;
+		    transition: transform .18s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow .18s ease, background .15s ease, border-color .15s ease;
+		}
+		/* 主功能：經典黑膠囊 */
+		.member-service-add-button, .member-service-form-submit {
+		    background: var(--color-ink);
+		    color: #ffffff;
+		    box-shadow: var(--shadow-sm);
+		}
+		.member-service-add-button:hover, .member-service-form-submit:hover {
+		    transform: translateY(-2px);
+		    box-shadow: var(--shadow-md);
+		    background: var(--color-yellow-deep);
+		    color: var(--color-ink);
+		}
+		/* 次功能：淺色暖米框 */
+		.btn-secondary {
+		    background: var(--color-surface);
+		    color: var(--color-ink);
+		    border: 1.5px solid var(--color-border);
+		    box-shadow: var(--shadow-sm);
+		}
+		.btn-secondary:hover {
+		    transform: translateY(-2px);
+		    border-color: var(--color-ink);
+		    background: var(--color-surface-soft);
+		    box-shadow: var(--shadow-md);
+		}
+		.btn:active { transform: translateY(0) scale(0.97); }
+		
+		/* ==========================================================
+		   功能導覽巡航列 (升級大膠囊整合包裝)
+		   ========================================================== */
+		.member-service-nav {
+			background: var(--color-surface);
+			border: 1.5px solid var(--color-border);
+			padding: 8px 12px;
+			border-radius: var(--radius-full);
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			margin-bottom: 32px;
+			box-shadow: var(--shadow-sm);
+			flex-wrap: wrap;
+		}
+		.member-service-nav-link {
+			font-size: 13.5px;
+			font-weight: 800;
+			color: var(--color-ink-soft);
+			text-decoration: none;
+			padding: 8px 18px;
+			border-radius: var(--radius-full);
+			transition: all 0.18s ease;
+		}
+		.member-service-nav-link:hover {
+			background: var(--color-surface-soft);
+			color: var(--color-ink);
+			box-shadow: inset 0 2px 4px rgba(23, 20, 15, 0.02);
+		}
+		/* 會員狀態獨立右移精緻化 */
+		.member-service-login-status {
+			margin-left: auto;
+			font-size: 12.5px;
+			font-weight: 700;
+			color: var(--color-ink-soft);
+			background: var(--color-bg);
+			padding: 6px 16px;
+			border-radius: var(--radius-full);
+			border: 1px dashed var(--color-border);
+			display: inline-flex;
+			align-items: center;
+		}
+		.member-service-login-status strong {
+			font-family: var(--font-display);
+			color: var(--color-red);
+			font-size: 14px;
+			margin-left: 4px;
+		}
+		
+		/* 提示訊息橫幅 */
+		.alert {
+		    padding: 14px 20px;
+		    border-radius: var(--radius-md);
+		    font-size: 14px;
+		    font-weight: 700;
+		    margin-bottom: 28px;
+		    box-shadow: var(--shadow-sm);
+		}
+		.alert-success { background: var(--color-green); color: var(--color-ink); }
+		.alert-error { background: var(--color-pink); color: var(--color-ink); }
+		
+		/* ==========================================================
+		   統計看板摘要區
+		   ========================================================== */
+		.member-service-summary {
+		    display: grid;
+		    grid-template-columns: repeat(4, 1fr);
+		    gap: 16px;
+		    margin-bottom: 36px;
+		}
+		.member-service-summary-card {
+		    background: var(--color-surface);
+		    border: 1.5px solid var(--color-border);
+		    border-radius: var(--radius-md);
+		    padding: 20px 16px;
+		    text-align: center;
+		    box-shadow: var(--shadow-sm);
+		    transition: transform 0.2s ease, box-shadow 0.2s ease;
+		}
+		.member-service-summary-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+		.member-service-summary-label { font-size: 13px; font-weight: 800; color: var(--color-ink-soft); margin: 0 0 6px 0; }
+		.member-service-summary-value { font-family: var(--font-display); font-size: 26px; font-weight: 800; color: var(--color-ink); margin: 0; }
+		
+		/* 看板專屬馬卡龍背景對應 */
+		.member-service-summary-card--active { background: var(--color-green); }
+		.member-service-summary-card--inactive { background: var(--color-yellow); }
+		.member-service-summary-card--disabled { background: var(--color-pink); }
+		
+		/* ==========================================================
+		   完全沒有資料的療癒空狀態
+		   ========================================================== */
+		.member-service-empty {
+		    text-align: center;
+		    padding: 60px 24px;
+		    background: var(--color-surface-soft);
+		    border: 1.5px dashed var(--color-border);
+		    border-radius: var(--radius-lg);
+		    margin: 40px 0;
+		}
+		.member-service-empty-icon { font-size: 42px; color: var(--color-yellow-deep); margin-bottom: 14px; font-weight: 800; }
+		.member-service-empty h2 { font-size: 20px; font-weight: 800; color: var(--color-ink); margin-bottom: 8px; }
+		.member-service-empty p { font-size: 14px; color: var(--color-ink-soft); font-weight: 500; margin-bottom: 24px; }
+		
+		/* ==========================================================
+		   服務列表控制抬頭
+		   ========================================================== */
+		.member-service-result-heading {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-end;
+			border-bottom: 2px dashed var(--color-border);
+			padding-bottom: 16px;
+			margin-bottom: 24px;
+		}
+		.member-service-result-heading h2 { font-size: 20px; font-weight: 800; color: var(--color-ink); }
+		.member-service-result-heading p { margin: 4px 0 0 0; font-size: 13.5px; color: var(--color-ink-soft); font-weight: 500; }
+		.member-service-count { font-size: 12.5px; font-weight: 800; color: var(--color-ink-soft); background: var(--color-surface); padding: 4px 14px; border-radius: var(--radius-full); border: 1.5px solid var(--color-border); }
+		
+		/* ==========================================================
+		   🌟 絕美發揮：服務卡片三欄瀑布網格與馬卡龍邊框美學
+		   ========================================================== */
+		.member-service-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+			gap: 24px;
+		}
+		.member-service-card {
+			background: var(--color-surface);
+			border: 1.5px solid var(--color-border);
+			border-radius: var(--radius-lg); /* 26px 大圓角 */
+			overflow: hidden;
+			box-shadow: var(--shadow-sm);
+			display: flex;
+			flex-direction: column;
+			transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.15), box-shadow 0.2s ease;
+		}
+		.member-service-card:hover {
+			transform: translateY(-5px);
+			box-shadow: var(--shadow-md);
+		}
+		
+		/* 圖片裁剪縮放區 */
+		.member-service-image-wrap {
+			position: relative;
+			display: block;
+			width: 100%;
+			height: 190px;
+			overflow: hidden;
+			background: var(--color-surface-soft);
+			border-bottom: 1px solid var(--color-border);
+		}
+		.member-service-image {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			transition: transform 0.4s ease;
+		}
+		.member-service-card:hover .member-service-image {
+			transform: scale(1.04);
+		}
+		
+		/* 圖片內嵌精緻小 Badge 系統 */
+		.member-service-type-badge {
+			position: absolute;
+			top: 14px;
+			left: 14px;
+			z-index: 2;
+			font-size: 11px;
+			font-weight: 800;
+			background: var(--color-blue);
+			color: var(--color-ink);
+			padding: 4px 12px;
+			border-radius: var(--radius-full);
+			box-shadow: var(--shadow-sm);
+		}
+		.member-service-status {
+			position: absolute;
+			top: 14px;
+			right: 14px;
+			z-index: 2;
+			font-size: 11px;
+			font-weight: 800;
+			padding: 4px 12px;
+			border-radius: var(--radius-full);
+			box-shadow: var(--shadow-sm);
+		}
+		.member-service-status--active { background: var(--color-green); color: var(--color-ink); }
+		.member-service-status--inactive { background: var(--color-yellow); color: var(--color-ink); }
+		.member-service-status--deleted { background: var(--color-border); color: var(--color-ink-soft); }
+		.member-service-status--disabled { background: var(--color-pink); color: var(--color-ink); }
+		
+		/* 卡片內文排版口袋 */
+		.member-service-card-body {
+			padding: 24px;
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+		}
+		.member-service-card-title-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			gap: 12px;
+			margin-bottom: 6px;
+		}
+		.member-service-card-title {
+			font-size: 19px;
+			font-weight: 800;
+			color: var(--color-ink);
+			line-height: 1.35;
+		}
+		.member-service-card-id {
+			font-size: 12px;
+			font-weight: 700;
+			color: var(--color-ink-soft);
+			opacity: 0.6;
+			margin-top: 3px;
+		}
+		
+		/* 地點與集合標示 */
+		.member-service-location {
+			font-size: 13px;
+			font-weight: 800;
+			color: var(--color-ink);
+			margin: 0 0 4px 0;
+			display: flex;
+			align-items: center;
+			gap: 6px;
+		}
+		.member-service-location-dot {
+			width: 6px;
+			height: 6px;
+			background-color: var(--color-yellow-deep);
+			border-radius: 50%;
+			display: inline-block;
+		}
+		.member-service-place {
+			font-size: 12.5px;
+			color: var(--color-ink-soft);
+			font-weight: 600;
+			margin: 0 0 12px 0;
+			padding-left: 12px;
+		}
+		
+		/* 服務描述多行文本裁切紙條 */
+		.member-service-description-text {
+			font-size: 13.5px;
+			color: var(--color-ink-soft);
+			font-weight: 500;
+			line-height: 1.55;
+			margin: 0 0 18px 0;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+			background: var(--color-surface-soft);
+			padding: 8px 12px;
+			border-radius: var(--radius-sm);
+			border: 1px solid var(--color-border);
+		}
+		
+		/* 內凹式數據雙格看盤 */
+		.member-service-info-grid {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 10px;
+			margin-bottom: 18px;
+			margin-top: auto; /* 確保不管字數多少，數據列與按鈕都保持底部對齊 */
+		}
+		.member-service-info-item {
+			background: var(--color-surface-soft);
+			border: 1px solid var(--color-border);
+			padding: 10px 12px;
+			border-radius: var(--radius-sm);
+		}
+		.member-service-info-label { font-size: 11.5px; font-weight: 600; color: var(--color-ink-soft); margin: 0 0 2px 0; }
+		.member-service-info-value { font-size: 13px; font-weight: 700; color: var(--color-ink); margin: 0; }
+		.member-service-price { font-family: var(--font-display); font-size: 16px; font-weight: 800; color: var(--color-ink); }
+		
+		/* 平台停用警示泡泡 */
+		.member-service-disabled-message {
+			margin: 0 0 16px 0;
+			font-size: 12.5px;
+			font-weight: 700;
+			color: #A84D42;
+			background: #FFF4F1;
+			border: 1px solid #F0C3B9;
+			padding: 10px 12px;
+			border-radius: var(--radius-sm);
+			line-height: 1.5;
+		}
+		
+		/* ==========================================================
+		   卡片底部多按鈕控制面板区 (100% 膠囊小顆化)
+		   ========================================================== */
+		.member-service-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 6px;
+			border-top: 1px dashed var(--color-border);
+			padding-top: 14px;
+		}
+		.member-service-actions .btn, 
+		.member-service-actions button.member-service-action-button {
+			font-size: 12px;
+			padding: 7px 12px;
+			font-weight: 800;
+			border-radius: var(--radius-full);
+			flex: 1 1 calc(33.33% - 6px); /* 採納黃金比例：三列自適應排版 */
+			min-width: 75px;
+			text-align: center;
+			background: var(--color-surface);
+			border: 1.2px solid var(--color-border);
+			color: var(--color-ink);
+			box-shadow: none;
+		}
+		/* 查看詳情小膠囊 */
+		.member-service-actions .member-service-detail-button {
+			background: var(--color-surface-soft);
+		}
+		/* 修改與時段核心功能 */
+		.member-service-actions .member-service-edit-button,
+		.member-service-actions .member-service-slot-button {
+			background: var(--color-ink);
+			color: #ffffff;
+			border-color: var(--color-ink);
+		}
+		.member-service-actions .member-service-edit-button:hover,
+		.member-service-actions .member-service-slot-button:hover {
+			background: var(--color-yellow-deep);
+			color: var(--color-ink);
+			border-color: var(--color-yellow-deep);
+		}
+		/* 刪除特殊危險按鈕 */
+		.member-service-actions .member-service-delete-button {
+			background: rgba(255, 82, 113, 0.05);
+			color: var(--color-red);
+			border-color: rgba(255, 82, 113, 0.15);
+		}
+		.member-service-actions .member-service-delete-button:hover {
+			background: var(--color-red);
+			color: #ffffff;
+			border-color: var(--color-red);
+		}
+		/* Form 獨立包裹排版防擠壓 */
+		.member-service-action-form {
+			display: inline-flex;
+			flex: 1 1 calc(33.33% - 6px);
+			min-width: 75px;
+		}
+		.member-service-action-form button {
+			width: 100%;
+		}
+		.member-service-actions .btn:hover {
+			transform: translateY(-1px);
+			border-color: var(--color-ink);
+		}
+		
+		/* ==========================================================
+		   安全防禦型彈窗控制
+		   ========================================================== */
+		body.member-service-modal-open { overflow: hidden; }
+		.member-service-modal[hidden] { display: none !important; }
+		
+		.member-service-modal {
+		    position: fixed; inset: 0; z-index: 9999;
+		    display: grid; place-items: center; padding: 20px;
+		    background: rgba(23, 20, 15, 0.45); backdrop-filter: blur(4px);
+		}
+		.member-service-modal-content {
+		    position: relative; width: min(450px, 100%);
+		    padding: 36px 32px; border: 1.5px solid var(--color-border);
+		    border-radius: var(--radius-lg); background: var(--color-surface);
+		    box-shadow: var(--shadow-md); text-align: center;
+		}
+		.member-service-modal-title { font-size: 22px; font-weight: 800; color: var(--color-ink); margin-bottom: 10px; }
+		.member-service-modal-text { font-size: 14.5px; color: var(--color-ink-soft); font-weight: 500; margin: 0 0 24px 0; line-height: 1.6; }
+		.member-service-modal-text strong { color: var(--color-red); background: rgba(255, 82, 113, 0.06); padding: 2px 8px; border-radius: 4px; }
+		.member-service-modal-actions { display: grid; grid-template-columns: 1fr 1.3fr; gap: 12px; }
+		
+		/* ==========================================================
+		   RWD 響應式佈局調節
+		   ========================================================== */
+		@media (max-width: 900px) {
+			.member-service-summary { grid-template-columns: repeat(2, 1fr); }
+		}
+		@media (max-width: 768px) {
+			.member-service-heading { flex-direction: column; align-items: stretch; gap: 16px; }
+			.member-service-heading-actions .btn { flex: 1; }
+			.member-service-nav { border-radius: var(--radius-md); padding: 12px; }
+			.member-service-login-status { margin-left: 0; width: 100%; justify-content: center; margin-top: 6px; }
+		}
+		@media (max-width: 480px) {
+			.member-service-summary { grid-template-columns: 1fr; }
+			.member-service-actions .btn, .member-service-action-form { flex: 1 1 calc(50% - 6px); }
+		}
+    </style>
 </head>
 
 <body>
@@ -53,9 +586,9 @@
 
         <div class="member-service-heading-main">
 
-            <p class="member-service-eyebrow">
-                服務管理中心
-            </p>
+<!--             <p class="member-service-eyebrow"> -->
+<!--                 服務管理中心 -->
+<!--             </p> -->
 
             <h1 class="page-title">
                 我的服務
@@ -70,8 +603,8 @@
         <div class="member-service-heading-actions">
 
             <a class="btn btn-secondary"
-               th:href="@{/front/services}">
-                查看公開服務
+               th:href="@{/member/service-orders/seller}">
+                收到的預約
             </a>
 
             <a class="btn member-service-add-button"
@@ -86,39 +619,39 @@
     <!-- ======================================================
          功能導覽
          ====================================================== -->
-    <nav class="member-service-nav">
+<!--     <nav class="member-service-nav"> -->
 
-        <a class="member-service-nav-link"
-           th:href="@{/front/services}">
-            服務首頁
-        </a>
+<!--         <a class="member-service-nav-link" -->
+<!--            th:href="@{/front/services}"> -->
+<!--             服務首頁 -->
+<!--         </a> -->
 
-        <a class="member-service-nav-link"
-           th:href="@{/member/service-orders/seller}">
-            收到的預約
-        </a>
+<!--         <a class="member-service-nav-link" -->
+<!--            th:href="@{/member/service-orders/seller}"> -->
+<!--             收到的預約 -->
+<!--         </a> -->
 
-        <a class="member-service-nav-link"
-           th:href="@{/member/service-orders/buyer}">
-            我的預約
-        </a>
+<!--         <a class="member-service-nav-link" -->
+<!--            th:href="@{/member/service-orders/buyer}"> -->
+<!--             我的預約 -->
+<!--         </a> -->
 
-        <a class="member-service-nav-link"
-           th:href="@{/member/services/fakelogout}">
-            假登出
-        </a>
+<!--         <a class="member-service-nav-link" -->
+<!--            th:href="@{/member/services/fakelogout}"> -->
+<!--             假登出 -->
+<!--         </a> -->
 
-        <span class="member-service-login-status">
+<!--         <span class="member-service-login-status"> -->
 
-            目前會員：
+<!--             目前會員： -->
 
-            <strong th:text="${loginMemberId}">
-                1
-            </strong>
+<!--             <strong th:text="${loginMemberId}"> -->
+<!--                 1 -->
+<!--             </strong> -->
 
-        </span>
+<!--         </span> -->
 
-    </nav>
+<!--     </nav> -->
 
     <!-- ======================================================
          成功與錯誤訊息
@@ -262,23 +795,16 @@
                      服務圖片
                      ================================================== -->
                 <a class="member-service-image-wrap"
-                   th:href="@{/front/services/{serviceId}(
-                                serviceId=${service.serviceId}
-                             )}">
+                   th:href="@{/front/services/{serviceId}(serviceId=${service.serviceId})}">
 
                     <img class="member-service-image"
-                         th:src="@{/front/services/image/{serviceId}(
-                                    serviceId=${service.serviceId}
-                                 )}"
-                         th:onerror="this.onerror=null;
-                                     this.src='/images/activity/default-activity.jpg';"
+                         th:src="@{/front/services/image/{serviceId}(serviceId=${service.serviceId})}"
+                         th:onerror="this.onerror=null; this.src='/images/activity/default-activity.jpg';"
                          alt="服務圖片">
 
                     <!-- 服務類型 -->
                     <span class="member-service-type-badge"
-                          th:text="${service.serviceType != null
-                                   ? service.serviceType.typeName
-                                   : '無服務類型'}">
+                          th:text="${service.serviceType != null ? service.serviceType.typeName : '無服務類型'}">
                         服務類型
                     </span>
 
@@ -324,22 +850,20 @@
                             河堤散步陪伴
                         </h3>
 
-                        <span class="member-service-card-id"
-                              th:text="|#${service.serviceId}|">
-                            #1
-                        </span>
+<!--                         <span class="member-service-card-id" -->
+<!--                               th:text="|#${service.serviceId}|"> -->
+<!--                             #1 -->
+<!--                         </span> -->
 
                     </div>
 
                     <!-- 地區 -->
                     <p class="member-service-location"
-                       th:if="${service.serviceCity != null
-                                or service.serviceDistrict != null}">
+                       th:if="${service.serviceCity != null or service.serviceDistrict != null}">
 
                         <span class="member-service-location-dot"></span>
 
-                        <span th:text="|${service.serviceCity ?: ''}
-                                       ${service.serviceDistrict ?: ''}|">
+                        <span th:text="|${service.serviceCity ?: ''} ${service.serviceDistrict ?: ''}|">
                             桃園市 八德區
                         </span>
 
@@ -347,17 +871,16 @@
 
                     <!-- 詳細地點 -->
                     <p class="member-service-place"
-                       th:if="${service.serviceLocation != null
-                                and !#strings.isEmpty(service.serviceLocation)}"
+                       th:if="${service.serviceLocation != null and !#strings.isEmpty(service.serviceLocation)}"
                        th:text="${service.serviceLocation}">
                         八德埤塘自然生態公園附近
                     </p>
 
                     <!-- 服務描述 -->
-                    <p class="member-service-description-text"
-                       th:text="${service.description}">
-                        服務說明
-                    </p>
+<!--                     <p class="member-service-description-text" -->
+<!--                        th:text="${service.description}"> -->
+<!--                         服務說明 -->
+<!--                     </p> -->
 
                     <!-- ==================================================
                          基本資訊
@@ -390,12 +913,7 @@
                             </p>
 
                             <p class="member-service-info-value"
-                               th:text="${service.createdAt != null
-                                        ? #temporals.format(
-                                            service.createdAt,
-                                            'yyyy-MM-dd'
-                                          )
-                                        : '-'}">
+                               th:text="${service.createdAt != null ? #temporals.format(service.createdAt, 'yyyy-MM-dd') : '-'}">
                                 2026-07-13
                             </p>
 
@@ -420,20 +938,15 @@
                         <!-- 公開詳情 -->
                         <a class="btn member-service-action-button
                                   member-service-detail-button"
-                           th:href="@{/front/services/{serviceId}(
-                                        serviceId=${service.serviceId}
-                                     )}">
+                           th:href="@{/front/services/{serviceId}(serviceId=${service.serviceId})}">
                             查看詳情
                         </a>
 
                         <!-- 修改 -->
                         <a class="btn member-service-action-button
                                   member-service-edit-button"
-                           th:if="${service.status != 2
-                                   and service.status != 3}"
-                           th:href="@{/member/services/{serviceId}/edit(
-                                        serviceId=${service.serviceId}
-                                     )}">
+                           th:if="${service.status != 2 and service.status != 3}"
+                           th:href="@{/member/services/{serviceId}/edit(serviceId=${service.serviceId})}">
                             修改服務
                         </a>
 
@@ -441,18 +954,14 @@
                         <a class="btn member-service-action-button
                                   member-service-slot-button"
                            th:if="${service.status != 2}"
-                           th:href="@{/member/services/{serviceId}/slots(
-                                        serviceId=${service.serviceId}
-                                     )}">
+                           th:href="@{/member/services/{serviceId}/slots(serviceId=${service.serviceId})}">
                             管理時段
                         </a>
 
                         <!-- 下架 -->
                         <form class="member-service-action-form"
                               th:if="${service.status == 1}"
-                              th:action="@{/member/services/{serviceId}/deactivate(
-                                           serviceId=${service.serviceId}
-                                        )}"
+                              th:action="@{/member/services/{serviceId}/deactivate(serviceId=${service.serviceId})}"
                               method="post">
 
                             <input type="hidden"
@@ -473,9 +982,7 @@
                         <!-- 重新上架 -->
                         <form class="member-service-action-form"
                               th:if="${service.status == 0}"
-                              th:action="@{/member/services/{serviceId}/activate(
-                                           serviceId=${service.serviceId}
-                                        )}"
+                              th:action="@{/member/services/{serviceId}/activate(serviceId=${service.serviceId})}"
                               method="post">
 
                             <input type="hidden"
@@ -498,11 +1005,8 @@
                                        member-service-delete-button
                                        js-delete-service"
                                 type="button"
-                                th:if="${service.status != 2
-                                       and service.status != 3}"
-                                th:attr="data-delete-url=@{/member/services/{serviceId}/delete(
-                                             serviceId=${service.serviceId}
-                                         )},
+                                th:if="${service.status != 2 and service.status != 3}"
+                                th:attr="data-delete-url=@{/member/services/{serviceId}/delete(serviceId=${service.serviceId})},
                                          data-service-name=${service.serviceName}">
 
                             刪除服務
@@ -541,12 +1045,8 @@
         <p class="member-service-modal-text">
 
             你即將刪除
-
-            <strong id="deleteServiceName">
-                這項服務
-            </strong>
-
-            。沒有訂單時會直接刪除；已有訂單時會改為封存。
+            <strong id="deleteServiceName">這項服務</strong>
+            <br>沒有訂單時會直接刪除；已有訂單時會改為封存。
 
         </p>
 
