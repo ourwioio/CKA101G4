@@ -73,7 +73,7 @@ public class FrontActivityController {
 	@PostMapping("/activity/front/syncAttendees")
 	public String syncAttendeesFromOrders(HttpSession session) {
 		if (!isLoginMember(session)) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 
 		activitySvc.syncAttendeesFromOrders();
@@ -237,7 +237,7 @@ public class FrontActivityController {
 	public String frontActivityOrder(@RequestParam("activityId") Integer activityId, Model model, HttpSession session) {
 		Integer loginMemberId = getLoginMemberId(session);
 		if (loginMemberId == null) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 		addFakeLoginMember(model, session);
 
@@ -280,7 +280,7 @@ public class FrontActivityController {
 		Integer activityPrice = orderVO.getActivityPrice();
 		Integer loginMemberId = getLoginMemberId(session);
 		if (loginMemberId == null) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 		ActivityVO activityVO = activitySvc.getOneActivity(orderVO.getActivityId());
 
@@ -326,7 +326,7 @@ public class FrontActivityController {
 	@PostMapping("/activity/front/order/cancel")
 	public String cancelOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
 		if (!isLoginMember(session)) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 
 		ActivityOrderVO existingOrder = activityOrderSvc.getOneOrder(activityOrderId);
@@ -350,7 +350,7 @@ public class FrontActivityController {
 	public String requestRefund(@RequestParam("activityOrderId") Integer activityOrderId,
 			@RequestParam(value = "refundReason", required = false) String refundReason, HttpSession session) {
 		if (!isLoginMember(session)) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 
 		ActivityOrderVO orderVO = activityOrderSvc.requestRefund(activityOrderId, getLoginMemberId(session), refundReason);
@@ -366,7 +366,7 @@ public class FrontActivityController {
 	public String payOrder(@RequestParam("activityOrderId") Integer activityOrderId,
 			@RequestParam("activityPaymentMethod") Byte activityPaymentMethod, HttpSession session) {
 		if (!isLoginMember(session)) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 
 		ActivityOrderVO orderVO = activityOrderSvc.getOneOrder(activityOrderId);
@@ -400,7 +400,7 @@ public class FrontActivityController {
 	public String myOrder(Model model, HttpSession session) {
 		Integer loginMemberId = getLoginMemberId(session);
 		if (loginMemberId == null) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 
 		addFakeLoginMember(model, session);
@@ -445,11 +445,46 @@ public class FrontActivityController {
 		return statusMap;
 	}
 
+	/**
+	 * 前台活動狀態輪詢 API。供已開啟的活動頁面偵測下架、時間狀態及人數變化，
+	 * 狀態不同時由前端自動刷新，方便展示跨頁即時同步效果。
+	 */
+	@GetMapping("/activity/front/status")
+	@ResponseBody
+	public Map<Integer, Map<String, Object>> frontActivityStatus(
+			@RequestParam("activityIds") String activityIds) {
+		Map<Integer, Map<String, Object>> statusMap = new HashMap<>();
+		if (activityIds == null || activityIds.trim().isEmpty()) {
+			return statusMap;
+		}
+
+		for (String rawActivityId : activityIds.split(",")) {
+			Integer activityId = parseInteger(rawActivityId);
+			if (activityId == null) {
+				continue;
+			}
+
+			ActivityVO activityVO = activitySvc.getOneActivity(activityId);
+			if (activityVO == null) {
+				continue;
+			}
+
+			Map<String, Object> status = new HashMap<>();
+			status.put("activityStatus", activityVO.getActivityStatus());
+			status.put("attendeesCount", activityVO.getAttendeesCount());
+			status.put("registrationStatus", getRegistrationStatusText(activityVO));
+			status.put("ended", activitySvc.isActivityEnded(activityId));
+			statusMap.put(activityId, status);
+		}
+
+		return statusMap;
+	}
+
 	@GetMapping("/activity/front/addHostActivity")
 	public String addHostActivity(Model model, HttpSession session) {
 		Integer loginMemberId = getLoginMemberId(session);
 		if (loginMemberId == null) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 		ActivityVO activityVO = new ActivityVO();
 
@@ -473,7 +508,7 @@ public class FrontActivityController {
 	public String repeatHostActivity(@RequestParam("id") Integer sourceActivityId, Model model, HttpSession session) {
 		Integer loginMemberId = getLoginMemberId(session);
 		if (loginMemberId == null) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 		ActivityVO sourceVO = activitySvc.getOneActivity(sourceActivityId);
 
@@ -515,7 +550,7 @@ public class FrontActivityController {
 			@RequestParam(value = "activityImageFile", required = false) MultipartFile activityImageFile, Model model,
 			HttpSession session) throws IOException {
 		if (!isLoginMember(session)) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 
 		activityVO.setMemberId(getLoginMemberId(session));
@@ -554,7 +589,7 @@ public class FrontActivityController {
 	public String myHostActivity(Model model, HttpSession session) {
 		Integer loginMemberId = getLoginMemberId(session);
 		if (loginMemberId == null) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 		List<ActivityVO> activityList = activitySvc.getActivitiesByMemberId(loginMemberId);
 		Map<Integer, Integer> pendingReviewCountMap = new HashMap<>();
@@ -585,7 +620,7 @@ public class FrontActivityController {
 	public String cancelHostActivity(@RequestParam("activityId") Integer activityId, HttpSession session) {
 		Integer loginMemberId = getLoginMemberId(session);
 		if (loginMemberId == null) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 
 		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
@@ -607,7 +642,7 @@ public class FrontActivityController {
 	public String memberList(@RequestParam("activityId") Integer activityId, Model model, HttpSession session) {
 		Integer loginMemberId = getLoginMemberId(session);
 		if (loginMemberId == null) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 		addFakeLoginMember(model, session);
 
@@ -655,7 +690,7 @@ public class FrontActivityController {
 	@PostMapping("/activity/front/memberList/approve")
 	public String approveMemberOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
 		if (!isLoginMember(session)) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 
 		ActivityOrderVO orderVO = activityOrderSvc.getOneOrder(activityOrderId);
@@ -689,7 +724,7 @@ public class FrontActivityController {
 	@PostMapping("/activity/front/memberList/reject")
 	public String rejectMemberOrder(@RequestParam("activityOrderId") Integer activityOrderId, HttpSession session) {
 		if (!isLoginMember(session)) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 
 		ActivityOrderVO orderVO = activityOrderSvc.getOneOrder(activityOrderId);
@@ -719,7 +754,7 @@ public class FrontActivityController {
 	public String updateHostActivity(@RequestParam("id") Integer activityId, Model model, HttpSession session) {
 		Integer loginMemberId = getLoginMemberId(session);
 		if (loginMemberId == null) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 
 		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
@@ -749,7 +784,7 @@ public class FrontActivityController {
 			HttpSession session) throws IOException {
 		Integer loginMemberId = getLoginMemberId(session);
 		if (loginMemberId == null) {
-			return "redirect:/activity/front/home?loginRequired=true";
+			return "redirect:/member/login";
 		}
 
 		ActivityVO oldVO = activitySvc.getOneActivity(formVO.getActivityId());
@@ -946,6 +981,11 @@ public class FrontActivityController {
 	private String getRegistrationStatusText(ActivityVO activityVO) {
 		if (activityVO == null) {
 			return "活動不存在";
+		}
+
+		// 活動已下架時必須優先於報名時間判斷，避免誤顯示為「報名中」。
+		if (Byte.valueOf((byte) 2).equals(activityVO.getActivityStatus())) {
+			return "活動已取消";
 		}
 
 		LocalDateTime now = LocalDateTime.now();

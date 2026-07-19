@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,16 +72,6 @@ public class MemberFrontControllerAyaka {
     private BCryptPasswordEncoder passwordEncoder;
 	
 	
-	private static final Map<String, Integer> STATUS_PRIORITY = Map.of(
-	        "即將截止", 0,
-	        "報名中", 1,
-	        "尚未開放報名", 2,
-	        "報名已截止", 3,
-	        "活動已結束", 4,
-	        "活動不存在", 5
-	);
-
-
 	//會員頁面
 	@GetMapping("oneMember")
 	public String getOneMember(@RequestParam("memberId") Integer memberId,
@@ -93,30 +82,15 @@ public class MemberFrontControllerAyaka {
 	    ServiceVO serviceList = serviceService.getOneService(memberId);
 	    List<VenueVO> venueList = venueService.getActiveByMember(memberId);
 	    List<MemberReviewDTO> reviews = myReviewService.getReviewsByMemberId(memberId);
-	    addHostedActivityData(model, memberId);
+	    // 公開會員頁只顯示該會員仍可展示的舉辦活動，已下架／已取消活動不顯示。
+	    addHostedActivityData(model, memberId, true);
 	    model.addAttribute("reviews", reviews);
-
-	    List<ActivityVO> activityList = activityService.getAll();
-	    Map<Integer, String> registrationStatusMap = memberService.getRegistrationStatusMap(activityList);
-
-	    // 依優先順序排序活動清單
-	    List<ActivityVO> sortedActivityList = activityList.stream()
-	            .sorted(Comparator.comparingInt(activityVO ->
-	                    STATUS_PRIORITY.getOrDefault(
-	                            registrationStatusMap.get(activityVO.getActivityId()),
-	                            99
-	                    )
-	            ))
-	            .collect(Collectors.toList());
 	    List<ServiceVO> serviceListData = serviceService.getAll().stream()
 	            .filter(s -> s.getMemberId().equals(memberId))
 	            .filter(s -> s.getStatus() == 1)
 	            .collect(Collectors.toList());
 
 
-
-	    model.addAttribute("registrationStatusMap", registrationStatusMap);
-	    model.addAttribute("activityListData", sortedActivityList); // 給 Thymeleaf 用排序後的清單
 
 	    model.addAttribute("serviceListData", serviceListData);
 	    model.addAttribute("memberVO", memberVO);
@@ -140,7 +114,8 @@ public class MemberFrontControllerAyaka {
 	    MemberVO memberVO = memberService.getOneMember(memberId);
 	    List<VenueVO> venueList = venueService.getActiveByMember(memberId);
 	    List<MemberReviewDTO> reviews = myReviewService.getReviewsByMemberId(memberId);
-	    addHostedActivityData(model, memberId);
+	    // 個人頁面只顯示本人仍可展示的舉辦活動，已下架／已取消活動不顯示。
+	    addHostedActivityData(model, memberId, true);
 	    model.addAttribute("reviews", reviews);
 
 	    // 只保留這個會員、且上架中的服務
@@ -148,22 +123,6 @@ public class MemberFrontControllerAyaka {
 	            .filter(s -> s.getMemberId().equals(memberId))
 	            .filter(s -> s.getStatus() == 1)
 	            .collect(Collectors.toList());
-
-	    List<ActivityVO> activityList = activityService.getAll();
-	    Map<Integer, String> registrationStatusMap = memberService.getRegistrationStatusMap(activityList);
-
-	    // 依優先順序排序活動清單
-	    List<ActivityVO> activityListData = activityList.stream()
-	            .sorted(Comparator.comparingInt(activityVO ->
-	                    STATUS_PRIORITY.getOrDefault(
-	                            registrationStatusMap.get(activityVO.getActivityId()),
-	                            99
-	                    )
-	            ))
-	            .collect(Collectors.toList());
-
-	    model.addAttribute("registrationStatusMap", registrationStatusMap);
-	    model.addAttribute("activityListData", activityListData);
 
 	    model.addAttribute("memberVO", memberVO);
 	    model.addAttribute("serviceListData", serviceListData);   // 改成用正確過濾好的清單
@@ -175,8 +134,16 @@ public class MemberFrontControllerAyaka {
 	
 
 	private void addHostedActivityData(ModelMap model, Integer memberId) {
+		addHostedActivityData(model, memberId, false);
+	}
+
+	private void addHostedActivityData(ModelMap model, Integer memberId, boolean hideCancelled) {
 		LocalDateTime now = LocalDateTime.now();
-		List<ActivityVO> hostedActivities = activityService.getActivitiesByMemberId(memberId);
+		List<ActivityVO> hostedActivities = activityService.getActivitiesByMemberId(memberId).stream()
+				.filter(activity -> !hideCancelled
+						|| activity.getActivityStatus() == null
+						|| activity.getActivityStatus() != 2)
+				.collect(Collectors.toList());
 
 		Map<Integer, List<ActivityOrderVO>> activityReviewMap = new HashMap<>();
 		Map<Integer, String> activityDisplayStatusMap = new HashMap<>();
@@ -197,6 +164,7 @@ public class MemberFrontControllerAyaka {
 		model.addAttribute("activityListData", hostedActivities);
 		model.addAttribute("activityReviewMap", activityReviewMap);
 		model.addAttribute("activityDisplayStatusMap", activityDisplayStatusMap);
+		model.addAttribute("registrationStatusMap", memberService.getRegistrationStatusMap(hostedActivities));
 	}
 		
 	

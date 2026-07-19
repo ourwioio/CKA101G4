@@ -519,7 +519,13 @@ a { text-decoration: none; color: inherit; }
 
   <!-- ========== 卡片網格 (已套用全新的區塊高度固定邏輯) ========== -->
   <div class="container" th:unless="${#lists.isEmpty(activityListData)}">
-    <div class="card" th:each="activity : ${activityListData}"  th:if="${registrationStatusMap[activity.activityId]} != '活動已結束'">
+    <div class="card" th:each="activity : ${activityListData}"
+         th:if="${registrationStatusMap[activity.activityId] != '活動已結束'
+                 and registrationStatusMap[activity.activityId] != '活動已取消'}"
+         th:attr="data-live-activity-id=${activity.activityId},
+                  data-live-activity-status=${activity.activityStatus},
+                  data-live-attendees-count=${activity.attendeesCount},
+                  data-live-registration-status=${registrationStatusMap[activity.activityId]}">
       <a th:href="@{/activity/front/detail(id=${activity.activityId})}">
         
         <!-- 圖片容器 + 飄浮在右上角的狀態標籤 -->
@@ -670,5 +676,6 @@ a { text-decoration: none; color: inherit; }
     });
   </script>
 
+<script th:src="@{/js/front-end/activity/activityStatusPolling.js}"></script>
 </body>
 </html>

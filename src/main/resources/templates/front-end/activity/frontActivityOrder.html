@@ -226,7 +226,10 @@ textarea.form-control {
 
 <body>
 
-  <div class="container">
+  <div class="container"
+       th:attr="data-live-activity-id=${activityVO.activityId},
+                data-live-activity-status=${activityVO.activityStatus},
+                data-live-attendees-count=${activityVO.attendeesCount}">
     <div class="card">
       
       <!-- 帶有黃點定位的 Q 萌標題 -->
@@ -283,5 +286,6 @@ textarea.form-control {
   </div>
   <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
+<script th:src="@{/js/front-end/activity/activityStatusPolling.js}"></script>
 </body>
 </html>

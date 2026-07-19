@@ -476,7 +476,11 @@ tr:hover td {
             </tr>
 
             <!-- 數據資料列 (字重 450 / 顏色 ink-soft) -->
-            <tr th:each="activity : ${activityListData}">
+            <tr th:each="activity : ${activityListData}"
+                th:attr="data-live-activity-id=${activity.activityId},
+                         data-live-activity-status=${activity.activityStatus},
+                         data-live-attendees-count=${activity.attendeesCount},
+                         data-live-ended=${endedActivityMap[activity.activityId]}">
               <!-- 活動編號 (稍加粗區隔) -->
               <td style="padding-left: 24px; font-weight: 600; color: var(--color-ink);" th:text="${activity.activityId}"></td>
 
@@ -556,5 +560,6 @@ tr:hover td {
 
   <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
+<script th:src="@{/js/front-end/activity/activityStatusPolling.js}"></script>
 </body>
 </html>
