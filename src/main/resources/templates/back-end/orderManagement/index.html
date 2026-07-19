@@ -1,66 +1,164 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<title>訂單交易管理</title>
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-	rel="stylesheet">
-<style>
-.menu-card {
-	transition: box-shadow 0.15s, transform 0.15s;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>訂單交易管理 - Webond 後台管理</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-.menu-card:hover {
-	box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.1);
-	transform: translateY(-2px);
-}
-</style>
+        body {
+            margin: 0;
+            color: #2d3436;
+            background: #f5f6fa;
+            font-family: Arial, "Noto Sans TC", sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* =========================================
+           頁面主容器
+           ========================================= */
+        .dashboard-container {
+            width: 100%;
+            max-width: 1000px; /* 功能選單頁面放寬，便於多欄位排版 */
+            margin: 0 auto;
+        }
+
+        /* =========================================
+           頁面標頭
+           ========================================= */
+        .page-header {
+            margin-bottom: 28px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #dfe4e8;
+        }
+
+        .page-title {
+            margin: 0 0 8px;
+            font-size: 30px;
+            color: #2d3436;
+        }
+
+        .page-subtitle {
+            margin: 0;
+            color: #636e72;
+            font-size: 15px;
+        }
+
+        /* =========================================
+           網格選單佈局 (替代原 Bootstrap Row/Col)
+           ========================================= */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* =========================================
+           卡片式功能按鈕
+           ========================================= */
+        .menu-card {
+            background: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+        }
+
+        /* 懸停效果：沿用財務藍與微幅上浮感 */
+        .menu-card:hover {
+            border-color: #0984e3;
+            box-shadow: 0 6px 18px rgba(9, 132, 227, 0.12);
+            transform: translateY(-3px);
+        }
+
+        .card-title {
+            margin: 0 0 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2d3436;
+        }
+
+        .card-text {
+            margin: 0;
+            color: #636e72;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+    </style>
 </head>
-<body class="bg-light">
-	<div class="container py-4">
+<body>
 
-		<div class="d-flex justify-content-between align-items-center mb-4">
-			<h2>訂單交易管理</h2>
-		</div>
+<div class="wb-admin-layout">
 
-		<div class="row g-3">
-			<div class="col-md-4">
-				<a th:href="@{/refundPayout/payoutList}"
-					class="text-decoration-none">
-					<div class="card h-100 menu-card">
-						<div class="card-body">
-							<h5 class="card-title text-dark">撥款明細管理</h5>
-							<p class="card-text text-muted mb-0">三類訂單撥款狀態與處理進度。</p>
-						</div>
-					</div>
-				</a>
-			</div>
+    <!-- =========================================
+         左側共用後台 Sidebar
+         ========================================= -->
+    <div th:replace="~{back-end/fragments/adminSidebar:: adminSidebar}"></div>
 
-			<div class="col-md-4">
-				<a th:href="@{/refundPayout/refundList}"
-					class="text-decoration-none">
-					<div class="card h-100 menu-card">
-						<div class="card-body">
-							<h5 class="card-title text-dark">退款明細管理</h5>
-							<p class="card-text text-muted mb-0">三類訂單退款狀態與處理進度。</p>
-						</div>
-					</div>
-				</a>
-			</div>
+    <!-- =========================================
+         右側主要內容區
+         ========================================= -->
+    <main class="wb-admin-content">
 
-			<div class="col-md-4">
-				<a th:href="@{/transaction/revenue}" class="text-decoration-none">
-					<div class="card h-100 menu-card">
-						<div class="card-body">
-							<h5 class="card-title text-dark">營收與交易明細</h5>
-							<p class="card-text text-muted mb-0">各類訂單營收概況與交易紀錄查詢。</p>
-						</div>
-					</div>
-				</a>
-			</div>
-		</div>
+        <div class="dashboard-container">
 
-	</div>
+            <!-- =====================================
+                 頁面標頭
+                 ===================================== -->
+            <header class="page-header">
+                <h1 class="page-title">訂單交易管理</h1>
+                <p class="page-subtitle">請選擇欲管理的項目，以進行款項撥付、退款審核與營收明細查詢。</p>
+            </header>
+
+            <!-- =====================================
+                 功能卡片選單區
+                 ===================================== -->
+            <div class="menu-grid">
+                
+                <!-- 撥款明細管理 -->
+                <a th:href="@{/admin/refundPayout/payoutList}">
+                    <div class="menu-card">
+                        <h5 class="card-title">撥款明細管理</h5>
+                        <p class="card-text">三類訂單撥款狀態與處理進度。</p>
+                    </div>
+                </a>
+
+                <!-- 退款明細管理 -->
+                <a th:href="@{/admin/refundPayout/refundList}">
+                    <div class="menu-card">
+                        <h5 class="card-title">退款明細管理</h5>
+                        <p class="card-text">三類訂單退款狀態與處理進度。</p>
+                    </div>
+                </a>
+
+                <!-- 營收與交易明細 -->
+                <a th:href="@{/admin/transaction/revenue}">
+                    <div class="menu-card">
+                        <h5 class="card-title">營收與交易明細</h5>
+                        <p class="card-text">各類訂單營收概況與交易紀錄查詢。</p>
+                    </div>
+                </a>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
 </body>
 </html>

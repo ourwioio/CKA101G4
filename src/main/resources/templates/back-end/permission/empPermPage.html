@@ -3,127 +3,383 @@
 <head>
 <meta charset="UTF-8">
 <title>後台管理系統 - 員工權限管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================= 全局與現代化佈局變數 ================= */
+:root {
+	--slate-50: #f8fafc;
+	--slate-100: #f1f5f9;
+	--slate-200: #e2e8f0;
+	--slate-300: #cbd5e1;
+	--slate-500: #64748b;
+	--slate-600: #475569;
+	--slate-700: #334155;
+	--slate-800: #1e293b;
+	--sky-50: #f0f9ff;
+	--sky-600: #0284c7;
+	--sky-700: #0369a1;
+	--rose-50: #fff1f2;
+	--rose-600: #e11d48;
+	--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	background-color: var(--slate-50);
+	font-family: 'Inter', "Microsoft JhengHei", sans-serif;
+	color: var(--slate-800);
+	-webkit-font-smoothing: antialiased;
+}
+
+/* 雙欄主框架外容器 */
+.admin-container {
+	display: flex;
+	min-height: 100vh;
+	width: 100%;
+}
+
+/* 側邊欄包裹區 */
+.sidebar-wrapper {
+	width: 270px;
+	flex-shrink: 0;
+	background-color: #ffffff;
+	border-right: 1px solid var(--slate-200);
+}
+
+/* 右側主要內容版面 */
+.main-content {
+	flex-grow: 1;
+	padding: 32px;
+	box-sizing: border-box;
+	background-color: var(--slate-50);
+	overflow-x: hidden;
+}
+
+/* 白色卡片內襯底 */
+.content-card {
+	background-color: #ffffff;
+	border-radius: 12px;
+	border: 1px solid var(--slate-200);
+	box-shadow: var(--shadow-sm);
+	padding: 24px;
+	margin: 0 auto;
+	max-width: 1500px;
+}
+
+/* 頂部標題與工具列排版 */
+.page-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 24px;
+	padding-bottom: 16px;
+	border-bottom: 1px solid var(--slate-100);
+}
+
+.page-title {
+	font-size: 22px;
+	font-weight: 700;
+	color: var(--slate-800);
+	margin: 0;
+}
+
+/* 按鈕美化 */
+.btn-primary {
+	background-color: var(--sky-600);
+	color: #ffffff;
+	border: none;
+	padding: 10px 18px;
+	font-size: 14px;
+	font-weight: 600;
+	border-radius: 8px;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	transition: background-color 0.15s ease;
+}
+
+.btn-primary:hover {
+	background-color: var(--sky-700);
+}
+
+.btn-action-edit {
+	background-color: #ffffff;
+	color: var(--slate-700);
+	border: 1px solid var(--slate-300);
+	padding: 6px 12px;
+	font-size: 13px;
+	font-weight: 500;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.btn-action-edit:hover {
+	background-color: var(--slate-50);
+	border-color: var(--slate-400);
+}
+
+.btn-action-delete {
+	background-color: #ffffff;
+	color: var(--rose-600);
+	border: 1px solid var(--slate-200);
+	padding: 6px 12px;
+	font-size: 13px;
+	font-weight: 500;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.btn-action-delete:hover {
+	background-color: var(--rose-50);
+	border-color: var(--rose-600);
+}
+
+/* ================= 現代化資料表格系統 ================= */
+.table-responsive-wrapper {
+	width: 100%;
+	overflow-x: auto;
+	border: 1px solid var(--slate-200);
+	border-radius: 8px;
+	background-color: #ffffff;
+}
+
+.modern-table {
+	width: 100%;
+	border-collapse: collapse;
+	text-align: left;
+	font-size: 14px;
+}
+
+.modern-table th {
+	background-color: var(--slate-50);
+	color: var(--slate-600);
+	font-weight: 600;
+	padding: 14px 16px;
+	border-bottom: 1px solid var(--slate-200);
+	white-space: nowrap;
+}
+
+.modern-table td {
+	padding: 14px 16px;
+	border-bottom: 1px solid var(--slate-100);
+	color: var(--slate-700);
+}
+
+.modern-table tbody tr:hover {
+	background-color: rgba(241, 245, 249, 0.5);
+}
+
+/* 員工編號對應的藥丸標籤組 */
+.emp-badge-container {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.emp-badge-item {
+	display: inline-flex;
+	align-items: center;
+	background-color: var(--slate-50);
+	border: 1px solid var(--slate-200);
+	padding: 4px 8px;
+	border-radius: 6px;
+	font-size: 12px;
+	color: var(--slate-700);
+	max-width: fit-content;
+}
+
+.emp-id-highlight {
+	font-weight: 600;
+	color: var(--sky-700);
+	background-color: var(--sky-50);
+	padding: 2px 4px;
+	border-radius: 4px;
+	margin-right: 4px;
+}
+
+.empty-state-text {
+	color: var(--slate-500);
+	font-style: italic;
+	font-size: 13px;
+}
+
+/* ================= 分頁導覽控制區 ================= */
+.pagination-wrapper {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 8px;
+	margin-top: 24px;
+}
+
+.page-link-btn {
+	padding: 8px 14px;
+	border: 1px solid var(--slate-300);
+	text-decoration: none;
+	background-color: #ffffff;
+	color: var(--slate-700);
+	border-radius: 6px;
+	font-size: 13px;
+	font-weight: 500;
+	transition: all 0.15s ease;
+}
+
+.page-link-btn:hover {
+	background-color: var(--slate-50);
+	border-color: var(--slate-400);
+}
+
+.page-info-text {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--slate-600);
+	padding: 0 8px;
+}
+
+/* ================= 現代化燈箱外框優化 ================= */
+.premium-modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: #ffffff;
+	border: none !important;
+	border-radius: 12px;
+	padding: 28px;
+	z-index: 1000;
+	box-shadow: var(--shadow-lg), 0 0 0 1px rgba(0, 0, 0, 0.05);
+	width: 520px;
+	box-sizing: border-box;
+}
+</style>
 </head>
-<body
-	style="text-align: center; font-family: Arial, sans-serif; padding: 20px;">
+<body>
 
-	<table border="1" cellpadding="10" cellspacing="0"
-		style="width: 100%; max-width: 1500px; table-layout: fixed; margin: 0 auto;">
-		<tr>
-			<td style="width: 270px; padding: 0; vertical-align: top;">
+	<!-- 外層改用 CSS Flex 彈性雙欄取代傳統大 Table -->
+	<div class="admin-container">
+		
+		<!-- 左側導覽列區塊 -->
+		<div class="sidebar-wrapper">
+			<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
+		</div>
 
-                <div
-                    th:replace="~{back-end/fragments/adminSidebar
-                       :: adminSidebar}">
-                </div>
+		<!-- 右側主要工作面板 -->
+		<div class="main-content">
+			<div class="content-card">
+				
+				<!-- 頁面頂部檔頭區塊 -->
+				<div class="page-header">
+					<h2 class="page-title">員工權限管理系統</h2>
+					<button type="button" class="btn-primary" onclick="openAddModal()">
+						<span>＋</span> 新增權限
+					</button>
+				</div>
 
-            </td>
-
-
-			<td >
-				<div
-					style="display: block; width: 100%; overflow-x: auto; white-space: nowrap;">
-					<div style="text-align: center;">
-						<h2>員工權限管理</h2>
-					</div>
-
-
-					<div
-						style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; white-space: nowrap; position: sticky; left: 0; width: 100%; box-sizing: border-box; padding-right: 5px;">
-						<button type="button" onclick="openAddModal()">新增權限</button>
-					</div>
-
-					<table border="1" cellpadding="5" cellspacing="0"
-						style="width: 100%; white-space: nowrap;">
+				<!-- 資料表格響應式容器 -->
+				<div class="table-responsive-wrapper">
+					<table class="modern-table">
 						<thead>
 							<tr>
-								<th style="text-align: center;">權限編號</th>
-								<th style="text-align: center;">權限名稱</th>
-								<th style="text-align: center;">權限內容</th>
-								<th style="text-align: center;">權限更新時間</th>
-								<th style="text-align: center;">員工編號 & 授權時間</th>
-								<th style="text-align: center;">修改</th>
-								<th style="text-align: center;">刪除</th>
+								<th style="width: 90px; text-align: center;">權限編號</th>
+								<th style="width: 150px;">權限名稱</th>
+								<th>權限功能描述</th>
+								<th style="width: 160px; text-align: center;">最近更新時間</th>
+								<th style="width: 320px;">已授權員工 & 授權時間</th>
+								<th style="width: 80px; text-align: center;">修改</th>
+								<th style="width: 80px; text-align: center;">刪除</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr th:each="permVO : ${permListData}">
 								<!-- 權限編號 -->
-								<td th:text="${permVO.permId }" style="text-align: center;"></td>
+								<td th:text="${permVO.permId}" style="text-align: center; font-weight: 600;"></td>
 								<!-- 權限名稱 -->
-								<td th:text="${permVO.permName}" style="text-align: center;"></td>
-								<!-- 權限內容 -->
-								<td th:text="${permVO.permDsc}" style="text-align: center;"></td>
+								<td>
+									<strong th:text="${permVO.permName}"></strong>
+								</td>
+								<!-- 權限內容描述 -->
+								<td th:text="${permVO.permDsc}"></td>
 								<!-- 權限更新時間 -->
-								<td th:text="${permVO.permUpdatedAt ?: '未更新'}" style="text-align: center;"></td>
-								<!-- 員工編號與授權時間 -->
-								<td style="text-align: left; padding: 8px;"><span
-									th:each="empPermVO, stat : ${permVO.empPermVO}"> 員工編號：<th:block
-											th:text="${empPermVO.emps.employeeId}"></th:block> ｜ 時間：<span
-										th:text="${empPermVO.assignedAt != null ?  #dates.format(empPermVO.assignedAt, 'yyyy-MM-dd HH:mm') : '未紀錄'}"></span>
-
-										<br th:if="${!stat.last}" />
-								</span> <span th:if="${#lists.isEmpty(permVO.empPermVO)}"
-									style="color: #999; font-style: italic;"> 目前無授權員工 </span></td>
-
-								<td align="center">
-									<button type="button"
-										th:onclick="openEditModal([[${permVO.permId}]], [[${permVO.permName}]], [[${permVO.permDsc}]])">
-										修改</button>
+								<td th:text="${permVO.permUpdatedAt ?: '未更新'}" style="text-align: center; font-size: 13px; color: var(--slate-500);"></td>
+								<!-- 員工編號與授權時間 (優化為精緻的藥丸標籤堆疊) -->
+								<td>
+									<div class="emp-badge-container" th:if="${!#lists.isEmpty(permVO.empPermVO)}">
+										<div class="emp-badge-item" th:each="empPermVO : ${permVO.empPermVO}">
+											<span class="emp-id-highlight" th:text="'ID: ' + ${empPermVO.emps.employeeId}"></span>
+											<span style="color: var(--slate-500); margin: 0 4px;">|</span>
+											<span th:text="${empPermVO.assignedAt != null ? #dates.format(empPermVO.assignedAt, 'yyyy-MM-dd HH:mm') : '未紀錄'}"></span>
+										</div>
+									</div>
+									<span th:if="${#lists.isEmpty(permVO.empPermVO)}" class="empty-state-text">
+										⚠ 目前無授權員工
+									</span>
 								</td>
 
-								<td align="center">
-									<form method="post" th:action="@{/admin/employees/permDelete}"
-										style="margin: 0px;">
+								<!-- 修改按鈕 -->
+								<td style="text-align: center;">
+									<button type="button" class="btn-action-edit"
+										th:onclick="openEditModal([[${permVO.permId}]], [[${permVO.permName}]], [[${permVO.permDsc}]])">
+										修改
+									</button>
+								</td>
+
+								<!-- 刪除按鈕與表單 -->
+								<td style="text-align: center;">
+									<form method="post" th:action="@{/admin/employees/permDelete}" style="margin: 0;">
 										<input type="hidden" name="permId" th:value="${permVO.permId}">
-										<input type="submit" value="刪除" style="color: red;"
-											onclick="return confirm('確定要刪除此員工權限嗎？');">
+										<button type="submit" class="btn-action-delete" onclick="return confirm('確定要完全刪除此項員工權限嗎？');">
+											刪除
+										</button>
 									</form>
 								</td>
 							</tr>
 						</tbody>
-
 					</table>
-
-					<div
-						style="text-align: center; margin-top: 20px; font-family: Arial, sans-serif;">
-
-						<a th:if="${currentPage > 0}"
-							th:href="@{/admin/employees/empPermPage(p=${(currentPage ?: 0) - 1})}"
-							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
-							上一頁 </a> <span
-							style="margin: 0 10px; font-weight: bold; color: #555;"
-							th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?:1} + ' 頁'">
-							第 1 頁 / 共 1 頁 </span> <a
-							th:if="${(currentPage ?: 0) < (totalPages?: 1) - 1}"
-							th:href="@{/admin/employees/empPermPage(p=${currentPage + 1})}"
-							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
-							下一頁 </a>
-
-					</div>
 				</div>
-			</td>
-		</tr>
 
+				<!-- 分頁導覽控制面板 -->
+				<div class="pagination-wrapper">
+					<a th:if="${currentPage > 0}"
+						th:href="@{/admin/employees/empPermPage(p=${(currentPage ?: 0) - 1})}"
+						class="page-link-btn">
+						上一頁
+					</a> 
+					
+					<span class="page-info-text" th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?:1} + ' 頁'">
+						第 1 頁 / 共 1 頁
+					</span> 
+					
+					<a th:if="${(currentPage ?: 0) < (totalPages?: 1) - 1}"
+						th:href="@{/admin/employees/empPermPage(p=${currentPage + 1})}"
+						class="page-link-btn">
+						下一頁
+					</a>
+				</div>
+				
+			</div>
+		</div>
+	</div>
 
-	</table>
+	<!-- ================= 新增權限燈箱外框 ================= -->
+	<div id="addModal" class="premium-modal"
+	    th:style="'display: ' + (${openAddModal} ? 'block' : 'none') + ';'">
+	    <div th:insert="~{back-end/permission/addPerm :: addPermContent}"></div>
+	</div>
 
-<div id="addModal" 
-    th:style="'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid black; padding: 25px; z-index: 1000; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); width: 500px; box-sizing: border-box; white-space: nowrap; text-align: left !important; display: flow-root; display: ' + (${openAddModal} ? 'block' : 'none') + ';'">
-    <div th:insert="~{back-end/permission/addPerm :: addPermContent}"></div>
-</div>
-
-
-	<div id="editModal"
-		th:style="'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid black; padding: 25px; z-index: 1000; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); width: 500px; box-sizing: border-box; white-space: nowrap; text-align: left !important; display: flow-root; display: ' + (${openEditModal} ? 'block' : 'none') + ';'">
-
+	<!-- ================= 修改權限燈箱外框 ================= -->
+	<div id="editModal" class="premium-modal"
+		th:style="'display: ' + (${openEditModal} ? 'block' : 'none') + ';'">
 		<div th:insert="~{back-end/permission/updatePerm :: updatePermContent}"></div>
-
 	</div>
 
 <script>
-
-//新增按鈕的 (點擊按鈕打開燈箱)
+// 新增按鈕控制邏輯
 function openAddModal() {
 	var modal = document.getElementById("addModal");
 	if (modal) {
@@ -131,12 +387,10 @@ function openAddModal() {
 		if (form) {
 			form.reset();
 		}
-		// 手動打開時一樣要給它 block
 		modal.style.setProperty("display", "block", "important");
 	}
 }
 
-// 新增頁面的取消按鈕 (關閉燈箱)
 function closeAddModal() {
 	var modal = document.getElementById("addModal");
 	if (modal) {
@@ -144,7 +398,7 @@ function closeAddModal() {
 	}
 }
 
-//修改按鈕的 (點擊按鈕打開燈箱)
+// 修改按鈕控制邏輯
 function openEditModal(permId, permName, permDsc) {
 	var modal = document.getElementById("editModal");
 	if (modal) {
@@ -160,21 +414,18 @@ function openEditModal(permId, permName, permDsc) {
 		if (document.getElementById("editPermDsc"))
 			document.getElementById("editPermDsc").value = permDsc;
 		
-		
 		modal.style.setProperty("display", "block", "important");
 	}
 }
 
-// 修改頁面的取消按鈕 (關閉燈箱)
+// 修正原版 JavaScript 裡 EditModal 字母大小寫不一致的 Bug
 function closeEditModal() {
-	var modal = document.getElementById("EditModal");
+	var modal = document.getElementById("editModal");
 	if (modal) {
 		modal.style.setProperty("display", "none", "important");
 	}
 }
-
 </script>
-
 
 </body>
 </html>

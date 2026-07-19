@@ -1,113 +1,381 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<title>撥款明細管理</title>
-<link
-	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-	rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>撥款明細管理 - Webond 後台管理</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            color: #2d3436;
+            background: #f5f6fa;
+            font-family: Arial, "Noto Sans TC", sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* =========================================
+           列表頁面主容器
+           ========================================= */
+        .list-container {
+            width: 100%;
+            max-width: 1150px; /* 寬版設計，確保表格數據橫向舒展 */
+            margin: 0 auto;
+        }
+
+        /* =========================================
+           頂部功能切換列 (頁籤選單樣式)
+           ========================================= */
+        .tab-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 0 0 16px 0;
+            margin: 0 0 28px 0;
+            list-style: none;
+            border-bottom: 1px solid #dfe4e8;
+        }
+
+        .tab-link {
+            display: inline-block;
+            padding: 9px 18px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #636e72;
+            border-radius: 6px;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+
+        .tab-link:hover {
+            background: #dfe4e8;
+            color: #2d3436;
+        }
+
+        /* 作用中狀態：沿用系統核心財務藍 */
+        .tab-link.active {
+            background: #0984e3;
+            color: #ffffff;
+        }
+
+        /* =========================================
+           頁面標頭
+           ========================================= */
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            margin: 0 0 6px;
+            font-size: 26px;
+            color: #2d3436;
+        }
+
+        /* =========================================
+           條件篩選區塊卡片
+           ========================================= */
+        .filter-card {
+            background: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .filter-form {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: 16px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #636e72;
+        }
+
+        /* 表單元件樣式 (完全相容第一頁) */
+        .form-control {
+            min-width: 160px;
+            height: 40px;
+            padding: 0 12px;
+            font-size: 14px;
+            color: #2d3436;
+            background-color: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 6px;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .form-control:focus {
+            border-color: #0984e3;
+            box-shadow: 0 0 0 3px rgba(9, 132, 227, 0.15);
+        }
+
+        /* 按鈕群組 */
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-form {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            padding: 0 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.15s ease;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .btn-form--submit {
+            background: #343a40;
+            color: #ffffff;
+        }
+
+        .btn-form--submit:hover {
+            background: #111111;
+        }
+
+        .btn-form--cancel {
+            background: #ffffff;
+            color: #636e72;
+            border: 1px solid #dfe4e8;
+        }
+
+        .btn-form--cancel:hover {
+            background: #f5f6fa;
+            color: #2d3436;
+            border-color: #b2bec3;
+        }
+
+        /* =========================================
+           明細資料表格卡片
+           ========================================= */
+        .table-card {
+            background: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+            overflow: hidden; /* 防止表格直角溢出卡片圓角 */
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .custom-table th {
+            background: #f8fafc; /* 與第一頁的員工唯讀區背景色一致 */
+            color: #2d3436;
+            font-weight: bold;
+            padding: 14px 16px;
+            border-bottom: 2px solid #dfe4e8;
+        }
+
+        .custom-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #dfe4e8;
+            color: #2d3436;
+        }
+
+        /* 表格列懸停動態微亮效果 */
+        .custom-table tbody tr:hover {
+            background-color: #fdfdfd;
+        }
+
+        .custom-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-muted {
+            color: #636e72 !important;
+        }
+
+        /* =========================================
+           狀態標籤 Badge
+           ========================================= */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        /* 已撥款：清新綠 */
+        .status-badge--success {
+            color: #2e7d32;
+            background-color: #e8f5e9;
+        }
+
+        /* 未撥款：中性灰 */
+        .status-badge--secondary {
+            color: #616161;
+            background-color: #f5f5f5;
+        }
+    </style>
 </head>
-<body class="bg-light">
-	<div class="container py-4">
+<body>
 
-		<!-- 訂單交易管理切換列 -->
-		<ul class="nav nav-pills mb-4 border-bottom pb-3">
-			<li class="nav-item"><a class="nav-link"
-				th:href="@{/orderManagement/index}">訂單交易管理首頁</a></li>
-			<li class="nav-item"><a class="nav-link active"
-				th:href="@{/refundPayout/payoutList}">撥款明細管理</a></li>
-			<li class="nav-item"><a class="nav-link"
-				th:href="@{/refundPayout/refundList}">退款明細管理</a></li>
-			<li class="nav-item"><a class="nav-link"
-				th:href="@{/transaction/revenue}">營收與交易明細</a></li>
-		</ul>
+<div class="wb-admin-layout">
 
-		<div class="d-flex justify-content-between align-items-center mb-4">
-			<h2>撥款所有明細</h2>
-		</div>
+    <!-- =========================================
+         左側共用後台 Sidebar
+         ========================================= -->
+    <div th:replace="~{back-end/fragments/adminSidebar:: adminSidebar}"></div>
 
-		<!-- 篩選條件 -->
-		<form th:action="@{/refundPayout/payoutList}" method="get"
-			class="row g-3 mb-4">
+    <!-- =========================================
+         右側主要內容區
+         ========================================= -->
+    <main class="wb-admin-content">
 
-			<div class="col-auto">
-				<label class="form-label">時間區間</label> <select name="quickRange"
-					class="form-select" onchange="this.form.submit()">
-					<option value="thisMonth"
-						th:selected="${selectedRange == 'thisMonth'}">本月</option>
-					<option value="thisQuarter"
-						th:selected="${selectedRange == 'thisQuarter'}">本季</option>
-					<option value="thisYear"
-						th:selected="${selectedRange == 'thisYear'}">今年</option>
-					<option value="all" th:selected="${selectedRange == 'all'}">全部</option>
-					<option value="custom" th:selected="${selectedRange == 'custom'}">自訂區間</option>
-				</select>
-			</div>
+        <div class="list-container">
 
-			<div class="col-auto" th:if="${selectedRange == 'custom'}">
-				<label class="form-label">開始日期</label> <input type="date"
-					name="startDate" class="form-control">
-			</div>
+            <!-- =====================================
+                 頂部功能切換列 (導覽頁籤)
+                 ===================================== -->
+            <ul class="tab-nav">
+                <li>
+                    <a class="tab-link" th:href="@{/admin/orderManagement/index}">訂單交易管理首頁</a>
+                </li>
+                <li>
+                    <a class="tab-link active" th:href="@{/admin/refundPayout/payoutList}">撥款明細管理</a>
+                </li>
+                <li>
+                    <a class="tab-link" th:href="@{/admin/refundPayout/refundList}">退款明細管理</a>
+                </li>
+                <li>
+                    <a class="tab-link" th:href="@{/admin/transaction/revenue}">營收與交易明細</a>
+                </li>
+            </ul>
 
-			<div class="col-auto" th:if="${selectedRange == 'custom'}">
-				<label class="form-label">結束日期</label> <input type="date"
-					name="endDate" class="form-control">
-			</div>
+            <!-- =====================================
+                 頁面標頭
+                 ===================================== -->
+            <header class="page-header">
+                <h1 class="page-title">撥款所有明細</h1>
+            </header>
 
-			<div class="col-auto">
-				<label class="form-label">訂單類型</label> <select name="sourceType"
-					class="form-select" onchange="this.form.submit()">
-					<option value=""
-						th:selected="${selectedSourceType == null or selectedSourceType == ''}">全部</option>
-					<option value="ONE_ON_ONE"
-						th:selected="${selectedSourceType == 'ONE_ON_ONE'}">一對一服務</option>
-					<option value="GROUP"
-						th:selected="${selectedSourceType == 'GROUP'}">揪團活動</option>
-					<option value="VENUE"
-						th:selected="${selectedSourceType == 'VENUE'}">場地租借</option>
-				</select>
-			</div>
+            <!-- =====================================
+                 篩選條件區塊
+                 ===================================== -->
+            <div class="filter-card">
+                <form th:action="@{/admin/refundPayout/payoutList}" method="get" class="filter-form">
 
-			<div class="col-auto align-self-end">
-				<button type="submit" class="btn btn-primary">查詢</button>
-				<a th:href="@{/refundPayout/payoutList}"
-					class="btn btn-outline-secondary">清除條件</a>
-			</div>
-		</form>
+                    <!-- 時間區間 -->
+                    <div class="filter-group">
+                        <label class="filter-label">時間區間</label>
+                        <select name="quickRange" class="form-control" onchange="this.form.submit()">
+                            <option value="thisMonth" th:selected="${selectedRange == 'thisMonth'}">本月</option>
+                            <option value="thisQuarter" th:selected="${selectedRange == 'thisQuarter'}">本季</option>
+                            <option value="thisYear" th:selected="${selectedRange == 'thisYear'}">今年</option>
+                            <option value="all" th:selected="${selectedRange == 'all'}">全部</option>
+                            <option value="custom" th:selected="${selectedRange == 'custom'}">自訂區間</option>
+                        </select>
+                    </div>
 
-		<!-- 明細表格 -->
-		<table class="table table-bordered table-hover align-middle bg-white">
-			<thead class="table-light">
-				<tr>
-					<th>訂單類型</th>
-					<th>撥款狀態</th>
-					<th>訂單編號</th>
-					<th>會員編號</th>
-					<th>訂單金額</th>
-					<th>負責員工</th>
-					<th>處理時間</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr th:if="${#lists.isEmpty(records)}">
-					<td colspan="7" class="text-center text-muted">查無撥款明細</td>
-				</tr>
-				<tr th:each="r : ${records}">
-					<td th:text="${r.orderTypeName}"></td>
-					<td><span th:if="${r.payoutDone}" class="badge bg-success">已撥款</span>
-						<span th:unless="${r.payoutDone}" class="badge bg-secondary">未撥款</span>
-					</td>
-					<td th:text="${r.orderId}"></td>
-					<td th:text="${r.memberId}"></td>
-					<td th:text="${r.totalAmount}"></td>
-					<td
-						th:text="${r.employeeId} != null ? (${r.employeeId} + ' - ' + ${r.employeeName}) : '-'"></td>
-					<td
-						th:text="${r.handledAt} != null ? ${#temporals.format(r.handledAt, 'yyyy-MM-dd HH:mm')} : '-'"></td>
-				</tr>
-			</tbody>
-		</table>
+                    <!-- 開始日期 (自訂時間限定) -->
+                    <div class="filter-group" th:if="${selectedRange == 'custom'}">
+                        <label class="filter-label">開始日期</label>
+                        <input type="date" name="startDate" class="form-control" th:value="${param.startDate}">
+                    </div>
 
-	</div>
+                    <!-- 結束日期 (自訂時間限定) -->
+                    <div class="filter-group" th:if="${selectedRange == 'custom'}">
+                        <label class="filter-label">結束日期</label>
+                        <input type="date" name="endDate" class="form-control" th:value="${param.endDate}">
+                    </div>
+
+                    <!-- 訂單類型 -->
+                    <div class="filter-group">
+                        <label class="filter-label">訂單類型</label>
+                        <select name="sourceType" class="form-control" onchange="this.form.submit()">
+                            <option value="" th:selected="${selectedSourceType == null or selectedSourceType == ''}">全部</option>
+                            <option value="ONE_ON_ONE" th:selected="${selectedSourceType == 'ONE_ON_ONE'}">一對一服務</option>
+                            <option value="GROUP" th:selected="${selectedSourceType == 'GROUP'}">揪團活動</option>
+                            <option value="VENUE" th:selected="${selectedSourceType == 'VENUE'}">場地租借</option>
+                        </select>
+                    </div>
+
+                    <!-- 操作按鈕 -->
+                    <div class="filter-actions">
+                        <button type="submit" class="btn-form btn-form--submit">查詢</button>
+                        <a th:href="@{/admin/refundPayout/payoutList}" class="btn-form btn-form--cancel">清除條件</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- =====================================
+                 明細資料表格區塊
+                 ===================================== -->
+            <div class="table-card">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>訂單類型</th>
+                            <th>撥款狀態</th>
+                            <th>訂單編號</th>
+                            <th>會員編號</th>
+                            <th>訂單金額</th>
+                            <th>負責員工</th>
+                            <th>處理時間</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 查無資料時顯示 -->
+                        <tr th:if="${#lists.isEmpty(records)}">
+                            <td colspan="7" class="text-center text-muted">查無撥款明細</td>
+                        </tr>
+                        <!-- 資料資料迴圈印出 -->
+                        <tr th:each="r : ${records}">
+                            <td th:text="${r.orderTypeName}"></td>
+                            <td>
+                                <span th:if="${r.payoutDone}" class="status-badge status-badge--success">已撥款</span>
+                                <span th:unless="${r.payoutDone}" class="status-badge status-badge--secondary">未撥款</span>
+                            </td>
+                            <td th:text="${r.orderId}"></td>
+                            <td th:text="${r.memberId}"></td>
+                            <td th:text="${r.totalAmount}"></td>
+                            <td th:text="${r.employeeId} != null ? (${r.employeeId} + ' - ' + ${r.employeeName}) : '-'"></td>
+                            <td th:text="${r.handledAt} != null ? ${#temporals.format(r.handledAt, 'yyyy-MM-dd HH:mm')} : '-'"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
 </body>
 </html>

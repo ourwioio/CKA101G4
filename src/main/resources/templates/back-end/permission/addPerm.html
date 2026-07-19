@@ -3,48 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
 	<!-- ================= 新增員工權限燈箱 ================= -->
-	<div th:fragment="addPermContent">
+	<!-- 注意：style 寫在這個 div 裡面而不是 <head>，
+	     因為主頁面是用 th:replace/th:insert 只抓取本 fragment 的內容，
+	     <head> 裡的東西不會被帶過去，樣式若寫在 head 會完全失效 -->
+	<div th:fragment="addPermContent" class="modal-body-content">
 
-		<h3>新增員工權限資料</h3>
+		<style>
+		/* 燈箱內部專用優化樣式表 */
+		.modal-body-content {
+			font-family: 'Inter', "Microsoft JhengHei", sans-serif;
+			color: var(--slate-800, #1e293b);
+		}
+
+		.modal-title {
+			font-size: 20px;
+			font-weight: 700;
+			color: var(--slate-800, #1e293b);
+			margin-bottom: 24px;
+			padding-bottom: 12px;
+			border-bottom: 1px solid var(--slate-200, #e2e8f0);
+		}
+
+		/* 表單整齊排列組群 */
+		.form-group {
+			display: flex;
+			flex-direction: column;
+			gap: 6px;
+			margin-bottom: 18px;
+		}
+
+		.form-label {
+			font-size: 14px;
+			font-weight: 600;
+			color: var(--slate-700, #334155);
+		}
+
+		/* 現代化輸入框與文字區域 */
+		.form-control {
+			width: 100% !important;
+			padding: 10px 12px;
+			font-size: 14px;
+			color: var(--slate-800, #1e293b) !important;
+			background-color: #ffffff;
+			border: 1px solid var(--slate-300, #cbd5e1) !important;
+			border-radius: 8px;
+			box-sizing: border-box;
+			transition: all 0.2s ease;
+		}
+
+		.form-control:focus {
+			outline: none;
+			border-color: var(--sky-500, #0ea5e9);
+			box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+		}
+
+		/* 針對 textarea 文字區域的專屬高級感微調 */
+		textarea.form-control {
+			min-height: 110px !important;
+			resize: vertical;
+			font-family: inherit;
+			line-height: 1.5;
+		}
+
+		/* 錯誤訊息紅字提示 */
+		.form-error-msg {
+			color: var(--rose-600, #e11d48);
+			font-size: 13px;
+			font-weight: 600;
+			margin-top: 4px;
+			text-align: left;
+			display: block;
+		}
+
+		/* 底部按鈕區塊 */
+		.form-actions {
+			display: flex;
+			justify-content: flex-end;
+			gap: 12px;
+			margin-top: 28px;
+			padding-top: 16px;
+			border-top: 1px solid var(--slate-200, #e2e8f0);
+		}
+
+		.btn-modal-submit {
+			background: var(--sky-600, #0284c7);
+			color: #ffffff;
+			border: none;
+			padding: 10px 24px;
+			border-radius: 8px;
+			font-size: 14px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background-color 0.2s;
+		}
+
+		.btn-modal-submit:hover {
+			background: var(--sky-700, #0369a1);
+		}
+
+		.btn-modal-cancel {
+			background: #ffffff;
+			color: var(--slate-700, #334155);
+			border: 1px solid var(--slate-300, #cbd5e1);
+			padding: 10px 24px;
+			border-radius: 8px;
+			font-size: 14px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.btn-modal-cancel:hover {
+			background: var(--slate-50, #f8fafc);
+			border-color: var(--slate-400, #94a3b8);
+		}
+		</style>
+
+		<h3 class="modal-title">新增員工權限資料</h3>
+
 		<form th:action="@{/admin/employees/addPerm}" method="POST"
 			th:object="${permissionVO}">
-			<table border="0" cellpadding="5">
-				<tr>
-					<td style="white-space: nowrap;">權限名稱：</td>
-					<td><input type="text" th:field="*{permName}"
-						style="width: 100%; max-width: 250px; padding: 6px; border: 1px solid #7a7a7a !important; border-radius: 4px; box-sizing: border-box;">
 
-						<span th:if="${#fields.hasErrors('permName')}"
-						th:errors="*{permName}" class="error"
-						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;">
-					</span></td>
-				</tr>
+			<!-- 權限名稱輸入 -->
+			<div class="form-group">
+				<label for="permName" class="form-label">權限名稱</label>
+				<input type="text" th:field="*{permName}" class="form-control" placeholder="請輸入權限名稱（例如：訂單管理）">
+				<span th:if="${#fields.hasErrors('permName')}" th:errors="*{permName}" class="form-error-msg"></span>
+			</div>
 
-				<tr>
-					<td style="white-space: nowrap;">權限內容：</td>
-					<td><textarea type="text" th:field="*{permDsc}"
-							style="width: 100%; max-width: 250px; padding: 6px; border: 1px solid #7a7a7a !important; border-radius: 4px; box-sizing: border-box;">
-						</textarea> <span th:if="${#fields.hasErrors('permDsc')}"
-						th:errors="*{permDsc}" class="error"
-						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;">
-					</span></td>
-				</tr>
+			<!-- 權限內容描述輸入 -->
+			<div class="form-group">
+				<label for="permDsc" class="form-label">權限功能描述</label>
+				<textarea th:field="*{permDsc}" class="form-control" placeholder="請詳細說明此權限所涵蓋的系統後台操作範圍..."></textarea>
+				<span th:if="${#fields.hasErrors('permDsc')}" th:errors="*{permDsc}" class="form-error-msg"></span>
+			</div>
 
+			<!-- 功能按鈕控制區 -->
+			<div class="form-actions">
+				<button type="button" class="btn-modal-cancel"
+					th:onclick="|window.location.href='@{/admin/employees/empPermPage}'|"
+					onclick="closeAddModal()">
+					取消返回
+				</button>
+				<button type="submit" class="btn-modal-submit">確認儲存</button>
+			</div>
 
-
-			</table>
-			<br>
-			<button type="submit">確認儲存</button>
-			<button type="button"
-				th:onclick="|window.location.href='@{/admin/employees/empPermPage}'|"
-				onclick="closeAddModal()">取消</button>
 		</form>
 	</div>
-
 
 </body>
 </html>
