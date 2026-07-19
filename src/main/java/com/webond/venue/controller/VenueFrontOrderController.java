@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.member.model.MemberVO;
 import com.webond.member.model.NotificationVO;
@@ -329,7 +330,7 @@ public class VenueFrontOrderController {
 	@PostMapping("cancelOrder")
 	public String cancelOrder(@RequestParam("venueOrderId") Integer venueOrderId,
 	        @RequestParam("refundReason") String refundReason,
-	        HttpSession session) {
+	        HttpSession session, RedirectAttributes redirectAttributes) {
 
 	    MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
 	    if (loginMember == null) {
@@ -337,12 +338,21 @@ public class VenueFrontOrderController {
 	    }
 
 	    VenueOrderVO venueOrderVO = venueOrderService.getOneVenueOrder(venueOrderId);
-	    if (venueOrderVO != null) {
-	        venueOrderVO.setOrderStatus((byte) 4);
-	        venueOrderVO.setRefundStatus((byte) 0);
-	        venueOrderVO.setRefundReason(refundReason);
-	        venueOrderService.updateVenueOrder(venueOrderVO);
+	    if (venueOrderVO == null) {
+	        return "redirect:/front/venueOrder/myVenueOrder";
 	    }
+
+	    LocalDate cancelCutoff = LocalDate.now().plusDays(3);
+	    if (!venueOrderVO.getBookDate().isAfter(cancelCutoff)) {
+	        redirectAttributes.addFlashAttribute("errorMsg", "此訂單的預約日期為三天內，無法申請取消退款");
+	        return "redirect:/front/venueOrder/myVenueOrder";
+	    }
+
+	    venueOrderVO.setOrderStatus((byte) 4);
+	    venueOrderVO.setRefundStatus((byte) 0);
+	    venueOrderVO.setRefundReason(refundReason);
+	    venueOrderService.updateVenueOrder(venueOrderVO);
+
 	    VenueVO venueVO = venueService.getOneVenue(venueOrderVO.getVenueVO().getVenueId());
 		// 新增通知給場地主
 		NotificationVO notificationVO = new NotificationVO();

@@ -146,13 +146,16 @@ function applyFilterAndSort() {
         !type || card.dataset.venueType === type
     );
 
-    filteredCards.sort((a, b) => {
-        const dateA = a.dataset.bookDate;
-        const dateB = b.dataset.bookDate;
-        return dir === 'asc'
-            ? dateA.localeCompare(dateB)
-            : dateB.localeCompare(dateA);
-    });
+    // 使用者還沒選排序方式時，保留後端給的原始順序（訂單編號降冪），不主動排序
+    if (dir) {
+        filteredCards.sort((a, b) => {
+            const dateA = a.dataset.bookDate;
+            const dateB = b.dataset.bookDate;
+            return dir === 'asc'
+                ? dateA.localeCompare(dateB)
+                : dateB.localeCompare(dateA);
+        });
+    }
 
     // 🌟 關鍵：排序陣列只是改變參考順序，不會改變畫面顯示順序，
     // 一定要用 appendChild 把節點實際搬到新的 DOM 順序，畫面才會跟著變。

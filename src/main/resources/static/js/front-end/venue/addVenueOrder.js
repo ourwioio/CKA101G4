@@ -116,5 +116,35 @@ function restorePreviousSelection() {
 }
 
 function validateForm() {
-    return true;
+    const dateStr = document.getElementById('selectedSlotDate').value;
+    if (!dateStr) return true;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const bookDate = new Date(dateStr);
+    bookDate.setHours(0, 0, 0, 0);
+
+    const oneDay = 24 * 60 * 60 * 1000;
+    const daysUntil = Math.round((bookDate - today) / oneDay);
+
+    const msg = daysUntil <= 3
+        ? '此訂單的預約日期為三天內，無法退款。'
+        : '在預約當日三天前都可以申請退款。';
+
+    document.getElementById('refundNoticeText').textContent = msg;
+    document.getElementById('refundNoticeModalOverlay').style.display = 'flex';
+    return false;
 }
+
+function closeRefundNoticeModal() {
+    document.getElementById('refundNoticeModalOverlay').style.display = 'none';
+}
+
+function confirmRefundNotice() {
+    document.getElementById('refundNoticeModalOverlay').style.display = 'none';
+    document.getElementById('venueOrderForm').submit();
+}
+
+document.getElementById('refundNoticeModalOverlay').addEventListener('click', function (e) {
+    if (e.target === this) closeRefundNoticeModal();
+});

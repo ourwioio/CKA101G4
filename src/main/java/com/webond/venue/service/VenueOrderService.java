@@ -65,7 +65,7 @@ public class VenueOrderService {
 	}
 
 	public List<VenueOrderVO> getVenuesByMember(Integer memberId) {
-		return repository.findByMember_MemberId(memberId);
+		return repository.findByMember_MemberIdOrderByVenueOrderIdDesc(memberId);
 	}
 
 	public List<VenueOrderVO> search(VenueOrderQueryDTO params) {
