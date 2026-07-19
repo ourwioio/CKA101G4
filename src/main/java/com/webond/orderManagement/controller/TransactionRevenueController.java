@@ -18,7 +18,7 @@ import com.webond.orderManagement.dto.TransactionDetailDTO;
 import com.webond.orderManagement.service.TransactionRevenueService;
 
 @Controller
-@RequestMapping("/transaction")
+@RequestMapping("/admin/transaction")
 public class TransactionRevenueController {
 
     @Autowired private TransactionRevenueService revenueService;

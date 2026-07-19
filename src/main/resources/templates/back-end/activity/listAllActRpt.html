@@ -1,294 +1,639 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org" xmlns:sec="http://thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org" lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<title>後台管理系統 - 活動檢舉管理</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>後台管理系統 - 活動檢舉管理</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f6fa;
+            font-family: Arial, "Noto Sans TC", sans-serif;
+            color: #2d3436;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* =========================================
+           後台主佈局雙欄容器 (一體化設計)
+           ========================================= */
+        .wb-admin-layout {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* 主要內容工作區 */
+        .wb-admin-content {
+            flex: 1;
+            padding: 32px;
+            background-color: #f5f6fa;
+            overflow-x: hidden;
+        }
+
+        .list-container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 頁面大標題 */
+        .page-header {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 26px;
+            color: #2d3436;
+            font-weight: bold;
+        }
+
+        /* =========================================
+           頂部功能快捷按鈕列
+           ========================================= */
+        .action-bar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .btn-nav {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 42px;
+            padding: 0 18px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffffff;
+            transition: opacity 0.15s ease, transform 0.1s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-nav:hover {
+            opacity: 0.9;
+        }
+        
+        .btn-nav:active {
+            transform: scale(0.98);
+        }
+
+        /* 快捷鈕色彩系統統一整合 */
+        .btn-nav--blue   { background: #0984e3; }
+        .btn-nav--purple { background: #6c5ce7; }
+        .btn-nav--green  { background: #2ed573; }
+        .btn-nav--orange { background: #e17055; }
+        .btn-nav--gray   { background: #636e72; }
+
+        /* =========================================
+           狀態篩選卡片區塊
+           ========================================= */
+        .filter-card {
+            background: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .filter-label {
+            font-weight: bold;
+            color: #2d3436;
+            font-size: 14px;
+        }
+
+        .filter-tab-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        /* 篩選標籤按鈕基礎樣式 */
+        .tab-btn {
+            padding: 6px 14px;
+            font-size: 13px;
+            font-weight: bold;
+            background: #ffffff;
+            color: #636e72;
+            border: 1px solid #dfe4e8;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .tab-btn:hover {
+            background: #f8fafc;
+            color: #2d3436;
+            border-color: #b2bec3;
+        }
+
+        /* 各狀態動態激活 (Active) 樣式 */
+        .tab-btn.active-all      { background: #0984e3; color: #fff; border-color: #0984e3; }
+        .tab-btn.active-pending  { background: #fdcb6e; color: #2d3436; border-color: #fdcb6e; }
+        .tab-btn.active-invest   { background: #d63031; color: #fff; border-color: #d63031; }
+        .tab-btn.active-success  { background: #2ed573; color: #fff; border-color: #2ed573; }
+        .tab-btn.active-reject   { background: #b2bec3; color: #fff; border-color: #b2bec3; }
+        .tab-btn.active-appeal-s { background: #00cec9; color: #fff; border-color: #00cec9; }
+        .tab-btn.active-appeal-r { background: #636e72; color: #fff; border-color: #636e72; }
+
+        /* =========================================
+           明細資料表格卡片與響應式包裹
+           ========================================= */
+        .table-card {
+            background: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto; /* 超出寬度時自動提供橫向滾動條 */
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            white-space: nowrap; /* 防止多欄位文字折行擠壓 */
+        }
+
+        .custom-table th {
+            background: #f8fafc;
+            color: #2d3436;
+            font-weight: bold;
+            padding: 14px 12px;
+            border-bottom: 2px solid #dfe4e8;
+            text-align: center;
+        }
+
+        .custom-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dfe4e8;
+            color: #2d3436;
+            vertical-align: middle;
+        }
+
+        .custom-table tbody tr:hover {
+            background-color: #fdfdfd;
+        }
+
+        /* 輔助文字小樣式 */
+        .text-muted-sub {
+            font-size: 11px;
+            color: #7f8c8d;
+            margin-top: 3px;
+            display: block;
+        }
+
+        /* =========================================
+           狀態標籤 Badge 系統
+           ========================================= */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .status-badge--orange { color: #d35400; background: #fff3e0; }
+        .status-badge--green  { color: #27ae60; background: #e8f5e9; }
+        .status-badge--gray   { color: #7f8c8d; background: #f5f5f5; }
+        .status-badge--red    { color: #c0392b; background: #ffebee; }
+        .status-badge--blue   { color: #2980b9; background: #e1f5fe; }
+        .status-badge--dark   { color: #2c3e50; background: #eceff1; }
+
+        /* 操作按鈕 */
+        .btn-action {
+            background: #0984e3;
+            color: #ffffff;
+            border: none;
+            padding: 5px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .btn-action:hover { background: #076bba; }
+        
+        .text-readonly {
+            color: #b2bec3;
+            font-size: 12px;
+        }
+
+        /* =========================================
+           分頁導覽
+           ========================================= */
+        .pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-page {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 34px;
+            padding: 0 14px;
+            background: #ffffff;
+            border: 1px solid #dfe4e8;
+            color: #2d3436;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+
+        .btn-page:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .page-info {
+            font-size: 13px;
+            font-weight: bold;
+            color: #636e72;
+        }
+
+        /* =========================================
+           彈出審核視窗 (Modal) 現代化精緻造型
+           ========================================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 360px;
+            padding: 24px;
+            border: none;
+        }
+
+        .modal-title {
+            margin: 0 0 16px 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2d3436;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            color: #636e72;
+            margin-bottom: 6px;
+        }
+
+        .modal-control {
+            width: 100%;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #dfe4e8;
+            border-radius: 6px;
+            color: #2d3436;
+            outline: none;
+            background-color: #ffffff;
+            transition: border-color 0.15s;
+        }
+        
+        .modal-control:focus {
+            border-color: #0984e3;
+        }
+
+        .modal-control[readonly] {
+            background-color: #f5f6fa;
+            color: #7f8c8d;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-modal {
+            height: 36px;
+            padding: 0 16px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-modal--cancel {
+            background: #f5f6fa;
+            color: #636e72;
+            border: 1px solid #dfe4e8;
+        }
+        .btn-modal--cancel:hover { background: #dfe4e8; }
+
+        .btn-modal--submit {
+            background: #2ed573;
+            color: #ffffff;
+        }
+        .btn-modal--submit:hover { background: #26af5f; }
+    </style>
 </head>
-<body
-	style="text-align: center; font-family: Arial, sans-serif; padding: 20px;">
+<body>
 
-	<table border="1" cellpadding="10" cellspacing="0"
-		style="width: 100%; max-width: 1500px; table-layout: fixed; margin: 0 auto;">
-		<tr>
-			<td style="width: 270px; padding: 0; vertical-align: top;">
+<div class="wb-admin-layout">
 
-				<div
-					th:replace="~{back-end/fragments/adminSidebar
-                       :: adminSidebar}">
-				</div>
+    <!-- 左側共用後台 Sidebar -->
+    <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
 
-			</td>
+    <!-- 右側主要內容區 -->
+    <main class="wb-admin-content">
+        <div class="list-container">
 
-			<td
-				style="vertical-align: top; text-align: left; width: calc(100% - 200px);">
+            <!-- 頁面大標題 -->
+            <header class="page-header">
+                <h2 class="page-title">活動檢舉管理系統</h2>
+            </header>
 
-				<div
-					style="display: block; width: 100%; overflow-x: auto; white-space: nowrap;">
+            <!-- 頂部功能快捷按鈕列 -->
+            <div class="action-bar">
+                <a th:href="@{/admin/activity/listAllActivity}" class="btn-nav btn-nav--blue">活動管理</a>
+                <a th:href="@{/admin/activity/type/listAllActivityType}" class="btn-nav btn-nav--purple">類別管理</a>
+                <a th:href="@{/admin/activity/order/listAllActivityOrder}" class="btn-nav btn-nav--green">訂單紀錄</a>
+                <a th:href="@{/admin/activity/order/finance}" class="btn-nav btn-nav--orange">撥退款作業</a>
+                <a th:href="@{/admin/activity/home}" class="btn-nav btn-nav--gray">回後台首頁</a>
+            </div>
 
-					<div style="text-align: center;">
-						<h2>活動檢舉管理系統</h2>
-					</div>
+            <!-- 狀態篩選區塊 -->
+            <div class="filter-card">
+                <span class="filter-label">狀態篩選：</span>
+                <div class="filter-tab-group">
+                    
+                    <a th:href="@{/admin/activity/actRptList}"
+                       th:class="'tab-btn ' + (${currentStatus == null} ? 'active-all' : '')">
+                       查看全部
+                    </a>
+                    
+                    <a th:href="@{/admin/activity/actRptList(status=0)}"
+                       th:class="'tab-btn ' + (${currentStatus == 0} ? 'active-pending' : '')">
+                       待處理
+                    </a>
+                    
+                    <a th:href="@{/admin/activity/actRptList(status=3)}"
+                       th:class="'tab-btn ' + (${currentStatus == 3} ? 'active-invest' : '')">
+                       申訴中/調查中
+                    </a>
+                    
+                    <a th:href="@{/admin/activity/actRptList(status=1)}"
+                       th:class="'tab-btn ' + (${currentStatus == 1} ? 'active-success' : '')">
+                       檢舉成立
+                    </a>
+                    
+                    <a th:href="@{/admin/activity/actRptList(status=2)}"
+                       th:class="'tab-btn ' + (${currentStatus == 2} ? 'active-reject' : '')">
+                       檢舉駁回
+                    </a>
+                    
+                    <a th:href="@{/admin/activity/actRptList(status=4)}"
+                       th:class="'tab-btn ' + (${currentStatus == 4} ? 'active-appeal-s' : '')">
+                       申訴成功
+                    </a>
+                    
+                    <a th:href="@{/admin/activity/actRptList(status=5)}"
+                       th:class="'tab-btn ' + (${currentStatus == 5} ? 'active-appeal-r' : '')">
+                       申訴駁回
+                    </a>
+                    
+                </div>
+            </div>
 
-					<div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;">
-						<a th:href="@{/admin/activity/listAllActivity}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #2563eb; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">活動管理</a>
-						<a th:href="@{/admin/activity/type/listAllActivityType}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #7c3aed; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">類別管理</a>
-						<a th:href="@{/admin/activity/order/listAllActivityOrder}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #059669; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">訂單紀錄</a>
-						<a th:href="@{/admin/activity/order/finance}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #d97706; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">撥退款作業</a>
-						<a th:href="@{/admin/activity/home}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 48px; min-width: 132px; padding: 0 20px; border-radius: 12px; background: #475569; color: white; text-decoration: none; font-size: 18px; font-weight: bold;">回後台首頁</a>
-					</div>
+            <!-- 明細資料表格區塊 -->
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>檢舉編號</th>
+                                <th>活動與被檢舉人</th>
+                                <th>檢舉人編號</th>
+                                <th>檢舉類型</th>
+                                <th>檢舉評語/內文</th>
+                                <th>檢舉圖片</th>
+                                <th>檢舉時間</th>
+                                <th>處理狀態</th>
+                                <th>審核員工</th>
+                                <th>申訴內容</th>
+                                <th>申訴圖片</th>
+                                <th>狀態修改時間</th>
+                                <th>審核備註</th>
+                                <th>審核操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 資料迴圈印出 -->
+                            <tr th:each="rptVO : ${actRptListData}">
+                                <td th:text="${rptVO.actRptId}" class="text-center"></td>
+                                <td class="text-center">
+                                    <span th:text="${rptVO.actId != null ? rptVO.actId.activityId : '無'}"></span>
+                                    <span class="text-muted-sub" th:text="${rptVO.actId != null ? '被檢舉人 ID: ' + rptVO.actId.memberId : '被檢舉人: 無'}"></span>
+                                </td>
+                                <td th:text="${rptVO.reporterId != null ? rptVO.reporterId.memberId : '未知'}" class="text-center"></td>
+                                <td th:switch="${rptVO.rptType}" class="text-center">
+                                    <span th:case="0">詐騙/虛假活動</span>
+                                    <span th:case="1">色情/不當活動</span>
+                                    <span th:case="2">暴力/危險活動</span>
+                                    <span th:case="3">違法行為(聚賭、毒品)</span>
+                                    <span th:case="4">其他</span>
+                                </td>
+                                <td th:text="${#strings.abbreviate(rptVO.actRptCom, 15)}" th:title="${rptVO.actRptCom}"></td>
+                                <td class="text-center">
+                                    <img th:if="${rptVO.actRptImg != null}"
+                                         th:src="@{/admin/activity/actRpt/img/{id}(id=${rptVO.actRptId})}"
+                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #dfe4e8;">
+                                    <span th:unless="${rptVO.actRptImg != null}" style="color: #ccc;">無</span>
+                                </td>
+                                <td th:text="${rptVO.actRptTime != null ? #dates.format(rptVO.actRptTime, 'yyyy-MM-dd HH:mm') : '—'}" class="text-center"></td>
+                                <td th:switch="${rptVO.actRptStatus}" class="text-center">
+                                    <span th:case="0" class="status-badge status-badge--orange">待處理</span>
+                                    <span th:case="1" class="status-badge status-badge--green">檢舉成立/已處罰</span>
+                                    <span th:case="2" class="status-badge status-badge--gray">檢舉駁回</span>
+                                    <span th:case="3" class="status-badge status-badge--red">申訴中/調查中</span>
+                                    <span th:case="4" class="status-badge status-badge--blue">申訴成功/已撤銷</span>
+                                    <span th:case="5" class="status-badge status-badge--dark">申訴駁回/維持原判</span>
+                                </td>
+                                <td th:text="${rptVO.empId != null ? rptVO.empId.empName : '—'}" class="text-center"></td>
+                                <td th:text="${#strings.abbreviate(rptVO.appealContent, 15)}" th:title="${rptVO.appealContent}"></td>
+                                <td class="text-center">
+                                    <img th:if="${rptVO.appealImg != null}"
+                                         th:src="@{/admin/activity/actRpt/appealImg/{id}(id=${rptVO.actRptId})}"
+                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #dfe4e8;">
+                                    <span th:unless="${rptVO.appealImg != null}" style="color: #ccc;">無</span>
+                                </td>
+                                <td th:text="${rptVO.updated != null ? #dates.format(rptVO.updated, 'yyyy-MM-dd HH:mm') : '—'}" class="text-center"></td>
+                                <td th:text="${#strings.abbreviate(rptVO.remark, 10) ?: '—'}" th:title="${rptVO.remark}"></td>
+                                <td class="text-center">
+                                    <button th:if="${rptVO.actRptStatus == 0 || rptVO.actRptStatus == 3}"
+                                            type="button" class="btn-action"
+                                            th:onclick="openReviewModal([[${rptVO.actRptId}]], [[${rptVO.actRptCom}]], [[${rptVO.actRptStatus}]], [[${rptVO.remark}]])">
+                                            審核
+                                    </button>
+                                    <span th:unless="${rptVO.actRptStatus == 0 || rptVO.actRptStatus == 3}" class="text-readonly">唯讀</span>
+                                </td>
+                            </tr>
+                            <!-- 查無資料時顯示 -->
+                            <tr th:if="${#lists.isEmpty(actRptListData)}">
+                                <td colspan="14" style="text-align: center; color: #999; padding: 30px;">該分類目前沒有任何檢舉或申訴案件。</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-					<div
-						style="margin-bottom: 20px; text-align: left; background: #f8f9fa; padding: 10px; border-radius: 4px; border: 1px solid #ddd;">
-						<span style="font-weight: bold; margin-right: 15px;">狀態篩選：</span>
-						<a th:href="@{/admin/activity/actRptList}"
-							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == null} ? 'background-color: #0d6efd ; color: white; font-weight: bold;' : 'background-color: white; color: #333;')"
-							th:class="'tab-btn tab-all ' + (${currentStatus == null} ? 'active' : '')">
-							查看全部 </a> <a th:href="@{/admin/activity/actRptList(status=0)}"
-							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 0} ? 'background-color: orange; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
-							待處理 </a> <a th:href="@{/admin/activity/actRptList(status=3)}"
-							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 3} ? 'background-color: red; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
-							申訴中/調查中 </a> <a th:href="@{/admin/activity/actRptList(status=1)}"
-							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 1} ? 'background-color: green; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
-							檢舉成立 </a> <a th:href="@{/admin/activity/actRptList(status=2)}"
-							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 2} ? 'background-color: gray; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
-							檢舉駁回 </a> <a th:href="@{/admin/activity/actRptList(status=4)}"
-							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 4} ? 'background-color: #0dcaf0; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
-							申訴成功 </a> <a th:href="@{/admin/activity/actRptList(status=5)}"
-							th:style="'padding: 6px 12px; margin-right: 5px; text-decoration: none; border-radius: 4px; border: 1px solid #ccc; ' + (${currentStatus == 5} ? 'background-color: #6c757d; color: white; font-weight: bold;' : 'background-color: white; color: #333;')">
-							申訴駁回 </a>
-					</div>
+            <!-- 下方分頁導覽 -->
+            <div class="pagination-container">
+                <a th:if="${currentPage > 0}"
+                   th:href="@{/admin/activity/actRptList(status=${currentStatus}, page=${currentPage - 1})}"
+                   class="btn-page">
+                   上一頁
+                </a>
+                <span class="page-info" th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?: 1} + ' 頁'">
+                   第 1 頁 / 共 1 頁
+                </span>
+                <a th:if="${(currentPage ?: 0) < (totalPages ?: 1) - 1}"
+                   th:href="@{/admin/activity/actRptList(status=${currentStatus}, page=${currentPage + 1})}"
+                   class="btn-page">
+                   下一頁
+                </a>
+            </div>
 
-					<table border="1" cellpadding="5" cellspacing="0"
-						style="width: 100%; white-space: nowrap;">
-						<thead>
-							<tr>
-								<th style="text-align: center;">檢舉編號</th>
-								<th style="text-align: center;">活動編號 & 被檢舉人編號</th>
-								<th style="text-align: center;">檢舉人編號</th>
-								<th style="text-align: center;">檢舉類型</th>
-								<th style="text-align: center;">檢舉評語/內文</th>
-								<th style="text-align: center;">檢舉圖片</th>
-								<th style="text-align: center;">檢舉時間</th>
-								<th style="text-align: center;">處理狀態</th>
-								<th style="text-align: center;">審核員工</th>
-								<th style="text-align: center;">申訴內容</th>
-								<th style="text-align: center;">申訴圖片</th>
-								<th style="text-align: center;">狀態修改時間</th>
-								<th style="text-align: center;">審核備註</th>
-								<th style="text-align: center;">審核</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr th:each="rptVO : ${actRptListData}">
-								<!-- 檢舉ID -->
-								<td th:text="${rptVO.actRptId}" style="text-align: center;"></td>
+        </div>
+    </main>
+</div>
 
-								<!-- 活動ID (關聯 ActivityVO	) -->
-								<td style="text-align: center; vertical-align: middle;">
-									<!-- 顯示活動 ID --> <span
-									th:text="${rptVO.actId != null ? rptVO.actId.activityId : '無'}"></span>
-									<br /> <small style="color: #6c757d;"
-									th:text="${rptVO.actId != null ? '被檢舉人: ' + rptVO.actId.memberId : '被檢舉人: 無'}">
-								</small>
-								</td>
+<!-- =========================================
+     彈出審核視窗 (Modal 外殼加入 overlay 層確保置中)
+     ========================================= -->
+<div id="reviewModal" class="modal-overlay" th:style="${openReviewModal} ? 'display: flex;' : 'display: none;'">
+    <div class="modal-card">
+        <h4 class="modal-title">檢舉審核處置</h4>
 
-								<!-- 檢舉人 (關聯 MemberVO) -->
-								<td
-									th:text="${rptVO.reporterId != null ? rptVO.reporterId.memberId : '未知'}"
-									style="text-align: center;"></td>
+        <form method="post" th:action="@{/admin/activity/submit}">
+            <input type="hidden" id="modalActRptId" name="actRptId">
 
-								<!-- 檢舉類型 -->
-								<td th:switch="${rptVO.rptType}" style="text-align: center;">
-									<span th:case="0">詐騙/虛假活動</span> <span th:case="1">色情/不當活動</span>
-									<span th:case="2">暴力/危險活動</span> <span th:case="3">違法行為(聚賭、毒品)</span>
-									<span th:case="4">其他</span>
-								</td>
+            <div class="form-group">
+                <label>檢舉事由：</label>
+                <input type="text" id="modalActRptCom" readonly class="modal-control">
+            </div>
 
-								<!-- 檢舉評語 (滑鼠懸停看完整內容) -->
-								<td th:text="${#strings.abbreviate(rptVO.actRptCom, 15)}"
-									th:title="${rptVO.actRptCom}" style="padding: 0 5px;"></td>
+            <div id="appealBlock" class="form-group" style="display: none;">
+                <label style="color: #d63031;">會員申訴內容：</label>
+                <textarea id="modalAppealContent" readonly rows="2" class="modal-control"></textarea>
+            </div>
 
-								<!-- 檢舉圖片  -->
-								<td style="text-align: center;"><img
-									th:if="${rptVO.actRptImg != null}"
-									th:src="@{/admin/activity/actRpt/img/{id}(id=${rptVO.actRptId})}"
-									style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
-									<span th:unless="${rptVO.actRptImg != null}"
-									style="color: #ccc;">無</span></td>
+            <div class="form-group">
+                <label>審核決定：</label>
+                <select id="modalStatus" name="actRptStatus" onchange="togglePenaltyFields()" class="modal-control">
+                    <option value="1">檢舉成立 (處罰)</option>
+                    <option value="2">駁回檢舉</option>
+                </select>
+            </div>
 
-								<!-- 檢舉時間 -->
-								<td
-									th:text="${rptVO.actRptTime != null ? #dates.format(rptVO.actRptTime, 'yyyy-MM-dd HH:mm') : '—'}"
-									style="text-align: center;"></td>
+            <div id="penaltyBlock" class="form-group">
+                <div class="form-group">
+                    <label>處罰類型：</label>
+                    <select name="penaltyType" class="modal-control">
+                        <option value="0">無/駁回</option>
+                        <option value="1">記點 (點數)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>處罰數值：</label>
+                    <input type="number" name="penaltyValue" value="0" min="0" class="modal-control" style="width: 120px;">
+                </div>
+            </div>
 
-								<!-- 處理狀態 (0=待處理, 1=審核通過, 2=審核駁回, 3=申訴中, 4=申訴完成) -->
-								<td th:switch="${rptVO.actRptStatus}"
-									style="text-align: center; font-weight: bold;"><span
-									th:case="0" style="color: orange;">待處理</span> <span th:case="1"
-									style="color: green;">檢舉成立/已處罰</span> <span th:case="2"
-									style="color: gray;">檢舉駁回</span> <span th:case="3"
-									style="color: red;">申訴中/調查中</span> <span th:case="4"
-									style="color: blue;">申訴成功/已撤銷</span> <span th:case="5"
-									style="color: #6c757d;">申訴駁回/維持原判</span></td>
+            <div class="form-group">
+                <label>備註紀錄 (REMARK)：</label>
+                <textarea id="modalRemark" name="remark" rows="2" class="modal-control"></textarea>
+            </div>
 
-								<!-- 審核員工 (關聯 EmployeeVO) -->
-								<td th:text="${rptVO.empId != null ? rptVO.empId.empName : '—'}"
-									style="text-align: center;"></td>
+            <div class="modal-actions">
+                <button type="button" class="btn-modal btn-modal--cancel" onclick="closeReviewModal()">取消</button>
+                <button type="submit" class="btn-modal btn-modal--submit">提交</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-								<!-- 申訴內容 -->
-								<td th:text="${#strings.abbreviate(rptVO.appealContent, 15)}"
-									th:title="${rptVO.appealContent}" style="padding: 0 5px;"></td>
+<script th:inline="javascript">
+    function openReviewModal(actRptId, actRptCom, currentStatus, remark) {
+        /* 將原先修改 style.display = "block" 改為 "flex" 以符合 overlay 的彈性置中排版 */
+        document.getElementById("reviewModal").style.display = "flex";
+        document.getElementById("modalActRptId").value = actRptId;
+        document.getElementById("modalActRptCom").value = actRptCom;
+        document.getElementById("modalRemark").value = remark || "";
 
-								<!-- 申訴圖片 -->
-								<td style="text-align: center;"><img
-									th:if="${rptVO.appealImg != null}"
-									th:src="@{/admin/activity/actRpt/appealImg/{id}(id=${rptVO.actRptId})}"
-									style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
-									<span th:unless="${rptVO.appealImg != null}"
-									style="color: #ccc;">無</span></td>
+        var statusSelect = document.getElementById("modalStatus");
+        statusSelect.innerHTML = "";
 
-								<!-- 修改時間 -->
-								<td
-									th:text="${rptVO.updated != null ? #dates.format(rptVO.updated, 'yyyy-MM-dd HH:mm') : '—'}"
-									style="text-align: center;"></td>
+        if (currentStatus === 3) {
+            statusSelect.options.add(new Option("申訴結案-維持原判", "5"));
+            statusSelect.options.add(new Option("申訴成功-取消處罰", "4"));
+        } else {
+            statusSelect.options.add(new Option("檢舉成立 (處罰)", "1"));
+            statusSelect.options.add(new Option("駁回檢舉 (無罪)", "2"));
+        }
+        togglePenaltyFields();
+    }
 
-								<!-- 審核備註 -->
-								<td th:text="${#strings.abbreviate(rptVO.remark, 10) ?: '—'}"
-									th:title="${rptVO.remark}"
-									style="padding: 0 5px; text-align: left;"></td>
+    function closeReviewModal() {
+        document.getElementById("reviewModal").style.display = "none";
+    }
 
-								<!-- 審核操作 -->
-								<td align="center">
-									<button
-										th:if="${rptVO.actRptStatus == 0 || rptVO.actRptStatus == 3}"
-										type="button"
-										th:onclick="openReviewModal([[${rptVO.actRptId}]], [[${rptVO.actRptCom}]], [[${rptVO.actRptStatus}]], [[${rptVO.remark}]])">
-										審核</button> <span
-									th:unless="${rptVO.actRptStatus == 0 || rptVO.actRptStatus == 3}"
-									style="color: #999;">唯讀</span>
-								</td>
-							</tr>
-							<tr th:if="${#lists.isEmpty(actRptListData)}">
-								<td colspan="13"
-									style="text-align: center; color: #999; padding: 20px;">該分類目前沒有任何檢舉或申訴案件。</td>
-							</tr>
-						</tbody>
-					</table>
-
-					<div
-						style="text-align: center; margin-top: 20px; font-family: Arial, sans-serif;">
-						<!-- 上一頁 -->
-						<a th:if="${currentPage > 0}"
-							th:href="@{/admin/activity/actRptList(status=${currentStatus}, page=${currentPage - 1})}"
-							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
-							上一頁 </a> <span
-							style="margin: 0 10px; font-weight: bold; color: #555;"
-							th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?: 1} + ' 頁'">
-							第 1 頁 / 共 1 頁 </span>
-
-						<!-- 下一頁 -->
-						<a th:if="${(currentPage ?: 0) < (totalPages ?: 1) - 1}"
-							th:href="@{/admin/activity/actRptList(status=${currentStatus}, page=${currentPage + 1})}"
-							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
-							下一頁 </a>
-					</div>
-				</div>
-			</td>
-		</tr>
-	</table>
-
-	<div id="reviewModal"
-		th:style="'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 2px solid black; padding: 15px; z-index: 1000; width: 320px; white-space: normal !important; text-align: left !important; display: ' + (${openReviewModal} ? 'block' : 'none') + ';'">
-
-		<h4 style="text-align: center; margin-top: 0; margin-bottom: 10px;">檢舉審核處置</h4>
-
-		<form method="post" th:action="@{/admin/activity/submit}">
-			<input type="hidden" id="modalActRptId" name="actRptId">
-
-			<div style="margin-bottom: 8px;">
-				<label>檢舉事由：</label><br> <input type="text" id="modalActRptCom"
-					readonly
-					style="background: #f0f0f0; border: 1px solid #767676 !important; padding: 4px; width: 280px; box-sizing: border-box;">
-			</div>
-
-			<div id="appealBlock" style="margin-bottom: 8px; display: none;">
-				<label style="color: red;">會員申訴內容：</label><br>
-				<textarea id="modalAppealContent" readonly rows="2"
-					style="border: 1px solid #767676 !important; padding: 4px; width: 280px; box-sizing: border-box;"></textarea>
-			</div>
-
-			<div style="margin-bottom: 8px;">
-				<label>審核決定：</label><br> <select id="modalStatus"
-					name="actRptStatus" onchange="togglePenaltyFields()"
-					style="border: 1px solid #767676 !important; padding: 4px; width: 280px; box-sizing: border-box;">
-					<option value="1">檢舉成立 (處罰)</option>
-					<option value="2">駁回檢舉</option>
-				</select>
-			</div>
-
-			<div id="penaltyBlock" style="margin-bottom: 8px;">
-				<div style="margin-bottom: 6px;">
-					<label>處罰類型：</label><br> <select name="penaltyType"
-						style="border: 1px solid #767676 !important; padding: 4px; width: 280px; box-sizing: border-box;">
-						<option value="0">無/駁回</option>
-						<option value="1">記點 (點數)</option>
-					</select>
-				</div>
-				<div>
-					<label>處罰數值：</label><br> <input type="number"
-						name="penaltyValue" value="0" min="0"
-						style="border: 1px solid #767676 !important; padding: 4px; width: 100px; box-sizing: border-box;">
-				</div>
-			</div>
-
-			<div style="margin-bottom: 12px;">
-				<label>備註紀錄 (REMARK)：</label><br>
-				<textarea id="modalRemark" name="remark" rows="2"
-					style="border: 1px solid #767676 !important; padding: 4px; width: 280px; box-sizing: border-box;"></textarea>
-			</div>
-
-			<div style="text-align: right;">
-				<button type="button" onclick="closeReviewModal()">取消</button>
-				<button type="submit"
-					style="background-color: green; color: white; border: 1px solid darkgreen; padding: 4px 10px; cursor: pointer;">提交</button>
-			</div>
-		</form>
-	</div>
-
-	<script th:inline="javascript">
-		function openReviewModal(actRptId, actRptCom, currentStatus, remark) {
-			document.getElementById("reviewModal").style.display = "block";
-			document.getElementById("modalActRptId").value = actRptId;
-			document.getElementById("modalActRptCom").value = actRptCom;
-			document.getElementById("modalRemark").value = remark || "";
-
-			var statusSelect = document.getElementById("modalStatus");
-			statusSelect.innerHTML = "";
-
-			if (currentStatus === 3) {
-				statusSelect.options.add(new Option("申訴結案-維持原判", "5"));
-				statusSelect.options.add(new Option("申訴成功-取消處罰", "4"));
-			} else {
-				statusSelect.options.add(new Option("檢舉成立 (處罰)", "1"));
-				statusSelect.options.add(new Option("駁回檢舉 (無罪)", "2"));
-			}
-			togglePenaltyFields();
-		}
-
-		function closeReviewModal() {
-			document.getElementById("reviewModal").style.display = "none";
-		}
-
-		function togglePenaltyFields() {
-			var status = document.getElementById("modalStatus").value;
-			var penaltyBlock = document.getElementById("penaltyBlock");
-			// 只有檢舉成立(1)需要設定處罰數值
-			if (status === "1") {
-				penaltyBlock.style.display = "block";
-			} else {
-				penaltyBlock.style.display = "none";
-			}
-		}
-	</script>
+    function togglePenaltyFields() {
+        var status = document.getElementById("modalStatus").value;
+        var penaltyBlock = document.getElementById("penaltyBlock");
+        if (status === "1") {
+            penaltyBlock.style.display = "block";
+        } else {
+            penaltyBlock.style.display = "none";
+        }
+    }
+</script>
 </body>
 </html>

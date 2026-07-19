@@ -16,7 +16,7 @@ import com.webond.orderManagement.dto.RefundPayoutQueryDTO;
 import com.webond.orderManagement.service.RefundPayoutService;
 
 @Controller
-@RequestMapping("/refundPayout")
+@RequestMapping("/admin/refundPayout")
 public class RefundPayoutController {
 
 	@Autowired

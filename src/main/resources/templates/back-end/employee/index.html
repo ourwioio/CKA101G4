@@ -1,44 +1,109 @@
 <!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org"
-      xmlns:sec="http://thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
+      lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>後台管理系統 - 首頁</title>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f6fa;
+            font-family: Arial, "Noto Sans TC", sans-serif;
+            color: #2d3436;
+        }
+
+        /* =========================================
+           後台主佈局雙欄容器 (與所有子頁面完全一致)
+           ========================================= */
+        .wb-admin-layout {
+            display: flex;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* =========================================
+           右側主要工作內容區
+           ========================================= */
+        .wb-admin-content {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            align-items: center;      /* 讓歡迎卡片在畫面上垂直置中 */
+            justify-content: center;     /* 讓歡迎卡片在畫面上水平置中 */
+            background-color: #f5f6fa;
+        }
+
+        /* =========================================
+           歡迎區塊卡片
+           ========================================= */
+        .welcome-card {
+            background: #ffffff;
+            border: 1px solid #dfe4e8;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+            padding: 60px 40px;
+            text-align: center;
+            max-width: 550px;
+            width: 100%;
+            animation: fadeIn 0.4s ease-out; /* 加入細緻的進場微動畫 */
+        }
+
+        .welcome-title {
+            margin: 0 0 16px 0;
+            font-size: 28px;
+            font-weight: bold;
+            color: #2d3436;
+            letter-spacing: 0.5px;
+        }
+
+        .welcome-text {
+            margin: 0;
+            font-size: 15px;
+            color: #636e72;
+            line-height: 1.6;
+        }
+
+        /* 輕量進場動畫 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
 </head>
-<!-- 1. 外層維持與其他頁面百分之百相同的置中樣式 -->
-<body style="text-align: center; font-family: Arial, sans-serif; padding: 20px;">
+<body>
 
-    <h1 style="white-space: nowrap; margin-bottom: 20px;">後台管理系統</h1>
+    <!-- =========================================
+         後台一體化網格架構
+         ========================================= -->
+    <div class="wb-admin-layout">
 
-    <!-- 2. 建立大框架表格（與 empPage 寬度、結構完全一致） -->
-    <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; max-width: 1500px; table-layout: fixed; margin: 0 auto;">
-        <tr>
-            <!-- 【左側欄位】：直接引用主框架的 sidebar，原地取代 -->
-<!--             <td th:replace="~{back-end/employee/adminPage :: sidebar}"></td>修改 -->
+        <!-- 左側共用後台 Sidebar (維持 Thymeleaf 引入，不影響原有資料) -->
+        <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
 
-			<!-- 新增bar -->
-			<td style="
-    width: 270px;
-    padding: 0;
-    vertical-align: top;
-">
+        <!-- 右側工作區：放置歡迎核心內容 -->
+        <main class="wb-admin-content">
+            
+            <div class="welcome-card">
+                <h1 class="welcome-title">歡迎回來，後台管理員！</h1>
+                <p class="welcome-text">請選擇左側管理項目開始進行系統維護。</p>
+            </div>
 
-    <div th:replace="~{back-end/fragments/adminSidebar
-                       :: adminSidebar}">
+        </main>
+
     </div>
-
-</td>
-
-            <!-- 【右側欄位】：專心放你的歡迎文字 -->
-            <td style="vertical-align: top; text-align: center; padding: 40px 20px;">
-                
-                <!-- 這裡就是你原本右邊畫面的核心內容 -->
-                <h1>歡迎回來，後台管理員！</h1>
-                <p style="color: #666; font-size: 16px;">請選擇左側管理項目。</p>
-
-            </td>
-        </tr>
-    </table>
 
 </body>
 </html>

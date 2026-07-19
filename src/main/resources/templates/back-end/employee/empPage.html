@@ -4,60 +4,340 @@
 <head>
 <meta charset="UTF-8">
 <title>後台管理系統 - 員工管理</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+	--slate-50: #f8fafc;
+	--slate-100: #f1f5f9;
+	--slate-200: #e2e8f0;
+	--slate-300: #cbd5e1;
+	--slate-400: #94a3b8;
+	--slate-600: #475569;
+	--slate-700: #334155;
+	--slate-800: #1e293b;
+	--sky-500: #0ea5e9;
+	--sky-600: #0284c7;
+	--sky-700: #0369a1;
+	--sky-50: #f0f9ff;
+	--emerald-50: #ecfdf5;
+	--emerald-600: #16a34a;
+	--emerald-700: #15803d;
+	--rose-50: #fff1f2;
+	--rose-600: #e11d48;
+	--rose-700: #be123c;
+	--amber-50: #fffbeb;
+	--amber-600: #d97706;
+	--border-color: #e2e8f0;
+	--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
 
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: 'Inter', "Microsoft JhengHei", sans-serif;
+	background-color: var(--slate-100);
+	color: var(--slate-800);
+	line-height: 1.5;
+}
+
+/* 後台全畫面滿版 Flex 佈局 */
+.wb-admin-layout {
+	display: flex;
+	width: 100%;
+	min-height: 100vh;
+}
+
+/* 左側欄寬度固定 */
+.wb-sidebar-wrapper {
+	width: 270px;
+	flex-shrink: 0;
+	background-color: #ffffff;
+}
+
+/* 核心優化：右側主內容區塊完全頂到最右邊，並在邊緣留出 20px 的適當安全空間 */
+.wb-admin-content {
+	flex-grow: 1;
+	width: calc(100% - 20px); 
+	padding: 20px; 
+}
+
+/* 確保卡片主容器自動撐滿 100% 寬度 */
+.card-panel {
+	width: 100%;
+	background: #ffffff;
+	border-radius: 12px;
+	box-shadow: var(--shadow-md);
+	padding: 24px;
+	border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* 頂部標題與按鈕區塊（完美分居兩側） */
+.header-area {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 24px;
+	padding-bottom: 16px;
+	border-bottom: 1px solid var(--slate-200);
+}
+
+.header-area h2 {
+	font-size: 22px;
+	font-weight: 700;
+	color: var(--slate-800);
+}
+
+/* 按鈕樣式系列 */
+.btn-primary {
+	background: var(--sky-600);
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+	background: var(--sky-700);
+}
+
+.btn-action-edit {
+	background: var(--slate-100);
+	color: var(--slate-700);
+	border: 1px solid var(--slate-200);
+	padding: 6px 12px;
+	border-radius: 6px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.btn-action-edit:hover {
+	background: var(--sky-50);
+	color: var(--sky-600);
+	border-color: var(--sky-500);
+}
+
+.btn-action-delete {
+	background: var(--rose-50);
+	color: var(--rose-700);
+	border: 1px solid transparent;
+	padding: 6px 12px;
+	border-radius: 6px;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+
+.btn-action-delete:hover {
+	background: var(--rose-600);
+	color: white;
+}
+
+/* 響應式數據表格（寬螢幕下寬度 100% 撐滿，窄螢幕自動提供橫向滾動） */
+.table-responsive {
+	width: 100%;
+	overflow-x: auto;
+	border-radius: 8px;
+	border: 1px solid var(--slate-200);
+	margin-bottom: 20px;
+}
+
+.admin-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 14px;
+	text-align: left;
+	white-space: nowrap;
+}
+
+.admin-table th {
+	background: var(--slate-50);
+	padding: 14px 16px;
+	border-bottom: 2px solid var(--border-color);
+	font-weight: 600;
+	color: var(--slate-700);
+}
+
+.admin-table td {
+	padding: 14px 16px;
+	border-bottom: 1px solid var(--border-color);
+	color: var(--slate-600);
+	vertical-align: middle;
+}
+
+.admin-table tbody tr {
+	transition: background-color 0.15s ease;
+}
+
+.admin-table tbody tr:hover {
+	background-color: var(--slate-50);
+}
+
+/* 人員大頭貼 */
+.emp-avatar {
+	width: 54px;
+	height: 54px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid var(--slate-200);
+	box-shadow: var(--shadow-sm);
+}
+
+.emp-avatar-none {
+	width: 54px;
+	height: 54px;
+	border-radius: 50%;
+	background-color: var(--slate-200);
+	color: var(--slate-600);
+	font-size: 16px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 0 auto;
+	font-weight: 700;
+}
+
+/* 權限標籤 */
+.perm-badge {
+	display: inline-block;
+	background: var(--slate-100);
+	color: var(--slate-700);
+	padding: 2px 8px;
+	border-radius: 4px;
+	font-size: 12px;
+	font-weight: 500;
+	margin: 2px;
+	border: 1px solid var(--slate-200);
+}
+
+/* 狀態標籤 */
+.status-badge {
+	padding: 6px 12px;
+	border-radius: 50px;
+	font-size: 12px;
+	font-weight: 600;
+	display: inline-flex;
+	align-items: center;
+}
+
+.badge-unverified { background: var(--amber-50); color: var(--amber-600); }
+.badge-active { background: var(--emerald-50); color: var(--emerald-600); }
+.badge-cancelled { background: var(--slate-200); color: var(--slate-600); }
+.badge-suspended { background: var(--rose-50); color: var(--rose-700); }
+
+/* 分頁元件 */
+.pagination-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 12px;
+	margin-top: 24px;
+}
+
+.pagination-link {
+	padding: 8px 16px;
+	border: 1px solid var(--slate-200);
+	text-decoration: none;
+	color: var(--slate-700);
+	background-color: #ffffff;
+	border-radius: 6px;
+	font-size: 14px;
+	font-weight: 500;
+	transition: all 0.2s ease;
+	box-shadow: var(--shadow-sm);
+}
+
+.pagination-link:hover {
+	background-color: var(--slate-50);
+	border-color: var(--slate-300);
+}
+
+.pagination-info {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--slate-600);
+}
+
+/* 現代化燈箱控制彈窗 */
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(15, 23, 42, 0.6);
+	backdrop-filter: blur(4px);
+	z-index: 9999;
+	display: none;
+	justify-content: center;
+	align-items: center;
+}
+
+.modal-container {
+	background: #ffffff;
+	border-radius: 12px;
+	padding: 30px;
+	box-shadow: var(--shadow-lg);
+	width: 550px;
+	max-width: 90%;
+	box-sizing: border-box;
+	animation: modalFadeIn 0.25s ease;
+}
+
+@keyframes modalFadeIn {
+	from { opacity: 0; transform: scale(0.96); }
+	to { opacity: 1; transform: scale(1); }
+}
+</style>
+
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
-<!-- 1. 外層維持與主框架相同的置中樣式 -->
-<body style="text-align: center; font-family: Arial, sans-serif; padding: 20px;">
+<body>
 
+	<div class="wb-admin-layout">
 
-	<!-- 2. 建立大框架表格（1 row, 2 columns） -->
-	<table border="1" cellpadding="10" cellspacing="0"
-		style="width: 100%; max-width: 1500px; table-layout: fixed; margin: 0 auto;">
-		<tr>
-			<!-- 【左側欄位】：直接引用主框架的 sidebar，原地取代 -->
-			<td style="width: 270px; padding: 0; vertical-align: top;">
+		<!-- 左側欄位 -->
+		<div class="wb-sidebar-wrapper">
+			<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
+		</div>
 
-                <div
-                    th:replace="~{back-end/fragments/adminSidebar
-                       :: adminSidebar}">
-                </div>
+		<!-- 右側資料主內容區塊 -->
+		<main class="wb-admin-content">
+			<div class="card-panel">
+				
+				<div class="header-area">
+					<h2>👥 員工管理系統</h2>
+					<button type="button" class="btn-primary" onclick="openAddEmpModal()">＋ 新增員工</button>
+				</div>
 
-            </td>
-
-			<!-- 【右側欄位】：裝載你原本的員工管理完整內容 -->
-			<td
-				style="vertical-align: top; text-align: left; width: calc(100% - 200px);">
-
-				<!-- 這裡放你的內容區塊 -->
-				<div
-					style="display: block; width: 100%; overflow-x: auto; white-space: nowrap;">
-
-					<div style="text-align: center;">
-						<h2>員工管理系統</h2>
-					</div>
-
-					<!-- 新增員工 -->
-
-					<div
-						style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 10px; white-space: nowrap; position: sticky; left: 0; width: 100%; box-sizing: border-box; padding-right: 5px;">
-						<button type="button" 
-							onclick="openAddEmpModal()">新增員工</button>
-					</div>
-
-					<!-- 員工資料數據表格（純右側表格） -->
-					<table border="1" cellpadding="5" cellspacing="0"
-						style="width: 100%; white-space: nowrap;">
+				<!-- 員工資料數據表格 -->
+				<div class="table-responsive">
+					<table class="admin-table">
 						<thead>
 							<tr>
 								<th style="text-align: center;">員工編號(ID)</th>
-								<th style="text-align: center;">員工姓名</th>
+								<th>員工姓名</th>
 								<th style="text-align: center;">員工頭像</th>
-								<th style="text-align: center;">職稱</th>
-								<th style="text-align: center;">權限範圍</th>
+								<th>職稱</th>
+								<th>權限範圍</th>
 								<th style="text-align: center;">帳號狀態</th>
-								<th style="text-align: center;">最後登入時間</th>
-								<th style="text-align: center;">建立時間</th>
-								<th style="text-align: center;">修改時間</th>
+								<th>最後登入時間</th>
+								<th>建立時間</th>
+								<th>修改時間</th>
 								<th style="text-align: center;">修改</th>
 								<th style="text-align: center;">刪除</th>
 							</tr>
@@ -65,111 +345,110 @@
 						<tbody>
 							<tr th:each="empVO : ${empListData}">
 								<!-- 員工編號 -->
-								<td th:text="${empVO.employeeId}" style="text-align: center;"></td>
+								<td th:text="${empVO.employeeId}" style="text-align: center; font-weight: 600;"></td>
 								<!-- 員工姓名 -->
-								<td th:text="${empVO.empName}" style="text-align: center;"></td>
+								<td th:text="${empVO.empName}" style="font-weight: 700;"></td>
 								<!-- 員工頭像 -->
-								<td style="text-align: center;"><img
-									th:if="${empVO.empImg != null and empVO.empImg.length > 0}"
-									th:src="@{/admin/employees/empImg/{employeeId}(employeeId=${empVO.employeeId})}"
-									style="width: 100px; height: 100px; border-radius: 50%;">
-									<!-- 情況 B：如果員工沒有圖片 ➔ 顯示灰色圓圈 --> <!-- 💡 核心修正：刪除 line-height，加上 align-items: center; -->
-									<div
-										th:unless="${empVO.empImg != null and empVO.empImg.length > 0}"
-										style="width: 100px; height: 100px; border-radius: 50%; background-color: #e0e0e0; color: #666; font-size: 40px; display: flex; justify-content: center; align-items: center; margin: 0 auto; font-weight: bold;">
-										無</div></td>
+								<td style="text-align: center;">
+									<img th:if="${empVO.empImg != null and empVO.empImg.length > 0}"
+										th:src="@{/admin/employees/empImg/{employeeId}(employeeId=${empVO.employeeId})}"
+										class="emp-avatar">
+									
+									<div th:unless="${empVO.empImg != null and empVO.empImg.length > 0}"
+										class="emp-avatar-none">
+										無
+									</div>
+								</td>
 
 								<!-- 職稱 -->
-								<td th:switch="${empVO.roleTitle}" style="text-align: center;">
-									<span th:case="0">系統管理員</span> <span th:case="1">營運總監</span> <span
-									th:case="2">客服專員</span> <span th:case="3">財務專員</span> <span
-									th:case="4">行銷專員</span>
+								<td th:switch="${empVO.roleTitle}">
+									<span th:case="0">系統管理員</span> 
+									<span th:case="1">營運總監</span> 
+									<span th:case="2">客服專員</span> 
+									<span th:case="3">財務專員</span> 
+									<span th:case="4">行銷專員</span>
 								</td>
 								<!-- 權限範圍 -->
-								<td style="text-align: center;"><span
-									th:each="empPerm, stat : ${empVO.empPermVO}" class="perm-item" th:data-permid="${empPerm.perms.permId}"> <span
-										th:text="${empPerm.perms.permName} + (${stat.last}? '': '、')"></span>
-								</span></td>
+								<td>
+									<span th:each="empPerm, stat : ${empVO.empPermVO}" class="perm-item perm-badge" th:data-permid="${empPerm.perms.permId}"> 
+										<span th:text="${empPerm.perms.permName}"></span>
+									</span>
+								</td>
 								<!-- 帳號狀態 -->
 								<td th:switch="${empVO.empStatus}" style="text-align: center;">
-									<span th:case="0" style="color: orange;">未驗證</span> <span
-									th:case="1" style="color: green;">正常</span> <span th:case="2"
-									style="color: red;">註銷</span> <span th:case="3"
-									style="color: gray;">停權</span>
+									<span th:case="0" class="status-badge badge-unverified">⏳ 未驗證</span> 
+									<span th:case="1" class="status-badge badge-active">🟢 正常</span> 
+									<span th:case="2" class="status-badge badge-cancelled">⚪ 註銷</span> 
+									<span th:case="3" class="status-badge badge-suspended">🚫 停權</span>
 								</td>
 								<!-- 最後登入時間 -->
-								<td
-									th:text="${empVO.lastLoginAt != null ? #temporals.format(empVO.lastLoginAt, 'yyyy-MM-dd HH:mm') : '未登入'}"
-									style="text-align: center;"></td>
+								<td th:text="${empVO.lastLoginAt != null ? #temporals.format(empVO.lastLoginAt, 'yyyy-MM-dd HH:mm') : '未登入'}"></td>
 								<!-- 建立時間 -->
-								<td th:text="${empVO.createdAt}" style="text-align: center;"></td>
+								<td th:text="${empVO.createdAt}"></td>
 								<!-- 修改時間 -->
-								<td th:text="${empVO.updatedAt ?: '未修改'}"
-									style="text-align: center;"></td>
+								<td th:text="${empVO.updatedAt ?: '未修改'}"></td>
 
 								<!-- 修改按鈕 -->
-								<td align="center">
-									<button type="button"
+								<td style="text-align: center;">
+									<button type="button" class="btn-action-edit"
 										th:onclick="openEditEmpModal([[${empVO.employeeId}]],[[${empVO.empAccount}]],[[${empVO.empPassword}]], [[${empVO.empName}]], [[${empVO.roleTitle}]],[[${empVO.empStatus}]], [[${empVO.empImg != null && empVO.empImg.length > 0}]], this)">
-										修改</button>
+										修改
+									</button>
 								</td>
 
 								<!-- 刪除表單按鈕 -->
-								<td align="center">
-									<form method="post" th:action="@{/admin/employees/empDelete}"
-										style="margin: 0px;">
+								<td style="text-align: center;">
+									<form method="post" th:action="@{/admin/employees/empDelete}" style="margin: 0px;">
 										<input type="hidden" name="employeeId" th:value="${empVO.employeeId}">
-										<input type="submit" value="刪除" style="color: red;"
-											onclick="return confirm('確定要刪除這位員工嗎？');">
+										<input type="submit" value="刪除" class="btn-action-delete" onclick="return confirm('確定要刪除這位員工嗎？');">
 									</form>
 								</td>
 							</tr>
 						</tbody>
-
 					</table>
-					<div
-						style="text-align: center; margin-top: 20px; font-family: Arial, sans-serif;">
-
-						<a th:if="${currentPage > 0}"
-							th:href="@{/admin/employees/empPage(p=${(currentPage ?: 0) - 1})}"
-							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
-							上一頁 </a>
-
-						<span style="margin: 0 10px; font-weight: bold; color: #555;"
-							th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?:1} + ' 頁'">
-							第 1 頁 / 共 1 頁 </span>
-
-						<a th:if="${(currentPage ?: 0) < (totalPages?: 1) - 1}"
-							th:href="@{/admin/employees/empPage(p=${currentPage + 1})}"
-							style="padding: 6px 12px; border: 1px solid #ccc; text-decoration: none; margin: 5px; background-color: #f8f9fa; color: #333; border-radius: 4px;">
-							下一頁 </a>
-
-					</div>
 				</div>
+				
+				<!-- 分頁導航 -->
+				<div class="pagination-container">
+					<a th:if="${currentPage > 0}"
+						th:href="@{/admin/employees/empPage(p=${(currentPage ?: 0) - 1})}"
+						class="pagination-link">
+						上一頁
+					</a>
 
-			</td>
-		</tr>
+					<span class="pagination-info"
+						th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?:1} + ' 頁'">
+						第 1 頁 / 共 1 頁
+					</span>
 
-
-	</table>
-
-	<div id="addEmpModal"
-		th:style="'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid black; padding: 25px; z-index: 1000; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); width: 500px; box-sizing: border-box; white-space: nowrap; text-align: left !important; display: flow-root; display: ' + (${openAddEmpModal} ? 'block' : 'none') + ';'">
-
-		<div th:insert="~{back-end/employee/addEmp :: addContent}"></div>
+					<a th:if="${(currentPage ?: 0) < (totalPages?: 1) - 1}"
+						th:href="@{/admin/employees/empPage(p=${currentPage + 1})}"
+						class="pagination-link">
+						下一頁
+					</a>
+				</div>
+				
+			</div>
+		</main>
 
 	</div>
 
-	<div id="editEmpModal"
-		th:style="'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 3px solid black; padding: 25px; z-index: 1000; box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); width: 500px; box-sizing: border-box; white-space: nowrap; text-align: left !important; display: flow-root; display: ' + (${openEditEmpModal} ? 'block' : 'none') + ';'">
+	<!-- 新增員工彈窗燈箱 -->
+	<div id="addEmpModal" class="modal-overlay" th:style="${openAddEmpModal} ? 'display: flex;' : 'display: none;'">
+		<div class="modal-container">
+			<div th:insert="~{back-end/employee/addEmp :: addContent}"></div>
+		</div>
+	</div>
 
-		<div th:insert="~{back-end/employee/updateEmp :: updateContent}"></div>
-
+	<!-- 修改員工彈窗燈箱 -->
+	<div id="editEmpModal" class="modal-overlay" th:style="${openEditEmpModal} ? 'display: flex;' : 'display: none;'">
+		<div class="modal-container">
+			<div th:insert="~{back-end/employee/updateEmp :: updateContent}"></div>
+		</div>
 	</div>
 
 
 	<script>
-
 		// 照片預覽機制
 		function previewImage(input) {
 			var noImageCircle = document.getElementById('noImageCircle');
@@ -208,8 +487,7 @@
 					noImageCircle.style.display = "block";
 				}
 
-				// 手動打開時一樣要給它 block
-				modal.style.setProperty("display", "block", "important");
+				modal.style.setProperty("display", "flex", "important");
 			}
 		}
 
@@ -268,7 +546,6 @@
 
 				if (editNoImageCircle && editImagePreview) {
 					if (hasImg && employeeId) {
-						// 指向後端撈取圖片的 Controller 途徑，並帶上員工 ID
 						editImagePreview.src = "/admin/employees/dbgUpdateImg/"
 								+ employeeId;
 		                    editImagePreview.style.display = "block";
@@ -279,8 +556,7 @@
 						editNoImageCircle.style.display = "block";
 					}
 				}
-				// 手動打開時一樣要給它 block
-				modal.style.setProperty("display", "block", "important");
+				modal.style.setProperty("display", "flex", "important");
 			}
 		}
 
@@ -315,12 +591,14 @@
 		    }
 		}
 		
+		// 點擊遮罩關閉
+		document.querySelectorAll('.modal-overlay').forEach(overlay => {
+			overlay.addEventListener('click', function(e) {
+				if(e.target === this) {
+					this.style.setProperty("display", "none", "important");
+				}
+			});
+		});
 	</script>
-
-
-
-
 </body>
 </html>
-
-
