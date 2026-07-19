@@ -45,6 +45,9 @@ public class VenueReviewController {
 	@Autowired
 	VenueService venueService;
 
+	// 審核備註最大長度，需與 VenueReviewVO.reviewNote 的 @Size(max = ...) 一致
+	private static final int REVIEW_NOTE_MAX_LENGTH = 255;
+
 	// ===== 新增：顯示表單 =====
 	@GetMapping("addVenueReview")
 	public String addVenueReview(ModelMap model) {
@@ -158,6 +161,12 @@ public class VenueReviewController {
 			return "redirect:/admin/login";
 		}
 
+		if (reviewNote != null && reviewNote.length() > REVIEW_NOTE_MAX_LENGTH) {
+			redirectAttrs.addFlashAttribute("error", "審核備註：長度不能超過 " + REVIEW_NOTE_MAX_LENGTH + " 個字元");
+			redirectAttrs.addFlashAttribute("reviewNoteInput", reviewNote);
+			return "redirect:/admin/venue/venueReview/viewOne?venueReviewId=" + venueReviewId;
+		}
+
 		venueReviewSvc.approve(venueReviewId, loginEmp.getEmployeeId(), reviewNote);
 		redirectAttrs.addFlashAttribute("success", "- (審核通過)");
 
@@ -186,6 +195,12 @@ public class VenueReviewController {
 			return "redirect:/admin/login";
 		}
 
+		if (reviewNote != null && reviewNote.length() > REVIEW_NOTE_MAX_LENGTH) {
+			redirectAttrs.addFlashAttribute("error", "審核備註：長度不能超過 " + REVIEW_NOTE_MAX_LENGTH + " 個字元");
+			redirectAttrs.addFlashAttribute("reviewNoteInput", reviewNote);
+			return "redirect:/admin/venue/venueReview/viewOne?venueReviewId=" + venueReviewId;
+		}
+
 		venueReviewSvc.reject(venueReviewId, loginEmp.getEmployeeId(), reviewNote);
 		redirectAttrs.addFlashAttribute("success", "- (已標記為審核未通過)");
 
@@ -196,7 +211,11 @@ public class VenueReviewController {
 		NotificationVO notificationVO = new NotificationVO();
 		notificationVO.setMember(venueVO.getMember());
 		notificationVO.setTitle("場地審核未通過通知");
-		notificationVO.setContent("先生/小姐您好，您的場地：" + venueVO.getVenueName() + " 審核未通過，請重新修改上傳資料，謝謝");
+		String rejectReason = venueReviewVO.getReviewNote() != null && !venueReviewVO.getReviewNote().isBlank()
+				? venueReviewVO.getReviewNote()
+				: "未填寫";
+		notificationVO.setContent(
+				"先生/小姐您好，您的場地：" + venueVO.getVenueName() + " 審核未通過，<br/>原因為：" + rejectReason + "，請重新修改上傳資料，謝謝");
 		notificationVO.setNotificationType((byte) 2);
 		notificationService.addNotification(notificationVO);
 
