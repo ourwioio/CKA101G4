@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
@@ -60,6 +61,23 @@ class ActivityServiceTest {
 		verify(orderService).cancelOrdersByActivity(eq(1), anyString());
 		verify(orderService).cancelOrdersByActivity(eq(2), anyString());
 		verify(activityRepository).saveAll(List.of(hostedActivity, alreadyCancelledActivity));
+	}
+
+	@Test
+	void cancelActivityByHost_shouldMarkActivityCancelledAndCancelOrders() {
+		ActivityVO activityVO = activity(8, 3);
+		activityVO.setMemberId(9);
+		activityVO.setEndTime(LocalDateTime.now().plusDays(1));
+		when(activityRepository.findById(8)).thenReturn(Optional.of(activityVO));
+		when(orderService.getActiveBookingCount(8)).thenReturn(0);
+
+		boolean cancelled = activityService.cancelActivityByHost(8, 9);
+
+		assertEquals(true, cancelled);
+		assertEquals((byte) 2, activityVO.getActivityStatus());
+		assertEquals(0, activityVO.getAttendeesCount());
+		verify(activityRepository, times(2)).save(activityVO);
+		verify(orderService).cancelOrdersByActivity(eq(8), anyString());
 	}
 
 	private ActivityVO activity(Integer activityId, Integer attendeesCount) {

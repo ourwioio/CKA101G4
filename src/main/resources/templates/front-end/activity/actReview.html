@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>填寫活動評價｜Webond</title>
 <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 <style>
     /* ==========================================================
        Webond 活動評價頁 — 圓潤角色風 (cream / ink / pastel blobs)
@@ -295,6 +296,8 @@
 <!-- ==========================================================
      核心 JavaScript：完美接管 Google Map 星級交互反饋
      ========================================================== */ -->
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const ratingContainer = document.querySelector('.google-star-rating');

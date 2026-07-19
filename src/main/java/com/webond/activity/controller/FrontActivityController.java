@@ -558,17 +558,49 @@ public class FrontActivityController {
 		}
 		List<ActivityVO> activityList = activitySvc.getActivitiesByMemberId(loginMemberId);
 		Map<Integer, Integer> pendingReviewCountMap = new HashMap<>();
+		Map<Integer, Boolean> canCancelActivityMap = new HashMap<>();
+		Map<Integer, Boolean> endedActivityMap = new HashMap<>();
+		LocalDateTime now = LocalDateTime.now();
 
 		for (ActivityVO activityVO : activityList) {
 			pendingReviewCountMap.put(activityVO.getActivityId(),
 					activityOrderSvc.getPendingReviewCount(activityVO.getActivityId()));
+			boolean hasEnded = activityVO.getEndTime() != null && !activityVO.getEndTime().isAfter(now);
+			endedActivityMap.put(activityVO.getActivityId(), hasEnded);
+			canCancelActivityMap.put(activityVO.getActivityId(),
+					activityVO.getActivityStatus() != null && activityVO.getActivityStatus() != 2
+							&& !hasEnded);
 		}
 
 		addFakeLoginMember(model, session);
 		model.addAttribute("activityListData", activityList);
 		model.addAttribute("pendingReviewCountMap", pendingReviewCountMap);
+		model.addAttribute("canCancelActivityMap", canCancelActivityMap);
+		model.addAttribute("endedActivityMap", endedActivityMap);
 
 		return "front-end/activity/myHostActivity";
+	}
+
+	@PostMapping("/activity/front/cancelHostActivity")
+	public String cancelHostActivity(@RequestParam("activityId") Integer activityId, HttpSession session) {
+		Integer loginMemberId = getLoginMemberId(session);
+		if (loginMemberId == null) {
+			return "redirect:/activity/front/home?loginRequired=true";
+		}
+
+		ActivityVO activityVO = activitySvc.getOneActivity(activityId);
+		if (activityVO == null) {
+			return "redirect:/activity/front/myHostActivity?activityNotFound=true";
+		}
+		if (!loginMemberId.equals(activityVO.getMemberId())) {
+			return "redirect:/activity/front/myHostActivity?noPermission=true";
+		}
+
+		if (!activitySvc.cancelActivityByHost(activityId, loginMemberId)) {
+			return "redirect:/activity/front/myHostActivity?cannotCancel=true";
+		}
+
+		return "redirect:/activity/front/myHostActivity?cancelSuccess=true";
 	}
 
 	@GetMapping("/activity/front/memberList")

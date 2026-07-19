@@ -6,6 +6,7 @@
 <title>活動聊天室</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
@@ -287,5 +288,7 @@ body {
 			<button type="submit">送出</button>
 		</form>
 	</div>
+
+	<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 </body>
 </html>
