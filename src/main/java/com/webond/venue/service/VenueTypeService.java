@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.webond.venue.model.VenueTypeVO;
@@ -36,7 +37,7 @@ public class VenueTypeService {
 	}
 
 	public List<VenueTypeVO> getAll() {
-		return repository.findAll();
+		return repository.findAll(Sort.by(Sort.Direction.DESC, "venueTypeId"));
 	}
 	
 	public Set<VenueVO> getVenueByVenueType(Integer venueTypeId){
