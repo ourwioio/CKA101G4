@@ -14,6 +14,7 @@
 <link rel="stylesheet" th:href="@{/css/front-end/venue/listOneVenue.css}" href="venue-detail.css">
 <link rel="stylesheet" th:href="@{/css/front-end/venue/loginModal.css}">
 <link rel="stylesheet" th:href="@{/css/front-end/venue/photoLightbox.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 </head>
 <body>
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
@@ -166,6 +167,8 @@
 	</button>
 	<div class="lightbox__counter" id="lightboxCounter"></div>
 </div>
+
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
 <script th:src="@{/js/front-end/venue/loginModal.js}"></script>
 <script th:src="@{/js/front-end/venue/photoLightbox.js}"></script>

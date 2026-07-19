@@ -12,6 +12,7 @@
 <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/front-end/venue/update_venue_input.css}" href="edit-venue.css">
+<link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 </head>
 <body>
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
@@ -202,6 +203,8 @@
 		</form>
 	</div>
 </div>
+
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
 <script th:src="@{/js/front-end/venue/addressSelector.js}"></script>
 <script th:src="@{/js/front-end/venue/update_venue_input.js}"></script>
