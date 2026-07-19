@@ -58,7 +58,7 @@ img{ max-width: 100%; }
 }
 .myvenue-tabs a{
 	position: relative;
-	padding: 4px 0;
+	padding: 4px 6px;
 	color: var(--color-ink-soft);
 	text-decoration: none;
 	transition: color .15s ease;
@@ -253,20 +253,20 @@ img{ max-width: 100%; }
 }
 
 .item-card__detail {
-	align-self: flex-end;
-	margin-top: auto;
-	padding-top: 14px;
+	display: inline-block;
 	font-size: 13px;
-	font-weight: 800;
-	color: var(--color-ink);
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
+	background: var(--color-yellow-deep);
+	padding: 4px 14px;
+	color: black;
+	font-weight: bold;
+	border-radius: var(--radius-full);
+	margin-left: auto;
 }
-.item-card__detail::after {
-	content: '\2192';
-	transition: transform .15s ease;
-}
+/* .item-card__detail::after { */
+/* 	content: '\2192'; */
+/* 	transition: transform .15s ease; */
+/* } */
+
 .item-card:hover .item-card__detail::after {
 	transform: translateX(4px);
 }
@@ -280,9 +280,10 @@ img{ max-width: 100%; }
 	border-radius: var(--radius-full);
 	background: var(--color-surface-soft);
 	color: var(--color-ink-soft);
+	margin-right: auto;
 }
 .status-badge--up{ background: var(--color-green); color: var(--color-ink); }
-.status-badge--down{ background: var(--color-surface-soft); color: var(--color-ink-soft); }
+.status-badge--down{ background: LightSalmon; color: var(--color-ink-soft); }
 .status-badge--pending{ background: var(--color-yellow); color: var(--color-ink); }
 
 /* ---------- 表格（場地預約狀況／我的場地評價） ---------- */
