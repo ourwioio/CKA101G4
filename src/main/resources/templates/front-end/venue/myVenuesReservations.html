@@ -21,6 +21,15 @@
 
 	<h2 class="section-title">場地預約狀況</h2>
 
+	<div class="status-filter" th:if="${not #lists.isEmpty(myReservationslist)}">
+<!-- 		<label for="sortDirFilter">排序方式</label> -->
+		<select id="sortDirFilter">
+			<option value="">排序方式</option>
+			<option value="desc">預約日期：新到舊</option>
+			<option value="asc">預約日期：舊到新</option>
+		</select>
+	</div>
+
 	<div class="table-card" th:if="${not #lists.isEmpty(myReservationslist)}">
 		<table class="data-table">
 			<thead>
@@ -35,7 +44,8 @@
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="venueOrderVO : ${myReservationslist}">
+				<tr th:each="venueOrderVO : ${myReservationslist}"
+				    th:attr="data-book-date=${#temporals.format(venueOrderVO.bookDate, 'yyyy-MM-dd')}">
 					<td th:text="${venueOrderVO.venueOrderId}"></td>
 					<td th:text="${venueOrderVO.venueVO.venueId}"></td>
 					<td th:text="${venueOrderVO.venueVO.venueName}"></td>
@@ -66,5 +76,34 @@
 </main>
 
 <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const sortDirFilter = document.getElementById('sortDirFilter');
+		if (!sortDirFilter) return;
+
+		const tbody = document.querySelector('.data-table tbody');
+		const originalRows = Array.from(tbody.querySelectorAll('tr'));
+
+		sortDirFilter.addEventListener('change', function () {
+			const dir = sortDirFilter.value;
+
+			// 還沒選排序方式時，還原成後端給的原始順序（訂單編號）
+			if (!dir) {
+				originalRows.forEach(row => tbody.appendChild(row));
+				return;
+			}
+
+			const sortedRows = originalRows.slice().sort((a, b) => {
+				const dateA = a.dataset.bookDate;
+				const dateB = b.dataset.bookDate;
+				return dir === 'asc'
+					? dateA.localeCompare(dateB)
+					: dateB.localeCompare(dateA);
+			});
+			sortedRows.forEach(row => tbody.appendChild(row));
+		});
+	});
+</script>
 </body>
 </html>
