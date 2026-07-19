@@ -58,6 +58,7 @@ public class VenueVO {
 
 	@Column(name = "ADDRESS")
 	@NotEmpty(message = "場地地址：請勿空白")
+	@Size(max = 50, message = "場地名稱：請勿超過 50 字")
 	private String address;
 
 	@Column(name = "CAPACITY")
@@ -90,6 +91,7 @@ public class VenueVO {
 
 	@Column(name = "VENUE_DESCRIPTION")
 	@Size(max = 200, message = "場地介紹：請勿超過 200 字")
+	@NotEmpty(message = "場地介紹請勿空白")
 	private String venueDescription;
 
 	public VenueVO() {
