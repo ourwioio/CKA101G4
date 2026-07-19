@@ -234,20 +234,32 @@ img{ max-width: 100%; }
 	padding: 8px 14px;
 	border-radius: 10px;
 	cursor: pointer;
+	color: var(--color-ink-soft); 
+	cursor: pointer; 
+	transition: background .15s ease, color .15s ease; 
+	user-select: none;
+	font-weight: 500;
 }
+/* 取消打勾 */
+.field option::checkmark {
+	display: none;
+}
+
 /* 滑鼠停在上面的選項 */
 .field option:hover {
-	background: var(--color-yellow-deep);
-	color: var(--color-ink);
+/* 	background: white; */
+/* 	color: var(--color-ink); */
+	background: var(--color-surface-soft); 
+	color: black; 
 }
 /* 目前被選中的那項 */
 .field option:checked {
-	background: var(--color-yellow-deep);
+	background: #FFE59A;
 	color: #fff;
 }
 /* 鍵盤方向鍵選項 */
 .field option:focus {
-	background: var(--color-yellow-deep);
+	background: #FFE59A;
 	color: var(--color-ink);
 }
 
@@ -493,6 +505,6 @@ img{ max-width: 100%; }
 }
 
 .search-form__grid {
-	grid-template-columns: 1.4fr 1.4fr 0.8fr 1.4fr 1.4fr;
+	grid-template-columns: 1.4fr 1.4fr 0.5fr 1.4fr 1.4fr;
 	/* 場地名稱  地址關鍵字  場地類型  容納人數  每小時費用 */
 }
