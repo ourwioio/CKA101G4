@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>會員全部通知</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
   <style>
 /* ==========================================================
    Webond 全部通知頁 — 圓潤角色風 (cream / ink / pastel blobs)
@@ -329,6 +330,7 @@ a{ text-decoration: none; color: inherit; }
 
     </div>
   </div>
+    <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
   <!-- 原封不動的 AJAX 後端已讀請求腳本 -->
   <script type="text/javascript">
