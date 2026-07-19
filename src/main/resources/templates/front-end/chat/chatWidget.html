@@ -4,11 +4,21 @@
 	<div class="chat-widget-container">
 
 		<!-- A. 聊天室收合時的圓形按鈕 -->
-		<button type="button" class="chat-trigger-btn" id="chatTriggerBtn"
-			onclick="toggleChatWindow()">
-			<span class="chat-icon">💬</span> <span class="chat-badge"
-				id="chatUnreadBadge" style="display: none;">0</span>
-		</button>
+		<!-- A. 聊天室收合時的圓形按鈕 -->
+<button type="button" class="chat-trigger-btn" id="chatTriggerBtn" onclick="toggleChatWindow()">
+    <!-- 💡 替換成您的 SVG，並加上 chat-icon class -->
+    <svg class="chat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8
+                 8.5 8.5 0 0 1-7.6 4.7
+                 8.38 8.38 0 0 1-3.8-.9
+                 L3 21l1.9-5.7
+                 a8.38 8.38 0 0 1-.9-3.8
+                 8.5 8.5 0 0 1 4.7-7.6
+                 8.38 8.38 0 0 1 3.8-.9h.5
+                 a8.48 8.48 0 0 1 8 8v.5z"/>
+    </svg> 
+    <span class="chat-badge" id="chatUnreadBadge" style="display: none;">0</span>
+</button>
 
 		<!-- B. 聊天室主視窗：擴充為雙欄版面 -->
 		<div class="chat-window-split chat-hidden" id="chatWindow"

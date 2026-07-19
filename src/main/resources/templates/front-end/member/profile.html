@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>會員個人檔案</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
   <style>
 
@@ -557,6 +558,7 @@
 </head>
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
 
+
 <body>
   <div class="container">
     <!-- ========== 頭部檔案 ========== -->
@@ -687,7 +689,7 @@
     <section class="section">
       <h2 class="section-title">上架服務</h2>
       <div class="card-grid" id="serviceGrid">
-        <div th:each="service : ${serviceListData}" class="item-card">
+            <div th:each="service : ${serviceListData}" class="item-card">
           <a th:href="@{/front/services/{id}(id=${service.serviceId})}">
             <div class="item-card__thumb-wrap">
               <img th:src="@{/front/services/image/{serviceId}(serviceId=${service.serviceId})}" alt="服務圖片" th:onerror="this.src='/images/file.jpeg'">
@@ -703,12 +705,12 @@
           </a>
         </div>
 
-        <div class="no-items" th:if="${serviceListData == null}">
-          目前尚無上架服務
-        </div>
+        <div class="no-items" th:if="${#lists.isEmpty(serviceListData)}">
+	      目前尚無上架服務
+	    </div>
       </div>
 
-      <div class="pagination" id="servicePagination" th:if="${serviceListData != null}">
+      <div class="pagination" id="servicePagination" th:if="${!#lists.isEmpty(serviceListData)}">
         <button onclick="changePage('service', -1)" id="servicePrevBtn">上一頁</button>
         <span class="page-info" id="servicePageInfo">1 / 1</span>
         <button onclick="changePage('service', 1)" id="serviceNextBtn">下一頁</button>
@@ -819,9 +821,12 @@
         <button onclick="changePage('venue', 1)" id="venueNextBtn">下一頁</button>
       </div>
     </section>
+    
+    
   </div>
-
-  <script th:src="@{/js/front-end/member/profile.js}"></script>
+	
+	<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+	<script th:src="@{/js/front-end/member/profile.js}"></script>
 </body>
 
 </html>
