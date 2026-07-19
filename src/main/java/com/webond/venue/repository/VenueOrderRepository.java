@@ -13,7 +13,7 @@ import com.webond.venue.model.VenueOrderVO;
 public interface VenueOrderRepository
 		extends JpaRepository<VenueOrderVO, Integer>, JpaSpecificationExecutor<VenueOrderVO> {
 
-	List<VenueOrderVO> findByMember_MemberId(Integer memberId);
+	List<VenueOrderVO> findByMember_MemberIdOrderByVenueOrderIdDesc(Integer memberId);
 
 	List<VenueOrderVO> findByOrderStatusAndCreatedAtBefore(Byte orderStatus, LocalDateTime dateTime);
 
