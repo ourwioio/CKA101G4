@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>會員通知詳細資訊</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
   <style>
 /* ==========================================================
    Webond 通知詳情頁 — 圓潤角色風 (cream / ink / pastel blobs)
@@ -246,6 +247,7 @@
     </div>
 
   </div>
+    <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
 </body>
 </html>
