@@ -12,6 +12,7 @@
 <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/front-end/venue/myVenue.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 </head>
 <body>
 <div th:replace="~{front-end/venue/venueHeader :: header('myVenuesReservations')}"></div>
@@ -63,5 +64,7 @@
 	</div>
 
 </main>
+
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 </body>
 </html>

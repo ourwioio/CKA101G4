@@ -347,6 +347,11 @@ public class VenueFrontOrderController {
 	        redirectAttributes.addFlashAttribute("errorMsg", "此訂單的預約日期為三天內，無法申請取消退款");
 	        return "redirect:/front/venueOrder/myVenueOrder";
 	    }
+	    
+	    if (refundReason.length() > 30) {
+	    	redirectAttributes.addFlashAttribute("errorMsg", "退款原因請在30個字以內");
+	    	return "redirect:/front/venueOrder/myVenueOrder";
+	    }
 
 	    venueOrderVO.setOrderStatus((byte) 4);
 	    venueOrderVO.setRefundStatus((byte) 0);

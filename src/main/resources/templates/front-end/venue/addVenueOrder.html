@@ -12,6 +12,7 @@
 <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/front-end/venue/addVenueOrder.css}" href="venue-order.css">
+<link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 </head>
 <body>
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
@@ -110,6 +111,8 @@
 		</div>
 	</div>
 </div>
+
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
 <!-- 把驗證失敗後、後端保留的值，轉成 JS 變數，方便頁面載入時重建畫面狀態 -->
 <!-- 這段需要 Thymeleaf 注入後端資料，無法抽成純外部 .js 檔案，須留在此處 -->

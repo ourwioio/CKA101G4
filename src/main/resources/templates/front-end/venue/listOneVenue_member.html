@@ -13,6 +13,7 @@
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/front-end/venue/listOneVenue_member.css}" href="venue-detail-manage.css">
 <link rel="stylesheet" th:href="@{/css/front-end/venue/photoLightbox.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 </head>
 <body>
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
@@ -168,6 +169,8 @@
 	</button>
 	<div class="lightbox__counter" id="lightboxCounter"></div>
 </div>
+
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
 <script th:src="@{/js/front-end/venue/photoLightbox.js}"></script>
 </body>

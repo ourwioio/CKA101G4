@@ -13,6 +13,7 @@
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/front-end/venue/myVenue.css}">
 <link rel="stylesheet" th:href="@{/css/front-end/venue/myVenueOrder.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 </head>
 <body>
 <div th:replace="~{front-end/venue/venueHeader :: header('myVenueOrder')}"></div>
@@ -182,7 +183,7 @@
 
             <label for="cancelReason" class="cancel-label">請告訴我們取消的原因：</label>
             <textarea name="refundReason" id="cancelReason"
-                      placeholder="請輸入取消原因..." required></textarea>
+                      placeholder="請輸入取消原因..." required maxlength="30"></textarea>
 
             <div class="modal-actions">
                 <button type="button" class="btn-cancel" onclick="closeCancelModal()">返回</button>
@@ -220,6 +221,8 @@
         </div>
     </div>
 </div>
+
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
 <script th:src="@{/js/front-end/venue/myVenueOrder.js}"></script>
 
