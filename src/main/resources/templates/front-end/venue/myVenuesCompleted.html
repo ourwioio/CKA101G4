@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>我的場地評價</title>
+<title>訂單結算與評價</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,28 +19,34 @@
 
 <main class="myvenue-page">
 
-	<h2 class="section-title">我的場地評價</h2>
+	<h2 class="section-title">訂單結算與評價</h2>
+
+	<div class="status-filter" th:if="${not #lists.isEmpty(myAllCompletedlist)}">
+		<label for="venueNameFilter">場地名稱</label>
+		<input type="text" id="venueNameFilter" placeholder="輸入場地名稱查詢">
+	</div>
 
 	<div class="table-card" th:if="${not #lists.isEmpty(myAllCompletedlist)}">
 		<table class="data-table">
 			<thead>
 				<tr>
 					<th>訂單編號</th>
-					<th>場地編號</th>
+<!-- 					<th>場地編號</th> -->
 					<th>買方會員姓名</th>
 					<th>場地名稱</th>
 					<th>撥款狀態</th>
 					<th>預約日期</th>
-					<th>預約時段</th>
-					<th>評價星數</th>
+<!-- 					<th>預約時段</th> -->
+<!-- 					<th>評價星數</th> -->
 					<th>評價內容</th>
 				</tr>
 			</thead>
 			<tbody>
-				<tr th:each="venueOrderVO : ${myAllCompletedlist}">
-					<td ><a class="venueOrderId" th:href="@{/front/venueOrder/getOneReservations(venueOrderId=${venueOrderVO.venueOrderId})}" 
+				<tr th:each="venueOrderVO : ${myAllCompletedlist}"
+				    th:attr="data-venue-name=${venueOrderVO.venueVO.venueName}">
+					<td ><a class="venueOrderId" th:href="@{/front/venueOrder/getOneReservations(venueOrderId=${venueOrderVO.venueOrderId})}"
 					th:text="${venueOrderVO.venueOrderId}"></a></td>
-					<td th:text="${venueOrderVO.venueVO.venueId}"></td>
+<!-- 					<td th:text="${venueOrderVO.venueVO.venueId}"></td> -->
 					<td th:text="${venueOrderVO.member.realName}"></td>
 					<td th:text="${venueOrderVO.venueVO.venueName}"></td>
 					<td th:switch="${venueOrderVO.payoutAmount}">
@@ -48,16 +54,22 @@
 						<span th:case="1" class="status-badge status-badge--up">已撥款</span>
 					</td>
 					<td th:text="${venueOrderVO.bookDate}"></td>
-					<td th:text="${venueOrderVO.startAt} + '~' + ${venueOrderVO.endAt}"></td>
+<!-- 					<td th:text="${venueOrderVO.startAt} + '~' + ${venueOrderVO.endAt}"></td> -->
+<!-- 					<td> -->
+<!-- 						<span class="stars-readonly" th:if="${venueOrderVO.venueRating != null}"> -->
+<!-- 							<span th:each="i : ${#numbers.sequence(1,5)}" -->
+<!-- 							      th:text="'★'" -->
+<!-- 							      th:class="${i <= venueOrderVO.venueRating} ? 'filled' : ''"></span> -->
+<!-- 						</span> -->
+<!-- 						<span th:if="${venueOrderVO.venueRating == null}">尚未評價</span> -->
+<!-- 					</td> -->
 					<td>
-						<span class="stars-readonly" th:if="${venueOrderVO.venueRating != null}">
-							<span th:each="i : ${#numbers.sequence(1,5)}"
-							      th:text="'★'"
-							      th:class="${i <= venueOrderVO.venueRating} ? 'filled' : ''"></span>
-						</span>
+						<button type="button" class="btn-view-review"
+						        th:if="${venueOrderVO.venueRating != null}"
+						        th:attr="data-rating=${venueOrderVO.venueRating}, data-comment=${venueOrderVO.venueComment}"
+						        onclick="openViewReviewModal(this)">查看評價</button>
 						<span th:if="${venueOrderVO.venueRating == null}">尚未評價</span>
 					</td>
-					<td th:text="${venueOrderVO.venueComment}"></td>
 				</tr>
 			</tbody>
 		</table>
@@ -70,6 +82,67 @@
 
 </main>
 
+<!-- 查看評價 Modal -->
+<div class="modal-overlay" id="viewReviewModalOverlay">
+	<div class="modal-box">
+		<h3>使用者評價</h3>
+
+		<div class="view-review-stars" id="viewReviewStars"></div>
+		<p class="view-review-comment" id="viewReviewComment"></p>
+
+		<div class="modal-actions">
+			<button type="button" class="btn-cancel" onclick="closeViewReviewModal()">關閉</button>
+		</div>
+	</div>
+</div>
+
 <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		const venueNameFilter = document.getElementById('venueNameFilter');
+		if (!venueNameFilter) return;
+
+		const rows = Array.from(document.querySelectorAll('.data-table tbody tr'));
+
+		venueNameFilter.addEventListener('input', function () {
+			const keyword = venueNameFilter.value.trim().toLowerCase();
+			rows.forEach(function (row) {
+				const venueName = (row.dataset.venueName || '').toLowerCase();
+				row.style.display = !keyword || venueName.includes(keyword) ? '' : 'none';
+			});
+		});
+	});
+
+	function openViewReviewModal(btn) {
+		const rating = parseInt(btn.getAttribute('data-rating'), 10) || 0;
+		const comment = btn.getAttribute('data-comment');
+
+		let starsHtml = '';
+		for (let i = 1; i <= 5; i++) {
+			starsHtml += '<span class="' + (i <= rating ? 'filled' : '') + '">★</span>';
+		}
+		document.getElementById('viewReviewStars').innerHTML = starsHtml;
+
+		const commentEl = document.getElementById('viewReviewComment');
+		if (comment && comment !== 'null' && comment.trim() !== '') {
+			commentEl.textContent = comment;
+			commentEl.classList.remove('view-review-empty');
+		} else {
+			commentEl.textContent = '（沒有留下文字評論）';
+			commentEl.classList.add('view-review-empty');
+		}
+
+		document.getElementById('viewReviewModalOverlay').style.display = 'flex';
+	}
+
+	function closeViewReviewModal() {
+		document.getElementById('viewReviewModalOverlay').style.display = 'none';
+	}
+
+	document.getElementById('viewReviewModalOverlay').addEventListener('click', function (e) {
+		if (e.target === this) closeViewReviewModal();
+	});
+</script>
 </body>
 </html>

@@ -3,6 +3,7 @@
 	--radius-lg: 26px;
 	--radius-md: 16px;
 	--shadow-md: 0 14px 34px rgba(23, 20, 15, 0.10);
+	--color-yellow-deep:  #FFC94D;
 }
 
 *{ box-sizing: border-box; }
@@ -81,7 +82,7 @@ body {
 	text-decoration-color: var(--color-border);
 	transition: color .15s ease;
 }
-.info-link:hover{ color: var(--color-yellow-deep); }
+/* .info-link:hover{ color: var(--color-yellow-deep); } */
 
 .status-badge{
 	display: inline-block;
@@ -97,4 +98,22 @@ body {
 	.card{ padding: 24px 20px; }
 	.info-row{ flex-direction: column; align-items: flex-start; gap: 4px; }
 	.info-value{ text-align: left; }
+}
+
+.member{
+	display: inline-block;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    background: var(--color-yellow);
+    color: black;
+/*     margin-right: auto; */
+    text-decoration: none;
+}
+
+.member:hover{
+	transform: translateY(-6px);
+	box-shadow: var(--shadow-md);
+	background: var(--color-yellow-deep);
+	transition: transform .15s ease;
 }

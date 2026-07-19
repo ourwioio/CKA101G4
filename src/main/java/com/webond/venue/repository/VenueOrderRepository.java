@@ -22,6 +22,7 @@ public interface VenueOrderRepository
 			JOIN o.venueVO v
 			JOIN v.member m
 			WHERE m.memberId = :ownerMemberId AND o.orderStatus = :orderStatus
+			ORDER BY o.venueOrderId DESC
 			""")
 	List<VenueOrderVO> findPaidOrdersByVenueOwner(@Param("ownerMemberId") Integer ownerMemberId,
 			@Param("orderStatus") Byte orderStatus);
