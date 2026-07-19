@@ -154,7 +154,6 @@ public class ChatService {
                 System.err.println("⚠️ 已讀後自動預熱快取失敗: " + e.getMessage());
             }
             
-            System.out.println("🚀 [已讀持久化] 成功標記 " + updatedRows + " 筆訊息為已讀，並成功刷新且預熱 Redis 快取。");
         }
     }
 	
