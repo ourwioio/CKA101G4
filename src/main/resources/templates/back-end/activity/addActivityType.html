@@ -28,23 +28,31 @@
         .btn-cancel { background-color: #ffffff; color: #475569; border: 1px solid #cbd5e1; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; text-decoration: none; transition: all 0.2s; }
         .btn-cancel:hover { background-color: #f1f5f9; }
     </style>
+    <link rel="stylesheet" th:href="@{/css/back-end/activity/activityAdmin.css}">
 </head>
 <body>
-    <div class="header-container">
-        <div class="header-title">➕ 新增活動分類</div>
-        <a th:href="@{/admin/activity/type/listAllActivityType}" class="btn-secondary">🔙 返回列表</a>
-    </div>
-    <div class="form-card">
-        <form th:action="@{/admin/activity/type/insert}" th:object="${activityTypeVO}" method="post">
-            <div class="form-group">
-                <label>分類標籤名稱 <span style="color: #ef4444;">*</span></label>
-                <input type="text" class="form-control" th:field="*{activityTypeName}" placeholder="例如：桌遊益智" required>
+    <div class="wb-admin-layout">
+        <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
+        <main class="wb-admin-content">
+            <div class="activity-type-form">
+                <div class="header-container">
+                    <div class="header-title">新增活動分類</div>
+                    <a th:href="@{/admin/activity/type/listAllActivityType}" class="btn-secondary">返回列表</a>
+                </div>
+                <div class="form-card">
+                    <form th:action="@{/admin/activity/type/insert}" th:object="${activityTypeVO}" method="post">
+                        <div class="form-group">
+                            <label>分類標籤名稱 <span style="color: #ef4444;">*</span></label>
+                            <input type="text" class="form-control" th:field="*{activityTypeName}" placeholder="例如：桌遊益智" required>
+                        </div>
+                        <div class="form-actions">
+                            <a th:href="@{/admin/activity/type/listAllActivityType}" class="btn-cancel">取消</a>
+                            <button type="submit" class="btn-submit">儲存並啟用</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-actions">
-                <a th:href="@{/admin/activity/type/listAllActivityType}" class="btn-cancel">取消</a>
-                <button type="submit" class="btn-submit">💾 儲存並啟用</button>
-            </div>
-        </form>
+        </main>
     </div>
 </body>
 </html>

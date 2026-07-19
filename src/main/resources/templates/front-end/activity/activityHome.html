@@ -1,211 +1,70 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<title>活動後台</title>
-<style>
-body {
-	margin: 0;
-	background: #f8fafc;
-	font-family: "Microsoft JhengHei", sans-serif;
-	color: #1e293b;
-}
-
-.activity-admin-content {
-	padding: 40px;
-}
-
-.top-actions {
-	max-width: 1100px;
-	margin: 0 auto 20px;
-	display: flex;
-	justify-content: flex-end;
-}
-
-.btn-home {
-	background: #64748b;
-	color: white;
-	text-decoration: none;
-	padding: 10px 18px;
-	border-radius: 8px;
-	font-weight: bold;
-}
-
-.header {
-	max-width: 1100px;
-	margin: auto;
-	text-align: center;
-	margin-bottom: 28px;
-}
-
-.header h1 {
-	font-size: 2.2rem;
-	margin-bottom: 10px;
-	color: #0f172a;
-}
-
-.header p {
-	color: #64748b;
-	font-size: 1.05rem;
-}
-
-.login-panel {
-	max-width: 1100px;
-	margin: 0 auto 32px;
-	background: white;
-	border: 1px solid #e2e8f0;
-	border-radius: 12px;
-	padding: 18px 20px;
-	box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	gap: 16px;
-}
-
-.login-panel strong {
-	color: #0f172a;
-}
-
-.warning {
-	max-width: 1100px;
-	margin: 0 auto 20px;
-	background: #fef3c7;
-	color: #92400e;
-	border: 1px solid #fde68a;
-	border-radius: 10px;
-	padding: 14px 18px;
-	font-weight: bold;
-}
-
-.card-container {
-	max-width: 1100px;
-	margin: auto;
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-	gap: 30px;
-}
-
-.card {
-	background: #fff;
-	border-radius: 15px;
-	padding: 35px;
-	text-align: center;
-	border: 1px solid #e2e8f0;
-	box-shadow: 0 5px 12px rgba(0, 0, 0, .08);
-}
-
-.card h2 {
-	margin: 10px 0;
-	color: #0f172a;
-}
-
-.card p {
-	color: #64748b;
-	line-height: 1.7;
-	min-height: 60px;
-}
-
-.btn {
-	display: inline-block;
-	margin-top: 20px;
-	padding: 12px 28px;
-	border-radius: 8px;
-	color: white;
-	text-decoration: none;
-	font-weight: bold;
-}
-
-.activity {
-	background: #3b82f6;
-}
-
-.type {
-	background: #8b5cf6;
-}
-
-.order {
-	background: #0f766e;
-}
-
-.finance {
-	background: #d97706;
-}
-
-.report {
-	background: #e11d48;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活動管理中心</title>
+    <link rel="stylesheet" th:href="@{/css/back-end/activity/activityAdmin.css}">
 </head>
-
 <body>
 <div class="wb-admin-layout">
-	<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
-	<main class="wb-admin-content activity-admin-content">
-	<div class="top-actions">
-		<a th:href="@{/admin/adminPage}" class="btn-home">回後台首頁</a>
-	</div>
+    <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
 
-	<div class="header">
-		<h1>活動後台</h1>
-		<p>
-			目前員工：<span th:text="${loginEmployeeName}">未登入</span>
-			<span th:if="${isLoginEmployee}">（員工編號 <span th:text="${loginEmployeeId}">1</span>）</span>
-		</p>
-	</div>
+    <main class="wb-admin-content">
+        <div class="activity-home">
+            <header class="activity-home-header">
+                <h1 class="activity-title">活動管理中心</h1>
+                <p class="activity-description">管理平台活動、活動類別、訂單紀錄與款項處理。</p>
+                <div class="employee-info">
+                    目前登入員工：
+                    <span th:text="${loginEmployeeName}">管理員</span>
+                    <span th:if="${isLoginEmployee}">
+                        （員工編號 <span th:text="${loginEmployeeId}">1</span>）
+                    </span>
+                </div>
+            </header>
 
-	<div th:if="${param.loginRequired}" class="warning">
-		請先登入後台員工，才能查看活動後台資料。
-	</div>
+            <div th:if="${param.loginRequired}" class="activity-alert">
+                請先登入後台管理系統，再使用活動管理功能。
+            </div>
 
-	<div class="login-panel">
-		<div>
-			<strong>後台員工登入狀態</strong>
-			<div th:if="${isLoginEmployee}">
-				已使用正式員工登入，可查看活動資料、訂單紀錄與撥退款作業。
-			</div>
-			<div th:unless="${isLoginEmployee}">
-				請先使用員工帳號登入後台，才能使用活動後台功能。
-			</div>
-		</div>
-	</div>
+            <section class="activity-menu" th:if="${isLoginEmployee}">
+                <article class="activity-card">
+                    <h2 class="activity-card-title">活動管理</h2>
+                    <p class="activity-card-description">查看平台所有活動、目前狀態與參加人數，並處理需要下架的活動。</p>
+                    <a class="activity-card-link" th:href="@{/admin/activity/listAllActivity}">進入活動管理</a>
+                </article>
 
-	<div th:unless="${isLoginEmployee}" class="warning">
-		目前尚未登入後台員工，下方功能卡片會暫時隱藏。
-	</div>
+                <article class="activity-card">
+                    <h2 class="activity-card-title">類別管理</h2>
+                    <p class="activity-card-description">維護活動類別名稱，讓前台活動建立與搜尋分類保持一致。</p>
+                    <a class="activity-card-link" th:href="@{/admin/activity/type/listAllActivityType}">進入類別管理</a>
+                </article>
 
-	<div class="card-container" th:if="${isLoginEmployee}">
-		<div class="card">
-			<h2>活動管理</h2>
-			<p>後台只可查看活動與下架活動，不提供新增或修改活動。</p>
-			<a class="btn activity" th:href="@{/admin/activity/listAllActivity}">進入活動管理</a>
-		</div>
+                <article class="activity-card">
+                    <h2 class="activity-card-title">訂單紀錄</h2>
+                    <p class="activity-card-description">查看會員報名訂單、付款方式、訂單金額與目前處理狀態。</p>
+                    <a class="activity-card-link" th:href="@{/admin/activity/order/listAllActivityOrder}">查看訂單紀錄</a>
+                </article>
 
-		<div class="card">
-			<h2>活動類別管理</h2>
-			<p>管理活動分類資料。</p>
-			<a class="btn type" th:href="@{/admin/activity/type/listAllActivityType}">進入類別管理</a>
-		</div>
+                <article class="activity-card">
+                    <h2 class="activity-card-title">撥退款作業</h2>
+                    <p class="activity-card-description">集中處理活動取消退款與活動完成後的主辦方撥款。</p>
+                    <a class="activity-card-link activity-card-link--finance" th:href="@{/admin/activity/order/finance}">進入撥退款作業</a>
+                </article>
 
-		<div class="card">
-			<h2>訂單紀錄</h2>
-			<p>查看活動報名、付款與訂單狀態；報名審核由主辦會員處理。</p>
-			<a class="btn order" th:href="@{/admin/activity/order/listAllActivityOrder}">查看訂單紀錄</a>
-		</div>
+                <article class="activity-card">
+                    <h2 class="activity-card-title">活動檢舉審核</h2>
+                    <p class="activity-card-description">查看活動檢舉內容與處理進度，維護平台活動品質。</p>
+                    <a class="activity-card-link activity-card-link--report" th:href="@{/admin/activity/actRptList}">進入檢舉審核</a>
+                </article>
+            </section>
 
-		<div class="card">
-			<h2>撥退款作業</h2>
-			<p>處理活動訂單的待退款、已退款、待撥款與已撥款狀態。</p>
-			<a class="btn finance" th:href="@{/admin/activity/order/finance}">進入撥退款作業</a>
-		</div>
-		
-		<div class="card">
-			<h2>活動檢舉審核</h2>
-			<p>處理活動檢舉與申訴案件。</p>
-			<a class="btn report" th:href="@{/admin/activity/actRptList}">進入活動檢舉審核</a>
-		</div>
-	</div>
-	</main>
+            <div th:unless="${isLoginEmployee}" class="activity-alert">
+                尚未登入後台，請先由後台登入頁完成登入。
+            </div>
+        </div>
+    </main>
 </div>
 </body>
 </html>

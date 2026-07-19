@@ -352,7 +352,9 @@ td:nth-child(2) { color: var(--color-ink); font-weight: 800; }
 					</tr>
 
 					<tr th:each="order : ${orderListData}"
-						th:attr="data-order-id=${order.activityOrderId},data-order-status=${order.orderStatus}">
+						th:attr="data-order-id=${order.activityOrderId},
+						         data-order-status=${order.orderStatus},
+						         data-order-refund-status=${order.refundStatus}">
 						<td th:text="${order.activityOrderId}"></td>
 
 						<td>
@@ -523,7 +525,10 @@ td:nth-child(2) { color: var(--color-ink); font-weight: 800; }
 				.then(function(data) {
 					const hasChanged = rows.some(function(row) {
 						const current = data[row.dataset.orderId];
-						return current && String(current.orderStatus) !== String(row.dataset.orderStatus);
+						return current && (
+							String(current.orderStatus) !== String(row.dataset.orderStatus)
+							|| String(current.refundStatus) !== String(row.dataset.orderRefundStatus)
+						);
 					});
 					if (hasChanged) {
 						window.location.reload();

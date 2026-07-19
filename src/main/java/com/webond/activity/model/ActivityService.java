@@ -58,6 +58,9 @@ public class ActivityService {
 
 			if (status != null) {
 				predicates.add(cb.equal(root.get("activityStatus"), status));
+			} else {
+				// 前台未指定狀態時，不公開顯示已下架／已取消的活動。
+				predicates.add(cb.notEqual(root.get("activityStatus"), ACTIVITY_STATUS_CANCELLED));
 			}
 
 			if (excludeMemberId != null) {

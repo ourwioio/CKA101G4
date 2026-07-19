@@ -721,7 +721,11 @@
     <section class="section">
       <h2 class="section-title">舉辦活動紀錄</h2>
       <div class="card-grid" id="activityGrid">
-        <div th:each="activity : ${activityListData}" class="item-card">
+        <div th:each="activity : ${activityListData}" class="item-card"
+             th:attr="data-live-activity-id=${activity.activityId},
+                      data-live-activity-status=${activity.activityStatus},
+                      data-live-attendees-count=${activity.attendeesCount},
+                      data-live-registration-status=${registrationStatusMap[activity.activityId]}">
           <a th:href="@{/activity/front/detail(id=${activity.activityId})}">
             <div class="item-card__thumb-wrap">
               <img th:src="@{/activity/front/image(id=${activity.activityId})}" alt="活動圖片" th:onerror="this.src='/images/file.jpeg'">
@@ -827,6 +831,7 @@
 	
 	<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 	<script th:src="@{/js/front-end/member/profile.js}"></script>
+<script th:src="@{/js/front-end/activity/activityStatusPolling.js}"></script>
 </body>
 
 </html>

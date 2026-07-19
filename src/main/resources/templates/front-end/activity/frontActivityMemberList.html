@@ -281,7 +281,12 @@ td:nth-child(7) { text-align: left; }
 <body>
 
 <div class="container"
-    th:attr="data-activity-id=${activityVO.activityId},data-order-count=${orderCount},data-latest-order-id=${latestOrderId}">
+    th:attr="data-activity-id=${activityVO.activityId},
+             data-order-count=${orderCount},
+             data-latest-order-id=${latestOrderId},
+             data-live-activity-id=${activityVO.activityId},
+             data-live-activity-status=${activityVO.activityStatus},
+             data-live-attendees-count=${activityVO.attendeesCount}">
 
     <div class="header">
         <div>
@@ -566,5 +571,6 @@ td:nth-child(7) { text-align: left; }
     bindReviewForms();
 </script>
 
+<script th:src="@{/js/front-end/activity/activityStatusPolling.js}"></script>
 </body>
 </html>
