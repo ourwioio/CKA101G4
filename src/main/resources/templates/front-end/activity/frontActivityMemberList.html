@@ -6,6 +6,7 @@
 <title>報名審核</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
 <style>
@@ -396,6 +397,8 @@ td:nth-child(7) { text-align: left; }
     </div>
 
 </div>
+
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
 <script th:inline="javascript">
     function formatRemaining(milliseconds) {

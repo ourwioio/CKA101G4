@@ -23,6 +23,7 @@ public class ActivityService {
 	private static final boolean ENFORCE_REGISTRATION_TIME = false;
 	private static final Byte ACTIVITY_STATUS_CANCELLED = 2;
 	private static final String DISABLED_MEMBER_CANCELLATION_REASON = "會員停權或註銷，系統取消活動及訂單";
+	private static final String HOST_CANCELLATION_REASON = "活動發起者下架活動，系統取消訂單";
 
 	@Autowired
 	private ActivityRepository repository;
@@ -169,6 +170,36 @@ public class ActivityService {
 		for (Integer activityId : affectedActivityIds) {
 			syncAttendeesFromOrders(activityId);
 		}
+	}
+
+	/**
+	 * 由活動發起者自行下架尚未結束的活動。
+	 * 活動資料不會刪除，而是改為狀態 2（已取消），並同步取消未完成訂單與退款標記。
+	 */
+	@Transactional
+	public boolean cancelActivityByHost(Integer activityId, Integer hostMemberId) {
+		if (activityId == null || hostMemberId == null) {
+			return false;
+		}
+
+		ActivityVO activityVO = repository.findById(activityId).orElse(null);
+		if (activityVO == null || !hostMemberId.equals(activityVO.getMemberId())) {
+			return false;
+		}
+
+		if (ACTIVITY_STATUS_CANCELLED.equals(activityVO.getActivityStatus())) {
+			return true;
+		}
+
+		if (activityVO.getEndTime() == null || !activityVO.getEndTime().isAfter(LocalDateTime.now())) {
+			return false;
+		}
+
+		activityVO.setActivityStatus(ACTIVITY_STATUS_CANCELLED);
+		repository.save(activityVO);
+		activityOrderSvc.cancelOrdersByActivity(activityId, HOST_CANCELLATION_REASON);
+		syncAttendeesFromOrders(activityId);
+		return true;
 	}
 
 	// 報名成功後增加已報名人數
