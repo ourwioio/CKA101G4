@@ -108,46 +108,52 @@ public class MemberFrontControllerAyaka {
 	                    )
 	            ))
 	            .collect(Collectors.toList());
+	    List<ServiceVO> serviceListData = serviceService.getAll().stream()
+	            .filter(s -> s.getMemberId().equals(memberId))
+	            .filter(s -> s.getStatus() == 1)
+	            .collect(Collectors.toList());
+
+
 
 	    model.addAttribute("registrationStatusMap", registrationStatusMap);
 	    model.addAttribute("activityListData", sortedActivityList); // 給 Thymeleaf 用排序後的清單
 
+	    model.addAttribute("serviceListData", serviceListData);
 	    model.addAttribute("memberVO", memberVO);
-	    model.addAttribute("serviceListData", serviceList);
 	    model.addAttribute("venueListData", venueList);
 
 	    return "front-end/member/profile";
 	}
 	
 
-	
-	
 	//會員個人頁面
 	@GetMapping("my")
-	public String getMyMemberPage(
-	        ModelMap model, HttpSession session) {	
-		
-		MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
-		if(loginMember == null) {
-			return "redirect:/member/login";
-		}
-		
-		Integer memberId = loginMember.getMemberId();
-		
-		MemberVO memberVO = memberService.getOneMember(memberId);
-	    ServiceVO serviceList = serviceService.getOneService(memberId);
+	public String getMyMemberPage(ModelMap model, HttpSession session) {
+
+	    MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
+	    if (loginMember == null) {
+	        return "redirect:/member/login";
+	    }
+
+	    Integer memberId = loginMember.getMemberId();
+
+	    MemberVO memberVO = memberService.getOneMember(memberId);
 	    List<VenueVO> venueList = venueService.getActiveByMember(memberId);
 	    List<MemberReviewDTO> reviews = myReviewService.getReviewsByMemberId(memberId);
 	    addHostedActivityData(model, memberId);
 	    model.addAttribute("reviews", reviews);
-	    
 
+	    // 只保留這個會員、且上架中的服務
+	    List<ServiceVO> serviceListData = serviceService.getAll().stream()
+	            .filter(s -> s.getMemberId().equals(memberId))
+	            .filter(s -> s.getStatus() == 1)
+	            .collect(Collectors.toList());
 
 	    List<ActivityVO> activityList = activityService.getAll();
 	    Map<Integer, String> registrationStatusMap = memberService.getRegistrationStatusMap(activityList);
 
 	    // 依優先順序排序活動清單
-	    List<ActivityVO> sortedActivityList = activityList.stream()
+	    List<ActivityVO> activityListData = activityList.stream()
 	            .sorted(Comparator.comparingInt(activityVO ->
 	                    STATUS_PRIORITY.getOrDefault(
 	                            registrationStatusMap.get(activityVO.getActivityId()),
@@ -157,17 +163,16 @@ public class MemberFrontControllerAyaka {
 	            .collect(Collectors.toList());
 
 	    model.addAttribute("registrationStatusMap", registrationStatusMap);
-	    model.addAttribute("activityDataList", sortedActivityList); // 給 Thymeleaf 用排序後的清單
-	    
-	    model.addAttribute("memberVO", memberVO);
-	    model.addAttribute("serviceListData", serviceList);
-	    model.addAttribute("venueListData", venueList);
-		
+	    model.addAttribute("activityListData", activityListData);
 
-	    
-	    
-		return "front-end/member/myProfile";
+	    model.addAttribute("memberVO", memberVO);
+	    model.addAttribute("serviceListData", serviceListData);   // 改成用正確過濾好的清單
+	    model.addAttribute("venueListData", venueList);
+
+	    return "front-end/member/myProfile";
 	}
+	
+	
 
 	private void addHostedActivityData(ModelMap model, Integer memberId) {
 		LocalDateTime now = LocalDateTime.now();

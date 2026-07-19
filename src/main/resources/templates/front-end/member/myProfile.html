@@ -7,6 +7,7 @@
   <title>會員個人檔案</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/member/profileEdit.css}">
+   <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
   <style>
 	/* ==========================================================
 	   Webond 會員個人檔案頁 — 圓潤角色風 (cream / ink / pastel blobs)
@@ -485,81 +486,81 @@
     </div>
 
     <!-- ========== 上架服務區塊 ========== -->
-    <section class="section">
-      <h2 class="section-title">上架服務</h2>
-      <div class="card-grid" id="serviceGrid">
-        <div th:each="service : ${serviceListData}" class="item-card">
-          <a th:href="@{/front/services/{id}(id=${service.serviceId})}">
-            <div class="item-card__thumb-wrap">
-              <img th:src="@{/front/services/image/{serviceId}(serviceId=${service.serviceId})}" alt="服務圖片" th:onerror="this.src='/images/file.jpeg'">
-            </div>
-            <div class="item-card__body">
-              <h3 class="item-card__title" th:text="${service.serviceName}">服務名稱</h3>
-              <span class="item-card__price">NT$ <span th:text="${service.hourlyRate}">500</span></span>
-              <div class="item-card__footer">
-                <span class="item-card__date" th:text="${#temporals.format(service.createdAt, 'yyyy-MM-dd')}">建立日期</span>
-                <span class="item-card__detail-btn">查看詳情 →</span>
-              </div>
-            </div>
-          </a>
-        </div>
-
-        <div class="no-items" th:if="${serviceListData == null}">
-          目前尚無上架服務
-        </div>
-      </div>
-
-      <div class="pagination" id="servicePagination" th:if="${serviceListData != null}">
-        <button onclick="changePage('service', -1)" id="servicePrevBtn">上一頁</button>
-        <span class="page-info" id="servicePageInfo">1 / 1</span>
-        <button onclick="changePage('service', 1)" id="serviceNextBtn">下一頁</button>
-      </div>
-    </section>
+   <section class="section">
+	  <h2 class="section-title">上架服務</h2>
+	  <div class="card-grid" id="serviceGrid">
+	
+	    <div th:each="service : ${serviceListData}"
+	         class="item-card"
+	         th:attr="data-status=${service.status}">
+	      <a th:href="@{/front/services/{id}(id=${service.serviceId})}">
+	        <div class="item-card__thumb-wrap">
+	          <img th:src="@{/front/services/image/{serviceId}(serviceId=${service.serviceId})}" alt="服務圖片" th:onerror="this.src='/images/file.jpeg'">
+	        </div>
+	        <div class="item-card__body">
+	          <h3 class="item-card__title" th:text="${service.serviceName}">服務名稱</h3>
+	          <span class="item-card__price">NT$ <span th:text="${service.hourlyRate}">500</span></span>
+	          <div class="item-card__footer">
+	            <span class="item-card__date" th:text="${#temporals.format(service.createdAt, 'yyyy-MM-dd')}">建立日期</span>
+	            <span class="item-card__detail-btn">查看詳情 →</span>
+	          </div>
+	        </div>
+	      </a>
+	    </div>
+	
+	    <div class="no-items" th:if="${#lists.isEmpty(serviceListData)}">
+	      目前尚無上架服務
+	    </div>
+	  </div>
+	
+	  <div class="pagination" id="servicePagination" th:if="${serviceListData != null and serviceListData.size() > 4}">
+	    <button onclick="changePage('service', -1)" id="servicePrevBtn">上一頁</button>
+	    <span class="page-info" id="servicePageInfo">1 / 1</span>
+	    <button onclick="changePage('service', 1)" id="serviceNextBtn">下一頁</button>
+	  </div>
+	</section>
 
     <!-- ========== 舉辦活動區塊 ========== -->
-    <section class="section">
-      <h2 class="section-title">舉辦活動紀錄</h2>
-      <div class="card-grid" id="activityGrid">
-        <div th:each="activity : ${activityListData}" class="item-card">
-          <a th:href="@{/activity/front/detail(id=${activity.activityId})}">
-            <div class="item-card__thumb-wrap">
-              <img th:src="@{/activity/front/image(id=${activity.activityId})}" alt="活動圖片" th:onerror="this.src='/images/file.jpeg'">
-            </div>
-            <div class="item-card__body item-card__body--status">
-              
-              	<span class="status-badge"
-				      th:classappend="${
-				          registrationStatusMap[activity.activityId] == '即將截止'} ? 'status-badge--delayed' :
-				          (${registrationStatusMap[activity.activityId]} == '報名中' ? 'status-badge--ongoing' : 'status-badge--cancel')"
-				      th:text="${registrationStatusMap[activity.activityId]}">
-				    活動狀態
-				</span>
-             
-
-              <h3 class="item-card__title" th:text="${activity.activityTitle}">活動名稱</h3>
-              <span class="item-card__price">NT$ <span th:text="${activity.activityPrice}">0</span></span>
-              
-              <div class="item-card__footer">
-                <span class="item-card__date"
-                  th:text="${#temporals.format(activity.startTime, 'yyyy-MM-dd')+' ~ '+#temporals.format(activity.endTime, 'yyyy-MM-dd')}">活動時間</span>
-                <span class="item-card__detail-btn">查看詳情 →</span>
-              </div>
-            </div>
-          </a>
+  <section class="section">
+  <h2 class="section-title">舉辦活動紀錄</h2>
+  <div class="card-grid" id="activityGrid">
+    <div th:each="activity : ${activityListData}" class="item-card">
+      <a th:href="@{/activity/front/detail(id=${activity.activityId})}">
+        <div class="item-card__thumb-wrap">
+          <img th:src="@{/activity/front/image(id=${activity.activityId})}" alt="活動圖片" th:onerror="this.src='/images/file.jpeg'">
         </div>
+        <div class="item-card__body item-card__body--status">
 
-        <div class="no-items" th:if="${#lists.isEmpty(activityListData)}">
-          目前尚無舉辦活動
+          <span class="status-badge"
+                th:classappend="${registrationStatusMap[activity.activityId] == '即將截止' ? 'status-badge--delayed' : 
+                                 (registrationStatusMap[activity.activityId] == '報名中' ? 'status-badge--ongoing' : 'status-badge--cancel')}"
+                th:text="${registrationStatusMap[activity.activityId]}">
+            活動狀態
+          </span>
+
+          <h3 class="item-card__title" th:text="${activity.activityTitle}">活動名稱</h3>
+          <span class="item-card__price">NT$ <span th:text="${activity.activityPrice}">0</span></span>
+
+          <div class="item-card__footer">
+            <span class="item-card__date"
+              th:text="${#temporals.format(activity.startTime, 'yyyy-MM-dd')+' ~ '+#temporals.format(activity.endTime, 'yyyy-MM-dd')}">活動時間</span>
+            <span class="item-card__detail-btn">查看詳情 →</span>
+          </div>
         </div>
-      </div>
+      </a>
+    </div>
 
-      <div class="pagination" id="activityPagination" th:if="${!#lists.isEmpty(activityListData)}">
-        <button onclick="changePage('activity', -1)" id="activityPrevBtn">上一頁</button>
-        <span class="page-info" id="activityPageInfo">1 / 1</span>
-        <button onclick="changePage('activity', 1)" id="activityNextBtn">下一頁</button>
-      </div>
-    </section>
+    <div class="no-items" th:if="${#lists.isEmpty(activityListData)}">
+      目前尚無舉辦活動
+    </div>
+  </div>
 
+  <div class="pagination" id="activityPagination" th:if="${activityListData != null and activityListData.size() > 4}">
+    <button onclick="changePage('activity', -1)" id="activityPrevBtn">上一頁</button>
+    <span class="page-info" id="activityPageInfo">1 / 1</span>
+    <button onclick="changePage('activity', 1)" id="activityNextBtn">下一頁</button>
+  </div>
+</section>
     <!-- ========== 場地提供區塊 ========== -->
     <section class="section">
       <h2 class="section-title">場地提供</h2>
@@ -610,7 +611,7 @@
       </div>
     </section>
   </div>
-  
+  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
   <script th:src="@{/js/front-end/member/profile.js}"></script>
 </body>
 
