@@ -117,12 +117,19 @@ img{ max-width: 100%; }
 .provider-btn{
 	display: inline-block;
 	padding: 6px 16px;
-	background: var(--color-yellow-deep);
-	color: #fff;
+	background: var(--color-yellow);
+	color: black;
 	border-radius: var(--radius-full);
 	font-size: 13px;
 	font-weight: 700;
 	text-decoration: none;                  /* 拿掉連結底線 */
+}
+
+.provider-btn:hover{
+	transform: translateY(-6px);
+	box-shadow: var(--shadow-md);
+	background: var(--color-yellow-deep);
+	transition: transform .15s ease;
 }
 
 .detail-card__desc{
