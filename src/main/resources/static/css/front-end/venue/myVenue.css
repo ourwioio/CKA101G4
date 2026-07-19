@@ -228,7 +228,7 @@ img{ max-width: 100%; }
 	flex: 1;
 	display: flex;
 	flex-direction: column;
-	padding: 18px 20px 20px;
+	padding: 18px 20px 10px 20px;
 }
 
 .item-card__title {
@@ -264,20 +264,28 @@ img{ max-width: 100%; }
 .item-card__detail {
 	display: inline-block;
 	font-size: 13px;
-	background: var(--color-yellow-deep);
+	background: var(--color-yellow);
 	padding: 4px 14px;
 	color: black;
 	font-weight: bold;
 	border-radius: var(--radius-full);
 	margin-left: auto;
+	align-self: flex-end;
+	margin-top: auto;
 }
-/* .item-card__detail::after { */
-/* 	content: '\2192'; */
-/* 	transition: transform .15s ease; */
-/* } */
+.item-card__detail::after {
+	content: '\2192';
+	transition: transform .15s ease;
+}
 
-.item-card:hover .item-card__detail::after {
+.item-card:hover .item-card__detail::after{
 	transform: translateX(4px);
+}
+
+.item-card:hover .item-card__detail{
+	transform: translateY(-6px);
+	box-shadow: var(--shadow-md);
+	background: var(--color-yellow-deep);
 }
 
 /* ---------- 狀態徽章 ---------- */
