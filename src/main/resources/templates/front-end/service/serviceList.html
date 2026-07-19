@@ -541,15 +541,10 @@
         <div class="service-login-status">
 
             <!-- 已登入 -->
-            <span th:if="${session.memberVO != null}" style="display: flex; gap: 12px;">
-                <a class="back-btn" th:href="@{/member/service-orders/buyer}">
-                    我的預約
-                </a>
-            </span>
-				
+            
             <span>
                 <a th:if="${session.memberVO != null}"  class="back-btn" th:href="@{/member/services}">
-                    我的服務
+                   服務管理
                 </a>
             </span>
 
