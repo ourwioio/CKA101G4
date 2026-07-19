@@ -7,7 +7,7 @@
 
 		<div class="service-topbar">
 			<div class="service-topbar__inner">
-				<h1 class="service-topbar__title">服務中心</h1>
+				<h1 class="service-topbar__title">服務管理</h1>
 				<nav class="service-tabs">
 					<a th:href="@{/member/services}"
 					   th:classappend="${active == 'memberServiceList'} ? 'is-active' : ''">我的服務</a>
@@ -16,7 +16,7 @@
 					<a th:href="@{/member/service-orders/seller}"
 					   th:classappend="${active == 'memberSellerOrderList'} ? 'is-active' : ''">收到的預約</a>
 					<a th:href="@{/front/services}">瀏覽服務頁面</a>
-					<a th:href="@{/member/services/add}" class="service-tabs__cta">＋ 新增服務</a>
+					<a th:href="@{/member/services/add}" class="service-tabs__cta">新增服務</a>
 				</nav>
 			</div>
 		</div>
