@@ -412,9 +412,16 @@ img{ max-width: 100%; }
 	padding: 4px 12px;
 	border-radius: var(--radius-full);
 	background: Moccasin;
-	color: var(--color-ink-soft);
+	color: black;
 	margin-right: auto;
 	text-decoration: none;
+}
+
+.venueOrderId:hover{
+	transform: translateY(-6px);
+	box-shadow: var(--shadow-md);
+	background: var(--color-yellow-deep);
+	transition: transform .15s ease;
 }
 
 html {
