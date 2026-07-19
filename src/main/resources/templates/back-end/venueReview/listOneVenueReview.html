@@ -51,6 +51,29 @@ a {
 	font-weight: 500;
 }
 
+.alert-danger {
+	background-color: #fee2e2;
+	color: #b91c1c;
+	border: 1px solid #fca5a5;
+	padding: 12px 16px;
+	border-radius: 6px;
+	margin-bottom: 1.5rem;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.char-count {
+	font-size: 12px;
+	margin-top: -0.75rem;
+	margin-bottom: 1rem;
+	color: #64748b;
+}
+
+.char-count.over-limit {
+	color: #dc2626;
+	font-weight: 600;
+}
+
 .card {
 	background: #ffffff;
 	border-radius: 8px;
@@ -271,6 +294,10 @@ select:focus, textarea:focus {
 							<div class="info-label">場地地址</div>
 							<div class="info-value" th:text="${venueVO.address}"></div>
 						</div>
+						<div class="info-group full-width">
+							<div class="info-label">場地介紹</div>
+							<div class="info-value" th:text="${venueVO.venueDescription}"></div>
+						</div>
 						<div class="info-group">
 							<div class="info-label">最大容納人數</div>
 							<div class="info-value" th:text="${venueVO.capacity} + ' 人'"></div>
@@ -346,8 +373,11 @@ select:focus, textarea:focus {
 
 					<div class="action-form">
 						<label for="reviewNoteInput">審核備註／退件理由</label>
+						<div class="alert-danger" th:if="${error != null}" th:text="${error}"></div>
 						<textarea id="reviewNoteInput" rows="3"
-							placeholder="通過可留空；未通過請務必填寫理由，以便場地方修改"></textarea>
+							placeholder="通過可留空；未通過請務必填寫理由，以便場地方修改"
+							oninput="updateReviewNoteCount()" th:text="${reviewNoteInput}"></textarea>
+						<div id="reviewNoteCount" class="char-count">0 / 255</div>
 
 						<!-- 實際送出的表單：approve -->
 						<form th:action="@{/admin/venue/venueReview/approve}" method="post"
@@ -382,8 +412,29 @@ select:focus, textarea:focus {
 	</div>
 
 	<script>
+		var REVIEW_NOTE_MAX_LENGTH = 255;
+
+		function updateReviewNoteCount() {
+			const noteEl = document.getElementById('reviewNoteInput');
+			const countEl = document.getElementById('reviewNoteCount');
+			if (!noteEl || !countEl) {
+				return;
+			}
+			const overLimit = noteEl.value.length > REVIEW_NOTE_MAX_LENGTH;
+			countEl.textContent = noteEl.value.length + ' / ' + REVIEW_NOTE_MAX_LENGTH;
+			countEl.classList.toggle('over-limit', overLimit);
+		}
+
+		updateReviewNoteCount();
+
 		function submitReview(action) {
 			const reviewNote = document.getElementById('reviewNoteInput').value;
+
+			if (reviewNote.length > REVIEW_NOTE_MAX_LENGTH) {
+				updateReviewNoteCount();
+				alert('審核備註／退件理由不能超過 ' + REVIEW_NOTE_MAX_LENGTH + ' 個字元，請刪減內容後再送出');
+				return;
+			}
 
 			if (action === 'reject'
 					&& (!reviewNote || reviewNote.trim() === '')) {

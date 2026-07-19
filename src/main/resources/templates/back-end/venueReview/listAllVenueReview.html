@@ -75,7 +75,8 @@
 						</span></td>
 						<td
 							th:text="${venueReview.employeeId != null ? venueReview.employeeId + ' - ' + employeeNameMap.get(venueReview.employeeId) : '尚未指派'}"></td>
-						<td th:text="${venueReview.reviewNote}"></td>
+						<td
+							th:text="${#strings.abbreviate(venueReview.reviewNote, 13)}"></td>
 						<td
 							th:text="${venueReview.reviewedAt != null ? #temporals.format(venueReview.reviewedAt, 'yyyy-MM-dd HH:mm') : '-'}"></td>
 						<td>
