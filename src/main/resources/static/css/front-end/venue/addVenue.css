@@ -122,20 +122,29 @@ option {
 	padding: 8px 14px;
 	border-radius: 10px;
 	cursor: pointer;
+	color: var(--color-ink-soft);
+	transition: background .15s ease, color .15s ease;
+	user-select: none;
+	font-weight: 500;
 }
+/* 取消打勾 */
+option::checkmark {
+	display: none;
+}
+
 /* 滑鼠停在上面的選項 */
 option:hover {
-	background: var(--color-yellow-deep);
-	color: var(--color-ink);
+	background: var(--color-surface-soft);
+	color: black;
 }
 /* 目前被選中的那項 */
 option:checked {
-	background: var(--color-yellow-deep);
+	background: #FFE59A;
 	color: #fff;
 }
 /* 鍵盤方向鍵選項 */
 option:focus {
-	background: var(--color-yellow-deep);
+	background: #FFE59A;
 	color: var(--color-ink);
 }
 
