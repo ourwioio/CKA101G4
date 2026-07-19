@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>場地列表</title>
+<title>瀏覽場地</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,12 +21,12 @@
 <main class="venue-page">
 
 	<div class="header-bar">
-		<h1>場地列表</h1>
+		<h1>瀏覽場地</h1>
 		<div class="header-bar__actions">
 			<a th:href="@{/front/venue/myVenue}" class="btn-primary btn-primary--ghost"
-			   th:attr="data-require-login=${session.memberVO == null} ? 'true' : null">我的場地</a>
-			<a th:href="@{/front/venue/addVenue}" class="btn-primary"
-			   th:attr="data-require-login=${session.memberVO == null} ? 'true' : null">新增場地</a>
+			   th:attr="data-require-login=${session.memberVO == null} ? 'true' : null">場地管理</a>
+<!-- 			<a th:href="@{/front/venue/addVenue}" class="btn-primary" -->
+<!-- 			   th:attr="data-require-login=${session.memberVO == null} ? 'true' : null">新增場地</a> -->
 		</div>
 	</div>
 

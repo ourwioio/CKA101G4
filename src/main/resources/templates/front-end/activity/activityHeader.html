@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+	<div th:fragment="header(active)">
+
+		<div th:replace="~{front-end/common/navbar :: navbar}"></div>
+
+		<div class="activity-topbar">
+			<div class="activity-topbar__inner">
+				<h1 class="activity-topbar__title">活動管理</h1>
+				<nav class="activity-tabs">
+					<a th:href="@{/activity/front/myOrder}"
+					   th:classappend="${active == 'myActivityOrder'} ? 'is-active' : ''">我的報名</a>
+					<a th:href="@{/activity/front/myHostActivity}"
+					   th:classappend="${active == 'myHostActivity'} ? 'is-active' : ''">我舉辦的活動</a>
+					<a th:href="@{/activity/front/list}">瀏覽活動頁面</a>
+					<a th:href="@{/activity/front/addHostActivity}" class="activity-tabs__cta">我要辦活動</a>
+				</nav>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>
