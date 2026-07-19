@@ -7,10 +7,10 @@
 
 		<div class="myvenue-topbar">
 			<div class="myvenue-topbar__inner">
-				<h1 class="myvenue-topbar__title">我的場地</h1>
+				<h1 class="myvenue-topbar__title">場地管理</h1>
 				<nav class="myvenue-tabs">
 					<a th:href="@{/front/venue/myVenue}"
-					   th:classappend="${active == 'myVenue'} ? 'is-active' : ''">我的場地</a>
+					   th:classappend="${active == 'myVenue'} ? 'is-active' : ''">場地管理</a>
 					<a th:href="@{/front/venueOrder/myVenuesReservations}"
 					   th:classappend="${active == 'myVenuesReservations'} ? 'is-active' : ''">場地預約狀況</a>
 					<a th:href="@{/front/venueOrder/myVenuesCompleted}"
