@@ -5,6 +5,7 @@
 :root{
 	--color-bg:      #F7F3EC;
 	--color-venue:   #A9D3FF;
+	--color-yellow:       #FFE59A;
 
 	--radius-lg: 26px;
 	--radius-md: 16px;
@@ -72,12 +73,12 @@ img{ max-width: 100%; }
 
 .btn-primary {
 	display: inline-block;
-	padding: 10px 22px;
+	padding: 10px 20px;
 	background: var(--color-ink);
 	color: #fff;
 	border: none;
 	border-radius: var(--radius-full);
-	font-size: 14px;
+	font-size: 13.5px;
 	font-weight: 700;
 	text-decoration: none;
 	cursor: pointer;
@@ -303,6 +304,12 @@ img{ max-width: 100%; }
 	box-shadow: var(--shadow-md);
 }
 
+.item-card:hover .item-card__btn{
+	transform: translateY(-6px);
+	box-shadow: var(--shadow-md);
+	background: var(--color-yellow-deep);
+}
+
 .item-card__link {
 	display: flex;
 	flex-direction: column;
@@ -325,7 +332,10 @@ img{ max-width: 100%; }
 	display: block;
 	transition: transform .35s ease;
 }
-.item-card:hover .item-card__thumb-wrap img{ transform: scale(1.06); }
+.item-card:hover .item-card__thumb-wrap img{ 
+	transform: scale(1.06); 
+	
+}
 
 .item-card__body {
 	flex: 1;
@@ -495,13 +505,20 @@ img{ max-width: 100%; }
 .item-card__btn{
 	display: inline-block;
 	font-size: 13px;
-	background: var(--color-yellow-deep);
+	background: var(--color-yellow);
 	padding: 4px 14px;
 	color: black;
 	font-weight: bold;
 	border-radius: var(--radius-full);
 	margin-left: auto;
-	
+	display: inline-flex;      /* 讓文字跟箭頭可以並排、對齊 */
+	align-items: center;
+	gap: 4px;                  /* 文字跟箭頭之間留一點間距 */
+}
+
+.item-card__btn::after {
+	content: '\2192';          /* → 箭頭符號 */
+	transition: transform .15s ease;
 }
 
 .search-form__grid {

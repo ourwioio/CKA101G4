@@ -62,7 +62,7 @@ input[type="text"], select, textarea {
 }
 input:disabled, select:disabled, input:read-only, textarea:read-only { color: var(--color-ink-soft); background: var(--color-surface-soft); cursor: not-allowed; }
 input:focus, select:focus, textarea:focus { border-color: var(--color-yellow-deep); }
-textarea { resize: vertical; }
+textarea { resize: none; }
 
 .error-text { color: #c0392b; font-size: 12px; margin-top: 4px; display: block; }
 

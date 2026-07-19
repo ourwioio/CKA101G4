@@ -53,7 +53,7 @@ public class VenueVO {
 
 	@Column(name = "VENUE_NAME")
 	@NotEmpty(message = "場地名稱：請勿空白")
-	@Size(max = 20, message = "場地名稱：請勿超過 20 字")
+	@Size(max = 14, message = "場地名稱：請勿超過 14 字")
 	private String venueName;
 
 	@Column(name = "ADDRESS")
