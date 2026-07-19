@@ -117,6 +117,21 @@
   position: relative;
 }
 
+/* 滑鼠從 trigger 移到 menu 中間有一段空隙(top: calc(100% + 14px)),
+   這段空隙在 menu 顯示前是不可觸控的(visibility:hidden; pointer-events:none),
+   滑鼠一經過就會離開 .navbar__dropdown 的 hover 範圍導致選單收起。
+   這裡補一塊透明但可觸控的橋接區,銜接 trigger 與 menu。 */
+.navbar__dropdown::after{
+  content:'';
+  position:absolute;
+  top:100%;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  min-width:150px;
+  height:14px;
+}
+
 .navbar__dropdown-trigger{
   position:relative;
   display:flex;
