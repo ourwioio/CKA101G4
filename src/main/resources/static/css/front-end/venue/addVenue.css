@@ -242,7 +242,7 @@ option:focus {
 }
 
 textarea {
-	resize: vertical;
+	resize: none;
 	font-family: var(--font-body);
 }
 

@@ -601,7 +601,7 @@ h1 {
 }
 
 .btn-danger-submit { 
-    background: #c0392b; 
+    background: var(--color-ink); 
 }
 
 .btn-danger-submit:hover { 
