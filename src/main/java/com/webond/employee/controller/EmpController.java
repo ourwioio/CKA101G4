@@ -327,7 +327,7 @@ public class EmpController {
 			empSvc.updateEmp(employeeVO, permIds, upImg);
 			/*************************** 3.修改完成,準備轉交(Send the Success view) **************/
 
-			return "redirect:/admin/employees/empPage";
+			return "redirect:/admin/employees/empPage?p=" + currentPage;
 		}
 		
 		

@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link
+	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+	rel="stylesheet">
 </head>
 <body>
 
@@ -14,115 +16,115 @@
 	<div th:fragment="addPermContent" class="modal-body-content">
 
 		<style>
-		/* 燈箱內部專用優化樣式表 */
-		.modal-body-content {
-			font-family: 'Inter', "Microsoft JhengHei", sans-serif;
-			color: var(--slate-800, #1e293b);
-		}
+/* 燈箱內部專用優化樣式表 */
+.modal-body-content {
+	font-family: 'Inter', "Microsoft JhengHei", sans-serif;
+	color: var(--slate-800, #1e293b);
+}
 
-		.modal-title {
-			font-size: 20px;
-			font-weight: 700;
-			color: var(--slate-800, #1e293b);
-			margin-bottom: 24px;
-			padding-bottom: 12px;
-			border-bottom: 1px solid var(--slate-200, #e2e8f0);
-		}
+.modal-title {
+	font-size: 20px;
+	font-weight: 700;
+	color: var(--slate-800, #1e293b);
+	margin-bottom: 24px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid var(--slate-200, #e2e8f0);
+}
 
-		/* 表單整齊排列組群 */
-		.form-group {
-			display: flex;
-			flex-direction: column;
-			gap: 6px;
-			margin-bottom: 18px;
-		}
+/* 表單整齊排列組群 */
+.form-group {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin-bottom: 18px;
+}
 
-		.form-label {
-			font-size: 14px;
-			font-weight: 600;
-			color: var(--slate-700, #334155);
-		}
+.form-label {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--slate-700, #334155);
+}
 
-		/* 現代化輸入框與文字區域 */
-		.form-control {
-			width: 100% !important;
-			padding: 10px 12px;
-			font-size: 14px;
-			color: var(--slate-800, #1e293b) !important;
-			background-color: #ffffff;
-			border: 1px solid var(--slate-300, #cbd5e1) !important;
-			border-radius: 8px;
-			box-sizing: border-box;
-			transition: all 0.2s ease;
-		}
+/* 現代化輸入框與文字區域 */
+.form-control {
+	width: 100% !important;
+	padding: 10px 12px;
+	font-size: 14px;
+	color: var(--slate-800, #1e293b) !important;
+	background-color: #ffffff;
+	border: 1px solid var(--slate-300, #cbd5e1) !important;
+	border-radius: 8px;
+	box-sizing: border-box;
+	transition: all 0.2s ease;
+}
 
-		.form-control:focus {
-			outline: none;
-			border-color: var(--sky-500, #0ea5e9);
-			box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
-		}
+.form-control:focus {
+	outline: none;
+	border-color: var(--sky-500, #0ea5e9);
+	box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
 
-		/* 針對 textarea 文字區域的專屬高級感微調 */
-		textarea.form-control {
-			min-height: 110px !important;
-			resize: vertical;
-			font-family: inherit;
-			line-height: 1.5;
-		}
+/* 針對 textarea 文字區域的專屬高級感微調 */
+textarea.form-control {
+	min-height: 110px !important;
+	resize: vertical;
+	font-family: inherit;
+	line-height: 1.5;
+}
 
-		/* 錯誤訊息紅字提示 */
-		.form-error-msg {
-			color: var(--rose-600, #e11d48);
-			font-size: 13px;
-			font-weight: 600;
-			margin-top: 4px;
-			text-align: left;
-			display: block;
-		}
+/* 錯誤訊息紅字提示 */
+.form-error-msg {
+	color: var(--rose-600, #e11d48);
+	font-size: 13px;
+	font-weight: 600;
+	margin-top: 4px;
+	text-align: left;
+	display: block;
+}
 
-		/* 底部按鈕區塊 */
-		.form-actions {
-			display: flex;
-			justify-content: flex-end;
-			gap: 12px;
-			margin-top: 28px;
-			padding-top: 16px;
-			border-top: 1px solid var(--slate-200, #e2e8f0);
-		}
+/* 底部按鈕區塊 */
+.form-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 12px;
+	margin-top: 28px;
+	padding-top: 16px;
+	border-top: 1px solid var(--slate-200, #e2e8f0);
+}
 
-		.btn-modal-submit {
-			background: var(--sky-600, #0284c7);
-			color: #ffffff;
-			border: none;
-			padding: 10px 24px;
-			border-radius: 8px;
-			font-size: 14px;
-			font-weight: 600;
-			cursor: pointer;
-			transition: background-color 0.2s;
-		}
+.btn-modal-submit {
+	background: var(--sky-600, #0284c7);
+	color: #ffffff;
+	border: none;
+	padding: 10px 24px;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
 
-		.btn-modal-submit:hover {
-			background: var(--sky-700, #0369a1);
-		}
+.btn-modal-submit:hover {
+	background: var(--sky-700, #0369a1);
+}
 
-		.btn-modal-cancel {
-			background: #ffffff;
-			color: var(--slate-700, #334155);
-			border: 1px solid var(--slate-300, #cbd5e1);
-			padding: 10px 24px;
-			border-radius: 8px;
-			font-size: 14px;
-			font-weight: 600;
-			cursor: pointer;
-			transition: all 0.2s;
-		}
+.btn-modal-cancel {
+	background: #ffffff;
+	color: var(--slate-700, #334155);
+	border: 1px solid var(--slate-300, #cbd5e1);
+	padding: 10px 24px;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+}
 
-		.btn-modal-cancel:hover {
-			background: var(--slate-50, #f8fafc);
-			border-color: var(--slate-400, #94a3b8);
-		}
-		</style>
+.btn-modal-cancel:hover {
+	background: var(--slate-50, #f8fafc);
+	border-color: var(--slate-400, #94a3b8);
+}
+</style>
 
 		<h3 class="modal-title">新增員工權限資料</h3>
 
@@ -131,28 +133,32 @@
 
 			<!-- 權限名稱輸入 -->
 			<div class="form-group">
-				<label for="permName" class="form-label">權限名稱</label>
-				<input type="text" th:field="*{permName}" class="form-control" placeholder="請輸入權限名稱（例如：訂單管理）">
-				<span th:if="${#fields.hasErrors('permName')}" th:errors="*{permName}" class="form-error-msg"></span>
+				<label for="permName" class="form-label">權限名稱</label> <input
+					type="text" th:field="*{permName}" class="form-control"
+					placeholder="請輸入權限名稱（例如：訂單管理）"> <span
+					th:if="${#fields.hasErrors('permName')}" th:errors="*{permName}"
+					class="form-error-msg"></span>
 			</div>
 
 			<!-- 權限內容描述輸入 -->
 			<div class="form-group">
 				<label for="permDsc" class="form-label">權限功能描述</label>
-				<textarea th:field="*{permDsc}" class="form-control" placeholder="請詳細說明此權限所涵蓋的系統後台操作範圍..."></textarea>
-				<span th:if="${#fields.hasErrors('permDsc')}" th:errors="*{permDsc}" class="form-error-msg"></span>
+				<textarea th:field="*{permDsc}" class="form-control"
+					placeholder="請詳細說明此權限所涵蓋的系統後台操作範圍..."></textarea>
+				<span th:if="${#fields.hasErrors('permDsc')}" th:errors="*{permDsc}"
+					class="form-error-msg"></span>
 			</div>
 
 			<!-- 功能按鈕控制區 -->
 			<div class="form-actions">
 				<button type="button" class="btn-modal-cancel"
-					th:onclick="|window.location.href='@{/admin/employees/empPermPage}'|"
-					onclick="closeAddModal()">
-					取消返回
-				</button>
+					onclick="closeAddModal(); var p = document.getElementById('modalCurrentPage').value; window.location.href='/admin/employees/empPermPage?p=' + (p ? p : 0);">
+					取消返回</button>
 				<button type="submit" class="btn-modal-submit">確認儲存</button>
 			</div>
 
+			<input type="hidden" name="currentPage" id="modalCurrentPage"
+				th:value="${currentPage != null ? currentPage : 0}" />
 		</form>
 	</div>
 
