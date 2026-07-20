@@ -81,7 +81,7 @@ function renderPreviews() {
 
             const item = document.createElement('div');
             item.className = 'preview-item' + (isCover ? ' is-cover' : '');
-            item.onclick = () => setCover(index);
+            item.onclick = () => setCover(index, item);
 
             const img = document.createElement('img');
             img.src = e.target.result;
@@ -125,9 +125,20 @@ function removeFile(index) {
     renderPreviews();
 }
 
-function setCover(index) {
+// 只切換樣式、不重新讀取檔案，避免因為 FileReader 非同步讀取順序不固定，
+// 導致每次選封面時整批縮圖重新排列、畫面跳動
+function setCover(index, element) {
     coverIndex = index;
-    renderPreviews();
+    document.getElementById('coverIndex').value = coverIndex;
+
+    document.querySelectorAll('.preview-item').forEach(item => {
+        item.classList.remove('is-cover');
+        const tag = item.querySelector('.cover-tag');
+        if (tag) tag.textContent = '設為封面';
+    });
+
+    element.classList.add('is-cover');
+    element.querySelector('.cover-tag').textContent = '目前封面';
 }
 
 // <input type="file"> 的 files 是唯讀的，不能直接刪除其中一個檔案，

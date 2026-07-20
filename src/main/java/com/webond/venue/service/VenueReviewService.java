@@ -125,23 +125,20 @@ public class VenueReviewService {
 			venue.setVenueStatus(VENUE_STATUS_PENDING);
 			venueRepository.save(venue);
 		}
+
+		startNewReview(venueReview.getVenueId());
 	}
 
 	public VenueReviewVO getOneVenueReviewByVenueId(Integer venueId) {
 		return repository.findTopByVenueIdOrderByVenueReviewIdDesc(venueId);
 	}
 
-	// ===== 檢舉成立：把該場地的審核紀錄退回審核中，重新走審核流程 =====
+	// ===== 場地退回審核中：新增一筆全新的審核紀錄，不動舊紀錄，避免跟歷史審核搞混 =====
 	@Transactional
-	public void resetToReviewing(Integer venueId) {
-		VenueReviewVO venueReview = getOneVenueReviewByVenueId(venueId);
-		if (venueReview == null) {
-			return;
-		}
+	public void startNewReview(Integer venueId) {
+		VenueReviewVO venueReview = new VenueReviewVO();
+		venueReview.setVenueId(venueId);
 		venueReview.setReviewStatus(STATUS_REVIEWING);
-		venueReview.setEmployeeId(null);
-		venueReview.setReviewNote(null);
-		venueReview.setReviewedAt(null);
 		repository.save(venueReview);
 	}
 }
