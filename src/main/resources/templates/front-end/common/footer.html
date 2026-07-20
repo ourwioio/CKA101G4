@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-TW">
+<body>
+
+  <!-- ========== Footer Fragment ========== -->
+  <footer class="site-footer" th:fragment="footer">
+    <div class="site-footer__card">
+
+      <div class="site-footer__brand">
+        <a class="navbar__logo" href="/">
+          <span class="navbar__logo-mark">
+            <span class="navbar__logo-eye"></span>
+            <span class="navbar__logo-eye"></span>
+          </span>
+          <span class="navbar__logo-text">
+            <span class="t">Webond</span>
+            <span class="s">閒人出租</span>
+          </span>
+        </a>
+        <p>
+          Webond 致力於打造多元的資源交流平台，<br>
+          讓每一次出租、每一場活動、每一個場地，<br>
+          都能被妥善使用，創造長久的價值。
+        </p>
+        <div class="site-footer__social">
+          <a class="icon-dot" href="https://www.instagram.com/mtvtherappers?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" title="Instagram" aria-disabled="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+          </a>
+          <a class="icon-dot" href="https://www.tibame.com/" title="X" aria-disabled="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16M20 4L4 20"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="site-footer__col">
+        <h4>服務</h4>
+        <ul>
+          <li><a th:href="@{front/services}">個人出租</a></li>
+          <li><a th:href="@{/activity/front/list}">團體活動</a></li>
+          <li><a th:href="@{/front/venue/listAllVenue}">場地推薦</a></li>
+        </ul>
+      </div>
+
+      <div class="site-footer__col">
+        <h4>關於</h4>
+        <ul>
+          <li><a th:href="@{/faqs}">系統公告</a></li>
+        </ul>
+      </div>
+
+    </div>
+    <p class="site-footer__bottom">© 2026 Webond. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

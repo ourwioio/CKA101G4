@@ -6,8 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>會員個人檔案</title>
   <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/member/profileEdit.css}">
    <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
+   
   <style>
 	/* ==========================================================
 	   Webond 會員個人檔案頁 — 圓潤角色風 (cream / ink / pastel blobs)
@@ -348,8 +350,8 @@
   </style>
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 </head>
-<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 <body>
+<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 
   <div class="container">
     
@@ -616,6 +618,7 @@
     </section>
   </div>
   <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+  <div th:replace="~{front-end/common/footer :: footer}"></div>
   <script th:src="@{/js/front-end/member/profile.js}"></script>
 <script th:src="@{/js/front-end/activity/activityStatusPolling.js}"></script>
 </body>
