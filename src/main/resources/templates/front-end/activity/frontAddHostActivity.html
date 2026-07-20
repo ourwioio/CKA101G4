@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>我要辦活動</title>
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 
   <style>
@@ -654,7 +655,8 @@ input[type="file"].form-control {
   <!-- ==========================================================
        🌟 原有核心 JS 行為保持不變，同步完美相容
        ========================================================== -->
-  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+  <div th:replace="~{front-end/common/footer :: footer}"></div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {

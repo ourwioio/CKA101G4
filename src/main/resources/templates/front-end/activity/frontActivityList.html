@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>活動列表</title>
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
@@ -611,7 +612,8 @@ a { text-decoration: none; color: inherit; }
   <!-- ==========================================================
        核心 JavaScript：模擬下拉式選單交互與數據同步
        ========================================================== -->
-  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+  <div th:replace="~{front-end/common/footer :: footer}"></div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {

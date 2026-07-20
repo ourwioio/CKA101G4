@@ -12,7 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <!-- 前台共用 Navbar CSS -->
-    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
 
     <style>
         /* ==========================================================
@@ -1162,5 +1163,6 @@
     	});
 </script>
 
+<div th:replace="~{front-end/common/footer :: footer}"></div>
 </body>
 </html>

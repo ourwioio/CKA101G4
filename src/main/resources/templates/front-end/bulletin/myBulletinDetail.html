@@ -18,7 +18,8 @@
     <!-- Webond 前台共用 CSS -->
 <!--     <link rel="stylesheet" th:href="@{/css/front-end/service/common.css}"> -->
     <!-- 前台共用 Navbar CSS -->
-    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
     <!-- 公告內容專屬 CSS -->
     <link rel="stylesheet" th:href="@{/css/front-end/bulletin/bulletinDetail.css}">
     <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
@@ -91,7 +92,8 @@
 
 </main>
 
-<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+<div th:replace="~{front-end/common/footer :: footer}"></div>
 
 <!-- 共用通知 AJAX 輪詢 -->
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>

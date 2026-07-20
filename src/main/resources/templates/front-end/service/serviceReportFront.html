@@ -5,7 +5,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>檢舉服務</title>
-<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
  <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 <style>
     /* ==========================================================
@@ -286,7 +287,8 @@
         <button type="submit" class="report-submit-btn">送出檢舉</button>
     </form>
 </div>
-  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+  <div th:replace="~{front-end/common/footer :: footer}"></div>
 
 </body>
 </html>

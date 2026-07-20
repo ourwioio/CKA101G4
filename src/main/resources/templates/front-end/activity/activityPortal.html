@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Webond 活動入口</title>
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
@@ -127,5 +128,6 @@ body {
 
 	</div>
 
+<div th:replace="~{front-end/common/footer :: footer}"></div>
 </body>
 </html>
