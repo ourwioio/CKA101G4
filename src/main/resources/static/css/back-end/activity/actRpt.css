@@ -1,0 +1,272 @@
+:root {
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-300: #cbd5e1;
+    --slate-400: #94a3b8;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-800: #1e293b;
+    --sky-50: #f0f9ff;
+    --sky-500: #0ea5e9;
+    --sky-600: #0284c7;
+    --sky-700: #0369a1;
+    --emerald-50: #ecfdf5;
+    --emerald-600: #16a34a;
+    --emerald-700: #15803d;
+    --rose-50: #fff1f2;
+    --rose-600: #e11d48;
+    --rose-700: #be123c;
+    --amber-50: #fffbeb;
+    --amber-600: #d97706;
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
+/* =========================================
+   後台主佈局與雙欄容器 (修復貼齊左側)
+   ========================================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #f5f6fa; /* 沿用主列表底色 */
+    color: var(--slate-800);
+    margin: 0;
+    padding: 0; /* ✅ 徹底清空，才能百分之百貼齊邊緣 */
+}
+
+/* 確保外層 Flex 容器正常運作 */
+.wb-admin-layout {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* 右側主要內容工作區 */
+.wb-admin-content {
+    flex: 1;
+    padding: 32px;
+    background-color: #f5f6fa;
+    overflow-x: hidden;
+}
+
+/* 內部容器寬度限制 */
+.list-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* =========================================
+   審核表單卡片佈局
+   ========================================= */
+.review-wrapper {
+    width: 100%;
+    max-width: 900px; /* 限制表單寬度，避免在大螢幕上被拉得太寬 */
+    margin: 0 auto;   /* 在右側工作區內水平置中，看起來最舒服 */
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-bottom: 40px;
+}
+
+/* 頂部導航與標題 */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--slate-200);
+    padding-bottom: 16px;
+    margin-bottom: 0; /* 重設間距 */
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--slate-800);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    background-color: white;
+    border: 1px solid var(--slate-300);
+    border-radius: 8px;
+    color: var(--slate-600);
+    font-weight: 500;
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.btn-back:hover {
+    background-color: var(--slate-100);
+    color: var(--slate-800);
+    border-color: var(--slate-400);
+}
+
+/* 區塊卡片共通樣式 */
+.panel-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--slate-200);
+    box-shadow: var(--shadow-md);
+    padding: 28px;
+}
+
+.panel-title {
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--slate-400);
+    margin-top: 0;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 資訊網格格線 */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.meta-item {
+    background-color: var(--slate-50);
+    padding: 14px 18px;
+    border-radius: 8px;
+    border: 1px solid var(--slate-100);
+}
+
+.meta-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--slate-600);
+    margin-bottom: 6px;
+}
+
+.meta-value {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--slate-800);
+}
+
+/* 檢舉內文與大圖排版 */
+.content-block {
+    grid-column: span 2;
+    background-color: var(--slate-50);
+    padding: 18px;
+    border-radius: 8px;
+    border: 1px solid var(--slate-100);
+}
+
+.evidence-text {
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--slate-700);
+    margin: 0;
+}
+
+.image-preview-box {
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.img-fluid {
+    max-width: 100%;
+    max-height: 380px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid var(--slate-200);
+    background-color: var(--slate-100);
+}
+
+.no-img-placeholder {
+    padding: 40px;
+    text-align: center;
+    background: var(--slate-50);
+    border: 2px dashed var(--slate-200);
+    border-radius: 8px;
+    color: var(--slate-400);
+    font-size: 14px;
+}
+
+/* 表單元件樣式 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--slate-700);
+}
+
+.form-select, .form-input, .form-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--slate-300);
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--slate-800);
+    background-color: white;
+    transition: all 0.2s ease;
+}
+
+.form-select:focus, .form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: var(--sky-500);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+/* 動作按鈕 */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.btn-submit {
+    background-color: var(--sky-500);
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(14, 165, 233, 0.2);
+    transition: background-color 0.2s;
+}
+
+.btn-submit:hover {
+    background-color: var(--sky-600);
+}

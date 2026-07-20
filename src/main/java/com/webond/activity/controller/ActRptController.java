@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.webond.activity.model.ActRptService;
 import com.webond.activity.model.ActRptVO;
@@ -46,7 +47,7 @@ public class ActRptController {
 	    
 	    @GetMapping({ "/admin/actRptList", "/admin/activity/actRptList" })
 	    public String actRptList(
-	            @RequestParam(value = "status", required = false) Integer status, // 預設看 0:待處理
+	            @RequestParam(value = "status", required = false) Integer status, 
 	            @RequestParam(value = "page", defaultValue = "0") int page,
 	    		Model model, 
 	    		HttpSession session) {
@@ -56,7 +57,7 @@ public class ActRptController {
 	            return "redirect:/admin/login"; 
 	        }
 	        
-	        int pageSize = 10; 
+	        int pageSize = 5; 
 	        Page<ActRptVO> reportPage;
 
 	        if (status == null) {
@@ -133,9 +134,7 @@ public class ActRptController {
 	        	NotificationVO notificationVO = new NotificationVO();
 	        	notificationVO.setMember(memVO);
 	        	notificationVO.setTitle("您的「" + actVO.getActivityTitle() + "」已被檢舉");
-	        	notificationVO.setContent("活動已違反：" + originalRpt.getRptType() + "<br>" +
-	        							  "懲處：會員記點 " + originalRpt.getPenaltyValue() + "<br>" +
-	        							  "申訴管道(請在三天內完成)：<a href='" + appealPath + "' class='alert-link'>點此填寫申訴單</a>");
+	        	notificationVO.setContent("活動已違反：" + originalRpt.getRptType());
 	        	notificationVO.setNotificationType((byte) 2);
 	        	
 	        	notificationSvc.addNotification(notificationVO);
@@ -177,6 +176,30 @@ public class ActRptController {
 	        actRptSvc.reviewRpt(actRptVO);
 	        
 	        return "redirect:/admin/activity/actRptList";
+	    }
+	    
+	    
+	    @GetMapping({ "/admin/actRpt/review/{id}", "/admin/activity/actRpt/review/{id}" })
+	    public String showReviewPage(
+	    		@PathVariable("id") Integer actRptId, 
+	    		Model model, 
+	    		RedirectAttributes redirectAttributes) {
+	        
+	        ActRptVO actRptVO = actRptSvc.getOneActRpt(actRptId); 
+	        
+	        if (actRptVO == null) {
+	            redirectAttributes.addFlashAttribute("errorMessage", "❌ 找不到該筆檢舉案件，可能已被處理或刪除。");
+	            return "redirect:/admin/activity/actRptList";
+	        }
+	        
+	        if (actRptVO.getActRptStatus() != 0) {
+	            redirectAttributes.addFlashAttribute("errorMessage", "⚠️ 該案件已經審核完畢，無法重複審核。");
+	            return "redirect:/admin/activity/actRptList";
+	        }
+	        
+	        model.addAttribute("actRptVO", actRptVO);
+	        
+	        return "back-end/activity/actRpt"; 
 	    }
 	    
 	    

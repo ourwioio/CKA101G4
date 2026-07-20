@@ -1,639 +1,637 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org" lang="zh-TW">
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org" lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>後台管理系統 - 活動檢舉管理</title>
-    
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport"
+	content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>後台管理系統 - 活動檢舉管理</title>
 
-        body {
-            margin: 0;
-            background: #f5f6fa;
-            font-family: Arial, "Noto Sans TC", sans-serif;
-            color: #2d3436;
-        }
+<style>
+* {
+	box-sizing: border-box;
+}
 
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
+body {
+	margin: 0;
+	background: #f5f6fa;
+	font-family: Arial, "Noto Sans TC", sans-serif;
+	color: #2d3436;
+}
 
-        /* =========================================
+a {
+	text-decoration: none;
+	color: inherit;
+}
+
+/* =========================================
            後台主佈局雙欄容器 (一體化設計)
            ========================================= */
-        .wb-admin-layout {
-            display: flex;
-            min-height: 100vh;
-            width: 100%;
-        }
+.wb-admin-layout {
+	display: flex;
+	min-height: 100vh;
+	width: 100%;
+}
 
-        /* 主要內容工作區 */
-        .wb-admin-content {
-            flex: 1;
-            padding: 32px;
-            background-color: #f5f6fa;
-            overflow-x: hidden;
-        }
+/* 主要內容工作區 */
+.wb-admin-content {
+	flex: 1;
+	padding: 32px;
+	background-color: #f5f6fa;
+	overflow-x: hidden;
+}
 
-        .list-container {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+.list-container {
+	width: 100%;
+	max-width: 1400px;
+	margin: 0 auto;
+}
 
-        /* 頁面大標題 */
-        .page-header {
-            margin-bottom: 24px;
-            text-align: center;
-        }
+/* 頁面大標題 */
+.page-header {
+	margin-bottom: 24px;
+	text-align: center;
+}
 
-        .page-title {
-            margin: 0;
-            font-size: 26px;
-            color: #2d3436;
-            font-weight: bold;
-        }
+.page-title {
+	margin: 0;
+	font-size: 26px;
+	color: #2d3436;
+	font-weight: bold;
+}
 
-        /* =========================================
+/* =========================================
            頂部功能快捷按鈕列
            ========================================= */
-        .action-bar {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
+.action-bar {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+	margin-bottom: 20px;
+}
 
-        .btn-nav {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            height: 42px;
-            padding: 0 18px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #ffffff;
-            transition: opacity 0.15s ease, transform 0.1s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        }
+.btn-nav {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 42px;
+	padding: 0 18px;
+	border-radius: 8px;
+	font-size: 14px;
+	font-weight: bold;
+	color: #ffffff;
+	transition: opacity 0.15s ease, transform 0.1s ease;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
 
-        .btn-nav:hover {
-            opacity: 0.9;
-        }
-        
-        .btn-nav:active {
-            transform: scale(0.98);
-        }
+.btn-nav:hover {
+	opacity: 0.9;
+}
 
-        /* 快捷鈕色彩系統統一整合 */
-        .btn-nav--blue   { background: #0984e3; }
-        .btn-nav--purple { background: #6c5ce7; }
-        .btn-nav--green  { background: #2ed573; }
-        .btn-nav--orange { background: #e17055; }
-        .btn-nav--gray   { background: #636e72; }
+.btn-nav:active {
+	transform: scale(0.98);
+}
 
-        /* =========================================
+/* 快捷鈕色彩系統統一整合 */
+.btn-nav--blue {
+	background: #0984e3;
+}
+
+.btn-nav--purple {
+	background: #6c5ce7;
+}
+
+.btn-nav--green {
+	background: #2ed573;
+}
+
+.btn-nav--orange {
+	background: #e17055;
+}
+
+.btn-nav--gray {
+	background: #636e72;
+}
+
+/* =========================================
            狀態篩選卡片區塊
            ========================================= */
-        .filter-card {
-            background: #ffffff;
-            border: 1px solid #dfe4e8;
-            border-radius: 10px;
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
+.filter-card {
+	background: #ffffff;
+	border: 1px solid #dfe4e8;
+	border-radius: 10px;
+	padding: 16px 20px;
+	margin-bottom: 24px;
+	box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 12px;
+}
 
-        .filter-label {
-            font-weight: bold;
-            color: #2d3436;
-            font-size: 14px;
-        }
+.filter-label {
+	font-weight: bold;
+	color: #2d3436;
+	font-size: 14px;
+}
 
-        .filter-tab-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
+.filter-tab-group {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
 
-        /* 篩選標籤按鈕基礎樣式 */
-        .tab-btn {
-            padding: 6px 14px;
-            font-size: 13px;
-            font-weight: bold;
-            background: #ffffff;
-            color: #636e72;
-            border: 1px solid #dfe4e8;
-            border-radius: 6px;
-            transition: all 0.15s ease;
-        }
+/* 篩選標籤按鈕基礎樣式 */
+.tab-btn {
+	padding: 6px 14px;
+	font-size: 13px;
+	font-weight: bold;
+	background: #ffffff;
+	color: #636e72;
+	border: 1px solid #dfe4e8;
+	border-radius: 6px;
+	transition: all 0.15s ease;
+}
 
-        .tab-btn:hover {
-            background: #f8fafc;
-            color: #2d3436;
-            border-color: #b2bec3;
-        }
+.tab-btn:hover {
+	background: #f8fafc;
+	color: #2d3436;
+	border-color: #b2bec3;
+}
 
-        /* 各狀態動態激活 (Active) 樣式 */
-        .tab-btn.active-all      { background: #0984e3; color: #fff; border-color: #0984e3; }
-        .tab-btn.active-pending  { background: #fdcb6e; color: #2d3436; border-color: #fdcb6e; }
-        .tab-btn.active-invest   { background: #d63031; color: #fff; border-color: #d63031; }
-        .tab-btn.active-success  { background: #2ed573; color: #fff; border-color: #2ed573; }
-        .tab-btn.active-reject   { background: #b2bec3; color: #fff; border-color: #b2bec3; }
-        .tab-btn.active-appeal-s { background: #00cec9; color: #fff; border-color: #00cec9; }
-        .tab-btn.active-appeal-r { background: #636e72; color: #fff; border-color: #636e72; }
+/* 各狀態動態激活 (Active) 樣式 */
+.tab-btn.active-all {
+	background: #0984e3;
+	color: #fff;
+	border-color: #0984e3;
+}
 
-        /* =========================================
+.tab-btn.active-pending {
+	background: #fdcb6e;
+	color: #2d3436;
+	border-color: #fdcb6e;
+}
+
+.tab-btn.active-invest {
+	background: #d63031;
+	color: #fff;
+	border-color: #d63031;
+}
+
+.tab-btn.active-success {
+	background: #2ed573;
+	color: #fff;
+	border-color: #2ed573;
+}
+
+.tab-btn.active-reject {
+	background: #b2bec3;
+	color: #fff;
+	border-color: #b2bec3;
+}
+
+.tab-btn.active-appeal-s {
+	background: #00cec9;
+	color: #fff;
+	border-color: #00cec9;
+}
+
+.tab-btn.active-appeal-r {
+	background: #636e72;
+	color: #fff;
+	border-color: #636e72;
+}
+
+/* =========================================
            明細資料表格卡片與響應式包裹
            ========================================= */
-        .table-card {
-            background: #ffffff;
-            border: 1px solid #dfe4e8;
-            border-radius: 10px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
-            overflow: hidden;
-            margin-bottom: 24px;
-        }
+.table-card {
+	background: #ffffff;
+	border: 1px solid #dfe4e8;
+	border-radius: 10px;
+	box-shadow: 0 3px 12px rgba(0, 0, 0, 0.04);
+	overflow: hidden;
+	margin-bottom: 24px;
+}
 
-        .table-responsive {
-            width: 100%;
-            overflow-x: auto; /* 超出寬度時自動提供橫向滾動條 */
-        }
+.table-responsive {
+	width: 100%;
+	overflow-x: auto; /* 超出寬度時自動提供橫向滾動條 */
+}
 
-        .custom-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            white-space: nowrap; /* 防止多欄位文字折行擠壓 */
-        }
+.custom-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+	white-space: nowrap; /* 防止多欄位文字折行擠壓 */
+}
 
-        .custom-table th {
-            background: #f8fafc;
-            color: #2d3436;
-            font-weight: bold;
-            padding: 14px 12px;
-            border-bottom: 2px solid #dfe4e8;
-            text-align: center;
-        }
+.custom-table th {
+	background: #f8fafc;
+	color: #2d3436;
+	font-weight: bold;
+	padding: 14px 12px;
+	border-bottom: 2px solid #dfe4e8;
+	text-align: center;
+}
 
-        .custom-table td {
-            padding: 12px;
-            border-bottom: 1px solid #dfe4e8;
-            color: #2d3436;
-            vertical-align: middle;
-        }
+.custom-table td {
+	padding: 12px;
+	border-bottom: 1px solid #dfe4e8;
+	color: #2d3436;
+	vertical-align: middle;
+}
 
-        .custom-table tbody tr:hover {
-            background-color: #fdfdfd;
-        }
+.custom-table tbody tr:hover {
+	background-color: #fdfdfd;
+}
 
-        /* 輔助文字小樣式 */
-        .text-muted-sub {
-            font-size: 11px;
-            color: #7f8c8d;
-            margin-top: 3px;
-            display: block;
-        }
+/* 輔助文字小樣式 */
+.text-muted-sub {
+	font-size: 11px;
+	color: #7f8c8d;
+	margin-top: 3px;
+	display: block;
+}
 
-        /* =========================================
+/* =========================================
            狀態標籤 Badge 系統
            ========================================= */
-        .status-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            font-size: 12px;
-            font-weight: bold;
-            border-radius: 4px;
-            text-align: center;
-        }
-        .status-badge--orange { color: #d35400; background: #fff3e0; }
-        .status-badge--green  { color: #27ae60; background: #e8f5e9; }
-        .status-badge--gray   { color: #7f8c8d; background: #f5f5f5; }
-        .status-badge--red    { color: #c0392b; background: #ffebee; }
-        .status-badge--blue   { color: #2980b9; background: #e1f5fe; }
-        .status-badge--dark   { color: #2c3e50; background: #eceff1; }
+.status-badge {
+	display: inline-block;
+	padding: 4px 8px;
+	font-size: 12px;
+	font-weight: bold;
+	border-radius: 4px;
+	text-align: center;
+}
 
-        /* 操作按鈕 */
-        .btn-action {
-            background: #0984e3;
-            color: #ffffff;
-            border: none;
-            padding: 5px 12px;
-            font-size: 12px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.15s;
-        }
-        .btn-action:hover { background: #076bba; }
-        
-        .text-readonly {
-            color: #b2bec3;
-            font-size: 12px;
-        }
+.status-badge--orange {
+	color: #d35400;
+	background: #fff3e0;
+}
 
-        /* =========================================
+.status-badge--green {
+	color: #27ae60;
+	background: #e8f5e9;
+}
+
+.status-badge--gray {
+	color: #7f8c8d;
+	background: #f5f5f5;
+}
+
+.status-badge--red {
+	color: #c0392b;
+	background: #ffebee;
+}
+
+.status-badge--blue {
+	color: #2980b9;
+	background: #e1f5fe;
+}
+
+.status-badge--dark {
+	color: #2c3e50;
+	background: #eceff1;
+}
+
+/* 操作按鈕 */
+.btn-action {
+	background: #0984e3;
+	color: #ffffff;
+	border: none;
+	padding: 5px 12px;
+	font-size: 12px;
+	font-weight: bold;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background 0.15s;
+}
+
+.btn-action:hover {
+	background: #076bba;
+}
+
+.text-readonly {
+	color: #b2bec3;
+	font-size: 12px;
+}
+
+/* =========================================
            分頁導覽
            ========================================= */
-        .pagination-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
+.pagination-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	margin-top: 20px;
+}
 
-        .btn-page {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            height: 34px;
-            padding: 0 14px;
-            background: #ffffff;
-            border: 1px solid #dfe4e8;
-            color: #2d3436;
-            font-size: 13px;
-            font-weight: bold;
-            border-radius: 4px;
-            transition: background 0.15s;
-        }
+.btn-page {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 34px;
+	padding: 0 14px;
+	background: #ffffff;
+	border: 1px solid #dfe4e8;
+	color: #2d3436;
+	font-size: 13px;
+	font-weight: bold;
+	border-radius: 4px;
+	transition: background 0.15s;
+}
 
-        .btn-page:hover {
-            background: #edf2f7;
-            border-color: #cbd5e0;
-        }
+.btn-page:hover {
+	background: #edf2f7;
+	border-color: #cbd5e0;
+}
 
-        .page-info {
-            font-size: 13px;
-            font-weight: bold;
-            color: #636e72;
-        }
+.page-info {
+	font-size: 13px;
+	font-weight: bold;
+	color: #636e72;
+}
 
-        /* =========================================
-           彈出審核視窗 (Modal) 現代化精緻造型
-           ========================================= */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+.text-center {
+	text-align: center !important;
+}
 
-        .modal-card {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            width: 360px;
-            padding: 24px;
-            border: none;
-        }
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.4); /* 半透明黑底背景 */
+	z-index: 9999;
+	display: flex; /* 關鍵：啟動彈性排版 */
+	align-items: center; /* 垂直置中 */
+	justify-content: center; /* 水平置中 */
+}
 
-        .modal-title {
-            margin: 0 0 16px 0;
-            font-size: 18px;
-            font-weight: bold;
-            color: #2d3436;
-            text-align: center;
-        }
+.modal-card {
+	background: #ffffff;
+	border-radius: 12px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+	width: 450px; /* 微調到 450px 讓長文字備註比較好讀 */
+	padding: 24px;
+	border: none;
+}
 
-        .form-group {
-            margin-bottom: 14px;
-        }
+.modal-title {
+	margin: 0 0 16px 0;
+	font-size: 18px;
+	font-weight: bold;
+	color: #2d3436;
+	text-align: center;
+}
 
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: bold;
-            color: #636e72;
-            margin-bottom: 6px;
-        }
+.modal-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 10px;
+	margin-top: 20px;
+}
 
-        .modal-control {
-            width: 100%;
-            padding: 8px 12px;
-            font-size: 14px;
-            border: 1px solid #dfe4e8;
-            border-radius: 6px;
-            color: #2d3436;
-            outline: none;
-            background-color: #ffffff;
-            transition: border-color 0.15s;
-        }
-        
-        .modal-control:focus {
-            border-color: #0984e3;
-        }
+.btn-modal {
+	height: 36px;
+	padding: 0 16px;
+	font-size: 13px;
+	font-weight: bold;
+	border-radius: 6px;
+	cursor: pointer;
+	border: none;
+}
 
-        .modal-control[readonly] {
-            background-color: #f5f6fa;
-            color: #7f8c8d;
-        }
+.btn-modal--cancel {
+	background: #f5f6fa;
+	color: #636e72;
+	border: 1px solid #dfe4e8;
+}
 
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-modal {
-            height: 36px;
-            padding: 0 16px;
-            font-size: 13px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-modal--cancel {
-            background: #f5f6fa;
-            color: #636e72;
-            border: 1px solid #dfe4e8;
-        }
-        .btn-modal--cancel:hover { background: #dfe4e8; }
-
-        .btn-modal--submit {
-            background: #2ed573;
-            color: #ffffff;
-        }
-        .btn-modal--submit:hover { background: #26af5f; }
-    </style>
+.btn-modal--cancel:hover {
+	background: #dfe4e8;
+}
+</style>
 </head>
 <body>
 
-<div class="wb-admin-layout">
+	<div class="wb-admin-layout">
 
-    <!-- 左側共用後台 Sidebar -->
-    <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
+		<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
 
-    <!-- 右側主要內容區 -->
-    <main class="wb-admin-content">
-        <div class="list-container">
+		<main class="wb-admin-content">
+			<div class="list-container">
 
-            <!-- 頁面大標題 -->
-            <header class="page-header">
-                <h2 class="page-title">活動檢舉管理系統</h2>
-            </header>
+				<header class="page-header">
+					<h2 class="page-title">活動檢舉管理系統</h2>
+				</header>
 
-            <!-- 頂部功能快捷按鈕列 -->
-            <div class="action-bar">
-                <a th:href="@{/admin/activity/listAllActivity}" class="btn-nav btn-nav--blue">活動管理</a>
-                <a th:href="@{/admin/activity/type/listAllActivityType}" class="btn-nav btn-nav--purple">類別管理</a>
-                <a th:href="@{/admin/activity/order/listAllActivityOrder}" class="btn-nav btn-nav--green">訂單紀錄</a>
-                <a th:href="@{/admin/activity/order/finance}" class="btn-nav btn-nav--orange">撥退款作業</a>
-                <a th:href="@{/admin/activity/home}" class="btn-nav btn-nav--gray">回後台首頁</a>
-            </div>
+				<div class="action-bar">
+					<a th:href="@{/admin/activity/listAllActivity}"
+						class="btn-nav btn-nav--blue">活動管理</a> <a
+						th:href="@{/admin/activity/type/listAllActivityType}"
+						class="btn-nav btn-nav--purple">類別管理</a> <a
+						th:href="@{/admin/activity/order/listAllActivityOrder}"
+						class="btn-nav btn-nav--green">訂單紀錄</a> <a
+						th:href="@{/admin/activity/order/finance}"
+						class="btn-nav btn-nav--orange">撥退款作業</a> <a
+						th:href="@{/admin/activity/home}" class="btn-nav btn-nav--gray">回後台首頁</a>
+				</div>
 
-            <!-- 狀態篩選區塊 -->
-            <div class="filter-card">
-                <span class="filter-label">狀態篩選：</span>
-                <div class="filter-tab-group">
-                    
-                    <a th:href="@{/admin/activity/actRptList}"
-                       th:class="'tab-btn ' + (${currentStatus == null} ? 'active-all' : '')">
-                       查看全部
-                    </a>
-                    
-                    <a th:href="@{/admin/activity/actRptList(status=0)}"
-                       th:class="'tab-btn ' + (${currentStatus == 0} ? 'active-pending' : '')">
-                       待處理
-                    </a>
-                    
-                    <a th:href="@{/admin/activity/actRptList(status=3)}"
-                       th:class="'tab-btn ' + (${currentStatus == 3} ? 'active-invest' : '')">
-                       申訴中/調查中
-                    </a>
-                    
-                    <a th:href="@{/admin/activity/actRptList(status=1)}"
-                       th:class="'tab-btn ' + (${currentStatus == 1} ? 'active-success' : '')">
-                       檢舉成立
-                    </a>
-                    
-                    <a th:href="@{/admin/activity/actRptList(status=2)}"
-                       th:class="'tab-btn ' + (${currentStatus == 2} ? 'active-reject' : '')">
-                       檢舉駁回
-                    </a>
-                    
-                    <a th:href="@{/admin/activity/actRptList(status=4)}"
-                       th:class="'tab-btn ' + (${currentStatus == 4} ? 'active-appeal-s' : '')">
-                       申訴成功
-                    </a>
-                    
-                    <a th:href="@{/admin/activity/actRptList(status=5)}"
-                       th:class="'tab-btn ' + (${currentStatus == 5} ? 'active-appeal-r' : '')">
-                       申訴駁回
-                    </a>
-                    
-                </div>
-            </div>
+				<div class="filter-card">
+					<span class="filter-label">狀態篩選：</span>
+					<div class="filter-tab-group">
 
-            <!-- 明細資料表格區塊 -->
-            <div class="table-card">
-                <div class="table-responsive">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>檢舉編號</th>
-                                <th>活動與被檢舉人</th>
-                                <th>檢舉人編號</th>
-                                <th>檢舉類型</th>
-                                <th>檢舉評語/內文</th>
-                                <th>檢舉圖片</th>
-                                <th>檢舉時間</th>
-                                <th>處理狀態</th>
-                                <th>審核員工</th>
-                                <th>申訴內容</th>
-                                <th>申訴圖片</th>
-                                <th>狀態修改時間</th>
-                                <th>審核備註</th>
-                                <th>審核操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- 資料迴圈印出 -->
-                            <tr th:each="rptVO : ${actRptListData}">
-                                <td th:text="${rptVO.actRptId}" class="text-center"></td>
-                                <td class="text-center">
-                                    <span th:text="${rptVO.actId != null ? rptVO.actId.activityId : '無'}"></span>
-                                    <span class="text-muted-sub" th:text="${rptVO.actId != null ? '被檢舉人 ID: ' + rptVO.actId.memberId : '被檢舉人: 無'}"></span>
-                                </td>
-                                <td th:text="${rptVO.reporterId != null ? rptVO.reporterId.memberId : '未知'}" class="text-center"></td>
-                                <td th:switch="${rptVO.rptType}" class="text-center">
-                                    <span th:case="0">詐騙/虛假活動</span>
-                                    <span th:case="1">色情/不當活動</span>
-                                    <span th:case="2">暴力/危險活動</span>
-                                    <span th:case="3">違法行為(聚賭、毒品)</span>
-                                    <span th:case="4">其他</span>
-                                </td>
-                                <td th:text="${#strings.abbreviate(rptVO.actRptCom, 15)}" th:title="${rptVO.actRptCom}"></td>
-                                <td class="text-center">
-                                    <img th:if="${rptVO.actRptImg != null}"
-                                         th:src="@{/admin/activity/actRpt/img/{id}(id=${rptVO.actRptId})}"
-                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #dfe4e8;">
-                                    <span th:unless="${rptVO.actRptImg != null}" style="color: #ccc;">無</span>
-                                </td>
-                                <td th:text="${rptVO.actRptTime != null ? #dates.format(rptVO.actRptTime, 'yyyy-MM-dd HH:mm') : '—'}" class="text-center"></td>
-                                <td th:switch="${rptVO.actRptStatus}" class="text-center">
-                                    <span th:case="0" class="status-badge status-badge--orange">待處理</span>
-                                    <span th:case="1" class="status-badge status-badge--green">檢舉成立/已處罰</span>
-                                    <span th:case="2" class="status-badge status-badge--gray">檢舉駁回</span>
-                                    <span th:case="3" class="status-badge status-badge--red">申訴中/調查中</span>
-                                    <span th:case="4" class="status-badge status-badge--blue">申訴成功/已撤銷</span>
-                                    <span th:case="5" class="status-badge status-badge--dark">申訴駁回/維持原判</span>
-                                </td>
-                                <td th:text="${rptVO.empId != null ? rptVO.empId.empName : '—'}" class="text-center"></td>
-                                <td th:text="${#strings.abbreviate(rptVO.appealContent, 15)}" th:title="${rptVO.appealContent}"></td>
-                                <td class="text-center">
-                                    <img th:if="${rptVO.appealImg != null}"
-                                         th:src="@{/admin/activity/actRpt/appealImg/{id}(id=${rptVO.actRptId})}"
-                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid #dfe4e8;">
-                                    <span th:unless="${rptVO.appealImg != null}" style="color: #ccc;">無</span>
-                                </td>
-                                <td th:text="${rptVO.updated != null ? #dates.format(rptVO.updated, 'yyyy-MM-dd HH:mm') : '—'}" class="text-center"></td>
-                                <td th:text="${#strings.abbreviate(rptVO.remark, 10) ?: '—'}" th:title="${rptVO.remark}"></td>
-                                <td class="text-center">
-                                    <button th:if="${rptVO.actRptStatus == 0 || rptVO.actRptStatus == 3}"
-                                            type="button" class="btn-action"
-                                            th:onclick="openReviewModal([[${rptVO.actRptId}]], [[${rptVO.actRptCom}]], [[${rptVO.actRptStatus}]], [[${rptVO.remark}]])">
-                                            審核
-                                    </button>
-                                    <span th:unless="${rptVO.actRptStatus == 0 || rptVO.actRptStatus == 3}" class="text-readonly">唯讀</span>
-                                </td>
-                            </tr>
-                            <!-- 查無資料時顯示 -->
-                            <tr th:if="${#lists.isEmpty(actRptListData)}">
-                                <td colspan="14" style="text-align: center; color: #999; padding: 30px;">該分類目前沒有任何檢舉或申訴案件。</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+						<a th:href="@{/admin/activity/actRptList}"
+							th:class="'tab-btn ' + (${currentStatus == null} ? 'active-all' : '')">
+							查看全部 </a> <a th:href="@{/admin/activity/actRptList(status=0)}"
+							th:class="'tab-btn ' + (${currentStatus == 0} ? 'active-pending' : '')">
+							待處理 </a> <a th:href="@{/admin/activity/actRptList(status=1)}"
+							th:class="'tab-btn ' + (${currentStatus == 1} ? 'active-success' : '')">
+							檢舉成立 </a> <a th:href="@{/admin/activity/actRptList(status=2)}"
+							th:class="'tab-btn ' + (${currentStatus == 2} ? 'active-reject' : '')">
+							檢舉駁回 </a>
 
-            <!-- 下方分頁導覽 -->
-            <div class="pagination-container">
-                <a th:if="${currentPage > 0}"
-                   th:href="@{/admin/activity/actRptList(status=${currentStatus}, page=${currentPage - 1})}"
-                   class="btn-page">
-                   上一頁
-                </a>
-                <span class="page-info" th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?: 1} + ' 頁'">
-                   第 1 頁 / 共 1 頁
-                </span>
-                <a th:if="${(currentPage ?: 0) < (totalPages ?: 1) - 1}"
-                   th:href="@{/admin/activity/actRptList(status=${currentStatus}, page=${currentPage + 1})}"
-                   class="btn-page">
-                   下一頁
-                </a>
-            </div>
+					</div>
+				</div>
 
-        </div>
-    </main>
-</div>
+				<!-- 明細資料表格區塊 -->
+				<div class="table-card">
+					<div class="table-responsive">
+						<table class="custom-table">
+							<thead>
+								<tr>
+									<th>檢舉編號</th>
+									<th>活動與被檢舉人</th>
+									<th>檢舉類型</th>
+									<th>檢舉時間</th>
+									<th>處理狀態</th>
+									<th>審核員工</th>
+									<th>狀態修改時間</th>
+									<th>審核備註</th>
+									<th>審核操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="rptVO : ${actRptListData}">
+									<td th:text="${rptVO.actRptId}" class="text-center"></td>
+									<td class="text-center"><span class="text-center"
+										th:text="${rptVO.actId != null ? #strings.abbreviate(rptVO.actId.activityTitle, 15) : '未知活動'}"
+										th:title="${rptVO.actId != null ? rptVO.actId.activityTitle : ''}">
+									</span> <span class="text-muted-sub"
+										th:text="${rptVO.actId != null ? '被檢舉人 ID: ' + rptVO.actId.memberId : '被檢舉人: 無'}"></span>
+									</td>
+									<td th:switch="${rptVO.rptType}" class="text-center"><span
+										th:case="0">詐騙/虛假活動</span> <span th:case="1">色情/不當活動</span> <span
+										th:case="2">暴力/危險活動</span> <span th:case="3">違法行為(聚賭、毒品)</span>
+										<span th:case="4">其他</span></td>
+									<td
+										th:text="${rptVO.actRptTime != null ? #dates.format(rptVO.actRptTime, 'yyyy-MM-dd HH:mm') : '—'}"
+										class="text-center"></td>
+									<td th:switch="${rptVO.actRptStatus}" class="text-center">
+										<span th:case="0" class="status-badge status-badge--orange">待處理</span>
+										<span th:case="1" class="status-badge status-badge--green">檢舉成立/已處罰</span>
+										<span th:case="2" class="status-badge status-badge--gray">檢舉駁回</span>
+									</td>
+									<td
+										th:text="${rptVO.empId != null ? rptVO.empId.empName : '—'}"
+										class="text-center"></td>
+									<td
+										th:text="${rptVO.updated != null ? #dates.format(rptVO.updated, 'yyyy-MM-dd HH:mm') : '—'}"
+										class="text-center"></td>
+									<td class="text-center" style="vertical-align: middle;">
+										<button th:if="${rptVO.remark != null && rptVO.remark != ''}"
+											type="button" class="btn-action"
+											style="background: #636e72; padding: 4px 10px; font-size: 11px; margin: 0 auto; display: block;"
+											th:data-remark="${rptVO.remark}"
+											th:data-type="${rptVO.penaltyType}"
+											th:data-value="${rptVO.penaltyValue != null ? rptVO.penaltyValue : 0}"
+											onclick="openRemarkModal(this)">查看</button> <span
+										th:unless="${rptVO.remark != null && rptVO.remark != ''}"
+										class="text-readonly">—</span>
+									</td>
 
-<!-- =========================================
-     彈出審核視窗 (Modal 外殼加入 overlay 層確保置中)
-     ========================================= -->
-<div id="reviewModal" class="modal-overlay" th:style="${openReviewModal} ? 'display: flex;' : 'display: none;'">
-    <div class="modal-card">
-        <h4 class="modal-title">檢舉審核處置</h4>
+									<td class="text-center"><a
+										th:if="${rptVO.actRptStatus == 0}"
+										th:href="@{/admin/activity/actRpt/review/{id}(id=${rptVO.actRptId})}"
+										class="btn-action"
+										style="display: inline-block; text-decoration: none; line-height: normal;">
+											審核 </a> <span th:unless="${rptVO.actRptStatus == 0}"
+										class="text-readonly">唯讀</span></td>
+								</tr>
+								<tr th:if="${#lists.isEmpty(actRptListData)}">
+									<td colspan="14"
+										style="text-align: center; color: #999; padding: 30px;">該分類目前沒有任何檢舉或申訴案件。</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
 
-        <form method="post" th:action="@{/admin/activity/submit}">
-            <input type="hidden" id="modalActRptId" name="actRptId">
+				<!-- 下方分頁導覽 -->
+				<div class="pagination-container">
+					<a th:if="${currentPage > 0}"
+						th:href="@{/admin/activity/actRptList(status=${currentStatus}, page=${currentPage - 1})}"
+						class="btn-page"> 上一頁 </a> <span class="page-info"
+						th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?: 1} + ' 頁'">
+						第 1 頁 / 共 1 頁 </span> <a
+						th:if="${(currentPage ?: 0) < (totalPages ?: 1) - 1}"
+						th:href="@{/admin/activity/actRptList(status=${currentStatus}, page=${currentPage + 1})}"
+						class="btn-page"> 下一頁 </a>
+				</div>
 
-            <div class="form-group">
-                <label>檢舉事由：</label>
-                <input type="text" id="modalActRptCom" readonly class="modal-control">
-            </div>
+			</div>
+		</main>
+	</div>
 
-            <div id="appealBlock" class="form-group" style="display: none;">
-                <label style="color: #d63031;">會員申訴內容：</label>
-                <textarea id="modalAppealContent" readonly rows="2" class="modal-control"></textarea>
-            </div>
+	<div id="remarkModal" class="modal-overlay" style="display: none;">
+		<div class="modal-card" style="width: 480px;">
+			<h3 class="modal-title">📄 完整審核紀錄與懲處明細</h3>
 
-            <div class="form-group">
-                <label>審核決定：</label>
-                <select id="modalStatus" name="actRptStatus" onchange="togglePenaltyFields()" class="modal-control">
-                    <option value="1">檢舉成立 (處罰)</option>
-                    <option value="2">駁回檢舉</option>
-                </select>
-            </div>
+			<div
+				style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; margin-bottom: 16px;">
+				<div
+					style="background-color: #f5f6fa; padding: 10px 14px; border-radius: 6px; border: 1px solid #dfe4e8; text-align: left;">
+					<div
+						style="font-size: 11px; font-weight: bold; color: #7f8c8d; margin-bottom: 4px;">歷史懲處類型</div>
+					<div id="modalPenaltyType"
+						style="font-size: 14px; font-weight: bold; color: #2d3436;">—</div>
+				</div>
+				<div
+					style="background-color: #f5f6fa; padding: 10px 14px; border-radius: 6px; border: 1px solid #dfe4e8; text-align: left;">
+					<div
+						style="font-size: 11px; font-weight: bold; color: #7f8c8d; margin-bottom: 4px;">當時處罰記點</div>
+					<div id="modalPenaltyValue"
+						style="font-size: 14px; font-weight: bold; color: #2d3436;">—</div>
+				</div>
+			</div>
 
-            <div id="penaltyBlock" class="form-group">
-                <div class="form-group">
-                    <label>處罰類型：</label>
-                    <select name="penaltyType" class="modal-control">
-                        <option value="0">無/駁回</option>
-                        <option value="1">記點 (點數)</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>處罰數值：</label>
-                    <input type="number" name="penaltyValue" value="0" min="0" class="modal-control" style="width: 120px;">
-                </div>
-            </div>
+			<div class="form-group"
+				style="margin-bottom: 24px; text-align: left;">
+				<label
+					style="display: block; font-size: 12px; font-weight: bold; color: #636e72; margin-bottom: 6px;">審核備註紀錄：</label>
+				<p id="fullRemarkText"
+					style="font-size: 14px; line-height: 1.6; color: #2d3436; white-space: pre-wrap; word-break: break-all; margin: 0; padding: 12px; background-color: #fdfdfd; border-radius: 6px; border: 1px solid #dfe4e8; min-height: 100px; max-height: 200px; overflow-y: auto;"></p>
+			</div>
 
-            <div class="form-group">
-                <label>備註紀錄 (REMARK)：</label>
-                <textarea id="modalRemark" name="remark" rows="2" class="modal-control"></textarea>
-            </div>
+			<div class="modal-actions"
+				style="margin-top: 0; padding-top: 0; border: none; justify-content: center;">
+				<button type="button" class="btn-modal btn-modal--cancel"
+					onclick="closeRemarkModal()" style="width: 100%; height: 38px;">
+					關閉視窗</button>
+			</div>
+		</div>
+	</div>
 
-            <div class="modal-actions">
-                <button type="button" class="btn-modal btn-modal--cancel" onclick="closeReviewModal()">取消</button>
-                <button type="submit" class="btn-modal btn-modal--submit">提交</button>
-            </div>
-        </form>
-    </div>
-</div>
+	<script>
+		function openRemarkModal(buttonElement) {
+			const remarkText = buttonElement.dataset.remark;
+			const penaltyType = buttonElement.dataset.type;
+			const penaltyValue = buttonElement.dataset.value;
 
-<script th:inline="javascript">
-    function openReviewModal(actRptId, actRptCom, currentStatus, remark) {
-        /* 將原先修改 style.display = "block" 改為 "flex" 以符合 overlay 的彈性置中排版 */
-        document.getElementById("reviewModal").style.display = "flex";
-        document.getElementById("modalActRptId").value = actRptId;
-        document.getElementById("modalActRptCom").value = actRptCom;
-        document.getElementById("modalRemark").value = remark || "";
+			if (!remarkText)
+				return;
 
-        var statusSelect = document.getElementById("modalStatus");
-        statusSelect.innerHTML = "";
+			const typeEl = document.getElementById('modalPenaltyType');
+			if (penaltyType == "1") {
+				typeEl.innerHTML = '<span class="status-badge status-badge--red" style="padding: 2px 6px;">⚠️ 記點處分</span>';
+			} else {
+				typeEl.innerHTML = '<span class="status-badge status-badge--green" style="padding: 2px 6px;">✅ 無 / 駁回</span>';
+			}
 
-        if (currentStatus === 3) {
-            statusSelect.options.add(new Option("申訴結案-維持原判", "5"));
-            statusSelect.options.add(new Option("申訴成功-取消處罰", "4"));
-        } else {
-            statusSelect.options.add(new Option("檢舉成立 (處罰)", "1"));
-            statusSelect.options.add(new Option("駁回檢舉 (無罪)", "2"));
-        }
-        togglePenaltyFields();
-    }
+			const valEl = document.getElementById('modalPenaltyValue');
+			if (penaltyType == "1") {
+				valEl.innerHTML = '<strong style="color: #c0392b; font-size: 15px;">- '
+						+ penaltyValue + ' 點</strong>';
+			} else {
+				valEl.innerHTML = '<span style="color: #7f8c8d;">0 點</span>';
+			}
 
-    function closeReviewModal() {
-        document.getElementById("reviewModal").style.display = "none";
-    }
+			document.getElementById('fullRemarkText').textContent = remarkText;
+			document.getElementById('remarkModal').style.display = 'flex';
+		}
 
-    function togglePenaltyFields() {
-        var status = document.getElementById("modalStatus").value;
-        var penaltyBlock = document.getElementById("penaltyBlock");
-        if (status === "1") {
-            penaltyBlock.style.display = "block";
-        } else {
-            penaltyBlock.style.display = "none";
-        }
-    }
-</script>
+		function closeRemarkModal() {
+			document.getElementById('remarkModal').style.display = 'none';
+			document.getElementById('fullRemarkText').textContent = '';
+			document.getElementById('modalPenaltyType').textContent = '—';
+			document.getElementById('modalPenaltyValue').textContent = '—';
+		}
+
+		// 點擊半透明黑底自動關閉
+		document.getElementById('remarkModal').addEventListener('click',
+				function(e) {
+					if (e.target === this) {
+						closeRemarkModal();
+					}
+				});
+	</script>
+
 </body>
 </html>
