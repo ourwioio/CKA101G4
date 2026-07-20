@@ -121,7 +121,7 @@ public class MemberReportService {
 					}
 				}
 			}
-			
+			 
 			// 4. 儲存檢舉案件狀態
 			repository.saveAndFlush(memberReportVO);
 			

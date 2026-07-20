@@ -336,6 +336,14 @@ button[type="submit"]:hover {
 		<p class="subtitle">請輸入您的帳號密碼進行登入</p>
 	</div>
 
+	<!-- 🎯 新增：被停權/註銷強制登出的提示訊息（LoginFilter 銷毀 session 後導向 ?forced=1） -->
+	<div class="error-message" th:if="${param.forced}">
+		<svg viewBox="0 0 20 20">
+			<path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+		</svg>
+		<span>您的帳號狀態已變更（停權或註銷），已被系統強制登出。如有疑問請聯繫客服。</span>
+	</div>
+
 	<div class="success-message" th:if="${successMsg != null}">
 		<svg viewBox="0 0 20 20">
 			<path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
@@ -355,7 +363,7 @@ button[type="submit"]:hover {
 			<label for="email">Email 帳號 *</label>
 			<input type="email" id="email" name="email" th:value="${email}" placeholder="example@email.com" required>
 		</div>
-
+ 
 		<div class="form-group">
 			<div class="password-header">
 				<label for="password">密碼 *</label>

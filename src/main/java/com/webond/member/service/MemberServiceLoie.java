@@ -174,7 +174,7 @@ public class MemberServiceLoie {
 			int currentPoints = dbMember.getReportPoints() != null ? dbMember.getReportPoints() : 0;
 			
 			if (currentPoints >= 5 && (dbMember.getAccountStatus() == null || dbMember.getAccountStatus() != 3)) {
-				dbMember.setAccountStatus((byte) 3);
+				dbMember.setAccountStatus((byte) 3); 
 				// --- 🟢 這裡呼叫你已經寫好的方法 ---
 			    venueService.removeVenue(dbMember); 
 			    activityService.cancelActivitiesAndOrdersByDisabledMember(dbMember.getMemberId());
