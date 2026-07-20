@@ -21,9 +21,10 @@ public class MemberReportService {
 	
 	@Autowired
 	private MemberRepository memberRepository; 
-
+	
 	@Autowired
-	private MemberDeactivationCoordinator memberDeactivationCoordinator;
+    private MemberDeactivationCoordinator memberDeactivationCoordinator;
+	
 
 	// =========================================================================
 	// 【業務邏輯 1】會員送出新檢舉案 (前台網頁呼叫)

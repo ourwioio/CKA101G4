@@ -37,8 +37,9 @@ public class MemberService {
     @Autowired
     private ActivityService activityService;
 
-	@Autowired
-	private MemberDeactivationCoordinator memberDeactivationCoordinator;
+    @Autowired
+    private MemberDeactivationCoordinator memberDeactivationCoordinator;
+	
     
     public String getNickname(Integer memberId) {
         if (memberId == null) {
