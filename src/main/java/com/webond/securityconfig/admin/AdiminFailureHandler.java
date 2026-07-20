@@ -18,7 +18,6 @@ public class AdiminFailureHandler implements AuthenticationFailureHandler {
 			AuthenticationException exception) throws IOException, ServletException {
 String errorMsg = "密碼輸入錯誤或帳號不存在"; // 設定一個安全的預設值
 		
-		// 🌟 核心高階技巧：直接從 request 中再次抓取前端送來的帳號密碼進行二次格式分析
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		
