@@ -96,7 +96,7 @@
                     <h2 class="panel-title">案件審核裁決</h2>
                 </div>
                 <div class="panel-body">
-                    <form th:action="@{/serviceReport/update}" th:object="${serviceReportVO}" method="post" class="edit-form">
+                    <form th:action="@{/admin/serviceReport/update}" th:object="${serviceReportVO}" method="post" class="edit-form">
                         
                         <!-- 隱藏主鍵欄位 -->
                         <input type="hidden" th:field="*{serviceReportId}"/>
@@ -128,7 +128,7 @@
                             <button th:if="${serviceReportVO.serviceReportStatus == 0}" type="submit" class="btn btn--primary">
                                 送出處理結果
                             </button>
-                            <a th:href="@{/serviceReport/listAllServiceReport}" class="btn btn--secondary">
+                            <a th:href="@{/admin/serviceReport/listAllServiceReport}" class="btn btn--secondary">
                                 返回列表
                             </a>
                         </div>

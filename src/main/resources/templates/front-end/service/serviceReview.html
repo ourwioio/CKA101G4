@@ -239,12 +239,25 @@
         }
         .review-completed-box p { margin: 6px 0; font-size: 14px; font-weight: 600; color: var(--color-ink-soft); }
         .review-completed-box p strong { color: var(--color-ink); font-weight: 800; }
-        .review-none-text { font-size: 14px; color: var(--color-ink-soft); font-weight: 600; font-style: italic; padding: 10px 4px; }
+        .review-none-text { font-size: 14px; color: var(--color-ink-soft); font-weight: 600; padding: 10px 4px; }
 
         @media (max-width: 520px) {
             .info-grid { grid-template-columns: 1fr; }
             .info.info--full-width { grid-column: span 1; }
             .card { padding: 24px; }
+        }
+        
+         .service-detail-back {
+            display: inline-flex;
+            align-items: center;
+            color: var(--color-ink);
+            font-weight: 600;
+            font-size: 12px;
+            padding: 10px 20px;
+            transition: all .18s ease;
+        }
+        .service-detail-back:hover {
+            color: var(--color-yellow-deep);
         }
     </style>
 </head>
@@ -252,6 +265,9 @@
 <body>
 
 <div class="container">
+<a class="service-detail-back" th:href="@{/front/services}">
+            ← 回服務列表
+        </a>
 
     <!-- 錯誤訊息提示區塊 -->
     <div th:if="${errorMessage}" class="alert-error">
@@ -397,14 +413,14 @@
                 <p>評價時間：<span th:text="${#temporals.format(order.buyerReviewedAt, 'yyyy-MM-dd HH:mm')}"></span></p>
             </div>
             <div th:if="${order.buyerReviewedAt == null}">
-                <p class="review-none-text">⏳ 買家目前尚未留下評價</p>
+                <p class="review-none-text">買家目前尚未留下評價</p>
             </div>
         </div>
 
     </div>
 </div>
   <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
-  <div th:replace="~{front-end/common/footer :: footer}"></div>
+<!--   <div th:replace="~{front-end/common/footer :: footer}"></div> -->
 
 <!-- ==========================================================
      核心 JavaScript：精準模擬 Google Map 評分交互效果

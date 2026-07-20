@@ -301,7 +301,7 @@
                                 
                                 <!-- 修改按鈕 -->
                                 <td>
-                                    <form th:action="@{/admin/platform/notification/getOne_For_update}" method="post">
+                                    <form th:action="@{/admin/platform/notification/getOne_For_update}" th:if="${n.notificationType != 2}"method="post">
                                         <input type="hidden" name="notificationId" th:value="${n.notificationId}"/>
                                         <button type="submit" class="btn-table btn-table--edit">修改</button>
                                     </form>
