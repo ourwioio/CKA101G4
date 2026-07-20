@@ -151,8 +151,8 @@ public class ActivityService {
 	 */
 	@Transactional
 	public void cancelActivitiesAndOrdersByDisabledMember(Integer memberId) {
-		if (memberId == null) {
-			return;
+		if (memberId == null) { 
+			return;  
 		}
 
 		LocalDateTime now = LocalDateTime.now();
