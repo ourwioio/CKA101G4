@@ -441,11 +441,12 @@ button, input, select {
 								<option value="1"
 									th:selected="${searchStatus != null and searchStatus == 1}">
 									已發布</option>
-							</select> <input type="text" name="keyword" placeholder="搜尋標題、內容或標籤"
-								th:value="${searchKeyword}"> <span class="search-sep">
+							</select> <span class="search-sep">
 								發布日期 </span> <input type="date" name="startDate"
 								th:value="${searchStartDate}"> <span class="search-sep">
 								～ </span> <input type="date" name="endDate" th:value="${searchEndDate}">
+								<input type="text" name="keyword" placeholder="搜尋標題、內容或標籤"
+								th:value="${searchKeyword}">
 
 							<div class="search-form-actions">
 
