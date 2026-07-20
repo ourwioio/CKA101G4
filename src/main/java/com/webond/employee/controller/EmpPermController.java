@@ -71,14 +71,15 @@ public class EmpPermController {
 	public String insert(
 			@Valid PermissionVO permVO,
 			BindingResult result,
-			ModelMap model){
+			ModelMap model,
+			@RequestParam(value = "currentPage", defaultValue = "0") int currentPage){
 		
 		if(result.hasErrors()) {
 			model.addAttribute("permissionVO",permVO);
 			
-			Page<PermissionVO> permPage = permSvc.getAllByPage(0);
+			Page<PermissionVO> permPage = permSvc.getAllByPage(currentPage);
 			model.addAttribute("permListData", permPage.getContent());
-			model.addAttribute("currentPage", 0);
+			model.addAttribute("currentPage",currentPage);
 			model.addAttribute("totalPages", permPage.getTotalPages());
 
 			model.addAttribute("openAddModal", true);
@@ -89,7 +90,7 @@ public class EmpPermController {
 		
 		permSvc.addPermission(permVO);
 		
-		return "redirect:/admin/employees/empPermPage";
+		return "redirect:/admin/employees/empPermPage?p=" + currentPage;
 	}
 	
 	
@@ -111,14 +112,15 @@ public class EmpPermController {
 		public String update(
 				@Valid PermissionVO permVO,
 				BindingResult result,
-				ModelMap model){
+				ModelMap model,
+				@RequestParam(value = "currentPage", defaultValue = "0") int currentPage){
 			
 			if(result.hasErrors()) {
 				model.addAttribute("permissionVO",permVO);
 				
-				Page<PermissionVO> permPage = permSvc.getAllByPage(0);
+				Page<PermissionVO> permPage = permSvc.getAllByPage(currentPage);
 				model.addAttribute("permListData", permPage.getContent());
-				model.addAttribute("currentPage", 0);
+				model.addAttribute("currentPage", currentPage);
 				model.addAttribute("totalPages", permPage.getTotalPages());
 
 				model.addAttribute("openEditModal", true);
@@ -129,7 +131,7 @@ public class EmpPermController {
 			
 			permSvc.updatePerm(permVO);
 			
-			return "redirect:/admin/employees/empPermPage";
+			return "redirect:/admin/employees/empPermPage?p=" + currentPage;
 		}
 		
 // === 刪除員工權限(確認送出) ===//

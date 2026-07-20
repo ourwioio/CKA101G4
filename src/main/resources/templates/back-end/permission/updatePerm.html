@@ -14,80 +14,80 @@
 	<div th:fragment="updatePermContent">
 
 		<style>
-		    /* =========================================
+/* =========================================
 		       修改員工權限燈箱 - 樣式
 		       ========================================= */
-		    .perm-edit-form {
-		        color: #2d3436;
-		    }
+.perm-edit-form {
+	color: #2d3436;
+}
 
-		    .perm-edit-title {
-		        margin: 0 0 16px;
-		        font-size: 18px;
-		        color: #2d3436;
-		    }
+.perm-edit-title {
+	margin: 0 0 16px;
+	font-size: 18px;
+	color: #2d3436;
+}
 
-		    .perm-edit-table {
-		        width: 100%;
-		        border-collapse: collapse;
-		    }
+.perm-edit-table {
+	width: 100%;
+	border-collapse: collapse;
+}
 
-		    .perm-edit-table td {
-		        padding: 8px 5px;
-		        vertical-align: top;
-		    }
+.perm-edit-table td {
+	padding: 8px 5px;
+	vertical-align: top;
+}
 
-		    .perm-label {
-		        white-space: nowrap;
-		        color: #2d3436;
-		    }
+.perm-label {
+	white-space: nowrap;
+	color: #2d3436;
+}
 
-		    /* 唯讀欄位（權限編號） */
-		    .perm-input-readonly {
-		        border: none;
-		        background: transparent;
-		        pointer-events: none;
-		        outline: none;
-		        padding: 0;
-		    }
+/* 唯讀欄位（權限編號） */
+.perm-input-readonly {
+	border: none;
+	background: transparent;
+	pointer-events: none;
+	outline: none;
+	padding: 0;
+}
 
-		    /* 一般可編輯欄位（權限名稱） */
-		    .perm-input {
-		        width: 100%;
-		        max-width: 250px;
-		        padding: 6px;
-		        border: 1px solid #7a7a7a !important;
-		        border-radius: 4px;
-		        box-sizing: border-box;
-		    }
+/* 一般可編輯欄位（權限名稱） */
+.perm-input {
+	width: 100%;
+	max-width: 250px;
+	padding: 6px;
+	border: 1px solid #7a7a7a !important;
+	border-radius: 4px;
+	box-sizing: border-box;
+}
 
-		    /* 權限內容 textarea */
-		    .perm-textarea {
-		        width: 100% !important;
-		        max-width: 350px !important;
-		        min-height: 120px !important;
-		        padding: 8px;
-		        border: 1px solid #7a7a7a !important;
-		        border-radius: 4px;
-		        box-sizing: border-box;
-		        resize: vertical;
-		        font-family: inherit;
-		        color: #2d3436 !important;
-		    }
+/* 權限內容 textarea */
+.perm-textarea {
+	width: 100% !important;
+	max-width: 350px !important;
+	min-height: 120px !important;
+	padding: 8px;
+	border: 1px solid #7a7a7a !important;
+	border-radius: 4px;
+	box-sizing: border-box;
+	resize: vertical;
+	font-family: inherit;
+	color: #2d3436 !important;
+}
 
-		    .perm-error {
-		        color: #ff3333;
-		        font-size: 0.85rem;
-		        display: block;
-		        margin-top: 5px;
-		        font-weight: bold;
-		        text-align: left;
-		    }
+.perm-error {
+	color: #ff3333;
+	font-size: 0.85rem;
+	display: block;
+	margin-top: 5px;
+	font-weight: bold;
+	text-align: left;
+}
 
-		    .perm-edit-actions {
-		        margin-top: 12px;
-		    }
-		</style>
+.perm-edit-actions {
+	margin-top: 12px;
+}
+</style>
 
 		<h3 class="perm-edit-title">修改員工資料</h3>
 
@@ -100,33 +100,25 @@
 				<tr>
 					<td class="perm-label">權限編號：</td>
 					<td><input type="text" id="editPermId" name="permId"
-						th:value="*{permId}" readonly
-						class="perm-input-readonly" />
-					</td>
+						th:value="*{permId}" readonly class="perm-input-readonly" /></td>
 				</tr>
 
 				<!-- 權限名稱 -->
 				<tr>
 					<td class="perm-label">權限名稱：</td>
-					<td>
-						<input type="text" th:field="*{permName}" id="editPermName"
-							class="perm-input">
-						<span th:if="${#fields.hasErrors('permName')}"
-							th:errors="*{permName}" class="perm-error error">
-						</span>
-					</td>
+					<td><input type="text" th:field="*{permName}"
+						id="editPermName" class="perm-input"> <span
+						th:if="${#fields.hasErrors('permName')}" th:errors="*{permName}"
+						class="perm-error error"> </span></td>
 				</tr>
 
 				<!-- 權限內容 -->
 				<tr>
 					<td class="perm-label">權限內容：</td>
-					<td>
-						<textarea th:field="*{permDsc}" id="editPermDsc"
-							class="perm-textarea"></textarea>
-						<span th:if="${#fields.hasErrors('permDsc')}"
-							th:errors="*{permDsc}" class="perm-error error">
-						</span>
-					</td>
+					<td><textarea th:field="*{permDsc}" id="editPermDsc"
+							class="perm-textarea"></textarea> <span
+						th:if="${#fields.hasErrors('permDsc')}" th:errors="*{permDsc}"
+						class="perm-error error"> </span></td>
 				</tr>
 
 			</table>
@@ -134,10 +126,11 @@
 			<div class="perm-edit-actions">
 				<button type="submit">確認儲存</button>
 				<button type="button"
-					th:onclick="|window.location.href='@{/admin/employees/empPermPage}'|"
-					onclick="closeEditModal()">取消</button>
+					onclick="closeEditModal(); var p = document.getElementById('modalCurrentPage').value; window.location.href='/admin/employees/empPermPage?p=' + (p ? p : 0);">取消</button>
 			</div>
 
+			<input type="hidden" name="currentPage" id="modalCurrentPage"
+				th:value="${currentPage != null ? currentPage : 0}" />
 		</form>
 	</div>
 

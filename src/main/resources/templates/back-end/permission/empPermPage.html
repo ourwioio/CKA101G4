@@ -276,7 +276,7 @@ body {
 				<!-- 頁面頂部檔頭區塊 -->
 				<div class="page-header">
 					<h2 class="page-title">員工權限管理系統</h2>
-					<button type="button" class="btn-primary" onclick="openAddModal()">
+					<button type="button" class="btn-primary" th:onclick="openAddModal([[${currentPage}]])">
 						<span>＋</span> 新增權限
 					</button>
 				</div>
@@ -324,7 +324,7 @@ body {
 								<!-- 修改按鈕 -->
 								<td style="text-align: center;">
 									<button type="button" class="btn-action-edit"
-										th:onclick="openEditModal([[${permVO.permId}]], [[${permVO.permName}]], [[${permVO.permDsc}]])">
+										th:onclick="openEditModal([[${permVO.permId}]], [[${permVO.permName}]], [[${permVO.permDsc}]],[[${currentPage}]])">
 										修改
 									</button>
 								</td>
@@ -380,13 +380,18 @@ body {
 
 <script>
 // 新增按鈕控制邏輯
-function openAddModal() {
+function openAddModal(currentPage) {
 	var modal = document.getElementById("addModal");
 	if (modal) {
 		var form = modal.querySelector("form");
 		if (form) {
 			form.reset();
 		}
+		
+		if (document.getElementById("modalCurrentPage")) {
+			document.getElementById("modalCurrentPage").value = (currentPage !== undefined && currentPage !== null) ? currentPage : 0; 
+		}
+		
 		modal.style.setProperty("display", "block", "important");
 	}
 }
@@ -399,7 +404,7 @@ function closeAddModal() {
 }
 
 // 修改按鈕控制邏輯
-function openEditModal(permId, permName, permDsc) {
+function openEditModal(permId, permName, permDsc, currentPage) {
 	var modal = document.getElementById("editModal");
 	if (modal) {
 		var form = modal.querySelector("form");
@@ -413,6 +418,9 @@ function openEditModal(permId, permName, permDsc) {
 			document.getElementById("editPermName").value = permName;
 		if (document.getElementById("editPermDsc"))
 			document.getElementById("editPermDsc").value = permDsc;
+		if (document.getElementById("modalCurrentPage")) {
+			document.getElementById("modalCurrentPage").value = (currentPage !== undefined && currentPage !== null) ? currentPage : 0; 
+		}
 		
 		modal.style.setProperty("display", "block", "important");
 	}
