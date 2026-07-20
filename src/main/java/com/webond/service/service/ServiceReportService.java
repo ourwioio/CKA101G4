@@ -91,7 +91,7 @@ public class ServiceReportService {
             notification.setMember(memberVO);
             notification.setTitle("【服務下架通知】您的服務已被檢舉涉嫌違規");
             notification.setContent("日前我們收到針對您服務的檢舉，經初步審查，服務因違反平台規範已暫時下架。");
-            notification.setNotificationType((byte) 3);   // 這裡要填正確的類型代碼
+            notification.setNotificationType((byte) 2);   // 這裡要填正確的類型代碼
             notificationService.addNotification(notification);
             
             ServiceVO serviceVO = existing.getService();
