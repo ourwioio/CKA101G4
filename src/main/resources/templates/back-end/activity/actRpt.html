@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>後台管理系統 - 檢舉案件審核</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <!-- ✅ 引入外部 CSS -->
+    <link rel="stylesheet" th:href="@{/css/back-end/activity/actRpt.css}">
+</head>
+<body>
+
+<div class="wb-admin-layout">
+
+    <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
+
+    <main class="wb-admin-content">
+        
+        <div class="list-container">
+            
+            <div class="review-wrapper">
+
+                <header class="page-header">
+                    <h2 class="page-title">⚖️ 檢舉案件審核系統</h2>
+                    <a th:href="@{/admin/activity/actRptList}" class="btn-back">
+                        ← 返回檢舉清單
+                    </a>
+                </header>
+
+                <section class="panel-card">
+                    <h3 class="panel-title">Case Evidences / 檢舉案由與證據</h3>
+                    
+                    <div class="info-grid">
+                        <div class="meta-item">
+                            <div class="meta-label">檢舉案號</div>
+                            <div class="meta-value" th:text="'#' + ${actRptVO.actRptId}"></div>
+                        </div>
+                        
+                        <div class="meta-item">
+                            <div class="meta-label">檢舉類型分類</div>
+                            <div class="meta-value" th:switch="${actRptVO.rptType}">
+                                <span th:case="0">詐騙/虛假活動</span>
+                                <span th:case="1">色情/不當活動</span>
+                                <span th:case="2">暴力/危險活動</span>
+                                <span th:case="3">違法行為(聚賭、毒品)</span>
+                                <span th:case="4">其他</span>
+                                <span th:case="*">未歸類</span>
+                            </div>
+                        </div>
+
+                        <div class="meta-item">
+                            <div class="meta-label">檢舉發起人 (Reporter ID)</div>
+                            <div class="meta-value" th:text="${actRptVO.reporterId != null ? '會員 #' + actRptVO.reporterId.memberId : '未知成員'}"></div>
+                        </div>
+
+                        <div class="meta-item">
+                            <div class="meta-label">被檢舉對象與活動</div>
+                            <div class="meta-value">
+                                <span th:text="${actRptVO.actId != null ? '活動ID: ' + actRptVO.actId.activityId : '無活動資訊'}"></span>
+                                <span style="font-weight: 400; color: var(--slate-400); margin: 0 6px;">|</span>
+                                <!-- 💡 修正原本寫錯的 actId.memberId，補上完整的物件路徑 -->
+                                <span th:text="${actRptVO.actId != null ? '被檢舉會員ID: ' + actRptVO.actId.memberId : '無成員資訊'}"></span>
+                            </div>
+                        </div>
+
+                        <div class="content-block">
+                            <div class="meta-label" style="margin-bottom: 8px;">詳細檢舉內容 / 事實說明</div>
+                            <p class="evidence-text" th:text="${actRptVO.actRptCom ?: '（檢舉人未填寫說明敘述）'}"></p>
+                        </div>
+
+                        <div class="image-preview-box">
+                            <div class="meta-label">佐證圖片證據</div>
+                            <div th:if="${actRptVO.actRptImg != null}">
+                                <img th:src="@{/admin/activity/actRpt/img/{id}(id=${actRptVO.actRptId})}" class="img-fluid" alt="檢舉佐證圖片">
+                            </div>
+                            <div th:unless="${actRptVO.actRptImg != null}" class="no-img-placeholder">
+                                📷 本案檢舉人未上傳任何圖片佐證
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel-card">
+    <h3 class="panel-title">Review Action / 審核決議控制台</h3>
+    
+    <form th:action="@{/admin/activity/submit}" th:object="${actRptVO}" method="post">
+        
+        <!-- 隱藏欄位：傳遞主鍵 ID，不可缺少 -->
+        <input type="hidden" th:field="*{actRptId}" />
+        
+        <!-- 第一橫列：審核狀態決議 -->
+        <div class="form-group">
+            <label class="form-label">審核決議狀態</label>
+            <select th:field="*{actRptStatus}" class="form-select" id="actRptStatus" required>
+                <option value="0">待處理</option>
+                <option value="1">檢舉成立（執行扣分懲罰）</option>
+                <option value="2">檢舉駁回（不成立）</option>
+            </select>
+        </div>
+
+        <!-- 第二橫列：你指定的處罰區塊（水平並排設計） -->
+        <div id="penaltyBlock" class="form-row-2">
+            <!-- 處罰類型下拉選單 -->
+            <div class="form-group">
+                <label class="form-label">處罰類型</label>
+                <!-- 💡 th:field 會自動將對應的變數名稱綁定到後端 Java VO 物件中 -->
+                <select th:field="*{penaltyType}" class="form-select" id="penaltyType">
+                    <!-- 💡 假設你的 penaltyType 是 Integer，這裡對應 0 與 1。如果是字串，會自動轉型 -->
+                    <option value="0">無 / 駁回 / 不懲罰</option>
+                    <option value="1">記點 (點數)</option>
+                </select>
+            </div>
+
+            <!-- 處罰數值輸入框 -->
+            <div class="form-group">
+                <label class="form-label">處罰點數值</label>
+                <input type="number" th:field="*{penaltyValue}" class="form-input" min="0" max="10" placeholder="0" id="penaltyValue"/>
+            </div>
+        </div>
+
+        <!-- 第三橫列：審核紀錄與內部備註 -->
+        <div class="form-group">
+            <label class="form-label">審核紀錄與備註（內部紀錄）</label>
+            <textarea th:field="*{remark}" class="form-textarea" rows="4" placeholder="請詳細寫下本次審核決議的理由..."></textarea>
+        </div>
+
+        <!-- 表單動作按鈕 -->
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">確認並提交決議</button>
+        </div>
+    </form>
+</section>
+                
+            </div>
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

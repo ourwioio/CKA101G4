@@ -66,7 +66,13 @@ public class ActRptService {
                     int currentPoints = memVO.getReportPoints() != null ? memVO.getReportPoints() : 0;
                     int penalty = reviewData.getPenaltyValue() != null ? reviewData.getPenaltyValue() : 0;
                     
-                    memVO.setReportPoints(currentPoints + penalty);
+                    int newPoints = currentPoints + penalty;
+                    memVO.setReportPoints(newPoints);
+                    
+                    if (newPoints >= 5) {
+                        memVO.setAccountStatus((byte) 3); 
+                        
+                    }
                     
                     memSvc.updateMember(memVO); 
                 }
