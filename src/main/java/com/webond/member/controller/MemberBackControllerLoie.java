@@ -5,6 +5,7 @@ import java.util.Base64;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -83,14 +84,16 @@ public class MemberBackControllerLoie {
 			@RequestParam("type") String type) {
 		
 		MemberVO memberVO = memberService.getOneMember(memberId);
-		// 基礎防禦：會員不存在或圖片欄位為空則回傳 404
-		if (memberVO == null || memberVO.getIdImage() == null) {
+		// 🎯 修正：只檢查會員存不存在，不要不分 type 一律卡 idImage 是否為 null
+		if (memberVO == null) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 
 		try {
 			// 1. 處理身分證正反面 (JSON 格式儲存)
 			if ("idFront".equals(type) || "idBack".equals(type)) {
+				if (memberVO.getIdImage() == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
 				String jsonStr = new String(memberVO.getIdImage(), "UTF-8");
 				// 根據 type 對應 JSON 中的 Key: front 或 back
 				String key = "idFront".equals(type) ? "front" : "back";
@@ -109,12 +112,15 @@ public class MemberBackControllerLoie {
 
 				HttpHeaders headers = new HttpHeaders();
 				headers.setContentType(MediaType.IMAGE_JPEG);
+				// 🎯 修正：加上 no-cache，避免瀏覽器沿用舊圖
+				headers.setCacheControl(CacheControl.noCache().getHeaderValue());
 				return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
 			} 
 			// 2. 處理人臉照片 (直接儲存的 BLOB)
 			else if ("faceImage".equals(type)) {
 				if (memberVO.getFaceImage() == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 				return ResponseEntity.ok()
+						.cacheControl(CacheControl.noCache()) // 🎯 修正：避免瀏覽器沿用舊圖
 						.contentType(MediaType.IMAGE_JPEG)
 						.body(memberVO.getFaceImage());
 			} 
@@ -122,6 +128,7 @@ public class MemberBackControllerLoie {
 			else if ("memberPic".equals(type)) {
 				if (memberVO.getMemberPic() == null) return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 				return ResponseEntity.ok()
+						.cacheControl(CacheControl.noCache()) // 🎯 修正：這就是 memberList 大頭貼沒更新的關鍵
 						.contentType(MediaType.IMAGE_JPEG)
 						.body(memberVO.getMemberPic());
 			}

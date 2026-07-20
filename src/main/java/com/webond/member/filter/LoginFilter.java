@@ -2,8 +2,12 @@ package com.webond.member.filter;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import com.webond.member.model.MemberVO;
+import com.webond.member.service.MemberServiceLoie;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,18 +20,23 @@ import jakarta.servlet.http.HttpSession;
  *
  * 權責劃分：
  * - /admin/** 由 AdminSecurityConfig（Spring Security）保護，本 Filter 不碰
- * - 員工後台原本掛在這裡的清單（memberList / toggleStatus / displayImage /
- *   manageReport / updateReportStatus）已全數搬到 /admin/members/** 底下，
- *   改由 Spring Security 的 hasAuthority("會員管理") 把關，故本 Filter 移除員工檢查，
- *   只保留「會員」頁面的登入門禁
+ * - 本 Filter 只保護「會員」頁面清單內的網址，清單外一律放行
  *
  * 運作流程：
  * 1. shouldNotFilter()：不在保護清單內的網址回傳 true（跳過檢查）
- * 2. doFilterInternal()：檢查 session.account（handleLogin 登入成功時寫入）
+ * 2. doFilterInternal()：
+ *    a. 檢查 session.account（handleLogin 登入成功時寫入）→ 沒有就導去登入頁
+ *    b. 🎯 即時狀態檢查：每次都重新查資料庫確認帳號仍是「正常(1)」，
+ *       若已被停權(3)/註銷(2)，立刻銷毀 session 強制登出。
+ *       搭配前端每 3 秒一次的通知輪詢（也在保護清單內），
+ *       管理員停權後最慢約 3 秒該會員的 session 就會被殺掉。
  * 3. 未登入 → 把原網址存入 session.location（登入後跳回用），導向會員登入頁
  */
 @Component
 public class LoginFilter extends OncePerRequestFilter {
+
+	@Autowired
+	private MemberServiceLoie memberService;
 
 	/** 需要「會員」登入的頁面 */
 	private boolean isMemberProtected(String uri) {
@@ -75,7 +84,8 @@ public class LoginFilter extends OncePerRequestFilter {
 		HttpSession session = request.getSession();
 
 		// 會員頁面：檢查會員登入身分（handleLogin 寫入）
-		if (session.getAttribute("account") == null) {
+		String account = (String) session.getAttribute("account");
+		if (account == null) {
 			// 🎯 AJAX 輪詢（如 /front/notification/unread-count）未登入時
 			// 直接回 401，且「不寫入 location」，避免污染登入後的跳轉目標
 			if (isAjaxRequest(request)) {
@@ -87,7 +97,31 @@ public class LoginFilter extends OncePerRequestFilter {
 			return;
 		}
 
-		// 已登入，放行給 Controller
+		// =====================================================================
+		// 🎯 新增：即時帳號狀態檢查（強制登出機制）
+		// 已登入的會員每次存取受保護頁面時，重新到資料庫確認帳號狀態。
+		// 只要不是「正常(1)」——被停權(3)、被註銷(2)、甚至資料被刪除——
+		// 立刻銷毀 session 強制登出，不必等他自己登出或 session 過期。
+		// =====================================================================
+		MemberVO currentMember = memberService.findByEmail(account);
+		if (currentMember == null
+				|| currentMember.getAccountStatus() == null
+				|| currentMember.getAccountStatus() != 1) {
+
+			session.invalidate(); // 銷毀整個 session，等同強制登出
+
+			if (isAjaxRequest(request)) {
+				// 背景輪詢請求：回 401 就好（前端輪詢 3 秒打一次，
+				// 所以停權後最慢約 3 秒 session 就會被殺掉）
+				response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+				return;
+			}
+			// 一般頁面瀏覽：導回登入頁並帶上參數，讓登入頁能顯示提示訊息
+			response.sendRedirect(request.getContextPath() + "/member/login?forced=1");
+			return;
+		}
+
+		// 已登入且帳號狀態正常，放行給 Controller
 		filterChain.doFilter(request, response);
 	}
 }
