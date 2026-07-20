@@ -125,6 +125,7 @@
         transform: translateY(0) scale(0.98);
     }
 </style>
+  <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
 </head>
 <body>
 
@@ -144,7 +145,8 @@
     <a th:href="@{/activity/front/myOrder}">返回我的報名畫面</a>
 </div>
 
-<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+<div th:replace="~{front-end/common/footer :: footer}"></div>
 
 </body>
 </html>

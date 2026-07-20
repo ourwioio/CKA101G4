@@ -5,7 +5,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>我舉辦的活動</title>
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
@@ -558,7 +559,8 @@ tr:hover td {
 
   </div>
 
-  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+  <div th:replace="~{front-end/common/footer :: footer}"></div>
 
 <script th:src="@{/js/front-end/activity/activityStatusPolling.js}"></script>
 </body>

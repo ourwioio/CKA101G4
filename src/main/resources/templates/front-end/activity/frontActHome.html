@@ -8,7 +8,8 @@
 
 <title>活動前台</title>
 
-<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
 
 <link rel="stylesheet" th:href="@{/css/front-end/activity/activity-navbar-offset.css}">
 
@@ -615,7 +616,8 @@ th:text="|會員${memberId}|">
 </div>
 
 
-<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+<div th:replace="~{front-end/common/footer :: footer}"></div>
 
 </body>
 

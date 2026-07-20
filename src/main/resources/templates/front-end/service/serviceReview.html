@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>訂單評價｜Webond</title>
-    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
      <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
     <style>
         /* ==========================================================
@@ -402,7 +403,8 @@
 
     </div>
 </div>
-  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+  <div th:replace="~{front-end/common/footer :: footer}"></div>
 
 <!-- ==========================================================
      核心 JavaScript：精準模擬 Google Map 評分交互效果

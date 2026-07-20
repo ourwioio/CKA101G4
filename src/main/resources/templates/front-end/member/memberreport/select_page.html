@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>會員檢舉管理：首頁</title>
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
   <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
 <style>
@@ -247,5 +248,6 @@
      </ul>
   </div>
 
+<div th:replace="~{front-end/common/footer :: footer}"></div>
 </body>
 </html>

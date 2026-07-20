@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>編輯會員個人頁面</title>
   <link rel="stylesheet" th:href="@{/css/front-end/member/profileEdit.css}" />
-  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
   <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
   <style>
 /* ==========================================================
@@ -518,7 +519,8 @@ body.page-body{
       </div>
     </div>
   </div>
-	  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+	  <div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+	  <div th:replace="~{front-end/common/footer :: footer}"></div>
   <!-- ========== 頭貼刪除與即時預覽腳本 ========== -->
   <script th:inline="javascript">
     // 超實用：頭貼選擇檔案後即時預覽 (不必等儲存送出就能看到效果)

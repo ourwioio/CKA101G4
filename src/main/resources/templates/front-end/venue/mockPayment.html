@@ -9,7 +9,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/front-end/venue/mockPayment.css}" href="payment.css">
 <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
@@ -79,7 +80,8 @@
     <input type="hidden" name="venueOrderId" th:value="${order.venueOrderId}" />
 </form>
 
-<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+<div th:replace="~{front-end/common/footer :: footer}"></div>
 
 <!-- 這個變數需要 Thymeleaf 注入後端的 secondsLeft，無法搬到純外部 .js 檔案，須留在此處 -->
 <script th:inline="javascript">

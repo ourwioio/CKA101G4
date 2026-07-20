@@ -10,7 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <!-- 前台共用 Navbar CSS -->
-    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
     <!-- 賣方訂單頁專屬 CSS -->
 <!--     <link rel="stylesheet" th:href="@{/css/front-end/service/memberSellerOrderList.css}"> -->
 
@@ -1053,5 +1054,6 @@
 	<!-- 共用通知 AJAX 輪巡機制 -->
 	<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
+<div th:replace="~{front-end/common/footer :: footer}"></div>
 </body>
 </html>
