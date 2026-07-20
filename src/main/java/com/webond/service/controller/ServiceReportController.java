@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
-@RequestMapping("/serviceReport")
+@RequestMapping("/admin/serviceReport")
 public class ServiceReportController {
 	
 	@Autowired
@@ -84,7 +84,7 @@ public class ServiceReportController {
 		return "back-end/service/serviceReportList";
 	}
 	
-	@PostMapping("getOne_For_update")
+	@PostMapping("/getOne_For_update")
 	public String getOneServiceReport(@RequestParam("serviceReportId") Integer serviceReportId, ModelMap model,HttpSession session) {
 
         Integer loginEmployeeId =
@@ -97,12 +97,11 @@ public class ServiceReportController {
 		return "back-end/service/serviceReportUpdate";
 	}
 	
-	@PostMapping("update")
+	@PostMapping("/update")
 	public String update(@Valid ServiceReportVO serviceReportVO, BindingResult result, ModelMap model, HttpSession session) {
 	    Integer loginEmployeeId = getLoginEmployeeId(session);
 
-	    EmployeeVO employee = employeeRepository.getReferenceById(loginEmployeeId);
-	    serviceReportVO.setEmployee(employee);
+
 	  
 		try {
 			serviceReportService.updateServiceReport(serviceReportVO);
@@ -115,7 +114,7 @@ public class ServiceReportController {
 		
 		model.addAttribute("success", "finish");
 		
-		return "redirect:/serviceReport/listAllServiceReport";
+		return "redirect:/admin/serviceReport/listAllServiceReport";
 	}
 	
 

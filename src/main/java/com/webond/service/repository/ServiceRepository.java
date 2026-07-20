@@ -71,7 +71,7 @@ public interface ServiceRepository extends JpaRepository<ServiceVO, Integer> {
            select s from ServiceVO s
            left join fetch s.serviceType
            where s.memberId = :memberId
-           and s.status in (0, 1)
+           and s.status in (0, 1, 3)
            order by s.serviceId desc
            """)
     List<ServiceVO> findManageableServicesByMemberId(Integer memberId);
