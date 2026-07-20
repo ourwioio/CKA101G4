@@ -106,8 +106,8 @@ public class ServiceReviewService {
 	private void notifyReviewSubmitted(Integer targetMemberId) {
 		NotificationVO notification = new NotificationVO();
 		notification.setMember(memberRepository.getReferenceById(targetMemberId));
-		notification.setTitle("新評價通知");
-		notification.setContent("您收到一則新評價，快來查看吧！");
+		notification.setTitle("服務新評價通知");
+		notification.setContent("您的服務收到一則新評價，快來查看吧！");
 		notification.setNotificationType((byte) 1); // 這裡要填正確的類型代碼
 		notificationService.addNotification(notification);
 	}

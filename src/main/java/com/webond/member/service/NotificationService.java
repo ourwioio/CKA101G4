@@ -131,7 +131,7 @@ public class NotificationService {
     	}
     	
     	if(title.contains("服務")) {
-    		if(title.contains("新的預約申請") || title.contains("付款完成") || title.contains("買家取消")) {
+    		if(title.contains("預約申請") || title.contains("付款完成") || title.contains("買家取消")) {
         		return "/member/service-orders/seller";
     		}
     		else if(title.contains("通過") || title.contains("賣家取消") || title.contains("預約時段")
