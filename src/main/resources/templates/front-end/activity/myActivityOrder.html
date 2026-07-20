@@ -505,6 +505,12 @@ td:nth-child(2) { color: var(--color-ink); font-weight: 800; }
 		const orderStatusUrl = /*[[@{/activity/front/order/status}]]*/ '/activity/front/order/status';
 		let isPollingOrderStatus = false;
 
+		// Thymeleaf 遇到 null 時可能不輸出 data 屬性，瀏覽器讀取後會變成 undefined。
+		// 統一轉成空字串再比較，避免 null 與 undefined 被誤判成狀態異動而每秒刷新頁面。
+		function normalizeOrderStatus(value) {
+			return value == null ? '' : String(value);
+		}
+
 		function pollOrderStatuses() {
 			const rows = Array.from(document.querySelectorAll('[data-order-id][data-order-status]'));
 			if (rows.length === 0 || isPollingOrderStatus) {
@@ -526,8 +532,8 @@ td:nth-child(2) { color: var(--color-ink); font-weight: 800; }
 					const hasChanged = rows.some(function(row) {
 						const current = data[row.dataset.orderId];
 						return current && (
-							String(current.orderStatus) !== String(row.dataset.orderStatus)
-							|| String(current.refundStatus) !== String(row.dataset.orderRefundStatus)
+							normalizeOrderStatus(current.orderStatus) !== normalizeOrderStatus(row.dataset.orderStatus)
+							|| normalizeOrderStatus(current.refundStatus) !== normalizeOrderStatus(row.dataset.orderRefundStatus)
 						);
 					});
 					if (hasChanged) {

@@ -8,9 +8,15 @@
     return Array.from(document.querySelectorAll('[data-live-activity-id]'));
   }
 
+  function normalizeValue(value) {
+    return value == null ? '' : String(value);
+  }
+
   function hasChanged(element, current) {
+    // API 暫時缺少某筆資料時不刷新，避免空回應造成每秒重新載入。
+    // 活動下架／取消仍會由 API 回傳新的 activityStatus，並走下方正常比較。
     if (!current) {
-      return true;
+      return false;
     }
 
     var comparisons = [
@@ -26,7 +32,7 @@
       if (!element.hasAttribute(attribute)) {
         return false;
       }
-      return String(element.getAttribute(attribute)) !== String(current[responseKey]);
+      return normalizeValue(element.getAttribute(attribute)) !== normalizeValue(current[responseKey]);
     });
   }
 
