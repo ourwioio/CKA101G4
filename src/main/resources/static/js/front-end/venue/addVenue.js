@@ -77,37 +77,32 @@ function renderPreviews() {
     selectedFiles.forEach((file, index) => {
         const reader = new FileReader();
         reader.onload = function(e) {
-            const wrapper = document.createElement('div');
-            wrapper.style.cssText = 'position: relative; cursor: pointer;';
-            wrapper.onclick = () => setCover(index);
+            const isCover = index === coverIndex;
+
+            const item = document.createElement('div');
+            item.className = 'preview-item' + (isCover ? ' is-cover' : '');
+            item.onclick = () => setCover(index);
 
             const img = document.createElement('img');
             img.src = e.target.result;
-            img.style.cssText = 'width: 100px; height: 80px; object-fit: cover; border-radius: 6px; border: 2px solid ' + (index === coverIndex ? '#1d9e75' : '#e0e0e0') + ';';
-
-            wrapper.appendChild(img);
-
-            // 只有封面那一張才建立標籤，不是封面就不要放這個 div，
-            // 不然空的 div 還是會因為背景色套用而顯示出一個綠色小方塊
-            if (index === coverIndex) {
-                const label = document.createElement('div');
-                label.className = 'cover-label';
-                label.textContent = '封面';
-                label.style.cssText = 'position: absolute; top: 2px; left: 2px; background: #1d9e75; color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px;';
-                wrapper.appendChild(label);
-            }
+            item.appendChild(img);
 
             const removeBtn = document.createElement('div');
+            removeBtn.className = 'remove-btn';
             removeBtn.textContent = '✕';
             removeBtn.title = '不上傳這張';
-            removeBtn.style.cssText = 'position: absolute; top: 2px; right: 2px; width: 18px; height: 18px; line-height: 18px; text-align: center; background: rgba(0,0,0,0.6); color: #fff; font-size: 12px; border-radius: 50%; cursor: pointer;';
             removeBtn.onclick = function(e) {
                 e.stopPropagation(); // 避免同時觸發設封面
                 removeFile(index);
             };
+            item.appendChild(removeBtn);
 
-            wrapper.appendChild(removeBtn);
-            previewArea.appendChild(wrapper);
+            const tag = document.createElement('div');
+            tag.className = 'cover-tag';
+            tag.textContent = isCover ? '目前封面' : '設為封面';
+            item.appendChild(tag);
+
+            previewArea.appendChild(item);
         };
         reader.readAsDataURL(file);
     });
