@@ -1,0 +1,238 @@
+/* ================= 現代化全域與排版樣式 ================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    min-height: 100vh;
+}
+
+/* 後台大框架：左側固定，右側自適應 */
+.admin-container {
+    display: flex;
+    width: 100%;
+}
+
+/* 左側側邊欄容器 */
+.sidebar-wrapper {
+    width: 270px;
+    background-color: #1e293b; /* 深色高質感背景 */
+    flex-shrink: 0;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+/* 右側主內容區 */
+.main-content {
+    flex-grow: 1;
+    padding: 30px;
+    background-color: #f8fafc;
+    overflow-x: hidden;
+}
+
+/* 內容卡片白底區塊 */
+.card-panel {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 24px;
+    margin-top: 20px;
+}
+
+/* 標題與上方工具列 */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+.page-header h2 {
+    margin: 0;
+    color: #1e293b;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* ================= 按鈕設計 ================= */
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-primary {
+    background-color: #3b82f6;
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #2563eb;
+}
+.btn-edit {
+    background-color: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+}
+.btn-edit:hover {
+    background-color: #e2e8f0;
+}
+.btn-delete {
+    background-color: #fee2e2;
+    color: #ef4444;
+    border: 1px solid #fca5a5;
+}
+.btn-delete:hover {
+    background-color: #fecaca;
+}
+
+/* ================= 表格設計 ================= */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+    text-align: left;
+    font-size: 14px;
+}
+.custom-table th {
+    background-color: #f1f5f9;
+    color: #475569;
+    font-weight: 600;
+    padding: 14px 16px;
+    border-bottom: 2px solid #e2e8f0;
+}
+.custom-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #edf2f7;
+    color: #334155;
+    vertical-align: middle;
+}
+.custom-table tbody tr:hover {
+    background-color: #f8fafc; /* 滑鼠懸停變色 */
+}
+
+/* ================= 狀態與標籤 (Badges) ================= */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+.status-unverified { background-color: #fef3c7; color: #d97706; }
+.status-normal { background-color: #dcfce7; color: #15803d; }
+.status-cancelled { background-color: #fee2e2; color: #b91c1c; }
+.status-suspended { background-color: #f1f5f9; color: #64748b; }
+
+.perm-item {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-right: 4px;
+    display: inline-block;
+}
+
+/* 頭像優化 */
+.avatar-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.avatar-none {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #e2e8f0;
+    color: #94a3b8;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    font-weight: bold;
+}
+
+/* ================= 分頁設計 ================= */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 24px;
+    gap: 8px;
+}
+.page-link {
+    padding: 8px 16px;
+    border: 1px solid #cbd5e1;
+    text-decoration: none;
+    background-color: white;
+    color: #334155;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+.page-link:hover {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+}
+.page-info {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0 12px;
+    font-weight: 500;
+}
+
+/* ================= 燈箱外殼與遮罩升級 ================= */
+
+/* 新增與修改燈箱的通用外殼樣式 */
+#addEmpModal, #editEmpModal {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    background: #ffffff !important;
+    border: none !important; /* 移除原本生硬的 3px 黑線 */
+    border-radius: 12px !important; /* 加上現代化圓角 */
+    padding: 30px !important;
+    z-index: 1050 !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important; /* 柔和的高級感深層陰影 */
+    width: 520px !important;
+    max-height: 90vh !important; /* 防止超出螢幕高度 */
+    overflow-y: auto !important;  /* 內容過長時自動產生內部捲軸 */
+    box-sizing: border-box !important;
+    white-space: normal !important; /* 修正：外殼放寬為自動換行，避免排版擠壓 */
+    text-align: left !important;
+}
+
+/* 遮罩背景優化（可選）：如果你未來想加上彈出燈箱時的後半透明黑底 */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.6); /* 深藍色半透明遮罩 */
+    backdrop-filter: blur(4px); /* 現代瀏覽器專屬：背景微模糊特效 */
+    z-index: 1040;
+}
+

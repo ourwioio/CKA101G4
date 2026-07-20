@@ -448,6 +448,7 @@ body {
 	</div>
 
 
+
 	<script>
 		// 照片預覽機制
 		function previewImage(input) {
@@ -470,7 +471,7 @@ body {
 		}
 
 		// 新增按鈕的 (點擊按鈕打開彈窗)
-		function openAddEmpModal() {
+		function openAddEmpModal(currentPage) {
 			var modal = document.getElementById("addEmpModal");
 			if (modal) {
 				var form = modal.querySelector("form");
@@ -480,6 +481,10 @@ body {
 
 				var noImageCircle = document.getElementById("noImageCircle");
 				var imagePreview = document.getElementById("imagePreview");
+				
+				if (document.getElementById("modalCurrentPage")) {
+					document.getElementById("modalCurrentPage").value = (currentPage !== undefined && currentPage !== null) ? currentPage : 0; 
+				}
 
 				if (noImageCircle && imagePreview) {
 					imagePreview.src = "";
@@ -492,7 +497,8 @@ body {
 		}
 
 		// 修改按鈕的 (點擊按鈕打開彈窗)
-		function openEditEmpModal(employeeId,  empAccount, empPassword,empName, roleTitle, empStatus, hasImg, btnElement) {
+		function openEditEmpModal(employeeId, empAccount, empPassword, empName,
+				roleTitle, empStatus, hasImg,currentPage, btnElement) {
 			var modal = document.getElementById("editEmpModal");
 			if (modal) {
 				var form = modal.querySelector("form");
@@ -512,49 +518,56 @@ body {
 					document.getElementById("editRoleTitle").value = roleTitle;
 				if (document.getElementById("editEmpStatus"))
 					document.getElementById("editEmpStatus").value = empStatus;
-				
-	
+				if (document.getElementById("modalCurrentPage")) {
+					document.getElementById("modalCurrentPage").value = (currentPage !== undefined && currentPage !== null) ? currentPage : 0; 
+				}
+
 				//拿權限編號
-				var permIdsArray =[];
-				if(btnElement){
+				var permIdsArray = [];
+				if (btnElement) {
 					var currentRow = btnElement.closest('tr');
-					if(currentRow){
-						var permSpans = currentRow.querySelectorAll('.perm-item');
-						permSpans.forEach(function(span){
-							if(span.dataset.permid){
+					if (currentRow) {
+						var permSpans = currentRow
+								.querySelectorAll('.perm-item');
+						permSpans.forEach(function(span) {
+							if (span.dataset.permid) {
 								permIdsArray.push(span.dataset.permid);
 							}
 						});
 					}
 				}
-				
-				
-				var checkboxes = modal.querySelectorAll("input[name='permIds']");
-				
-				checkboxes.forEach(function(checkbox){
-					if(permIdsArray.includes(checkbox.value)){
+
+				var checkboxes = modal
+						.querySelectorAll("input[name='permIds']");
+
+				checkboxes.forEach(function(checkbox) {
+					if (permIdsArray.includes(checkbox.value)) {
 						checkbox.checked = true;
 					}
 				});
-				
-				
-				
+
 				var editNoImageCircle = document
 						.getElementById("editNoImageCircle");
 				var editImagePreview = document
 						.getElementById("editImagePreview");
 
 				if (editNoImageCircle && editImagePreview) {
+					
 					if (hasImg && employeeId) {
 						editImagePreview.src = "/admin/employees/dbgUpdateImg/"
 								+ employeeId;
-		                    editImagePreview.style.display = "block";
-		                    editNoImageCircle.style.display = "none";
+						editImagePreview.style.display = "block";
+						editNoImageCircle.style.display = "none";
 					} else {
 						editImagePreview.src = "";
 						editImagePreview.style.display = "none";
 						editNoImageCircle.style.display = "block";
 					}
+				}
+				
+				var fileInput = document.getElementById("editUpImg");
+				if (fileInput) {
+					fileInput.value = ""; 
 				}
 				modal.style.setProperty("display", "flex", "important");
 			}
@@ -569,26 +582,30 @@ body {
 		}
 		// 修改用(關閉彈窗)
 		function closeEditEmpModal() {
-		    var modal = document.getElementById("editEmpModal");
-		    if (modal) {
-		        modal.style.setProperty("display", "none", "important");
-		    }
+			var modal = document.getElementById("editEmpModal");
+			if (modal) {
+				modal.style.setProperty("display", "none", "important");
+			}
 		}
-		
+
 		// 照片即時預覽機制（修改燈箱專用）
 		function previewEditImage(input) {
-		    var noImageCircle = document.getElementById('editNoImageCircle');
-		    var imagePreview = document.getElementById('editImagePreview');
+			var noImageCircle = document.getElementById('editNoImageCircle');
+			var imagePreview = document.getElementById('editImagePreview');
 
-		    if (input.files && input.files[0]) {
-		        var reader = new FileReader();
-		        reader.onload = function(e) {
-		            imagePreview.src = e.target.result;
-		            imagePreview.style.display = 'block';
-		            noImageCircle.style.display = 'none';
-		        }
-		        reader.readAsDataURL(input.files[0]);
-		    }
+			if (input.files && input.files[0]) {
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					imagePreview.src = e.target.result;
+					imagePreview.style.display = 'block';
+					noImageCircle.style.display = 'none';
+				}
+				reader.readAsDataURL(input.files[0]);
+			} else {
+				imagePreview.src = '';
+				imagePreview.style.display = 'none';
+				if (noImageCircle) noImageCircle.style.display = 'flex';
+			}
 		}
 		
 		// 點擊遮罩關閉

@@ -1,128 +1,101 @@
-<!DOCTYPE html>
-<html xmlns:th="http://thymeleaf.org"
-	xmlns:sec="http://thymeleaf.org/extras/spring-security">
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
+<!-- ================= 修改員工燈箱 ================= -->
+<div th:fragment="updateContent" class="modal-content-wrapper">
 
-	<!-- ================= 修改員工燈箱 ================= -->
-	<div th:fragment="updateContent">
-
-		<h3>修改員工資料</h3>
-		<form th:action="@{/admin/employees/update}" method="POST"
-			th:object="${employeeVO}" enctype="multipart/form-data">
-			<tr>
-				<td style="white-space: nowrap;">員工編號：</td>
-				<td><input type="text" id="editEmployeeId" name="employeeId"
-					th:value="*{employeeId}" readonly
-					style="border: none; background: transparent; pointer-events: none; outline: none; padding: 0;" />
-				</td>
-			</tr>
-
-			<input type="hidden" id="editEmpAccount" name="empAccount"
-				th:value="*{empAccount}" /> <input type="hidden"
-				id="editEmpPassword" name="empPassword" th:value="*{empPassword}" />
+	<h3>修改員工資料</h3>
+	
+	<form th:action="@{/admin/employees/update}" method="POST"
+		th:object="${employeeVO}" enctype="multipart/form-data">
+		
+<div class="form-group" style="flex-direction: row; align-items: center; background-color: #f8f9fa; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #007bff; max-width: 400px; box-sizing: border-box;">
+	<!-- 核心修正：加寬並限制絕對不換行 -->
+	<label style="width: 100px; margin-bottom: 0; white-space: nowrap; flex-shrink: 0; font-weight: 600; color: #495057;">員工編號：</label>
+	
+	<input type="text" id="editEmployeeId" name="employeeId" th:value="*{employeeId}" readonly 
+		style="border: none !important; background: transparent !important; pointer-events: none; outline: none !important; padding: 0 !important; font-size: 1.1rem; font-weight: 700; color: #212529; letter-spacing: 0.5px; width: 100%;" />
+</div>
 
 
+		<!-- 隱藏表單控制項 -->
+		<input type="hidden" id="editEmpAccount" name="empAccount" th:value="*{empAccount}" /> 
+		<input type="hidden" id="editEmpPassword" name="empPassword" th:value="*{empPassword}" />
 
-			<table border="0" cellpadding="5">
-				<tr>
-					<td style="white-space: nowrap;">姓名：</td>
-					<td><input type="text" th:field="*{empName}" id="editEmpName"
-						style="width: 100%; max-width: 250px; padding: 6px; border: 1px solid #7a7a7a !important; border-radius: 4px; box-sizing: border-box;">
+		<!-- 姓名 -->
+		<div class="form-group">
+			<label>員工姓名</label>
+			<input type="text" th:field="*{empName}" id="editEmpName" class="form-control" placeholder="請輸入姓名">
+			<span th:if="${#fields.hasErrors('empName')}" th:errors="*{empName}" class="error-text"></span>
+		</div>
 
-						<span th:if="${#fields.hasErrors('empName')}"
-						th:errors="*{empName}" class="error"
-						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;">
-					</span></td>
-				</tr>
+		<!-- 職稱 -->
+		<div class="form-group">
+			<label>職稱</label>
+			<select th:field="*{roleTitle}" id="editRoleTitle" class="form-control">
+				<option value="0">系統管理員</option>
+				<option value="1">營運總監</option>
+				<option value="2">客服專員</option>
+				<option value="3">財務專員</option>
+				<option value="4">行銷專員</option>
+			</select> 
+			<span th:if="${#fields.hasErrors('roleTitle')}" th:errors="*{roleTitle}" class="error-text"></span>
+		</div>
 
-				<tr>
-					<td style="white-space: nowrap;">職稱：</td>
-					<td><select th:field="*{roleTitle}" id="editRoleTitle"
-						style="width: 100%; max-width: 250px; padding: 6px; border: 1px solid #7a7a7a !important; border-radius: 4px; box-sizing: border-box;">
-							<option value="0">系統管理員</option>
-							<option value="1">營運總監</option>
-							<option value="2">客服專員</option>
-							<option value="3">財務專員</option>
-							<option value="4">行銷專員</option>
-					</select> <span th:if="${#fields.hasErrors('roleTitle')}"
-						th:errors="*{roleTitle}" class="error"
-						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;"></span></td>
+		<!-- 帳號狀態 -->
+		<div class="form-group">
+			<label>帳號狀態</label>
+			<select th:field="*{empStatus}" id="editEmpStatus" class="form-control">
+				<option value="1">正常</option>
+				<option value="2">註銷</option>
+				<option value="3">停權</option>
+			</select> 
+			<span th:if="${#fields.hasErrors('empStatus')}" th:errors="*{empStatus}" class="error-text"></span>
+		</div>
 
-				</tr>
+		<!-- 權限範圍 -->
+		<div class="form-group">
+			<label>權限範圍</label>
+			<div class="perm-scroll-box">
+				<th:block th:each="perms : ${permVO}">
+					<label class="perm-label-badge">
+						<input type="checkbox" name="permIds" th:value="${perms.permId}"
+							th:checked="${selectedPermIds != null && selectedPermIds.contains(perms.permId)}"> 
+						<span th:text="${perms.permName}"></span>
+					</label>
+				</th:block>
+			</div> 
+			<span th:if="${#fields.hasErrors('empPermVO')}" th:errors="*{empPermVO}" class="error-text"></span>
+		</div>
 
+		<!-- 員工照片 -->
+		<div class="form-group">
+			<label>員工照片</label>
+			<input type="file" name="upImg" accept="image/*" onchange="previewEditImage(this);" style="margin-bottom: 8px;">
+			
+			<div class="avatar-upload-box">
+				<!-- 預設無圖片灰色圈：只有當 VO 裡完全沒圖時才顯示 -->
+				<div id="editNoImageCircle" class="avatar-none"
+					 th:style="${employeeVO.empImg == null} ? 'display: flex;' : 'display: none;'">
+					無
+				</div>
+				
+				<!-- 圖片預覽：如果填錯被退回，就跑 Base64 渲染；正常編輯則讀取網址路徑 -->
+				<img id="editImagePreview" alt="圖片預覽" class="avatar-img"
+					 th:src="${employeeVO.empImg != null} ? 
+							 (${#fields.hasAnyErrors()} ? 'data:image/jpeg;base64,' + ${T(java.util.Base64).getEncoder().encodeToString(employeeVO.empImg)} : @{/admin/employees/dbgUpdateImg/{id}(id=${employeeVO.employeeId})}) 
+							 : ''"
+					 th:style="${employeeVO.empImg != null} ? 'display: block;' : 'display: none;'" />
+			</div>
+			<span th:if="${#fields.hasErrors('empImg')}" th:errors="*{empImg}" class="error-text"></span>
+		</div>
 
-				<tr>
-					<td style="white-space: nowrap;">帳號狀態：</td>
-					<td><select th:field="*{empStatus}" id="editEmpStatus"
-						style="width: 100%; max-width: 250px; padding: 6px; border: 1px solid #7a7a7a !important; border-radius: 4px; box-sizing: border-box;">
-							<option value="1">正常</option>
-							<option value="2">註銷</option>
-							<option value="3">停權</option>
-					</select> <span th:if="${#fields.hasErrors('empStatus')}"
-						th:errors="*{empStatus}" class="error"
-						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;"></span></td>
-
-				</tr>
-
-
-				<tr>
-					<td>權限範圍：</td>
-					<td>
-						<div
-							style="display: flex; flex-wrap: wrap; gap: 10px; max-width: 320px; max-height: 120px; overflow-y: auto; white-space: normal; padding: 5px; border: 1px solid #e0e0e0; border-radius: 4px; background-color: #fafafa;">
-							<th:block th:each="perms : ${permVO}">
-								<label
-									style="display: inline-flex; align-items: center; white-space: nowrap; cursor: pointer; background: #eee; padding: 4px 8px; border-radius: 4px; font-size: 13px;">
-									<input type="checkbox" name="permIds"
-									th:value="${perms.permId}"
-									th:checked="${selectedPermIds != null && selectedPermIds.contains(perms.permId)}"
-									style="margin-right: 4px;"> <span
-									th:text="${perms.permName}"></span>
-
-								</label>
-							</th:block>
-						</div> <span th:if="${#fields.hasErrors('empPermVO')}"
-						th:errors="*{empPermVO}" class="error"
-						style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;"></span>
-
-					</td>
-				</tr>
-
-				<tr>
-					<td
-						style="white-space: nowrap; color: black; vertical-align: top; padding-top: 8px;">員工照片：</td>
-					<td><input type="file" name="upImg" accept="image/*"
-						onchange="previewEditImage(this);" style="margin-bottom: 12px;"><br>
-						<div
-							style="width: 120px; height: 120px; border: 2px dashed #a0a0a0; border-radius: 6px; padding: 4px; background-color: #fafafa; display: flex; justify-content: center; align-items: center; box-sizing: border-box;">
-
-							<div id="editNoImageCircle"
-								th:style="${#fields.hasAnyErrors() && employeeVO.empImg != null} ? 'display: none;' : 'width: 50px; height: 50px; border-radius: 50%; background-color: #e0e0e0; color: #666; font-size: 12px; line-height: 50px; text-align: center; font-weight: bold; display: block;'">
-								無</div>
-
-							<img id="editImagePreview" alt="圖片預覽"
-								th:src="${employeeVO.employeeId != null && employeeVO.empImg != null} ? @{/admin/employees/dbgUpdateImg/{id}(id=${employeeVO.employeeId})} : ''"
-								th:style="${#fields.hasAnyErrors() && employeeVO.empImg != null} ? 'width: 100%; height: 100%; object-fit: cover; border-radius: 4px; display: block;' : 'width: 100%; height: 100%; object-fit: cover; border-radius: 4px; display: none;'"
-								src="" /> <span class="error" th:errors="*{empImg}"
-								style="color: #ff3333; font-size: 0.85rem; display: block; margin-top: 5px; font-weight: bold; text-align: left;"></span>
-
-						</div></td>
-				</tr>
-
-
-			</table>
-			<br>
-			<button type="submit">確認儲存</button>
-			<button type="button"
-				th:onclick="|window.location.href='@{/admin/employees/empPage}'|"
-				onclick="closeEditEmpModal()">取消</button>
-		</form>
-	</div>
-
-
-</body>
-</html>
+		<!-- 操作按鈕列 -->
+		<div class="modal-footer-btns">
+			<button type="submit" class="btn btn-primary">確認儲存</button>
+				<button type="button" class="btn btn-edit"
+					onclick="closeEmpModal(); var p = document.getElementById('modalCurrentPage').value; window.location.href='/admin/employees/empPage?p=' + (p ? p : 0);">
+					取消</button>
+			</div>
+			<input type="hidden" name="currentPage" id="modalCurrentPage" 
+       th:value="${currentPage != null ? currentPage : 0}" />
+		
+	</form>
+</div>
