@@ -12,6 +12,7 @@
 <!-- 前台共用 Navbar CSS -->
 <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
 <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 <!-- 買方訂單頁專屬 CSS -->
 <!-- <link rel="stylesheet" th:href="@{/css/front-end/service/memberBuyerOrderList.css}"> -->
 
@@ -896,6 +897,8 @@
 			</form>
 		</div>
 	</div>
+
+	<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
 	<script th:src="@{/js/front-end/service/memberBuyerOrderList.js}"></script>
 	<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>

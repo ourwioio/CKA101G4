@@ -22,6 +22,7 @@
 <!-- 前台共用 Navbar CSS -->
 <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
 <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 
 <!-- 時段管理專屬 CSS -->
 <!-- <link rel="stylesheet" th:href="@{/css/front-end/service/memberServiceSlotList.css}"> -->
@@ -1146,6 +1147,8 @@
 	</div>
 
 	<!-- 時段管理頁功能 -->
+	<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+
 	<script th:src="@{/js/front-end/service/memberServiceSlotList.js}"></script>
 
 	<!-- 共用通知 AJAX 輪巡 -->

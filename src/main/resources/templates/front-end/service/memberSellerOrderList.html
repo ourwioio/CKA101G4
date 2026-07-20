@@ -12,6 +12,7 @@
     <!-- 前台共用 Navbar CSS -->
     <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
     <!-- 賣方訂單頁專屬 CSS -->
 <!--     <link rel="stylesheet" th:href="@{/css/front-end/service/memberSellerOrderList.css}"> -->
 
@@ -1050,6 +1051,8 @@
 
 	<!-- 腳本引入 -->
 	<!-- 賣方訂單頁功能邏輯 -->
+	<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+
 	<script th:src="@{/js/front-end/service/memberSellerOrderList.js}"></script>
 	<!-- 共用通知 AJAX 輪巡機制 -->
 	<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>

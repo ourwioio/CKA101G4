@@ -125,6 +125,7 @@
     }
 </style>
   <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
+  <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 </head>
 <body>
 
@@ -141,6 +142,8 @@
     <p>我們已收到您的評價</p>
     <a th:href="@{/}">返回首頁</a>
 </div>
+
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
 <div th:replace="~{front-end/common/footer :: footer}"></div>
 </body>

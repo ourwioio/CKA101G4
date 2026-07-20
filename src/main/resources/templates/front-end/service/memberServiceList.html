@@ -17,6 +17,7 @@
 	<!-- 前台共用 Navbar CSS -->
 	<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
 	<link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
+	<link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
     <!-- 我的服務列表專屬 CSS -->
     <!-- <link rel="stylesheet" th:href="@{/css/front-end/service/memberServiceList.css}"> -->
 
@@ -1143,6 +1144,8 @@
 <!-- ==========================================================
      刪除彈窗 JS
      ========================================================== -->
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
