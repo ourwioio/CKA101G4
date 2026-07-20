@@ -550,7 +550,6 @@ body {
 			webSocket = new WebSocket(endPointURL);
 
 			webSocket.onopen = function(event) {
-				console.log("Connect Success!");
 				document.getElementById('sendMessage').disabled = false;
 
 				const historyReq = {
@@ -643,7 +642,6 @@ body {
 				// 🅲 情況 C：對方點開對話，即時將畫面上的「未讀」集體改為「已讀」
 				} else if("read" === jsonObj.type){
 					const readerId = jsonObj.senderId; 
-					console.log(`[已讀廣播追蹤] 收到已讀通知，發送者(對方)ID: ${readerId}, 目前我網頁綁定的 targetId: ${targetId}`);
 
 					// 💡 修正 2：加強防禦性判定，如果 targetId 剛好是 null、或者字串比對有些微時差，我們印出 log 協助確認
 				    if (!targetId || String(readerId) === String(targetId)) {
@@ -653,7 +651,6 @@ body {
 				            label.style.color = "lightgray";
 				            label.classList.remove("unread-marker"); 
 				        });
-				        console.log("🚀 [畫面刷新成功] 已將目前對話窗內部的未讀字樣集體刷為已讀！");
 				    }
 				}
 			};
@@ -821,7 +818,6 @@ window.addEventListener("DOMContentLoaded", function() {
 						if (existingBadge) {
 							existingBadge.remove();
 						}
-						console.log(`[已讀削平] 成功將目前對話目標 ${pIdNum} 的硬碟計數歸零，並當場扒掉畫面的紅點！`);
 					} else {
 						// 🌟 否則，如果是別人在背景傳訊息的人，去硬碟撈出屬於他個人的舊未讀數，還原小紅點！
 						updateLeftSidebarBadge(pIdNum, true); 

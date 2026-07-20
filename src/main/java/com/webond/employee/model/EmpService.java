@@ -83,8 +83,6 @@ public class EmpService {
 		if(empImg != null && !empImg.isEmpty()) {
 			byte[] imgBytes = empImg.getBytes();
 			empVO.setEmpImg(imgBytes);
-		}else {
-			empVO.setEmpImg(null);
 		}
 		
 		// 密碼加密

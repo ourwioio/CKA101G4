@@ -137,6 +137,7 @@ public class EmpController {
 			ModelMap model,
 			@RequestParam(value = "permIds", required = false) List<Integer> permIds, // 手動接收前端Checkbox陣列
 			@RequestParam("upImg") MultipartFile upImg,
+			@RequestParam(value = "currentPage", defaultValue = "0") int currentPage,
 			HttpSession session ) throws IOException {
 
 		/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
@@ -190,28 +191,53 @@ public class EmpController {
 			
 	        if (upImg != null && !upImg.isEmpty()) {
 	            session.setAttribute("addSessionImg", upImg.getBytes());
-	            employeeVO.setEmpImg(upImg.getBytes()); 
+	            employeeVO.setEmpImg(null);
+	        }else {
+	        	Object imgObj = session.getAttribute("addSessionImg");
+	            if (imgObj instanceof byte[]) { 
+	            	employeeVO.setEmpImg(null);
+	            }
 	        }
 	        
 	        if (session.getAttribute("addSessionImg") != null) {
 	            model.addAttribute("hasTempImg", true);
 	        }
 	        
+	        List<EmployeeVO> list = empSvc.getAll(); 
+	        model.addAttribute("empListData", list);
+	        
+	        model.addAttribute("currentPage", currentPage);
 	        model.addAttribute("employeeVO", employeeVO);
 			model.addAttribute("selectedPermIds", permIds);
-			return addError(model,result);
+			return addError(model,result,currentPage);
 		}
 
 		/*************************** 2.開始新增資料 *****************************************/
 		
+	    byte[] finalImgBytes = null;
+
+	    if (upImg != null && !upImg.isEmpty()) {
+	        finalImgBytes = upImg.getBytes();
+	    } else {
+	        // 【安全防禦修改】：安全地從 Session 取出圖片
+	        Object imgObj = session.getAttribute("addSessionImg");
+	        if (imgObj instanceof byte[]) { // 確保型別安全，防止轉型錯誤
+	            finalImgBytes = (byte[]) imgObj;
+	        }
+	    }
+	    
+	    employeeVO.setEmpImg(finalImgBytes);
+		
 		empSvc.saveEmp(employeeVO, permIds, upImg);
+		
+		session.removeAttribute("addSessionImg");
 
 		/*************************** 3.新增完成,準備轉交(Send the Success view) **************/
 		List<EmployeeVO> list = empSvc.getAll();
 		model.addAttribute("empListData", list);
 		model.addAttribute("success", "- (新增成功)");
 		
-		return "redirect:/admin/employees/empPage";
+		return "redirect:/admin/employees/empPage?p=" + currentPage;
 	}
 	
 //=== 新增的圖片處理 === //
@@ -220,15 +246,20 @@ public class EmpController {
 					HttpServletResponse response,
 					HttpSession session ) throws IOException {
 				
-			    byte[] imageBytes = (byte[]) session.getAttribute("addSessionImg");
-				
-			    if (imageBytes != null && imageBytes.length > 0) {
-			        response.setContentType("image/jpeg"); 
-			        try (ServletOutputStream out = response.getOutputStream()) {
-			            out.write(imageBytes);
-			            out.flush();
-			        }
-			    }
+				 Object imgObj = session.getAttribute("addSessionImg");
+				    
+				    if (imgObj instanceof byte[]) {
+				        byte[] imageBytes = (byte[]) imgObj;
+				        
+				        if (imageBytes != null && imageBytes.length > 0) {
+				            response.setContentType("image/jpeg"); 
+				            try (ServletOutputStream out = response.getOutputStream()) {
+				                out.write(imageBytes);
+				                out.flush();
+				            }
+				            return; 
+				        }
+				    }
 				
 			}
 			
@@ -262,6 +293,7 @@ public class EmpController {
 				ModelMap model,
 				@RequestParam(value = "permIds", required = false) List<Integer> permIds, // 手動接收前端Checkbox陣列
 				@RequestParam("upImg") MultipartFile upImg,
+				@RequestParam(value = "currentPage", defaultValue = "0") int currentPage,
 				HttpSession session) throws IOException {
 
 			/*************************** 1.接收請求參數 - 輸入格式的錯誤處理 ************************/
@@ -285,9 +317,10 @@ public class EmpController {
 					session.setAttribute("sessionImg" + employeeVO.getEmployeeId(), upImg.getBytes());
 				}
 				
+				model.addAttribute("currentPage", currentPage);
 				model.addAttribute("selectedPermIds", permIds);
 				model.addAttribute("employeeVO",employeeVO);
-				return updateError(model,result);
+				return updateError(model,result, currentPage);
 			}
 
 			/*************************** 2.開始修改資料 *****************************************/
@@ -367,7 +400,7 @@ public class EmpController {
 	}
 
 // === 輔助(新增) : 封裝失敗時要塞給前端的變數 === //
-	private String addError(ModelMap model, BindingResult result) {
+	private String addError(ModelMap model, BindingResult result, int currentPage) {
 		List<PermissionVO> permListData = permSvc.getAll();
 		model.addAttribute("permVO", permListData);
 		
@@ -383,11 +416,12 @@ public class EmpController {
 	        model.put(bindingResultKey, cleanResult);
 	    }
 		
+	    
 
 		// 補齊分頁預設變數，防止燈箱退回時背景的主畫面列表破版
-		Page<EmployeeVO> empPage = empSvc.getAllByPage(0);
+		Page<EmployeeVO> empPage = empSvc.getAllByPage(currentPage);
 		model.addAttribute("empListData", empPage.getContent());
-		model.addAttribute("currentPage", 0);
+		model.addAttribute("currentPage", currentPage);
 		model.addAttribute("totalPages", empPage.getTotalPages());
 		// 傳變數給前端，跟他說出錯了，請自動打開(不然出錯可能會關掉?)
 		model.addAttribute("openAddEmpModal", true);
@@ -397,7 +431,7 @@ public class EmpController {
 	}
 	
 // === 輔助(修改) : 封裝失敗時要塞給前端的變數 === //
-		private String updateError(ModelMap model, BindingResult result) {
+		private String updateError(ModelMap model, BindingResult result, int currentPage) {
 			List<PermissionVO> permListData = permSvc.getAll();
 			model.addAttribute("permVO", permListData);
 			
@@ -415,9 +449,9 @@ public class EmpController {
 			
 
 			// 補齊分頁預設變數，防止燈箱退回時背景的主畫面列表破版
-			Page<EmployeeVO> empPage = empSvc.getAllByPage(0);
+			Page<EmployeeVO> empPage = empSvc.getAllByPage(currentPage);
 			model.addAttribute("empListData", empPage.getContent());
-			model.addAttribute("currentPage", 0);
+			model.addAttribute("currentPage", currentPage);
 			model.addAttribute("totalPages", empPage.getTotalPages());
 			// 傳變數給前端，跟他說出錯了，請自動打開(不然出錯可能會關掉?)
 			model.addAttribute("openEditEmpModal", true);
