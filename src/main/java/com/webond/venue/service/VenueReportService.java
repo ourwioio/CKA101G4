@@ -138,7 +138,7 @@ public class VenueReportService {
 		}
 
 		// ③ 場地審核紀錄退回審核中
-		venueReviewService.resetToReviewing(venueVO.getVenueId());
+		venueReviewService.startNewReview(venueVO.getVenueId());
 
 		// ④ 場地狀態改為待審核
 		venueVO.setVenueStatus(VENUE_STATUS_PENDING);
