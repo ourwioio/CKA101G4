@@ -301,8 +301,10 @@ public class MemberFrontControllerAyaka {
 	        return ResponseEntity.badRequest().body(result);
 	    }
 
-	    memberService.updateAccountStatus(memberId, (byte)2); // 3 = 停權
+	    memberService.updateAccountStatus(memberId, (byte)2); // 2 = 註銷
 	    session.invalidate(); // 登出
+	    
+	    venueService.removeVenue(member);
 
 	    result.put("success", true);
 	    return ResponseEntity.ok(result);
