@@ -138,7 +138,7 @@ td {
 				<tr>
 					<th>類型ID</th>
 					<th>類型名稱</th>
-					<th>類型描述</th>
+<!-- 					<th>類型描述</th> -->
 					<th>操作</th>
 				</tr>
 			</thead>
@@ -146,7 +146,7 @@ td {
 				<tr th:each="venueType : ${venueTypeListData}">
 					<td th:text="${venueType.venueTypeId}"></td>
 					<td th:text="${venueType.typeName}"></td>
-					<td th:text="${venueType.typeDesc}"></td>
+<!-- 					<td th:text="${venueType.typeDesc}"></td> -->
 					<td>
 						<div class="actions">
 							<form th:action="@{/admin/venue/venueType/getOne_For_Update}" method="post"
