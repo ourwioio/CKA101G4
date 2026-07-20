@@ -14,6 +14,7 @@
     <!-- 前台共用 Navbar CSS -->
     <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 
     <style>
         /* ==========================================================
@@ -1032,6 +1033,8 @@
 </main>
 
 <!-- 表單頁互動 -->
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+
 <script th:src="@{/js/front-end/service/memberServiceForm.js}"></script>
 
 <!-- 共用通知 AJAX 輪巡 -->

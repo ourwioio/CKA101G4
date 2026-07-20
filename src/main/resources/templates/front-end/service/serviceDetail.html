@@ -17,6 +17,7 @@
     <!-- 前台共用 Navbar CSS -->
     <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
     <!-- 服務詳情頁專專屬 CSS -->
 <!--     <link rel="stylesheet" th:href="@{/css/front-end/service/serviceDetail.css}"> -->
 
@@ -834,6 +835,8 @@
 </div>
 
 <!-- SockJS -->
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
 <!-- STOMP -->
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
