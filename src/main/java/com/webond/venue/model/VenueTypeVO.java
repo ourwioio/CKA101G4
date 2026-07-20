@@ -32,8 +32,8 @@ public class VenueTypeVO {
 	private String typeName;
 
 	@Column(name = "TYPE_DESC")
-	@NotEmpty(message="場地描述: 請勿空白")
-	@Size(max = 30, message = "場地介紹：請勿超過 30 字")
+//	@NotEmpty(message="場地描述: 請勿空白")
+//	@Size(max = 30, message = "場地介紹：請勿超過 30 字")
 //	@Pattern(regexp = "^[\u4e00-\u9fa5a-zA-Z0-9，。！？、\\s]{2,100}$", message = "場地描述: 長度必需在2到100之間")
 	private String typeDesc;
 
