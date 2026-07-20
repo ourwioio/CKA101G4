@@ -21,6 +21,7 @@
     <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
     <!-- 平台規範內容專屬 CSS -->
     <link rel="stylesheet" th:href="@{/css/front-end/platformSpecification/specDetail.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 
     <style>
     </style>
@@ -74,113 +75,10 @@
 
 </main>
 
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+
 <!-- 共用通知 AJAX 輪詢 -->
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
 </body>
 </html>
-
- <!--<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      lang="zh-TW">
-
-<head>
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title th:text="|${specVO.title}｜Webond|">
-        平台規範內容｜Webond
-    </title>
-
-    Google Fonts 
-    <link rel="preconnect"
-          href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-          rel="stylesheet">
-
-     Webond 前台共用 CSS 
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/service/common.css}">
-
-     前台共用 Navbar CSS
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/common/navbar.css}">
-
-    平台規範內容專屬 CSS 
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/platformSpecification/specDetail.css}">
-</head>
--->
-<!--
-<body>
-
- ==========================================================
-     共用固定導覽列
-     ========================================================== 
-<header th:replace="~{front-end/common/navbar :: navbar}">
-</header>
--->
-<!-- ==========================================================
-     主要內容
-     ========================================================== 
-<main class="site-main spec-detail-page">
-
-    <a class="spec-detail-back"
-       th:href="@{/specifications}">
-        ← 回平台規範列表
-    </a>
-
-    <article class="panel">
-
-        <div class="spec-detail-header">
-
-            <p class="spec-detail-eyebrow"
-               th:text="${specTypeListData.get(specVO.specType)}">
-                規範類型
-            </p>
-
-            <h1 class="spec-detail-title"
-                th:text="${specVO.title}">
-                規範標題
-            </h1>
-
-            <p class="spec-detail-meta"
-               th:if="${specVO.updatedAt != null
-                        and specVO.createdAt != null
-                        and specVO.updatedAt.isAfter(specVO.createdAt)}">
-
-                最後更新：
-
-                <strong th:text="${#temporals.format(
-                            specVO.updatedAt,
-                            'yyyy-MM-dd'
-                        )}">
-                    2026-07-01
-                </strong>
-
-            </p>
-
-        </div>
-
-        <p class="spec-detail-body"
-           th:text="${specVO.description}">
-            規範內容
-        </p>
-
-    </article>
-
-</main>
--->
-<!-- 共用通知 AJAX 輪詢 
-<script th:src="@{/js/front-end/common/notificationPolling.js}">
-</script>
-
-</body>
-</html>-->

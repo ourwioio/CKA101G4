@@ -21,6 +21,7 @@
     <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
     <!-- FAQ 內容專屬 CSS -->
     <link rel="stylesheet" th:href="@{/css/front-end/faq/faqDetail.css}">
+    <link rel="stylesheet" th:href="@{/css/front-end/chat/chatWidget.css}">
 
     <style>
     </style>
@@ -76,121 +77,10 @@
 
 </main>
 
+<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
+
 <!-- 共用通知 AJAX 輪詢 -->
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 
 </body>
 </html>
-
-<!--<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      lang="zh-TW">
-
-<head>
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title th:text="|${faqVO.question}｜Webond|">
-        常見問題內容｜Webond
-    </title>
-
-     Google Fonts -->
-    <!-- <link rel="preconnect"
-          href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin>
-
-    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700&display=swap"
-          rel="stylesheet">
-
-    Webond 前台共用 CSS -->
-    <!--<link rel="stylesheet"
-          th:href="@{/css/front-end/service/common.css}">
-
-     前台共用 Navbar CSS 
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/common/navbar.css}">
-
-    <!-- FAQ 內容專屬 CSS
-    <link rel="stylesheet"
-          th:href="@{/css/front-end/faq/faqDetail.css}">
-</head>
-
-<body>
--->
-<!-- ==========================================================
-     共用固定導覽列
-     ========================================================== 
-<header th:replace="~{front-end/common/navbar :: navbar}">
-</header>
-
- ==========================================================
-     主要內容
-     ========================================================== -->
-     <!--
-<main class="site-main faq-detail-page">
-
-    <a class="faq-detail-back"
-       th:href="@{/faqs}">
-        ← 回常見問題列表
-    </a>
-
-    <article class="panel">
-
-        <div class="faq-detail-header">
-
-            <p class="faq-detail-eyebrow"
-               th:text="${faqTypeListData.get(faqVO.faqType)}">
-                問題類型
-            </p>
-
-            <h2 class="faq-detail-title">
-
-                <span class="faq-detail-title-mark">
-                    Q
-                </span>
-
-                <span th:text="${faqVO.question}">
-                    問題內容
-                </span>
-
-            </h2>
-
-            <p class="faq-detail-meta"
-               th:if="${faqVO.updatedAt != null
-                        and faqVO.createdAt != null
-                        and faqVO.updatedAt.isAfter(faqVO.createdAt)}">
-
-                最後更新：
-
-                <strong th:text="${#temporals.format(
-                            faqVO.updatedAt,
-                            'yyyy-MM-dd'
-                        )}">
-                    2026-07-01
-                </strong>
-
-            </p>
-
-        </div>
-
-        <p class="faq-detail-body"
-           th:text="${faqVO.answer}">
-            答案內容
-        </p>
-
-    </article>
-
-</main>
-
- 共用通知 AJAX 輪詢 
-<script th:src="@{/js/front-end/common/notificationPolling.js}">
-</script>
-
-</body>
-</html>
--->
