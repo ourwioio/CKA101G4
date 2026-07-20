@@ -32,7 +32,11 @@ public class AdminSecurityConfig {
 			.securityMatcher("/admin/**")
 		
 			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/admin/login", "/admin/login?error=true").permitAll()
+				.requestMatchers("/admin/login", 
+								 "/admin/login?error=true",
+								 "/admin/forgotPassword",
+								 "/admin/resetPassword").permitAll()
+				
 				.requestMatchers("/admin/employees/updatePassword").authenticated() 
 				
 				.requestMatchers("/admin/employees/**").hasAuthority("員工管理")

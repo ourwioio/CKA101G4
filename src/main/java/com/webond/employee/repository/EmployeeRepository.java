@@ -30,5 +30,14 @@ public interface EmployeeRepository extends JpaRepository<EmployeeVO, Integer> {
 	void updateLastLoginAt(@Param("id") Integer id, @Param("now") LocalDateTime now);
 	
 	
-	
+	@Modifying
+	@Transactional
+	@Query("UPDATE EmployeeVO e SET e.resetToken = :token, e.tokenExpiry = :expiry WHERE e.employeeId = :id")
+	void updateResetTokenOnly(@Param("id") Integer id, @Param("token") String token, @Param("expiry") LocalDateTime expiry);
+
+	// 局部更新密碼並清除 Token，狀態設為 1 (啟用)
+	@Modifying
+	@Transactional
+	@Query("UPDATE EmployeeVO e SET e.empPassword = :password, e.empStatus = 1, e.resetToken = null, e.tokenExpiry = null WHERE e.resetToken = :token")
+	int updatePasswordAndClearToken(@Param("token") String token, @Param("password") String password);
 }
