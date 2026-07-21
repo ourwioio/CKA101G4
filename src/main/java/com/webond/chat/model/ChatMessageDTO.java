@@ -7,6 +7,7 @@ public class ChatMessageDTO {
 	private Integer receiverId;
 	private String message;
 	private Integer msgRead;
+	private String sentAt;
 	
 	public ChatMessageDTO() {
 		super();
@@ -28,6 +29,19 @@ public class ChatMessageDTO {
 		this.receiverId = receiverId;
 		this.message = message;
 		this.msgRead = msgRead;
+	}
+	
+	
+
+	public ChatMessageDTO(String type, Integer senderId, Integer receiverId, String message, Integer msgRead,
+			String sentAt) {
+		super();
+		this.type = type;
+		this.senderId = senderId;
+		this.receiverId = receiverId;
+		this.message = message;
+		this.msgRead = msgRead;
+		this.sentAt = sentAt;
 	}
 
 	public String getType() {
@@ -68,6 +82,14 @@ public class ChatMessageDTO {
 
 	public void setMsgRead(Integer msgRead) {
 		this.msgRead = msgRead;
+	}
+
+	public String getSentAt() {
+		return sentAt;
+	}
+
+	public void setSentAt(String sentAt) {
+		this.sentAt = sentAt;
 	}
 
 	

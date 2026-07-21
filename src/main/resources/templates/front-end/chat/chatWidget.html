@@ -62,6 +62,33 @@
 			</div>
 				<div class="chat-input-footer">
 				<label for="chatWidgetImageInput" style="font-size: 18px; padding: 0 4px; cursor: pointer; user-select: none;">📎</label>
+                <div class="widget-emoji-container" style="position: relative; display: inline-block;">
+    <!-- 點擊這個笑臉，就會彈出面板 -->
+    <button type="button" id="widgetEmojiTrigger" style="background: none; border: none; font-size: 20px; cursor: pointer; padding: 4px 8px; user-select: none;">😀</button>
+    
+    <!-- 預設隱藏的 Emoji 彈出面板 (對齊質感行內樣式) -->
+    <div id="widgetEmojiPicker" style="display: none; position: absolute; bottom: 40px; right: 0; width: 220px; height: 180px; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; padding: 10px; flex-wrap: wrap; overflow-y: auto; gap: 8px; justify-content: flex-start; align-content: flex-start;">
+        <!-- 這些是業界最常用、絕對不會變亂碼的黃金 Emoji 陣列 -->
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">😀</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">😂</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🤣</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🥰</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">😍</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">👍</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">👏</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🔥</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🚀</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🎉</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">❤️</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">✨</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🤔</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">👀</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🙏</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">💯</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">💡</span>
+        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">弱</span>
+    </div>
+</div>
                 <input type="file" id="chatWidgetImageInput" multiple accept="image/*" onchange="uploadWidgetChatImage(this)" style="display: none;">
 					<input type="text" id="chatInputField" placeholder="請輸入訊息..."
 						onkeydown="if(event.key==='Enter') sendChatMessage()">
@@ -94,16 +121,95 @@
 	let widgetHeartbeatInterval = null; 
 	
 	let widgetTempImageArray = [];
+	
+	let isWidgetAutoScrolling = false;
+	
+	
+	const emojiTrigger = document.getElementById("widgetEmojiTrigger");
+    const emojiPicker = document.getElementById("widgetEmojiPicker");
+    const chatInputField = document.getElementById("chatInputField"); // 確保對齊你的文字欄位 ID
+
+    if (emojiTrigger && emojiPicker && chatInputField) {
+        // 1. 點擊笑臉按鈕：切換面板顯示/隱藏
+        emojiTrigger.addEventListener("click", function(e) {
+            e.stopPropagation(); // 防止點擊事件向上冒泡導致面板立刻被關閉
+            const isOpen = emojiPicker.style.display === "flex";
+            emojiPicker.style.display = isOpen ? "none" : "flex";
+        });
+
+        // 2. 核心功能：使用「事件代理」監聽面板內所有 Emoji 的點擊
+        emojiPicker.addEventListener("click", function(e) {
+            if (e.target.classList.contains("emoji-item")) {
+                e.stopPropagation();
+                
+                // 現場把點擊的 Emoji 串接到輸入框當前的文字後面
+                const clickedEmoji = e.target.innerText;
+                chatInputField.value += clickedEmoji;
+                
+                // 智慧型手動重新聚焦游標，方便使用者繼續打字
+                chatInputField.focus();
+                
+                // 選擇完畢後，優雅地自動收合面板
+                emojiPicker.style.display = "none";
+                
+                // 觸發你原本寫好的打字中偵測訊號 (如有實作)
+                if (typeof sendTypingSignal === 'function') sendTypingSignal("1");
+            }
+        });
+
+        // 3. 超讚 UX 優化：當使用者點擊網頁其他任何「空白地方」時，自動把 Emoji 面板收起來
+        document.addEventListener("click", function(e) {
+            if (emojiPicker.style.display === "flex" && !emojiPicker.contains(e.target) && e.target !== emojiTrigger) {
+                emojiPicker.style.display = "none";
+            }
+        });
+    }
     
     // ==========================================
     // 1. 頁面初始化與自動連線機制
     // ==========================================
-	document.addEventListener("DOMContentLoaded", function() {
-            if (currentMemberId) {
-                initWebSocket(); // 1. 啟動 WebSocket 連線
-                loadChatContactsAndCheckAutoOpen(); 
+	 document.addEventListener("DOMContentLoaded", function() {
+        if (currentMemberId) {
+            initWebSocket(); 
+            loadChatContactsAndCheckAutoOpen(); 
+            
+            const widgetMessagesContainer = document.getElementById('chatMessagesBody'); 
+            
+            if (widgetMessagesContainer) {
+                widgetMessagesContainer.addEventListener("scroll", function() {
+                    const activeWidgetDivider = document.getElementById('widgetActiveUnreadDivider');
+                    
+                    // 防線 1：系統自動定位、排版中，直接跳出，不准碰紅線
+                    if (typeof isWidgetAutoScrolling !== 'undefined' && isWidgetAutoScrolling) {
+                        return; 
+                    }
+                    
+                    if (activeWidgetDivider && !activeWidgetDivider.classList.contains('fade-out-hidden')) {
+                        const scrollTop = widgetMessagesContainer.scrollTop;
+                        const clientHeight = widgetMessagesContainer.clientHeight;
+                        const scrollHeight = widgetMessagesContainer.scrollHeight;
+
+                        // 防線 2：如果訊息內容太少根本沒出現捲軸，拒絕判定
+                        if (scrollHeight <= clientHeight) return;
+
+                        // 🎯【核心修正】：將緩衝範圍縮小到 5px 以內，逼近真正的「物理最底部」
+                        // scrollTop + clientHeight 代表目前捲軸的最下緣
+                        // scrollHeight 代表整條對話歷史的總高度
+                        const isPhysicallyAtBottom = (scrollTop + clientHeight) >= (scrollHeight - 5);
+                        
+                        // 防線 3：物理觸底且 scrollTop > 10，確保是使用者手動往下滑到最底部的行為
+                        if (isPhysicallyAtBottom && scrollTop > 10) {
+                            activeWidgetDivider.classList.add('fade-out-hidden');
+                            
+                            setTimeout(() => {
+                                if (activeWidgetDivider) activeWidgetDivider.removeAttribute('id');
+                            }, 450);
+                        }
+                    }
+                });
             }
-        });
+        }
+    });
     
     // ==========================================
     // 2. 外部觸發 API (例如：點擊別人個人檔案的「私聊按鈕」)
@@ -193,7 +299,11 @@
 			initWebSocket();
 		}
 
-		if (messagesBody) messagesBody.innerHTML = `<div class="chat-system-msg">正在同步歷史訊息...</div>`;
+		if (messagesBody) {
+			// 🚀【換房起手式】：點擊聯絡人的瞬間，光速將小視窗打入隱形，徹底杜絕上一位好友圖片閃爍一閃而過的鬼影！
+			messagesBody.style.setProperty('visibility', 'hidden', 'important');
+			messagesBody.innerHTML = `<div class="chat-system-msg">正在同步歷史訊息...</div>`;
+		}
 
 		// 透過等待連線過濾器，安全向後端索取這兩人的全新歷史紀錄
 		waitForConnection(() => {
@@ -203,9 +313,6 @@
 				receiverId: Number(receiverId),
 				message: ""
 			}));
-			
-			// 💡 打開方對話框的瞬間，立刻向後端發送一筆「已讀訊號」，消滅資料庫裡的未讀狀態
-			sendWidgetReadReceipt();
 		});
 	}
 
@@ -243,32 +350,141 @@
 			// 🅰️ 情況 A：載入歷史紀錄 (type = "history")
 			// ----------------------------------------------------
 			if (msgData.type === "history") {
-				if (messagesBody) messagesBody.innerHTML = ''; 
+				if (!messagesBody) return;
+
+				// ✅【重構核心】：拉起全域狀態鎖，封鎖排版震盪對時間造成的物理蓋台
+				isWidgetAutoScrolling = true; 
+
+				messagesBody.style.removeProperty('visibility');
+				messagesBody.innerHTML = ''; 
+				
 				let historyList = msgData.historyList;
+				let widgetFirstUnreadIndex = -1;
 				
 				if (historyList && historyList.length > 0) {
-					historyList.forEach(msgObj => {
-						const finalMsg = (typeof msgObj === 'object') ? msgObj : JSON.parse(msgObj);
-						const direction = (Number(finalMsg.senderId) === Number(currentMemberId)) ? 'outgoing' : 'incoming';
-						const widgetContent = finalMsg.message || finalMsg.content || "";
-						const timeStr = finalMsg.lastTime || finalMsg.sentAt || getCurrentTime();
+					for (let i = 0; i < historyList.length; i++) {
+						const msgObj = historyList[i];
+						const data = (typeof msgObj === 'object') ? msgObj : JSON.parse(msgObj);
+						const isFromFriend = String(data.senderId) !== String(currentMemberId);
+						const isUnread = Number(data.getIsRead || data.msgRead || 0) === 0;
+						if (isFromFriend && isUnread) { widgetFirstUnreadIndex = i; break; }
+					}
+				}
 
-						// 🚀 核心修正：懸浮窗歷史紀錄圖片精準分流
-						if (isWidgetImage(finalMsg.type, widgetContent)) {
-							// 呼叫專屬圖片氣泡渲染器，把 Base64 塞進 <img>
-							appendWidgetImageMessage(widgetContent, direction, finalMsg.msgRead, timeStr);
+				if (historyList && historyList.length > 0) {
+					const fragment = document.createDocumentFragment(); 
+
+					historyList.forEach((msgObj, i) => {
+						if (i === widgetFirstUnreadIndex && widgetFirstUnreadIndex >= 0) {
+							const dividerDiv = document.createElement('div');
+							dividerDiv.className = 'unread-divider';
+							dividerDiv.id = 'widgetActiveUnreadDivider'; 
+							dividerDiv.innerHTML = `<span>以下為未讀訊息</span>`;
+							fragment.appendChild(dividerDiv);
+						}
+
+						let finalMsg = msgObj;
+						if (typeof msgObj === 'string') {
+							try { finalMsg = JSON.parse(msgObj); } catch (e) {}
+						}
+						
+						const isMe = Number(finalMsg.senderId) === Number(currentMemberId);
+						const widgetContent = finalMsg.message || finalMsg.content || "";
+						
+						// ================= 👑 智慧型小聊天室歷史時間校正防線 =================
+						let finalTimeStr = "";
+						// 修正點：對齊後端 DTO Fact！優先抓取大、小聊天室通用的 sentAt 欄位
+						let rawTime = finalMsg.sentAt || finalMsg.lastTime;
+						
+						if (rawTime) {
+							// 情況 1：如果是數字（毫秒數時間戳）
+							if (!isNaN(rawTime)) {
+								const d = new Date(Number(rawTime));
+								finalTimeStr = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+							} 
+							// 情況 2：如果是後端改好的格式化字串 "yyyy-MM-dd HH:mm:ss"
+							else if (typeof rawTime === 'string' && rawTime.length >= 16) {
+								finalTimeStr = rawTime.substring(11, 16); // 完美切出 "HH:mm" 放入小視窗
+							} else {
+								finalTimeStr = rawTime;
+							}
 						} else {
-							// 呼叫原本的文字氣泡
-							appendMessage(widgetContent, direction, finalMsg.msgRead, timeStr);
+							// 萬一完全沒拿到，才用原本的 getCurrentTime 兜底
+							finalTimeStr = (typeof getCurrentTime === 'function') ? getCurrentTime() : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+						}
+						// ===================================================================
+
+						const msgTypeAttr = finalMsg.type || "";
+						const isHistoryImage = (String(msgTypeAttr).toLowerCase() === "image") || 
+											   (typeof widgetContent === 'string' && (widgetContent.indexOf("base64") !== -1 || widgetContent.indexOf("data:image") !== -1));
+
+						if (isHistoryImage) {
+							// 👑 傳送歷史時間 finalTimeStr 進入圖片氣泡
+							const imageRowNode = appendWidgetImageMessage(widgetContent, isMe ? 'outgoing' : 'incoming', finalMsg.msgRead || 0, finalTimeStr, true);
+							if (imageRowNode) {
+								fragment.appendChild(imageRowNode);
+							}
+						} else {
+							// 文字訊息上屏
+							const row = document.createElement('div');
+							const safeText = String(widgetContent).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' }[m]));
+							row.style.cssText = "display: flex !important; width: 100%; align-items: flex-end !important; margin-bottom: 12px; gap: 6px; font-size: 12px;";
+							
+							if (isMe) {
+								row.className = 'msg-row msg-outgoing';
+								row.style.justifyContent = "flex-end";
+								const statusText = (Number(finalMsg.msgRead) === 1) ? '已讀' : '未讀';
+								const statusColor = (Number(finalMsg.msgRead) === 1) ? 'lightgray' : 'var(--color-ink-soft)';
+								const markerClass = (Number(finalMsg.msgRead) === 1) ? '' : 'class="widget-unread-marker"';
+								
+								row.innerHTML = `
+									<div class="widget-isolated-time-box" style="display: flex; flex-direction: column; align-items: flex-end; font-size: 9px; font-weight: 800; line-height: 1.2; user-select: none; color: var(--color-ink-soft); flex-shrink: 0;">
+										<p style="margin: 0 !important; padding: 0 !important; display: inline !important;">${finalTimeStr}</p>
+										<span ${markerClass} style="color: ${statusColor}; font-weight: 800;">${statusText}</span>
+									</div>
+									<div class="widget-bubble" style="max-width: 70%; padding: 8px 12px; border: 1px solid #F3D36C; border-radius: 16px 6px 16px 16px; background: var(--color-yellow); color: var(--color-ink); word-break: break-all; font-weight: 500; text-align: left;">
+										${safeText}
+									</div>
+								`;
+							} else {
+								row.className = 'msg-row msg-incoming';
+								row.style.justifyContent = "flex-start";
+								
+								row.innerHTML = `
+									<div class="widget-bubble" style="max-width: 70%; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 6px 16px 16px 16px; background: var(--color-surface); color: var(--color-ink); word-break: break-all; font-weight: 500; text-align: left;">
+										${safeText}
+									</div>
+									<div class="widget-isolated-time-box-right" style="font-size: 9px; font-weight: 800; color: var(--color-ink-soft); user-select: none; flex-shrink: 0; display: flex; align-items: flex-end; margin-bottom: 2px;">
+										<p style="margin: 0 !important; padding: 0 !important; display: inline !important;">${finalTimeStr}</p>
+									</div>
+								`;
+							}
+							fragment.appendChild(row);
 						}
 					});
+					
+					messagesBody.appendChild(fragment);
 				} else {
-					if (messagesBody) messagesBody.innerHTML = `<div class="chat-system-msg">暫無歷史訊息，開始聊聊吧！</div>`;
+					messagesBody.innerHTML = `<div class="chat-system-msg">暫無歷史訊息，開始聊聊吧！</div>`;
 				}
 				
-				sendWidgetReadReceipt(); 
-				scrollToBottom(); 
-				if (typeof updateGlobalUnreadBadge === 'function') updateGlobalUnreadBadge(); 
+				if (typeof sendWidgetReadReceipt === 'function') sendWidgetReadReceipt(); 
+				if (widgetTargetId) localStorage.setItem(`chat_unread_${currentMemberId}_to_${widgetTargetId}`, 0);
+				
+				// 智慧自動定位
+				setTimeout(() => {
+					const widgetActiveDivider = document.getElementById('widgetActiveUnreadDivider');
+					if (widgetActiveDivider) {
+						widgetActiveDivider.scrollIntoView({ behavior: "auto", block: "center" });
+					} else {
+						if (typeof scrollToBottom === 'function') {
+							scrollToBottom();
+						} else {
+							messagesBody.scrollTop = messagesBody.scrollHeight;
+						}
+					}
+					setTimeout(() => { isWidgetAutoScrolling = false; }, 200); 
+				}, 100); 
 				return; 
 			}
 
@@ -278,59 +494,55 @@
 			if (msgData.type === "chat" || msgData.type === "image") {
 				const listContainer = document.getElementById('chatContactList'); 
 				const isChatOpen = chatWin && !chatWin.classList.contains('chat-hidden');
-				
 				const isMyOwnMessage = Number(msgData.senderId) === Number(currentMemberId);
 				const isFromCurrentPartner = activeReceiverId && Number(msgData.senderId) === Number(activeReceiverId);
-				
 				const targetIdForMove = isMyOwnMessage ? msgData.receiverId : msgData.senderId;
 				const targetRow = document.getElementById(`contact-item-${targetIdForMove}`);
 				
-				// 智慧摘要型態判定，防止左側好友名單摘要印出 Base64 亂碼
-				let summaryText = msgData.message || "";
-				if (msgData.type === "image" || summaryText.startsWith("data:image/")) {
-					summaryText = "[圖片訊息]";
-				} else {
-					summaryText = summaryText.length > 10 ? summaryText.substring(0, 10) + "..." : summaryText;
-				}
+				const rawContent = msgData.message || msgData.content || "";
 
-				// 即時刷新左側懸浮名單摘要與順序置頂
+				// ================= 👑 智慧型小聊天室即時時間校正防線 =================
+				let timeStr = "";
+				let rawTime = msgData.sentAt;
+				
+				if (rawTime) {
+					// 情況 1：如果是數字（毫秒數時間戳）
+					if (!isNaN(rawTime)) {
+						const d = new Date(Number(rawTime));
+						timeStr = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+					} 
+					// 情況 2：如果是後端改好的格式化字串 "yyyy-MM-dd HH:mm:ss"
+					else if (typeof rawTime === 'string' && rawTime.length >= 16) {
+						timeStr = rawTime.substring(11, 16); // 完美切出 "HH:mm" 供即時上屏
+					} else {
+						timeStr = rawTime;
+					}
+				} else {
+					// 萬一完全沒拿到，才呼叫原本的 getCurrentTime 兜底
+					timeStr = (typeof getCurrentTime === 'function') ? getCurrentTime() : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+				}
+				// ===================================================================
+
+				const isImgMsg = ("image" === msgData.type) || (typeof rawContent === 'string' && (rawContent.indexOf("base64") !== -1 || rawContent.indexOf("data:image") !== -1));
+
+				let summaryText = rawContent;
+				if (isImgMsg) summaryText = "[圖片訊息]";
+				else summaryText = summaryText.length > 10 ? summaryText.substring(0, 10) + "..." : summaryText;
+
 				if (targetRow) {
 					const lastMsgEl = targetRow.querySelector('.widget-last-msg');
 					if (lastMsgEl) lastMsgEl.innerText = summaryText;
-					
 					const timeEl = targetRow.querySelector('.widget-time');
-					if (timeEl) timeEl.innerText = getCurrentTime();
-					
-					if (listContainer && listContainer.firstChild !== targetRow) {
-						listContainer.insertBefore(targetRow, listContainer.firstChild);
-					}
-				} else {
-					if (typeof loadChatContactsAndCheckAutoOpen === 'function') loadChatContactsAndCheckAutoOpen();
+					// 👑 這裡優化：如果已經是我們智慧切好的 HH:mm 字串，就直接灌進去
+					if (timeEl) timeEl.innerText = (typeof timeStr === 'number') ? formatTimestamp(timeStr) : timeStr;
+					if (listContainer && listContainer.firstChild !== targetRow) listContainer.insertBefore(targetRow, listContainer.firstChild);
 				}
 
-				// 🚀【小視窗即時上屏分流鏈】
-				if (isMyOwnMessage) {
-					// 情況 1：自己發的
-					if (msgData.type === "image" || msgData.message.startsWith("data:image/")) {
-						appendWidgetImageMessage(msgData.message, 'outgoing', 0, getCurrentTime());
-					} else {
-						appendMessage(msgData.message, 'outgoing', 0, getCurrentTime());
-					}
-				} else if (isChatOpen && isFromCurrentPartner) {
-					// 情況 2：對方發的，且目前小視窗正開著
-					if (msgData.type === "image" || msgData.message.startsWith("data:image/")) {
-						appendWidgetImageMessage(msgData.message, 'incoming', 1, getCurrentTime());
-					} else {
-						appendMessage(msgData.message, 'incoming', 1, getCurrentTime());
-					}
-					sendWidgetReadReceipt(); 
-					
-					if (targetRow) {
-						const badgeEl = targetRow.querySelector('.widget-unread-badge');
-						if (badgeEl) badgeEl.style.setProperty('display', 'none', 'important');
-					}
+				if (isMyOwnMessage || (isChatOpen && isFromCurrentPartner)) {
+					if (isImgMsg) appendWidgetImageMessage(rawContent, isMyOwnMessage ? 'outgoing' : 'incoming', isMyOwnMessage ? 0 : 1, timeStr);
+					else appendMessage(rawContent, isMyOwnMessage ? 'outgoing' : 'incoming', isMyOwnMessage ? 0 : 1, timeStr);
+					if (isFromCurrentPartner) sendWidgetReadReceipt(); 
 				} else {
-					// 情況 3：別人在背景傳的，累積小紅點
 					if (targetRow) {
 						const badgeEl = targetRow.querySelector('.widget-unread-badge');
 						if (badgeEl) {
@@ -341,13 +553,8 @@
 						}
 					}
 				}
-				
-				if (typeof loadWidgetContacts === 'function') {
-					setTimeout(() => { loadWidgetContacts(); }, 150);
-				}
 				return;
 			}
-
 			// ----------------------------------------------------
 			// 🅲 【核心修正】情況 C：對方已讀了我的訊息 (type = "read")
 			// ----------------------------------------------------
@@ -614,52 +821,56 @@ function waitForConnection(callback, interval = 100) {
 // 7. 💡 修正與安全防禦優化後的畫面渲染組件
 // ==========================================
    function appendMessage(text, direction, msgRead, timeStr) {
-		const container = document.getElementById('chatMessagesBody');
-		if (!container) return;
+	const container = document.getElementById('chatMessagesBody');
+	if (!container) return;
 
-		const row = document.createElement('div');
-		
-		// 如果沒有傳入時間，前端主動現場撈取最新的 分:秒
-		if (!timeStr) {
-			timeStr = getCurrentTime();
-		}
-
-		const safeText = escapeHtml(text); // 安全過濾 XSS 惡意腳本
-
-		if (direction === 'outgoing') {
-			row.className = 'msg-row msg-outgoing';
-			// 💡【核心修正】將原創的類別名稱完美替換為 widget-unread-marker 與 onmessage 已讀分流死死互鎖！
-			const statusText = (Number(msgRead) === 1) ? '已讀' : '未讀';
-			const statusColor = (Number(msgRead) === 1) ? 'lightgray' : 'var(--color-ink-soft)';
-			const markerClass = (Number(msgRead) === 1) ? '' : 'class="widget-unread-marker"';
-
-			// 完美保留您精緻的外觀錯位樣式
-			row.style.cssText = "display: flex !important; width: 100%; justify-content: flex-end !important; align-items: flex-end !important; margin-bottom: 12px; gap: 6px; font-size: 12px;";
-			row.innerHTML = `
-				<div class="widget-meta-left" style="display: flex; flex-direction: column; align-items: flex-end; font-size: 9px; font-weight: 800; line-height: 1.2; user-select: none; color: var(--color-ink-soft); flex-shrink: 0;">
-					<span>${timeStr}</span>
-					<span ${markerClass} style="color: ${statusColor}; font-weight: 800;">${statusText}</span>
-				</div>
-				<div class="widget-bubble" style="max-width: 70%; padding: 8px 12px; border: 1px solid #F3D36C; border-radius: 16px 6px 16px 16px; background: var(--color-yellow); color: var(--color-ink); word-break: break-all; font-weight: 500; text-align: left;">
-					${safeText}
-				</div>
-			`;
-		} else {
-			row.className = 'msg-row msg-incoming';
-			row.style.cssText = "display: flex !important; width: 100%; justify-content: flex-start !important; align-items: flex-end !important; margin-bottom: 12px; gap: 6px; font-size: 12px;";
-			row.innerHTML = `
-				<div class="widget-bubble" style="max-width: 70%; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 6px 16px 16px 16px; background: var(--color-surface); color: var(--color-ink); word-break: break-all; font-weight: 500; text-align: left;">
-					${safeText}
-				</div>
-				<div class="widget-meta-right" style="font-size: 9px; font-weight: 800; color: var(--color-ink-soft); user-select: none; flex-shrink: 0; display: flex; align-items: flex-end;">
-					<span>${timeStr}</span>
-				</div>
-			`;
-		}
-		
-		container.appendChild(row);
-		scrollToBottom(); // 💡 補齊滾動條自動探底
+	const row = document.createElement('div');
+	
+	// 🚀【型態強轉防禦】：如果是毫秒數時間戳記，前端現場轉化為 HH:mm
+	if (typeof timeStr === 'number' || (typeof timeStr === 'string' && !timeStr.includes(':') && timeStr.length > 5)) {
+		const dateObj = new Date(Number(timeStr));
+		timeStr = String(dateObj.getHours()).padStart(2, '0') + ':' + String(dateObj.getMinutes()).padStart(2, '0');
 	}
+	if (!timeStr) timeStr = getCurrentTime();
+
+	const safeText = escapeHtml(text); 
+
+	if (direction === 'outgoing') {
+		row.className = 'msg-row msg-outgoing';
+		const statusText = (Number(msgRead) === 1) ? '已讀' : '未讀';
+		const statusColor = (Number(msgRead) === 1) ? 'lightgray' : 'var(--color-ink-soft)';
+		const markerClass = (Number(msgRead) === 1) ? '' : 'class="widget-unread-marker"';
+
+		row.style.cssText = "display: flex !important; width: 100%; justify-content: flex-end !important; align-items: flex-end !important; margin-bottom: 12px; gap: 6px; font-size: 12px;";
+		row.innerHTML = `
+			<div class="widget-meta-left" style="display: flex; flex-direction: column; align-items: flex-end; font-size: 9px; font-weight: 800; line-height: 1.2; user-select: none; color: var(--color-ink-soft); flex-shrink: 0;">
+				<span>${timeStr}</span>
+				<span ${markerClass} style="color: ${statusColor}; font-weight: 800;">${statusText}</span>
+			</div>
+			<div class="widget-bubble" style="max-width: 70%; padding: 8px 12px; border: 1px solid #F3D36C; border-radius: 16px 6px 16px 16px; background: var(--color-yellow); color: var(--color-ink); word-break: break-all; font-weight: 500; text-align: left;">
+				${safeText}
+			</div>
+		`;
+	} else {
+		row.className = 'msg-row msg-incoming';
+		row.style.cssText = "display: flex !important; width: 100%; justify-content: flex-start !important; align-items: flex-end !important; margin-bottom: 12px; gap: 6px; font-size: 12px;";
+		row.innerHTML = `
+			<div class="widget-bubble" style="max-width: 70%; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 6px 16px 16px 16px; background: var(--color-surface); color: var(--color-ink); word-break: break-all; font-weight: 500; text-align: left;">
+				${safeText}
+			</div>
+			<div class="widget-meta-right" style="font-size: 9px; font-weight: 800; color: var(--color-ink-soft); user-select: none; flex-shrink: 0; display: flex; align-items: flex-end; margin-bottom: 2px;">
+				<span>${timeStr}</span>
+			</div>
+		`;
+	}
+	
+	container.appendChild(row);
+	
+	if (typeof isWidgetAutoScrolling !== 'undefined' && isWidgetAutoScrolling) {
+		return; 
+	}
+	scrollToBottom(); 
+}
 
    function startWidgetHeartbeat() {
 		widgetHeartbeatInterval = setInterval(() => {
@@ -834,21 +1045,50 @@ function renderWidgetPreviewListHTML() {
 /**
  * 💡【全新功能】懸浮窗確定發送真愛多圖
  */
-function confirmAndSendWidgetMultipleImages() {
-	if (!widgetTempImageArray || widgetTempImageArray.length === 0 || !widgetTargetId) return;
+ function confirmAndSendWidgetMultipleImages() {
+	    // 🚀 嚴格鎖定小聊天室專屬全域變數
+	    if (!widgetTempImageArray || widgetTempImageArray.length === 0 || !widgetTargetId) {
+	        console.warn("⚠️ [小聊天室] 圖片佇列為空或尚未選擇聊天對象，攔截發送");
+	        return;
+	    }
 
-	if (widgetWebSocket && widgetWebSocket.readyState === WebSocket.OPEN) {
-		widgetTempImageArray.forEach((imageBase64) => {
-			widgetWebSocket.send(JSON.stringify({
-				"type": "image",
-				"senderId": Number(currentMemberId),
-				"receiverId": Number(widgetTargetId),
-				"message": imageBase64
-			}));
-		});
+	    if (widgetWebSocket && widgetWebSocket.readyState === WebSocket.OPEN) {
+	        
+	        // 自己發送圖片時，主動讓小視窗的舊未讀紅線淡出退場
+	        const activeWidgetDivider = document.getElementById('widgetActiveUnreadDivider');
+	        if (activeWidgetDivider && !activeWidgetDivider.classList.contains('fade-out-hidden')) {
+	            activeWidgetDivider.classList.add('fade-out-hidden');
+	            setTimeout(() => {
+	                if (activeWidgetDivider) activeWidgetDivider.removeAttribute('id');
+	            }, 450);
+	        }
+
+	        // 遍歷小視窗多圖陣列，進行 WebSocket 連發
+	        widgetTempImageArray.forEach((imageBase64) => {
+	            
+	            // 🎯【完美對齊】：跟大聊天室完全一樣，type 送 "image"，內容塞 "message"
+	            // 變數則精準鎖定在小視窗的 currentMemberId 與 widgetTargetId 隔離區
+	            const payload = {
+	                "type": "image",                             // ✅ 100% 對齊大聊天室
+	                "senderId": Number(currentMemberId),         // 小視窗專屬自己 ID
+	                "receiverId": Number(widgetTargetId),         // 小視窗專屬對方 ID
+	                "message": imageBase64,                      // 主訊息欄位 (Base64 大圖字串)
+	                "content": imageBase64                       // 備援相容欄位
+	            };
+	            
+	            console.log("📸 [小聊天室] 圖片 Payload 完美送出:", payload);
+	            widgetWebSocket.send(JSON.stringify(payload));
+	        });
+	    } else {
+	        console.error("🛑 [小聊天室錯誤] widgetWebSocket 連線未開啟，無法發送圖片！");
+	        alert("即時通訊連線中斷，請重新整理網頁再試一次。");
+	    }
+		
+	    // 🚀 發送完畢，精準呼叫小視窗專屬的清理預覽函式
+	    if (typeof cancelWidgetImagePreview === 'function') {
+	        cancelWidgetImagePreview();
+	    }
 	}
-	cancelWidgetImagePreview();
-}
 
 /**
  * 💡【全新功能】懸浮窗取消清理
@@ -870,17 +1110,22 @@ function cancelWidgetImagePreview() {
 //==========================================
 // 🚀【全新登場】懸浮窗專屬圖片氣泡渲染器 (澈底解決看不到圖片的關鍵修改)
 // ==========================================
-function appendWidgetImageMessage(base64Src, direction, msgRead, timeStr) {
+function appendWidgetImageMessage(base64Src, direction, msgRead, timeStr, returnNodeOnly = false) {
 	const container = document.getElementById('chatMessagesBody');
-	if (!container) return;
+	if (!container || !base64Src) return null;
 
 	const row = document.createElement('div');
+	
+	// 🚀【時間戳記安全防禦】：如果傳進來的是後端的毫秒數時間戳記，前端自動現場轉換為 HH:mm
+	if (typeof timeStr === 'number' || (typeof timeStr === 'string' && !timeStr.includes(':'))) {
+		const dateObj = new Date(Number(timeStr));
+		timeStr = String(dateObj.getHours()).padStart(2, '0') + ':' + String(dateObj.getMinutes()).padStart(2, '0');
+	}
 	if (!timeStr) timeStr = getCurrentTime();
 
-	// 小視窗寬度窄，圖片 max-width 設為 65% 最優雅，並限制 max-height 160px 防止圖片過大頂爆小視窗
 	const imgWrapperHtml = `
-		<div class="widget-img-bubble-wrapper" style="max-width: 65%; cursor: pointer; user-select: none;" onclick="window.open('${base64Src}')">
-			<img src="${base64Src}" style="width: 100%; height: auto; max-height: 160px; object-fit: contain; border-radius: 12px; border: 1px solid #ECE4D6; box-shadow: var(--shadow-sm); display: block;" alt="圖片">
+		<div class="widget-img-bubble-wrapper" style="width: 130px !important; min-height: 100px !important; flex-shrink: 0 !important; cursor: pointer; user-select: none; display: block !important;" onclick="window.open('${base64Src}')">
+			<img src="${base64Src}" style="width: 100% !important; height: auto !important; max-height: 160px !important; min-height: 100px !important; object-fit: cover !important; border-radius: 12px; border: 1px solid #ECE4D6; box-shadow: var(--shadow-sm); display: block !important;" alt="圖片">
 		</div>
 	`;
 
@@ -890,7 +1135,7 @@ function appendWidgetImageMessage(base64Src, direction, msgRead, timeStr) {
 		const statusColor = (Number(msgRead) === 1) ? 'lightgray' : 'var(--color-ink-soft)';
 		const markerClass = (Number(msgRead) === 1) ? '' : 'class="widget-unread-marker"';
 
-		row.style.cssText = "display: flex !important; width: 100%; justify-content: flex-end !important; align-items: flex-end !important; margin-bottom: 12px; gap: 6px; font-size: 12px;";
+		row.style.cssText = "display: flex !important; width: 100% !important; justify-content: flex-end !important; align-items: flex-end !important; margin-bottom: 12px; gap: 6px; font-size: 12px; min-height: 100px !important; flex-shrink: 0 !important;";
 		row.innerHTML = `
 			<div class="widget-meta-left" style="display: flex; flex-direction: column; align-items: flex-end; font-size: 9px; font-weight: 800; line-height: 1.2; user-select: none; color: var(--color-ink-soft); flex-shrink: 0;">
 				<span>${timeStr}</span>
@@ -900,7 +1145,7 @@ function appendWidgetImageMessage(base64Src, direction, msgRead, timeStr) {
 		`;
 	} else {
 		row.className = 'msg-row msg-incoming is-image';
-		row.style.cssText = "display: flex !important; width: 100%; justify-content: flex-start !important; align-items: flex-end !important; margin-bottom: 12px; gap: 6px; font-size: 12px;";
+		row.style.cssText = "display: flex !important; width: 100% !important; justify-content: flex-start !important; align-items: flex-end !important; margin-bottom: 12px; gap: 6px; font-size: 12px; min-height: 100px !important; flex-shrink: 0 !important;";
 		row.innerHTML = `
 			${imgWrapperHtml}
 			<div class="widget-meta-right" style="font-size: 9px; font-weight: 800; color: var(--color-ink-soft); user-select: none; flex-shrink: 0; display: flex; align-items: flex-end;">
@@ -909,14 +1154,21 @@ function appendWidgetImageMessage(base64Src, direction, msgRead, timeStr) {
 		`;
 	}
 
-	container.appendChild(row);
+	// 👑【資深工程師防連鎖核心】：如果是歷史紀錄加載，直接把畫好的 row 節點丢回去，不准自己 append 偷跑！
+	if (returnNodeOnly) {
+		return row;
+	}
 
-	// 💡 智慧防抖觸底：等圖片在小視窗內真的渲染完成，才將滾動條完全探底
+	// 否則，如果是真人即時聊天聊天、新訊息上屏，才直接灌入網頁中並自動觸底
+	container.appendChild(row);
+	
+	if (typeof isWidgetAutoScrolling !== 'undefined' && isWidgetAutoScrolling) return;
+
 	const img = row.querySelector('img');
 	if (img) {
-		img.onload = scrollToBottom;
+		img.onload = function() { if (typeof scrollToBottom === 'function') scrollToBottom(); };
 	} else {
-		scrollToBottom();
+		if (typeof scrollToBottom === 'function') scrollToBottom();
 	}
 }
 

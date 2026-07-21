@@ -1,6 +1,7 @@
 package com.webond.chat.service;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,10 +57,17 @@ public class ChatService {
 			vo.setContent(dto.getMessage() != null ? dto.getMessage() : payloadJson);
 			vo.setSentAt(new Timestamp(System.currentTimeMillis())); 
 			
+			long nowMillis = System.currentTimeMillis();
+	        vo.setSentAt(new Timestamp(nowMillis)); 
+			
 			int finalReadStatus = isReceiverInWindow ? 1 : 0;
 			vo.setIsRead(finalReadStatus); 
 			
 			chatMsgRepo.save(vo); 
+			
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	        dto.setSentAt(sdf.format(new java.util.Date(nowMillis)));
+	        dto.setMsgRead(finalReadStatus);
 			
 			String key = getRedisKey(senderId, receiverId);
 			dto.setMsgRead(finalReadStatus);
@@ -86,14 +94,28 @@ public class ChatService {
 		List<ChatMsgVO> dbData = chatMsgRepo.findHistory(Integer.parseInt(senderId), Integer.parseInt(receiverId));
 		List<String> restoredList = new ArrayList<>();
 		
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		
 		for (ChatMsgVO vo : dbData) {
 			String msgType = "chat";
 			if (vo.getContent() != null && vo.getContent().startsWith("data:image/")) {
 				msgType = "image";
 			}
 			
-			ChatMessageDTO cm = new ChatMessageDTO(msgType, vo.getSenderId(), vo.getReceiverId(), vo.getContent(), vo.getIsRead());
-			restoredList.add(objectMapper.writeValueAsString(cm));
+			tools.jackson.databind.node.ObjectNode msgNode = objectMapper.createObjectNode();
+			msgNode.put("type", msgType);
+			msgNode.put("senderId", vo.getSenderId());
+			msgNode.put("receiverId", vo.getReceiverId());
+			msgNode.put("message", vo.getContent());
+			msgNode.put("msgRead", vo.getIsRead());
+			
+			if (vo.getSentAt() != null) {
+	            msgNode.put("sentAt", sdf.format(vo.getSentAt())); 
+	        } else {
+	            msgNode.put("sentAt", sdf.format(new java.util.Date()));
+	        }
+			
+			restoredList.add(objectMapper.writeValueAsString(msgNode));
 		}
 		
 		if (!restoredList.isEmpty()) {
@@ -205,4 +227,6 @@ public class ChatService {
 			return 0;
 		}
 	}
+	
+	
 }
