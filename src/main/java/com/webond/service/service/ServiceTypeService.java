@@ -12,225 +12,160 @@ import com.webond.service.repository.ServiceTypeRepository;
 @Transactional
 public class ServiceTypeService {
 
-    private final ServiceTypeRepository serviceTypeRepository;
+	private final ServiceTypeRepository serviceTypeRepository;
 
-    public ServiceTypeService(
-            ServiceTypeRepository serviceTypeRepository) {
+	public ServiceTypeService(ServiceTypeRepository serviceTypeRepository) {
 
-        this.serviceTypeRepository =
-                serviceTypeRepository;
-    }
+		this.serviceTypeRepository = serviceTypeRepository;
+	}
 
-    // =========================================================
-    // 查單一服務類型
-    // =========================================================
+	// =========================================================
+	// 查單一服務類型
+	// =========================================================
 
-    @Transactional(readOnly = true)
-    public ServiceTypeVO findByPK(
-            Integer serviceTypeId) {
+	@Transactional(readOnly = true)
+	public ServiceTypeVO findByPK(Integer serviceTypeId) {
 
-        if (serviceTypeId == null) {
-            return null;
-        }
+		if (serviceTypeId == null) {
+			return null;
+		}
 
-        return serviceTypeRepository
-                .findById(serviceTypeId)
-                .orElse(null);
-    }
+		return serviceTypeRepository.findById(serviceTypeId).orElse(null);
+	}
 
-    // =========================================================
-    // 查全部服務類型
-    // =========================================================
+	// =========================================================
+	// 查全部服務類型
+	// =========================================================
 
-    @Transactional(readOnly = true)
-    public List<ServiceTypeVO> getAll() {
+	@Transactional(readOnly = true)
+	public List<ServiceTypeVO> getAll() {
 
-        return serviceTypeRepository.findAll();
-    }
-    
-    @Transactional(readOnly = true)
-    public List<ServiceTypeVO> search(String keyword) {
+		return serviceTypeRepository.findAll();
+	}
 
-        String normalizedKeyword =
-                normalizeNullableText(keyword);
+	@Transactional(readOnly = true)
+	public List<ServiceTypeVO> search(String keyword) {
 
-        if (normalizedKeyword == null) {
-            return serviceTypeRepository.findAll();
-        }
+		String normalizedKeyword = normalizeNullableText(keyword);
 
-        return serviceTypeRepository
-                .findByTypeNameContainingIgnoreCaseOrDescripContainingIgnoreCase(
-                        normalizedKeyword,
-                        normalizedKeyword
-                );
-    }
+		if (normalizedKeyword == null) {
+			return serviceTypeRepository.findAll();
+		}
 
-    // =========================================================
-    // 新增服務類型
-    //
-    // TYPE_MODE、DEFAULT_IMAGE_URL 暫時不使用
-    // =========================================================
+		return serviceTypeRepository.findByTypeNameContainingIgnoreCaseOrDescripContainingIgnoreCase(normalizedKeyword,
+				normalizedKeyword);
+	}
 
-    public ServiceTypeVO add(
-            String name,
-            String description) {
+	// =========================================================
+	// 新增服務類型
+	//
+	// TYPE_MODE、DEFAULT_IMAGE_URL 暫時不使用
+	// =========================================================
 
-        validateServiceType(
-                name,
-                description
-        );
+	public ServiceTypeVO add(String name, String description) {
 
-        ServiceTypeVO serviceTypeVO =
-                new ServiceTypeVO();
+		validateServiceType(name, description);
 
-        serviceTypeVO.setTypeName(
-                name.trim()
-        );
+		ServiceTypeVO serviceTypeVO = new ServiceTypeVO();
 
-        serviceTypeVO.setDescrip(
-                normalizeNullableText(description)
-        );
+		serviceTypeVO.setTypeName(name.trim());
 
-        /*
-         * 目前沒有使用這兩個欄位，
-         * 新增時暫時存 null。
-         */
-        serviceTypeVO.setTypeMode(null);
-        serviceTypeVO.setImgURL(null);
+		serviceTypeVO.setDescrip(normalizeNullableText(description));
 
-        return serviceTypeRepository.save(
-                serviceTypeVO
-        );
-    }
+		// TYPE_MODE 資料庫欄位為 NOT NULL
+		serviceTypeVO.setTypeMode(0);
 
-    // =========================================================
-    // 修改服務類型
-    //
-    // 只修改名稱、描述
-    // 不處理 TYPE_MODE、DEFAULT_IMAGE_URL
-    // =========================================================
+		// 預設圖片目前未使用
+		serviceTypeVO.setImgURL(null);
 
-    public ServiceTypeVO update(
-            Integer serviceTypeId,
-            String name,
-            String description) {
+		return serviceTypeRepository.save(serviceTypeVO);
+	}
+	// =========================================================
+	// 修改服務類型
+	//
+	// 只修改名稱、描述
+	// 不處理 TYPE_MODE、DEFAULT_IMAGE_URL
+	// =========================================================
 
-        if (serviceTypeId == null) {
-            throw new IllegalArgumentException(
-                    "服務類型編號不可為空"
-            );
-        }
+	public ServiceTypeVO update(Integer serviceTypeId, String name, String description) {
 
-        validateServiceType(
-                name,
-                description
-        );
+		if (serviceTypeId == null) {
+			throw new IllegalArgumentException("服務類型編號不可為空");
+		}
 
-        ServiceTypeVO serviceTypeVO =
-                serviceTypeRepository
-                        .findById(serviceTypeId)
-                        .orElseThrow(
-                                () -> new IllegalArgumentException(
-                                        "查無此服務類型"
-                                )
-                        );
+		validateServiceType(name, description);
 
-        serviceTypeVO.setTypeName(
-                name.trim()
-        );
+		ServiceTypeVO serviceTypeVO = serviceTypeRepository.findById(serviceTypeId)
+				.orElseThrow(() -> new IllegalArgumentException("查無此服務類型"));
 
-        serviceTypeVO.setDescrip(
-                normalizeNullableText(description)
-        );
+		serviceTypeVO.setTypeName(name.trim());
 
-        /*
-         * 修改時不設定 typeMode、imgURL，
-         * 避免覆蓋舊資料。
-         */
+		serviceTypeVO.setDescrip(normalizeNullableText(description));
 
-        return serviceTypeRepository.save(
-                serviceTypeVO
-        );
-    }
+		/*
+		 * 修改時不設定 typeMode、imgURL， 避免覆蓋舊資料。
+		 */
 
-    // =========================================================
-    // 刪除服務類型
-    //
-    // 若 SERVICE 還有參照這個類型，
-    // 資料庫外鍵可能會阻止刪除。
-    // =========================================================
+		return serviceTypeRepository.save(serviceTypeVO);
+	}
 
-    public void delete(
-            Integer serviceTypeId) {
+	// =========================================================
+	// 刪除服務類型
+	//
+	// 若 SERVICE 還有參照這個類型，
+	// 資料庫外鍵可能會阻止刪除。
+	// =========================================================
 
-        if (serviceTypeId == null) {
-            throw new IllegalArgumentException(
-                    "服務類型編號不可為空"
-            );
-        }
+	public void delete(Integer serviceTypeId) {
 
-        if (!serviceTypeRepository
-                .existsById(serviceTypeId)) {
+		if (serviceTypeId == null) {
+			throw new IllegalArgumentException("服務類型編號不可為空");
+		}
 
-            throw new IllegalArgumentException(
-                    "查無此服務類型"
-            );
-        }
+		if (!serviceTypeRepository.existsById(serviceTypeId)) {
 
-        serviceTypeRepository.deleteById(
-                serviceTypeId
-        );
-    }
+			throw new IllegalArgumentException("查無此服務類型");
+		}
 
-    // =========================================================
-    // 共用驗證
-    // =========================================================
+		serviceTypeRepository.deleteById(serviceTypeId);
+	}
 
-    private void validateServiceType(
-            String name,
-            String description) {
+	// =========================================================
+	// 共用驗證
+	// =========================================================
 
-        if (name == null
-                || name.trim().isEmpty()) {
+	private void validateServiceType(String name, String description) {
 
-            throw new IllegalArgumentException(
-                    "服務類型名稱不可為空"
-            );
-        }
+		if (name == null || name.trim().isEmpty()) {
 
-        if (name.trim().length() > 50) {
+			throw new IllegalArgumentException("服務類型名稱不可為空");
+		}
 
-            throw new IllegalArgumentException(
-                    "服務類型名稱不可超過 50 個字"
-            );
-        }
+		if (name.trim().length() > 50) {
 
-        String normalizedDescription =
-                normalizeNullableText(description);
+			throw new IllegalArgumentException("服務類型名稱不可超過 50 個字");
+		}
 
-        if (normalizedDescription != null
-                && normalizedDescription.length() > 255) {
+		String normalizedDescription = normalizeNullableText(description);
 
-            throw new IllegalArgumentException(
-                    "服務類型描述不可超過 255 個字"
-            );
-        }
-    }
+		if (normalizedDescription != null && normalizedDescription.length() > 255) {
 
-    // =========================================================
-    // 共用：空白字串轉成 null
-    // =========================================================
+			throw new IllegalArgumentException("服務類型描述不可超過 255 個字");
+		}
+	}
 
-    private String normalizeNullableText(String text) {
+	// =========================================================
+	// 共用：空白字串轉成 null
+	// =========================================================
 
-        if (text == null) {
-            return null;
-        }
+	private String normalizeNullableText(String text) {
 
-        String normalized = text.trim();
+		if (text == null) {
+			return null;
+		}
 
-        return normalized.isEmpty()
-                ? null
-                : normalized;
-    }
+		String normalized = text.trim();
+
+		return normalized.isEmpty() ? null : normalized;
+	}
 }
