@@ -52,7 +52,5 @@ public class ServiceOrderScheduler {
 //                    + " 筆"
 //            );
         }
-        
-        
     }
 }
