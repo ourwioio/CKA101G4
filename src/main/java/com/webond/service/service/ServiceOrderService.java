@@ -2131,4 +2131,64 @@ public class ServiceOrderService {
 
 	    return orderRepo.countCompletedOrders();
 	}
+	
+	// =========================================================
+	// 排程：服務結束後自動完成訂單
+	//
+	// Repository 查詢：
+	// ORDER_STATUS = 2 已成立
+	// SLOT_END_TIME_SNAPSHOT <= 現在
+	// =========================================================
+
+	public int completeFinishedOrders() {
+
+	    LocalDateTime now =
+	            LocalDateTime.now();
+
+	    List<ServiceOrderVO> finishedOrders =
+	            orderRepo
+	                    .findByOrderStatusAndSlotEndTimeSnapshotLessThanEqual(
+	                            ORDER_CONFIRMED,
+	                            now
+	                    );
+
+	    int count = 0;
+
+	    for (ServiceOrderVO order : finishedOrders) {
+
+	        // 防止查出後，訂單狀態已被其他操作修改
+	        if (!Byte.valueOf(ORDER_CONFIRMED)
+	                .equals(order.getOrderStatus())) {
+
+	            continue;
+	        }
+
+	        order.setOrderStatus(
+	                ORDER_COMPLETED
+	        );
+
+	        /*
+	         * 建議記錄真正的服務結束時間，
+	         * 而不是排程執行當下時間。
+	         */
+	        order.setServiceCompletedAt(
+	                order.getSlotEndTimeSnapshot()
+	        );
+
+	        /*
+	         * 已使用完畢的時段仍維持：
+	         * SLOT_STATUS = 2 已預約
+	         *
+	         * 不需要重新釋放。
+	         */
+
+	        count++;
+	    }
+
+	    if (!finishedOrders.isEmpty()) {
+	        orderRepo.saveAll(finishedOrders);
+	    }
+
+	    return count;
+	}
 }

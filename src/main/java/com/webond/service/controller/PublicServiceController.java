@@ -32,288 +32,219 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/front/services")
 public class PublicServiceController {
 
-    private final ServiceService serviceSvc;
-    private final ServiceTypeService serviceTypeSvc;
-    private final ServiceSlotService serviceSlotSvc;
-    private final ServiceOrderService serviceOrderSvc;
+	private final ServiceService serviceSvc;
+	private final ServiceTypeService serviceTypeSvc;
+	private final ServiceSlotService serviceSlotSvc;
+	private final ServiceOrderService serviceOrderSvc;
 
-    public PublicServiceController(
-            ServiceService serviceSvc,
-            ServiceTypeService serviceTypeSvc,
-            ServiceSlotService serviceSlotSvc,
-            ServiceOrderService serviceOrderSvc) {
+	public PublicServiceController(ServiceService serviceSvc, ServiceTypeService serviceTypeSvc,
+			ServiceSlotService serviceSlotSvc, ServiceOrderService serviceOrderSvc) {
 
-        this.serviceSvc = serviceSvc;
-        this.serviceTypeSvc = serviceTypeSvc;
-        this.serviceSlotSvc = serviceSlotSvc;
-        this.serviceOrderSvc = serviceOrderSvc;
-    }
+		this.serviceSvc = serviceSvc;
+		this.serviceTypeSvc = serviceTypeSvc;
+		this.serviceSlotSvc = serviceSlotSvc;
+		this.serviceOrderSvc = serviceOrderSvc;
+	}
 
-    // =========================================================
-    // 前台公開服務列表
-    // URL：GET /front/services
-    // =========================================================
-    @GetMapping
-    public String listService(Model model) {
+	// =========================================================
+	// 前台公開服務列表
+	// URL：GET /front/services
+	// =========================================================
+	@GetMapping
+	public String listService(Model model) {
 
-        List<ServiceVO> serviceList =
-                serviceSvc.getActiveServices();
+		List<ServiceVO> serviceList = serviceSvc.getActiveServices();
 
-        List<ServiceTypeVO> serviceTypeList =
-                serviceTypeSvc.getAll();
+		List<ServiceTypeVO> serviceTypeList = serviceTypeSvc.getAll();
 
-        model.addAttribute(
-                "serviceList",
-                serviceList
-        );
+		model.addAttribute("serviceList", serviceList);
 
-        model.addAttribute(
-                "serviceTypeList",
-                serviceTypeList
-        );
+		model.addAttribute("serviceTypeList", serviceTypeList);
 
-        return "front-end/service/serviceList";
-    }
+		return "front-end/service/serviceList";
+	}
 
-    // =========================================================
-    // 前台服務詳情
-    // URL：GET /front/services/{serviceId}
-    // =========================================================
-    @GetMapping("/{serviceId}")
-    public String getServiceDetail(
-            @PathVariable Integer serviceId,
-            Model model) {
+	// =========================================================
+	// 前台服務詳情
+	// URL：GET /front/services/{serviceId}
+	// =========================================================
+	@GetMapping("/{serviceId}")
+	public String getServiceDetail(@PathVariable Integer serviceId, Model model) {
 
-        ServiceVO serviceVO =
-                serviceSvc.getActiveServiceById(serviceId);
+		ServiceVO serviceVO = serviceSvc.getActiveServiceById(serviceId);
 
-        if (serviceVO == null) {
+		if (serviceVO == null) {
 
-            model.addAttribute(
-                    "errorMsg",
-                    "查無此服務或此服務目前未上架"
-            );
+			model.addAttribute("errorMsg", "查無此服務或此服務目前未上架");
 
-            model.addAttribute(
-                    "serviceList",
-                    serviceSvc.getActiveServices()
-            );
+			model.addAttribute("serviceList", serviceSvc.getActiveServices());
 
-            model.addAttribute(
-                    "serviceTypeList",
-                    serviceTypeSvc.getAll()
-            );
+			model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
 
-            return "front-end/service/serviceList";
-        }
+			return "front-end/service/serviceList";
+		}
 
-        List<ServiceSlotVO> serviceSlotList =
-                serviceSlotSvc
-                        .getPublicFutureSlotsByServiceId(
-                                serviceId
-                        );
-        
-        List<ServiceOrderVO> reviewListData = serviceOrderSvc.getReviewsByServiceId(serviceId);
-        Double avgRating = serviceOrderSvc.getAverageRating(serviceId);
-        
-        model.addAttribute(
-                "serviceVO",
-                serviceVO
-        );
+		List<ServiceSlotVO> serviceSlotList = serviceSlotSvc.getPublicFutureSlotsByServiceId(serviceId);
 
-        model.addAttribute(
-                "serviceSlotList",
-                serviceSlotList
-        );
-		
+		List<ServiceOrderVO> reviewListData = serviceOrderSvc.getReviewsByServiceId(serviceId);
+		Double avgRating = serviceOrderSvc.getAverageRating(serviceId);
+
+		model.addAttribute("serviceVO", serviceVO);
+
+		model.addAttribute("serviceSlotList", serviceSlotList);
+
 		model.addAttribute("reviewListData", reviewListData);
 		model.addAttribute("avgRating", avgRating);
 
-        return "front-end/service/serviceDetail";
-    }
+		return "front-end/service/serviceDetail";
+	}
 
-    // =========================================================
-    // 前台依服務類型查詢
-    // URL：GET /front/services/type/{serviceTypeId}
-    // =========================================================
-    @GetMapping("/type/{serviceTypeId}")
-    public String listServicesByType(
-            @PathVariable Integer serviceTypeId,
-            Model model) {
+	// =========================================================
+	// 前台依服務類型查詢
+	// URL：GET /front/services/type/{serviceTypeId}
+	// =========================================================
+	@GetMapping("/type/{serviceTypeId}")
+	public String listServicesByType(@PathVariable Integer serviceTypeId, Model model) {
 
-        List<ServiceVO> serviceList =
-                serviceSvc
-                        .getActiveServicesByServiceTypeId(
-                                serviceTypeId
-                        );
+		List<ServiceVO> serviceList = serviceSvc.getActiveServicesByServiceTypeId(serviceTypeId);
 
-        List<ServiceTypeVO> serviceTypeList =
-                serviceTypeSvc.getAll();
+		List<ServiceTypeVO> serviceTypeList = serviceTypeSvc.getAll();
 
-        model.addAttribute(
-                "serviceList",
-                serviceList
-        );
+		model.addAttribute("serviceList", serviceList);
 
-        model.addAttribute(
-                "serviceTypeList",
-                serviceTypeList
-        );
+		model.addAttribute("serviceTypeList", serviceTypeList);
 
-        model.addAttribute(
-                "selectedServiceTypeId",
-                serviceTypeId
-        );
+		model.addAttribute("selectedServiceTypeId", serviceTypeId);
 
-        return "front-end/service/serviceList";
-    }
+		return "front-end/service/serviceList";
+	}
 
-    // =========================================================
-    // 前台依關鍵字搜尋
-    // URL：GET /front/services/search?keyword=Java
-    // =========================================================
-    @GetMapping("/search")
-    public String searchServices(
-            @RequestParam(required = false)
-            String keyword,
-            Model model) {
+	// =========================================================
+	// 前台複合條件搜尋
+	//
+	// GET /front/services/search
+	// =========================================================
 
-        List<ServiceVO> serviceList =
-                serviceSvc.searchActiveServices(keyword);
+	@GetMapping("/search")
+	public String searchServices(
 
-        List<ServiceTypeVO> serviceTypeList =
-                serviceTypeSvc.getAll();
+			@RequestParam(required = false) String keyword,
 
-        model.addAttribute(
-                "serviceList",
-                serviceList
-        );
+			@RequestParam(required = false) Integer serviceTypeId,
 
-        model.addAttribute(
-                "serviceTypeList",
-                serviceTypeList
-        );
+			@RequestParam(required = false) String serviceCity,
 
-        model.addAttribute(
-                "keyword",
-                keyword
-        );
+			@RequestParam(required = false) String serviceDistrict,
 
-        return "front-end/service/serviceList";
-    }
+			@RequestParam(required = false) Integer minRate,
 
-    // =========================================================
-    // 買家送出預約申請
-    // URL：
-    // POST /front/services/{serviceId}/slots/{serviceSlotId}/request
-    // =========================================================
-    @PostMapping(
-            "/{serviceId}/slots/{serviceSlotId}/request"
-    )
-    public String createServiceRequest(
-            @PathVariable Integer serviceId,
-            @PathVariable Integer serviceSlotId,
-            @RequestParam(required = false)
-            String buyerRequestNote,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+			@RequestParam(required = false) Integer maxRate,
 
-        MemberVO memberVO =
-                (MemberVO) session.getAttribute(
-                        "memberVO"
-                );
+			Model model) {
 
-        // 未登入時導向正式登入頁
-        if (memberVO == null) {
+		List<ServiceVO> serviceList;
 
-            redirectAttributes.addFlashAttribute(
-                    "errorMsgs",
-                    "請先登入後再預約"
-            );
+		try {
 
-            return "redirect:/member/login";
-        }
+			serviceList = serviceSvc.searchActiveServices(keyword, serviceTypeId, serviceCity, serviceDistrict, minRate,
+					maxRate);
 
-        Integer buyerMemberId =
-                memberVO.getMemberId();
+		} catch (IllegalArgumentException e) {
 
-        try {
+			serviceList = List.of();
 
-            serviceOrderSvc.createRequest(
-                    serviceSlotId,
-                    buyerMemberId,
-                    buyerRequestNote
-            );
+			model.addAttribute("errorMsg", e.getMessage());
+		}
 
-            redirectAttributes.addFlashAttribute(
-                    "successMsg",
-                    "預約申請已送出，請等待賣家確認"
-            );
+		model.addAttribute("serviceList", serviceList);
 
-        } catch (RuntimeException e) {
+		model.addAttribute("serviceTypeList", serviceTypeSvc.getAll());
 
-            redirectAttributes.addFlashAttribute(
-                    "errorMsg",
-                    e.getMessage()
-            );
-        }
+		// 保留搜尋條件
+		model.addAttribute("keyword", keyword);
 
-        return "redirect:/front/services/"
-                + serviceId;
-    }
+		model.addAttribute("selectedServiceTypeId", serviceTypeId);
 
-    // =========================================================
-    // 顯示服務圖片
-    // 服務沒有圖片時顯示預設圖片
-    // URL：GET /front/services/image/{serviceId}
-    // =========================================================
-    @GetMapping("/image/{serviceId}")
-    public void showServiceImage(
-            @PathVariable Integer serviceId,
-            HttpServletResponse response)
-            throws IOException {
+		model.addAttribute("serviceCity", serviceCity);
 
-        ServiceVO serviceVO =
-                serviceSvc.getOneService(serviceId);
+		model.addAttribute("serviceDistrict", serviceDistrict);
 
-        if (serviceVO != null
-                && serviceVO.getServiceImage() != null
-                && serviceVO.getServiceImage().length > 0) {
+		model.addAttribute("minRate", minRate);
 
-            String imageType =
-                    serviceVO.getServiceImageType();
+		model.addAttribute("maxRate", maxRate);
 
-            if (imageType == null
-                    || imageType.isBlank()) {
+		model.addAttribute("searched", true);
 
-                imageType =
-                        MediaType.IMAGE_JPEG_VALUE;
-            }
+		return "front-end/service/serviceList";
+	}
 
-            response.setContentType(imageType);
+	// =========================================================
+	// 買家送出預約申請
+	// URL：
+	// POST /front/services/{serviceId}/slots/{serviceSlotId}/request
+	// =========================================================
+	@PostMapping("/{serviceId}/slots/{serviceSlotId}/request")
+	public String createServiceRequest(@PathVariable Integer serviceId, @PathVariable Integer serviceSlotId,
+			@RequestParam(required = false) String buyerRequestNote, HttpSession session,
+			RedirectAttributes redirectAttributes) {
 
-            response.getOutputStream()
-                    .write(
-                            serviceVO.getServiceImage()
-                    );
+		MemberVO memberVO = (MemberVO) session.getAttribute("memberVO");
 
-            return;
-        }
+		// 未登入時導向正式登入頁
+		if (memberVO == null) {
 
-        // 沒有圖片時讀取預設圖片
-        ClassPathResource defaultImage =
-                new ClassPathResource(
-                        "static/images/activity/"
-                                + "default-activity.jpg"
-                );
+			redirectAttributes.addFlashAttribute("errorMsgs", "請先登入後再預約");
 
-        response.setContentType(
-                MediaType.IMAGE_JPEG_VALUE
-        );
+			return "redirect:/member/login";
+		}
 
-        StreamUtils.copy(
-                defaultImage.getInputStream(),
-                response.getOutputStream()
-        );
-    }
+		Integer buyerMemberId = memberVO.getMemberId();
+
+		try {
+
+			serviceOrderSvc.createRequest(serviceSlotId, buyerMemberId, buyerRequestNote);
+
+			redirectAttributes.addFlashAttribute("successMsg", "預約申請已送出，請等待賣家確認");
+
+		} catch (RuntimeException e) {
+
+			redirectAttributes.addFlashAttribute("errorMsg", e.getMessage());
+		}
+
+		return "redirect:/front/services/" + serviceId;
+	}
+
+	// =========================================================
+	// 顯示服務圖片
+	// 服務沒有圖片時顯示預設圖片
+	// URL：GET /front/services/image/{serviceId}
+	// =========================================================
+	@GetMapping("/image/{serviceId}")
+	public void showServiceImage(@PathVariable Integer serviceId, HttpServletResponse response) throws IOException {
+
+		ServiceVO serviceVO = serviceSvc.getOneService(serviceId);
+
+		if (serviceVO != null && serviceVO.getServiceImage() != null && serviceVO.getServiceImage().length > 0) {
+
+			String imageType = serviceVO.getServiceImageType();
+
+			if (imageType == null || imageType.isBlank()) {
+
+				imageType = MediaType.IMAGE_JPEG_VALUE;
+			}
+
+			response.setContentType(imageType);
+
+			response.getOutputStream().write(serviceVO.getServiceImage());
+
+			return;
+		}
+
+		// 沒有圖片時讀取預設圖片
+		ClassPathResource defaultImage = new ClassPathResource("static/images/activity/" + "default-activity.jpg");
+
+		response.setContentType(MediaType.IMAGE_JPEG_VALUE);
+
+		StreamUtils.copy(defaultImage.getInputStream(), response.getOutputStream());
+	}
 }

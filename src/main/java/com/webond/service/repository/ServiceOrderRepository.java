@@ -229,4 +229,17 @@ public interface ServiceOrderRepository
            where o.orderStatus = 3
            """)
     Long countCompletedOrders();
+    
+    /*
+     * 查詢服務時間已結束，
+     * 且訂單狀態仍為已成立的訂單。
+     *
+     * ORDER_STATUS = 2
+     * SLOT_END_TIME_SNAPSHOT <= 現在
+     */
+    List<ServiceOrderVO>
+            findByOrderStatusAndSlotEndTimeSnapshotLessThanEqual(
+                    Byte orderStatus,
+                    LocalDateTime now
+            );
 }

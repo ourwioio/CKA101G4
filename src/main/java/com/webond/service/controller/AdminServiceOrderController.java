@@ -21,252 +21,418 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping(AdminServiceOrderController.BASE_PATH)
 public class AdminServiceOrderController {
 
-    public static final String BASE_PATH = "/admin/services/orders";
+    public static final String BASE_PATH =
+            "/admin/services/orders";
 
-    private static final String EMPLOYEE_SESSION_KEY = "employeeVO";
-    private static final int DEFAULT_FAKE_EMPLOYEE_ID = 1001;
+    private static final String EMPLOYEE_SESSION_KEY =
+            "employeeVO";
 
-    private static final String VIEW_ALL = "all";
-    private static final String VIEW_COMPLETED_UNPAID = "completed-unpaid";
-    private static final String VIEW_COMPLETED_PAID = "completed-paid";
-    private static final String VIEW_CANCELLED_NO_REFUND = "cancelled-no-refund";
-    private static final String VIEW_CANCELLED_PENDING_REFUND = "cancelled-pending-refund";
-    private static final String VIEW_CANCELLED_REFUNDED = "cancelled-refunded";
+    private static final String EMPLOYEE_LOGIN_PATH =
+            "/admin/login";
+
+    // =========================================================
+    // 訂單分類
+    // =========================================================
+
+    private static final String VIEW_ALL =
+            "all";
+
+    private static final String VIEW_COMPLETED_UNPAID =
+            "completed-unpaid";
+
+    private static final String VIEW_COMPLETED_PAID =
+            "completed-paid";
+
+    private static final String VIEW_CANCELLED_NO_REFUND =
+            "cancelled-no-refund";
+
+    private static final String VIEW_CANCELLED_PENDING_REFUND =
+            "cancelled-pending-refund";
+
+    private static final String VIEW_CANCELLED_REFUNDED =
+            "cancelled-refunded";
 
     private final ServiceOrderService serviceOrderSvc;
 
-    public AdminServiceOrderController(ServiceOrderService serviceOrderSvc) {
+    public AdminServiceOrderController(
+            ServiceOrderService serviceOrderSvc) {
+
         this.serviceOrderSvc = serviceOrderSvc;
     }
 
+    // =========================================================
+    // 後台服務訂單列表與訂單編號搜尋
+    //
+    // GET /admin/services/orders
+    // GET /admin/services/orders?view=completed-unpaid
+    // GET /admin/services/orders?orderId=1
+    // =========================================================
+
     @GetMapping
     public String listOrders(
-            @RequestParam(defaultValue = VIEW_ALL) String view,
+
+            @RequestParam(
+                    name = "view",
+                    defaultValue = VIEW_ALL
+            )
+            String view,
+
+            @RequestParam(
+                    name = "orderId",
+                    required = false
+            )
+            Integer orderId,
+
             HttpSession session,
             Model model) {
 
-        EmployeeVO employeeVO = getLoginEmployeeVO(session);
+        EmployeeVO employeeVO =
+                getLoginEmployeeVO(session);
 
         if (employeeVO == null) {
-            return redirectToFakeLogin();
+            return redirectToEmployeeLogin();
         }
 
-        String selectedView = normalizeView(view);
-        List<ServiceOrderVO> orderList = getOrderList(selectedView);
+        String selectedView =
+                normalizeView(view);
 
-        model.addAttribute("orderList", orderList);
-        model.addAttribute("selectedView", selectedView);
-        model.addAttribute("loginEmployeeId", employeeVO.getEmployeeId());
-        model.addAttribute("loginEmployeeVO", employeeVO);
+        List<ServiceOrderVO> orderList;
+
+        // =====================================================
+        // 有輸入訂單編號時，優先搜尋單筆訂單
+        // =====================================================
+
+        if (orderId != null) {
+
+            if (orderId <= 0) {
+
+                orderList = List.of();
+
+                model.addAttribute(
+                        "errorMsg",
+                        "訂單編號必須大於 0"
+                );
+
+            } else {
+
+                ServiceOrderVO order =
+                        serviceOrderSvc.getOne(orderId);
+
+                if (order == null) {
+
+                    orderList = List.of();
+
+                    model.addAttribute(
+                            "errorMsg",
+                            "查無訂單 #" + orderId
+                    );
+
+                } else {
+
+                    orderList =
+                            List.of(order);
+                }
+            }
+
+        } else {
+
+            // 沒有輸入訂單編號時，依分類查詢
+            orderList =
+                    getOrderList(selectedView);
+        }
+
+        // =====================================================
+        // 訂單資料
+        // =====================================================
+
+        model.addAttribute(
+                "orderList",
+                orderList
+        );
+
+        model.addAttribute(
+                "selectedView",
+                selectedView
+        );
+
+        /*
+         * HTML 會用這個值判斷：
+         * 1. 是否顯示搜尋條件
+         * 2. 是否自動捲動到訂單列表
+         */
+        model.addAttribute(
+                "searchOrderId",
+                orderId
+        );
+
+        // =====================================================
+        // 登入員工
+        // =====================================================
+
+        model.addAttribute(
+                "loginEmployeeId",
+                employeeVO.getEmployeeId()
+        );
+
+        model.addAttribute(
+                "loginEmployeeVO",
+                employeeVO
+        );
+
+        // =====================================================
+        // 後台統計
+        // =====================================================
 
         model.addAttribute(
                 "completedTotalAmount",
-                safeLong(serviceOrderSvc.getCompletedOrderTotalAmount())
+                safeLong(
+                        serviceOrderSvc
+                                .getCompletedOrderTotalAmount()
+                )
         );
 
         model.addAttribute(
                 "completedOrderCount",
-                safeLong(serviceOrderSvc.getCompletedOrderCount())
+                safeLong(
+                        serviceOrderSvc
+                                .getCompletedOrderCount()
+                )
         );
 
         model.addAttribute(
                 "completedUnpaidTotalAmount",
-                safeLong(serviceOrderSvc.getCompletedUnpaidTotalAmount())
+                safeLong(
+                        serviceOrderSvc
+                                .getCompletedUnpaidTotalAmount()
+                )
         );
 
         model.addAttribute(
                 "completedUnpaidOrderCount",
-                safeLong(serviceOrderSvc.getCompletedUnpaidOrderCount())
+                safeLong(
+                        serviceOrderSvc
+                                .getCompletedUnpaidOrderCount()
+                )
         );
 
         model.addAttribute(
                 "pendingRefundAmount",
-                safeLong(serviceOrderSvc.getPendingRefundAmount())
+                safeLong(
+                        serviceOrderSvc
+                                .getPendingRefundAmount()
+                )
         );
 
         model.addAttribute(
                 "pendingRefundOrderCount",
-                safeLong(serviceOrderSvc.getPendingRefundOrderCount())
+                safeLong(
+                        serviceOrderSvc
+                                .getPendingRefundOrderCount()
+                )
         );
 
         return "back-end/service/adminServiceOrderList";
     }
 
+    // =========================================================
+    // 完成撥款
+    // =========================================================
+
     @PostMapping("/{orderId}/payout")
     public String completePayout(
-            @PathVariable Integer orderId,
-            @RequestParam(defaultValue = VIEW_COMPLETED_UNPAID) String view,
+
+            @PathVariable
+            Integer orderId,
+
+            @RequestParam(
+                    name = "view",
+                    defaultValue = VIEW_COMPLETED_UNPAID
+            )
+            String view,
+
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        Integer employeeId = getLoginEmployeeId(session);
+        Integer employeeId =
+                getLoginEmployeeId(session);
 
         if (employeeId == null) {
+
             redirectAttributes.addFlashAttribute(
                     "errorMsg",
                     "請先登入員工帳號"
             );
 
-            return redirectToFakeLogin();
+            return redirectToEmployeeLogin();
         }
 
         try {
-            serviceOrderSvc.payout(orderId, employeeId);
+
+            serviceOrderSvc.payout(
+                    orderId,
+                    employeeId
+            );
 
             redirectAttributes.addFlashAttribute(
                     "successMsg",
-                    "訂單 #" + orderId
+                    "訂單 #"
+                            + orderId
                             + " 已完成撥款，處理員工 #"
                             + employeeId
             );
 
         } catch (RuntimeException e) {
+
             redirectAttributes.addFlashAttribute(
                     "errorMsg",
                     e.getMessage()
             );
         }
 
-        redirectAttributes.addAttribute("view", normalizeView(view));
+        redirectAttributes.addAttribute(
+                "view",
+                normalizeView(view)
+        );
 
         return redirectToOrderList();
     }
 
+    // =========================================================
+    // 完成退款
+    // =========================================================
+
     @PostMapping("/{orderId}/refund")
     public String completeRefund(
-            @PathVariable Integer orderId,
-            @RequestParam(defaultValue = VIEW_CANCELLED_PENDING_REFUND) String view,
+
+            @PathVariable
+            Integer orderId,
+
+            @RequestParam(
+                    name = "view",
+                    defaultValue =
+                            VIEW_CANCELLED_PENDING_REFUND
+            )
+            String view,
+
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        Integer employeeId = getLoginEmployeeId(session);
+        Integer employeeId =
+                getLoginEmployeeId(session);
 
         if (employeeId == null) {
+
             redirectAttributes.addFlashAttribute(
                     "errorMsg",
                     "請先登入員工帳號"
             );
 
-            return redirectToFakeLogin();
+            return redirectToEmployeeLogin();
         }
 
         try {
-            serviceOrderSvc.completeRefund(orderId, employeeId);
+
+            serviceOrderSvc.completeRefund(
+                    orderId,
+                    employeeId
+            );
 
             redirectAttributes.addFlashAttribute(
                     "successMsg",
-                    "訂單 #" + orderId
+                    "訂單 #"
+                            + orderId
                             + " 已完成退款，處理員工 #"
                             + employeeId
             );
 
         } catch (RuntimeException e) {
+
             redirectAttributes.addFlashAttribute(
                     "errorMsg",
                     e.getMessage()
             );
         }
 
-        redirectAttributes.addAttribute("view", normalizeView(view));
-
-        return redirectToOrderList();
-    }
-
-    // 測試用假登入，正式登入串接完成後可以移除
-
-    @GetMapping("/fake-login")
-    public String fakeLogin(
-            @RequestParam(required = false) Integer employeeId,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
-
-        int fakeEmployeeId =
-                employeeId == null
-                        ? DEFAULT_FAKE_EMPLOYEE_ID
-                        : employeeId;
-
-        if (fakeEmployeeId <= 0) {
-            redirectAttributes.addFlashAttribute(
-                    "errorMsg",
-                    "員工編號不正確"
-            );
-
-            return redirectToOrderList();
-        }
-
-        EmployeeVO employeeVO = new EmployeeVO();
-        employeeVO.setEmployeeId(fakeEmployeeId);
-
-        session.setAttribute(EMPLOYEE_SESSION_KEY, employeeVO);
-
-        redirectAttributes.addFlashAttribute(
-                "successMsg",
-                "已假登入員工 #" + fakeEmployeeId
+        redirectAttributes.addAttribute(
+                "view",
+                normalizeView(view)
         );
 
         return redirectToOrderList();
     }
 
-    @GetMapping("/fake-logout")
-    public String fakeLogout(
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+    // =========================================================
+    // 依分類取得訂單
+    // =========================================================
 
-        session.removeAttribute(EMPLOYEE_SESSION_KEY);
-
-        redirectAttributes.addFlashAttribute(
-                "successMsg",
-                "員工 Session 已清除"
-        );
-
-        return redirectToOrderList();
-    }
-
-    private List<ServiceOrderVO> getOrderList(String view) {
+    private List<ServiceOrderVO> getOrderList(
+            String view) {
 
         return switch (view) {
+
             case VIEW_COMPLETED_UNPAID ->
-                    serviceOrderSvc.getCompletedUnpaidOrders();
+                    serviceOrderSvc
+                            .getCompletedUnpaidOrders();
 
             case VIEW_COMPLETED_PAID ->
-                    serviceOrderSvc.getCompletedPaidOrders();
+                    serviceOrderSvc
+                            .getCompletedPaidOrders();
 
             case VIEW_CANCELLED_NO_REFUND ->
-                    serviceOrderSvc.getCancelledNoRefundOrders();
+                    serviceOrderSvc
+                            .getCancelledNoRefundOrders();
 
             case VIEW_CANCELLED_PENDING_REFUND ->
-                    serviceOrderSvc.getCancelledPendingRefundOrders();
+                    serviceOrderSvc
+                            .getCancelledPendingRefundOrders();
 
             case VIEW_CANCELLED_REFUNDED ->
-                    serviceOrderSvc.getCancelledRefundedOrders();
+                    serviceOrderSvc
+                            .getCancelledRefundedOrders();
 
             default ->
                     serviceOrderSvc.getAll();
         };
     }
 
-    private EmployeeVO getLoginEmployeeVO(HttpSession session) {
+    // =========================================================
+    // 取得登入員工
+    // =========================================================
+
+    private EmployeeVO getLoginEmployeeVO(
+            HttpSession session) {
 
         Object sessionObject =
-                session.getAttribute(EMPLOYEE_SESSION_KEY);
+                session.getAttribute(
+                        EMPLOYEE_SESSION_KEY
+                );
 
-        if (sessionObject instanceof EmployeeVO employeeVO) {
+        if (sessionObject
+                instanceof EmployeeVO employeeVO) {
+
             return employeeVO;
         }
 
         return null;
     }
 
-    private Integer getLoginEmployeeId(HttpSession session) {
+    private Integer getLoginEmployeeId(
+            HttpSession session) {
 
-        EmployeeVO employeeVO = getLoginEmployeeVO(session);
+        EmployeeVO employeeVO =
+                getLoginEmployeeVO(session);
 
         return employeeVO == null
                 ? null
                 : employeeVO.getEmployeeId();
     }
 
-    private String normalizeView(String view) {
+    // =========================================================
+    // 驗證分類
+    // =========================================================
+
+    private String normalizeView(
+            String view) {
 
         if (VIEW_COMPLETED_UNPAID.equals(view)
                 || VIEW_COMPLETED_PAID.equals(view)
@@ -280,15 +446,22 @@ public class AdminServiceOrderController {
         return VIEW_ALL;
     }
 
-    private long safeLong(Number value) {
-        return value == null ? 0L : value.longValue();
+    private long safeLong(
+            Number value) {
+
+        return value == null
+                ? 0L
+                : value.longValue();
     }
 
     private String redirectToOrderList() {
+
         return "redirect:" + BASE_PATH;
     }
 
-    private String redirectToFakeLogin() {
-        return "redirect:" + BASE_PATH + "/fake-login";
+    private String redirectToEmployeeLogin() {
+
+        return "redirect:"
+                + EMPLOYEE_LOGIN_PATH;
     }
 }
