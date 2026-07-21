@@ -290,6 +290,17 @@
             <div class="filter-card">
                 <form th:action="@{/admin/refundPayout/payoutList}" method="get" class="filter-form">
 
+                    <!-- 訂單類型 -->
+                    <div class="filter-group">
+                        <label class="filter-label">訂單類型</label>
+                        <select name="sourceType" class="form-control" onchange="this.form.submit()">
+                            <option value="" th:selected="${selectedSourceType == null or selectedSourceType == ''}">全部</option>
+                            <option value="ONE_ON_ONE" th:selected="${selectedSourceType == 'ONE_ON_ONE'}">一對一服務</option>
+                            <option value="GROUP" th:selected="${selectedSourceType == 'GROUP'}">揪團活動</option>
+                            <option value="VENUE" th:selected="${selectedSourceType == 'VENUE'}">場地租借</option>
+                        </select>
+                    </div>
+
                     <!-- 時間區間 -->
                     <div class="filter-group">
                         <label class="filter-label">時間區間</label>
@@ -312,17 +323,6 @@
                     <div class="filter-group" th:if="${selectedRange == 'custom'}">
                         <label class="filter-label">結束日期</label>
                         <input type="date" name="endDate" class="form-control" th:value="${param.endDate}">
-                    </div>
-
-                    <!-- 訂單類型 -->
-                    <div class="filter-group">
-                        <label class="filter-label">訂單類型</label>
-                        <select name="sourceType" class="form-control" onchange="this.form.submit()">
-                            <option value="" th:selected="${selectedSourceType == null or selectedSourceType == ''}">全部</option>
-                            <option value="ONE_ON_ONE" th:selected="${selectedSourceType == 'ONE_ON_ONE'}">一對一服務</option>
-                            <option value="GROUP" th:selected="${selectedSourceType == 'GROUP'}">揪團活動</option>
-                            <option value="VENUE" th:selected="${selectedSourceType == 'VENUE'}">場地租借</option>
-                        </select>
                     </div>
 
                     <!-- 操作按鈕 -->
