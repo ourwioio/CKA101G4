@@ -38,6 +38,24 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
 		session.getAttributes().put("MEMBER_ID", memberId);
 		sessionsMap.put(memberId, session);
+		
+		broadcastUserStatus(memberId, "online");
+		
+		try {
+			ObjectNode initOnlineNode = objectMapper.createObjectNode();
+			initOnlineNode.put("type", "initOnlineList");
+			
+			tools.jackson.databind.node.ArrayNode idArray = initOnlineNode.putArray("onlineUserIds");
+			for (Integer onlineId : sessionsMap.keySet()) {
+				idArray.add(onlineId);
+			}
+			
+			if (session.isOpen()) {
+				session.sendMessage(new TextMessage(objectMapper.writeValueAsString(initOnlineNode)));
+			}
+		} catch (Exception e) {
+			System.err.println("發送初始在線名單失敗: " + e.getMessage());
+		}
 
 	}
 
@@ -51,6 +69,11 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
 		Integer senderId = chatMessage.getSenderId();
 		Integer receiverId = chatMessage.getReceiverId();
+		String type = chatMessage.getType();
+		
+		if ("ping".equals(type)) {
+			return;
+		}
 
 		// 獲取歷史訊息紀錄(type = history)
 		if ("history".equals(chatMessage.getType())) {
@@ -95,16 +118,29 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		}
 
 		if ("read".equals(chatMessage.getType())) {
-			chatSvc.readChatMessage(String.valueOf(receiverId), String.valueOf(senderId));
+			chatSvc.readChatMessage(String.valueOf(senderId), String.valueOf(receiverId) );
 
 			WebSocketSession originalSenderSession = sessionsMap.get(receiverId);
 
 			if (originalSenderSession != null && originalSenderSession.isOpen()) {
 				ObjectNode readNotice = objectMapper.createObjectNode();
 				readNotice.put("type", "read");
-				readNotice.put("senderId", String.valueOf(senderId)); // 告訴對方是誰點開了已讀
+				readNotice.put("readByUserId", senderId); 
 
 				originalSenderSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(readNotice)));
+			}
+			return;
+		}
+		
+		// 打字中狀態即時觸發
+		if ("typing".equals(type)) {
+			WebSocketSession receiverSession = sessionsMap.get(receiverId);
+			if (receiverSession != null && receiverSession.isOpen()) {
+				ObjectNode typingNotice = objectMapper.createObjectNode();
+				typingNotice.put("type", "typing");
+				typingNotice.put("senderId", senderId);
+				typingNotice.put("status", chatMessage.getMessage()); // "1" 或 "0"
+				receiverSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(typingNotice)));
 			}
 			return;
 		}
@@ -123,9 +159,26 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 
 		if (memberIdClose != null) {
 			sessionsMap.remove(memberIdClose);
+			broadcastUserStatus(memberIdClose, "offline");
 		}
 
 	}
+	
+// 上線狀態判斷
+	private void broadcastUserStatus(Integer userId, String status) {
+		try {
+			ObjectNode node = objectMapper.createObjectNode();
+			node.put("type", "userStatus");
+			node.put("userId", userId);
+			node.put("status", status);
+			String json = objectMapper.writeValueAsString(node);
+			for (WebSocketSession s : sessionsMap.values()) {
+				if (s.isOpen()) s.sendMessage(new TextMessage(json));
+			}
+		} catch (Exception e) {}
+	}
+	
+	
 
 // === 從連線URI取出memberId === //
 	private Integer getMemberId(WebSocketSession session) {

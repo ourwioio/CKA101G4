@@ -4,12 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>私訊聊天室</title>
-    <link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
-    <!-- 保留你原有的 chatRoom.css 連結，若想完全改由本頁 style 掌控，可直接參考下方樣式 -->
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<!-- 保留你原有的 chatRoom.css 連結，若想完全改由本頁 style 掌控，可直接參考下方樣式 -->
 <!--     <link rel="stylesheet" th:href="@{/css/front-end/chat/chatRoom.css}"> -->
-    <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
+<script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap');
+@import
+	url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Noto+Sans+TC:wght@400;500;700;800&display=swap')
+	;
 
 :root {
 	--color-bg: #F7F3EC;
@@ -31,7 +33,9 @@
 	--shadow-md: 0 14px 34px rgba(23, 20, 15, .10);
 }
 
-* { box-sizing: border-box; }
+* {
+	box-sizing: border-box;
+}
 
 body {
 	margin: 0;
@@ -246,9 +250,7 @@ body {
 	line-height: 1.6;
 	overflow-wrap: anywhere;
 	white-space: pre-wrap;
-	
 	display: block !important;
-	
 	width: fit-content !important;
 }
 
@@ -256,7 +258,6 @@ body {
 .messages-list li.friend {
 	margin-right: auto !important;
 	margin-left: 0 !important;
-	
 	border-radius: 8px 20px 20px 20px;
 	color: var(--color-ink);
 }
@@ -265,7 +266,6 @@ body {
 .messages-list li.me {
 	margin-left: auto !important;
 	margin-right: 0 !important;
-	
 	border-color: #F3D36C;
 	border-radius: 20px 8px 20px 20px;
 	background: var(--color-yellow);
@@ -328,7 +328,8 @@ body {
 	font-size: 14px;
 	font-weight: 800;
 	cursor: pointer;
-	transition: transform .18s ease, background .15s ease, box-shadow .18s ease, color .15s ease;
+	transition: transform .18s ease, background .15s ease, box-shadow .18s
+		ease, color .15s ease;
 }
 
 .chat-input-area button:hover:not(:disabled) {
@@ -348,13 +349,12 @@ body {
 /* ==========================================
    【響應式手機版佈局】
    ========================================== */
-@media (max-width: 760px) {
+@media ( max-width : 760px) {
 	.user-info-bar {
 		margin: 80px 16px 0;
 		border-radius: 20px 20px 0 0;
 		padding: 10px 20px;
 	}
-
 	.chat-container {
 		flex-direction: column;
 		height: calc(100dvh - 165px);
@@ -371,25 +371,21 @@ body {
 		border-right: none;
 		border-bottom: 1px solid var(--color-border);
 	}
-
 	.left-sidebar h3 {
 		font-size: 14px;
 		margin-bottom: 6px;
 	}
-
 	.contact-list {
 		flex-direction: row;
 		overflow-x: auto;
 		gap: 8px;
 		padding-bottom: 4px;
 	}
-
 	.contact-link {
-		padding: 6px ;
+		padding: 6px;
 		font-size: 13px;
 		white-space: nowrap;
 	}
-
 	.contact-link:hover {
 		transform: none;
 	}
@@ -399,23 +395,18 @@ body {
 		flex: 1;
 		min-height: 0;
 	}
-
 	.chat-header {
 		padding: 16px 20px;
 	}
-
 	.chat-header h3 {
 		font-size: 17px;
 	}
-
 	.messages-display {
 		padding: 20px 16px;
 	}
-
 	.messages-list li {
 		max-width: 86%;
 	}
-
 	.chat-input-area {
 		padding: 14px 16px;
 	}
@@ -423,57 +414,82 @@ body {
 
 /* 🚀 讓時間與已讀完美在文字「左邊」與「右邊」的黃金排版 */
 .messages-list li {
-    position: relative !important;
-    margin-bottom: 24px !important; /* 留出下方或旁邊的餘裕 */
+	position: relative !important;
+	margin-bottom: 24px !important; /* 留出下方或旁邊的餘裕 */
 }
 
 /* 訊息專用時間狀態標籤 */
 .msg-side-meta {
-    position: absolute;
-    bottom: 0;
-    font-size: 10px !important;
-    font-weight: 800 !important;
-    line-height: 1.2;
-    color: var(--color-ink-soft);
-    display: flex;
-    flex-direction: column;
-    user-select: none;
-    white-space: nowrap;
+	position: absolute;
+	bottom: 0;
+	font-size: 10px !important;
+	font-weight: 800 !important;
+	line-height: 1.2;
+	color: var(--color-ink-soft);
+	display: flex;
+	flex-direction: column;
+	user-select: none;
+	white-space: nowrap;
 }
 
 /* 自己發的訊息 (.me)：把時間狀態標籤釘在氣泡的【左邊】 */
 .messages-list li.me .msg-side-meta {
-    left: -55px; /* 精準把時間和已讀逼到黃色氣泡的左邊 */
-    align-items: flex-end;
+	left: -55px; /* 精準把時間和已讀逼到黃色氣泡的左邊 */
+	align-items: flex-end;
 }
 
 /* 對方發的訊息 (.friend)：把時間標籤釘在氣泡的【右邊】 */
 .messages-list li.friend .msg-side-meta {
-    right: -45px; /* 精準把時間逼到白色氣泡的右邊 */
-    align-items: flex-start;
+	right: -45px; /* 精準把時間逼到白色氣泡的右邊 */
+	align-items: flex-start;
 }
 
 /* 左側聯絡人清單的未讀氣泡樣式 */
 .sidebar-unread-badge {
-    background-color: var(--color-pink) !important;
-    color: var(--color-surface) !important;
-    border-radius: var(--radius-full) !important;
-    padding: 2px 8px !important;
-    font-size: 11px !important;
-    font-weight: 800 !important;
-    margin-left: auto !important;
-    line-height: 1.3 !important;
-    box-shadow: var(--shadow-sm) !important;
-    border: 1px solid #FFA2B0 !important;
+	background-color: var(--color-pink) !important;
+	color: var(--color-surface) !important;
+	border-radius: var(--radius-full) !important;
+	padding: 2px 8px !important;
+	font-size: 11px !important;
+	font-weight: 800 !important;
+	line-height: 1.3 !important;
+	box-shadow: var(--shadow-sm) !important;
+	border: 1px solid #FFA2B0 !important;
+	
+	display: inline-flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	min-width: 22px !important; 
+	height: 18px !important;
 }
 
 .messages-list li {
-    display: block !important;       /* 1. 強制宣告為區塊，不被 align-self 扭曲 */
-    width: -webkit-fit-content !important; /* 2. 舊版瀏覽器相容 */
-    width: -moz-fit-content !important;    /* 3. 火狐瀏覽器相容 */
-    width: fit-content !important;         /* 4. 【核心指令】逼迫泡泡寬度，死死貼緊文字有多長就縮多小！ */
+	display: block !important; /* 1. 強制宣告為區塊，不被 align-self 扭曲 */
+	width: -webkit-fit-content !important; /* 2. 舊版瀏覽器相容 */
+	width: -moz-fit-content !important; /* 3. 火狐瀏覽器相容 */
+	width: fit-content !important; /* 4. 【核心指令】逼迫泡泡寬度，死死貼緊文字有多長就縮多小！ */
 }
 
+/* 上線圖標 */
+.status-dot {
+	width: 8px !important;
+	height: 8px !important;
+	border-radius: 50% !important;
+	display: inline-block !important;
+	flex-shrink: 0 !important;
+	background-color: #bfbfbf !important; /* 預設小灰燈 */
+	transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.status-dot.online {
+	background-color: #52c41a !important; /* 綠色 */
+	box-shadow: 0 0 6px #52c41a !important;  /* 螢光發光特效 */
+}
+
+.status-dot.offline {
+	background-color: #bfbfbf !important;
+	box-shadow: none !important;
+}
 </style>
 </head>
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
@@ -495,37 +511,56 @@ body {
 		<!-- 【左欄：真實會員清單】 -->
 		<div class="left-sidebar">
 			<h3>選擇聯絡人</h3>
-			<ul class="contact-list">
-				<li th:each="mem : ${memList}" class="contact-item" th:id="'contact-item-' + ${mem.memberId}">
-					<!-- 利用動態 class 決定是否套用 active-chat 樣式 -->
-					<a th:if="${mem.memberId != currentUserId}"
-					   th:href="@{/member/chatRoom(to=${mem.memberId})}"
-					   th:text="${mem.realName}"
-					   th:class="${mem.memberId == targetUserId} ? 'contact-link active-chat' : 'contact-link'">
-					</a>
-				</li>
-			</ul>
+			<ul class="contact-list" id="dynamicContactList">
+    <!-- 確保最外圍的 <li> 帶有 th:data-id 與 th:data-name，這是我們 JS 精準切換的雷達 -->
+    <li th:each="contact : ${memList}" th:if="${contact.userId != currentUserId}" class="contact-item" th:id="'contact-item-' + ${contact.userId}" th:data-id="${contact.userId}" th:data-name="${contact.username}">
+        
+        <!-- 💡【核心修正】拔掉 th:href 刷新跳轉，改為 javascript:void(0); 全權交由前端 SPA 點擊控制 -->
+        <a href="javascript:void(0);"
+           th:class="${contact.userId == targetUserId} ? 'contact-link active-chat' : 'contact-link'"
+           style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+            
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="status-dot offline" th:id="'status-dot-' + ${contact.userId}"></span>
+                <th:block th:text="${contact.username}"></th:block>
+            </div> 
+            
+            <span class="sidebar-unread-badge"
+                  th:text="${contact.userId == targetUserId} ? 0 : ${contact.unreadCount}"
+                  th:style="${contact.userId == targetUserId || contact.unreadCount == 0} ? 'display: none !important;' : 'display: inline-block; background-color: var(--color-pink); color: var(--color-surface); border-radius: var(--radius-full); padding: 2px 8px; font-size: 11px; font-weight: 800; line-height: 1.3; box-shadow: var(--shadow-sm); border: 1px solid #FFA2B0;'">
+                  0
+            </span>
+        </a>
+    </li>
+</ul>
 		</div>
 
 		<!-- 【右欄：對話視窗】 -->
 		<div class="right-chatbox">
 			<!-- 對話視窗頂部標題 -->
-			<div class="chat-header">
-				<h3 th:text="${targetName != null} ? '與 ' + ${targetName} + ' 聊天中' : '請選擇對象'"></h3>
+			<div class="chat-header"
+				style="display: flex; justify-content: space-between; align-items: center;">
+				<h3
+					th:text="${targetName != null} ? '與 ' + ${targetName} + ' 聊天中' : '請選擇對象'"></h3>
+				<span id="typingIndicator"
+					style="color: var(--color-ink-soft); font-size: 0.85em; font-style: italic;"></span>
 			</div>
 
 			<!-- 訊息滾動顯示區 -->
 			<div id="messagesArea" class="messages-display">
 				<ul id="area" class="messages-list">
 					<!-- 連線成功系統提示 -->
-					<p th:if="${targetName != null}" class="system-status">--- 已建立專屬私訊連線 ---</p>
+					<p th:if="${targetName != null}" class="system-status">---
+						已建立專屬私訊連線 ---</p>
 				</ul>
 			</div>
 
 			<!-- 底部輸入與發送功能 -->
 			<div class="chat-input-area">
-				<input type="text" id="message" placeholder="請輸入私訊內容..." th:disabled="${targetName == null}">
-				<button id="sendMessage" onclick="sendMessage()" th:disabled="${targetName == null}">發送</button>
+				<input type="text" id="message" placeholder="請輸入私訊內容..."
+					th:disabled="${targetName == null}">
+				<button id="sendMessage" onclick="sendMessage()"
+					th:disabled="${targetName == null}">發送</button>
 			</div>
 		</div>
 
@@ -535,7 +570,7 @@ body {
 	<script th:inline="javascript">
 		let webSocket = null;
 		const selfId = /*[[${currentUserId}]]*/'guest';
-		const targetId = /*[[${targetUserId}]]*/null;
+		let targetId = /*[[${targetUserId}]]*/null;
 		const targetName = /*[[${targetName}]]*/'';
 
 		const MyPoint = "/FriendWS/" + selfId;
@@ -543,30 +578,32 @@ body {
 
 		const statusOutput = document.getElementById("statusOutput");
 		const messagesArea = document.getElementById("messagesArea");
+		const chatHeaderTitle = document.getElementById("chatHeaderTitle");
+		const typingIndicator = document.getElementById("typingIndicator");
+		const inputMessage = document.getElementById("message");
+		const sendMessageBtn = document.getElementById("sendMessage");
 
+		let typingTimeout = null;    
+		let heartbeatInterval = null;
+		
+		
 		function connect() {
-			if (!targetId) return;
-
 			webSocket = new WebSocket(endPointURL);
 
 			webSocket.onopen = function(event) {
-				document.getElementById('sendMessage').disabled = false;
-
-				const historyReq = {
-					"type" : "history",
-					"senderId" : selfId,
-					"receiverId" : targetId,
-					"message" : ""
-				};
-				webSocket.send(JSON.stringify(historyReq));
-
-				const readReq = {
-						"type" : "read",
-						"senderId" : Number(selfId),
-						"receiverId" : Number(targetId),
+				startHeartbeat(); 
+				loadContacts();  
+				
+				if (targetId) {
+					const historyReq = {
+						"type" : "history",
+						"senderId" : Number(selfId),  
+						"receiverId" : Number(targetId), 
 						"message" : ""
 					};
-				webSocket.send(JSON.stringify(readReq));
+					webSocket.send(JSON.stringify(historyReq));
+
+				}
 			};
 
 			webSocket.onmessage = function(event) {
@@ -574,7 +611,8 @@ body {
 
 				// 🅰️ 情況 A：載入歷史紀錄
 				if ("history" === jsonObj.type) {
-					messagesArea.innerHTML = '<ul id="area" class="messages-list"></ul>';
+					const ulArea = document.getElementById("area");
+					ulArea.innerHTML = '';
 					
 					const messages = jsonObj.historyList;
 					
@@ -590,15 +628,12 @@ body {
 							const timeStr = historyData.lastTime || historyData.sentAt || getCurrentTime();
 							appendMessageContent(li, historyData.message, isMe, historyData.getIsRead || historyData.msgRead, timeStr);
 
-							document.getElementById("area").appendChild(li);
+							ulArea.appendChild(li);
 						}
 					}
                     
-					document.querySelectorAll("li.friend .unread-marker").forEach(label => {
-						label.innerText = "已讀";
-						label.style.color = "lightgray";
-						label.classList.remove("unread-marker");
-					});
+					sendReadReceipt();
+					
 					
 					if (targetId) {
 						localStorage.setItem(`chat_unread_${selfId}_to_${targetId}`, 0);
@@ -623,27 +658,49 @@ body {
 						appendMessageContent(li, jsonObj.message, isMe, isMe ? 0 : 1, timeStr);
 						
 						if (isFromCurrentPartner) {
-							const autoRead = {
-								"type" : "read",
-								"senderId" : Number(selfId),
-								"receiverId" : Number(targetId),
-								"message" : ""
-							};
-							webSocket.send(JSON.stringify(autoRead));
+							sendReadReceipt();
 						}
 						
 						document.getElementById("area").appendChild(li);
 						messagesArea.scrollTop = messagesArea.scrollHeight;
 					} else {
-						// 💡 核心優化 2：別人在背景傳訊息來，即時點亮左側聯絡人名單的小紅點數字提示
-						updateLeftSidebarBadge(jsonObj.senderId);
+						const partnerId = jsonObj.senderId;
+						if (partnerId) {
+							const targetLiEl = document.querySelector(`.contact-list .contact-item[data-id="${String(partnerId).trim()}"]`);
+							
+							if (targetLiEl) {
+								let badge = targetLiEl.querySelector('.sidebar-unread-badge');
+								
+								let currentDisplayCount = parseInt(badge.innerText) || 0;
+								
+								currentDisplayCount++;
+								
+								badge.innerText = currentDisplayCount;
+								badge.style.display = 'inline-block';
+								
+								let lastMsgSummary = "新訊息";
+								if (jsonObj.type === "image") {
+									lastMsgSummary = "[圖片訊息]";
+								} else if (jsonObj.message) {
+									lastMsgSummary = jsonObj.message.length > 10 ? jsonObj.message.substring(0, 10) + "..." : jsonObj.message;
+								}
+								const lastMsgEl = targetLiEl.querySelector('.contact-last-msg');
+								if (lastMsgEl) lastMsgEl.textContent = lastMsgSummary;
+
+								const storageKey = `chat_unread_${selfId}_to_${partnerId}`;
+								localStorage.setItem(storageKey, currentDisplayCount);
+							}
+						}
+						
+						setTimeout(() => {
+							loadContacts();
+						}, 150);
 					}
 					
 				// 🅲 情況 C：對方點開對話，即時將畫面上的「未讀」集體改為「已讀」
 				} else if("read" === jsonObj.type){
-					const readerId = jsonObj.senderId; 
+					const readerId = jsonObj.readByUserId;; 
 
-					// 💡 修正 2：加強防禦性判定，如果 targetId 剛好是 null、或者字串比對有些微時差，我們印出 log 協助確認
 				    if (!targetId || String(readerId) === String(targetId)) {
 				        const unreadLabels = document.querySelectorAll(".unread-marker");
 				        unreadLabels.forEach(label => {
@@ -653,10 +710,41 @@ body {
 				        });
 				    }
 				}
+				// 情況 D：即時接收對方的打字狀態 (Typing Indicator)
+				else if ("typing" === jsonObj.type) {
+					if (String(jsonObj.senderId) === String(targetId)) {
+						typingIndicator.textContent = (jsonObj.status === "1") ? "對方正在輸入中..." : "";
+					}
+				}
+				// 情況 E：處理系統級的好友即時「上下線狀態燈號」廣播
+				else if ("userStatus" === jsonObj.type) {
+					const statusDot = document.getElementById(`status-dot-${jsonObj.userId}`);
+					if (statusDot) {
+						statusDot.className = (jsonObj.status === "online") ? "status-dot online" : "status-dot offline";
+					}
+				}// 情況 F：連線成功時，接收後端主動回發的全體在線名單，一口氣集體點亮小綠燈！
+				else if ("initOnlineList" === jsonObj.type) {
+					const onlineIds = jsonObj.onlineUserIds; 
+					if (onlineIds && onlineIds.length > 0) {
+						onlineIds.forEach(onlineId => {
+							const statusDot = document.getElementById(`status-dot-${onlineId}`);
+							if (statusDot) {
+								statusDot.className = "status-dot online";
+							}
+						});
+					}
+				}
+			};
+			
+			webSocket.onclose = function(event) {
+				console.log("Disconnected!");
+				clearInterval(heartbeatInterval); // 斷線時清除定時器
 			};
 		}
 
-
+		
+	
+		// 發送聊天訊息：
 		function sendMessage() {
 			const inputMessage = document.getElementById("message");
 			const message = inputMessage.value.trim();
@@ -673,6 +761,8 @@ body {
 				webSocket.send(JSON.stringify(jsonObj));
 				inputMessage.value = "";
 				inputMessage.focus();
+				
+				sendTypingSignal("0");
 			}
 		}
 		
@@ -689,21 +779,17 @@ body {
 				liElement.style.cssText = "background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; display: flex !important; justify-content: flex-end !important; align-items: flex-end !important; gap: 8px; position: relative; list-style: none; margin-bottom: 12px;";
 				
 				liElement.innerHTML = `
-					<!-- 左邊：小巧精緻的時間與已讀狀態 -->
 					<div class="msg-meta-left" style="display: flex; flex-direction: column; align-items: flex-end; font-size: 10px; font-weight: 800; line-height: 1.3; user-select: none; flex-shrink: 0; margin-bottom: 2px;">
 						<span style="color: var(--color-ink-soft); font-weight: 800;">${timeStr}</span>
 						<span ${markerClass} style="color: ${statusColor}; font-weight: 800;">${statusText}</span>
 					</div>
-					<!-- 右邊：實體文字氣泡，打 123 就縮到 123 的大小 -->
 					<div class="msg-bubble-actual" style="display: inline-block !important; width: max-content !important; min-width: 0 !important; max-width: min(72%, 560px); padding: 13px 16px; border: 1px solid #F3D36C; border-radius: 20px 8px 20px 20px; background: var(--color-yellow); color: var(--color-ink); box-shadow: var(--shadow-sm); font-size: 14px; font-weight: 500; overflow-wrap: break-word !important; word-break: break-word !important; white-space: normal !important; text-align: left;">
 						${safeText}
 					</div>
 				`;
 			} else {
-				// 💡 對方傳來的訊息（左邊訊息）：靠左對齊 (justify-content: flex-start)
 				liElement.style.cssText = "background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; display: flex !important; justify-content: flex-start !important; align-items: flex-end !important; gap: 8px; position: relative; list-style: none; margin-bottom: 12px;";
 				
-				// 💡 核心修正：先渲染「白底氣泡」，後面緊接著「時間」，利用 flex-start 特性，時間就會百分之百死死貼在氣泡的【右邊旁邊】！
 				liElement.innerHTML = `
 					<!-- 左邊：實體白底氣泡，打 123 就縮到 123 的大小 -->
 					<div class="msg-bubble-actual" style="display: inline-block !important; width: max-content !important; min-width: 0 !important; max-width: min(72%, 560px); padding: 13px 16px; border: 1px solid var(--color-border); border-radius: 8px 20px 20px 20px; background: var(--color-surface); color: var(--color-ink); box-shadow: var(--shadow-sm); font-size: 14px; font-weight: 500; overflow-wrap: break-word !important; word-break: break-word !important; white-space: normal !important; text-align: left;">
@@ -718,56 +804,10 @@ body {
 		}
 		
 		// 💡 輔助方法 B：即時更新左側聯絡人小紅點數字
-		function updateLeftSidebarBadge(partnerId, isInitLoad = false) {
-			if (!partnerId) return;
-
-			// 1. 地毯式掃描左側所有超連結，看誰包含 to=對方ID
-			const allLinks = document.querySelectorAll('.contact-list .contact-link');
-			let targetLinkEl = null;
-			for (let i = 0; i < allLinks.length; i++) {
-				const hrefStr = allLinks[i].getAttribute('href') || '';
-				if (hrefStr.indexOf(`to=${partnerId}`) !== -1) {
-					targetLinkEl = allLinks[i];
-					break;
-				}
-			}
-			
-			if (!targetLinkEl) return;
-
-			// 2. 與 LocalStorage 的記憶體小本本完全對接
-			const storageKey = `chat_unread_${selfId}_to_${partnerId}`;
-			let currentCount = parseInt(localStorage.getItem(storageKey)) || 0;
-			
-			if (!isInitLoad) {
-				currentCount++;
-				localStorage.setItem(storageKey, currentCount); // 寫入硬碟鎖死
-			}
-			
-			// 如果硬碟讀出來的數字是 0 或負數，現場立刻將已經存在的紅點拔掉，並中斷不渲染
-			if (currentCount <= 0) {
-				const existingBadge = targetLinkEl.querySelector('.sidebar-unread-badge');
-				if (existingBadge) existingBadge.remove();
-				return;
-			}
-
-			// 3. 現場渲染高質感粉紅徽章
-			let badge = targetLinkEl.querySelector('.sidebar-unread-badge');
-			
-			if (!badge) {
-				badge = document.createElement('span');
-				badge.className = 'sidebar-unread-badge';
-				badge.style.cssText = "background-color: var(--color-pink); color: var(--color-surface); border-radius: var(--radius-full); padding: 2px 8px; font-size: 11px; font-weight: 800; margin-left: auto; display: inline-block; line-height: 1.3; box-shadow: var(--shadow-sm); border: 1px solid #FFA2B0;";
-				
-				targetLinkEl.style.display = "flex";
-				targetLinkEl.style.alignItems = "center";
-				targetLinkEl.style.width = "100%";
-				targetLinkEl.appendChild(badge);
-			}
-
-			badge.innerText = currentCount;
-			badge.style.display = 'inline-block';
+		function updateLeftSidebarBadge(partnerId) {
+			// 直接調用步驟 1 的資料庫同步器，資料庫說幾筆，畫面上就顯示幾筆，絕對不遺失、不卡 0！
+			loadContacts();
 		}
-		
 		
 		function getCurrentTime() {
 			const now = new Date();
@@ -775,73 +815,193 @@ body {
 		}
 		
 		function escapeHtml(string) {
+			if (!string) return '';
 			return String(string).replace(/[&<>"']/g, function (s) {
-				return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s];
+				return { 
+					'&': '&amp;', 
+					'<': '&lt;', 
+					'>': '&gt;', 
+					'"': '&quot;', 
+					"'": '&#039;'
+				}[s];
 			});
 		}
 		
 		
-window.addEventListener("DOMContentLoaded", function() {
-			
-			// 1. 🚀【字串精準切除與畫面強刷歸零】
-			const allLinks = document.querySelectorAll('.contact-list .contact-link');
-			allLinks.forEach(link => {
-				const hrefStr = link.getAttribute('href') || '';
-				let partnerId = null;
-
-				// 💡 鐵律：只要網址裡有 'to='，我們直接抓 'to=' 後面的所有字，並只留下純數字！
-				if (hrefStr.indexOf('to=') !== -1) {
-					const index = hrefStr.indexOf('to=');
-					const rawSub = hrefStr.substring(index + 3); 
-					partnerId = rawSub.replace(/[^0-9]/g, '');   
-				} else if (hrefStr.indexOf('=') !== -1) {
-					const index = hrefStr.indexOf('=');
-					const rawSub = hrefStr.substring(index + 1);
-					partnerId = rawSub.replace(/[^0-9]/g, '');
-				}
+		/**
+		 * 🚀 全網頁初始化核心事件（DOMContentLoaded）
+		 */
+		 
+		 window.addEventListener("DOMContentLoaded", function() {
+				// 1. 啟動 WebSocket 連線（連線成功的 onopen 內部會去呼叫 loadContacts() 載入資料庫紅點）
+				connect();
 				
-				// 確保有精準拿到這個好友的真實 ID 數字，且絕對不是空白
-				if (partnerId && partnerId.trim() !== '') {
-					// 💡 頂級防禦：強制去除所有隱形空白，並轉為純數字型態進行嚴格比對
-					const pIdNum = Number(partnerId.trim());
-					const currentTargetNum = targetId ? Number(targetId) : null;
-					
-					const storageKey = `chat_unread_${selfId}_to_${pIdNum}`;
-
-					// 💡 已讀削平核心：如果你目前的網址剛好正在跟這個人聊天（ID 完全一致）
-					if (currentTargetNum && pIdNum === currentTargetNum) {
-						// A. 強制將硬碟計數「清空歸零」，確保下一次 F5 刷新也是 0
-						localStorage.setItem(storageKey, 0);
-						
-						// B. 🚀【秒消絕殺】現場立刻去這個聯絡人的超連結內部，把任何已經跑出來的紅點氣泡當場撕掉（.remove()）！
-						const existingBadge = link.querySelector('.sidebar-unread-badge');
-						if (existingBadge) {
-							existingBadge.remove();
+				// 2. 完美的中文注音輸入法防爆 Enter 鍵發送機制
+				const inputMessage = document.getElementById("message");
+				if (inputMessage) {
+					inputMessage.addEventListener("keydown", function(event) {
+						if (event.key === "Enter") {
+							if (event.isComposing || event.keyCode === 229) return;
+							event.preventDefault(); 
+							sendMessage(); 
 						}
-					} else {
-						// 🌟 否則，如果是別人在背景傳訊息的人，去硬碟撈出屬於他個人的舊未讀數，還原小紅點！
-						updateLeftSidebarBadge(pIdNum, true); 
-					}
+					});
+
+					// 3. 綁定打字提示偵測
+					inputMessage.addEventListener("input", function() {
+						if (!targetId) return;
+						sendTypingSignal("1");
+						clearTimeout(typingTimeout);
+						typingTimeout = setTimeout(() => sendTypingSignal("0"), 1500);
+					});
 				}
 			});
-
-			// 2. 啟動你原本的 WebSocket 連線機制
-			connect();
+		
+		
+		//  打字中提示訊號發送器 : 透過 WebSocket 即時把「正在輸入(1)」或「停止輸入(0)」狀態轉發給對方
+		 function sendTypingSignal(status) {
+				if (webSocket && webSocket.readyState === WebSocket.OPEN && targetId) {
+					webSocket.send(JSON.stringify({
+						"type" : "typing",
+						"senderId" : Number(selfId),   
+						"receiverId" : Number(targetId),
+						"message" : status               
+					}));
+				}
+			}
+		
+		
+			// 每隔 25 秒向後端發送一次輕量 ping 訊號，杜絕行動網路（進電梯、弱網）因休眠造成的假在線鎖死問題
+			function startHeartbeat() {
+				heartbeatInterval = setInterval(() => {
+					if (webSocket && webSocket.readyState === WebSocket.OPEN) {
+						webSocket.send(JSON.stringify({ 
+							"type": "ping", 
+							"senderId": Number(selfId), 
+							"receiverId": 0, 
+							"message": "" 
+						}));
+					}
+				}, 25000);
+			}
 			
-			// 3. 綁定 Enter 鍵直接發送
-		    const inputMessage = document.getElementById("message");
-		    if (inputMessage) {
-		        inputMessage.addEventListener("keydown", function(event) {
-		            if (event.key === "Enter") {
-		                if (event.isComposing || event.keyCode === 229) {
-		                    return;
-		                }
-		                event.preventDefault(); 
-		                sendMessage(); 
-		            }
-		        });
-		    }
-		});
+			
+			/**
+			 * 當 WebSocket 一連線成功，主動地毯式掃描左側所有好友超連結，
+			 * 並從本地 LocalStorage 快取硬碟中，將其他好友累積的未讀紅點數字一一還原在畫面上！
+			 */
+			 function loadContacts() {
+					fetch('/api/chat/contacts')
+						.then(res => res.json())
+						.then(contacts => {
+							contacts.forEach(c => {
+								// 1. 精準抓到對應這個好友的 <li> 盒子元素
+								const targetLiEl = document.querySelector(`.contact-list .contact-item[data-id="${String(c.userId).trim()}"]`);
+								if (!targetLiEl) return; 
+
+								// 2. 💡【新功能：在線燈號初始加載補盲】
+								// 雖然 HTML 預設是 offline 灰燈，但我們可以根據後端在線狀態（如果 API 有包含，或後面由 userStatus 事件接管）
+								// 這裡我們先確保 DOM 結構節點絕對暢通。
+								// 為了讓全頁重整一進來就看到綠燈，我們在下方步驟2提供一個完美的後端配合。
+								
+								// 3. 處理粉紅徽章元件
+								let badge = targetLiEl.querySelector('.sidebar-unread-badge');
+								if (!badge) {
+									badge = document.createElement('span');
+									badge.className = 'sidebar-unread-badge';
+									const link = targetLiEl.querySelector('.contact-link');
+									if (link) link.appendChild(badge);
+								}
+
+								// 4. 核心商邊判定
+								const isCurrentChatting = targetId && String(c.userId) === String(targetId);
+								const finalUnreadCount = isCurrentChatting ? 0 : Number(c.unreadCount);
+
+								// 5. 絕殺覆蓋強制隱藏/顯示
+								if (finalUnreadCount <= 0) {
+									if (badge) {
+										badge.innerText = ""; 
+										badge.style.setProperty('display', 'none', 'important'); 
+									}
+								} else {
+									if (badge) {
+										badge.innerText = finalUnreadCount;
+										badge.style.setProperty('display', 'inline-block', 'important'); 
+									}
+								}
+							});
+						})
+						.catch(err => console.error("加載未讀數與燈號失敗:", err));
+				}
+			
+			
+			/**
+			 * 當前點開視窗的人是自己(selfId)，要把對方(targetId)發過來的未讀訊息標記為已讀
+			 */
+			function sendReadReceipt() {
+				if (webSocket && webSocket.readyState === WebSocket.OPEN && targetId) {
+					webSocket.send(JSON.stringify({
+						"type" : "read", 
+						"senderId" : Number(selfId), 
+						"receiverId" : Number(targetId),   
+						"message" : "" 
+					}));
+				}
+			}
+			
+			document.getElementById("dynamicContactList").addEventListener("click", function(e) {
+				const item = e.target.closest(".contact-item");
+				if (!item) return; // 防呆
+
+				const friendId = parseInt(item.getAttribute("data-id"));
+				const friendName = item.getAttribute("data-name");
+
+				// 觸發純前端不閃爍換房開窗
+				openChatWindow(friendId, friendName);
+			});
+
+			/**
+			 * 2. 核心換房控制器：動態更換右側主聊天面板，網頁完全不刷新、不白屏、不閃爍！
+			 */
+			function openChatWindow(friendId, friendName) {
+				// 動態變更全域當前正在聊天的目標變數
+				targetId = Number(friendId);
+
+				// A. 動態變更右側頂部 UI 標題與解鎖狀態
+				if (chatHeaderTitle) chatHeaderTitle.textContent = "與 " + friendName + " 聊天中";
+				if (typingIndicator) typingIndicator.textContent = ""; 
+				if (inputMessage) inputMessage.disabled = false;
+				if (sendMessageBtn) sendMessageBtn.disabled = false;
+				
+				const systemStatus = document.querySelector(".system-status");
+				if (systemStatus) systemStatus.style.display = 'none';
+
+				// B. 動態翻轉左側聯絡人的「選中藍框」高亮外框
+				document.querySelectorAll(".contact-link").forEach(el => el.classList.remove("active-chat"));
+				const currentLi = document.querySelector(`.contact-item[data-id="${friendId}"]`);
+				if (currentLi) {
+					const link = currentLi.querySelector('.contact-link');
+					if (link) link.classList.add("active-chat");
+					
+					// 點開他的瞬間，立刻在畫面上將他的未讀粉紅徽章隱藏消滅
+					const badge = currentLi.querySelector('.sidebar-unread-badge');
+					if (badge) badge.style.setProperty('display', 'none', 'important');
+				}
+
+				// C. 本地硬碟 LocalStorage 計數同步歸零
+				localStorage.setItem(`chat_unread_${selfId}_to_${friendId}`, 0);
+
+				// D. 🚀【極速雙向握手】直接透過當前健康的 WebSocket 連線，向後端索取全新歷史紀錄！
+				if (webSocket && webSocket.readyState === WebSocket.OPEN) {
+					webSocket.send(JSON.stringify({
+						"type": "history", 
+						"senderId": Number(selfId), 
+						"receiverId": Number(targetId), 
+						"message": ""
+					}));
+				}
+			}
+		
 	</script>
 </body>
 </html>

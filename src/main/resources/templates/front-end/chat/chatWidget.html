@@ -71,19 +71,22 @@
 	 // ==========================================
     // 0. 全域變數定義
     // ==========================================
-    let webSocket = null;
-    const currentMemberId = /*[[${session.memberVO.memberId}]]*/ null;
-    
-    const urlTargetToId = /*[[${targetToId}]]*/ null; 
+	let widgetWebSocket = null;
+	const currentMemberId = /*[[${session.memberVO != null ? session.memberVO.memberId : null}]]*/ null;
+	let widgetTargetId = null; // 當前在懸浮窗正點開聊天的對方 ID
+	let widgetTargetName = '';
+
+	const urlTargetToId = /*[[${targetToId}]]*/ null; 
+	
+	let widgetTypingTimeout = null;    
+	let widgetHeartbeatInterval = null; 
     
     // ==========================================
     // 1. 頁面初始化與自動連線機制
     // ==========================================
-document.addEventListener("DOMContentLoaded", function() {
+	document.addEventListener("DOMContentLoaded", function() {
             if (currentMemberId) {
                 initWebSocket(); // 1. 啟動 WebSocket 連線
-                
-                // 2. 💡 核心修正：撈取聯絡人清單，並在撈取成功後檢查是否需要自動開啟私聊
                 loadChatContactsAndCheckAutoOpen(); 
             }
         });
@@ -103,260 +106,314 @@ document.addEventListener("DOMContentLoaded", function() {
     // ==========================================
     // 2. 外部觸發 API (例如：點擊別人個人檔案的「私聊按鈕」)
     // ==========================================
-        function openPrivateChat(receiverId, receiverName) {
-    const chatWin = document.getElementById('chatWindow');
-    const triggerBtn = document.getElementById('chatTriggerBtn');
-    const messagesBody = document.getElementById('chatMessagesBody');
-    const listContainer = document.getElementById('chatContactList');
+       function openPrivateChat(receiverId, receiverName) {
+		if (!currentMemberId) return;
+		
+		// 💡【第四步修正】開窗時，第一時間將當前正聊天的對象元數據鎖定在全域隔離變數中
+		widgetTargetId = Number(receiverId);
+		widgetTargetName = receiverName;
 
-    if (!chatWin) return;
+		const chatWin = document.getElementById('chatWindow');
+		const triggerBtn = document.getElementById('chatTriggerBtn');
+		const messagesBody = document.getElementById('chatMessagesBody');
+		const listContainer = document.getElementById('chatContactList');
 
-    chatWin.classList.remove('chat-hidden');
-    if (triggerBtn) {
-        triggerBtn.style.transform = 'scale(0)';
-        setTimeout(() => { triggerBtn.style.display = 'none'; }, 200);
-    }
+		if (!chatWin) return;
 
-    chatWin.dataset.receiverId = receiverId; 
-    document.getElementById('chatUsername').innerText = receiverName;
-    document.getElementById('chatAvatar').innerText = receiverName ? receiverName.charAt(0) : 'M';
+		// 展開主視窗並連動圓形 Scal 縮放動畫
+		chatWin.classList.remove('chat-hidden');
+		if (triggerBtn) {
+			triggerBtn.style.transform = 'scale(0)';
+			setTimeout(() => { triggerBtn.style.display = 'none'; }, 200);
+		}
 
-    let activeItem = document.getElementById(`contact-item-${receiverId}`);
-    
-    if (!activeItem && listContainer) {
-        if (listContainer.querySelector('.chat-system-msg')) {
-            listContainer.innerHTML = '';
-        }
+		// 同步 dataset 屬性供 sendMessage 讀取
+		chatWin.dataset.receiverId = receiverId; 
+		document.getElementById('chatUsername').innerText = receiverName;
+		document.getElementById('chatAvatar').innerText = receiverName ? receiverName.charAt(0).toUpperCase() : 'M';
 
-        const newFriendHtml = `
-            <div class="contact-item-row active" id="contact-item-${receiverId}">
-                <div class="contact-avatar-circle">${receiverName.charAt(0)}</div>
-                <div class="contact-text-meta">
-                    <div class="contact-name-row">
-                        <span class="c-name">${receiverName}</span>
-                        <span class="c-time">剛剛</span>
-                    </div>
-                    <div class="contact-msg-badge-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                        <span class="c-last-msg" style="flex: 1; text-align: left;">新對話...</span>
-                        <span class="c-unread-badge" style="display: none !important;">0</span>
-                    </div>
-                </div>
-            </div>
-        `;
-        listContainer.insertAdjacentHTML('afterbegin', newFriendHtml);
-        
-        activeItem = document.getElementById(`contact-item-${receiverId}`);
-        activeItem.onclick = function() { openPrivateChat(receiverId, receiverName); };
-    }
+		let activeItem = document.getElementById(`contact-item-${receiverId}`);
+		
+		// 💡 如果左側聯絡人名單中根本沒有這個人 (首次聊天)，現場動態回補置頂節點！
+		if (!activeItem && listContainer) {
+			if (listContainer.querySelector('.chat-system-msg')) {
+				listContainer.innerHTML = '';
+			}
 
-    document.querySelectorAll('.contact-item-row').forEach(el => el.classList.remove('active'));
-    if (activeItem) {
-        activeItem.classList.add('active');
-        
-        const pBadge = activeItem.querySelector('.c-unread-badge');
-        if (pBadge) {
-            pBadge.innerText = '0';          
-            pBadge.style.setProperty('display', 'none', 'important'); 
-        }
-    }
+			// 【修正對齊】補上符合您原本的高質感雙欄行內樣式，並綁定 data- 屬性作為即時雷達掛載點！
+			const newFriendHtml = `
+				<div class="widget-contact-item active-widget-chat" id="contact-item-${receiverId}" data-partner-id="${receiverId}" data-partner-name="${receiverName}" style="padding: 10px; border-bottom: 1px solid #f0f0f0; cursor: pointer; font-size: 12px;">
+					<div class="widget-contact-box" style="display: flex; align-items: center; position: relative; gap: 8px; width: 100%;">
+						<span class="widget-dot offline" id="widget-dot-${receiverId}" style="width: 8px; height: 8px; border-radius: 50%; background-color: #bfbfbf; display: inline-block; flex-shrink: 0;"></span>
+						<div class="widget-contact-info" style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+							<div class="widget-name-time" style="display: flex; justify-content: space-between; align-items: center;">
+								<span class="widget-name" style="font-weight: 800; color: var(--color-ink); font-size: 13px;">${receiverName}</span>
+								<span class="widget-time" style="font-size: 10px; color: var(--color-ink-soft); font-weight: 800;">剛剛</span>
+							</div>
+							<span class="widget-last-msg" style="font-size: 11px; color: var(--color-ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; margin-top: 2px;">新對話...</span>
+						</div>
+						<span class="widget-unread-badge" style="display: none !important; background-color: var(--color-pink); color: var(--color-surface); border-radius: var(--radius-full); padding: 2px 6px; font-size: 10px; font-weight: 800; line-height: 1.3; box-shadow: var(--shadow-sm); border: 1px solid #FFA2B0; flex-shrink: 0;">0</span>
+					</div>
+				</div>
+			`;
+			listContainer.insertAdjacentHTML('afterbegin', newFriendHtml);
+			activeItem = document.getElementById(`contact-item-${receiverId}`);
+		}
 
-    initWebSocket();
+		// 刷新左側所有聯絡人的高亮藍框效果
+		document.querySelectorAll('.widget-contact-item').forEach(el => el.classList.remove('active-widget-chat'));
+		if (activeItem) {
+			activeItem.classList.add('active-widget-chat');
+			
+			// 打開他的對話框，現場消滅並隱藏他的未讀數小紅點
+			const pBadge = activeItem.querySelector('.widget-unread-badge');
+			if (pBadge) {
+				pBadge.innerText = '0';          
+				pBadge.style.setProperty('display', 'none', 'important'); 
+			}
+		}
 
-    messagesBody.innerHTML = `<div class="chat-system-msg">正在同步歷史訊息...</div>`;
+		// 💡【核心安全修正】移除原先盲目重連導致連線卡死、訊息出不來的 initWebSocket() 呼叫
+		// 改為只在 Socket 意外壞掉時才進行安全補盲，保持當前唯一的 WebSocket 連線！
+		if (!widgetWebSocket || widgetWebSocket.readyState !== WebSocket.OPEN) {
+			initWebSocket();
+		}
 
-    waitForConnection(() => {
-        const historyPayload = {
-            type: "history",
-            senderId: Number(currentMemberId),
-            receiverId: Number(receiverId),
-            message: "",
-            msgRead: 0
-        };
-        webSocket.send(JSON.stringify(historyPayload));
-        
-        // 💡 企業級優化：只要打開對話框，無條件對該 receiverId 觸發已讀通知，確保 DB 狀態同步
-        sendReadNotification(receiverId);
-    });
-}
+		if (messagesBody) messagesBody.innerHTML = `<div class="chat-system-msg">正在同步歷史訊息...</div>`;
+
+		// 透過等待連線過濾器，安全向後端索取這兩人的全新歷史紀錄
+		waitForConnection(() => {
+			widgetWebSocket.send(JSON.stringify({
+				type: "history",
+				senderId: Number(currentMemberId),
+				receiverId: Number(receiverId),
+				message: ""
+			}));
+			
+			// 💡 打開方對話框的瞬間，立刻向後端發送一筆「已讀訊號」，消滅資料庫裡的未讀狀態
+			sendWidgetReadReceipt();
+		});
+	}
 
     
      // ==========================================
      // 3. WebSocket 初始化與核心訊息分流
      // ==========================================
      function initWebSocket() {
-         if (!currentMemberId) return;
-         if (webSocket !== null && webSocket.readyState === WebSocket.OPEN) return;
-         
-         const wsUrl = `ws://${window.location.host}/FriendWS/${currentMemberId}`;
-         webSocket = new WebSocket(wsUrl);
+		if (!currentMemberId) return;
+		if (widgetWebSocket !== null && widgetWebSocket.readyState === WebSocket.OPEN) return;
+		
+		const wsUrl = `ws://${window.location.host}/FriendWS/${currentMemberId}`;
+		widgetWebSocket = new WebSocket(wsUrl);
 
-         webSocket.onmessage = function(event) {
-             const msgData = JSON.parse(event.data);
-             const chatWin = document.getElementById('chatWindow');
-             const messagesBody = document.getElementById('chatMessagesBody');
-             
-             // 💡 修正：如果 dataset 裡不存在或為空，就老老實實拿到 null，防止比對出錯
-             const activeReceiverId = (chatWin && chatWin.dataset.receiverId) ? chatWin.dataset.receiverId : null;
+		widgetWebSocket.onopen = function() {
+			console.log("🚀 全站懸浮窗即時通訊安全連線建立成功！");
+			startWidgetHeartbeat(); // 啟動全站 25 秒心跳防線，防止假上線
+		};
 
-             // ----------------------------------------------------
-             // 🅰️ 情況 A：載入歷史紀錄 (type = "history")
-             // ----------------------------------------------------
-             if (msgData.type === "history") {
-            	if (messagesBody) messagesBody.innerHTML = ''; 
-                
-                // 💡 完美對接後端：優先讀取後端重構後扁平化的 historyList 欄位
-                let historyList = msgData.historyList;
-                
-                // 防呆：如果未來後端某些特殊場景仍放 message 欄位，才進行相容解析
-                if (!historyList && msgData.message) {
-                    historyList = (typeof msgData.message === 'string') ? JSON.parse(msgData.message) : msgData.message;
-                }
-            
-	            if (historyList && historyList.length > 0) {
-	            	historyList.forEach(msgObj => {
-	            	    const isObject = typeof msgObj === 'object';
-	            	    const finalMsg = isObject ? msgObj : JSON.parse(msgObj);
-	            	    const direction = (Number(finalMsg.senderId) === Number(currentMemberId)) ? 'outgoing' : 'incoming';
-	            	    
-	            	    appendMessage(finalMsg.message, direction, finalMsg.msgRead, finalMsg.lastTime);
-	            	});
-        	    } else {
-            	    // 只有在「全新朋友、完全沒聊過天」時，才顯示歡迎詞
-                    if (messagesBody) messagesBody.innerHTML = `<div class="chat-system-msg">暫無歷史訊息，開始聊聊吧！</div>`;
-           	    }
-            
-            	scrollToBottom(); 
-            	return; 
-        	}
+		widgetWebSocket.onmessage = function(event) {
+			const msgData = JSON.parse(event.data);
+			const chatWin = document.getElementById('chatWindow');
+			const messagesBody = document.getElementById('chatMessagesBody');
+			const activeReceiverId = (chatWin && chatWin.dataset.receiverId) ? Number(chatWin.dataset.receiverId) : null;
 
-             // ----------------------------------------------------
-             // 🅱️ 情況 B：收到即時新訊息 (type = "chat")
-             // ----------------------------------------------------
-             if (msgData.type === "chat") {
-                 const listContainer = document.getElementById('chatContactList'); 
-                 
-                 const isChatOpen = chatWin && !chatWin.classList.contains('chat-hidden');
-                 const isMyOwnMessage = Number(msgData.senderId) === Number(currentMemberId);
-                 const isFromCurrentPartner = activeReceiverId && String(msgData.senderId) === String(activeReceiverId);
-                 
-                 // 決定要移動與更新哪一個聯絡人的節點
-                 const targetIdForMove = isMyOwnMessage ? msgData.receiverId : msgData.senderId;
-                 const targetRow = document.getElementById(`contact-item-${targetIdForMove}`);
-                 
-                 // 1. 動態更新左側清單欄位與順序
-                 if (targetRow) {
-                     // A. 更新左側最新一則訊息字樣
-                     const lastMsgEl = targetRow.querySelector('.c-last-msg');
-                     if (lastMsgEl) {
-                         lastMsgEl.innerText = msgData.message.length > 10 ? msgData.message.substring(0, 10) + "..." : msgData.message;
-                     }
-                     
-                     // B. 即時更新左側顯示時間 
-                     const now = new Date();
-                     const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-                     const timeEl = targetRow.querySelector('.c-time');
-                     if (timeEl) timeEl.innerText = timeStr;
-                     
-                     if (listContainer && listContainer.firstChild !== targetRow) {
-                         listContainer.insertBefore(targetRow, listContainer.firstChild);
-                     }
-                 } else {
-                     loadChatContactsAndCheckAutoOpen(); 
-                     if (isChatOpen && isFromCurrentPartner) {
-                         appendMessage(msgData.message, 'incoming', 0);
-                         sendReadNotification(activeReceiverId);
-                     }
-                     return; 
-                 }
+			// ----------------------------------------------------
+			// 🅰️ 情況 A：載入歷史紀錄 (type = "history")
+			// ----------------------------------------------------
+			if (msgData.type === "history") {
+				if (messagesBody) messagesBody.innerHTML = ''; 
+				let historyList = msgData.historyList;
+				
+				if (historyList && historyList.length > 0) {
+					historyList.forEach(msgObj => {
+						const finalMsg = (typeof msgObj === 'object') ? msgObj : JSON.parse(msgObj);
+						const direction = (Number(finalMsg.senderId) === Number(currentMemberId)) ? 'outgoing' : 'incoming';
+						appendMessage(finalMsg.message, direction, finalMsg.msgRead);
+					});
+				} else {
+					if (messagesBody) messagesBody.innerHTML = `<div class="chat-system-msg">暫無歷史訊息，開始聊聊吧！</div>`;
+				}
+				
+				sendWidgetReadReceipt(); // 歷史載入完畢，安全回發已讀
+				scrollToBottom(); 
+				updateGlobalUnreadBadge(); // 動態更新右下角大按鈕數字
+				return; 
+			}
 
-                 if (isChatOpen && isFromCurrentPartner) {
-                     appendMessage(msgData.message, 'incoming', 0);
-                     sendReadNotification(activeReceiverId);
-                     
-                     const badgeEl = targetRow.querySelector('.c-unread-badge');
-                     if (badgeEl) {
-                         badgeEl.innerText = '0';
-                         badgeEl.style.setProperty('display', 'none', 'important');
-                     }
-                 } else if (isMyOwnMessage) {
-                     appendMessage(msgData.message, 'outgoing', 0);
-                 } else {
-                     const badgeEl = targetRow.querySelector('.c-unread-badge');
-                     if (badgeEl) {
-                         let currentUnread = parseInt(badgeEl.innerText) || 0;
-                         currentUnread++; // 數字累加 1
-                         
-                         badgeEl.innerText = currentUnread; 
-                         badgeEl.style.setProperty('display', 'flex', 'important'); // 強制點亮小紅點
-                     }
-                     
-                     const globalBadge = document.getElementById('chatUnreadBadge');
-                     if (globalBadge) {
-                         let currentGlobalCount = parseInt(globalBadge.innerText) || 0;
-                         currentGlobalCount++;
-                         updateGlobalUnreadBadge();
-                     }
-                 }
-                 return;
-             }
+			// ----------------------------------------------------
+			// 🅱️ 情況 B：收到即時新訊息 (type = "chat")
+			// ----------------------------------------------------
+			if (msgData.type === "chat") {
+				const listContainer = document.getElementById('chatContactList'); 
+				const isChatOpen = chatWin && !chatWin.classList.contains('chat-hidden');
+				
+				const isMyOwnMessage = Number(msgData.senderId) === Number(currentMemberId);
+				const isFromCurrentPartner = activeReceiverId && Number(msgData.senderId) === Number(activeReceiverId);
+				
+				const targetIdForMove = isMyOwnMessage ? msgData.receiverId : msgData.senderId;
+				const targetRow = document.getElementById(`contact-item-${targetIdForMove}`);
+				
+				// 1. 即時刷新左側懸浮名單摘要與順序置頂
+				if (targetRow) {
+					const lastMsgEl = targetRow.querySelector('.c-last-msg');
+					if (lastMsgEl) {
+						lastMsgEl.innerText = msgData.message.length > 10 ? msgData.message.substring(0, 10) + "..." : msgData.message;
+					}
+					const timeEl = targetRow.querySelector('.c-time');
+					if (timeEl) timeEl.innerText = getCurrentTime();
+					
+					if (listContainer && listContainer.firstChild !== targetRow) {
+						listContainer.insertBefore(targetRow, listContainer.firstChild);
+					}
+				} else {
+					// 首次互動的新朋友，主動 Fetch 洗滌名單
+					loadChatContactsAndCheckAutoOpen();
+				}
 
-             // ----------------------------------------------------
-             // 🅲 情況 C：對方已讀了我的訊息 (type = "read")
-             // ----------------------------------------------------
-             if (msgData.type === "read") {
-                 if (activeReceiverId && String(msgData.senderId) === String(activeReceiverId)) {
-                     document.querySelectorAll('.msg-status-meta.status-unread').forEach(el => {
-                         el.classList.remove('status-unread');
-                         el.classList.add('status-read');
-                         el.innerText = '已讀'; 
-                     });
-                 }
-             }
-         };
-     } 
+				// 2. 🚀【核心修正】使用嚴密且具排他性的 if-else 邏輯鏈，澈底杜絕自己發的字跳到左邊的 Bug！
+				if (isMyOwnMessage) {
+					// 情況 1：只要這則私訊是我自己發送的，一律在畫面上渲染為右側黃色 outgoing 氣泡！
+					appendMessage(msgData.message, 'outgoing', 0);
+				} else if (isChatOpen && isFromCurrentPartner) {
+					// 情況 2：如果是對方發的，且我「此時正開著跟他對話的懸浮窗」，渲染為左側白底 incoming，並秒送已讀回條！
+					appendMessage(msgData.message, 'incoming', 1); // 正看著算已讀
+					sendWidgetReadReceipt(); 
+					
+					if (targetRow) {
+						const badgeEl = targetRow.querySelector('.c-unread-badge');
+						if (badgeEl) badgeEl.style.setProperty('display', 'none', 'important');
+					}
+				} else {
+					// 情況 3：如果是對方發的，但我此時「在背景/看著別人」，左側名單小紅點主動數字累加 +1！
+					if (targetRow) {
+						const badgeEl = targetRow.querySelector('.c-unread-badge');
+						if (badgeEl) {
+							let currentUnread = parseInt(badgeEl.innerText) || 0;
+							currentUnread++;
+							badgeEl.innerText = currentUnread;
+							badgeEl.style.setProperty('display', 'inline-block', 'important'); // 點亮紅點
+						}
+					}
+				}
+				
+				// 3. 【異步排隊】讓 Fetch 延遲 150 毫秒跟後端 Java 進行最終未讀總數清洗
+				setTimeout(() => { loadWidgetContacts(); }, 150);
+				return;
+			}
+
+			// ----------------------------------------------------
+			// 🅲 【核心修正】情況 C：對方已讀了我的訊息 (type = "read")
+			// ----------------------------------------------------
+			if (msgData.type === "read") {
+				// 完美對接重構後後端高階變數 readByUserId
+				const readerId = msgData.readByUserId; 
+				if (activeReceiverId && Number(readerId) === Number(activeReceiverId)) {
+					// 抓取懸浮窗專屬的 .widget-unread-marker 字樣進行集體翻轉！
+					document.querySelectorAll('.widget-unread-marker').forEach(el => {
+						el.textContent = '已讀';
+						el.style.color = 'lightgray';
+						el.classList.remove('widget-unread-marker');
+					});
+				}
+				return;
+			}
+
+			// ----------------------------------------------------
+			// 🅳 情況 D：對方正在輸入中提示轉發
+			// ----------------------------------------------------
+			if (msgData.type === "typing") {
+				if (activeReceiverId && Number(msgData.senderId) === Number(activeReceiverId)) {
+					const indicator = document.getElementById("chatUsername");
+					const originName = chatWin.getAttribute("data-partner-name") || "好友";
+					indicator.innerHTML = (msgData.status === "1") ? `${originName} <span style="font-size:0.8em; color:#aaa; font-style:italic;">(輸入中...)</span>` : originName;
+				}
+				return;
+			}
+
+			// ----------------------------------------------------
+			// 🅴 情況 E：接收全站系統級好友突發「上下線燈號廣播」
+			// ----------------------------------------------------
+			if (msgData.type === "userStatus") {
+				const dot = document.getElementById(`widget-dot-${msgData.userId}`);
+				if (dot) dot.className = (msgData.status === "online") ? "widget-dot online" : "widget-dot offline";
+				return;
+			}
+
+			// ----------------------------------------------------
+			// 🅵 情況 F：一進入網頁連線成功，接收後端逆向回發的全體在線名單，一口氣集體點亮綠燈！
+			// ----------------------------------------------------
+			if (msgData.type === "initOnlineList") {
+				const onlineIds = msgData.onlineUserIds;
+				if (onlineIds && onlineIds.length > 0) {
+					onlineIds.forEach(onlineId => {
+						const dot = document.getElementById(`widget-dot-${onlineId}`);
+						if (dot) dot.className = "widget-dot online"; // 秒點亮首頁在線綠燈！
+					});
+				}
+				return;
+			}
+		};
+
+		widgetWebSocket.onclose = function() {
+			console.log("全站懸浮聊天室連線關閉");
+			clearInterval(widgetHeartbeatInterval);
+		};
+	}
 
 
     // ==========================================
     // 4. 視窗控制開關
     // ==========================================
 function toggleChatWindow() {
-    const chatWin = document.getElementById('chatWindow');
-    const triggerBtn = document.getElementById('chatTriggerBtn');
-    const messagesBody = document.getElementById('chatMessagesBody');
+		const chatWin = document.getElementById('chatWindow');
+		const triggerBtn = document.getElementById('chatTriggerBtn');
+		const messagesBody = document.getElementById('chatMessagesBody');
 
-    if (!chatWin || !triggerBtn) return;
+		if (!chatWin || !triggerBtn) return;
 
-    const isClosing = chatWin.classList.toggle('chat-hidden');
+		const isClosing = chatWin.classList.toggle('chat-hidden');
 
-    if (!isClosing) {
-        triggerBtn.style.transform = 'scale(0)'; 
-        setTimeout(() => { triggerBtn.style.display = 'none'; }, 200);
-        
-        updateGlobalUnreadBadge(); 
-        
-        chatWin.dataset.receiverId = ""; 
-        
-        const usernameEl = document.getElementById('chatUsername');
-        const avatarEl = document.getElementById('chatAvatar');
-        
-        if (usernameEl) usernameEl.innerText = "請選擇聯絡人"; 
-        if (avatarEl) avatarEl.innerText = "M"; 
-        
-        document.querySelectorAll('.contact-item-row').forEach(el => el.classList.remove('active'));
-        
-        if (messagesBody) {
-            messagesBody.innerHTML = `<div class="chat-system-msg">歡迎來到線上即時會員聊天室！請選擇聯絡人開始對話。</div>`;
-        }
-
-        loadChatContactsAndCheckAutoOpen(); 
-        initWebSocket();
-    } else {
-        triggerBtn.style.display = 'flex';
-        setTimeout(() => { triggerBtn.style.transform = 'scale(1)'; }, 50);
-        
-        updateGlobalUnreadBadge();
-    }
-}
+		if (!isClosing) {
+			// 💡【展開聊天視窗】優化您的圓形 Scal 縮放收合動畫
+			triggerBtn.style.transform = 'scale(0)'; 
+			setTimeout(() => { triggerBtn.style.display = 'none'; }, 200);
+			
+			// 展開時刷新一遍資料庫名單與最新未讀數
+			loadWidgetContacts(); 
+			
+			// 💡【體驗升級】如果原本就已經有指定對話對象(dataset.receiverId)，點開時直接保留畫面，不再強行重置回歡迎頁！
+			if (!chatWin.dataset.receiverId || chatWin.dataset.receiverId === "") {
+				chatWin.dataset.receiverId = ""; 
+				if (document.getElementById('chatUsername')) document.getElementById('chatUsername').innerText = "請選擇聯絡人"; 
+				if (document.getElementById('chatAvatar')) document.getElementById('chatAvatar').innerText = "M"; 
+				document.querySelectorAll('.widget-contact-item').forEach(el => el.classList.remove('active-widget-chat'));
+				if (messagesBody) {
+					messagesBody.innerHTML = `<div class="chat-system-msg">歡迎來到線上即時會員聊天室！請選擇聯絡人開始對話。</div>`;
+				}
+			} else {
+				// 如果原本就有對象，點開的瞬間立刻向後端補發一筆已讀通知，確保 MySQL 狀態秒同步
+				sendWidgetReadReceipt();
+			}
+			
+			// 安全補防：如果 Socket 因逛網頁換頁意外斷開，才進行重連，平時絕不重複 new 連線
+			if (!widgetWebSocket || widgetWebSocket.readyState !== WebSocket.OPEN) {
+				initWebSocket();
+			}
+		} else {
+			// 💡【收合聊天視窗】還原圓形大圈圈按鈕的彈出動畫
+			triggerBtn.style.display = 'flex';
+			setTimeout(() => { triggerBtn.style.transform = 'scale(1)'; }, 50);
+			
+			// 縮小視窗的當下，立刻發起 Fetch 去問 MySQL 資料庫，重新加總精準的「全站總未讀數」點亮大圈圈
+			fetch('/api/chat/contacts')
+				.then(res => res.json())
+				.then(contacts => {
+					let totalSum = 0;
+					contacts.forEach(c => { totalSum += Number(c.unreadCount || 0); });
+					updateGlobalUnreadBadge(totalSum);
+				});
+		}
+	}
 
 
 
@@ -366,89 +423,71 @@ function toggleChatWindow() {
 //5. 非同步撈取歷史聯絡人名單 (強效點亮小紅點版)
 //==========================================
 function loadChatContactsAndCheckAutoOpen() {
-const listContainer = document.getElementById('chatContactList');
-if (!listContainer) return;
+		loadWidgetContacts(); 
+	}
 
-const chatWin = document.getElementById('chatWindow');
-const activeReceiverId = chatWin ? chatWin.dataset.receiverId : null;
-const activeUsername = document.getElementById('chatUsername') ? document.getElementById('chatUsername').innerText : '';
+function loadWidgetContacts() {
+	fetch('/api/chat/contacts')
+		.then(res => {
+			if (!res.ok) throw new Error("資料庫名單撈取失敗");
+			return res.json();
+		})
+		.then(contacts => {
+			const listContainer = document.getElementById("chatContactList");
+			if (!listContainer) return;
+			listContainer.innerHTML = ''; // 清空舊名單
+			
+			let totalAllUnread = 0; // 全站總未讀加總器
+			
+			contacts.forEach(c => {
+				// 1. 核心商務判定：如果是當前正點開窗聊天的對方，未讀數在前端強制洗為 0，其他人讀資料庫
+				const isCurrentChatting = widgetTargetId && String(c.userId) === String(widgetTargetId);
+				
+				// 💡【核心防線】全函式唯一事實來源變數：actualUnread
+				const actualUnread = isCurrentChatting ? 0 : Number(c.unreadCount || 0);
+				totalAllUnread += actualUnread;
 
-fetch('/api/chat/contacts')
-   .then(response => {
-       if (!response.ok) throw new Error("名單撈取失敗");
-       return response.json();
-   })
-   .then(contacts => {
-       listContainer.innerHTML = ''; 
+				const activeClass = (c.userId === widgetTargetId) ? "widget-contact-item active-widget-chat" : "widget-contact-item";
+				// 💡 樣式狀態同步對齊 actualUnread
+				const badgeStyle = (actualUnread > 0) ? "display: inline-block !important;" : "display: none !important;";
+				
+				const itemDiv = document.createElement("div");
+				itemDiv.className = activeClass;
+				itemDiv.id = `contact-item-${c.userId}`; 
+				itemDiv.setAttribute("data-id", c.userId);
+				itemDiv.setAttribute("data-partner-id", c.userId);
+				itemDiv.setAttribute("data-partner-name", c.username);
+				itemDiv.onclick = function() { openPrivateChat(c.userId, c.username); };
+				
+				// 💡【地毯式對齊】確保 innerHTML 內部所有的變數呼叫通通都叫 actualUnread！
+				itemDiv.innerHTML = `
+						<div class="widget-contact-box" style="display: flex; align-items: center; position: relative; gap: 8px; width: 100%;">
+							
+							<!-- 左邊：內縮的高質感小指示燈 -->
+							<span class="widget-dot offline" id="widget-dot-${c.userId}" style="width: 8px; height: 8px; border-radius: 50%; background-color: #bfbfbf; display: inline-block; flex-shrink: 0; margin-left: 6px; margin-right: 4px;"></span>
+							
+							<div class="widget-contact-info" style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+								<div class="widget-name-time" style="display: flex; justify-content: space-between; align-items: center;">
+									<span class="widget-name" style="font-weight: 800; color: var(--color-ink); font-size: 13px;">${c.username}</span>
+									
+									<!-- 💡【時間貼邊終極修正】在 style 裡面，單獨加上 margin-right: 6px; ！ -->
+									<!-- 這樣做可以讓最新時間（如 21:14）主動往左內縮 6 像素，與最右側外框保持舒服的對齊距離，不再死死黏在邊緣！ -->
+									<span class="widget-time" style="font-size: 10px; color: var(--color-ink-soft); font-weight: 800; margin-right: 6px;">${c.lastTime || ''}</span>
+								</div>
+								<span class="widget-last-msg" style="font-size: 11px; color: var(--color-ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; margin-top: 2px;">${c.lastMsg || '暫無訊息'}</span>
+							</div>
+							
+							<!-- 未讀小徽章 -->
+							<span class="widget-unread-badge c-unread-badge" style="${badgeStyle} background-color: var(--color-pink); color: var(--color-surface); border-radius: var(--radius-full); padding: 2px 6px; font-size: 10px; font-weight: 800; line-height: 1.3; box-shadow: var(--shadow-sm); border: 1px solid #FFA2B0; flex-shrink: 0; margin-right: 6px;">${actualUnread}</span>
+						</div>
+					`;
+				listContainer.appendChild(itemDiv);
+			});
 
-       let hasCurrentActiveInList = false;
-       let totalGlobalUnread = 0; 
-
-       if (contacts && contacts.length > 0) {
-           contacts.forEach(c => {
-               if (activeReceiverId && String(c.userId) === String(activeReceiverId)) {
-                   hasCurrentActiveInList = true;
-               }
-
-               const isCurrentPartner = activeReceiverId && (String(activeReceiverId) === String(c.userId));
-               
-               const actualUnread = isCurrentPartner ? 0 : Number(c.unreadCount || 0);
-               totalGlobalUnread += actualUnread;
-
-               const row = document.createElement('div');
-               row.className = `contact-item-row ${isCurrentPartner ? 'active' : ''}`;
-               row.id = `contact-item-${c.userId}`;
-               row.onclick = function() { openPrivateChat(c.userId, c.username); };
-
-               const badgeStyle = (actualUnread > 0) ? 'display: flex !important;' : 'display: none !important;';
-
-               row.innerHTML = `
-                   <div class="contact-avatar-circle">${c.username.charAt(0)}</div>
-                   <div class="contact-text-meta">
-                       <div class="contact-name-row">
-                           <span class="c-name">${c.username}</span>
-                           <span class="c-time">${c.lastTime || ''}</span>
-                       </div>
-                       <div class="contact-msg-badge-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                           <span class="c-last-msg" style="flex: 1; text-align: left;">${c.lastMsg || ''}</span>
-                           <span class="c-unread-badge" style="${badgeStyle}">${actualUnread}</span>
-                       </div>
-                   </div>
-               `;
-               listContainer.appendChild(row);
-           });
-       }
-
-       updateGlobalUnreadBadge(totalGlobalUnread);
-
-       if (activeReceiverId && activeReceiverId !== "" && !hasCurrentActiveInList && activeUsername && activeUsername !== "請選擇聯絡人") {
-           const row = document.createElement('div');
-           row.className = 'contact-item-row active';
-           row.id = `contact-item-${activeReceiverId}`;
-           row.onclick = function() { openPrivateChat(activeReceiverId, activeUsername); };
-           row.innerHTML = `
-               <div class="contact-avatar-circle">${activeUsername.charAt(0)}</div>
-               <div class="contact-text-meta">
-                   <div class="contact-name-row">
-                       <span class="c-name">${activeUsername}</span>
-                       <span class="c-time">剛剛</span>
-                   </div>
-                   <div class="contact-msg-badge-row" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                       <span class="c-last-msg" style="flex: 1; text-align: left;">新對話...</span>
-                       <span class="c-unread-badge" style="display: none !important;">0</span>
-                   </div>
-               </div>
-           `;
-           listContainer.insertBefore(row, listContainer.firstChild);
-       }
-
-       if (listContainer.children.length === 0) {
-           listContainer.innerHTML = '<div class="chat-system-msg" style="padding: 20px;">尚無聊天紀錄</div>';
-       }
-   })
-   .catch(err => {
-       console.error("[Chat] 前端載入名單崩潰:", err);
-   });
+			// 更新大圈圈藍色按鈕的總計數紅點
+			updateGlobalUnreadBadge(totalAllUnread); 
+		})
+		.catch(err => console.error("[Chat Widget API] 前端載入名單崩潰:", err));
 }
 
 
@@ -462,72 +501,67 @@ fetch('/api/chat/contacts')
 // ==========================================
 
 function sendChatMessage() {
-	 const input = document.getElementById('chatInputField');
-     if (!input) return;
-     const content = input.value.trim();
-     const receiverId = document.getElementById('chatWindow').dataset.receiverId;
-     const listContainer = document.getElementById('chatContactList'); // 💡 獲取左側名單容器
-     
-     if (!content || !receiverId) return;
-     
-     if (webSocket && webSocket.readyState === WebSocket.OPEN) {
-         const payload = {
-             type: "chat",
-             senderId: Number(currentMemberId),
-             receiverId: Number(receiverId),
-             message: content, 
-             msgRead: 0        
-         };
-         webSocket.send(JSON.stringify(payload));
-         
-         const partnerRow = document.getElementById(`contact-item-${receiverId}`);
-         if (partnerRow) {
-             const lastMsgEl = partnerRow.querySelector('.c-last-msg');
-             if (lastMsgEl) {
-                 lastMsgEl.innerText = content.length > 10 ? content.substring(0, 10) + "..." : content;
-             }
-             
-             const timeEl = partnerRow.querySelector('.c-time');
-             if (timeEl) {
-                 const now = new Date();
-                 timeEl.innerText = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-             }
-             
-             if (listContainer && listContainer.firstChild !== partnerRow) {
-                 listContainer.insertBefore(partnerRow, listContainer.firstChild);
-             }
-         }
-     }
-     input.value = ''; 
- }
+		const input = document.getElementById('chatInputField');
+		if (!input) return;
+		const content = input.value.trim();
+		// 💡【修正】發送目標全面綁定我們第四關開窗記錄的全域隔離變數 widgetTargetId
+		const receiverId = widgetTargetId; 
+		const listContainer = document.getElementById('chatContactList'); 
+		
+		if (!content || !receiverId) return;
+		
+		// 💡【修正】全面換成頂部重構優化後的 widgetWebSocket 隔離變數，防範全域污染
+		if (widgetWebSocket && widgetWebSocket.readyState === WebSocket.OPEN) {
+			const payload = {
+				type: "chat",
+				senderId: Number(currentMemberId),
+				receiverId: Number(receiverId),
+				message: content, 
+				msgRead: 0        
+			};
+			widgetWebSocket.send(JSON.stringify(payload));
+			
+			// 發送成功後，前端主動更新左欄最新對話摘要與時間
+			const partnerRow = document.getElementById(`contact-item-${receiverId}`);
+			if (partnerRow) {
+				const lastMsgEl = partnerRow.querySelector('.widget-last-msg');
+				if (lastMsgEl) {
+					lastMsgEl.innerText = content.length > 10 ? content.substring(0, 10) + "..." : content;
+				}
+				
+				const timeEl = partnerRow.querySelector('.widget-time');
+				if (timeEl) timeEl.innerText = getCurrentTime();
+				
+				if (listContainer && listContainer.firstChild !== partnerRow) {
+					listContainer.insertBefore(partnerRow, listContainer.firstChild);
+				}
+			}
+		}
+		input.value = ''; 
+		input.focus();
+	}
     
     
 //發送已讀回條給後端
-function sendReadNotification(partnerId) {
-    if (!partnerId || String(partnerId).trim() === "" || !webSocket || webSocket.readyState !== WebSocket.OPEN) return;
-    
-    const readPayload = {
-        type: "read",
-        senderId: Number(currentMemberId),  
-        receiverId: Number(partnerId)       
-    };
-    webSocket.send(JSON.stringify(readPayload));
-}
+function sendWidgetReadReceipt() {
+		if (widgetWebSocket && widgetWebSocket.readyState === WebSocket.OPEN && widgetTargetId) {
+			widgetWebSocket.send(JSON.stringify({
+				type: "read",
+				senderId: Number(currentMemberId),  
+				receiverId: Number(widgetTargetId)       
+			}));
+		}
+	}
 
      
-function waitForConnection(callback, attempts = 0) {
-    if (attempts > 30) {
-        console.warn("[Chat WS Warning] 連線逾時，無法發送請求。");
-        return;
-    }
-
-    if (webSocket && webSocket.readyState === WebSocket.OPEN) {
-        callback();
-    } else {
-        setTimeout(() => { 
-            waitForConnection(callback, attempts + 1); 
-        }, 100);
-    }
+function waitForConnection(callback, interval = 100) {
+	if (widgetWebSocket && widgetWebSocket.readyState === WebSocket.OPEN) {
+		callback();
+	} else {
+		setTimeout(() => { 
+			waitForConnection(callback, interval); 
+		}, interval);
+	}
 }
 
 
@@ -536,80 +570,71 @@ function waitForConnection(callback, attempts = 0) {
 // 7. 💡 修正與安全防禦優化後的畫面渲染組件
 // ==========================================
    function appendMessage(text, direction, msgRead, timeStr) {
-       const container = document.getElementById('chatMessagesBody');
-       if (!container) return;
+		const container = document.getElementById('chatMessagesBody');
+		if (!container) return;
 
-       const row = document.createElement('div');
-       
-       if (!timeStr) {
-           const now = new Date();
-           timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
-       }
+		const row = document.createElement('div');
+		
+		// 如果沒有傳入時間，前端主動現場撈取最新的 分:秒
+		if (!timeStr) {
+			timeStr = getCurrentTime();
+		}
 
-       let readStatusHtml = '';
-       if (direction === 'outgoing') {
-           if (Number(msgRead) === 1) {
-               readStatusHtml = `<span class="msg-status-meta status-read">已讀</span>`;
-           } else {
-               readStatusHtml = `<span class="msg-status-meta status-unread">未讀</span>`;
-           }
-       }
+		const safeText = escapeHtml(text); // 安全過濾 XSS 惡意腳本
 
-       const safeText = escapeHtml(text);
+		if (direction === 'outgoing') {
+			row.className = 'msg-row msg-outgoing';
+			// 💡【核心修正】將原創的類別名稱完美替換為 widget-unread-marker 與 onmessage 已讀分流死死互鎖！
+			const statusText = (Number(msgRead) === 1) ? '已讀' : '未讀';
+			const statusColor = (Number(msgRead) === 1) ? 'lightgray' : 'var(--color-ink-soft)';
+			const markerClass = (Number(msgRead) === 1) ? '' : 'class="widget-unread-marker"';
 
-       if (direction === 'outgoing') {
-           row.className = 'msg-row msg-outgoing';
-           row.style.cssText = "display: flex !important; width: fit-content !important; margin-left: auto !important; margin-right: 0 !important; align-items: flex-end !important; margin-bottom: 12px; gap: 4px;";
-           
-           row.innerHTML = `
-               <div class="msg-meta-box">
-                   <span class="msg-status-meta msg-time-text">${timeStr}</span>
-                   ${readStatusHtml}
-               </div>
-               <div class="msg-bubble">${safeText}</div>
-           `;
-       } else {
-           row.className = 'msg-row msg-incoming';
-           row.style.cssText = "display: flex !important; width: fit-content !important; margin-right: auto !important; margin-left: 0 !important; align-items: flex-end !important; margin-bottom: 12px; gap: 4px;";
-           
-           row.innerHTML = `
-               <div class="msg-bubble">${safeText}</div>
-               <div class="msg-meta-box">
-                   <span class="msg-status-meta msg-time-text">${timeStr}</span>
-                   ${readStatusHtml}
-               </div>
-           `;
-       }
+			// 完美保留您精緻的外觀錯位樣式
+			row.style.cssText = "display: flex !important; width: 100%; justify-content: flex-end !important; align-items: flex-end !important; margin-bottom: 12px; gap: 6px; font-size: 12px;";
+			row.innerHTML = `
+				<div class="widget-meta-left" style="display: flex; flex-direction: column; align-items: flex-end; font-size: 9px; font-weight: 800; line-height: 1.2; user-select: none; color: var(--color-ink-soft); flex-shrink: 0;">
+					<span>${timeStr}</span>
+					<span ${markerClass} style="color: ${statusColor}; font-weight: 800;">${statusText}</span>
+				</div>
+				<div class="widget-bubble" style="max-width: 70%; padding: 8px 12px; border: 1px solid #F3D36C; border-radius: 16px 6px 16px 16px; background: var(--color-yellow); color: var(--color-ink); word-break: break-all; font-weight: 500; text-align: left;">
+					${safeText}
+				</div>
+			`;
+		} else {
+			row.className = 'msg-row msg-incoming';
+			row.style.cssText = "display: flex !important; width: 100%; justify-content: flex-start !important; align-items: flex-end !important; margin-bottom: 12px; gap: 6px; font-size: 12px;";
+			row.innerHTML = `
+				<div class="widget-bubble" style="max-width: 70%; padding: 8px 12px; border: 1px solid var(--color-border); border-radius: 6px 16px 16px 16px; background: var(--color-surface); color: var(--color-ink); word-break: break-all; font-weight: 500; text-align: left;">
+					${safeText}
+				</div>
+				<div class="widget-meta-right" style="font-size: 9px; font-weight: 800; color: var(--color-ink-soft); user-select: none; flex-shrink: 0; display: flex; align-items: flex-end;">
+					<span>${timeStr}</span>
+				</div>
+			`;
+		}
+		
+		container.appendChild(row);
+		scrollToBottom(); // 💡 補齊滾動條自動探底
+	}
 
-       container.appendChild(row);
-       scrollToBottom();
-   }
-
-
+   function startWidgetHeartbeat() {
+		widgetHeartbeatInterval = setInterval(() => {
+			if (widgetWebSocket && widgetWebSocket.readyState === WebSocket.OPEN) {
+				widgetWebSocket.send(JSON.stringify({ "type": "ping", "senderId": Number(currentMemberId), "receiverId": 0, "message": "" }));
+			}
+		}, 25000);
+	}
 
    function scrollToBottom() {
-       const body = document.getElementById('chatMessagesBody');
-       if (body) body.scrollTop = body.scrollHeight;
-       
-       window.requestAnimationFrame(() => {
-           if (body) body.scrollTop = body.scrollHeight;
-       });
-   }
+		const container = document.getElementById('chatMessagesBody');
+		if (container) container.scrollTop = container.scrollHeight;
+	}
 
-   function waitForConnection(callback, attempts = 0) {
-       if (attempts > 30) {
-           console.warn("[Chat WS Warning] 連線逾時，無法發送請求。");
-           return;
-       }
-
-   	if (webSocket && webSocket.readyState === WebSocket.OPEN) {
-   		callback();
-       } else {
-           setTimeout(() => { 
-               waitForConnection(callback, attempts + 1); 
-           }, 100);
-       }
-   }
+   
+   function getCurrentTime() {
+		const now = new Date();
+		return String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+	}
    
    function escapeHtml(string) {
        return String(string).replace(/[&<>"']/g, function (s) {
@@ -646,40 +671,40 @@ function waitForConnection(callback, attempts = 0) {
    // 💡 新增：統一更新右下角圓形按鈕總未讀數的小工具
    // ==========================================
 function updateGlobalUnreadBadge(forcedCount) {
-  const globalBadge = document.getElementById('chatUnreadBadge');
-  const chatWin = document.getElementById('chatWindow');
-  if (!globalBadge || !chatWin) return;
+		const globalBadge = document.getElementById('chatUnreadBadge');
+		const chatWin = document.getElementById('chatWindow');
+		if (!globalBadge || !chatWin) return;
 
-  const isChatOpen = !chatWin.classList.contains('chat-hidden');
+		// 鐵律防線：只要懸浮聊天主窗此時此刻「正開著」，右下角大圈圈的總數紅點必須強制隱藏！
+		const isChatOpen = !chatWin.classList.contains('chat-hidden');
+		if (isChatOpen) {
+			globalBadge.style.setProperty('display', 'none', 'important');
+			return;
+		}
 
-  if (isChatOpen) {
-      globalBadge.style.setProperty('display', 'none', 'important');
-      return;
-  }
+		let realUnreadSum = 0;
+		if (typeof forcedCount === 'number') {
+			realUnreadSum = forcedCount;
+		} else {
+			// 如果呼叫時沒傳參數，JS 自動掃描左側所有小徽章進行即時累加
+			document.querySelectorAll('.widget-unread-badge').forEach(badgeEl => {
+				const isVisible = badgeEl.style.display !== 'none' && badgeEl.style.visibility !== 'hidden';
+				const count = parseInt(badgeEl.innerText) || 0;
+				if (isVisible && count > 0) {
+					realUnreadSum += count;
+				}
+			});
+		}
 
-  let realUnreadSum = 0;
-
-  if (typeof forcedCount === 'number') {
-      realUnreadSum = forcedCount;
-  } else {
-      document.querySelectorAll('.c-unread-badge').forEach(badgeEl => {
-          const isVisible = badgeEl.style.display !== 'none' && badgeEl.style.visibility !== 'hidden';
-          const count = parseInt(badgeEl.innerText) || 0;
-          
-          if (isVisible && count > 0) {
-              realUnreadSum += count;
-          }
-      });
-  }
-
-  if (realUnreadSum > 0) {
-      globalBadge.innerText = realUnreadSum;
-      globalBadge.style.setProperty('display', 'flex', 'important'); 
-  } else {
-      globalBadge.innerText = '0';
-      globalBadge.style.setProperty('display', 'none', 'important'); 
-  }
-}
+		// 🚀 資料庫事實與全站紅點連動宣告！
+		if (realUnreadSum > 0) {
+			globalBadge.innerText = realUnreadSum;
+			globalBadge.style.setProperty('display', 'flex', 'important'); // 點亮全站大徽章
+		} else {
+			globalBadge.innerText = '0';
+			globalBadge.style.setProperty('display', 'none', 'important'); // 全站沒有未讀，徹底拿掉隱藏！
+		}
+	}
 
      
 	</script>

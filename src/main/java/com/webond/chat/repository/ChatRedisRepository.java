@@ -20,7 +20,7 @@ public class ChatRedisRepository {
 // === 儲存單條訊息到Redis的List ===//
 	public void saveMessage(String redisKey, String messageJson) {
 		redisTemplate.opsForList().rightPush(redisKey, messageJson);
-		// 訊息保存30天
+		redisTemplate.opsForList().trim(redisKey, -100, -1);
 		redisTemplate.expire(redisKey, 30, TimeUnit.DAYS);
 	}
 	
@@ -34,6 +34,7 @@ public class ChatRedisRepository {
 	public void saveAllMessages(String redisKey, List<String> messagesList) {
 	    if (messagesList != null && !messagesList.isEmpty()) {
 	        redisTemplate.opsForList().rightPushAll(redisKey, messagesList);
+	        redisTemplate.opsForList().trim(redisKey, -100, -1);
 	        redisTemplate.expire(redisKey, 30, java.util.concurrent.TimeUnit.DAYS);
 	    }
 	}	
@@ -41,12 +42,9 @@ public class ChatRedisRepository {
 	
 // === 產生新聊天時，更新兩人的聊過天清單，紀錄最新時間戳記 === //
 	public void addChatFriend(Integer userId, Integer friendId) {
-	    String userKey = "chat:friends:" + userId;
-	    String friendKey = "chat:friends:" + friendId;
-	    long now = System.currentTimeMillis();
-
-	    redisTemplate.opsForZSet().add(userKey, String.valueOf(friendId), now);
-	    redisTemplate.opsForZSet().add(friendKey, String.valueOf(userId), now);
+		String userKey = "chat:friends:" + userId;
+		long now = System.currentTimeMillis();
+		redisTemplate.opsForZSet().add(userKey, String.valueOf(friendId), now);
 	}
 	
 	

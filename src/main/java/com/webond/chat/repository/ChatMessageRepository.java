@@ -28,8 +28,8 @@ public interface ChatMessageRepository extends JpaRepository <ChatMsgVO, Integer
     
     @Modifying
     @Transactional
-    @Query("UPDATE ChatMsgVO c SET c.isRead = 1 WHERE c.senderId = :senderId AND c.receiverId = :receiverId AND c.isRead = 0")
-    int markMessagesAsRead(@Param("senderId") Integer senderId, @Param("receiverId") Integer receiverId);
+    @Query("UPDATE ChatMsgVO c SET c.isRead = 1 WHERE c.senderId = :authorId AND c.receiverId = :readerId AND c.isRead = 0")
+    int markMessagesAsRead(@Param("authorId") Integer authorId, @Param("readerId") Integer readerId);
 
     @Query(value = "SELECT * FROM chat_message WHERE (SENDER_MEMBER_ID = :u1 AND RECEIVER_MEMBER_ID = :u2) OR (SENDER_MEMBER_ID = :u2 AND RECEIVER_MEMBER_ID = :u1) ORDER BY SENT_AT DESC LIMIT 1", nativeQuery = true)
     ChatMsgVO findLastMessage(@Param("u1") Integer u1, @Param("u2") Integer u2);
