@@ -42,7 +42,7 @@ public interface ChatMessageRepository extends JpaRepository <ChatMsgVO, Integer
             "    m.MESSAGE_ID as msgId, " +
             "    m.SENDER_MEMBER_ID as senderId, " +
             "    m.RECEIVER_MEMBER_ID as receiverId, " +
-            "    m.CONTENT as message, " +
+            "    CAST(m.CONTENT AS CHAR(4000000)) as message, " + 
             "    m.SENT_AT as sentAt, " +
             "    (SELECT COUNT(*) FROM chat_message u " +
             "     WHERE u.SENDER_MEMBER_ID = CASE WHEN m.SENDER_MEMBER_ID = :currentUserId THEN m.RECEIVER_MEMBER_ID ELSE m.SENDER_MEMBER_ID END " +

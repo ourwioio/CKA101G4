@@ -50,9 +50,8 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 				idArray.add(onlineId);
 			}
 			
-			if (session.isOpen()) {
-				session.sendMessage(new TextMessage(objectMapper.writeValueAsString(initOnlineNode)));
-			}
+			sendSafeMessage(session, objectMapper.writeValueAsString(initOnlineNode));
+			
 		} catch (Exception e) {
 			System.err.println("發送初始在線名單失敗: " + e.getMessage());
 		}
@@ -88,11 +87,9 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		    historyResponse.put("type", "history");
 		    historyResponse.put("senderId", senderId);
 		    historyResponse.put("receiverId", receiverId);
-		    historyResponse.put("historyList", historyDtos); // 🚀 完美把陣列塞進去，前端直接用 msgData.historyList 就能讀取
+		    historyResponse.put("historyList", historyDtos); // 完美把陣列塞進去，前端直接用 msgData.historyList 就能讀取
 
-		    if (userSession.isOpen()) {
-		        userSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(historyResponse)));
-		    }
+		    sendSafeMessage(userSession, objectMapper.writeValueAsString(historyResponse));
 
 		    return;
 		}
@@ -106,16 +103,16 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 			String cleanJsonMessage = objectMapper.writeValueAsString(chatMessage);
 
 			if (isReceiverOnline) {
-				receiverSession.sendMessage(new TextMessage(cleanJsonMessage));
+				sendSafeMessage(receiverSession, cleanJsonMessage);
 			}
 
-			if (userSession.isOpen()) {
-				userSession.sendMessage(new TextMessage(cleanJsonMessage));
-			}
+			sendSafeMessage(userSession, cleanJsonMessage);
 
 			chatSvc.saveChatMessage(String.valueOf(senderId), String.valueOf(receiverId), cleanJsonMessage, false);
 			return;
 		}
+		
+		// 發送即時圖片(type = "image")
 		if ("image".equals(type)) {
 			WebSocketSession receiverSession = sessionsMap.get(receiverId);
 			boolean isReceiverOnline = (receiverSession != null && receiverSession.isOpen());
@@ -124,41 +121,43 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 			String cleanJsonMessage = objectMapper.writeValueAsString(chatMessage);
 
 			if (isReceiverOnline) {
-				receiverSession.sendMessage(new TextMessage(cleanJsonMessage));
+				sendSafeMessage(receiverSession, cleanJsonMessage);
 			}
 
-			if (userSession.isOpen()) {
-				userSession.sendMessage(new TextMessage(cleanJsonMessage));
-			}
+			sendSafeMessage(userSession, cleanJsonMessage);
 
 			chatSvc.saveChatMessage(String.valueOf(senderId), String.valueOf(receiverId), cleanJsonMessage, false);
 			return;
 		}
 
+		// 處理已讀通知(type = "read")
 		if ("read".equals(chatMessage.getType())) {
 			chatSvc.readChatMessage(String.valueOf(senderId), String.valueOf(receiverId) );
 
 			WebSocketSession originalSenderSession = sessionsMap.get(receiverId);
 
-			if (originalSenderSession != null && originalSenderSession.isOpen()) {
+			if (originalSenderSession != null) {
 				ObjectNode readNotice = objectMapper.createObjectNode();
 				readNotice.put("type", "read");
 				readNotice.put("readByUserId", senderId); 
 
-				originalSenderSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(readNotice)));
+				sendSafeMessage(originalSenderSession, objectMapper.writeValueAsString(readNotice));
 			}
 			return;
 		}
 		
-		// 打字中狀態即時觸發
+		// 打字中狀態即時觸發(type = "typing")
 		if ("typing".equals(type)) {
 			WebSocketSession receiverSession = sessionsMap.get(receiverId);
-			if (receiverSession != null && receiverSession.isOpen()) {
+			
+			// 👑【修正 6】：打字提示訊息發送改用 sendSafeMessage
+			if (receiverSession != null) {
 				ObjectNode typingNotice = objectMapper.createObjectNode();
 				typingNotice.put("type", "typing");
 				typingNotice.put("senderId", senderId);
 				typingNotice.put("status", chatMessage.getMessage()); // "1" 或 "0"
-				receiverSession.sendMessage(new TextMessage(objectMapper.writeValueAsString(typingNotice)));
+				
+				sendSafeMessage(receiverSession, objectMapper.writeValueAsString(typingNotice));
 			}
 			return;
 		}
@@ -190,8 +189,10 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 			node.put("userId", userId);
 			node.put("status", status);
 			String json = objectMapper.writeValueAsString(node);
+			
+			// 👑【修正 7】：全體上線廣播迴圈改用 sendSafeMessage，防止多人同時上下線衝爆連線
 			for (WebSocketSession s : sessionsMap.values()) {
-				if (s.isOpen()) s.sendMessage(new TextMessage(json));
+				sendSafeMessage(s, json);
 			}
 		} catch (Exception e) {}
 	}
@@ -203,6 +204,18 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		String path = session.getUri().getPath();
 		String idStr = path.substring(path.lastIndexOf('/') + 1);
 		return Integer.valueOf(idStr);
+	}
+	
+	private void sendSafeMessage(WebSocketSession session, String textPayload) {
+		if (session != null && session.isOpen()) {
+			try {
+				synchronized (session) {
+					session.sendMessage(new TextMessage(textPayload));
+				}
+			} catch (Exception e) {
+				System.err.println("⚠️ 安全發送訊息失敗: " + e.getMessage());
+			}
+		}
 	}
 
 }
