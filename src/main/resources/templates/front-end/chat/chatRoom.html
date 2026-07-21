@@ -455,11 +455,10 @@ body {
 	line-height: 1.3 !important;
 	box-shadow: var(--shadow-sm) !important;
 	border: 1px solid #FFA2B0 !important;
-	
 	display: inline-flex !important;
 	align-items: center !important;
 	justify-content: center !important;
-	min-width: 22px !important; 
+	min-width: 22px !important;
 	height: 18px !important;
 }
 
@@ -483,7 +482,7 @@ body {
 
 .status-dot.online {
 	background-color: #52c41a !important; /* 綠色 */
-	box-shadow: 0 0 6px #52c41a !important;  /* 螢光發光特效 */
+	box-shadow: 0 0 6px #52c41a !important; /* 螢光發光特效 */
 }
 
 .status-dot.offline {
@@ -507,7 +506,7 @@ body {
 	width: 18px !important;
 	height: 18px !important;
 	background-color: #ff4d4f !important; /* 充滿警示感的紅色背景 */
-	color: #ffffff !important;           /* 白色交叉符號 */
+	color: #ffffff !important; /* 白色交叉符號 */
 	border-radius: 50% !important;
 	border: 1.5px solid #ffffff !important;
 	font-size: 11px !important;
@@ -531,76 +530,70 @@ body {
 
 /* 未讀訊息分隔線 */
 .unread-divider {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    
-    /* 🚀 核心黑魔法 1：改用絕對定位，強制跳出外層 align-items: flex-start 的靠左詛咒！ */
-    position: relative !important; /* 作為定位基點 */
-    width: 100% !important;
-    min-width: 100% !important;
-    height: 30px !important; /* 健全的 30px 實體高度 */
-    margin: 15px 0 !important;
-    padding: 0 !important;
-    list-style: none !important;
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    flex-shrink: 0 !important;
-    
-    transition: opacity 0.4s ease, height 0.4s ease !important; /* 🚀 新增這行 */
-    opacity: 1;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	/* 🚀 核心黑魔法 1：改用絕對定位，強制跳出外層 align-items: flex-start 的靠左詛咒！ */
+	position: relative !important; /* 作為定位基點 */
+	width: 100% !important;
+	min-width: 100% !important;
+	height: 30px !important; /* 健全的 30px 實體高度 */
+	margin: 15px 0 !important;
+	padding: 0 !important;
+	list-style: none !important;
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	flex-shrink: 0 !important;
+	transition: opacity 0.4s ease, height 0.4s ease !important;
+	/* 🚀 新增這行 */
+	opacity: 1;
 }
 
 /* 🚀 核心黑魔法 2：用一個絕對定位的偽元素，強行橫跨對話框 100% 寬度畫出一整條細紅線 */
 .unread-divider::before {
-    content: "" !important;
-    position: absolute !important;
-    left: 0 !important;
-    right: 0 !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    height: 1px !important; /* 高質感 1px 實心細線 */
-    background: #ff4d4f !important;
-    opacity: 0.5 !important;
-    z-index: 1 !important;
+	content: "" !important;
+	position: absolute !important;
+	left: 0 !important;
+	right: 0 !important;
+	top: 50% !important;
+	transform: translateY(-50%) !important;
+	height: 1px !important; /* 高質感 1px 實心細線 */
+	background: #ff4d4f !important;
+	opacity: 0.5 !important;
+	z-index: 1 !important;
 }
 
 /* 拿掉原本的 after，由單一 before 霸權拉長 */
 .unread-divider::after {
-    display: none !important;
+	display: none !important;
 }
 
 /* 🚀 中間精緻的未讀小文字（膠囊美化） */
 .unread-divider span {
-    color: #ff4d4f !important;
-    padding: 2px 14px !important; 
-    font-size: 11px !important;
-    font-weight: 700 !important;
-    white-space: nowrap !important;
-    user-select: none !important;
-    
-    /* 🚀 核心黑魔法 3：利用相對定位與高 z-index，強制壓在剛才畫好的 100% 長線上 */
-    position: relative !important;
-    z-index: 2 !important;
-    
-    /* 👑 關鍵點：背景色一定要給，才能完美把正中央的那一段紅線吃掉，形成斷開效果 */
-    background: #ffffff !important; 
-    
-    border: 1px solid rgba(255, 77, 79, 0.3) !important; 
-    border-radius: 20px !important; 
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05) !important;
+	color: #ff4d4f !important;
+	padding: 2px 14px !important;
+	font-size: 11px !important;
+	font-weight: 700 !important;
+	white-space: nowrap !important;
+	user-select: none !important;
+	/* 🚀 核心黑魔法 3：利用相對定位與高 z-index，強制壓在剛才畫好的 100% 長線上 */
+	position: relative !important;
+	z-index: 2 !important;
+	/* 👑 關鍵點：背景色一定要給，才能完美把正中央的那一段紅線吃掉，形成斷開效果 */
+	background: #ffffff !important;
+	border: 1px solid rgba(255, 77, 79, 0.3) !important;
+	border-radius: 20px !important;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05) !important;
 }
 
 .unread-divider.fade-out-hidden {
-    opacity: 0 !important;
-    height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    pointer-events: none !important; /* 防止隱藏後阻擋滑鼠點擊 */
+	opacity: 0 !important;
+	height: 0 !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	pointer-events: none !important; /* 防止隱藏後阻擋滑鼠點擊 */
 }
-
-
 </style>
 </head>
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
@@ -622,28 +615,46 @@ body {
 		<!-- 【左欄：真實會員清單】 -->
 		<div class="left-sidebar">
 			<h3>選擇聯絡人</h3>
+
+			<a href="javascript:void(0);"
+				th:onclick="setCurrentChatTarget([[${currentUserId}]], [[${currentUserName}]], this)"
+				th:class="${currentUserId == targetUserId} ? 'contact-link active-chat' : 'contact-link'"
+				style="display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid var(--color-border); padding: 12px 0; margin-bottom: 12px; text-decoration: none;">
+
+				<div style="display: flex; align-items: center; gap: 6px;">
+					<!-- 自己的狀態點，綠色在線 -->
+					<span class="status-dot online"
+						th:id="'status-dot-me-' + ${currentUserId}"></span> <strong
+						th:text="${currentUserName} + ' (我的備忘錄)'"
+						style="color: var(--color-ink); font-weight: 800; font-size: 14px;">我的個人空間</strong>
+				</div> <!-- 👑 關鍵修正：這裡完全不用原本的 sidebar-unread-badge 類名，改成完全空的 div，徹底斷絕紅色圖標的 CSS 污染 -->
+				<div
+					style="display: none !important; width: 0; height: 0; opacity: 0; visibility: hidden;"></div>
+			</a>
+
 			<ul class="contact-list" id="dynamicContactList">
-    <!-- 確保最外圍的 <li> 帶有 th:data-id 與 th:data-name，這是我們 JS 精準切換的雷達 -->
-    <li th:each="contact : ${memList}" th:if="${contact.userId != currentUserId}" class="contact-item" th:id="'contact-item-' + ${contact.userId}" th:data-id="${contact.userId}" th:data-name="${contact.username}">
-        
-        <!-- 💡【核心修正】拔掉 th:href 刷新跳轉，改為 javascript:void(0); 全權交由前端 SPA 點擊控制 -->
-        <a href="javascript:void(0);"
-           th:class="${contact.userId == targetUserId} ? 'contact-link active-chat' : 'contact-link'"
-           style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-            
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <span class="status-dot offline" th:id="'status-dot-' + ${contact.userId}"></span>
-                <th:block th:text="${contact.username}"></th:block>
-            </div> 
-            
-            <span class="sidebar-unread-badge"
-                  th:text="${contact.userId == targetUserId} ? 0 : ${contact.unreadCount}"
-                  th:style="${contact.userId == targetUserId || contact.unreadCount == 0} ? 'display: none !important;' : 'display: inline-block; background-color: var(--color-pink); color: var(--color-surface); border-radius: var(--radius-full); padding: 2px 8px; font-size: 11px; font-weight: 800; line-height: 1.3; box-shadow: var(--shadow-sm); border: 1px solid #FFA2B0;'">
-                  0
-            </span>
-        </a>
-    </li>
-</ul>
+
+				<li th:each="contact : ${memList}"
+					th:if="${contact.userId != currentUserId}" class="contact-item"
+					th:id="'contact-item-' + ${contact.userId}"
+					th:data-id="${contact.userId}" th:data-name="${contact.username}">
+
+					<a href="javascript:void(0);"
+					th:onclick="setCurrentChatTarget([[${contact.userId}]], [[${contact.username}]], this)"
+					th:class="${contact.userId == targetUserId} ? 'contact-link active-chat' : 'contact-link'"
+					style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+
+						<div style="display: flex; align-items: center; gap: 6px;">
+							<span class="status-dot offline"
+								th:id="'status-dot-' + ${contact.userId}"></span>
+							<th:block th:text="${contact.username}"></th:block>
+						</div> <span class="sidebar-unread-badge"
+						th:text="${contact.userId == targetUserId} ? 0 : ${contact.unreadCount}"
+						th:style="${contact.userId == targetUserId || contact.unreadCount == 0} ? 'display: none !important;' : 'display: inline-block; background-color: var(--color-pink); color: var(--color-surface); border-radius: var(--radius-full); padding: 2px 8px; font-size: 11px; font-weight: 800; line-height: 1.3; box-shadow: var(--shadow-sm); border: 1px solid #FFA2B0;'">
+							0 </span>
+				</a>
+				</li>
+			</ul>
 		</div>
 
 		<!-- 【右欄：對話視窗】 -->
@@ -651,7 +662,7 @@ body {
 			<!-- 對話視窗頂部標題 -->
 			<div class="chat-header"
 				style="display: flex; justify-content: space-between; align-items: center;">
-				<h3
+				<h3 id="chatTitle"
 					th:text="${targetName != null} ? '與 ' + ${targetName} + ' 聊天中' : '請選擇對象'"></h3>
 				<span id="typingIndicator"
 					style="color: var(--color-ink-soft); font-size: 0.85em; font-style: italic;"></span>
@@ -660,75 +671,106 @@ body {
 			<!-- 訊息滾動顯示區 -->
 			<div id="messagesArea" class="messages-display">
 				<ul id="area" class="messages-list">
-					<p th:if="${targetName != null}" class="system-status">--- 已建立專屬私訊連線 ---</p>
+					<p th:if="${targetName != null}" class="system-status">---
+						已建立專屬私訊連線 ---</p>
 				</ul>
 			</div>
 
-			<!-- 💡【全新功能：發送前圖片預覽小視窗】預設用 display: none 隱藏，選好圖後才優雅跳出 -->
-			<div id="imagePreviewContainer" style="display: none; background: var(--color-surface-soft); padding: 12px 28px; border-top: 1px solid var(--color-border); flex-direction: column; gap: 12px; justify-content: flex-start; position: relative; width: 100%;">
-				
-				<!-- 這裡是用來動態橫向排隊渲染多張預覽縮圖的滾動盒子容器 -->
-				<div id="imagePreviewList" style="display: flex !important; gap: 12px; overflow-x: auto; width: 100%; padding: 6px 4px; scrollbar-width: thin;">
-					<!-- JS 會現場在這裡動態插入多張 <img> 的小方塊 -->
+			<div id="imagePreviewContainer"
+				style="display: none; background: var(--color-surface-soft); padding: 12px 28px; border-top: 1px solid var(--color-border); flex-direction: column; gap: 12px; justify-content: flex-start; position: relative; width: 100%;">
+
+				<div id="imagePreviewList"
+					style="display: flex !important; gap: 12px; overflow-x: auto; width: 100%; padding: 6px 4px; scrollbar-width: thin;">
 				</div>
-				
-				<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-					<span id="previewCountLabel" style="font-size: 13px; font-weight: 800; color: var(--color-ink);">準備發送 0 張圖片嗎？</span>
+
+				<div
+					style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+					<span id="previewCountLabel"
+						style="font-size: 13px; font-weight: 800; color: var(--color-ink);">準備發送
+						0 張圖片嗎？</span>
 					<div style="display: flex; gap: 8px;">
-						<button type="button" onclick="confirmAndSendMultipleImages()" style="background: var(--color-ink); color: #fff; border: none; padding: 6px 16px; border-radius: 999px; font-size: 11px; font-weight: 800; cursor: pointer;">確定發送</button>
-						<button type="button" onclick="cancelImagePreview()" style="background: transparent; color: var(--color-ink-soft); border: 1px solid var(--color-border); padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; cursor: pointer;">取消</button>
+						<button type="button" onclick="confirmAndSendMultipleImages()"
+							style="background: var(--color-ink); color: #fff; border: none; padding: 6px 16px; border-radius: 999px; font-size: 11px; font-weight: 800; cursor: pointer;">確定發送</button>
+						<button type="button" onclick="cancelImagePreview()"
+							style="background: transparent; color: var(--color-ink-soft); border: 1px solid var(--color-border); padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; cursor: pointer;">取消</button>
 					</div>
 				</div>
 			</div>
 
-			<!-- 底部輸入與發送功能 -->
 			<div class="chat-input-area">
-				<label for="widgetImageInput" id="imageBtnLabel" class="chat-file-label" th:style="${targetName == null} ? 'opacity:0.5; cursor:not-allowed;' : 'cursor:pointer;'" style="font-size: 20px; padding: 0 10px; user-select: none; transition: transform 0.15s ease;">
-					📎
-				</label>
-				<!-- 💡【核心解鎖】加上 multiple 屬性，開啟一次多選多張圖的高階功能！ -->
-				
-				<div class="chat-input-actions" style="position: relative; display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-    
-    <!-- 💡 主聊天室笑臉觸發按鈕 -->
-    <button type="button" id="roomEmojiTrigger" style="background: none; border: none; font-size: 22px; cursor: pointer; padding: 4px; user-select: none; transition: transform 0.1s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">😀</button>
-    
-    <!-- 🚀 主聊天室專屬：高質感 Emoji 彈出選單（寬度更大，排版更像現代通訊軟體） -->
-    <div id="roomEmojiPicker" style="display: none; position: absolute; bottom: 45px; left: 0; width: 280px; height: 200px; background: #ffffff; border: 1px solid var(--color-border, #e0e0e0); border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.15); z-index: 1000; padding: 12px; flex-wrap: wrap; overflow-y: auto; gap: 10px; justify-content: flex-start; align-content: flex-start;">
-        <!-- 黃金精選表情符號陣列 -->
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">😀</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">😂</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🤣</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🥰</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">😍</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">😉</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">😎</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🎵</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">👍</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">👏</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🔥</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🚀</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🎉</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">❤️</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">✨</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🤔</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">👀</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🙏</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">💯</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">💡</span>
-        <span class="room-emoji-item" style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">💩</span>
-    </div>
-</div>
-				<input type="file" id="widgetImageInput" multiple accept="image/*" onchange="uploadChatImage(this)" th:disabled="${targetName == null}" style="display: none;">
-				
-				<input type="text" id="message" placeholder="請輸入私訊內容..." th:disabled="${targetName == null}">
-				<button id="sendMessage" onclick="sendMessage()" th:disabled="${targetName == null}">發送</button>
+				<label for="widgetImageInput" id="imageBtnLabel"
+					class="chat-file-label"
+					th:style="${targetName == null} ? 'opacity:0.5; cursor:not-allowed;' : 'cursor:pointer;'"
+					style="font-size: 20px; padding: 0 10px; user-select: none; transition: transform 0.15s ease;">
+					📎 </label>
+
+				<div class="chat-input-actions"
+					style="position: relative; display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+
+					<button type="button" id="roomEmojiTrigger"
+						style="background: none; border: none; font-size: 22px; cursor: pointer; padding: 4px; user-select: none; transition: transform 0.1s;"
+						onmouseover="this.style.transform='scale(1.1)'"
+						onmouseout="this.style.transform='scale(1)'">😀</button>
+
+					<div id="roomEmojiPicker"
+						style="display: none; position: absolute; bottom: 45px; left: 0; width: 280px; height: 200px; background: #ffffff; border: 1px solid var(--color-border, #e0e0e0); border-radius: 16px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); z-index: 1000; padding: 12px; flex-wrap: wrap; overflow-y: auto; gap: 10px; justify-content: flex-start; align-content: flex-start;">
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">😀</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">😂</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🤣</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🥰</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">😍</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">😉</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">😎</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🎵</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">👍</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">👏</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🔥</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🚀</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🎉</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">❤️</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">✨</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🤔</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">👀</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">🙏</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">💯</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">💡</span>
+						<span class="room-emoji-item"
+							style="font-size: 22px; cursor: pointer; user-select: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">💩</span>
+					</div>
+				</div>
+				<input type="file" id="widgetImageInput" multiple accept="image/*"
+					onchange="uploadChatImage(this)"
+					th:disabled="${targetName == null}" style="display: none;">
+
+				<input type="text" id="message" placeholder="請輸入私訊內容..."
+					th:disabled="${targetName == null}">
+				<button id="sendMessage" onclick="sendMessage()"
+					th:disabled="${targetName == null}">發送</button>
 			</div>
 		</div>
 
 	</div>
 
-	<!-- 💡 原生 JavaScript 邏輯完全保留，不影響你的 WebSocket 機制 -->
 	<script th:inline="javascript">
 		let webSocket = null;
 		const selfId = /*[[${currentUserId}]]*/'guest';
@@ -753,39 +795,33 @@ body {
 		
 		const roomEmojiTrigger = document.getElementById("roomEmojiTrigger");
         const roomEmojiPicker = document.getElementById("roomEmojiPicker");
-        const roomInputField = document.getElementById("message"); // 對齊你主聊天室原本的輸入框 ID
+        const roomInputField = document.getElementById("message"); 
 
+        // 表情符號
         if (roomEmojiTrigger && roomEmojiPicker && roomInputField) {
-            // 1. 點擊笑臉按鈕：彈出或收合面板
             roomEmojiTrigger.addEventListener("click", function(e) {
-                e.stopPropagation(); // 阻止事件冒泡，防止被下方的 document 點擊事件誤關閉
+                e.stopPropagation(); 
                 const isOpen = roomEmojiPicker.style.display === "flex";
                 roomEmojiPicker.style.display = isOpen ? "none" : "flex";
             });
 
-            // 2. 核心功能：使用高階「事件代理」監聽面板內所有 Emoji 的點擊
             roomEmojiPicker.addEventListener("click", function(e) {
                 if (e.target.classList.contains("room-emoji-item")) {
                     e.stopPropagation();
                     
-                    // 現場將點擊的表情文字追加到輸入框當前的數值後面
                     const clickedEmoji = e.target.innerText;
                     roomInputField.value += clickedEmoji;
                     
-                    // 智慧聚焦游標，確保使用者能流暢地接著打字或直接發送
                     roomInputField.focus();
                     
-                    // 選擇完畢，自動收合面板
                     roomEmojiPicker.style.display = "none";
                     
-                    // 觸發大網頁原本寫好的打字狀態發送訊號
                     if (typeof sendTypingSignal === 'function') {
                         sendTypingSignal("1");
                     }
                 }
             });
 
-            // 3. 極致體驗：當滑鼠點擊聊天室其他任何空白處時，主動將 Emoji 面板隱藏起來
             document.addEventListener("click", function(e) {
                 if (roomEmojiPicker.style.display === "flex" && !roomEmojiPicker.contains(e.target) && e.target !== roomEmojiTrigger) {
                     roomEmojiPicker.style.display = "none";
@@ -815,196 +851,219 @@ body {
 			webSocket.onmessage = function(event) {
 				const jsonObj = JSON.parse(event.data);
 				const ulArea = document.getElementById("area");
+				
+				const data = JSON.parse(event.data);
+			    const li = document.createElement('li');
+			    const isMe = (data.senderId === selfId);
 
 				// 🅰️ 情況 A：載入歷史紀錄 (type = "history")
 				if ("history" === jsonObj.type) {
-					
-					// 🚀【雙緩衝隱形防線啟用】：起手式立刻讓對話容器透明，徹底封鎖上一個房間的大圖殘留閃爍！
-					if (messagesArea) {
-						messagesArea.style.setProperty('opacity', '0', 'important');
-						// 加上 0.2 秒平滑淡入特效，體驗會極度絲滑高級
-						messagesArea.style.setProperty('transition', 'opacity 0.2s ease', 'important');
-					}
+    
+    			if (messagesArea) {
+        			messagesArea.style.setProperty('opacity', '0', 'important');
+        			messagesArea.style.setProperty('transition', 'opacity 0.2s ease', 'important');
+   				}
 
-					if (ulArea) ulArea.innerHTML = '';
-					const messages = jsonObj.historyList;
-					
-					// 🚀【硬核解法】：直接找出歷史紀錄中，第一條「對方發給我、且狀態為未讀(0)」的訊息索引
-					let firstUnreadIndex = -1;
-					if (messages && messages.length > 0) {
-						for (let i = 0; i < messages.length; i++) {
-							const msgObj = messages[i];
-							const data = (typeof msgObj === 'object') ? msgObj : JSON.parse(msgObj);
-							const isFromFriend = String(data.senderId) !== String(selfId);
-							const isUnread = Number(data.getIsRead || data.msgRead || 0) === 0;
-							
-							if (isFromFriend && isUnread) {
-								firstUnreadIndex = i; // 抓到了！這就是未讀的起點
-								break;
-							}
-						}
-					}
+    if (ulArea) ulArea.innerHTML = '';
+    const messages = jsonObj.historyList;
+    
+    const renderedMsgIds = new Set();
+    
+    let firstUnreadIndex = -1;
+    if (messages && messages.length > 0) {
+        for (let i = 0; i < messages.length; i++) {
+            const msgObj = messages[i];
+            const data = (typeof msgObj === 'object') ? msgObj : JSON.parse(msgObj);
+            const isFromFriend = String(data.senderId) !== String(selfId);
+            const isUnread = Number(data.getIsRead || data.msgRead || 0) === 0;
+            
+            if (isFromFriend && isUnread) {
+                firstUnreadIndex = i; 
+                break;
+            }
+        }
+    }
 
-					if (messages && messages.length > 0) {
-						const fragment = document.createDocumentFragment();
+    if (messages && messages.length > 0) {
+        const fragment = document.createDocumentFragment();
 
-						for (let i = 0; i < messages.length; i++) {
-							
-							// 🚀【修改點 1】：現場塞入紅線，並補上唯一的 ID，供下方 JS 鎖定焦點！
-							if (i === firstUnreadIndex && firstUnreadIndex >= 0) {
-								const dividerLi = document.createElement('li');
-								dividerLi.className = 'unread-divider';
-								dividerLi.id = 'roomActiveUnreadDivider'; // 👑 補上這個 ID 才能動態定位
-								dividerLi.innerHTML = `<span>以下為未讀訊息</span>`;
-								fragment.appendChild(dividerLi);
-							}
+        for (let i = 0; i < messages.length; i++) {
+            const msgObj = messages[i];
+            const historyData = (typeof msgObj === 'object') ? msgObj : JSON.parse(msgObj);
+            
+            const currentMsgId = historyData.msgId || historyData.id; 
+            if (currentMsgId) {
+                if (renderedMsgIds.has(currentMsgId)) {
+                    continue;
+                }
+                renderedMsgIds.add(currentMsgId);
+            }
 
-							const msgObj = messages[i];
-							const historyData = (typeof msgObj === 'object') ? msgObj : JSON.parse(msgObj);
-							
-							const li = document.createElement('li');
-							const isMe = String(historyData.senderId) === String(selfId);
-							li.className = isMe ? 'me' : 'friend';
+            if (i === firstUnreadIndex && firstUnreadIndex >= 0) {
+                const dividerLi = document.createElement('li');
+                dividerLi.className = 'unread-divider';
+                dividerLi.id = 'roomActiveUnreadDivider'; 
+                dividerLi.innerHTML = `<span>以下為未讀訊息</span>`;
+                fragment.appendChild(dividerLi);
+            }
+            
+            const li = document.createElement('li');
+            const isMe = String(historyData.senderId) === String(selfId);
+            li.className = isMe ? 'me' : 'friend';
 
-							// ================= 👑 智慧時間校正防線（核心修正） =================
-							let timeStr = "";
-							let rawTime = historyData.sentAt || historyData.lastTime;
-							
-							if (rawTime) {
-								// 如果後端丟過來的是數字（毫秒數時間戳），轉換成一般時間物件
-								if (!isNaN(rawTime)) {
-									const d = new Date(Number(rawTime));
-									timeStr = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-								} 
-								// 如果是我們後端剛剛改好的格式化字串 "yyyy-MM-dd HH:mm:ss"
-								else if (typeof rawTime === 'string' && rawTime.length >= 16) {
-									timeStr = rawTime.substring(11, 16); // 直接優雅切出 "HH:mm"
-								} else {
-									timeStr = rawTime;
-								}
-							} else {
-								// 萬一完全沒拿到時間，才觸發防呆 getCurrentTime
-								timeStr = (typeof getCurrentTime === 'function') ? getCurrentTime() : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-							}
-							// ===================================================================
+            let timeStr = "";
+            let rawTime = historyData.sentAt || historyData.lastTime;
+            
+            if (rawTime) {
+                if (!isNaN(rawTime)) {
+                    const d = new Date(Number(rawTime));
+                    timeStr = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+                } 
+                else if (typeof rawTime === 'string' && rawTime.length >= 16) {
+                    timeStr = rawTime.substring(11, 16); 
+                } else {
+                    timeStr = rawTime;
+                }
+            } else {
+                timeStr = (typeof getCurrentTime === 'function') ? getCurrentTime() : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+            }
 
-							const realContent = historyData.message || historyData.content || "";
+            const realContent = historyData.message || historyData.content || "";
 
-							// 雙重保險圖片歷史雷達防線
-							let isImg = false;
-							if (typeof isImageMessage === 'function') {
-								isImg = isImageMessage(historyData, realContent);
-							} else {
-								isImg = historyData.type === "image" || (typeof realContent === 'string' && (realContent.startsWith("data:image/") || realContent.includes("base64")));
-							}
+            let isImg = false;
+            if (typeof isImageMessage === 'function') {
+                isImg = isImageMessage(historyData, realContent);
+            } else {
+                isImg = historyData.type === "image" || (typeof realContent === 'string' && (realContent.startsWith("data:image/") || realContent.includes("base64")));
+            }
 
-							if (isImg) {
-								appendImageMessageContent(li, realContent, isMe, historyData.getIsRead || historyData.msgRead, timeStr);
-								const img = li.querySelector('img');
-								if (img) {
-									// 🚀【修改點 2】：當歷史大圖異步載入定型時，不要讓他盲目沉底！
-									img.onload = function() {
-										const activeDivider = document.getElementById('roomActiveUnreadDivider');
-										if (activeDivider) {
-											activeDivider.scrollIntoView({ behavior: "auto", block: "center" });
-										} else if (typeof scrollToBottom === 'function') {
-											scrollToBottom();
-										}
-									};
-								}
-							} else {
-								let cleanContent = (typeof sanitizeHTML === 'function') ? sanitizeHTML(realContent) : realContent;
-								appendMessageContent(li, cleanContent, isMe, historyData.getIsRead || historyData.msgRead, timeStr);
-							}
+            if (isImg) {
+                appendImageMessageContent(li, realContent, isMe, historyData.getIsRead || historyData.msgRead, timeStr);
+                const img = li.querySelector('img');
+                if (img) {
+                    img.onload = function() {
+                        const activeDivider = document.getElementById('roomActiveUnreadDivider');
+                        if (activeDivider) {
+                            activeDivider.scrollIntoView({ behavior: "auto", block: "center" });
+                        } else if (typeof scrollToBottom === 'function') {
+                            scrollToBottom();
+                        }
+                    };
+                }
+            } else {
+                let cleanContent = (typeof sanitizeHTML === 'function') ? sanitizeHTML(realContent) : realContent;
+                appendMessageContent(li, cleanContent, isMe, historyData.getIsRead || historyData.msgRead, timeStr, currentMsgId);
+            }
 
-							fragment.appendChild(li);
-						}
-						if (ulArea) ulArea.appendChild(fragment);
-					}
-                    
-					sendReadReceipt(); // 正看著他，秒發已讀
-					if (targetId) {
-						localStorage.setItem(`chat_unread_${selfId}_to_${targetId}`, 0);
-					}
-					
-					// 🚀【智慧換房定位與解鎖核心】
-					setTimeout(() => {
-						const activeDivider = document.getElementById('roomActiveUnreadDivider');
-						
-						if (activeDivider) {
-							// 🎯 核心黑魔法：一打開點擊直接瞄準未讀線正中央
-							activeDivider.scrollIntoView({ behavior: "auto", block: "center" });
-						} else {
-							// 如果原本就沒有任何未讀訊息（紅點是 0），才預設強制滑到最底部看最新對話
-							if (typeof scrollToBottom === 'function') {
-								scrollToBottom();
-							} else {
-								const messagesArea = document.getElementById("messagesArea");
-								if (messagesArea) messagesArea.scrollTop = messagesArea.scrollHeight;
-							}
-						}
+            if (li.parentNode === null) {
+                fragment.appendChild(li);
+            }
+        }
+        if (ulArea) ulArea.appendChild(fragment);
+    }
+    
+    sendReadReceipt(); 
+    if (targetId) {
+        localStorage.setItem(`chat_unread_${selfId}_to_${targetId}`, 0);
+    }
+    
+    setTimeout(() => {
+        const activeDivider = document.getElementById('roomActiveUnreadDivider');
+        
+        if (activeDivider) {
+            activeDivider.scrollIntoView({ behavior: "auto", block: "center" });
+        } else {
+            if (typeof scrollToBottom === 'function') {
+                scrollToBottom();
+            } else {
+                const messagesArea = document.getElementById("messagesArea");
+                if (messagesArea) messagesArea.scrollTop = messagesArea.scrollHeight;
+            }
+        }
 
-						// 🚀【修改點 3：解鎖點亮】
-						if (messagesArea) {
-							messagesArea.style.setProperty('opacity', '1', 'important');
-						}
+        if (messagesArea) {
+            messagesArea.style.setProperty('opacity', '1', 'important');
+        }
 
-					}, 150); // 延遲 150 毫秒
-				}
+    }, 30); 
+}
 				
 				// ----------------------------------------------------
-				// 🅱️ 【核心修正點】情況 B：收到即時新訊息 (支援文字 "chat" 與 圖片 "image" 同步即時上屏)
+				// 🅱️ 情況 B：收到即時新訊息 (支援文字 "chat" 與 圖片 "image" 同步即時上屏)
 				// ----------------------------------------------------
+				if (typeof recentRenderedTexts === 'undefined') {
+    				window.recentRenderedTexts = new Set();
+				}		
 				else if ("chat" === jsonObj.type || "image" === jsonObj.type) {
+					
+					const msgSenderStr = String(jsonObj.senderId).trim();
+				    const msgReceiverStr = String(jsonObj.receiverId).trim();
+				    const currentTargetStr = typeof targetId !== 'undefined' ? String(targetId).trim() : "";
+				    const currentMessageText = jsonObj.message || "";
+
+				    if (msgSenderStr === msgReceiverStr) {
+				        if (msgSenderStr === currentTargetStr) {
+				            
+				            const dedupKey = msgSenderStr + "_" + currentMessageText;
+				            if (window.recentRenderedTexts.has(dedupKey)) {
+				                return; 
+				            }
+				            
+				            window.recentRenderedTexts.add(dedupKey);
+				            setTimeout(() => {
+				                window.recentRenderedTexts.delete(dedupKey);
+				            }, 1000);
+				            
+				        } else {
+				            return; 
+				        }
+				    }
+					
 					const isMe = String(jsonObj.senderId) === String(selfId);
 					const isFromCurrentPartner = String(jsonObj.senderId) === String(targetId);
 					
-					// ================= 👑 智慧型即時時間校正防線（核心修正） =================
 					let timeStr = "";
 					let rawTime = jsonObj.sentAt;
 					
 					if (rawTime) {
-						// 如果是數字（毫秒數時間戳）
 						if (!isNaN(rawTime)) {
 							const d = new Date(Number(rawTime));
 							timeStr = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
 						} 
-						// 如果是我們後端改好的格式化字串 "yyyy-MM-dd HH:mm:ss"
 						else if (typeof rawTime === 'string' && rawTime.length >= 16) {
-							timeStr = rawTime.substring(11, 16); // 完美切出 "HH:mm"
+							timeStr = rawTime.substring(11, 16); 
 						} else {
 							timeStr = rawTime;
 						}
 					} else {
-						// 萬一完全沒拿到，才呼叫原本的 getCurrentTime 兜底
 						timeStr = (typeof getCurrentTime === 'function') ? getCurrentTime() : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
 					}
-					// ===================================================================
 
-					// 情況 1：是我自己發的，或是目前正開著視窗在聊天的對象發來的 -> 直接上屏
-					if (isMe || isFromCurrentPartner) {
-						const li = document.createElement('li');
-						li.className = isMe ? 'me' : 'friend';
-						
-						// 💡 智慧型即時泡泡渲染辨識
-						if ("image" === jsonObj.type || (jsonObj.message && jsonObj.message.startsWith("data:image/"))) {
-							appendImageMessageContent(li, jsonObj.message, isMe, isMe ? 0 : 1, timeStr);
-						} else {
-							appendMessageContent(li, jsonObj.message, isMe, isMe ? 0 : 1, timeStr);
-						}
-						
-						if (isFromCurrentPartner) {
-							sendReadReceipt(); // 正看著他，秒發已讀
-						}
-						
-						if (ulArea) ulArea.appendChild(li);
-						
-						// 加上微小延遲，確保圖片渲染完成後，滾動條才 100% 探底
-						setTimeout(() => {
-							messagesArea.scrollTop = messagesArea.scrollHeight;
-						}, 50);
-					} 
-					// 情況 2：別人在背景傳訊息來（且不管他是傳文字還是傳圖片），前端主動累加紅點數
+					 if (isMe || isFromCurrentPartner) {
+					        const li = document.createElement('li');
+					        li.className = isMe ? 'me' : 'friend';
+					        
+					        if ("image" === jsonObj.type || (jsonObj.message && jsonObj.message.startsWith("data:image/"))) {
+					            appendImageMessageContent(li, jsonObj.message, isMe, isMe ? 0 : 1, timeStr);
+					        } else {
+					            appendMessageContent(li, jsonObj.message, isMe, isMe ? 0 : 1, timeStr);
+					        }
+					        
+					        if (isFromCurrentPartner) {
+					            sendReadReceipt(); 
+					        }
+					        
+					        if (ulArea) {
+					            ulArea.appendChild(li);
+					        }
+					        
+					        setTimeout(() => {
+					            const messagesArea = document.getElementById("messagesArea");
+					            if (messagesArea) {
+					                messagesArea.scrollTop = messagesArea.scrollHeight;
+					            }
+					        }, 30);
+					    } 
 					else {
 						const partnerId = jsonObj.senderId;
 						if (partnerId) {
@@ -1012,7 +1071,7 @@ body {
 							
 							if (targetLiEl) {
 								let badge = targetLiEl.querySelector('.sidebar-unread-badge');
-								let finalCountToStore = 1; // 預設安全兜底數字
+								let finalCountToStore = 1; 
 								
 								if (badge) {
 									let currentDisplayCount = parseInt(badge.innerText, 10) || 0;
@@ -1020,10 +1079,9 @@ body {
 									badge.innerText = currentDisplayCount;
 									badge.style.display = 'inline-block';
 									
-									finalCountToStore = currentDisplayCount; // 👑 修正點：將區域變數安全導出給外部使用
+									finalCountToStore = currentDisplayCount; 
 								}
 								
-								// 更新左側最新訊息摘要字樣
 								let lastMsgSummary = "新訊息";
 								if (jsonObj.type === "image" || (jsonObj.message && jsonObj.message.startsWith("data:image/"))) {
 									lastMsgSummary = "[圖片訊息]";
@@ -1034,13 +1092,11 @@ body {
 								const lastMsgEl = targetLiEl.querySelector('.contact-last-msg');
 								if (lastMsgEl) lastMsgEl.textContent = lastMsgSummary;
 
-								// 👑 修正點：使用安全導出的變數寫入，絕不觸發變數找不到的 Uncaught ReferenceError
 								const storageKey = `chat_unread_${selfId}_to_${partnerId}`;
 								localStorage.setItem(storageKey, finalCountToStore);
 							}
 						}
 						
-						// 延遲刷新名單
 						if (typeof loadContacts === 'function') {
 							setTimeout(() => {
 								loadContacts();
@@ -1091,8 +1147,7 @@ body {
 			};
 			
 			webSocket.onclose = function(event) {
-				console.log("Disconnected!");
-				clearInterval(heartbeatInterval); // 斷線時清除定時器
+				clearInterval(heartbeatInterval); 
 			};
 		}
 
@@ -1100,66 +1155,71 @@ body {
 	
 		// 發送聊天訊息：
 		function sendMessage() {
-			const inputMessage = document.getElementById("message");
-			const message = inputMessage.value.trim();
+    const inputMessage = document.getElementById("message");
+    const message = inputMessage.value.trim();
 
-			if (message === "") {
-				inputMessage.focus();
-			} else {
-				const jsonObj = {
-					"type" : "chat",
-					"senderId" : selfId, 
-					"receiverId" : targetId, 
-					"message" : message
-				};
-				webSocket.send(JSON.stringify(jsonObj));
-				inputMessage.value = "";
-				inputMessage.focus();
-				
-				sendTypingSignal("0");
-			}
-		}
+    if (message === "") {
+        inputMessage.focus();
+    } else {
+        const jsonObj = {
+            "type" : "chat",
+            "senderId" : selfId, 
+            "receiverId" : targetId, 
+            "message" : message
+        };
+        webSocket.send(JSON.stringify(jsonObj));
+        
+        inputMessage.value = "";
+        inputMessage.focus();
+        sendTypingSignal("0");
+    }
+}
 		
 		// 💡 輔助方法 A：精準封裝右側結構 (時間與已讀在文字左邊)
-		function appendMessageContent(liElement, rawText, isMe, msgRead, timeStr) {
-			const safeText = escapeHtml(rawText);
-			
-			if (isMe) {
-				const statusText = (Number(msgRead) === 1) ? '已讀' : '未讀';
-				const statusColor = (Number(msgRead) === 1) ? 'lightgray' : 'var(--color-ink-soft)';
-				const markerClass = (Number(msgRead) === 1) ? '' : 'class="unread-marker"';
-				
-				// 我發的訊息：靠右對齊 (justify-content: flex-end)，時間在黃色泡泡「左邊」
-				liElement.style.cssText = "background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; display: flex !important; justify-content: flex-end !important; align-items: flex-end !important; gap: 8px; position: relative; list-style: none; margin-bottom: 12px;";
-				
-				liElement.innerHTML = `
-					<div class="msg-meta-left" style="display: flex; flex-direction: column; align-items: flex-end; font-size: 10px; font-weight: 800; line-height: 1.3; user-select: none; flex-shrink: 0; margin-bottom: 2px;">
-						<span style="color: var(--color-ink-soft); font-weight: 800;">${timeStr}</span>
-						<span ${markerClass} style="color: ${statusColor}; font-weight: 800;">${statusText}</span>
-					</div>
-					<div class="msg-bubble-actual" style="display: inline-block !important; width: max-content !important; min-width: 0 !important; max-width: min(72%, 560px); padding: 13px 16px; border: 1px solid #F3D36C; border-radius: 20px 8px 20px 20px; background: var(--color-yellow); color: var(--color-ink); box-shadow: var(--shadow-sm); font-size: 14px; font-weight: 500; overflow-wrap: break-word !important; word-break: break-word !important; white-space: normal !important; text-align: left;">
-						${safeText}
-					</div>
-				`;
-			} else {
-				liElement.style.cssText = "background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; display: flex !important; justify-content: flex-start !important; align-items: flex-end !important; gap: 8px; position: relative; list-style: none; margin-bottom: 12px;";
-				
-				liElement.innerHTML = `
-					<!-- 左邊：實體白底氣泡，打 123 就縮到 123 的大小 -->
-					<div class="msg-bubble-actual" style="display: inline-block !important; width: max-content !important; min-width: 0 !important; max-width: min(72%, 560px); padding: 13px 16px; border: 1px solid var(--color-border); border-radius: 8px 20px 20px 20px; background: var(--color-surface); color: var(--color-ink); box-shadow: var(--shadow-sm); font-size: 14px; font-weight: 500; overflow-wrap: break-word !important; word-break: break-word !important; white-space: normal !important; text-align: left;">
-						${safeText}
-					</div>
-					<!-- 右邊：緊貼在白色氣泡旁邊的時間盒子 -->
-					<div class="msg-meta-right" style="font-size: 10px; font-weight: 800; color: var(--color-ink-soft); user-select: none; flex-shrink: 0; margin-bottom: 2px; display: flex; align-items: flex-end;">
-						<span>${timeStr}</span>
-					</div>
-				`;
-			}
-		}
-		
+		function appendMessageContent(liElement, rawText, isMe, msgRead, timeStr, msgId) { // 🔥 參數最後面加上 msgId
+    const safeText = escapeHtml(rawText);
+    
+    if (msgId) {
+        if (document.getElementById(msgId)) {
+            liElement.remove(); 
+            return; 
+        }
+        liElement.id = msgId;
+    }
+    
+    if (isMe) {
+        const statusText = (Number(msgRead) === 1) ? '已讀' : '未讀';
+        const statusColor = (Number(msgRead) === 1) ? 'lightgray' : 'var(--color-ink-soft)';
+        const markerClass = (Number(msgRead) === 1) ? '' : 'class="unread-marker"';
+        
+        liElement.style.cssText = "background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; display: flex !important; justify-content: flex-end !important; align-items: flex-end !important; gap: 8px; position: relative; list-style: none; margin-bottom: 12px;";
+        
+        liElement.innerHTML = `
+            <div class="msg-meta-left" style="display: flex; flex-direction: column; align-items: flex-end; font-size: 10px; font-weight: 800; line-height: 1.3; user-select: none; flex-shrink: 0; margin-bottom: 2px;">
+                <span style="color: var(--color-ink-soft); font-weight: 800;">${timeStr}</span>
+                <span ${markerClass} style="color: ${statusColor}; font-weight: 800;">${statusText}</span>
+            </div>
+            <div class="msg-bubble-actual" style="display: inline-block !important; width: max-content !important; min-width: 0 !important; max-width: min(72%, 560px); padding: 13px 16px; border: 1px solid #F3D36C; border-radius: 20px 8px 20px 20px; background: var(--color-yellow); color: var(--color-ink); box-shadow: var(--shadow-sm); font-size: 14px; font-weight: 500; overflow-wrap: break-word !important; word-break: break-word !important; white-space: normal !important; text-align: left;">
+                ${safeText}
+            </div>
+        `;
+    } else {
+        liElement.style.cssText = "background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; display: flex !important; justify-content: flex-start !important; align-items: flex-end !important; gap: 8px; position: relative; list-style: none; margin-bottom: 12px;";
+        
+        liElement.innerHTML = `
+            <!-- 左邊：實體白底氣泡 -->
+            <div class="msg-bubble-actual" style="display: inline-block !important; width: max-content !important; min-width: 0 !important; max-width: min(72%, 560px); padding: 13px 16px; border: 1px solid var(--color-border); border-radius: 8px 20px 20px 20px; background: var(--color-surface); color: var(--color-ink); box-shadow: var(--shadow-sm); font-size: 14px; font-weight: 500; overflow-wrap: break-word !important; word-break: break-word !important; white-space: normal !important; text-align: left;">
+                ${safeText}
+            </div>
+            <!-- 右邊：緊貼在白色氣泡旁邊的時間盒子 -->
+            <div class="msg-meta-right" style="font-size: 10px; font-weight: 800; color: var(--color-ink-soft); user-select: none; flex-shrink: 0; margin-bottom: 2px; display: flex; align-items: flex-end;">
+                <span>${timeStr}</span>
+            </div>
+        `;
+    }
+}
 		// 💡 輔助方法 B：即時更新左側聯絡人小紅點數字
 		function updateLeftSidebarBadge(partnerId) {
-			// 直接調用步驟 1 的資料庫同步器，資料庫說幾筆，畫面上就顯示幾筆，絕對不遺失、不卡 0！
 			loadContacts();
 		}
 		
@@ -1182,37 +1242,27 @@ body {
 		}
 		
 		
-		/**
-		 * 🚀 全網頁初始化核心事件（DOMContentLoaded）
-		 */
 		 
 		 window.addEventListener("DOMContentLoaded", function() {
-				// 1. 啟動 WebSocket 連線（連線成功的 onopen 內部會去呼叫 loadContacts() 載入資料庫紅點）
 				connect();
 				
 				const chatMessagesContainer = document.getElementById("messagesArea"); // 對齊你的主聊天室滾動盒子 ID
 	            
 	            if (chatMessagesContainer) {
 	                chatMessagesContainer.addEventListener("scroll", function() {
-	                    // 現場抓取我們在歷史紀錄裡生出來的這條未讀紅線
 	                    const activeDivider = document.getElementById('roomActiveUnreadDivider');
 	                    
-	                    // 只有當畫面上「正存在未讀紅線」，且它還沒被隱藏時，我們才去計算觸底
 	                    if (activeDivider && !activeDivider.classList.contains('fade-out-hidden')) {
 	                        
 	                        const scrollTop = chatMessagesContainer.scrollTop;
 	                        const clientHeight = chatMessagesContainer.clientHeight;
 	                        const scrollHeight = chatMessagesContainer.scrollHeight;
 
-	                        // 🚀【防誤觸高規判定】：放寬觸底安全範圍（預留 30px 容錯）
-	                        // 且確保 scrollTop > 50（代表使用者真的有往下滾動，不是一打開就誤觸）
 	                        const isPhysicallyAtBottom = (scrollTop + clientHeight) >= (scrollHeight - 30);
 	                        
 	                        if (isPhysicallyAtBottom && scrollTop > 50) {
-	                            // 現場注入淡出 Class，紅線在 0.4 秒內溫柔融化蒸發！
 	                            activeDivider.classList.add('fade-out-hidden');
 	                            
-	                            // 動畫結束後徹底拔掉 ID，防止干擾下次換房
 	                            setTimeout(() => {
 	                                if (activeDivider) activeDivider.removeAttribute('id');
 	                            }, 450);
@@ -1221,7 +1271,6 @@ body {
 	                });
 	            }
 				
-				// 2. 完美的中文注音輸入法防爆 Enter 鍵發送機制
 				const inputMessage = document.getElementById("message");
 				if (inputMessage) {
 					inputMessage.addEventListener("keydown", function(event) {
@@ -1232,7 +1281,6 @@ body {
 						}
 					});
 
-					// 3. 綁定打字提示偵測
 					inputMessage.addEventListener("input", function() {
 						if (!targetId) return;
 						sendTypingSignal("1");
@@ -1256,7 +1304,6 @@ body {
 			}
 		
 		
-			// 每隔 25 秒向後端發送一次輕量 ping 訊號，杜絕行動網路（進電梯、弱網）因休眠造成的假在線鎖死問題
 			function startHeartbeat() {
 				heartbeatInterval = setInterval(() => {
 					if (webSocket && webSocket.readyState === WebSocket.OPEN) {
@@ -1273,23 +1320,15 @@ body {
 			
 			/**
 			 * 當 WebSocket 一連線成功，主動地毯式掃描左側所有好友超連結，
-			 * 並從本地 LocalStorage 快取硬碟中，將其他好友累積的未讀紅點數字一一還原在畫面上！
 			 */
 			 function loadContacts() {
 					fetch('/api/chat/contacts')
 						.then(res => res.json())
 						.then(contacts => {
 							contacts.forEach(c => {
-								// 1. 精準抓到對應這個好友的 <li> 盒子元素
 								const targetLiEl = document.querySelector(`.contact-list .contact-item[data-id="${String(c.userId).trim()}"]`);
 								if (!targetLiEl) return; 
 
-								// 2. 💡【新功能：在線燈號初始加載補盲】
-								// 雖然 HTML 預設是 offline 灰燈，但我們可以根據後端在線狀態（如果 API 有包含，或後面由 userStatus 事件接管）
-								// 這裡我們先確保 DOM 結構節點絕對暢通。
-								// 為了讓全頁重整一進來就看到綠燈，我們在下方步驟2提供一個完美的後端配合。
-								
-								// 3. 處理粉紅徽章元件
 								let badge = targetLiEl.querySelector('.sidebar-unread-badge');
 								if (!badge) {
 									badge = document.createElement('span');
@@ -1298,11 +1337,9 @@ body {
 									if (link) link.appendChild(badge);
 								}
 
-								// 4. 核心商邊判定
 								const isCurrentChatting = targetId && String(c.userId) === String(targetId);
 								const finalUnreadCount = isCurrentChatting ? 0 : Number(c.unreadCount);
 
-								// 5. 絕殺覆蓋強制隱藏/顯示
 								if (finalUnreadCount <= 0) {
 									if (badge) {
 										badge.innerText = ""; 
@@ -1336,25 +1373,22 @@ body {
 			
 			document.getElementById("dynamicContactList").addEventListener("click", function(e) {
 				const item = e.target.closest(".contact-item");
-				if (!item) return; // 防呆
+				if (!item) return;
 
 				const friendId = parseInt(item.getAttribute("data-id"));
 				const friendName = item.getAttribute("data-name");
 
-				// 觸發純前端不閃爍換房開窗
 				openChatWindow(friendId, friendName);
 			});
 
 			/**
-			 * 2. 核心換房控制器：動態更換右側主聊天面板，網頁完全不刷新、不白屏、不閃爍！
+			 * 核心換房控制器：動態更換右側主聊天面板
 			 */
 			function openChatWindow(friendId, friendName) {
 				
 				cancelImagePreview();
-				// 動態變更全域當前正在聊天的目標變數
 				targetId = Number(friendId);
 
-				// A. 動態變更右側頂部 UI 標題與解鎖狀態
 				if (chatHeaderTitle) chatHeaderTitle.textContent = "與 " + friendName + " 聊天中";
 				if (typingIndicator) typingIndicator.textContent = ""; 
 				if (inputMessage) inputMessage.disabled = false;
@@ -1363,22 +1397,18 @@ body {
 				const systemStatus = document.querySelector(".system-status");
 				if (systemStatus) systemStatus.style.display = 'none';
 
-				// B. 動態翻轉左側聯絡人的「選中藍框」高亮外框
 				document.querySelectorAll(".contact-link").forEach(el => el.classList.remove("active-chat"));
 				const currentLi = document.querySelector(`.contact-item[data-id="${friendId}"]`);
 				if (currentLi) {
 					const link = currentLi.querySelector('.contact-link');
 					if (link) link.classList.add("active-chat");
 					
-					// 點開他的瞬間，立刻在畫面上將他的未讀粉紅徽章隱藏消滅
 					const badge = currentLi.querySelector('.sidebar-unread-badge');
 					if (badge) badge.style.setProperty('display', 'none', 'important');
 				}
 
-				// C. 本地硬碟 LocalStorage 計數同步歸零
 				localStorage.setItem(`chat_unread_${selfId}_to_${friendId}`, 0);
 
-				// D. 🚀【極速雙向握手】直接透過當前健康的 WebSocket 連線，向後端索取全新歷史紀錄！
 				if (webSocket && webSocket.readyState === WebSocket.OPEN) {
 					webSocket.send(JSON.stringify({
 						"type": "history", 
@@ -1391,111 +1421,90 @@ body {
 			
 			
 			/**
-			 * 💡【多圖上傳第一步】非同步批次讀取多張檔案，並在橫向滾動盒子裡整排動態印出預覽圖！
+			 * 非同步批次讀取多張檔案，並在橫向滾動盒子裡整排動態印出預覽圖
 			 */
 			 async function uploadChatImage(inputElement) {
-					const files = inputElement.files; // 這是使用者選取的所有檔案陣列
+					const files = inputElement.files;
 					if (!files || files.length === 0) return; 
 					if (!targetId) { alert("請選擇聊天對象"); inputElement.value = ''; return; }
 
-					tempImageArray = []; // 清空之前的暫存陣列陣列
+					tempImageArray = []; 
 
-					// 限制單次多選的上限張數（符合商務通訊標準上限 9 張）
 					if (files.length > 9) {
 						alert("單次最多只能選擇 9 張圖片喔！");
 						inputElement.value = '';
 						return;
 					}
 
-					// 1. 利用標準 Array 迴圈，逐一檢查每張圖的容量體積 (限制 5MB)
 					for (let i = 0; i < files.length; i++) {
 						if (files[i].size > 5 * 1024 * 1024) {
 							alert(`圖片「${files[i].name}」體積超過 5MB，已自動為您跳過此檔案。`);
 							continue;
 						}
 
-						// 2. 將 FileReader 包裹進 Promise 裡面，確保多張大圖能排隊乖乖讀取、絕不相互踩死
 						const base64Str = await new Promise((resolve) => {
 							const reader = new FileReader();
 							reader.onload = function(e) { resolve(e.target.result); };
 							reader.readAsDataURL(files[i]);
 						});
 
-						// 3. 將這張成功讀取完畢的圖片碼塞進我們的全域大陣列
 						tempImageArray.push(base64Str);
 					}
 
-					// 4. 🚀【全新核心：呼叫動態 ❌ 按鈕渲染器】
 					renderPreviewListHTML();
 
-					inputElement.value = ''; // 發送完畢清空 input，允許重複選取
+					inputElement.value = ''; 
 				}
 			
-			 /**
-				 * 💡【全新高階函式】專屬動態渲染預覽清單與 ❌ 事件索引綁定器
-				 * 完美解決「想要多張圖片，但其中一張不想要」的商業級 UX 局部刪除功能！
-				 */
+
 				function renderPreviewListHTML() {
 					const previewList = document.getElementById("imagePreviewList");
 					if (!previewList) return;
-					previewList.innerHTML = ''; // 先清空，重新依據最新陣列畫圖
+					previewList.innerHTML = ''; 
 
-					// 💡【解耦安全防線】將舊的單圖變數彻底清空，確保單一事实來源(Array)不受髒快取污染
 					tempImageBase64 = null; 
 
-					// 如果陣列被使用者點到全部扣光了（變成 0 張），主動關閉整個預覽面板並復原
 					if (tempImageArray.length === 0) {
 						cancelImagePreview();
 						return;
 					}
 
-					// 遍歷當前陣列中殘留的所有圖片，並將 index 傳入作為剪裁密碼
 					tempImageArray.forEach((base64Str, index) => {
-						// 建立外殼包裝
 						const wrapper = document.createElement("div");
 						wrapper.className = "preview-img-wrapper";
 						
-						// 建立圖片標籤本身
 						const imgNode = document.createElement("img");
 						imgNode.src = base64Str;
 						imgNode.style.cssText = "width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); display: block;";
 						
-						// 建立 ❌ 刪除小按鈕 (對齊您的 CSS 定位類別)
 						const deleteBtn = document.createElement("div");
 						deleteBtn.className = "preview-delete-btn";
-						deleteBtn.innerHTML = "&times;"; // 就是 ❌ 符號
+						deleteBtn.innerHTML = "&times;"; 
 						
-						// 💡【絕殺核心：滑鼠點擊 ❌ 按鈕事件】
 						deleteBtn.onclick = function(e) {
-							e.stopPropagation(); // 阻止事件冒泡
+							e.stopPropagation(); 
 							
-							// A. 現場精準從全域陣列中切除這一張圖片的 Base64 資料！
 							tempImageArray.splice(index, 1); 
 							
-							// B. 重新渲染名單與計數，畫面上的這張圖就會瞬間「唰」的一聲流暢消失！
 							renderPreviewListHTML();
 						};
 
-						// 拼裝節點
 						wrapper.appendChild(imgNode);
 						wrapper.appendChild(deleteBtn);
 						previewList.appendChild(wrapper);
 					});
 
-					// 更新動態計數標籤文字與開關狀態
 					document.getElementById("previewCountLabel").textContent = `準備發送 ${tempImageArray.length} 張圖片嗎？`;
 					document.getElementById("imagePreviewContainer").style.display = "flex";
-					document.getElementById("message").disabled = true; // 預覽期間鎖定文字輸入框，防止打字干擾
+					document.getElementById("message").disabled = true; 
 				}
 			
 			
 			 /**
-				 * 💡【多圖上傳第二步】使用者按下「確定發送」，前端利用 forEach 迴圈以極速進行 WebSocket 連發推送！
+				 * 使用者按下「確定發送」，前端利用 forEach 迴圈以極速進行 WebSocket 連發推送
 				 */
 				 function confirmAndSendMultipleImages() {
-					    // 🚀 大聊天室專屬變數：tempImageArray（圖片陣列）與 targetId（對方ID）
 					    if (!tempImageArray || tempImageArray.length === 0 || !targetId) {
-					        console.warn("⚠️ [大聊天室] 圖片佇列為空或尚未選擇聊天對象");
 					        return;
 					    }
 
@@ -1525,19 +1534,18 @@ body {
 					        alert("網路連線中斷，請重新整理網頁。");
 					    }
 						
-					    cancelImagePreview(); // 收合預覽、解鎖輸入框
+					    cancelImagePreview(); 
 					}
 			 
 				/**
-				 * 💡【多圖上傳第三步】使用者點擊「取消」，清空陣列並重置隱藏
+				 * 使用者點擊「取消」，清空陣列並重置隱藏
 				 */
 				 function cancelImagePreview() {
-						tempImageArray = []; // 釋放記憶體陣列
-						tempImageBase64 = null; // 雙重保險釋放
+						tempImageArray = []; 
+						tempImageBase64 = null; 
 						const previewList = document.getElementById("imagePreviewList");
-						if (previewList) previewList.innerHTML = ''; // 清空預覽圖節點
+						if (previewList) previewList.innerHTML = ''; 
 						
-						// 💡【精準修正】刪除多餘的 .style 欄位，還原為標準的原生行內樣式權重覆蓋
 						const previewContainer = document.getElementById("imagePreviewContainer");
 						if (previewContainer) {
 							previewContainer.style.setProperty('display', 'none', 'important');
@@ -1555,11 +1563,8 @@ body {
 			 * 精準封裝圖片氣泡結構 
 			 */
 			 function appendImageMessageContent(liElement, base64Src, isMe, msgRead, timeStr) {
-					// 🚀【資深工程師核心安全防線】：
-					// 如果傳進來的 base64Src 為空，或者根本不是圖片格式，直接強制轉成空字串，嚴防前端崩潰
 					if (!base64Src) return;
 
-					// 限制圖片最寬 60%，最大高度 300px， object-fit: contain 確保圖片絕對不拉伸變形
 					const imgBubbleHtml = `
 						<div style="max-width: min(60%, 400px); cursor: pointer; user-select: none;" onclick="window.open('${base64Src}')">
 							<img src="${base64Src}" style="width: 100%; height: auto; max-height: 300px; object-fit: contain; border-radius: 16px; border: 1px solid #ECE4D6; box-shadow: var(--shadow-sm); display: block;" alt="圖片">
@@ -1617,6 +1622,45 @@ body {
 				        return escapeMap[match];
 				    });
 				}
+			 
+			 let currentActiveTargetId = null;
+			 let currentActiveTargetName = null;
+
+			 
+			 // 自己的聊天室
+			 function setCurrentChatTarget(targetId, targetName, element) {
+				    currentActiveTargetId = targetId;
+				    currentActiveTargetName = targetName;
+				    
+				    const chatTitle = document.querySelector('.chat-header h3') || document.getElementById('chatTitle');
+				    if (chatTitle) {
+				        chatTitle.innerText = '與 ' + targetName + ' 聊天中';
+				    }
+				    
+				    document.querySelectorAll('.contact-link').forEach(link => {
+				        link.classList.remove('active-chat');
+				    });
+				    if (element) {
+				        element.classList.add('active-chat');
+				    }
+				    const unreadBadge = element.querySelector('.sidebar-unread-badge');
+				    if (unreadBadge) {
+				        unreadBadge.style.display = 'none';
+				    }
+				    
+				    const historyPayload = {
+				        "type": "history",
+				        "senderId": selfId,              
+				        "receiverId": currentActiveTargetId 
+				    };
+				    
+				    if (typeof webSocket !== 'undefined' && webSocket.readyState === WebSocket.OPEN) {
+				        webSocket.send(JSON.stringify(historyPayload));
+				    } else {
+				        console.error("【發送失敗】WebSocket 尚未連線或名稱不對");
+				    }
+				}
+
 			
 
 		

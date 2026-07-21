@@ -150,7 +150,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 		if ("typing".equals(type)) {
 			WebSocketSession receiverSession = sessionsMap.get(receiverId);
 			
-			// 👑【修正 6】：打字提示訊息發送改用 sendSafeMessage
 			if (receiverSession != null) {
 				ObjectNode typingNotice = objectMapper.createObjectNode();
 				typingNotice.put("type", "typing");
@@ -190,7 +189,6 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 			node.put("status", status);
 			String json = objectMapper.writeValueAsString(node);
 			
-			// 👑【修正 7】：全體上線廣播迴圈改用 sendSafeMessage，防止多人同時上下線衝爆連線
 			for (WebSocketSession s : sessionsMap.values()) {
 				sendSafeMessage(s, json);
 			}
