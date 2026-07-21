@@ -1,7 +1,7 @@
 package com.webond.chat.controller;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -55,8 +55,8 @@ public class ChatRoomController {
 		model.addAttribute("targetUserId", targetVO.getMemberId());
 		model.addAttribute("targetName", targetVO.getRealName());
 		
-		List<MemberVO> memList = chatSvc.getChatList(myVO.getMemberId(), toId);
-		model.addAttribute("memList", memList);
+		List<Map<String, Object>> dynamicList = chatSvc.getDynamicChatContacts(myVO.getMemberId());
+		model.addAttribute("memList", dynamicList);
 
 		return "front-end/chat/chatRoom";
 		
@@ -78,8 +78,8 @@ public class ChatRoomController {
 		model.addAttribute("currentUserName", loginUser.getRealName());
 		
 		
-		List<MemberVO> memList = chatSvc.getChatList(loginUser.getMemberId(), toId);
-		model.addAttribute("memList", memList);
+		List<Map<String, Object>> dynamicList = chatSvc.getDynamicChatContacts(loginUser.getMemberId());
+		model.addAttribute("memList", dynamicList);
 		
 		if(toId != null) {
 			MemberVO targetMem = memberSvc.getOneMember(toId);

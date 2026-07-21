@@ -253,3 +253,26 @@
     margin-left: 8px !important;
     box-shadow: 0 2px 5px rgba(222, 93, 78, 0.3) !important;
 }
+
+/* 💡【懸浮窗加強】當點擊選中某個好友時，左側格子會亮起柔和的淡藍色選中外框，並帶有左側藍色條 */
+.active-widget-chat {
+	background-color: #e6f7ff !important;
+	border-left: 3px solid #1890ff !important;
+}
+
+/* 💡【全站綠燈防線】懸浮窗專屬在線小指示燈，長寬鎖死在 8 像素，防止被 flex 擠壓隱形 */
+.widget-dot {
+	width: 8px !important;
+	height: 8px !important;
+	border-radius: 50% !important;
+	display: inline-block !important;
+	flex-shrink: 0 !important;
+	background-color: #bfbfbf !important; /* 預設小灰燈 */
+	transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 當 class 變成 online 時，強迫注入螢光綠與發光外框，秒點亮首頁在線名單！ */
+.widget-dot.online {
+	background-color: #52c41a !important;
+	box-shadow: 0 0 5px #52c41a !important;
+}
