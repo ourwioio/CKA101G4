@@ -6,19 +6,19 @@
 	<form th:action="@{/admin/employees/update}" method="POST"
 		th:object="${employeeVO}" enctype="multipart/form-data">
 		
-<div class="form-group" style="flex-direction: row; align-items: center; background-color: #f8f9fa; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #007bff; max-width: 400px; box-sizing: border-box;">
-	<!-- 核心修正：加寬並限制絕對不換行 -->
-	<label style="width: 100px; margin-bottom: 0; white-space: nowrap; flex-shrink: 0; font-weight: 600; color: #495057;">員工編號：</label>
-	
-	<input type="text" id="editEmployeeId" name="employeeId" th:value="*{employeeId}" readonly 
-		style="border: none !important; background: transparent !important; pointer-events: none; outline: none !important; padding: 0 !important; font-size: 1.1rem; font-weight: 700; color: #212529; letter-spacing: 0.5px; width: 100%;" />
-</div>
-
+		<div class="form-group" style="flex-direction: row; align-items: center; background-color: #f8f9fa; padding: 10px 14px; border-radius: 6px; border-left: 4px solid #007bff; max-width: 400px; box-sizing: border-box;">
+			<label style="width: 100px; margin-bottom: 0; white-space: nowrap; flex-shrink: 0; font-weight: 600; color: #495057;">員工編號：</label>
+			<input type="text" id="editEmployeeId" name="employeeId" th:value="*{employeeId}" readonly 
+				style="border: none !important; background: transparent !important; pointer-events: none; outline: none !important; padding: 0 !important; font-size: 1.1rem; font-weight: 700; color: #212529; letter-spacing: 0.5px; width: 100%;" />
+		</div>
 
 		<!-- 隱藏表單控制項 -->
 		<input type="hidden" id="editEmpAccount" name="empAccount" th:value="*{empAccount}" /> 
 		<input type="hidden" id="editEmpPassword" name="empPassword" th:value="*{empPassword}" />
-
+		<input type="hidden" name="searchEmpName" th:value="${currentEmpName}">
+        <input type="hidden" name="searchRoleTitle" th:value="${currentRoleTitle}">
+        <input type="hidden" name="searchEmpStatus" th:value="${currentEmpStatus}">
+		
 		<!-- 姓名 -->
 		<div class="form-group">
 			<label>員工姓名</label>
@@ -56,13 +56,15 @@
 			<div class="perm-scroll-box">
 				<th:block th:each="perms : ${permVO}">
 					<label class="perm-label-badge">
-						<input type="checkbox" name="permIds" th:value="${perms.permId}"
+						<!-- 💡 核心優化：更換 checkbox 的 class 名稱，方便你在 JS 裡做特殊防禦排查 -->
+						<input type="checkbox" name="permIds" th:value="${perms.permId}" class="edit-perm-checkbox"
 							th:checked="${selectedPermIds != null && selectedPermIds.contains(perms.permId)}"> 
 						<span th:text="${perms.permName}"></span>
 					</label>
 				</th:block>
 			</div> 
-			<span th:if="${#fields.hasErrors('empPermVO')}" th:errors="*{empPermVO}" class="error-text"></span>
+			<!-- 💡 終極修正：直接使用 th:if 偵測是否有任何與 empPermVO 相關的錯誤，只要出錯就強制顯示文字，打破 binding 限制 -->
+			<span th:if="${#fields.hasErrors('empPermVO')}" class="error-text">權限範圍請勿空白</span>
 		</div>
 
 		<!-- 員工照片 -->
@@ -71,14 +73,11 @@
 			<input type="file" name="upImg" accept="image/*" onchange="previewEditImage(this);" style="margin-bottom: 8px;">
 			
 			<div class="avatar-upload-box">
-				<!-- 預設無圖片灰色圈：只有當 VO 裡完全沒圖時才顯示 -->
 				<div id="editNoImageCircle" class="avatar-none"
 					 th:style="${employeeVO.empImg == null} ? 'display: flex;' : 'display: none;'">
 					無
 				</div>
-				
-				<!-- 圖片預覽：如果填錯被退回，就跑 Base64 渲染；正常編輯則讀取網址路徑 -->
-				<img id="editImagePreview" alt="圖片預覽" class="avatar-img"
+				<img id="editImagePreview" alt="圖片预覽" class="avatar-img"
 					 th:src="${employeeVO.empImg != null} ? 
 							 (${#fields.hasAnyErrors()} ? 'data:image/jpeg;base64,' + ${T(java.util.Base64).getEncoder().encodeToString(employeeVO.empImg)} : @{/admin/employees/dbgUpdateImg/{id}(id=${employeeVO.employeeId})}) 
 							 : ''"
@@ -90,11 +89,11 @@
 		<!-- 操作按鈕列 -->
 		<div class="modal-footer-btns">
 			<button type="submit" class="btn btn-primary">確認儲存</button>
-				<button type="button" class="btn btn-edit"
-					onclick="closeEmpModal(); var p = document.getElementById('modalCurrentPage').value; window.location.href='/admin/employees/empPage?p=' + (p ? p : 0);">
-					取消</button>
-			</div>
-			<input type="hidden" name="currentPage" id="modalCurrentPage" 
+			<button type="button" class="btn btn-edit"
+				onclick="closeEmpModal(); var p = document.getElementById('modalCurrentPage').value; window.location.href='/admin/employees/empPage?p=' + (p ? p : 0);">
+				取消</button>
+		</div>
+		<input type="hidden" name="currentPage" id="modalCurrentPage" 
        th:value="${currentPage != null ? currentPage : 0}" />
 		
 	</form>

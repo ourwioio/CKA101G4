@@ -14,7 +14,7 @@
         
         <!-- 標題區域 -->
         <div class="title-area">
-            <h2>後端管理中心登入系統</h2>
+            <h2>管理中心登入系統</h2>
         </div>
 
 <div th:if="${loginErrorMessage != null}" class="error-message">
@@ -36,9 +36,9 @@
                 <input type="password" name="password" autocomplete="new-password"  class="form-control" placeholder="••••••••">
             </div>
 
-            <div class="form-options">
-                <a th:href="@{/admin/forgotPassword}" class="link-primary">忘記密碼？</a>
-            </div>
+<!--             <div class="form-options"> -->
+<!--                 <a th:href="@{/admin/forgotPassword}" class="link-primary">忘記密碼？</a> -->
+<!--             </div> -->
 
             <button type="submit" class="btn-submit">
                 立即登入

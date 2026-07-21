@@ -21,6 +21,7 @@ import com.webond.member.model.MemberVO;
 import com.webond.member.service.MemberService;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 
 @Controller
 public class ActRptFrontController {
@@ -76,11 +77,13 @@ public class ActRptFrontController {
 		//  處理表單提交（含圖片上傳）
 		    @PostMapping("/activity/rptSubmit")
 		    public String submitReport(
-		    		@ModelAttribute("actRptVO") ActRptVO actRptVO,
+		    		@Valid ActRptVO actRptVO,
 		    		BindingResult result,
 		    		@RequestParam("imageFile") MultipartFile file,
 		    		HttpSession session,
 		    		Model model) {
+		    	
+
 		        try {
 		        	
 		        	MemberVO loginMember = (MemberVO) session.getAttribute("memberVO");
@@ -88,13 +91,14 @@ public class ActRptFrontController {
 		                return "redirect:/member/login"; 
 		            }
 		            
-//		            if (file != null && !file.isEmpty()) {
-//		                String contentType = file.getContentType();
-//		                if (contentType == null || !contentType.startsWith("image/")) {
-//		                    result.rejectValue("actRptImg", "error.imageType", "佐證檔案必須是圖片格式。");
-//		                }
-//		            }
+		            if (file != null && !file.isEmpty()) {
+		                String contentType = file.getContentType();
+		                if (contentType == null || !contentType.startsWith("image/")) {
+		                    result.rejectValue("actRptImg", "error.imageType", "佐證檔案必須是圖片格式。");
+		                }
+		            }
 
+		            
 		            if (result.hasErrors()) {
 		            	
 		            	ActivityVO activity = actSvc.getOneActivity(actRptVO.getActId().getActivityId());  

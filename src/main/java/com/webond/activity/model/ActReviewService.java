@@ -2,6 +2,7 @@ package com.webond.activity.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,31 +14,42 @@ import com.webond.member.repository.MemberRepository;
 
 @Service
 public class ActReviewService {
+
+	@Autowired
+	private ActivityOrderRepository orderRepo;
+
+	@Autowired
+	private ActivityRepository activityRepo;
+
+	@Autowired
+	private MemberRepository memberRepository;
+
+	@Transactional
+	public void saveBuyerReview(ActivityOrderVO order, Byte rating, String comment) {
+		order.setBuyerRateSeller(rating);
+		order.setBuyerReviewComment(comment);
+		order.setBuyerReviewedAt(LocalDateTime.now());
+		orderRepo.save(order);
+
+		// 新增：查出主辦方，更新其「舉辦活動評分」統計
+		ActivityVO activity = activityRepo.getReferenceById(order.getActivityId());
+		memberRepository.addHoldactRating(activity.getMemberId(), BigDecimal.valueOf(rating));
+	}
+
+	public String getActivityNameForComment(Integer activityId) {
+		Optional<ActivityVO> activityOpt = activityRepo.findById(activityId);
+
+		ActivityVO activity = activityOpt.get();
+		return activity.getActivityTitle();
+	}
+
+	public LocalDateTime getActivityTimeForComment(Integer activityId) {
+		Optional<ActivityVO> activityOpt = activityRepo.findById(activityId);
+
+		ActivityVO activity = activityOpt.get();
+		return activity.getStartTime();
+	}
 	
-	 @Autowired
-	    private ActivityOrderRepository orderRepo;
-	 
-
-	    @Autowired
-	    private ActivityRepository activityRepo;
-
-	    @Autowired
-	    private MemberRepository memberRepository;
-	 
-	 
-	 
-	    @Transactional
-	    public void saveBuyerReview(ActivityOrderVO order, Byte rating, String comment) {
-	        order.setBuyerRateSeller(rating);
-	        order.setBuyerReviewComment(comment);
-	        order.setBuyerReviewedAt(LocalDateTime.now());
-	        orderRepo.save(order);
-
-	        // 新增：查出主辦方，更新其「舉辦活動評分」統計
-	        ActivityVO activity = activityRepo.getReferenceById(order.getActivityId());
-	        memberRepository.addHoldactRating(activity.getMemberId(), BigDecimal.valueOf(rating));
-	    }
-	    
-
+	
 
 }

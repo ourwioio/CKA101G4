@@ -30,7 +30,7 @@ import jakarta.validation.constraints.Pattern;
 @GroupSequence({ ValidGroup.First.class, ValidGroup.Second.class, EmployeeVO.class })
 @Entity
 @Table(name = "EMPLOYEE")
-public class EmployeeVO implements java.io.Serializable {
+public class EmployeeVO {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

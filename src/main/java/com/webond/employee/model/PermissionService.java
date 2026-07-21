@@ -45,6 +45,17 @@ public class PermissionService {
 		return permRepo.findAll();
 	}
 	
+	@Transactional(readOnly = true)
+	public Page<PermissionVO> getAllPermsByPage(String searchPermName, String searchHasEmp, int pageNo) {
+	    int pageSize = 3; 
+	    Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("permId").ascending());
+	    
+	    Boolean hasEmpBoolean = null;
+	    if ("true".equals(searchHasEmp)) hasEmpBoolean = true;
+	    if ("false".equals(searchHasEmp)) hasEmpBoolean = false;
+	    
+	    return permRepo.findByCompositeSearch(searchPermName, hasEmpBoolean, pageable);
+	}
 
 // === 員工權限首頁(分頁邏輯) ===//
 		public Page<PermissionVO> getAllByPage(int pageNo){

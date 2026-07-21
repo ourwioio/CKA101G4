@@ -37,10 +37,6 @@ public class ActRptService {
      
     
 //===============    後台審核
-    public Page<ActRptVO> getRptsByStatusWithPage(Integer status, int page, int size){
-    	Pageable pageable = PageRequest.of(page, size, Sort.by("actRptTime"));
-    	return actRptRepo.findByActRptStatus(status, pageable);
-    }
     
     public ActRptVO getRetById(Integer id) {
     	return actRptRepo.findById(id).orElse(null);
@@ -91,6 +87,26 @@ public class ActRptService {
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by("actRptId").ascending());
         return actRptRepo.findAll(pageable); 
     }
+    
+    
+    public Page<ActRptVO> getCompositeSearch(Integer status, Integer empId, Integer rptType, Pageable pageable) {
+        return actRptRepo.findByCompositeSearch(status, empId, rptType, pageable);
+    }
+    
+    public String getRptTypeChinese(Integer rptType) {
+        if (rptType == null) {
+            return "未知違規行為";
+        }
+        switch (rptType) {
+            case 0: return "詐騙/虛假活動";
+            case 1: return "色情/不當活動";
+            case 2: return "暴力/危險活動";
+            case 3: return "違法行為(聚賭、毒品)";
+            case 4: return "其他違規行為";
+            default: return "其他違規行為";
+        }
+    }
+    
     
     
     

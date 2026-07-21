@@ -1,8 +1,13 @@
 package com.webond.activity.controller;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -19,6 +24,7 @@ import com.webond.activity.model.ActRptService;
 import com.webond.activity.model.ActRptVO;
 import com.webond.activity.model.ActivityService;
 import com.webond.activity.model.ActivityVO;
+import com.webond.employee.model.EmpService;
 import com.webond.employee.model.EmployeeVO;
 import com.webond.member.model.MemberVO;
 import com.webond.member.model.NotificationVO;
@@ -42,32 +48,39 @@ public class ActRptController {
 	 
 	 @Autowired
 	 private MemberService memSvc;
+	 
+	 @Autowired
+	 private EmpService empSvc;
 
 
 	    
 	    @GetMapping({ "/admin/actRptList", "/admin/activity/actRptList" })
 	    public String actRptList(
-	            @RequestParam(value = "status", required = false) Integer status, 
+	            @RequestParam(value = "status", required = false) Integer status,
+	            @RequestParam(value = "empId",required = false) Integer empId,
+	            @RequestParam(value = "rptType", required = false) Integer rptType,
 	            @RequestParam(value = "page", defaultValue = "0") int page,
 	    		Model model, 
 	    		HttpSession session) {
 	        
+	    	
 	    	EmployeeVO loginEmp = (EmployeeVO) session.getAttribute("employeeVO");
 	        if (loginEmp == null) {
 	            return "redirect:/admin/login"; 
 	        }
 	        
-	        int pageSize = 5; 
-	        Page<ActRptVO> reportPage;
+	        int pageSize = 5;
+	        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("actRptId").descending());
 
-	        if (status == null) {
-	        	reportPage = actRptSvc.getAllRpts(page, pageSize);
-	        } else {
-	            reportPage = actRptSvc.getRptsByStatusWithPage(status, page, pageSize);
-	        }
+	        Page<ActRptVO> reportPage = actRptSvc.getCompositeSearch(status, empId, rptType, pageable);
+	        
+	        List<EmployeeVO> empList = empSvc.getEmployeesWithActRptPermission(); 
+	        model.addAttribute("empList", empList); 
 	        
 	        model.addAttribute("actRptListData", reportPage.getContent());
 	        model.addAttribute("currentStatus", status);
+	        model.addAttribute("currentEmpId", empId);
+	        model.addAttribute("currentRptType", rptType);
 	        model.addAttribute("currentPage", page);
 	        model.addAttribute("totalPages", reportPage.getTotalPages());
 	    	
@@ -134,7 +147,8 @@ public class ActRptController {
 	        	NotificationVO notificationVO = new NotificationVO();
 	        	notificationVO.setMember(memVO);
 	        	notificationVO.setTitle("您的「" + actVO.getActivityTitle() + "」已被檢舉");
-	        	notificationVO.setContent("活動已違反：" + originalRpt.getRptType());
+	        	String rptTypeChinese = actRptSvc.getRptTypeChinese(originalRpt.getRptType());
+	        	notificationVO.setContent("活動已違反：" + rptTypeChinese);
 	        	notificationVO.setNotificationType((byte) 2);
 	        	
 	        	notificationSvc.addNotification(notificationVO);
@@ -142,34 +156,36 @@ public class ActRptController {
 	        // 檢舉駁回(通知檢舉人)
 	        }else if(Integer.valueOf(2).equals(actRptVO.getActRptStatus())) {
 	        	NotificationVO notificationVO = new NotificationVO();
-	        	notificationVO.setMember(actRptVO.getReporterId());
+	        	notificationVO.setMember(originalRpt.getReporterId());
 	        	notificationVO.setTitle("您的「" + actVO.getActivityTitle() + "」檢舉已被駁回");
 	        	notificationVO.setContent("查無違規");
 	        	notificationVO.setNotificationType((byte) 2);
 	        	
 	        	notificationSvc.addNotification(notificationVO);
 	        
-	        // 申訴成功(通知被檢舉人)	
-	        }else if(Integer.valueOf(4).equals(actRptVO.getActRptStatus())) {
-	        	NotificationVO notificationVO = new NotificationVO();
-	        	notificationVO.setMember(memVO);
-	        	notificationVO.setTitle("您的「" + actVO.getActivityTitle() + "」申訴成功");
-	        	notificationVO.setContent("您的懲處已取消");
-	        	notificationVO.setNotificationType((byte) 2);
-	        	
-	        	notificationSvc.addNotification(notificationVO);
-	        	
-	        // 申訴失敗(通知被檢舉人)
-	        }else if(Integer.valueOf(5).equals(actRptVO.getActRptStatus())) {
-	        	NotificationVO notificationVO = new NotificationVO();
-	        	notificationVO.setMember(memVO);
-	        	notificationVO.setTitle("您的「" + actVO.getActivityTitle() + "」申訴失敗");
-	        	notificationVO.setContent("維持原處分");
-	        	notificationVO.setNotificationType((byte) 2);
-	        	
-	        	notificationSvc.addNotification(notificationVO);
-	        	
 	        }
+	        	
+	        	// 申訴成功(通知被檢舉人)	
+//	        }else if(Integer.valueOf(4).equals(actRptVO.getActRptStatus())) {
+//	        	NotificationVO notificationVO = new NotificationVO();
+//	        	notificationVO.setMember(memVO);
+//	        	notificationVO.setTitle("您的「" + actVO.getActivityTitle() + "」申訴成功");
+//	        	notificationVO.setContent("您的懲處已取消");
+//	        	notificationVO.setNotificationType((byte) 2);
+//	        	
+//	        	notificationSvc.addNotification(notificationVO);
+//	        	
+//	        // 申訴失敗(通知被檢舉人)
+//	        }else if(Integer.valueOf(5).equals(actRptVO.getActRptStatus())) {
+//	        	NotificationVO notificationVO = new NotificationVO();
+//	        	notificationVO.setMember(memVO);
+//	        	notificationVO.setTitle("您的「" + actVO.getActivityTitle() + "」申訴失敗");
+//	        	notificationVO.setContent("維持原處分");
+//	        	notificationVO.setNotificationType((byte) 2);
+//	        	
+//	        	notificationSvc.addNotification(notificationVO);
+//	        	
+//	        }
 
 	        
 	        actRptVO.setEmpId(loginEmp);

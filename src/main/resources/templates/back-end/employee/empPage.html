@@ -34,6 +34,134 @@
 	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
 }
 
+/* 1. 篩選外殼卡片：微陰影與溫和的高級白背景 */
+.filter-card--compact {
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* 2. 表單單行流暢排版 */
+.filter-inline-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+}
+
+/* 3. 單個篩選欄位：標籤與控制項完美居中對齊 */
+.filter-field-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 4. 側邊精緻小標籤 */
+.filter-label-inline {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569; /* 深灰藍色，比純黑更顯質感 */
+    white-space: nowrap;
+}
+
+/* 5. 輸入框與下拉選單的共用極簡樣式 */
+.filter-inline-form .form-control-inline {
+    height: 36px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: #1e293b;
+    background-color: #f8fafc; /* 淺灰底色，視覺更舒適 */
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.15s ease-in-out;
+}
+
+/* 寬度精確控制，防止畫面被中文字撐開變形 */
+input[type="text"].form-control-inline {
+    width: 150px;
+}
+
+.select-wrapper-inline {
+    position: relative;
+    display: inline-block;
+}
+
+.select-wrapper-inline select.form-control-inline {
+    width: 130px;
+    padding-right: 32px; /* 為自訂箭頭留白 */
+    cursor: pointer;
+    appearance: none; /* 拔除瀏覽器預設醜箭頭 */
+    -webkit-appearance: none;
+}
+
+/* 6. 特製現代感微型下拉小箭頭 */
+.select-wrapper-inline::after {
+    content: '▾';
+    font-size: 12px;
+    color: #64748b;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-52%);
+    pointer-events: none;
+}
+
+/* 7. 焦點互動：點擊時會呈現柔和的藍色呼吸發光層 */
+.filter-inline-form .form-control-inline:focus {
+    background-color: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+/* 8. 右側按鈕組佈局 */
+.filter-actions-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto; /* 💡 核心魔法：將按鈕優雅地推到橫列的最右邊 */
+}
+
+/* 9. 精緻深藍色搜尋按鈕 */
+.btn-filter-submit-inline {
+    height: 36px;
+    background: #1e293b; /* 採用沉穩的深鐵灰藍，高級後台標配 */
+    color: #ffffff;
+    border: none;
+    padding: 0 18px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.btn-filter-submit-inline:hover {
+    background: #0f172a; /* 懸停時加深 */
+}
+
+/* 10. 輕量級重設按鈕 */
+.btn-filter-reset-inline {
+    height: 36px;
+    line-height: 34px; /* 精確居中 */
+    color: #64748b;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0 14px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+}
+
+.btn-filter-reset-inline:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
 
 </style>
 <link rel="stylesheet" th:href="@{/css/back-end/employee/empPage.css}">
@@ -62,6 +190,52 @@
 				<button type="button" class="btn btn-primary"
 					th:onclick="openAddEmpModal([[${currentPage}]])">＋ 新增員工</button>
 			</div>
+			
+<div class="filter-card--compact">
+    <form th:action="@{/admin/employees/empPage}" method="get" class="filter-inline-form">
+        
+        <!-- 💡 1. 姓名搜尋：name 改為 searchEmpName -->
+        <div class="filter-field-inline">
+            <label class="filter-label-inline" for="empName">員工姓名</label>
+            <input type="text" id="empName" name="searchEmpName" class="form-control-inline" 
+                   placeholder="搜尋姓名關鍵字..." th:value="${currentEmpName}">
+        </div>
+
+        <!-- 💡 2. 職稱篩選：name 改為 searchRoleTitle -->
+        <div class="filter-field-inline">
+            <label class="filter-label-inline" for="roleTitle">職稱</label>
+            <div class="select-wrapper-inline">
+                <select id="roleTitle" name="searchRoleTitle" class="form-control-inline">
+                    <option value="">全部職稱</option>
+                    <option value="0" th:selected="${currentRoleTitle == 0}">系統管理員</option>
+                    <option value="1" th:selected="${currentRoleTitle == 1}">營運總監</option>
+                    <option value="2" th:selected="${currentRoleTitle == 2}">客服專專員</option>
+                    <option value="3" th:selected="${currentRoleTitle == 3}">財務專員</option>
+                    <option value="4" th:selected="${currentRoleTitle == 4}">行銷專員</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 💡 3. 狀態篩選：name 改為 searchEmpStatus -->
+        <div class="filter-field-inline">
+            <label class="filter-label-inline" for="empStatus">狀態</label>
+            <div class="select-wrapper-inline">
+                <select id="empStatus" name="searchEmpStatus" class="form-control-inline">
+                    <option value="">全部狀態</option>
+                    <option value="0" th:selected="${currentEmpStatus == 0}">未驗證</option>
+                    <option value="1" th:selected="${currentEmpStatus == 1}">正常</option>
+                    <option value="2" th:selected="${currentEmpStatus == 2}">註銷</option>
+                    <option value="3" th:selected="${currentEmpStatus == 3}">停權</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="filter-actions-inline">
+            <a th:href="@{/admin/employees/empPage}" class="btn-filter-reset-inline">重設</a>
+            <button type="submit" class="btn-filter-submit-inline">搜尋</button>
+        </div>
+    </form>
+</div>
 
 
 
@@ -73,6 +247,7 @@
 							<th style="text-align: center;">員工編號(ID)</th>
 							<th>員工姓名</th>
 							<th style="text-align: center;">員工頭像</th>
+							<th>帳號</th>
 							<th>職稱</th>
 							<th>權限範圍</th>
 							<th style="text-align: center;">帳號狀態</th>
@@ -100,6 +275,9 @@
 								<div
 									th:unless="${empVO.empImg != null and empVO.empImg.length > 0}"
 									class="avatar-none">無</div></td>
+
+							<!-- 員工帳號 -->
+							<td th:text="${empVO.empAccount}" style="font-weight: 500;"></td>
 
 							<!-- 職稱 -->
 							<td th:switch="${empVO.roleTitle}"><span th:case="0">系統管理員</span>
@@ -155,12 +333,12 @@
 
 			<div class="pagination-container">
 				<a th:if="${currentPage > 0}"
-					th:href="@{/admin/employees/empPage(p=${(currentPage ?: 0) - 1})}"
+					th:href="@{/admin/employees/empPage(p=${(currentPage ?: 0) - 1}, searchEmpName=${currentEmpName}, searchRoleTitle=${currentRoleTitle}, searchEmpStatus=${currentEmpStatus})}"
 					class="page-link"> 上一頁 </a> <span class="page-info"
 					th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?:1} + ' 頁'">
 					第 1 頁 / 共 1 頁 </span> <a
 					th:if="${(currentPage ?: 0) < (totalPages?: 1) - 1}"
-					th:href="@{/admin/employees/empPage(p=${currentPage + 1})}"
+					th:href="@{/admin/employees/empPage(p=${currentPage + 1}, searchEmpName=${currentEmpName}, searchRoleTitle=${currentRoleTitle}, searchEmpStatus=${currentEmpStatus})}"
 					class="page-link"> 下一頁 </a>
 			</div>
 		</div>
@@ -211,13 +389,13 @@
 		}
 
 		// 新增按鈕的 (點擊按鈕打開彈窗)
-		function openAddEmpModal(currentPage) {
+		function openAddEmpModal(currentPage, isErrorReturn = false) {
 			var modal = document.getElementById("addEmpModal");
 			if (modal) {
 				var form = modal.querySelector("form");
-				if (form) {
-					form.reset();
-				}
+				if (form && !isErrorReturn) {
+		            form.reset();
+		        }
 
 				var noImageCircle = document.getElementById("noImageCircle");
 				var imagePreview = document.getElementById("imagePreview");
@@ -226,11 +404,11 @@
 					document.getElementById("modalCurrentPage").value = (currentPage !== undefined && currentPage !== null) ? currentPage : 0; 
 				}
 
-				if (noImageCircle && imagePreview) {
-					imagePreview.src = "";
-					imagePreview.style.display = "none";
-					noImageCircle.style.display = "block";
-				}
+				if (noImageCircle && imagePreview && !isErrorReturn) {
+		            imagePreview.src = "";
+		            imagePreview.style.display = "none";
+		            noImageCircle.style.display = "block";
+		        }
 
 				modal.style.setProperty("display", "flex", "important");
 			}
@@ -238,44 +416,53 @@
 
 		// 修改按鈕的 (點擊按鈕打開彈窗)
 		function openEditEmpModal(employeeId, empAccount, empPassword, empName,
-				roleTitle, empStatus, hasImg,currentPage, btnElement) {
+				roleTitle, empStatus, hasImg,currentPage, btnElement, isErrorReturn = false) {
 			var modal = document.getElementById("editEmpModal");
 			if (modal) {
 				var form = modal.querySelector("form");
-				if (form) {
+				if (form && !isErrorReturn) {
 					form.reset();
 				}
 
-				if (document.getElementById("editEmployeeId"))
-					document.getElementById("editEmployeeId").value = employeeId;
-				if (document.getElementById("editEmpAccount"))
-					document.getElementById("editEmpAccount").value = empAccount;
-				if (document.getElementById("editEmpPassword"))
-					document.getElementById("editEmpPassword").value = empPassword;
-				if (document.getElementById("editEmpName"))
-					document.getElementById("editEmpName").value = empName;
-				if (document.getElementById("editRoleTitle"))
-					document.getElementById("editRoleTitle").value = roleTitle;
-				if (document.getElementById("editEmpStatus"))
-					document.getElementById("editEmpStatus").value = empStatus;
+				if (!isErrorReturn) {
+					if (document.getElementById("editEmployeeId"))
+						document.getElementById("editEmployeeId").value = employeeId;
+					if (document.getElementById("editEmpAccount"))
+						document.getElementById("editEmpAccount").value = empAccount;
+					if (document.getElementById("editEmpPassword"))
+						document.getElementById("editEmpPassword").value = empPassword;
+					if (document.getElementById("editEmpName"))
+						document.getElementById("editEmpName").value = empName;
+					if (document.getElementById("editRoleTitle"))
+						document.getElementById("editRoleTitle").value = roleTitle;
+					if (document.getElementById("editEmpStatus"))
+						document.getElementById("editEmpStatus").value = empStatus;
+				}
+				
 				if (document.getElementById("modalCurrentPage")) {
 					document.getElementById("modalCurrentPage").value = (currentPage !== undefined && currentPage !== null) ? currentPage : 0; 
 				}
 
 				//拿權限編號
-				var permIdsArray = [];
-				if (btnElement) {
-					var currentRow = btnElement.closest('tr');
-					if (currentRow) {
-						var permSpans = currentRow
-								.querySelectorAll('.perm-item');
-						permSpans.forEach(function(span) {
-							if (span.dataset.permid) {
-								permIdsArray.push(span.dataset.permid);
-							}
-						});
-					}
+				if (!isErrorReturn) {
+			var permIdsArray = [];
+			if (btnElement) {
+				var currentRow = btnElement.closest('tr');
+				if (currentRow) {
+					var permSpans = currentRow.querySelectorAll('.perm-item');
+					permSpans.forEach(function(span) {
+						if (span.dataset.permid) {
+							permIdsArray.push(span.dataset.permid);
+						}
+					});
 				}
+			}
+
+			var checkboxes = modal.querySelectorAll("input[name='permIds']");
+			checkboxes.forEach(function(checkbox) {
+				checkbox.checked = permIdsArray.includes(checkbox.value);
+			});
+		}
 
 				var checkboxes = modal
 						.querySelectorAll("input[name='permIds']");
@@ -350,6 +537,24 @@
 				if (noImageCircle) noImageCircle.style.display = 'flex';
 			}
 		}
+		
+		document.addEventListener("DOMContentLoaded", function() {
+	        let shouldOpenAddModal = /*[[${openAddEmpModal}]]*/ false;
+	        let shouldOpenEditModal = /*[[${openEditEmpModal}]]*/ false;
+	        let currentPage = /*[[${currentPage ?: 0}]]*/ 0;
+	        
+	        if (shouldOpenAddModal === true || shouldOpenAddModal === "true") {
+	            openAddEmpModal(currentPage, true); 
+	        }
+	        
+	        if (shouldOpenEditModal === true || shouldOpenEditModal === "true") {
+	            let empVO = /*[[${employeeVO}]]*/ null;
+	            if (empVO && empVO.employeeId) {
+	                
+	                openEditEmpModal(empVO.employeeId, empVO.empAccount, empVO.empPassword, empVO.empName, empVO.roleTitle, empVO.empStatus, true, currentPage);
+	            }
+	        }
+	    });
 	</script>
 </body>
 </html>
