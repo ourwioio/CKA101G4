@@ -30,6 +30,11 @@
 	width: 150px;
 }
 
+.filter-label {
+	white-space: nowrap;
+	margin-left: 4px;
+}
+
 .filter-bar input[name="venueName"] {
 	width: 140px;
 }
@@ -65,7 +70,7 @@ table th { white-space: nowrap; }
 		</div>
 
 		<!-- 搜尋區：處理狀態 + 檢舉時間區間 + 內容關鍵字 -->
-		<form class="filter-bar" th:action="@{/admin/venue/venueReport/search}" method="get">
+		<form id="venueReportSearchForm" class="filter-bar" th:action="@{/admin/venue/venueReport/search}" method="get">
 
 			<div class="filter-fields">
 				<select name="reportStatus">
@@ -76,8 +81,8 @@ table th { white-space: nowrap; }
 						th:selected="${searchStatus != null and searchStatus == 1}">審核通過</option>
 					<option value="2"
 						th:selected="${searchStatus != null and searchStatus == 2}">審核未通過</option>
-				</select> <input type="date" name="startDate" th:value="${searchStartDate}" />
-				<span>~</span> <input type="date" name="endDate"
+				</select> <span class="filter-label">檢舉時間</span> <input type="date" id="reportStartDate" name="startDate" th:value="${searchStartDate}" />
+				<span>~</span> <input type="date" id="reportEndDate" name="endDate"
 					th:value="${searchEndDate}" /> <input type="text" name="venueName"
 					placeholder="場地名稱" th:value="${searchVenueName}" /> <input
 					type="text" name="keyword" placeholder="檢舉內容關鍵字"
@@ -144,6 +149,24 @@ table th { white-space: nowrap; }
 	</main>
 
 </div>
+
+<script th:inline="javascript">
+document.getElementById('venueReportSearchForm').addEventListener('submit', function(e) {
+	var startDate = document.getElementById('reportStartDate').value;
+	var endDate = document.getElementById('reportEndDate').value;
+
+	if ((startDate && !endDate) || (!startDate && endDate)) {
+		e.preventDefault();
+		alert('請將檢舉時間的起訖日期填寫完整，否則無法查詢！');
+		return;
+	}
+
+	if (startDate && endDate && startDate > endDate) {
+		e.preventDefault();
+		alert('檢舉時間的結束日期不可早於開始日期！');
+	}
+});
+</script>
 
 </body>
 </html>
