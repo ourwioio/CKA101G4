@@ -339,7 +339,7 @@
         .btn {
             display: inline-flex; align-items: center; justify-content: center; font-family: var(--font-body);
             font-weight: 800; font-size: 13.5px; padding: 8px 18px; border-radius: var(--radius-full);
-            transition: all .15s ease; cursor: pointer; border: none; width: 100%;
+            transition: all .15s ease; cursor: pointer; border: none; width: 100%;box-sizing: border-box;
         }
         .service-booking-toggle { background: var(--color-ink); color: #fff; box-shadow: var(--shadow-sm); }
         .service-booking-toggle:hover { background: var(--color-yellow-deep); color: var(--color-ink); transform: translateY(-2px); }
@@ -750,7 +750,7 @@
                     <span class="review-count-badge" th:text="|(${#lists.size(reviewListData)})|">(0)</span>
                 </div>
 
-                <!-- 星等藥丸 Tabs 切換與排序按鈕 -->
+                <!-- 切換與排序按鈕 -->
                 <div class="review-filter-tabs" th:if="${!#lists.isEmpty(reviewListData)}">
                     <button type="button" class="filter-btn active" onclick="filterReviews('all')">全部評價</button>
                     <button type="button" class="filter-btn" onclick="filterReviews('5')">5 星</button>

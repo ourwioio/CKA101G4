@@ -18,11 +18,12 @@ public class ServiceOrderScheduler {
 
     /**
      * 每秒檢查一次：
-     * 1. 賣家是否超過60秒未確認
-     * 2. 買家是否超過30秒未付款
+     * 1. 賣家確認是否逾期
+     * 2. 買家付款是否逾期
+     * 3. 已成立訂單的服務時間是否已結束
      */
     @Scheduled(fixedDelay = 1000)
-    public void expireOverdueOrders() {
+    public void processServiceOrders() {
 
         int sellerExpiredCount =
                 serviceOrderService
@@ -32,17 +33,26 @@ public class ServiceOrderScheduler {
                 serviceOrderService
                         .expireOverduePaymentOrders();
 
-        if (sellerExpiredCount > 0
-                || paymentExpiredCount > 0) {
+        int completedCount =
+                serviceOrderService
+                        .completeFinishedOrders();
 
-            System.out.println(
-                    "服務訂單逾期處理完成："
-                    + "賣家確認逾期 "
-                    + sellerExpiredCount
-                    + " 筆，買家付款逾期 "
-                    + paymentExpiredCount
-                    + " 筆"
-            );
+        if (sellerExpiredCount > 0
+                || paymentExpiredCount > 0
+                || completedCount > 0) {
+
+//            System.out.println(
+//                    "服務訂單排程處理完成："
+//                    + "賣家確認逾期 "
+//                    + sellerExpiredCount
+//                    + " 筆，買家付款逾期 "
+//                    + paymentExpiredCount
+//                    + " 筆，自動完成 "
+//                    + completedCount
+//                    + " 筆"
+//            );
         }
+        
+        
     }
 }

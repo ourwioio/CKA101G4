@@ -43,7 +43,7 @@
         }
 
         /* =========================
-           頁面標題
+           頁面標題與搜尋
            ========================= */
 
         .page-header {
@@ -73,13 +73,11 @@
             margin-top: 14px;
         }
 
-        /* =========================
-           員工資訊
-           ========================= */
-
-        .employee-panel {
-            min-width: 280px;
-            padding: 16px 18px;
+        .order-search-form {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px;
             background: #ffffff;
             border: 1px solid #e1e5ea;
             border-radius: 14px;
@@ -88,35 +86,25 @@
                     rgba(0, 0, 0, 0.05);
         }
 
-        .employee-label {
-            margin-bottom: 6px;
-            color: #7b838b;
+        .order-search-form label {
+            color: #4f5964;
             font-size: 13px;
-        }
-
-        .employee-id {
-            margin-bottom: 12px;
-            font-size: 18px;
             font-weight: 800;
+            white-space: nowrap;
         }
 
-        .employee-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .employee-switch-form {
-            display: flex;
-            gap: 8px;
-        }
-
-        .employee-switch-form input {
-            width: 105px;
-            height: 38px;
-            padding: 0 10px;
+        .order-search-form input {
+            width: 170px;
+            height: 40px;
+            padding: 0 12px;
             border: 1px solid #d9dee5;
             border-radius: 8px;
+            outline: none;
+        }
+
+        .order-search-form input:focus {
+            border-color: #8c7ae6;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.12);
         }
 
         /* =========================
@@ -321,9 +309,29 @@
             font-size: 20px;
         }
 
+        .table-header-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        #order-list {
+            scroll-margin-top: 20px;
+        }
+
         .table-count {
             color: #69727b;
             font-size: 13px;
+            text-align: right;
+        }
+
+        .search-result-text {
+            display: block;
+            margin-top: 4px;
+            color: #6c5ce7;
+            font-weight: 800;
         }
 
         .table-scroll {
@@ -598,8 +606,13 @@
                 flex-direction: column;
             }
 
-            .employee-panel {
+            .order-search-form {
                 width: 100%;
+            }
+
+            .order-search-form input {
+                flex: 1;
+                width: auto;
             }
 
             .stats-grid {
@@ -613,13 +626,21 @@
                 flex: 1 1 150px;
             }
 
-            .employee-switch-form {
+            .order-search-form {
+                flex-wrap: wrap;
+            }
+
+            .order-search-form label {
                 width: 100%;
             }
 
-            .employee-switch-form input {
+            .order-search-form input {
+                width: 100%;
+                flex-basis: 100%;
+            }
+
+            .order-search-form .btn {
                 flex: 1;
-                width: auto;
             }
 
             .header-links {
@@ -629,6 +650,22 @@
             .header-links .btn {
                 width: 100%;
             }
+
+            .table-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .table-header-actions {
+                width: 100%;
+                align-items: stretch;
+                justify-content: flex-start;
+                flex-direction: column;
+            }
+
+            .table-count {
+                text-align: left;
+            }
         }
     </style>
 </head>
@@ -637,25 +674,16 @@
 
 <div class="wb-admin-layout">
 
-    <!-- =========================
-         左側共用 Sidebar
-         ========================= -->
-
+    <!-- 左側共用 Sidebar -->
     <div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}">
     </div>
 
-    <!-- =========================
-         右側服務訂單內容
-         ========================= -->
-
+    <!-- 右側服務訂單內容 -->
     <main class="wb-admin-content">
 
         <div class="page">
 
-            <!-- =========================
-                 標題及功能按鈕
-                 ========================= -->
-
+            <!-- 頁面標題與服務管理連結 -->
             <header class="page-header">
 
                 <div>
@@ -679,72 +707,9 @@
 
                 </div>
 
-                <!-- =========================
-                     員工 Session
-                     ========================= -->
-
-                <div class="employee-panel">
-
-                    <div class="employee-label">
-                        目前處理員工
-                    </div>
-
-                    <div class="employee-id">
-
-                        員工 #
-
-                        <span th:if="${loginEmployeeId != null}"
-                              th:text="${loginEmployeeId}">
-                            1001
-                        </span>
-
-                        <span th:if="${loginEmployeeId == null
-                                      and session.employeeVO != null}"
-                              th:text="${session.employeeVO.employeeId}">
-                            1001
-                        </span>
-
-                        <span th:if="${loginEmployeeId == null
-                                      and session.employeeVO == null}">
-                            未登入
-                        </span>
-
-                    </div>
-
-                    <div class="employee-actions">
-
-                        <form class="employee-switch-form"
-                              th:action="@{/admin/services/orders/fake-login}"
-                              method="get">
-
-                            <input type="number"
-                                   name="employeeId"
-                                   min="1"
-                                   placeholder="員工 ID"
-                                   required>
-
-                            <button class="btn btn--secondary"
-                                    type="submit">
-                                切換員工
-                            </button>
-
-                        </form>
-
-                        <a class="btn btn--secondary"
-                           th:href="@{/admin/services/orders/fake-logout}">
-                            重設 Session
-                        </a>
-
-                    </div>
-
-                </div>
-
             </header>
 
-            <!-- =========================
-                 成功或錯誤訊息
-                 ========================= -->
-
+            <!-- 成功或錯誤訊息 -->
             <div class="message message--success"
                  th:if="${successMsg != null}"
                  th:text="${successMsg}">
@@ -757,13 +722,9 @@
                 操作失敗
             </div>
 
-            <!-- =========================
-                 統計資訊
-                 ========================= -->
-
+            <!-- 統計資訊 -->
             <section class="stats-grid">
 
-                <!-- 已完成訂單 -->
                 <article class="stat-card">
 
                     <div class="stat-card__label">
@@ -802,7 +763,6 @@
 
                 </article>
 
-                <!-- 尚未撥款 -->
                 <article class="stat-card">
 
                     <div class="stat-card__label">
@@ -841,7 +801,6 @@
 
                 </article>
 
-                <!-- 等待退款 -->
                 <article class="stat-card">
 
                     <div class="stat-card__label">
@@ -882,10 +841,7 @@
 
             </section>
 
-            <!-- =========================
-                 訂單分類
-                 ========================= -->
-
+            <!-- 訂單分類 -->
             <section class="filter-panel">
 
                 <h2 class="filter-title">
@@ -895,7 +851,7 @@
                 <div class="filter-group">
 
                     <a class="filter-link"
-                       th:classappend="${selectedView == 'all'}
+                       th:classappend="${selectedView == 'all' and searchOrderId == null}
                                ? 'active'
                                : ''"
                        th:href="@{/admin/services/orders(view='all')}">
@@ -903,52 +859,42 @@
                     </a>
 
                     <a class="filter-link"
-                       th:classappend="${selectedView == 'completed-unpaid'}
+                       th:classappend="${selectedView == 'completed-unpaid' and searchOrderId == null}
                                ? 'active'
                                : ''"
-                       th:href="@{/admin/services/orders(
-                               view='completed-unpaid'
-                       )}">
+                       th:href="@{/admin/services/orders(view='completed-unpaid')}">
                         已完成／未撥款
                     </a>
 
                     <a class="filter-link"
-                       th:classappend="${selectedView == 'completed-paid'}
+                       th:classappend="${selectedView == 'completed-paid' and searchOrderId == null}
                                ? 'active'
                                : ''"
-                       th:href="@{/admin/services/orders(
-                               view='completed-paid'
-                       )}">
+                       th:href="@{/admin/services/orders(view='completed-paid')}">
                         已完成／已撥款
                     </a>
 
                     <a class="filter-link"
-                       th:classappend="${selectedView == 'cancelled-no-refund'}
+                       th:classappend="${selectedView == 'cancelled-no-refund' and searchOrderId == null}
                                ? 'active'
                                : ''"
-                       th:href="@{/admin/services/orders(
-                               view='cancelled-no-refund'
-                       )}">
+                       th:href="@{/admin/services/orders(view='cancelled-no-refund')}">
                         已取消／不需退款
                     </a>
 
                     <a class="filter-link"
-                       th:classappend="${selectedView == 'cancelled-pending-refund'}
+                       th:classappend="${selectedView == 'cancelled-pending-refund' and searchOrderId == null}
                                ? 'active'
                                : ''"
-                       th:href="@{/admin/services/orders(
-                               view='cancelled-pending-refund'
-                       )}">
+                       th:href="@{/admin/services/orders(view='cancelled-pending-refund')}">
                         已取消／待退款
                     </a>
 
                     <a class="filter-link"
-                       th:classappend="${selectedView == 'cancelled-refunded'}
+                       th:classappend="${selectedView == 'cancelled-refunded' and searchOrderId == null}
                                ? 'active'
                                : ''"
-                       th:href="@{/admin/services/orders(
-                               view='cancelled-refunded'
-                       )}">
+                       th:href="@{/admin/services/orders(view='cancelled-refunded')}">
                         已取消／已退款
                     </a>
 
@@ -956,11 +902,8 @@
 
             </section>
 
-            <!-- =========================
-                 訂單列表
-                 ========================= -->
-
-            <section class="table-panel">
+            <!-- 訂單列表 -->
+            <section class="table-panel" id="order-list">
 
                 <div class="table-header">
 
@@ -968,17 +911,58 @@
                         訂單列表
                     </h2>
 
-                    <div class="table-count">
+                    <div class="table-header-actions">
 
-                        共
+                        <form class="order-search-form"
+                              th:action="@{/admin/services/orders}"
+                              method="get">
 
-                        <span th:text="${orderList != null
-                                ? #lists.size(orderList)
-                                : 0}">
-                            0
-                        </span>
+                            <label for="orderId">
+                                訂單編號
+                            </label>
 
-                        筆
+                            <input id="orderId"
+                                   type="number"
+                                   name="orderId"
+                                   min="1"
+                                   step="1"
+                                   placeholder="輸入訂單編號"
+                                   th:value="${searchOrderId}">
+
+                            <button class="btn btn--primary"
+                                    type="submit">
+                                搜尋
+                            </button>
+
+                            <a class="btn btn--secondary"
+                               th:if="${searchOrderId != null}"
+                               th:href="@{/admin/services/orders}">
+                                清除
+                            </a>
+
+                        </form>
+
+                        <div class="table-count">
+
+                            共
+
+                            <span th:text="${orderList != null
+                                    ? #lists.size(orderList)
+                                    : 0}">
+                                0
+                            </span>
+
+                            筆
+
+                            <span class="search-result-text"
+                                  th:if="${searchOrderId != null}">
+                                搜尋訂單 #
+                                <span th:text="${searchOrderId}">
+                                    1
+                                </span>
+                            </span>
+
+                        </div>
 
                     </div>
 
@@ -1042,12 +1026,10 @@
 
                         <tr th:each="order : ${orderList}">
 
-                            <!-- 訂單編號 -->
                             <td th:text="${order.serviceOrderId}">
                                 1
                             </td>
 
-                            <!-- 服務資訊 -->
                             <td>
 
                                 <a class="service-link"
@@ -1056,9 +1038,7 @@
                                            serviceId=${order.serviceId}
                                    )}"
                                    th:text="${order.serviceNameSnapshot != null
-                                            and !#strings.isEmpty(
-                                                order.serviceNameSnapshot
-                                            )
+                                            and !#strings.isEmpty(order.serviceNameSnapshot)
                                             ? order.serviceNameSnapshot
                                             : '未命名服務'}">
                                     咖啡聊天
@@ -1067,9 +1047,7 @@
                                 <div class="primary-text"
                                      th:if="${order.serviceId == null}"
                                      th:text="${order.serviceNameSnapshot != null
-                                              and !#strings.isEmpty(
-                                                  order.serviceNameSnapshot
-                                              )
+                                              and !#strings.isEmpty(order.serviceNameSnapshot)
                                               ? order.serviceNameSnapshot
                                               : '未命名服務'}">
                                     咖啡聊天
@@ -1077,9 +1055,7 @@
 
                                 <div class="secondary-text"
                                      th:text="${order.serviceTypeNameSnapshot != null
-                                              and !#strings.isEmpty(
-                                                  order.serviceTypeNameSnapshot
-                                              )
+                                              and !#strings.isEmpty(order.serviceTypeNameSnapshot)
                                               ? order.serviceTypeNameSnapshot
                                               : '未分類'}">
                                     陪伴聊天
@@ -1098,7 +1074,6 @@
 
                             </td>
 
-                            <!-- 交易雙方 -->
                             <td>
 
                                 <div class="member-line">
@@ -1127,7 +1102,6 @@
 
                             </td>
 
-                            <!-- 預約時段 -->
                             <td>
 
                                 <div th:if="${order.slotStartTimeSnapshot != null
@@ -1169,7 +1143,6 @@
 
                             </td>
 
-                            <!-- 訂單金額 -->
                             <td>
 
                                 <div class="amount-text">
@@ -1206,7 +1179,6 @@
 
                             </td>
 
-                            <!-- 付款方式 -->
                             <td>
 
                                 <span class="status status--credit-card"
@@ -1233,7 +1205,6 @@
 
                             </td>
 
-                            <!-- 訂單狀態 -->
                             <td>
 
                                 <span class="status status--pending"
@@ -1268,7 +1239,6 @@
 
                             </td>
 
-                            <!-- 撥款及退款狀態 -->
                             <td>
 
                                 <div class="finance-status">
@@ -1321,7 +1291,6 @@
 
                             </td>
 
-                            <!-- 處理資訊 -->
                             <td>
 
                                 <div th:if="${order.employeeId != null}">
@@ -1387,9 +1356,7 @@
                                             取消原因：
 
                                             <span th:text="${order.cancelReason != null
-                                                           and !#strings.isEmpty(
-                                                               order.cancelReason
-                                                           )
+                                                           and !#strings.isEmpty(order.cancelReason)
                                                            ? order.cancelReason
                                                            : '未填寫取消原因'}">
                                                 取消原因
@@ -1416,10 +1383,8 @@
 
                             </td>
 
-                            <!-- 後台操作 -->
                             <td>
 
-                                <!-- 完成撥款 -->
                                 <form class="action-form"
                                       th:if="${order.orderStatus == 3
                                                and order.payoutStatus == 0
@@ -1446,7 +1411,6 @@
 
                                 </form>
 
-                                <!-- 完成退款 -->
                                 <form class="action-form"
                                       th:if="${order.orderStatus == 4
                                                and order.payoutStatus == 0
@@ -1497,11 +1461,21 @@
 
                 </div>
 
-                <!-- 沒有符合條件的訂單 -->
                 <div class="empty-state"
                      th:if="${orderList == null
                               or #lists.isEmpty(orderList)}">
-                    目前沒有符合條件的服務訂單
+
+                    <span th:if="${searchOrderId != null}">
+                        查無訂單 #
+                        <strong th:text="${searchOrderId}">
+                            1
+                        </strong>
+                    </span>
+
+                    <span th:if="${searchOrderId == null}">
+                        目前沒有符合條件的服務訂單
+                    </span>
+
                 </div>
 
             </section>
@@ -1511,6 +1485,20 @@
     </main>
 
 </div>
+
+
+<script th:if="${searchOrderId != null}">
+    window.addEventListener("DOMContentLoaded", function () {
+        const orderList = document.getElementById("order-list");
+
+        if (orderList) {
+            orderList.scrollIntoView({
+                behavior: "auto",
+                block: "start"
+            });
+        }
+    });
+</script>
 
 </body>
 </html>
