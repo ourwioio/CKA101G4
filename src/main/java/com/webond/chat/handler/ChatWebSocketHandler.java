@@ -116,6 +116,24 @@ public class ChatWebSocketHandler extends TextWebSocketHandler {
 			chatSvc.saveChatMessage(String.valueOf(senderId), String.valueOf(receiverId), cleanJsonMessage, false);
 			return;
 		}
+		if ("image".equals(type)) {
+			WebSocketSession receiverSession = sessionsMap.get(receiverId);
+			boolean isReceiverOnline = (receiverSession != null && receiverSession.isOpen());
+
+			chatMessage.setMsgRead(0);
+			String cleanJsonMessage = objectMapper.writeValueAsString(chatMessage);
+
+			if (isReceiverOnline) {
+				receiverSession.sendMessage(new TextMessage(cleanJsonMessage));
+			}
+
+			if (userSession.isOpen()) {
+				userSession.sendMessage(new TextMessage(cleanJsonMessage));
+			}
+
+			chatSvc.saveChatMessage(String.valueOf(senderId), String.valueOf(receiverId), cleanJsonMessage, false);
+			return;
+		}
 
 		if ("read".equals(chatMessage.getType())) {
 			chatSvc.readChatMessage(String.valueOf(senderId), String.valueOf(receiverId) );

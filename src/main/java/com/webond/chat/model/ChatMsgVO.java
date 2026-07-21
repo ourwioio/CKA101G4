@@ -24,7 +24,7 @@ public class ChatMsgVO {
 	@Column(name = "RECEIVER_MEMBER_ID")
 	private Integer receiverId;
 
-	@Column(name = "CONTENT")
+	@Column(name = "content", columnDefinition = "LONGTEXT")
 	private String content;
 
 	@Column(name = "SENT_AT", updatable = false)
