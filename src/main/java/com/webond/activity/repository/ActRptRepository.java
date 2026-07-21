@@ -12,7 +12,16 @@ import com.webond.activity.model.ActRptVO;
 @Repository
 public interface ActRptRepository extends JpaRepository<ActRptVO, Integer>{
 	
-	// 找出特定狀態
-	Page<ActRptVO> findByActRptStatus(Integer status, Pageable pageable);
+	
+	@Query("SELECT r FROM ActRptVO r WHERE " +
+	           "(:status IS NULL OR r.actRptStatus = :status) AND " +
+	           "(:empId IS NULL OR r.empId.employeeId = :empId) AND "  +
+	           "(:rptType IS NULL OR r.rptType = :rptType)")
+	    Page<ActRptVO> findByCompositeSearch(
+	        @Param("status") Integer status, 
+	        @Param("empId") Integer empId,
+	        @Param("rptType") Integer rptType,
+	        Pageable pageable
+	    );
 	
 }

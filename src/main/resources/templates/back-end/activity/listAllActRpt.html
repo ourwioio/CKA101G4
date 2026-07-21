@@ -417,6 +417,120 @@ a {
 .btn-modal--cancel:hover {
 	background: #dfe4e8;
 }
+
+/* 輕量化外殼：高度極低，帶有精緻的淺灰色細外框 */
+.filter-card--compact {
+	background: #ffffff;
+	border-radius: 8px;
+	border: 1px solid #e2e8f0;
+	padding: 12px 20px;
+	margin-bottom: 20px;
+}
+
+/* 橫向排列的表單容器 */
+.filter-inline-form {
+	display: flex;
+	flex-wrap: wrap; /* 避免極端小螢幕破版 */
+	align-items: center;
+	gap: 24px; /* 每個元件之間的精緻間距 */
+}
+
+/* 每個篩選元件：標籤與下拉選單橫向併排 */
+.filter-field-inline {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/* 縮小版的標籤文字 */
+.filter-label-inline {
+	font-size: 13px;
+	font-weight: 500;
+	color: #475569;
+	white-space: nowrap; /* 避免文字斷行 */
+}
+
+.select-wrapper-inline {
+	position: relative;
+	min-width: 140px; /* 給予適當寬度，防止選單縮得太小 */
+}
+
+/* 針對類型選單給予稍寬的空間（因為中文字數較多） */
+#rptType.form-control-inline {
+	min-width: 180px;
+}
+
+/* 輕量化下拉選單本體 */
+.form-control-inline {
+	width: 100%;
+	padding: 6px 30px 6px 12px; /* 減少上下內距，使其變扁、變精緻 */
+	font-size: 13px;
+	color: #334155;
+	background-color: #f8fafc;
+	border: 1px solid #cbd5e1;
+	border-radius: 6px;
+	cursor: pointer;
+	appearance: none;
+	-webkit-appearance: none;
+	transition: all 0.2s ease;
+}
+
+/* 自訂小箭頭 */
+.select-wrapper-inline::after {
+	content: '▼';
+	font-size: 9px;
+	color: #94a3b8;
+	position: absolute;
+	right: 10px;
+	top: 52%;
+	transform: translateY(-50%);
+	pointer-events: none;
+}
+
+.form-control-inline:focus {
+	border-color: #3b82f6;
+	background-color: #ffffff;
+	box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+	outline: none;
+}
+
+.filter-actions-inline {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-left: auto; /* 💡 神奇魔法：自動將按鈕推至最右邊，視覺上最和諧 */
+}
+
+.btn-filter-submit-inline {
+	background: #3b82f6;
+	color: #ffffff;
+	border: none;
+	padding: 6px 16px;
+	font-size: 13px;
+	font-weight: 500;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+
+.btn-filter-submit-inline:hover {
+	background: #2563eb;
+}
+
+.btn-filter-reset-inline {
+	color: #64748b;
+	text-decoration: none;
+	font-size: 13px;
+	font-weight: 500;
+	padding: 6px 12px;
+	border-radius: 6px;
+	transition: background 0.2s;
+}
+
+.btn-filter-reset-inline:hover {
+	background: #f1f5f9;
+	color: #334155;
+}
 </style>
 </head>
 <body>
@@ -444,22 +558,66 @@ a {
 						th:href="@{/admin/activity/home}" class="btn-nav btn-nav--gray">回後台首頁</a>
 				</div>
 
-				<div class="filter-card">
-					<span class="filter-label">狀態篩選：</span>
-					<div class="filter-tab-group">
+				<div class="filter-card filter-card--compact">
+					<form th:action="@{/admin/activity/actRptList}" method="get"
+						class="filter-inline-form">
 
-						<a th:href="@{/admin/activity/actRptList}"
-							th:class="'tab-btn ' + (${currentStatus == null} ? 'active-all' : '')">
-							查看全部 </a> <a th:href="@{/admin/activity/actRptList(status=0)}"
-							th:class="'tab-btn ' + (${currentStatus == 0} ? 'active-pending' : '')">
-							待處理 </a> <a th:href="@{/admin/activity/actRptList(status=1)}"
-							th:class="'tab-btn ' + (${currentStatus == 1} ? 'active-success' : '')">
-							檢舉成立 </a> <a th:href="@{/admin/activity/actRptList(status=2)}"
-							th:class="'tab-btn ' + (${currentStatus == 2} ? 'active-reject' : '')">
-							檢舉駁回 </a>
+						<!-- 1. 狀態篩選 -->
+						<div class="filter-field-inline">
+							<label class="filter-label-inline" for="status">狀態</label>
+							<div class="select-wrapper-inline">
+								<select id="status" name="status" class="form-control-inline">
+									<option value="">全部狀態</option>
+									<option value="0" th:selected="${currentStatus == 0}">待處理</option>
+									<option value="1" th:selected="${currentStatus == 1}">檢舉成立</option>
+									<option value="2" th:selected="${currentStatus == 2}">檢舉駁回</option>
+								</select>
+							</div>
+						</div>
 
-					</div>
+						<!-- 2. 員工篩選 -->
+						<div class="filter-field-inline">
+							<label class="filter-label-inline" for="empId">員工</label>
+							<div class="select-wrapper-inline">
+								<select id="empId" name="empId" class="form-control-inline">
+									<option value="">全部員工</option>
+									<option th:each="emp : ${empList}" th:value="${emp.employeeId}"
+										th:text="${emp.empName}"
+										th:selected="${currentEmpId == emp.employeeId}"></option>
+								</select>
+							</div>
+						</div>
+
+						<!-- 3. 檢舉類型 -->
+						<div class="filter-field-inline">
+							<label class="filter-label-inline" for="rptType">類型</label>
+							<div class="select-wrapper-inline">
+								<select id="rptType" name="rptType" class="form-control-inline">
+									<option value="">全部類型</option>
+									<option value="0" th:selected="${currentRptType == 0}">詐騙
+										/ 虛假活動</option>
+									<option value="1" th:selected="${currentRptType == 1}">色情
+										/ 不當活動</option>
+									<option value="2" th:selected="${currentRptType == 2}">暴力
+										/ 危險活動</option>
+									<option value="3" th:selected="${currentRptType == 3}">違法行為
+										(聚賭、毒品)</option>
+									<option value="4" th:selected="${currentRptType == 4}">其他</option>
+								</select>
+							</div>
+						</div>
+
+						<!-- 4. 按鈕組（直接融入尾端） -->
+						<div class="filter-actions-inline">
+							<button type="submit" class="btn-filter-submit-inline">篩選</button>
+							<a th:href="@{/admin/activity/actRptList}"
+								class="btn-filter-reset-inline">重設</a>
+						</div>
+
+					</form>
 				</div>
+
+
 
 				<!-- 明細資料表格區塊 -->
 				<div class="table-card">
@@ -537,12 +695,12 @@ a {
 				<!-- 下方分頁導覽 -->
 				<div class="pagination-container">
 					<a th:if="${currentPage > 0}"
-						th:href="@{/admin/activity/actRptList(status=${currentStatus}, page=${currentPage - 1})}"
+						th:href="@{/admin/activity/actRptList(status=${currentStatus}, empId=${currentEmpId}, page=${currentPage - 1})}"
 						class="btn-page"> 上一頁 </a> <span class="page-info"
 						th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?: 1} + ' 頁'">
 						第 1 頁 / 共 1 頁 </span> <a
 						th:if="${(currentPage ?: 0) < (totalPages ?: 1) - 1}"
-						th:href="@{/admin/activity/actRptList(status=${currentStatus}, page=${currentPage + 1})}"
+						th:href="@{/admin/activity/actRptList(status=${currentStatus}, empId=${currentEmpId}, page=${currentPage + 1})}"
 						class="btn-page"> 下一頁 </a>
 				</div>
 

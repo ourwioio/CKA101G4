@@ -1,5 +1,7 @@
 package com.webond.activity.controller;
 
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -49,7 +51,14 @@ public class ActReviewController {
 		if (order == null || order.getOrderStatus() != 4) {
 			return "redirect:/activity/front/myOrder?error=cannotReview";
 		}
+		
+		
+		String activityName = reviewSvc.getActivityNameForComment(order.getActivityId());
+		LocalDateTime activityTime = reviewSvc.getActivityTimeForComment(order.getActivityId());
 
+		
+		model.addAttribute("activityTime", activityTime);
+		model.addAttribute("activityName", activityName);
 		model.addAttribute("orderData", order);
 		model.addAttribute("orderId", orderId);
 		return "front-end/activity/actReview";

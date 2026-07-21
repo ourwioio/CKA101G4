@@ -16,12 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.webond.employee.dto.EmpPasswordDTO;
-import com.webond.employee.model.EmpPermVO;
-import com.webond.employee.model.EmployeeVO;
-import com.webond.employee.model.PermissionVO;
 import com.webond.employee.repository.EmpPermRepository;
 import com.webond.employee.repository.EmployeeRepository;
-import com.webond.member.model.MemberVO;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -59,20 +55,18 @@ public class EmpService {
 		return repository.findAll();
 	}
 	
-	
-	
-	//  查全部(分頁)
-	public Page<EmployeeVO> getAllByPage(int pageNo){
-		int pageSize = 5;
-		
-		// Sort.by("empId") 代表預設用員工編號排序，.ascending() 是正向排序。
-		Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("employeeId").ascending());
-		
-		// 直接將 pageable 傳給 repository.findAll()，它就會精準查出該頁的 3 筆資料並回傳。
-		return repository.findAll(pageable);
-		
-		
-	}
+    public List<EmployeeVO> getEmployeesWithActRptPermission() {
+    	List<EmployeeVO> empList = repository.findEmployeesWithActRptPermission();
+    	return empList;
+    }
+    
+    public Page<EmployeeVO> getAllByPage(String empName, Integer roleTitle, Integer empStatus, int pageNo) {
+        int pageSize = 5;
+        
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by("employeeId").ascending());
+        
+        return repository.findByCompositeSearch(empName, roleTitle, empStatus, pageable);
+    }
 	
 
 //=== 為了新增寫的 ===	//
@@ -248,8 +242,8 @@ public class EmpService {
     	}
     	
     	empPermRepo.deleteByEmployeeId(currentEmp.getEmployeeId());
-    
-    	repository.delete(currentEmp);
+    	
+    	repository.deleteEmployeeDirectly(currentEmp.getEmployeeId());
     }
     
     

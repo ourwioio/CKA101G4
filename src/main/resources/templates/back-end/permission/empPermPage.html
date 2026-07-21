@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>後台管理系統 - 員工權限管理</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link
+	href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+	rel="stylesheet">
 <style>
 /* ================= 全局與現代化佈局變數 ================= */
 :root {
@@ -21,8 +23,10 @@
 	--rose-50: #fff1f2;
 	--rose-600: #e11d48;
 	--shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px
+		rgba(0, 0, 0, 0.06);
+	--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px
+		rgba(0, 0, 0, 0.05);
 }
 
 body {
@@ -257,13 +261,143 @@ body {
 	width: 520px;
 	box-sizing: border-box;
 }
+
+/* 1. 權限專屬篩選外殼：極致洗鍊白、微陰影層次 */
+.filter-card--perm {
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+/* 2. 表單橫向彈性佈局 */
+.filter-inline-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+}
+
+/* 3. 單個篩選組合：標籤與控制項置中對齊 */
+.filter-field-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 4. 側邊精緻粗體小標籤 */
+.filter-label-inline {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569; /* 深灰藍，呈現內斂的專門感 */
+    white-space: nowrap;
+}
+
+/* 5. 輸入框與下拉選單的共用極簡高質感外觀 */
+.filter-inline-form .form-control-inline {
+    height: 36px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: #1e293b;
+    background-color: #f8fafc; /* 溫和的淺灰底色，降低眼睛疲勞 */
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.15s ease-in-out;
+}
+
+/* 寬度細緻調整，確保文字不會被遮擋或破版 */
+input[type="text"].form-control-inline {
+    width: 170px;
+}
+
+.select-wrapper-inline {
+    position: relative;
+    display: inline-block;
+}
+
+.select-wrapper-inline select.form-control-inline {
+    width: 160px;
+    padding-right: 32px; /* 為右側自訂小箭頭保留呼吸空間 */
+    cursor: pointer;
+    appearance: none; /* 彻底移除瀏覽器內建粗糙箭頭 */
+    -webkit-appearance: none;
+}
+
+/* 6. 特製現代感微型下拉小竹節箭頭 */
+.select-wrapper-inline::after {
+    content: '▾';
+    font-size: 12px;
+    color: #64748b;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-52%);
+    pointer-events: none;
+}
+
+/* 7. 焦點互動：點擊時會呈現高級感的翡翠綠呼吸發光層 */
+.filter-inline-form .form-control-inline:focus {
+    background-color: #ffffff;
+    border-color: #0d9488; /* 翡翠綠聚焦框 */
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+/* 8. 右側按鈕組排版 */
+.filter-actions-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+}
+
+/* 9. 沉穩的墨綠色搜尋確認按鈕（代表系統安全性控制） */
+.btn-filter-submit-inline {
+    height: 36px;
+    background: #115e59; 
+    color: #ffffff;
+    border: none;
+    padding: 0 18px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.btn-filter-submit-inline:hover {
+    background: #134e4a;
+}
+
+/* 10. 輕量級重設按鈕 */
+.btn-filter-reset-inline {
+    height: 36px;
+    line-height: 34px; /* 精確垂直置中 */
+    color: #64748b;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0 14px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    box-sizing: border-box;
+}
+
+.btn-filter-reset-inline:hover {
+    background: #f1f5f9;
+    color: #334155;
+}
+
 </style>
 </head>
 <body>
 
 	<!-- 外層改用 CSS Flex 彈性雙欄取代傳統大 Table -->
 	<div class="admin-container">
-		
+
 		<!-- 左側導覽列區塊 -->
 		<div class="sidebar-wrapper">
 			<div th:replace="~{back-end/fragments/adminSidebar :: adminSidebar}"></div>
@@ -272,14 +406,46 @@ body {
 		<!-- 右側主要工作面板 -->
 		<div class="main-content">
 			<div class="content-card">
-				
+
 				<!-- 頁面頂部檔頭區塊 -->
-				<div class="page-header">
-					<h2 class="page-title">員工權限管理系統</h2>
-					<button type="button" class="btn-primary" th:onclick="openAddModal([[${currentPage}]])">
-						<span>＋</span> 新增權限
-					</button>
-				</div>
+			<div class="page-header" style="margin-bottom: 20px;">
+    <h2 class="page-title">👥 員工權限管理系統</h2>
+    <button type="button" class="btn-primary" th:onclick="openAddModal([[${currentPage}]])">
+        <span>＋</span> 新增權限
+    </button>
+</div>
+
+<!-- ================= 【第二層】：完全獨立的流線型篩選列（移到 header 外面） ================= -->
+<div class="filter-card--compact filter-card--perm">
+    <form th:action="@{/admin/employees/empPermPage}" method="get" class="filter-inline-form">
+        
+        <!-- 1. 權限名稱關鍵字搜尋 -->
+        <div class="filter-field-inline">
+            <label class="filter-label-inline" for="searchPermName">權限名稱</label>
+            <input type="text" id="searchPermName" name="searchPermName" class="form-control-inline" 
+                   placeholder="輸入名稱關鍵字..." th:value="${currentPermName}">
+        </div>
+
+        <!-- 2. 已授權狀態篩選 -->
+        <div class="filter-field-inline">
+            <label class="filter-label-inline" for="searchHasEmp">授權狀態</label>
+            <div class="select-wrapper-inline">
+                <select id="searchHasEmp" name="searchHasEmp" class="form-control-inline">
+                    <option value="">全部權限狀態</option>
+                    <option value="true" th:selected="${currentHasEmp == 'true'}">已有授權員工</option>
+                    <option value="false" th:selected="${currentHasEmp == 'false'}">目前無授權員工</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 3. 按鈕組（神奇魔法：自動推至最右側平衡構圖） -->
+        <div class="filter-actions-inline">
+            <a th:href="@{/admin/employees/empPermPage}" class="btn-filter-reset-inline">重設</a>
+            <button type="submit" class="btn-filter-submit-inline">搜尋權限</button>
+        </div>
+        
+    </form>
+</div>
 
 				<!-- 資料表格響應式容器 -->
 				<div class="table-responsive-wrapper">
@@ -298,44 +464,49 @@ body {
 						<tbody>
 							<tr th:each="permVO : ${permListData}">
 								<!-- 權限編號 -->
-								<td th:text="${permVO.permId}" style="text-align: center; font-weight: 600;"></td>
+								<td th:text="${permVO.permId}"
+									style="text-align: center; font-weight: 600;"></td>
 								<!-- 權限名稱 -->
-								<td>
-									<strong th:text="${permVO.permName}"></strong>
-								</td>
+								<td><strong th:text="${permVO.permName}"></strong></td>
 								<!-- 權限內容描述 -->
 								<td th:text="${permVO.permDsc}"></td>
 								<!-- 權限更新時間 -->
-								<td th:text="${permVO.permUpdatedAt ?: '未更新'}" style="text-align: center; font-size: 13px; color: var(--slate-500);"></td>
+								<td th:text="${permVO.permUpdatedAt ?: '未更新'}"
+									style="text-align: center; font-size: 13px; color: var(--slate-500);"></td>
 								<!-- 員工編號與授權時間 (優化為精緻的藥丸標籤堆疊) -->
 								<td>
-									<div class="emp-badge-container" th:if="${!#lists.isEmpty(permVO.empPermVO)}">
-										<div class="emp-badge-item" th:each="empPermVO : ${permVO.empPermVO}">
-											<span class="emp-id-highlight" th:text="'ID: ' + ${empPermVO.emps.employeeId}"></span>
-											<span style="color: var(--slate-500); margin: 0 4px;">|</span>
-											<span th:text="${empPermVO.assignedAt != null ? #dates.format(empPermVO.assignedAt, 'yyyy-MM-dd HH:mm') : '未紀錄'}"></span>
+									<div class="emp-badge-container"
+										th:if="${!#lists.isEmpty(permVO.empPermVO)}">
+										<div class="emp-badge-item"
+											th:each="empPermVO : ${permVO.empPermVO}">
+											<span class="emp-id-highlight"
+												th:text="'ID: ' + ${empPermVO.emps.employeeId}"></span> <span
+												style="color: var(--slate-500); margin: 0 4px;">|</span> <span
+												th:text="${empPermVO.assignedAt != null ? #dates.format(empPermVO.assignedAt, 'yyyy-MM-dd HH:mm') : '未紀錄'}"></span>
 										</div>
-									</div>
-									<span th:if="${#lists.isEmpty(permVO.empPermVO)}" class="empty-state-text">
-										⚠ 目前無授權員工
-									</span>
+									</div> <span th:if="${#lists.isEmpty(permVO.empPermVO)}"
+									class="empty-state-text"> ⚠ 目前無授權員工 </span>
 								</td>
 
 								<!-- 修改按鈕 -->
 								<td style="text-align: center;">
 									<button type="button" class="btn-action-edit"
 										th:onclick="openEditModal([[${permVO.permId}]], [[${permVO.permName}]], [[${permVO.permDsc}]],[[${currentPage}]])">
-										修改
-									</button>
+										修改</button>
 								</td>
 
 								<!-- 刪除按鈕與表單 -->
 								<td style="text-align: center;">
-									<form method="post" th:action="@{/admin/employees/permDelete}" style="margin: 0;">
+									<form method="post" th:action="@{/admin/employees/permDelete}"
+										style="margin: 0;">
 										<input type="hidden" name="permId" th:value="${permVO.permId}">
-										<button type="submit" class="btn-action-delete" onclick="return confirm('確定要完全刪除此項員工權限嗎？');">
-											刪除
-										</button>
+										<input type="hidden" name="currentPage"
+											th:value="${currentPage}"> <input type="hidden"
+											name="searchPermName" th:value="${currentPermName}">
+										<input type="hidden" name="searchHasEmp"
+											th:value="${currentHasEmp}">
+										<button type="submit" class="btn-action-delete"
+											onclick="return confirm('確定要完全刪除此項員工權限嗎？');">刪除</button>
 									</form>
 								</td>
 							</tr>
@@ -346,94 +517,118 @@ body {
 				<!-- 分頁導覽控制面板 -->
 				<div class="pagination-wrapper">
 					<a th:if="${currentPage > 0}"
-						th:href="@{/admin/employees/empPermPage(p=${(currentPage ?: 0) - 1})}"
-						class="page-link-btn">
-						上一頁
-					</a> 
-					
-					<span class="page-info-text" th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?:1} + ' 頁'">
-						第 1 頁 / 共 1 頁
-					</span> 
-					
-					<a th:if="${(currentPage ?: 0) < (totalPages?: 1) - 1}"
-						th:href="@{/admin/employees/empPermPage(p=${currentPage + 1})}"
-						class="page-link-btn">
-						下一頁
-					</a>
+						th:href="@{/admin/employees/empPermPage(p=${(currentPage ?: 0) - 1}, searchPermName=${currentPermName}, searchHasEmp=${currentHasEmp})}"
+						class="page-link-btn"> 上一頁 </a> <span class="page-info-text"
+						th:text="'第 ' + (${currentPage ?: 0} + 1) + ' 頁 / 共 ' + ${totalPages ?:1} + ' 頁'">
+						第 1 頁 / 共 1 頁 </span> <a
+						th:if="${(currentPage ?: 0) < (totalPages?: 1) - 1}"
+						th:href="@{/admin/employees/empPermPage(p=${currentPage + 1}, searchPermName=${currentPermName}, searchHasEmp=${currentHasEmp})}"
+						class="page-link-btn"> 下一頁 </a>
 				</div>
-				
+
 			</div>
 		</div>
 	</div>
 
 	<!-- ================= 新增權限燈箱外框 ================= -->
 	<div id="addModal" class="premium-modal"
-	    th:style="'display: ' + (${openAddModal} ? 'block' : 'none') + ';'">
-	    <div th:insert="~{back-end/permission/addPerm :: addPermContent}"></div>
+		th:style="'display: ' + (${openAddModal} ? 'block' : 'none') + ';'">
+		<div th:insert="~{back-end/permission/addPerm :: addPermContent}"></div>
 	</div>
 
 	<!-- ================= 修改權限燈箱外框 ================= -->
 	<div id="editModal" class="premium-modal"
 		th:style="'display: ' + (${openEditModal} ? 'block' : 'none') + ';'">
-		<div th:insert="~{back-end/permission/updatePerm :: updatePermContent}"></div>
+		<div
+			th:insert="~{back-end/permission/updatePerm :: updatePermContent}"></div>
 	</div>
 
-<script>
-// 新增按鈕控制邏輯
-function openAddModal(currentPage) {
-	var modal = document.getElementById("addModal");
-	if (modal) {
-		var form = modal.querySelector("form");
-		if (form) {
-			form.reset();
-		}
-		
-		if (document.getElementById("modalCurrentPage")) {
-			document.getElementById("modalCurrentPage").value = (currentPage !== undefined && currentPage !== null) ? currentPage : 0; 
-		}
-		
-		modal.style.setProperty("display", "block", "important");
-	}
-}
+	<script th:inline="javascript">
+		// 新增按鈕控制邏輯
+		function openAddModal(currentPage, isErrorReturn = false) {
+			var modal = document.getElementById("addModal");
+			if (modal) {
+				var form = modal.querySelector("form");
+				if (form && !isErrorReturn) {
+	                form.reset();
+	            }
 
-function closeAddModal() {
-	var modal = document.getElementById("addModal");
-	if (modal) {
-		modal.style.setProperty("display", "none", "important");
-	}
-}
+				if (document.getElementById("modalCurrentPage")) {
+					document.getElementById("modalCurrentPage").value = (currentPage !== undefined && currentPage !== null) ? currentPage
+							: 0;
+				}
 
-// 修改按鈕控制邏輯
-function openEditModal(permId, permName, permDsc, currentPage) {
-	var modal = document.getElementById("editModal");
-	if (modal) {
-		var form = modal.querySelector("form");
-		if (form) {
-			form.reset();
+				modal.style.setProperty("display", "block", "important");
+			}
+		}
+
+		function closeAddModal() {
+			var modal = document.getElementById("addModal");
+			if (modal) {
+				modal.style.setProperty("display", "none", "important");
+			}
+		}
+
+		// 修改按鈕控制邏輯
+		function openEditModal(permId, permName, permDsc, currentPage, isErrorReturn = false) {
+			var modal = document.getElementById("editModal");
+			if (modal) {
+				
+				if (isErrorReturn) {
+	                modal.style.setProperty("display", "block", "important");
+	                return;
+	            }
+				
+				var form = modal.querySelector("form");
+				if (form) {
+					form.reset();
+				}
+
+				if (document.getElementById("editPermId"))
+					document.getElementById("editPermId").value = permId;
+				if (document.getElementById("editPermName"))
+					document.getElementById("editPermName").value = permName;
+				if (document.getElementById("editPermDsc"))
+					document.getElementById("editPermDsc").value = permDsc;
+				
+				
+				if (document.getElementById("modalCurrentPage")) {
+					document.getElementById("modalCurrentPage").value = (currentPage !== undefined && currentPage !== null) ? currentPage
+							: 0;
+				}
+
+				modal.style.setProperty("display", "block", "important");
+			}
+		}
+
+		// 修正原版 JavaScript 裡 EditModal 字母大小寫不一致的 Bug
+		function closeEditModal() {
+			var modal = document.getElementById("editModal");
+			if (modal) {
+				modal.style.setProperty("display", "none", "important");
+			}
 		}
 		
-		if (document.getElementById("editPermId"))
-			document.getElementById("editPermId").value = permId;
-		if (document.getElementById("editPermName"))
-			document.getElementById("editPermName").value = permName;
-		if (document.getElementById("editPermDsc"))
-			document.getElementById("editPermDsc").value = permDsc;
-		if (document.getElementById("modalCurrentPage")) {
-			document.getElementById("modalCurrentPage").value = (currentPage !== undefined && currentPage !== null) ? currentPage : 0; 
-		}
-		
-		modal.style.setProperty("display", "block", "important");
-	}
-}
+		document.addEventListener("DOMContentLoaded", function() {
+	        let shouldOpenAdd = /*[[${openAddModal}]]*/ false;
+	        let shouldOpenEdit = /*[[${openEditModal}]]*/ false;
+	        let currentPageNum = /*[[${currentPage ?: 0}]]*/ 0;
+	        
 
-// 修正原版 JavaScript 裡 EditModal 字母大小寫不一致的 Bug
-function closeEditModal() {
-	var modal = document.getElementById("editModal");
-	if (modal) {
-		modal.style.setProperty("display", "none", "important");
-	}
-}
-</script>
+	        if (shouldOpenAdd === true || shouldOpenAdd === "true" || window.location.search.includes("openAddModal=true")) {
+	            if (typeof openAddModal === 'function') openAddModal(currentPageNum, true);
+	        }
+	        
+	        if (shouldOpenEdit === true || shouldOpenEdit === "true" || window.location.search.includes("openEditModal=true")) {
+	            let permVO = /*[[${permissionVO}]]*/ null;
+	            if (permVO && permVO.permId) {
+	                if (typeof openEditModal === 'function') {
+	                    openEditModal(permVO.permId, permVO.permName, permVO.permDsc, currentPageNum, true); 
+	                }
+	            }
+	        }
+	    });
+	</script>
 
 </body>
 </html>
