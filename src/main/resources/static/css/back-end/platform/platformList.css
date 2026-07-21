@@ -1,0 +1,457 @@
+/* =========================================================
+   Webond 後台平台管理模組 - 共用列表頁樣式
+   給公告 / 平台規範 / FAQ 各列表頁共用
+   視覺 token 對齊 back-end/venue/listAllVenue.css
+   欄寬採百分比設計，確保表格不需左右滑動
+   ========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: #2d3436;
+    background: #f5f6fa;
+    font-family: "Noto Sans TC", Arial, sans-serif;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+.page {
+    width: 100%;
+    max-width: 1380px;
+    margin: 0 auto;
+    padding-bottom: 60px;
+}
+
+/* =========================
+   頁面標題
+   ========================= */
+
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.page-subtitle {
+    margin: 7px 0 0;
+    color: #69727b;
+    font-size: 14px;
+}
+
+/* =========================
+   訊息
+   ========================= */
+
+.message {
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-weight: 700;
+}
+
+.message--success {
+    color: #176b45;
+    background: #e8f8ef;
+    border: 1px solid #b7e4ca;
+}
+
+.message--error,
+.message--warning {
+    color: #a12622;
+    background: #fff0ef;
+    border: 1px solid #f3c0bd;
+}
+
+/* =========================
+   面板（查詢區 / 列表區共用外框）
+   ========================= */
+
+.panel {
+    margin-bottom: 22px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #e1e5ea;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 16px 20px;
+    background: #f7f8fa;
+    border-bottom: 1px solid #e7eaee;
+}
+
+.panel-title {
+    margin: 0;
+    color: #2d3436;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.panel-description {
+    color: #69727b;
+    font-size: 13px;
+}
+
+/* 標題列右側的按鈕（例：新增公告）推到最右邊 */
+.panel-header .btn {
+    margin-left: auto;
+}
+
+.panel-body {
+    padding: 18px 20px;
+}
+
+/* =========================
+   查詢 / 篩選區
+   ========================= */
+
+.search-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.search-form input[type="text"],
+.search-form input[type="number"],
+.search-form input[type="date"],
+.search-form select {
+    min-height: 40px;
+    padding: 8px 11px;
+    color: #2d3436;
+    background: #ffffff;
+    border: 1px solid #d9dee5;
+    border-radius: 8px;
+}
+
+.search-form input[type="text"] {
+    min-width: 200px;
+}
+
+.search-form input:focus,
+.search-form select:focus {
+    border-color: #6c5ce7;
+    outline: 2px solid rgba(108, 92, 231, 0.15);
+}
+
+.search-sep {
+    color: #69727b;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.search-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-left: auto;
+}
+
+/* =========================
+   按鈕
+   ========================= */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 8px 15px;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn--sm {
+    min-height: 30px;
+    padding: 5px 10px;
+    font-size: 12px;
+}
+
+.btn--primary {
+    color: #ffffff;
+    background: #6c5ce7;
+}
+
+.btn--primary:hover {
+    background: #5748c8;
+}
+
+.btn--secondary {
+    color: #4f5964;
+    background: #edf0f3;
+}
+
+.btn--secondary:hover {
+    background: #dfe4e8;
+}
+
+.btn--success {
+    color: #ffffff;
+    background: #00a878;
+}
+
+.btn--success:hover {
+    background: #008f66;
+}
+
+.btn--danger {
+    color: #ffffff;
+    background: #d63031;
+}
+
+.btn--danger:hover {
+    background: #b92526;
+}
+
+/* =========================
+   徽章 / 狀態標籤
+   ========================= */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    padding: 5px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.badge--published {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.badge--draft {
+    color: #475569;
+    background: #e2e8f0;
+}
+
+/* =========================
+   資料表格
+   欄寬一律用百分比，總和 <=100%，確保不會超出容器寬度
+   （不需要橫向捲動）
+   ========================= */
+
+.table-scroll {
+    /* 欄寬已用百分比控制，不需捲動；保留 hidden 避免任何極端情況
+       （超長無空白字串）撐破卡片邊界，並與場地模組的 table-wrap 行為一致 */
+    overflow: hidden;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.data-table thead {
+    background: #f7f8fa;
+}
+
+.data-table thead th {
+    padding: 10px 8px;
+    color: #4f5964;
+    font-size: 12px;
+    font-weight: 800;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 1px solid #e7eaee;
+}
+
+.data-table tbody tr {
+    background: #ffffff;
+    border-bottom: 1px solid #edf0f2;
+}
+
+.data-table tbody tr:last-child {
+    border-bottom: 0;
+}
+
+.data-table tbody tr:hover {
+    background: #fafaff;
+}
+
+/* 預設每欄都只顯示一行，超出寬度就直接隱藏溢出的部分，
+   避免文字換行把列高撐開；不加刪節號「…」，
+   因為狀態欄等含條件式標籤的欄位會殘留空白文字節點，
+   一律加「…」容易在沒有真正溢出時也冒出來 */
+.data-table td {
+    padding: 10px 8px;
+    color: #2d3436;
+    font-size: 12px;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* 內容可能較長、需要用「…」提示還有更多文字的欄位
+   （類型：規範/FAQ 類型名稱有時偏長） */
+.data-table td.cell-clip {
+    text-overflow: ellipsis;
+}
+
+/* 操作欄放的是按鈕群組，不是文字，取消截斷設定，
+   讓按鈕在真的放不下時可以自行換行，而不是被裁掉 */
+.data-table td.cell-actions {
+    white-space: normal;
+    overflow: visible;
+}
+
+/* 欄寬（百分比，跨頁共用；同一欄位語意在各頁使用相同比例） */
+.col-id {
+    width: 4%;
+}
+
+.col-type {
+    width: 14%;
+}
+
+.col-title,
+.col-question {
+    width: 17%;
+}
+
+.col-status {
+    width: 8%;
+}
+
+.col-date {
+    width: 12%;
+}
+
+.col-employee {
+    width: 11%;
+}
+
+.col-time {
+    width: 13%;
+}
+
+.col-action {
+    width: 19%;
+}
+
+/* =========================
+   表格內的連結式標題按鈕
+   ========================= */
+
+.title-link {
+    display: block;
+    width: 100%;
+    padding: 0;
+    color: #6c5ce7;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.title-link:hover {
+    text-decoration: underline;
+}
+
+/* =========================
+   操作按鈕群組
+   ========================= */
+
+.action-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.action-form {
+    display: inline-block;
+    margin: 0;
+}
+
+/* =========================
+   無資料
+   ========================= */
+
+.empty-state {
+    padding: 48px 20px;
+    color: #69727b;
+    text-align: center;
+}
+
+/* =========================
+   RWD
+   ========================= */
+
+@media (max-width: 800px) {
+
+    .page-header {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 620px) {
+
+    .search-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-form-actions {
+        margin-left: 0;
+    }
+
+    .search-form-actions .btn {
+        flex: 1;
+    }
+
+    .panel-header .btn {
+        margin-left: 0;
+    }
+
+    .data-table thead th,
+    .data-table td {
+        font-size: 12px;
+    }
+}
