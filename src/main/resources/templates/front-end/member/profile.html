@@ -590,6 +590,13 @@
         <!-- 加入日期 -->
         <div class="member-contact">
           <div class="contact-item">
+            <span th:text="'會員編號 # ' + ${memberVO.memberId}"></span>
+          </div>
+        </div>
+        
+        <!-- 加入日期 -->
+        <div class="member-contact">
+          <div class="contact-item">
             <span th:text="'加入時間： ' + ${memberVO.createdAt}"></span>
           </div>
         </div>
