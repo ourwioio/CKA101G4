@@ -87,7 +87,12 @@ public class ChatService {
 		List<String> restoredList = new ArrayList<>();
 		
 		for (ChatMsgVO vo : dbData) {
-			ChatMessageDTO cm = new ChatMessageDTO("chat", vo.getSenderId(), vo.getReceiverId(), vo.getContent(), vo.getIsRead());
+			String msgType = "chat";
+			if (vo.getContent() != null && vo.getContent().startsWith("data:image/")) {
+				msgType = "image";
+			}
+			
+			ChatMessageDTO cm = new ChatMessageDTO(msgType, vo.getSenderId(), vo.getReceiverId(), vo.getContent(), vo.getIsRead());
 			restoredList.add(objectMapper.writeValueAsString(cm));
 		}
 		

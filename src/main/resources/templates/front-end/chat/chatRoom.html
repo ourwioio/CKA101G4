@@ -490,6 +490,44 @@ body {
 	background-color: #bfbfbf !important;
 	box-shadow: none !important;
 }
+
+.preview-img-wrapper {
+	position: relative !important;
+	width: 72px !important;
+	height: 72px !important;
+	flex-shrink: 0 !important; /* 強制不准 flex 擠壓圖片體積 */
+	display: block !important;
+}
+
+/* 💡【全新加強：精緻紅色 ❌ 刪除按鈕定位】 */
+.preview-delete-btn {
+	position: absolute !important;
+	top: -6px !important;
+	right: -6px !important;
+	width: 18px !important;
+	height: 18px !important;
+	background-color: #ff4d4f !important; /* 充滿警示感的紅色背景 */
+	color: #ffffff !important;           /* 白色交叉符號 */
+	border-radius: 50% !important;
+	border: 1.5px solid #ffffff !important;
+	font-size: 11px !important;
+	font-weight: 800 !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	cursor: pointer !important;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+	transition: transform 0.12s ease, background-color 0.12s ease !important;
+	user-select: none !important;
+	line-height: 1 !important;
+	z-index: 99 !important; /* 確保 ❌ 永遠浮在圖片的最上方，點擊不受阻礙 */
+}
+
+/* 滑鼠懸停時微放大發光 */
+.preview-delete-btn:hover {
+	transform: scale(1.18) !important;
+	background-color: #ff7875 !important;
+}
 </style>
 </head>
 <div th:replace="~{front-end/common/navbar :: navbar}"></div>
@@ -549,18 +587,37 @@ body {
 			<!-- 訊息滾動顯示區 -->
 			<div id="messagesArea" class="messages-display">
 				<ul id="area" class="messages-list">
-					<!-- 連線成功系統提示 -->
-					<p th:if="${targetName != null}" class="system-status">---
-						已建立專屬私訊連線 ---</p>
+					<p th:if="${targetName != null}" class="system-status">--- 已建立專屬私訊連線 ---</p>
 				</ul>
+			</div>
+
+			<!-- 💡【全新功能：發送前圖片預覽小視窗】預設用 display: none 隱藏，選好圖後才優雅跳出 -->
+			<div id="imagePreviewContainer" style="display: none; background: var(--color-surface-soft); padding: 12px 28px; border-top: 1px solid var(--color-border); flex-direction: column; gap: 12px; justify-content: flex-start; position: relative; width: 100%;">
+				
+				<!-- 這裡是用來動態橫向排隊渲染多張預覽縮圖的滾動盒子容器 -->
+				<div id="imagePreviewList" style="display: flex !important; gap: 12px; overflow-x: auto; width: 100%; padding: 6px 4px; scrollbar-width: thin;">
+					<!-- JS 會現場在這裡動態插入多張 <img> 的小方塊 -->
+				</div>
+				
+				<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+					<span id="previewCountLabel" style="font-size: 13px; font-weight: 800; color: var(--color-ink);">準備發送 0 張圖片嗎？</span>
+					<div style="display: flex; gap: 8px;">
+						<button type="button" onclick="confirmAndSendMultipleImages()" style="background: var(--color-ink); color: #fff; border: none; padding: 6px 16px; border-radius: 999px; font-size: 11px; font-weight: 800; cursor: pointer;">確定發送</button>
+						<button type="button" onclick="cancelImagePreview()" style="background: transparent; color: var(--color-ink-soft); border: 1px solid var(--color-border); padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; cursor: pointer;">取消</button>
+					</div>
+				</div>
 			</div>
 
 			<!-- 底部輸入與發送功能 -->
 			<div class="chat-input-area">
-				<input type="text" id="message" placeholder="請輸入私訊內容..."
-					th:disabled="${targetName == null}">
-				<button id="sendMessage" onclick="sendMessage()"
-					th:disabled="${targetName == null}">發送</button>
+				<label for="widgetImageInput" id="imageBtnLabel" class="chat-file-label" th:style="${targetName == null} ? 'opacity:0.5; cursor:not-allowed;' : 'cursor:pointer;'" style="font-size: 20px; padding: 0 10px; user-select: none; transition: transform 0.15s ease;">
+					📎
+				</label>
+				<!-- 💡【核心解鎖】加上 multiple 屬性，開啟一次多選多張圖的高階功能！ -->
+				<input type="file" id="widgetImageInput" multiple accept="image/*" onchange="uploadChatImage(this)" th:disabled="${targetName == null}" style="display: none;">
+				
+				<input type="text" id="message" placeholder="請輸入私訊內容..." th:disabled="${targetName == null}">
+				<button id="sendMessage" onclick="sendMessage()" th:disabled="${targetName == null}">發送</button>
 			</div>
 		</div>
 
@@ -582,6 +639,9 @@ body {
 		const typingIndicator = document.getElementById("typingIndicator");
 		const inputMessage = document.getElementById("message");
 		const sendMessageBtn = document.getElementById("sendMessage");
+		
+		let tempImageBase64 = null;
+		let tempImageArray = [];
 
 		let typingTimeout = null;    
 		let heartbeatInterval = null;
@@ -602,18 +662,16 @@ body {
 						"message" : ""
 					};
 					webSocket.send(JSON.stringify(historyReq));
-
 				}
 			};
 
 			webSocket.onmessage = function(event) {
 				const jsonObj = JSON.parse(event.data);
+				const ulArea = document.getElementById("area");
 
-				// 🅰️ 情況 A：載入歷史紀錄
+				// 🅰️ 情況 A：載入歷史紀錄 (type = "history")
 				if ("history" === jsonObj.type) {
-					const ulArea = document.getElementById("area");
-					ulArea.innerHTML = '';
-					
+					if (ulArea) ulArea.innerHTML = '';
 					const messages = jsonObj.historyList;
 					
 					if (messages && messages.length > 0) {
@@ -624,29 +682,37 @@ body {
 							const li = document.createElement('li');
 							const isMe = String(historyData.senderId) === String(selfId);
 							li.className = isMe ? 'me' : 'friend';
-							
 							const timeStr = historyData.lastTime || historyData.sentAt || getCurrentTime();
-							appendMessageContent(li, historyData.message, isMe, historyData.getIsRead || historyData.msgRead, timeStr);
 
-							ulArea.appendChild(li);
+							// 💡【安全提取內容】相容所有欄位名稱，確保絕對抓得到這串 Base64 字串
+							const realContent = historyData.message || historyData.content || "";
+
+							// 🚀【終極圖片雷達防線】
+							// 拋棄脆弱的單一開頭判定！只要內容字串裡面包含 "base64" 或是 "data:image/" 關鍵字
+							// 瀏覽器就會 100% 斷定這絕對是一張圖片，死死鎖定塞進圖片氣泡，絕不再印出亂碼！
+							if (historyData.type === "image" || (typeof realContent === 'string' && (realContent.includes("base64") || realContent.startsWith("data:image/")))) {
+								appendImageMessageContent(li, realContent, isMe, historyData.getIsRead || historyData.msgRead, timeStr);
+							} else {
+								appendMessageContent(li, realContent, isMe, historyData.getIsRead || historyData.msgRead, timeStr);
+							}
+
+							if (ulArea) ulArea.appendChild(li);
 						}
 					}
                     
-					sendReadReceipt();
-					
-					
+					sendReadReceipt(); 
 					if (targetId) {
 						localStorage.setItem(`chat_unread_${selfId}_to_${targetId}`, 0);
 					}
-                    
 					messagesArea.scrollTop = messagesArea.scrollHeight;
-				
+				} 
 
-				// 🅱️ 情況 B：收到即時新訊息
-				} else if ("chat" === jsonObj.type) {
+				// ----------------------------------------------------
+				// 🅱️ 【核心修正點】情況 B：收到即時新訊息 (支援文字 "chat" 與 圖片 "image" 同步即時上屏)
+				// ----------------------------------------------------
+				else if ("chat" === jsonObj.type || "image" === jsonObj.type) {
 					const isMe = String(jsonObj.senderId) === String(selfId);
 					const isFromCurrentPartner = String(jsonObj.senderId) === String(targetId);
-					
 					const timeStr = getCurrentTime();
 
 					// 情況 1：是我自己發的，或是目前正開著視窗在聊天的對象發來的 -> 直接上屏
@@ -654,30 +720,40 @@ body {
 						const li = document.createElement('li');
 						li.className = isMe ? 'me' : 'friend';
 						
-						// 自己發的預設為未讀(0)，對方發來的因為我正盯著看所以算已讀(1)
-						appendMessageContent(li, jsonObj.message, isMe, isMe ? 0 : 1, timeStr);
-						
-						if (isFromCurrentPartner) {
-							sendReadReceipt();
+						// 💡 智慧型即時泡泡渲染辨識
+						if ("image" === jsonObj.type || (jsonObj.message && jsonObj.message.startsWith("data:image/"))) {
+							appendImageMessageContent(li, jsonObj.message, isMe, isMe ? 0 : 1, timeStr);
+						} else {
+							appendMessageContent(li, jsonObj.message, isMe, isMe ? 0 : 1, timeStr);
 						}
 						
-						document.getElementById("area").appendChild(li);
-						messagesArea.scrollTop = messagesArea.scrollHeight;
-					} else {
+						if (isFromCurrentPartner) {
+							sendReadReceipt(); // 正看著他，秒發已讀
+						}
+						
+						if (ulArea) ulArea.appendChild(li);
+						
+						// 加上微小延遲，確保圖片渲染完成後，滾動條才 100% 探底
+						setTimeout(() => {
+							messagesArea.scrollTop = messagesArea.scrollHeight;
+						}, 50);
+					} 
+					// 情況 2：別人在背景傳訊息來（且不管他是傳文字還是傳圖片），前端主動累加紅點數
+					else {
 						const partnerId = jsonObj.senderId;
 						if (partnerId) {
 							const targetLiEl = document.querySelector(`.contact-list .contact-item[data-id="${String(partnerId).trim()}"]`);
 							
 							if (targetLiEl) {
 								let badge = targetLiEl.querySelector('.sidebar-unread-badge');
+								if (badge) {
+									let currentDisplayCount = parseInt(badge.innerText) || 0;
+									currentDisplayCount++;
+									badge.innerText = currentDisplayCount;
+									badge.style.display = 'inline-block';
+								}
 								
-								let currentDisplayCount = parseInt(badge.innerText) || 0;
-								
-								currentDisplayCount++;
-								
-								badge.innerText = currentDisplayCount;
-								badge.style.display = 'inline-block';
-								
+								// 更新左側最新訊息摘要字樣
 								let lastMsgSummary = "新訊息";
 								if (jsonObj.type === "image") {
 									lastMsgSummary = "[圖片訊息]";
@@ -696,33 +772,36 @@ body {
 							loadContacts();
 						}, 150);
 					}
+				}
 					
 				// 🅲 情況 C：對方點開對話，即時將畫面上的「未讀」集體改為「已讀」
-				} else if("read" === jsonObj.type){
-					const readerId = jsonObj.readByUserId;; 
-
+				else if ("read" === jsonObj.type) {
+					const readerId = jsonObj.readByUserId; 
 				    if (!targetId || String(readerId) === String(targetId)) {
-				        const unreadLabels = document.querySelectorAll(".unread-marker");
-				        unreadLabels.forEach(label => {
+				        document.querySelectorAll(".unread-marker").forEach(label => {
 				            label.innerText = "已讀";
 				            label.style.color = "lightgray";
 				            label.classList.remove("unread-marker"); 
 				        });
 				    }
 				}
-				// 情況 D：即時接收對方的打字狀態 (Typing Indicator)
+
+				// 🅳 情況 D：即時接收對方的打字狀態 
 				else if ("typing" === jsonObj.type) {
 					if (String(jsonObj.senderId) === String(targetId)) {
 						typingIndicator.textContent = (jsonObj.status === "1") ? "對方正在輸入中..." : "";
 					}
 				}
-				// 情況 E：處理系統級的好友即時「上下線狀態燈號」廣播
+
+				// 🅴 情況 E：處理好友即時在線廣播
 				else if ("userStatus" === jsonObj.type) {
 					const statusDot = document.getElementById(`status-dot-${jsonObj.userId}`);
 					if (statusDot) {
 						statusDot.className = (jsonObj.status === "online") ? "status-dot online" : "status-dot offline";
 					}
-				}// 情況 F：連線成功時，接收後端主動回發的全體在線名單，一口氣集體點亮小綠燈！
+				}
+
+				// 🅵 情況 F：連線成功時，接收後端回發的初始在線名單，一口氣點亮綠燈！
 				else if ("initOnlineList" === jsonObj.type) {
 					const onlineIds = jsonObj.onlineUserIds; 
 					if (onlineIds && onlineIds.length > 0) {
@@ -964,6 +1043,8 @@ body {
 			 * 2. 核心換房控制器：動態更換右側主聊天面板，網頁完全不刷新、不白屏、不閃爍！
 			 */
 			function openChatWindow(friendId, friendName) {
+				
+				cancelImagePreview();
 				// 動態變更全域當前正在聊天的目標變數
 				targetId = Number(friendId);
 
@@ -1001,6 +1082,186 @@ body {
 					}));
 				}
 			}
+			
+			
+			/**
+			 * 💡【多圖上傳第一步】非同步批次讀取多張檔案，並在橫向滾動盒子裡整排動態印出預覽圖！
+			 */
+			 async function uploadChatImage(inputElement) {
+					const files = inputElement.files; // 這是使用者選取的所有檔案陣列
+					if (!files || files.length === 0) return; 
+					if (!targetId) { alert("請選擇聊天對象"); inputElement.value = ''; return; }
+
+					tempImageArray = []; // 清空之前的暫存陣列陣列
+
+					// 限制單次多選的上限張數（符合商務通訊標準上限 9 張）
+					if (files.length > 9) {
+						alert("單次最多只能選擇 9 張圖片喔！");
+						inputElement.value = '';
+						return;
+					}
+
+					// 1. 利用標準 Array 迴圈，逐一檢查每張圖的容量體積 (限制 5MB)
+					for (let i = 0; i < files.length; i++) {
+						if (files[i].size > 5 * 1024 * 1024) {
+							alert(`圖片「${files[i].name}」體積超過 5MB，已自動為您跳過此檔案。`);
+							continue;
+						}
+
+						// 2. 將 FileReader 包裹進 Promise 裡面，確保多張大圖能排隊乖乖讀取、絕不相互踩死
+						const base64Str = await new Promise((resolve) => {
+							const reader = new FileReader();
+							reader.onload = function(e) { resolve(e.target.result); };
+							reader.readAsDataURL(files[i]);
+						});
+
+						// 3. 將這張成功讀取完畢的圖片碼塞進我們的全域大陣列
+						tempImageArray.push(base64Str);
+					}
+
+					// 4. 🚀【全新核心：呼叫動態 ❌ 按鈕渲染器】
+					renderPreviewListHTML();
+
+					inputElement.value = ''; // 發送完畢清空 input，允許重複選取
+				}
+			
+			 /**
+				 * 💡【全新高階函式】專屬動態渲染預覽清單與 ❌ 事件索引綁定器
+				 * 完美解決「想要多張圖片，但其中一張不想要」的商業級 UX 局部刪除功能！
+				 */
+				function renderPreviewListHTML() {
+					const previewList = document.getElementById("imagePreviewList");
+					if (!previewList) return;
+					previewList.innerHTML = ''; // 先清空，重新依據最新陣列畫圖
+
+					// 💡【解耦安全防線】將舊的單圖變數彻底清空，確保單一事实來源(Array)不受髒快取污染
+					tempImageBase64 = null; 
+
+					// 如果陣列被使用者點到全部扣光了（變成 0 張），主動關閉整個預覽面板並復原
+					if (tempImageArray.length === 0) {
+						cancelImagePreview();
+						return;
+					}
+
+					// 遍歷當前陣列中殘留的所有圖片，並將 index 傳入作為剪裁密碼
+					tempImageArray.forEach((base64Str, index) => {
+						// 建立外殼包裝
+						const wrapper = document.createElement("div");
+						wrapper.className = "preview-img-wrapper";
+						
+						// 建立圖片標籤本身
+						const imgNode = document.createElement("img");
+						imgNode.src = base64Str;
+						imgNode.style.cssText = "width: 100%; height: 100%; object-fit: cover; border-radius: 8px; border: 1px solid var(--color-border); box-shadow: var(--shadow-sm); display: block;";
+						
+						// 建立 ❌ 刪除小按鈕 (對齊您的 CSS 定位類別)
+						const deleteBtn = document.createElement("div");
+						deleteBtn.className = "preview-delete-btn";
+						deleteBtn.innerHTML = "&times;"; // 就是 ❌ 符號
+						
+						// 💡【絕殺核心：滑鼠點擊 ❌ 按鈕事件】
+						deleteBtn.onclick = function(e) {
+							e.stopPropagation(); // 阻止事件冒泡
+							
+							// A. 現場精準從全域陣列中切除這一張圖片的 Base64 資料！
+							tempImageArray.splice(index, 1); 
+							
+							// B. 重新渲染名單與計數，畫面上的這張圖就會瞬間「唰」的一聲流暢消失！
+							renderPreviewListHTML();
+						};
+
+						// 拼裝節點
+						wrapper.appendChild(imgNode);
+						wrapper.appendChild(deleteBtn);
+						previewList.appendChild(wrapper);
+					});
+
+					// 更新動態計數標籤文字與開關狀態
+					document.getElementById("previewCountLabel").textContent = `準備發送 ${tempImageArray.length} 張圖片嗎？`;
+					document.getElementById("imagePreviewContainer").style.display = "flex";
+					document.getElementById("message").disabled = true; // 預覽期間鎖定文字輸入框，防止打字干擾
+				}
+			
+			
+			 /**
+				 * 💡【多圖上傳第二步】使用者按下「確定發送」，前端利用 forEach 迴圈以極速進行 WebSocket 連發推送！
+				 */
+				 function confirmAndSendMultipleImages() {
+						if (!tempImageArray || tempImageArray.length === 0 || !targetId) return;
+
+						if (webSocket && webSocket.readyState === WebSocket.OPEN) {
+							tempImageArray.forEach((imageBase64) => {
+								webSocket.send(JSON.stringify({
+									"type": "image",
+									"senderId": Number(selfId),
+									"receiverId": Number(targetId),
+									"message": imageBase64
+								}));
+							});
+						}
+
+						// 批次連發完畢，優雅地關閉並清理戰場
+						cancelImagePreview();
+					}
+			 
+				/**
+				 * 💡【多圖上傳第三步】使用者點擊「取消」，清空陣列並重置隱藏
+				 */
+				 function cancelImagePreview() {
+						tempImageArray = []; // 釋放記憶體陣列
+						tempImageBase64 = null; // 雙重保險釋放
+						const previewList = document.getElementById("imagePreviewList");
+						if (previewList) previewList.innerHTML = ''; // 清空預覽圖節點
+						
+						// 💡【精準修正】刪除多餘的 .style 欄位，還原為標準的原生行內樣式權重覆蓋
+						const previewContainer = document.getElementById("imagePreviewContainer");
+						if (previewContainer) {
+							previewContainer.style.setProperty('display', 'none', 'important');
+						}
+						
+						const inputMsg = document.getElementById("message");
+						if (inputMsg) {
+							inputMsg.disabled = false;
+							inputMsg.focus();
+						}
+					}
+
+
+			/**
+			 * 精準封裝圖片氣泡結構 
+			 */
+			 function appendImageMessageContent(liElement, base64Src, isMe, msgRead, timeStr) {
+					if (isMe) {
+						const statusText = (Number(msgRead) === 1) ? '已讀' : '未讀';
+						const statusColor = (Number(msgRead) === 1) ? 'lightgray' : 'var(--color-ink-soft)';
+						const markerClass = (Number(msgRead) === 1) ? '' : 'class="unread-marker"';
+						
+						liElement.style.cssText = "background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; display: flex !important; justify-content: flex-end !important; align-items: flex-end !important; gap: 8px; position: relative; list-style: none; margin-bottom: 12px;";
+						liElement.innerHTML = `
+							<div class="msg-meta-left" style="display: flex; flex-direction: column; align-items: flex-end; font-size: 10px; font-weight: 800; line-height: 1.3; user-select: none; flex-shrink: 0; margin-bottom: 2px;">
+								<span style="color: var(--color-ink-soft); font-weight: 800;">${timeStr}</span>
+								<span ${markerClass} style="color: ${statusColor}; font-weight: 800;">${statusText}</span>
+							</div>
+							<!-- 💡【防藍底遮擋】加上 user-select: none 防止使用者雙擊想放大圖片時，意外選中產生醜醜的藍色區塊 -->
+							<div style="max-width: min(60%, 400px); cursor: pointer; user-select: none;" onclick="window.open('${base64Src}')">
+								<!-- 💡【防排版晃動】預設一筆 max-height 和 object-fit，確保多圖極速連發、滾動條探底時，絕不卡死、排版強穩不晃動！ -->
+								<img src="${base64Src}" style="width: 100%; height: auto; max-height: 300px; object-fit: contain; border-radius: 16px; border: 1px solid #ECE4D6; box-shadow: var(--shadow-sm); display: block;" alt="圖片">
+							</div>
+						`;
+					} else {
+						liElement.style.cssText = "background: transparent !important; border: none !important; box-shadow: none !important; padding: 0 !important; width: 100% !important; display: flex !important; justify-content: flex-start !important; align-items: flex-end !important; gap: 8px; position: relative; list-style: none; margin-bottom: 12px;";
+						liElement.innerHTML = `
+							<div style="max-width: min(60%, 400px); cursor: pointer; user-select: none;" onclick="window.open('${base64Src}')">
+								<img src="${base64Src}" style="width: 100%; height: auto; max-height: 300px; object-fit: contain; border-radius: 16px; border: 1px solid #ECE4D6; box-shadow: var(--shadow-sm); display: block;" alt="圖片">
+							</div>
+							<div class="msg-meta-right" style="font-size: 10px; font-weight: 800; color: var(--color-ink-soft); user-select: none; flex-shrink: 0; margin-bottom: 2px; display: flex; align-items: flex-end;">
+								<span>${timeStr}</span>
+							</div>
+						`;
+					}
+				}
+			
+
 		
 	</script>
 </body>
