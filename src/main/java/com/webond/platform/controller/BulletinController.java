@@ -211,6 +211,11 @@ public class BulletinController {
 		boolean hasKeyword = keyword != null && !keyword.isBlank();
 		boolean hasDateRange = startDate != null && endDate != null;
 
+		// 發布日期區間只填了一端：不執行日期篩選，並提示使用者補填完整區間
+		if ((startDate != null) != (endDate != null)) {
+			model.addAttribute("dateRangeError", "請完整填寫發布日期區間的起訖日期");
+		}
+
 		// 1. 先用「範圍最明確」的條件從資料庫撈出基礎清單
 		List<BulletinVO> list = hasDateRange ? bulletinSvc.getByPublishDateBetween(startDate, endDate)
 				: bulletinSvc.getAll();

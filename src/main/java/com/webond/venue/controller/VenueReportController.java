@@ -88,7 +88,21 @@ public class VenueReportController {
 			@RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
 			ModelMap model) {
 
-		List<VenueReportVO> list = venueReportSvc.search(reportStatus, keyword, venueName, startDate, endDate);
+		// 檢舉時間區間只填了一端，或起訖日期顛倒：不執行日期篩選，並提示使用者修正
+		LocalDate effectiveStartDate = startDate;
+		LocalDate effectiveEndDate = endDate;
+		if ((startDate != null) != (endDate != null)) {
+			model.addAttribute("dateRangeError", "請將檢舉時間的起訖日期填寫完整，否則無法查詢");
+			effectiveStartDate = null;
+			effectiveEndDate = null;
+		} else if (startDate != null && startDate.isAfter(endDate)) {
+			model.addAttribute("dateRangeError", "檢舉時間的結束日期不可早於開始日期");
+			effectiveStartDate = null;
+			effectiveEndDate = null;
+		}
+
+		List<VenueReportVO> list = venueReportSvc.search(reportStatus, keyword, venueName, effectiveStartDate,
+				effectiveEndDate);
 
 		model.addAttribute("venueReportListData", list);
 		model.addAttribute("venueNameMap", venueReportSvc.getVenueNameMap(list));

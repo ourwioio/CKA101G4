@@ -69,6 +69,9 @@ table th { white-space: nowrap; }
 			<span class="title">場地檢舉清單</span>
 		</div>
 
+		<div class="message message--error" th:if="${dateRangeError != null}"
+			th:text="${dateRangeError}">請將檢舉時間的起訖日期填寫完整，否則無法查詢</div>
+
 		<!-- 搜尋區：處理狀態 + 檢舉時間區間 + 內容關鍵字 -->
 		<form id="venueReportSearchForm" class="filter-bar" th:action="@{/admin/venue/venueReport/search}" method="get">
 
@@ -149,24 +152,6 @@ table th { white-space: nowrap; }
 	</main>
 
 </div>
-
-<script th:inline="javascript">
-document.getElementById('venueReportSearchForm').addEventListener('submit', function(e) {
-	var startDate = document.getElementById('reportStartDate').value;
-	var endDate = document.getElementById('reportEndDate').value;
-
-	if ((startDate && !endDate) || (!startDate && endDate)) {
-		e.preventDefault();
-		alert('請將檢舉時間的起訖日期填寫完整，否則無法查詢！');
-		return;
-	}
-
-	if (startDate && endDate && startDate > endDate) {
-		e.preventDefault();
-		alert('檢舉時間的結束日期不可早於開始日期！');
-	}
-});
-</script>
 
 </body>
 </html>

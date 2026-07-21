@@ -39,7 +39,8 @@
 				name="employeeId">
 				<option value="">-- 全部審核員工 --</option>
 				<option th:each="emp : ${employeeListData}"
-					th:value="${emp.employeeId}" th:text="${emp.empName}"
+					th:value="${emp.employeeId}"
+					th:text="${emp.employeeId + ' - ' + emp.empName}"
 					th:selected="${searchEmployeeId != null && searchEmployeeId == emp.employeeId}">
 				</option>
 			</select>
