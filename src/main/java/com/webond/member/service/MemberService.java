@@ -2,11 +2,13 @@ package com.webond.member.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +92,27 @@ public class MemberService {
     public Map<Integer, String> getRegistrationStatusMap(List<ActivityVO> activityList) {
         return buildRegistrationStatusMap(activityList);
     }
+    
+    //活動排序
+    private static final Map<String, Integer> STATUS_ORDER = Map.of(
+    	    "即將截止", 0,
+    	    "報名中", 1,
+    	    "尚未開放報名", 2,
+    	    "報名已截止", 3,
+    	    "活動已結束", 4
+    	);
+
+    	public List<ActivityVO> sortByRegistrationStatus(List<ActivityVO> activityList) {
+    	    Map<Integer, String> statusMap = buildRegistrationStatusMap(activityList);
+    	    return activityList.stream()
+    	        .sorted(Comparator.comparingInt(activity ->
+    	            STATUS_ORDER.getOrDefault(
+    	                statusMap.get(activity.getActivityId()),
+    	                Integer.MAX_VALUE
+    	            )
+    	        ))
+    	        .collect(Collectors.toList());
+    	}
 
     
     
