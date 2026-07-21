@@ -331,14 +331,27 @@ CREATE TABLE NOTIFICATION(
     CONSTRAINT FK_NOTIFICATION_EMPLOYEE FOREIGN KEY (EMPLOYEE_ID) REFERENCES EMPLOYEE(EMPLOYEE_ID)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='通知';
 
-INSERT INTO NOTIFICATION
+
+INSERT INTO NOTIFICATION 
 (NOTIFICATION_ID, MEMBER_ID, TITLE, CONTENT, NOTIFICATION_TYPE, IS_READ, REPORT_ID, EMPLOYEE_ID, CREATED_AT)
 VALUES
-(1, 3, '檢舉成立通知', '您的服務因違反平台規範已下架', 2, 1, 1, 1003, NOW()),
-(2, 1, '系統通知', '歡迎加入本平台', 2, 0, NULL, 1002, NOW()),
-(3, 3, '訂單通知', '您有新的場地預約訂單', 0, 0, NULL, 1001, NOW()),
-(4, 4, '聊天室通知', '您收到新的聊天訊息', 3, 1, NULL, 1001, NOW()),
-(5, 5, '評價通知', '有會員給您新的評價', 1, 1, NULL, 1001, NOW());
+(1, 1, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(2, 2, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(3, 3, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(4, 4, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(5, 5, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(6, 6, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(7, 7, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(8, 8, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(9, 9, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(10, 10, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(11, 11, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(12, 12, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(13, 13, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(14, 14, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW()),
+(15, 15, '系統通知', '歡迎加入我們的閒人出租平台！在這裡，您可以輕鬆預約個人專業服務、參與各式精彩的團體活動，或是找到理想的場地空間。立即探索無限可能，開啟您的美好體驗！', 2, 0, NULL, 1001, NOW());
+
+
 -- =====================================================
 
 -- =====================================================
@@ -1423,58 +1436,6 @@ SET ao.ACTIVITY_COMPLETED_AT = a.END_TIME
 WHERE ao.ORDER_STATUS = 4;
 
 
-UPDATE ACT_ORDER
-SET BUYER_RATE_SELLER = 5,
-    BUYER_REVIEW_COMMENT = '主辦人很準時，跑步速度也有照顧初學者，整體氣氛很輕鬆。',
-    BUYER_REVIEWED_AT = '2026-06-21 15:20:00'
-WHERE ACTIVITY_ORDER_ID = 1;
-
-UPDATE ACT_ORDER
-SET BUYER_RATE_SELLER = 4,
-    BUYER_REVIEW_COMMENT = '路線安排得不錯，集合地點也很清楚，下次還會想參加。',
-    BUYER_REVIEWED_AT = '2026-06-22 09:30:00'
-WHERE ACTIVITY_ORDER_ID = 2;
-
-
-UPDATE ACT_ORDER
-SET BUYER_RATE_SELLER = 5,
-    BUYER_REVIEW_COMMENT = '主持人講解得很清楚，即使第一次玩狼人殺也能很快進入狀況。',
-    BUYER_REVIEWED_AT = '2026-06-28 10:15:00'
-WHERE ACTIVITY_ORDER_ID = 3;
-
-UPDATE ACT_ORDER
-SET BUYER_RATE_SELLER = 4,
-    BUYER_REVIEW_COMMENT = '遊戲安排流暢，參加者互動也很好，希望下次可以多玩一局。',
-    BUYER_REVIEWED_AT = '2026-06-28 14:40:00'
-WHERE ACTIVITY_ORDER_ID = 4;
-
-
-UPDATE ACT_ORDER
-SET BUYER_RATE_SELLER = 5,
-    BUYER_REVIEW_COMMENT = '教練很有耐心，裝備也準備得很完整，適合第一次接觸抱石的人。',
-    BUYER_REVIEWED_AT = '2026-07-04 20:10:00'
-WHERE ACTIVITY_ORDER_ID = 5;
-
-
-UPDATE ACT_ORDER
-SET BUYER_RATE_SELLER = 4,
-    BUYER_REVIEW_COMMENT = '十二人局很熱鬧，主持人的流程控制也很好，整體體驗很不錯。',
-    BUYER_REVIEWED_AT = '2026-07-12 11:30:00'
-WHERE ACTIVITY_ORDER_ID = 7;
-
-
-UPDATE ACT_ORDER
-SET BUYER_RATE_SELLER = 5,
-    BUYER_REVIEW_COMMENT = '主辦人事前有清楚說明集合方式，共乘與行程安排都很順利。',
-    BUYER_REVIEWED_AT = '2026-07-17 10:20:00'
-WHERE ACTIVITY_ORDER_ID = 12;
-
-UPDATE ACT_ORDER
-SET BUYER_RATE_SELLER = 5,
-    BUYER_REVIEW_COMMENT = '活動時間掌握得很好，主辦人也會主動確認大家的需求，值得推薦。',
-    BUYER_REVIEWED_AT = '2026-07-17 18:40:00'
-WHERE ACTIVITY_ORDER_ID = 13;
-
 UPDATE ACTIVITY
 SET MEMBER_ID = 11
 WHERE ACTIVITY_ID = 1;
@@ -1735,28 +1696,11 @@ WHERE r.SLOT_DATE IS NULL;
 -- =====================================================
 -- 9. 一對一聊天室：沿用 ZH.txt
 -- =====================================================
-CREATE TABLE CHAT_ROOM
-( CHAT_ROOM_ID INT NOT NULL,
-  MEMBER1_ID   INT NOT NULL,
-  MEMBER2_ID   INT NOT NULL,
-  CREATED_AT   DATETIME,
-  CONSTRAINT CHATROOM_ID_PK PRIMARY KEY (CHAT_ROOM_ID),
-  CONSTRAINT CHATROOM_MEM1ID_FK FOREIGN KEY(MEMBER1_ID) REFERENCES MEMBER(MEMBER_ID),
-  CONSTRAINT CHATROOM_MEM2ID_FK FOREIGN KEY(MEMBER2_ID) REFERENCES MEMBER(MEMBER_ID)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='聊天室';
-
-INSERT INTO CHAT_ROOM VALUES
-(100, 1, 2, '2026-05-20'),
-(101, 2, 3, '2026-05-21'),
-(102, 3, 4, '2026-04-22'),
-(103, 1, 4, '2026-03-23'),
-(104, 2, 5, '2026-04-25');
-
 CREATE TABLE CHAT_MESSAGE
 ( MESSAGE_ID       INT AUTO_INCREMENT NOT NULL,
   RECEIVER_MEMBER_ID     INT NOT NULL,
   SENDER_MEMBER_ID INT NOT NULL,
-  CONTENT          VARCHAR(255),
+  CONTENT          LONGTEXT ,
   SENT_AT          DATETIME,
   IS_READ          TINYINT,
   CONSTRAINT CHATMES_ID_PK PRIMARY KEY (MESSAGE_ID),
