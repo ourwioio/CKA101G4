@@ -89,9 +89,12 @@ public class MemberFrontControllerAyaka {
 	            .filter(s -> s.getMemberId().equals(memberId))
 	            .filter(s -> s.getStatus() == 1)
 	            .collect(Collectors.toList());
+	    List<ActivityVO> activityList = activityService.getAll(); // 或你原本取清單的方式
+	    Map<Integer, String> registrationStatusMap = memberService.getRegistrationStatusMap(activityList);
+	    List<ActivityVO> sortedActivityList = memberService.sortByRegistrationStatus(activityList);
 
-
-
+	    model.addAttribute("activityList", sortedActivityList);
+	    model.addAttribute("registrationStatusMap", registrationStatusMap);
 	    model.addAttribute("serviceListData", serviceListData);
 	    model.addAttribute("memberVO", memberVO);
 	    model.addAttribute("venueListData", venueList);
@@ -135,6 +138,7 @@ public class MemberFrontControllerAyaka {
 
 	private void addHostedActivityData(ModelMap model, Integer memberId) {
 		addHostedActivityData(model, memberId, false);
+		
 	}
 
 	private void addHostedActivityData(ModelMap model, Integer memberId, boolean hideCancelled) {
@@ -144,6 +148,8 @@ public class MemberFrontControllerAyaka {
 						|| activity.getActivityStatus() == null
 						|| activity.getActivityStatus() != 2)
 				.collect(Collectors.toList());
+
+	    hostedActivities = memberService.sortByRegistrationStatus(hostedActivities);
 
 		Map<Integer, List<ActivityOrderVO>> activityReviewMap = new HashMap<>();
 		Map<Integer, String> activityDisplayStatusMap = new HashMap<>();
