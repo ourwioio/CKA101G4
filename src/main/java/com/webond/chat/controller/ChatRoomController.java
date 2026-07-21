@@ -1,5 +1,6 @@
 package com.webond.chat.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,7 +56,29 @@ public class ChatRoomController {
 		model.addAttribute("targetUserId", targetVO.getMemberId());
 		model.addAttribute("targetName", targetVO.getRealName());
 		
+		
 		List<Map<String, Object>> dynamicList = chatSvc.getDynamicChatContacts(myVO.getMemberId());
+	    
+	    if (!meId.equals(toId) && targetVO != null) {
+	        boolean isExist = false;
+	        for (Map<String, Object> contact : dynamicList) {
+	            // 檢查名單內有沒有這個人的 userId
+	            if (String.valueOf(contact.get("userId")).equals(String.valueOf(toId))) {
+	                isExist = true;
+	                break;
+	            }
+	        }
+	        
+	        if (!isExist) {
+	            Map<String, Object> newContact = new HashMap<>();
+	            newContact.put("userId", targetVO.getMemberId());
+	            newContact.put("username", targetVO.getRealName()); 
+	            newContact.put("unreadCount", 0);
+	            
+	            dynamicList.add(0, newContact);
+	        }
+	    }
+		
 		model.addAttribute("memList", dynamicList);
 
 		return "front-end/chat/chatRoom";
