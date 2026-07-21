@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Webond 會員系統 - 送出檢舉案</title>
-<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+<link rel="stylesheet" th:href="@{/css/front-end/common/navbar.css}">
+
 <link rel="stylesheet" th:href="@{/css/front-end/common/footer.css}">
 <script th:src="@{/js/front-end/common/notificationPolling.js}"></script>
 <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
@@ -39,6 +40,14 @@ body {
 	min-height: 100vh;
 	font-family: var(--font-body);
 	color: var(--color-ink);
+	display: flex;
+	flex-direction: column;
+}
+
+/* 🎯 修正 footer 位置：把置中邏輯搬到這個 wrapper，
+   讓 navbar 在上、footer 在下，中間內容區塊自動撐開並置中 */
+.report-page-content {
+	flex: 1;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -231,85 +240,87 @@ textarea.form-control {
 <body>
 	<div th:replace="~{front-end/common/navbar :: navbar}"></div>
 
-	<div class="report-container">
-		<h2 class="form-title">建立新檢舉案件</h2>
-		<p class="form-subtitle">請填寫以下欄位，提交後將由系統管理員盡速為您審核辦理</p>
+	<main class="report-page-content">
+		<div class="report-container">
+			<h2 class="form-title">建立新檢舉案件</h2>
+			<p class="form-subtitle">請填寫以下欄位，提交後將由系統管理員盡速為您審核辦理</p>
 
-		<div class="success-msg" th:if="${successMsg != null}"
-			th:text="${successMsg}"></div>
+			<div class="success-msg" th:if="${successMsg != null}"
+				th:text="${successMsg}"></div>
 
-		<form id="reportForm" th:action="@{/backend/memberreport/addReport}"
-			th:object="${addMemberReportDTO}" method="post"
-			enctype="multipart/form-data">
+			<form id="reportForm" th:action="@{/backend/memberreport/addReport}"
+				th:object="${addMemberReportDTO}" method="post"
+				enctype="multipart/form-data">
 
-			<div class="section-divider">🛡️ 案件基本資料</div>
+				<div class="section-divider">🛡️ 案件基本資料</div>
 
-			<div class="row">
-				<div class="col-md-6 mb-4">
-					<label for="reporterId" class="form-label">您的會員編號 (檢舉人)</label> <input
-						type="number" class="form-control" id="reporterId"
-						th:field="*{reporterId}" readonly
-						style="background-color: var(--color-border); cursor: not-allowed;">
+				<div class="row">
+					<div class="col-md-6 mb-4">
+						<label for="reporterId" class="form-label">您的會員編號 (檢舉人)</label> <input
+							type="number" class="form-control" id="reporterId"
+							th:field="*{reporterId}" readonly
+							style="background-color: var(--color-border); cursor: not-allowed;">
+						<span class="field-error"
+							th:if="${#fields.hasErrors('reporterId')}"
+							th:errors="*{reporterId}"></span>
+					</div>
+
+					<div class="col-md-6 mb-4">
+						<label for="reportedId" class="form-label">被檢舉人編號 <span
+							class="text-danger">*</span></label> <input type="number"
+							class="form-control" id="reportedId" th:field="*{reportedId}"
+							placeholder="請輸入對方的會員編號"> <span class="field-error"
+							th:if="${#fields.hasErrors('reportedId')}"
+							th:errors="*{reportedId}"></span>
+					</div>
+				</div>
+
+				<div class="mb-4">
+					<label for="reportCategory" class="form-label">檢舉違規類別 <span
+						class="text-danger">*</span></label> <select class="form-select"
+						id="reportCategory" th:field="*{reportCategory}">
+						<option value="">-- 請選擇檢舉原因 --</option>
+						<option value="0">不當言論</option>
+						<option value="1">惡意騷擾</option>
+						<option value="2">詐騙行為</option>
+						<option value="3">其他原因</option>
+					</select> <span class="field-error"
+						th:if="${#fields.hasErrors('reportCategory')}"
+						th:errors="*{reportCategory}"></span>
+				</div>
+
+				<div class="mb-4">
+					<label for="reportContent" class="form-label">詳細內容描述 <span
+						class="text-danger">*</span></label>
+					<textarea class="form-control" id="reportContent"
+						th:field="*{reportContent}" rows="5"
+						placeholder="請詳細敘述違規事件經過（時間、聊天室內容等）..."></textarea>
 					<span class="field-error"
-						th:if="${#fields.hasErrors('reporterId')}"
-						th:errors="*{reporterId}"></span>
+						th:if="${#fields.hasErrors('reportContent')}"
+						th:errors="*{reportContent}"></span>
 				</div>
 
-				<div class="col-md-6 mb-4">
-					<label for="reportedId" class="form-label">被檢舉人編號 <span
-						class="text-danger">*</span></label> <input type="number"
-						class="form-control" id="reportedId" th:field="*{reportedId}"
-						placeholder="請輸入對方的會員編號"> <span class="field-error"
-						th:if="${#fields.hasErrors('reportedId')}"
-						th:errors="*{reportedId}"></span>
+				<div class="mb-4">
+					<label for="evidenceInput" class="form-label">上傳證據截圖 (可複選多張)
+						<span class="text-danger">*</span>
+					</label> <input class="form-control" type="file" id="evidenceInput"
+						accept="image/*" multiple onchange="handleFileSelect(this)">
+
+					<input type="file" id="realEvidenceInput" th:field="*{evidencePath}"
+						multiple style="display: none;"> <span class="field-error"
+						th:if="${#fields.hasErrors('evidencePath')}"
+						th:errors="*{evidencePath}"></span>
+
+					<div class="preview-grid" id="previewContainer"></div>
 				</div>
-			</div>
 
-			<div class="mb-4">
-				<label for="reportCategory" class="form-label">檢舉違規類別 <span
-					class="text-danger">*</span></label> <select class="form-select"
-					id="reportCategory" th:field="*{reportCategory}">
-					<option value="">-- 請選擇檢舉原因 --</option>
-					<option value="0">不當言論</option>
-					<option value="1">惡意騷擾</option>
-					<option value="2">詐騙行為</option>
-					<option value="3">其他原因</option>
-				</select> <span class="field-error"
-					th:if="${#fields.hasErrors('reportCategory')}"
-					th:errors="*{reportCategory}"></span>
-			</div>
-
-			<div class="mb-4">
-				<label for="reportContent" class="form-label">詳細內容描述 <span
-					class="text-danger">*</span></label>
-				<textarea class="form-control" id="reportContent"
-					th:field="*{reportContent}" rows="5"
-					placeholder="請詳細敘述違規事件經過（時間、聊天室內容等）..."></textarea>
-				<span class="field-error"
-					th:if="${#fields.hasErrors('reportContent')}"
-					th:errors="*{reportContent}"></span>
-			</div>
-
-			<div class="mb-4">
-				<label for="evidenceInput" class="form-label">上傳證據截圖 (可複選多張)
-					<span class="text-danger">*</span>
-				</label> <input class="form-control" type="file" id="evidenceInput"
-					accept="image/*" multiple onchange="handleFileSelect(this)">
-
-				<input type="file" id="realEvidenceInput" th:field="*{evidencePath}"
-					multiple style="display: none;"> <span class="field-error"
-					th:if="${#fields.hasErrors('evidencePath')}"
-					th:errors="*{evidencePath}"></span>
-
-				<div class="preview-grid" id="previewContainer"></div>
-			</div>
-
-			<div class="button-group-container">
-				<a th:href="@{/}" class="btn btn-cancel-webond">返回首頁</a>
-				<button type="submit" class="btn btn-submit-webond">確認送出檢舉</button>
-			</div>
-		</form>
-	</div>
+				<div class="button-group-container">
+					<a th:href="@{/}" class="btn btn-cancel-webond">返回首頁</a>
+					<button type="submit" class="btn btn-submit-webond">確認送出檢舉</button>
+				</div>
+			</form>
+		</div>
+	</main>
 
 	<script>
 	// 使用 DataTransfer 來管理即將提交給後端的 File 物件
