@@ -49,48 +49,80 @@
 				<div class="chat-messages-body" id="chatMessagesBody">
 					<div class="chat-system-msg" id="chatSystemMsg">歡迎來到線上即時會員聊天室！</div>
 				</div>
-<div id="widgetImagePreviewContainer" style="display: none; background: var(--color-surface-soft); padding: 8px 16px; border-top: 1px solid var(--color-border); flex-direction: column; gap: 8px; justify-content: flex-start; position: relative; width: 100%;">
-				<!-- 橫向排隊不變形 Flex 盒子 -->
-				<div id="widgetImagePreviewList" style="display: flex !important; gap: 8px; overflow-x: auto; width: 100%; padding: 4px 2px; scrollbar-width: thin;"></div>
-				<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-					<span id="widgetPreviewCountLabel" style="font-size: 11px; font-weight: 800; color: var(--color-ink);">準備發送 0 張圖片嗎？</span>
-					<div style="display: flex; gap: 6px;">
-						<button type="button" onclick="confirmAndSendWidgetMultipleImages()" style="background: var(--color-ink); color: #fff; border: none; padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; cursor: pointer;">發送</button>
-						<button type="button" onclick="cancelWidgetImagePreview()" style="background: transparent; color: var(--color-ink-soft); border: 1px solid var(--color-border); padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; cursor: pointer;">取消</button>
+				<div id="widgetImagePreviewContainer"
+					style="display: none; background: var(--color-surface-soft); padding: 8px 16px; border-top: 1px solid var(--color-border); flex-direction: column; gap: 8px; justify-content: flex-start; position: relative; width: 100%;">
+					<!-- 橫向排隊不變形 Flex 盒子 -->
+					<div id="widgetImagePreviewList"
+						style="display: flex !important; gap: 8px; overflow-x: auto; width: 100%; padding: 4px 2px; scrollbar-width: thin;"></div>
+					<div
+						style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+						<span id="widgetPreviewCountLabel"
+							style="font-size: 11px; font-weight: 800; color: var(--color-ink);">準備發送
+							0 張圖片嗎？</span>
+						<div style="display: flex; gap: 6px;">
+							<button type="button"
+								onclick="confirmAndSendWidgetMultipleImages()"
+								style="background: var(--color-ink); color: #fff; border: none; padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; cursor: pointer;">發送</button>
+							<button type="button" onclick="cancelWidgetImagePreview()"
+								style="background: transparent; color: var(--color-ink-soft); border: 1px solid var(--color-border); padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; cursor: pointer;">取消</button>
+						</div>
 					</div>
 				</div>
-			</div>
 				<div class="chat-input-footer">
-				<label for="chatWidgetImageInput" style="font-size: 18px; padding: 0 4px; cursor: pointer; user-select: none;">📎</label>
-                <div class="widget-emoji-container" style="position: relative; display: inline-block;">
-    <!-- 點擊這個笑臉，就會彈出面板 -->
-    <button type="button" id="widgetEmojiTrigger" style="background: none; border: none; font-size: 20px; cursor: pointer; padding: 4px 8px; user-select: none;">😀</button>
-    
-    <!-- 預設隱藏的 Emoji 彈出面板 (對齊質感行內樣式) -->
-    <div id="widgetEmojiPicker" style="display: none; position: absolute; bottom: 40px; right: 0; width: 220px; height: 180px; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; padding: 10px; flex-wrap: wrap; overflow-y: auto; gap: 8px; justify-content: flex-start; align-content: flex-start;">
-        <!-- 這些是業界最常用、絕對不會變亂碼的黃金 Emoji 陣列 -->
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">😀</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">😂</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🤣</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🥰</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">😍</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">👍</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">👏</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🔥</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🚀</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🎉</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">❤️</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">✨</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🤔</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">👀</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">🙏</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">💯</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">💡</span>
-        <span class="emoji-item" style="font-size: 20px; cursor: pointer; user-select: none;">弱</span>
-    </div>
-</div>
-                <input type="file" id="chatWidgetImageInput" multiple accept="image/*" onchange="uploadWidgetChatImage(this)" style="display: none;">
-					<input type="text" id="chatInputField" placeholder="請輸入訊息..."
+					<label for="chatWidgetImageInput"
+						style="font-size: 18px; padding: 0 4px; cursor: pointer; user-select: none;">📎</label>
+					<div class="widget-emoji-container"
+						style="position: relative; display: inline-block;">
+						<!-- 點擊這個笑臉，就會彈出面板 -->
+						<button type="button" id="widgetEmojiTrigger"
+							style="background: none; border: none; font-size: 20px; cursor: pointer; padding: 4px 8px; user-select: none;">😀</button>
+
+						<!-- 預設隱藏的 Emoji 彈出面板 (對齊質感行內樣式) -->
+						<div id="widgetEmojiPicker"
+							style="display: none; position: absolute; bottom: 40px; right: 0; width: 220px; height: 180px; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 1000; padding: 10px; flex-wrap: wrap; overflow-y: auto; gap: 8px; justify-content: flex-start; align-content: flex-start;">
+							<!-- 這些是業界最常用、絕對不會變亂碼的黃金 Emoji 陣列 -->
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">😀</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">😂</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">🤣</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">🥰</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">😍</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">👍</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">👏</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">🔥</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">🚀</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">🎉</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">❤️</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">✨</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">🤔</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">👀</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">🙏</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">💯</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">💡</span>
+							<span class="emoji-item"
+								style="font-size: 20px; cursor: pointer; user-select: none;">弱</span>
+						</div>
+					</div>
+					<input type="file" id="chatWidgetImageInput" multiple
+						accept="image/*" onchange="uploadWidgetChatImage(this)"
+						style="display: none;"> <input type="text"
+						id="chatInputField" placeholder="請輸入訊息..."
 						onkeydown="if(event.key==='Enter') sendChatMessage()">
 					<button type="button" class="chat-send-btn"
 						onclick="sendChatMessage()">
@@ -112,7 +144,7 @@
     // ==========================================
 	let widgetWebSocket = null;
 	const currentMemberId = /*[[${session.memberVO != null ? session.memberVO.memberId : null}]]*/ null;
-	let widgetTargetId = null; // 當前在懸浮窗正點開聊天的對方 ID
+	let widgetTargetId = null; 
 	let widgetTargetName = '';
 
 	const urlTargetToId = /*[[${targetToId}]]*/ null; 
@@ -125,39 +157,34 @@
 	let isWidgetAutoScrolling = false;
 	
 	
+	
+	//表情符號
 	const emojiTrigger = document.getElementById("widgetEmojiTrigger");
     const emojiPicker = document.getElementById("widgetEmojiPicker");
-    const chatInputField = document.getElementById("chatInputField"); // 確保對齊你的文字欄位 ID
+    const chatInputField = document.getElementById("chatInputField");
 
     if (emojiTrigger && emojiPicker && chatInputField) {
-        // 1. 點擊笑臉按鈕：切換面板顯示/隱藏
         emojiTrigger.addEventListener("click", function(e) {
-            e.stopPropagation(); // 防止點擊事件向上冒泡導致面板立刻被關閉
+            e.stopPropagation();
             const isOpen = emojiPicker.style.display === "flex";
             emojiPicker.style.display = isOpen ? "none" : "flex";
         });
 
-        // 2. 核心功能：使用「事件代理」監聽面板內所有 Emoji 的點擊
         emojiPicker.addEventListener("click", function(e) {
             if (e.target.classList.contains("emoji-item")) {
                 e.stopPropagation();
                 
-                // 現場把點擊的 Emoji 串接到輸入框當前的文字後面
                 const clickedEmoji = e.target.innerText;
                 chatInputField.value += clickedEmoji;
                 
-                // 智慧型手動重新聚焦游標，方便使用者繼續打字
                 chatInputField.focus();
                 
-                // 選擇完畢後，優雅地自動收合面板
                 emojiPicker.style.display = "none";
                 
-                // 觸發你原本寫好的打字中偵測訊號 (如有實作)
                 if (typeof sendTypingSignal === 'function') sendTypingSignal("1");
             }
         });
 
-        // 3. 超讚 UX 優化：當使用者點擊網頁其他任何「空白地方」時，自動把 Emoji 面板收起來
         document.addEventListener("click", function(e) {
             if (emojiPicker.style.display === "flex" && !emojiPicker.contains(e.target) && e.target !== emojiTrigger) {
                 emojiPicker.style.display = "none";
@@ -179,7 +206,6 @@
                 widgetMessagesContainer.addEventListener("scroll", function() {
                     const activeWidgetDivider = document.getElementById('widgetActiveUnreadDivider');
                     
-                    // 防線 1：系統自動定位、排版中，直接跳出，不准碰紅線
                     if (typeof isWidgetAutoScrolling !== 'undefined' && isWidgetAutoScrolling) {
                         return; 
                     }
@@ -189,15 +215,10 @@
                         const clientHeight = widgetMessagesContainer.clientHeight;
                         const scrollHeight = widgetMessagesContainer.scrollHeight;
 
-                        // 防線 2：如果訊息內容太少根本沒出現捲軸，拒絕判定
                         if (scrollHeight <= clientHeight) return;
 
-                        // 🎯【核心修正】：將緩衝範圍縮小到 5px 以內，逼近真正的「物理最底部」
-                        // scrollTop + clientHeight 代表目前捲軸的最下緣
-                        // scrollHeight 代表整條對話歷史的總高度
                         const isPhysicallyAtBottom = (scrollTop + clientHeight) >= (scrollHeight - 5);
                         
-                        // 防線 3：物理觸底且 scrollTop > 10，確保是使用者手動往下滑到最底部的行為
                         if (isPhysicallyAtBottom && scrollTop > 10) {
                             activeWidgetDivider.classList.add('fade-out-hidden');
                             
@@ -218,7 +239,6 @@
             if (currentMemberId) {
                 initWebSocket(); // 1. 啟動 WebSocket 連線
                 
-                // 2. 💡 核心修正：撈取聯絡人清單，並在撈取成功後檢查是否需要自動開啟私聊
                 loadChatContactsAndCheckAutoOpen(); 
             }
         });
@@ -229,7 +249,6 @@
        function openPrivateChat(receiverId, receiverName) {
 		if (!currentMemberId) return;
 		
-		// 💡【第四步修正】開窗時，第一時間將當前正聊天的對象元數據鎖定在全域隔離變數中
 		widgetTargetId = Number(receiverId);
 		widgetTargetName = receiverName;
 
@@ -240,27 +259,22 @@
 
 		if (!chatWin) return;
 
-		// 展開主視窗並連動圓形 Scal 縮放動畫
 		chatWin.classList.remove('chat-hidden');
 		if (triggerBtn) {
 			triggerBtn.style.transform = 'scale(0)';
 			setTimeout(() => { triggerBtn.style.display = 'none'; }, 200);
 		}
-
-		// 同步 dataset 屬性供 sendMessage 讀取
 		chatWin.dataset.receiverId = receiverId; 
 		document.getElementById('chatUsername').innerText = receiverName;
 		document.getElementById('chatAvatar').innerText = receiverName ? receiverName.charAt(0).toUpperCase() : 'M';
 
 		let activeItem = document.getElementById(`contact-item-${receiverId}`);
 		
-		// 💡 如果左側聯絡人名單中根本沒有這個人 (首次聊天)，現場動態回補置頂節點！
 		if (!activeItem && listContainer) {
 			if (listContainer.querySelector('.chat-system-msg')) {
 				listContainer.innerHTML = '';
 			}
 
-			// 【修正對齊】補上符合您原本的高質感雙欄行內樣式，並綁定 data- 屬性作為即時雷達掛載點！
 			const newFriendHtml = `
 				<div class="widget-contact-item active-widget-chat" id="contact-item-${receiverId}" data-partner-id="${receiverId}" data-partner-name="${receiverName}" style="padding: 10px; border-bottom: 1px solid #f0f0f0; cursor: pointer; font-size: 12px;">
 					<div class="widget-contact-box" style="display: flex; align-items: center; position: relative; gap: 8px; width: 100%;">
@@ -280,12 +294,10 @@
 			activeItem = document.getElementById(`contact-item-${receiverId}`);
 		}
 
-		// 刷新左側所有聯絡人的高亮藍框效果
 		document.querySelectorAll('.widget-contact-item').forEach(el => el.classList.remove('active-widget-chat'));
 		if (activeItem) {
 			activeItem.classList.add('active-widget-chat');
 			
-			// 打開他的對話框，現場消滅並隱藏他的未讀數小紅點
 			const pBadge = activeItem.querySelector('.widget-unread-badge');
 			if (pBadge) {
 				pBadge.innerText = '0';          
@@ -293,19 +305,15 @@
 			}
 		}
 
-		// 💡【核心安全修正】移除原先盲目重連導致連線卡死、訊息出不來的 initWebSocket() 呼叫
-		// 改為只在 Socket 意外壞掉時才進行安全補盲，保持當前唯一的 WebSocket 連線！
 		if (!widgetWebSocket || widgetWebSocket.readyState !== WebSocket.OPEN) {
 			initWebSocket();
 		}
 
 		if (messagesBody) {
-			// 🚀【換房起手式】：點擊聯絡人的瞬間，光速將小視窗打入隱形，徹底杜絕上一位好友圖片閃爍一閃而過的鬼影！
 			messagesBody.style.setProperty('visibility', 'hidden', 'important');
 			messagesBody.innerHTML = `<div class="chat-system-msg">正在同步歷史訊息...</div>`;
 		}
 
-		// 透過等待連線過濾器，安全向後端索取這兩人的全新歷史紀錄
 		waitForConnection(() => {
 			widgetWebSocket.send(JSON.stringify({
 				type: "history",
@@ -328,23 +336,47 @@
 		widgetWebSocket = new WebSocket(wsUrl);
 
 		widgetWebSocket.onopen = function() {
-			console.log("🚀 全站懸浮窗即時通訊安全連線建立成功！");
-			startWidgetHeartbeat(); // 啟動全站 25 秒心跳防線，防止假上線
+			startWidgetHeartbeat(); 
 		};
 
 		widgetWebSocket.onmessage = function(event) {
-			const msgData = JSON.parse(event.data);
-			const chatWin = document.getElementById('chatWindow');
-			const messagesBody = document.getElementById('chatMessagesBody');
-			const activeReceiverId = (chatWin && chatWin.dataset.receiverId) ? Number(chatWin.dataset.receiverId) : null;
+		    const msgData = JSON.parse(event.data);
+		    const chatWin = document.getElementById('chatWindow');
+		    const messagesBody = document.getElementById('chatMessagesBody');
+		    const activeReceiverId = (chatWin && chatWin.dataset.receiverId) ? Number(chatWin.dataset.receiverId) : null;
 
-			function isWidgetImage(type, content) {
-				if (type === "image") return true;
-				if (typeof content === 'string') {
-					return content.startsWith("data:image/") || content.includes("base64");
-				}
-				return false;
-			}
+		    if (msgData.type === "status" || msgData.type === "status_change" || msgData.status) {
+    
+    const targetUserId = String(msgData.userId || msgData.senderId).trim();
+    const isOnline = msgData.status === "online" || msgData.isOnline === true;
+
+
+    if (isOnline) {
+        sessionStorage.setItem(`online_user_${targetUserId}`, "true");
+    } else {
+        sessionStorage.removeItem(`online_user_${targetUserId}`);
+    }
+
+    const widgetDot = document.getElementById(`widget-dot-${targetUserId}`);
+    if (widgetDot) {
+        if (isOnline) {
+            widgetDot.className = "widget-dot online";
+            widgetDot.style.backgroundColor = "#2ecc71"; 
+        } else {
+            widgetDot.className = "widget-dot offline";
+            widgetDot.style.backgroundColor = "#bfbfbf"; 
+        }
+    }
+    return; 
+}
+
+		    function isWidgetImage(type, content) {
+		        if (type === "image") return true;
+		        if (typeof content === 'string') {
+		            return content.startsWith("data:image/") || content.includes("base64");
+		        }
+		        return false;
+		    }
 			
 			// ----------------------------------------------------
 			// 🅰️ 情況 A：載入歷史紀錄 (type = "history")
@@ -352,7 +384,6 @@
 			if (msgData.type === "history") {
 				if (!messagesBody) return;
 
-				// ✅【重構核心】：拉起全域狀態鎖，封鎖排版震盪對時間造成的物理蓋台
 				isWidgetAutoScrolling = true; 
 
 				messagesBody.style.removeProperty('visibility');
@@ -391,41 +422,33 @@
 						const isMe = Number(finalMsg.senderId) === Number(currentMemberId);
 						const widgetContent = finalMsg.message || finalMsg.content || "";
 						
-						// ================= 👑 智慧型小聊天室歷史時間校正防線 =================
 						let finalTimeStr = "";
-						// 修正點：對齊後端 DTO Fact！優先抓取大、小聊天室通用的 sentAt 欄位
 						let rawTime = finalMsg.sentAt || finalMsg.lastTime;
 						
 						if (rawTime) {
-							// 情況 1：如果是數字（毫秒數時間戳）
 							if (!isNaN(rawTime)) {
 								const d = new Date(Number(rawTime));
 								finalTimeStr = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
 							} 
-							// 情況 2：如果是後端改好的格式化字串 "yyyy-MM-dd HH:mm:ss"
 							else if (typeof rawTime === 'string' && rawTime.length >= 16) {
 								finalTimeStr = rawTime.substring(11, 16); // 完美切出 "HH:mm" 放入小視窗
 							} else {
 								finalTimeStr = rawTime;
 							}
 						} else {
-							// 萬一完全沒拿到，才用原本的 getCurrentTime 兜底
 							finalTimeStr = (typeof getCurrentTime === 'function') ? getCurrentTime() : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
 						}
-						// ===================================================================
 
 						const msgTypeAttr = finalMsg.type || "";
 						const isHistoryImage = (String(msgTypeAttr).toLowerCase() === "image") || 
 											   (typeof widgetContent === 'string' && (widgetContent.indexOf("base64") !== -1 || widgetContent.indexOf("data:image") !== -1));
 
 						if (isHistoryImage) {
-							// 👑 傳送歷史時間 finalTimeStr 進入圖片氣泡
 							const imageRowNode = appendWidgetImageMessage(widgetContent, isMe ? 'outgoing' : 'incoming', finalMsg.msgRead || 0, finalTimeStr, true);
 							if (imageRowNode) {
 								fragment.appendChild(imageRowNode);
 							}
 						} else {
-							// 文字訊息上屏
 							const row = document.createElement('div');
 							const safeText = String(widgetContent).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#x27;' }[m]));
 							row.style.cssText = "display: flex !important; width: 100%; align-items: flex-end !important; margin-bottom: 12px; gap: 6px; font-size: 12px;";
@@ -491,78 +514,102 @@
 			// ----------------------------------------------------
 			// 🅱️ 情況 B：收到即時新訊息 (type = "chat")
 			// ----------------------------------------------------
-			if (msgData.type === "chat" || msgData.type === "image") {
-				const listContainer = document.getElementById('chatContactList'); 
-				const isChatOpen = chatWin && !chatWin.classList.contains('chat-hidden');
-				const isMyOwnMessage = Number(msgData.senderId) === Number(currentMemberId);
-				const isFromCurrentPartner = activeReceiverId && Number(msgData.senderId) === Number(activeReceiverId);
-				const targetIdForMove = isMyOwnMessage ? msgData.receiverId : msgData.senderId;
-				const targetRow = document.getElementById(`contact-item-${targetIdForMove}`);
-				
-				const rawContent = msgData.message || msgData.content || "";
+			if (typeof window.recentWidgetTexts === 'undefined') {
+    window.recentWidgetTexts = new Set();
+}
 
-				// ================= 👑 智慧型小聊天室即時時間校正防線 =================
-				let timeStr = "";
-				let rawTime = msgData.sentAt;
-				
-				if (rawTime) {
-					// 情況 1：如果是數字（毫秒數時間戳）
-					if (!isNaN(rawTime)) {
-						const d = new Date(Number(rawTime));
-						timeStr = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-					} 
-					// 情況 2：如果是後端改好的格式化字串 "yyyy-MM-dd HH:mm:ss"
-					else if (typeof rawTime === 'string' && rawTime.length >= 16) {
-						timeStr = rawTime.substring(11, 16); // 完美切出 "HH:mm" 供即時上屏
-					} else {
-						timeStr = rawTime;
-					}
-				} else {
-					// 萬一完全沒拿到，才呼叫原本的 getCurrentTime 兜底
-					timeStr = (typeof getCurrentTime === 'function') ? getCurrentTime() : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-				}
-				// ===================================================================
+if (msgData.type === "chat" || msgData.type === "image") {
+    const listContainer = document.getElementById('chatContactList'); 
+    const isChatOpen = chatWin && !chatWin.classList.contains('chat-hidden');
+    
+    const msgSenderStr = String(msgData.senderId).trim();
+    const msgReceiverStr = String(msgData.receiverId).trim();
+    const currentMemberStr = String(currentMemberId).trim();
+    const currentPartnerStr = activeReceiverId ? String(activeReceiverId).trim() : "";
+    
+    const isMyOwnMessage = msgSenderStr === currentMemberStr;
+    const isFromCurrentPartner = activeReceiverId && msgSenderStr === currentPartnerStr;
+    
+    if (msgSenderStr === msgReceiverStr) {
+        if (msgSenderStr === currentPartnerStr) {
+            const dedupKey = msgSenderStr + "_" + (msgData.message || msgData.content || "");
+            if (window.recentWidgetTexts.has(dedupKey)) {
+                return; 
+            }
+            window.recentWidgetTexts.add(dedupKey);
+            setTimeout(() => { window.recentWidgetTexts.delete(dedupKey); }, 1000);
+        } 
+        else {
+            return; 
+        }
+    }
 
-				const isImgMsg = ("image" === msgData.type) || (typeof rawContent === 'string' && (rawContent.indexOf("base64") !== -1 || rawContent.indexOf("data:image") !== -1));
+    const targetIdForMove = isMyOwnMessage ? msgData.receiverId : msgData.senderId;
+    const targetRow = document.getElementById(`contact-item-${targetIdForMove}`);
+    const rawContent = msgData.message || msgData.content || "";
 
-				let summaryText = rawContent;
-				if (isImgMsg) summaryText = "[圖片訊息]";
-				else summaryText = summaryText.length > 10 ? summaryText.substring(0, 10) + "..." : summaryText;
+    let timeStr = "";
+    let rawTime = msgData.sentAt;
+    
+    if (rawTime) {
+        if (!isNaN(rawTime)) {
+            const d = new Date(Number(rawTime));
+            timeStr = d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+        } 
+        else if (typeof rawTime === 'string' && rawTime.length >= 16) {
+            timeStr = rawTime.substring(11, 16); 
+        } else {
+            timeStr = rawTime;
+        }
+    } else {
+        timeStr = (typeof getCurrentTime === 'function') ? getCurrentTime() : new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
+    }
 
-				if (targetRow) {
-					const lastMsgEl = targetRow.querySelector('.widget-last-msg');
-					if (lastMsgEl) lastMsgEl.innerText = summaryText;
-					const timeEl = targetRow.querySelector('.widget-time');
-					// 👑 這裡優化：如果已經是我們智慧切好的 HH:mm 字串，就直接灌進去
-					if (timeEl) timeEl.innerText = (typeof timeStr === 'number') ? formatTimestamp(timeStr) : timeStr;
-					if (listContainer && listContainer.firstChild !== targetRow) listContainer.insertBefore(targetRow, listContainer.firstChild);
-				}
+    const isImgMsg = ("image" === msgData.type) || (typeof rawContent === 'string' && (rawContent.indexOf("base64") !== -1 || rawContent.indexOf("data:image") !== -1));
 
-				if (isMyOwnMessage || (isChatOpen && isFromCurrentPartner)) {
-					if (isImgMsg) appendWidgetImageMessage(rawContent, isMyOwnMessage ? 'outgoing' : 'incoming', isMyOwnMessage ? 0 : 1, timeStr);
-					else appendMessage(rawContent, isMyOwnMessage ? 'outgoing' : 'incoming', isMyOwnMessage ? 0 : 1, timeStr);
-					if (isFromCurrentPartner) sendWidgetReadReceipt(); 
-				} else {
-					if (targetRow) {
-						const badgeEl = targetRow.querySelector('.widget-unread-badge');
-						if (badgeEl) {
-							let currentUnread = parseInt(badgeEl.innerText, 10) || 0;
-							currentUnread++;
-							badgeEl.innerText = currentUnread > 99 ? "99+" : currentUnread;
-							badgeEl.style.setProperty('display', 'inline-block', 'important'); 
-						}
-					}
-				}
-				return;
-			}
+    let summaryText = rawContent;
+    if (isImgMsg) summaryText = "[圖片訊息]";
+    else summaryText = summaryText.length > 10 ? summaryText.substring(0, 10) + "..." : summaryText;
+
+    if (targetRow) {
+        const lastMsgEl = targetRow.querySelector('.widget-last-msg');
+        if (lastMsgEl) lastMsgEl.innerText = summaryText;
+        const timeEl = targetRow.querySelector('.widget-time');
+        if (timeEl) timeEl.innerText = (typeof timeStr === 'number') ? formatTimestamp(timeStr) : timeStr;
+        
+        if (msgSenderStr !== msgReceiverStr) {
+            if (listContainer && listContainer.firstChild !== targetRow) {
+                listContainer.insertBefore(targetRow, listContainer.firstChild);
+            }
+        }
+    }
+
+    if (isMyOwnMessage || (isChatOpen && isFromCurrentPartner)) {
+        if (isImgMsg) {
+            appendWidgetImageMessage(rawContent, isMyOwnMessage ? 'outgoing' : 'incoming', isMyOwnMessage ? 0 : 1, timeStr);
+        } else {
+            appendMessage(rawContent, isMyOwnMessage ? 'outgoing' : 'incoming', isMyOwnMessage ? 0 : 1, timeStr);
+        }
+        if (isFromCurrentPartner) sendWidgetReadReceipt(); 
+    } else {
+        if (targetRow) {
+            const badgeEl = targetRow.querySelector('.widget-unread-badge');
+            if (badgeEl) {
+                let currentUnread = parseInt(badgeEl.innerText, 10) || 0;
+                currentUnread++;
+                badgeEl.innerText = currentUnread > 99 ? "99+" : currentUnread;
+                badgeEl.style.setProperty('display', 'inline-block', 'important'); 
+            }
+        }
+    }
+    return;
+}
 			// ----------------------------------------------------
 			// 🅲 【核心修正】情況 C：對方已讀了我的訊息 (type = "read")
 			// ----------------------------------------------------
 			if (msgData.type === "read") {
-				// 完美對接重構後後端高階變數 readByUserId
 				const readerId = msgData.readByUserId; 
 				if (activeReceiverId && Number(readerId) === Number(activeReceiverId)) {
-					// 抓取懸浮窗專屬的 .widget-unread-marker 字樣進行集體翻轉！
 					document.querySelectorAll('.widget-unread-marker').forEach(el => {
 						el.textContent = '已讀';
 						el.style.color = 'lightgray';
@@ -601,7 +648,7 @@
 				if (onlineIds && onlineIds.length > 0) {
 					onlineIds.forEach(onlineId => {
 						const dot = document.getElementById(`widget-dot-${onlineId}`);
-						if (dot) dot.className = "widget-dot online"; // 秒點亮首頁在線綠燈！
+						if (dot) dot.className = "widget-dot online"; 
 					});
 				}
 				return;
@@ -609,7 +656,6 @@
 		};
 
 		widgetWebSocket.onclose = function() {
-			console.log("全站懸浮聊天室連線關閉");
 			clearInterval(widgetHeartbeatInterval);
 		};
 	}
@@ -628,14 +674,11 @@ function toggleChatWindow() {
 		const isClosing = chatWin.classList.toggle('chat-hidden');
 
 		if (!isClosing) {
-			// 💡【展開聊天視窗】優化您的圓形 Scal 縮放收合動畫
 			triggerBtn.style.transform = 'scale(0)'; 
 			setTimeout(() => { triggerBtn.style.display = 'none'; }, 200);
 			
-			// 展開時刷新一遍資料庫名單與最新未讀數
 			loadWidgetContacts(); 
 			
-			// 💡【體驗升級】如果原本就已經有指定對話對象(dataset.receiverId)，點開時直接保留畫面，不再強行重置回歡迎頁！
 			if (!chatWin.dataset.receiverId || chatWin.dataset.receiverId === "") {
 				chatWin.dataset.receiverId = ""; 
 				if (document.getElementById('chatUsername')) document.getElementById('chatUsername').innerText = "請選擇聯絡人"; 
@@ -645,20 +688,16 @@ function toggleChatWindow() {
 					messagesBody.innerHTML = `<div class="chat-system-msg">歡迎來到線上即時會員聊天室！請選擇聯絡人開始對話。</div>`;
 				}
 			} else {
-				// 如果原本就有對象，點開的瞬間立刻向後端補發一筆已讀通知，確保 MySQL 狀態秒同步
 				sendWidgetReadReceipt();
 			}
 			
-			// 安全補防：如果 Socket 因逛網頁換頁意外斷開，才進行重連，平時絕不重複 new 連線
 			if (!widgetWebSocket || widgetWebSocket.readyState !== WebSocket.OPEN) {
 				initWebSocket();
 			}
 		} else {
-			// 💡【收合聊天視窗】還原圓形大圈圈按鈕的彈出動畫
 			triggerBtn.style.display = 'flex';
 			setTimeout(() => { triggerBtn.style.transform = 'scale(1)'; }, 50);
 			
-			// 縮小視窗的當下，立刻發起 Fetch 去問 MySQL 資料庫，重新加總精準的「全站總未讀數」點亮大圈圈
 			fetch('/api/chat/contacts')
 				.then(res => res.json())
 				.then(contacts => {
@@ -689,20 +728,17 @@ function loadWidgetContacts() {
 		.then(contacts => {
 			const listContainer = document.getElementById("chatContactList");
 			if (!listContainer) return;
-			listContainer.innerHTML = ''; // 清空舊名單
+			listContainer.innerHTML = ''; 
 			
-			let totalAllUnread = 0; // 全站總未讀加總器
+			let totalAllUnread = 0;
 			
 			contacts.forEach(c => {
-				// 1. 核心商務判定：如果是當前正點開窗聊天的對方，未讀數在前端強制洗為 0，其他人讀資料庫
 				const isCurrentChatting = widgetTargetId && String(c.userId) === String(widgetTargetId);
 				
-				// 💡【核心防線】全函式唯一事實來源變數：actualUnread
 				const actualUnread = isCurrentChatting ? 0 : Number(c.unreadCount || 0);
 				totalAllUnread += actualUnread;
 
 				const activeClass = (c.userId === widgetTargetId) ? "widget-contact-item active-widget-chat" : "widget-contact-item";
-				// 💡 樣式狀態同步對齊 actualUnread
 				const badgeStyle = (actualUnread > 0) ? "display: inline-block !important;" : "display: none !important;";
 				
 				const itemDiv = document.createElement("div");
@@ -713,29 +749,40 @@ function loadWidgetContacts() {
 				itemDiv.setAttribute("data-partner-name", c.username);
 				itemDiv.onclick = function() { openPrivateChat(c.userId, c.username); };
 				
-				// 💡【地毯式對齊】確保 innerHTML 內部所有的變數呼叫通通都叫 actualUnread！
-				itemDiv.innerHTML = `
-						<div class="widget-contact-box" style="display: flex; align-items: center; position: relative; gap: 8px; width: 100%;">
-							
-							<!-- 左邊：內縮的高質感小指示燈 -->
-							<span class="widget-dot offline" id="widget-dot-${c.userId}" style="width: 8px; height: 8px; border-radius: 50%; background-color: #bfbfbf; display: inline-block; flex-shrink: 0; margin-left: 6px; margin-right: 4px;"></span>
-							
-							<div class="widget-contact-info" style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
-								<div class="widget-name-time" style="display: flex; justify-content: space-between; align-items: center;">
-									<span class="widget-name" style="font-weight: 800; color: var(--color-ink); font-size: 13px;">${c.username}</span>
-									
-									<span class="widget-time" style="font-size: 10px; color: var(--color-ink-soft); font-weight: 800; margin-right: 12px;">${c.lastTime || ''}</span>
-								</div>
-								<span class="widget-last-msg" style="font-size: 11px; color: var(--color-ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; margin-top: 2px;">${c.lastMsg || '暫無訊息'}</span>
-							</div>
-							
-							<span class="widget-unread-badge c-unread-badge" style="${badgeStyle} background-color: var(--color-pink); color: var(--color-surface); border-radius: var(--radius-full); padding: 2px 6px; font-size: 10px; font-weight: 800; line-height: 1.3; box-shadow: var(--shadow-sm); border: 1px solid #FFA2B0; flex-shrink: 0; margin-right: 12px;">${actualUnread}</span>
-						</div>
-					`;
-				listContainer.appendChild(itemDiv);
+				  itemDiv.innerHTML = `
+			            <div class="widget-contact-box" style="display: flex; align-items: center; position: relative; gap: 8px; width: 100%;">
+			                <span class="widget-dot offline" id="widget-dot-${c.userId}" style="width: 8px; height: 8px; border-radius: 50%; background-color: #bfbfbf; display: inline-block; flex-shrink: 0; margin-left: 6px; margin-right: 4px;"></span>
+			                
+			                <div class="widget-contact-info" style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+			                    <div class="widget-name-time" style="display: flex; justify-content: space-between; align-items: center;">
+			                        <span class="widget-name" style="font-weight: 800; color: var(--color-ink); font-size: 13px;">${c.username}</span>
+			                        <span class="widget-time" style="font-size: 10px; color: var(--color-ink-soft); font-weight: 800; margin-right: 12px;">${c.lastTime || ''}</span>
+			                    </div>
+			                    <span class="widget-last-msg" style="font-size: 11px; color: var(--color-ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; margin-top: 2px;">${c.lastMsg || '暫無訊息'}</span>
+			                </div>
+			                
+			                <span class="widget-unread-badge c-unread-badge" style="${badgeStyle} background-color: var(--color-pink); color: var(--color-surface); border-radius: var(--radius-full); padding: 2px 6px; font-size: 10px; font-weight: 800; line-height: 1.3; box-shadow: var(--shadow-sm); border: 1px solid #FFA2B0; flex-shrink: 0; margin-right: 12px;">${actualUnread}</span>
+			            </div>
+			        `;
+			        listContainer.appendChild(itemDiv);
+			        
+			        const thisWidgetDot = itemDiv.querySelector(`#widget-dot-${c.userId}`);
+			        
+			        if (thisWidgetDot) {
+			            const isSavedOnline = sessionStorage.getItem(`online_user_${c.userId}`) === "true";
+			            
+			            const mainChatDot = document.getElementById(`status-dot-${c.userId}`);
+			            const isMainOnline = mainChatDot && mainChatDot.classList.contains('online');
+			            
+			            if (isSavedOnline || isMainOnline) {
+			                thisWidgetDot.className = "widget-dot online";
+			                thisWidgetDot.style.backgroundColor = "#2ecc71"; // 點亮綠燈！
+			                
+			                sessionStorage.setItem(`online_user_${c.userId}`, "true");
+			            }
+			        }
 			});
 
-			// 更新大圈圈藍色按鈕的總計數紅點
 			updateGlobalUnreadBadge(totalAllUnread); 
 		})
 		.catch(err => console.error("[Chat Widget API] 前端載入名單崩潰:", err));
@@ -755,13 +802,11 @@ function sendChatMessage() {
 		const input = document.getElementById('chatInputField');
 		if (!input) return;
 		const content = input.value.trim();
-		// 💡【修正】發送目標全面綁定我們第四關開窗記錄的全域隔離變數 widgetTargetId
 		const receiverId = widgetTargetId; 
 		const listContainer = document.getElementById('chatContactList'); 
 		
 		if (!content || !receiverId) return;
 		
-		// 💡【修正】全面換成頂部重構優化後的 widgetWebSocket 隔離變數，防範全域污染
 		if (widgetWebSocket && widgetWebSocket.readyState === WebSocket.OPEN) {
 			const payload = {
 				type: "chat",
@@ -772,7 +817,6 @@ function sendChatMessage() {
 			};
 			widgetWebSocket.send(JSON.stringify(payload));
 			
-			// 發送成功後，前端主動更新左欄最新對話摘要與時間
 			const partnerRow = document.getElementById(`contact-item-${receiverId}`);
 			if (partnerRow) {
 				const lastMsgEl = partnerRow.querySelector('.widget-last-msg');
@@ -826,7 +870,6 @@ function waitForConnection(callback, interval = 100) {
 
 	const row = document.createElement('div');
 	
-	// 🚀【型態強轉防禦】：如果是毫秒數時間戳記，前端現場轉化為 HH:mm
 	if (typeof timeStr === 'number' || (typeof timeStr === 'string' && !timeStr.includes(':') && timeStr.length > 5)) {
 		const dateObj = new Date(Number(timeStr));
 		timeStr = String(dateObj.getHours()).padStart(2, '0') + ':' + String(dateObj.getMinutes()).padStart(2, '0');
@@ -930,7 +973,6 @@ function updateGlobalUnreadBadge(forcedCount) {
 		const chatWin = document.getElementById('chatWindow');
 		if (!globalBadge || !chatWin) return;
 
-		// 鐵律防線：只要懸浮聊天主窗此時此刻「正開著」，右下角大圈圈的總數紅點必須強制隱藏！
 		const isChatOpen = !chatWin.classList.contains('chat-hidden');
 		if (isChatOpen) {
 			globalBadge.style.setProperty('display', 'none', 'important');
@@ -941,7 +983,6 @@ function updateGlobalUnreadBadge(forcedCount) {
 		if (typeof forcedCount === 'number') {
 			realUnreadSum = forcedCount;
 		} else {
-			// 如果呼叫時沒傳參數，JS 自動掃描左側所有小徽章進行即時累加
 			document.querySelectorAll('.widget-unread-badge').forEach(badgeEl => {
 				const isVisible = badgeEl.style.display !== 'none' && badgeEl.style.visibility !== 'hidden';
 				const count = parseInt(badgeEl.innerText) || 0;
@@ -951,13 +992,12 @@ function updateGlobalUnreadBadge(forcedCount) {
 			});
 		}
 
-		// 🚀 資料庫事實與全站紅點連動宣告！
 		if (realUnreadSum > 0) {
 			globalBadge.innerText = realUnreadSum;
-			globalBadge.style.setProperty('display', 'flex', 'important'); // 點亮全站大徽章
+			globalBadge.style.setProperty('display', 'flex', 'important'); 
 		} else {
 			globalBadge.innerText = '0';
-			globalBadge.style.setProperty('display', 'none', 'important'); // 全站沒有未讀，徹底拿掉隱藏！
+			globalBadge.style.setProperty('display', 'none', 'important');
 		}
 	}
 
@@ -1013,7 +1053,7 @@ function renderWidgetPreviewListHTML() {
 
 	widgetTempImageArray.forEach((base64Str, index) => {
 		const wrapper = document.createElement("div");
-		wrapper.className = "preview-img-wrapper"; // 完美套用我們在大網頁寫好的 CSS 定位外殼
+		wrapper.className = "preview-img-wrapper"; 
 		wrapper.style.cssText = "position: relative !important; width: 50px !important; height: 50px !important; flex-shrink: 0 !important; display: block !important;";
 		
 		const imgNode = document.createElement("img");
@@ -1021,15 +1061,14 @@ function renderWidgetPreviewListHTML() {
 		imgNode.style.cssText = "width: 100%; height: 100%; object-fit: cover; border-radius: 6px; border: 1px solid var(--color-border); display: block;";
 		
 		const deleteBtn = document.createElement("div");
-		deleteBtn.className = "preview-delete-btn"; // 完美套用大網頁的警示紅 ❌ 樣式
+		deleteBtn.className = "preview-delete-btn";
 		deleteBtn.style.cssText = "position: absolute !important; top: -5px !important; right: -5px !important; width: 14px !important; height: 14px !important; background-color: #ff4d4f !important; color: #fff !important; border-radius: 50% !important; border: 1px solid #fff !important; font-size: 9px !important; font-weight: 800; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; z-index: 99 !important; line-height: 1 !important;";
 		deleteBtn.innerHTML = "&times;";
 		
-		// 💡【核心絕殺】點擊 ❌，現場精準割除懸浮窗記憶體陣列，畫面瞬間往左內縮補位！
 		deleteBtn.onclick = function(e) {
 			e.stopPropagation();
 			widgetTempImageArray.splice(index, 1);
-			renderWidgetPreviewListHTML(); // 逆向重繪
+			renderWidgetPreviewListHTML(); 
 		};
 
 		wrapper.appendChild(imgNode);
@@ -1039,22 +1078,19 @@ function renderWidgetPreviewListHTML() {
 
 	document.getElementById("widgetPreviewCountLabel").textContent = `準備發送 ${widgetTempImageArray.length} 張圖片？`;
 	document.getElementById("widgetImagePreviewContainer").style.display = "flex";
-	document.getElementById("chatInputField").disabled = true; // 預覽時鎖定欄位
+	document.getElementById("chatInputField").disabled = true; 
 }
 
 /**
  * 💡【全新功能】懸浮窗確定發送真愛多圖
  */
  function confirmAndSendWidgetMultipleImages() {
-	    // 🚀 嚴格鎖定小聊天室專屬全域變數
 	    if (!widgetTempImageArray || widgetTempImageArray.length === 0 || !widgetTargetId) {
-	        console.warn("⚠️ [小聊天室] 圖片佇列為空或尚未選擇聊天對象，攔截發送");
 	        return;
 	    }
 
 	    if (widgetWebSocket && widgetWebSocket.readyState === WebSocket.OPEN) {
 	        
-	        // 自己發送圖片時，主動讓小視窗的舊未讀紅線淡出退場
 	        const activeWidgetDivider = document.getElementById('widgetActiveUnreadDivider');
 	        if (activeWidgetDivider && !activeWidgetDivider.classList.contains('fade-out-hidden')) {
 	            activeWidgetDivider.classList.add('fade-out-hidden');
@@ -1063,35 +1099,29 @@ function renderWidgetPreviewListHTML() {
 	            }, 450);
 	        }
 
-	        // 遍歷小視窗多圖陣列，進行 WebSocket 連發
 	        widgetTempImageArray.forEach((imageBase64) => {
 	            
-	            // 🎯【完美對齊】：跟大聊天室完全一樣，type 送 "image"，內容塞 "message"
-	            // 變數則精準鎖定在小視窗的 currentMemberId 與 widgetTargetId 隔離區
 	            const payload = {
-	                "type": "image",                             // ✅ 100% 對齊大聊天室
-	                "senderId": Number(currentMemberId),         // 小視窗專屬自己 ID
-	                "receiverId": Number(widgetTargetId),         // 小視窗專屬對方 ID
-	                "message": imageBase64,                      // 主訊息欄位 (Base64 大圖字串)
-	                "content": imageBase64                       // 備援相容欄位
+	                "type": "image",                             
+	                "senderId": Number(currentMemberId),      
+	                "receiverId": Number(widgetTargetId),        
+	                "message": imageBase64,                      
+	                "content": imageBase64                     
 	            };
 	            
-	            console.log("📸 [小聊天室] 圖片 Payload 完美送出:", payload);
 	            widgetWebSocket.send(JSON.stringify(payload));
 	        });
 	    } else {
-	        console.error("🛑 [小聊天室錯誤] widgetWebSocket 連線未開啟，無法發送圖片！");
 	        alert("即時通訊連線中斷，請重新整理網頁再試一次。");
 	    }
 		
-	    // 🚀 發送完畢，精準呼叫小視窗專屬的清理預覽函式
 	    if (typeof cancelWidgetImagePreview === 'function') {
 	        cancelWidgetImagePreview();
 	    }
 	}
 
 /**
- * 💡【全新功能】懸浮窗取消清理
+ * 懸浮窗取消清理
  */
 function cancelWidgetImagePreview() {
 	widgetTempImageArray = [];
@@ -1108,7 +1138,7 @@ function cancelWidgetImagePreview() {
 }
 
 //==========================================
-// 🚀【全新登場】懸浮窗專屬圖片氣泡渲染器 (澈底解決看不到圖片的關鍵修改)
+// 懸浮窗專屬圖片氣泡渲染器 
 // ==========================================
 function appendWidgetImageMessage(base64Src, direction, msgRead, timeStr, returnNodeOnly = false) {
 	const container = document.getElementById('chatMessagesBody');
@@ -1116,7 +1146,7 @@ function appendWidgetImageMessage(base64Src, direction, msgRead, timeStr, return
 
 	const row = document.createElement('div');
 	
-	// 🚀【時間戳記安全防禦】：如果傳進來的是後端的毫秒數時間戳記，前端自動現場轉換為 HH:mm
+	// 如果傳進來的是後端的毫秒數時間戳記，前端自動現場轉換為 HH:mm
 	if (typeof timeStr === 'number' || (typeof timeStr === 'string' && !timeStr.includes(':'))) {
 		const dateObj = new Date(Number(timeStr));
 		timeStr = String(dateObj.getHours()).padStart(2, '0') + ':' + String(dateObj.getMinutes()).padStart(2, '0');
@@ -1154,12 +1184,10 @@ function appendWidgetImageMessage(base64Src, direction, msgRead, timeStr, return
 		`;
 	}
 
-	// 👑【資深工程師防連鎖核心】：如果是歷史紀錄加載，直接把畫好的 row 節點丢回去，不准自己 append 偷跑！
 	if (returnNodeOnly) {
 		return row;
 	}
 
-	// 否則，如果是真人即時聊天聊天、新訊息上屏，才直接灌入網頁中並自動觸底
 	container.appendChild(row);
 	
 	if (typeof isWidgetAutoScrolling !== 'undefined' && isWidgetAutoScrolling) return;

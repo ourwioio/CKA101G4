@@ -256,21 +256,17 @@ textarea.form-control::-webkit-scrollbar {
 		</div>
 		<div class="card-body">
 
-			<!-- 錯誤訊息提示區 -->
 			<div th:if="${errorMessage != null}" class="alert-error"
 				th:text="${errorMessage}">這裡會動態顯示錯誤訊息</div>
 
-			<!-- 訂單資訊顯示 -->
 			<div class="info-card"
 				style="background: var(--color-surface-soft); border: 1.5px dashed var(--color-border); padding: 20px; border-radius: var(--radius-md); margin-bottom: 24px;">
 
-				<!-- 1. 活動名稱（放大作為主要標題） -->
 				<div
 					style="font-size: 18px; font-weight: 800; color: var(--color-ink); margin-bottom: 12px; border-bottom: 1px solid var(--color-border); padding-bottom: 8px;">
 					📌 活動名稱：<span th:text="${activityName}"></span>
 				</div>
 
-				<!-- 2. 次要資訊用輕量小字並排或條列 -->
 				<div
 					style="font-size: 13.5px; color: var(--color-ink-soft); display: flex; flex-direction: column; gap: 6px;">
 					<div>
@@ -278,7 +274,6 @@ textarea.form-control::-webkit-scrollbar {
 							th:text="${orderData.activityOrderId}"></span>
 					</div>
 
-					<!-- 💡 推薦擴充欄位（需確認對方 orderData 內有無此欄位名稱，或從活動資料帶過來） -->
 					<div>
 						<strong>活動時間：</strong> <span
 							th:text="${#temporals.format(activityTime, 'yyyy/MM/dd HH:mm')}"></span>
@@ -290,21 +285,17 @@ textarea.form-control::-webkit-scrollbar {
 				</div>
 			</div>
 
-			<!-- 標準表單提交 -->
 			<form th:action="@{/review/submit}" method="post">
 				<input type="hidden" name="orderId"
 					th:value="${orderData.activityOrderId}" />
 
-				<!-- 🌟 升級：完美替代原先 Select 的 Google Maps 互動評分星級組 -->
 				<div class="form-group">
 					<label class="form-label">給予本次活動評分</label>
 
-					<!-- 隱藏輸入框：維持原有的 id 與 name，完美綁定原有後端與 th:value 舊資料回填邏輯 -->
 					<input type="hidden" id="buyerRating" name="buyerRating"
 						class="js-real-rating-input"
 						th:value="${prevRating != null ? prevRating : 3}" />
 
-					<!-- 星等外殼 -->
 					<div class="google-star-rating">
 						<span class="google-star-node" data-score="1">★</span> <span
 							class="google-star-node" data-score="2">★</span> <span
@@ -314,7 +305,6 @@ textarea.form-control::-webkit-scrollbar {
 					</div>
 				</div>
 
-				<!-- 內文輸入 -->
 				<div class="form-group">
 					<label for="buyerComment" class="form-label">評價內容</label>
 					<textarea class="form-control" id="buyerComment"
@@ -334,9 +324,7 @@ textarea.form-control::-webkit-scrollbar {
 	</div>
 
 
-	<!-- ==========================================================
-     核心 JavaScript：完美接管 Google Map 星級交互反饋
-     ========================================================== */ -->
+	
 	<div th:replace="~{front-end/chat/chatWidget :: chatWidget}"></div>
 
 
@@ -360,24 +348,21 @@ textarea.form-control::-webkit-scrollbar {
             });
         }
 
-        // 🚀 初始化：載入時立刻讀取 input 的值（完美融合歷史選擇或初次預設 3 分）
+        // 載入時立刻讀取 input 的值
         const initialScore = parseInt(hiddenInput.value, 10) || 3;
         lightUpStars(initialScore);
 
         stars.forEach(star => {
-            // 1. 滑鼠移入：暫時亮到懸浮的星等
             star.addEventListener('mouseenter', function() {
                 const currentHoverScore = parseInt(this.getAttribute('data-score'), 10);
                 lightUpStars(currentHoverScore);
             });
 
-            // 2. 滑鼠移出：還原回當前真正鎖定的分數
             star.addEventListener('mouseleave', function() {
                 const currentSelectedScore = parseInt(hiddenInput.value, 10) || 0;
                 lightUpStars(currentSelectedScore);
             });
 
-            // 3. 點擊星星：鎖定數值並寫入表單 input
             star.addEventListener('click', function() {
                 const selectedScore = this.getAttribute('data-score');
                 hiddenInput.value = selectedScore;
